@@ -6,5 +6,5 @@ ask questions about the tool on zope-cmf@zope.org.  Future development
 depends entirely on people's needs, so speak up!
 
 Shane Hathaway
-Digital Creations
+Zope Corporation
 shane@zope.com
