@@ -1,0 +1,34 @@
+<html xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="here/main_template/macros/master">
+<body>
+<div metal:fill-slot="main">
+<div class="Desktop">
+
+<div class="File">
+<span tal:replace="structure here/content_byline">ByLine</span>
+<p>
+<b>Filename</b>: <span tal:replace="here/getId">My ID</span>
+<br>
+<b>Size</b>: <span tal:replace="here/size">1024K</span>
+<br>
+<b>Content type</b>: <span tal:replace="here/content_type">application/gzip</span>
+<br>
+<b>Description</b>: <span tal:define="pss modules/Products.PythonScripts.standard; description here/Description"
+                          tal:replace="structure python:pss.newline_to_br(description)">File Description</span>
+</p>
+
+<a href="aLInk.html" title="Download File"
+   tal:define="file here/absolute_url"
+   tal:attributes="href file; title here/Title"
+   tal:content="string:Download ${here/Title}">Download File</a>
+
+<div class="Discussion">
+<span tal:replace="here/viewThreadsAtBottom"
+       tal:condition="viewThreadsAtBottom|nothing">Dicussions</span>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

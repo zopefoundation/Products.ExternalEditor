@@ -1,0 +1,30 @@
+<html xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="here/main_template/macros/master">
+<body>
+<div metal:fill-slot="main">
+<div class="Desktop">
+
+<div class="Link">
+
+<div tal:replace="structure here/content_byline">By Me</div>
+
+<p>
+<a href="favorite.html" title="ZopeOrg"
+   tal:define="favorite python:here.portal_url.getPortalPath() + '/' + here.remote_url"
+   tal:attributes="href favorite; title favorite">
+<span tal:replace="favorite">www.zope.org</span></a>
+</p>
+<p></p>
+
+<dtml-var Description>
+
+<div class="Discussion">
+<span tal:replace="here/viewThreadsAtBottom"
+       tal:condition="viewThreadsAtBottom|nothing">Dicussions</span>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

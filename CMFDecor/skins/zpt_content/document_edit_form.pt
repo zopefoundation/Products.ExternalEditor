@@ -1,0 +1,83 @@
+<html xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="here/main_template/macros/master">
+<body>
+<div metal:fill-slot="main">	  
+<div class="Desktop">
+
+
+<span tal:replace="request/message"
+   tal:condition="request/message|nothing"><hr></span>
+
+<div class="Document">
+
+<h2>Edit <span tal:replace="here/getId">My ID</span></h2>
+
+<form action="document_edit" method="post" enctype="multipart/form-data">
+
+ <input type="hidden" name="SafetyBelt" value="&dtml-SafetyBelt;">
+
+<table class="FormLayout">
+ <tr>
+  <th>
+    Title
+  </th>
+  <td>
+   <span tal:replace="here/Title">Title</span>
+  </td>
+ </tr>
+
+ <tr>
+  <th>
+    Description
+  </th>
+  <td>
+   <span tal:replace="here/description">Description</span>
+  </td>
+ </tr>
+
+ <tr>
+  <th>
+   Format
+  </th>
+  <td>
+   <input type="radio" name="text_format"
+                     value="structured-text"
+                     tal:attributes="checked python: path('here/text_format') == 'structured-text'" />
+	      <label for="cb_structuredtext">structured-text</label>
+	      <input type="radio" name="text_format" value="html"
+              tal:attributes="checked python: path('here/text_format') == 'html'" />
+	      <label for="cb_html">html</label>
+  </td>
+ </tr>
+
+ <tr>
+  <th> Upload </th>
+  <td>
+   <input type="file" name="file" size="25">
+  </td>
+ </tr>
+
+ <tr>
+  <th class="TextField"> Edit </th>
+  <td class="TextField">
+   <textarea name="text:text" rows="20" cols="80"
+                    tal:content="here/EditableBody"></textarea>
+  </td>
+ </tr>
+
+ <tr>
+  <td> <br> </td>
+  <td>
+    <input type="submit" value=" Change ">
+  </td>
+ </tr>
+</table>
+</form>
+
+</div>
+
+</div>
+</div>
+</body>
+</html>

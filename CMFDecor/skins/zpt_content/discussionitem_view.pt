@@ -1,0 +1,29 @@
+<html xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="here/main_template/macros/master">
+<body>
+<div metal:fill-slot="main">	  
+<div class="Desktop">
+
+ <div class="Document">
+
+  <div tal:replace="structure here/content_byline">By Me</div>
+
+  <div class="Discussion">
+   <span tal:replace="structure here/aboveInThread"></span>
+  </div>
+
+  <h1> <span tal:replace="here/Title">My Title</span> </h1>
+
+  <div tal:replace="structure here/CookedBody">Body</div>
+
+  <div class="Discussion">
+  <span tal:replace="here/viewThreadsAtBottom"
+       tal:condition="here/viewThreadsAtBottom|nothing">Dicussions</span>
+  </div>
+
+ </div>
+</div>
+</div>
+</body>
+</html>
