@@ -51,8 +51,11 @@
  </variable>
  <worklist
         worklist_id="reviewer_queue"
+        title="For Review"
         tal:repeat="worklist workflow/worklist_info"
-        tal:attributes="worklist_id worklist/id">
+        tal:attributes="worklist_id worklist/id;
+                        title worklist/title;
+                       ">
   <span
         tal:replace="worklist/description">Reviewer tasks</span>
   <action

@@ -228,7 +228,7 @@ class WorkflowToolConfigurator( Implicit ):
         states = _extractStateNodes( root )
         transitions = _extractTransitionNodes( root )
         variables = _extractVariableNodes( root )
-        worklists = []
+        worklists = _extractWorklistNodes( root )
         permissions = []
         scripts = []
 
@@ -789,6 +789,25 @@ def _extractVariableNodes( root, encoding=None ):
 
     return result
 
+def _extractWorklistNodes( root, encoding=None ):
+
+    result = []
+
+    for w_node in root.getElementsByTagName( 'worklist' ):
+
+        info = { 'worklist_id' : _getNodeAttribute( w_node, 'worklist_id'
+                                                    , encoding )
+               , 'title' : _getNodeAttribute( w_node, 'title' , encoding )
+               , 'description' : _coalesceTextNodeChildren( w_node, encoding )
+               , 'match' : _extractMatchNode( w_node, encoding )
+               , 'action' : _extractActionNode( w_node, encoding )
+               , 'guard' : _extractGuardNode( w_node, encoding )
+               }
+
+        result.append( info )
+
+    return result
+
 def _extractActionNode( parent, encoding=None ):
 
     nodes = parent.getElementsByTagName( 'action' )
@@ -858,3 +877,17 @@ def _extractDefaultNode( parent, encoding=None ):
     return { 'value' : value_text
            , 'expression' : expr_text
            }
+
+def _extractMatchNode( parent, encoding=None ):
+
+    nodes = parent.getElementsByTagName( 'match' )
+
+    result = {}
+
+    for node in nodes:
+
+        name = _getNodeAttribute( node, 'name', encoding )
+        values = _getNodeAttribute( node, 'values', encoding )
+        result[ name ] = values.split()
+
+    return result

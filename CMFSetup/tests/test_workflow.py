@@ -946,6 +946,65 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
                             , expected[ 8 ] )
             self.assertEqual( guard.get( 'expression', '' ), expected[ 9 ] )
 
+    def test_parseWorkflowXML_normal_worklists( self ):
+
+        from Products.CMFSetup.workflow import TRIGGER_TYPES
+
+        WF_ID = 'normal'
+        WF_TITLE = 'Normal DCWorkflow'
+        WF_INITIAL_STATE = 'closed'
+
+        site = self._initSite()
+
+        configurator = self._makeOne( site ).__of__( site )
+
+        ( workflow_id
+        , title
+        , state_variable
+        , initial_state
+        , states
+        , transitions
+        , variables
+        , worklists
+        , permissions
+        , scripts
+        ) = configurator.parseWorkflowXML( _NORMAL_WORKFLOW_EXPORT
+                                         % ( WF_ID
+                                           , WF_TITLE
+                                           , WF_INITIAL_STATE
+                                           ) )
+
+        self.assertEqual( len( worklists ), len( _WF_WORKLISTS ) )
+
+        for worklist in worklists:
+
+            worklist_id = worklist[ 'worklist_id' ]
+            self.failUnless( worklist_id in _WF_WORKLISTS )
+
+            expected = _WF_WORKLISTS[ worklist_id ]
+
+            self.assertEqual( worklist[ 'title' ], expected[ 0 ] )
+
+            description = ''.join( worklist[ 'description' ] )
+            self.failUnless( expected[ 1 ] in description )
+
+            self.assertEqual( tuple( worklist[ 'match' ] )
+                            , tuple( expected[ 2 ] ) )
+
+            action = worklist[ 'action' ]
+            self.assertEqual( action.get( 'name', '' ), expected[ 3 ] )
+            self.assertEqual( action.get( 'url', '' ), expected[ 4 ] )
+            self.assertEqual( action.get( 'category', '' ), expected[ 5 ] )
+
+            guard = worklist[ 'guard' ]
+            self.assertEqual( tuple( guard.get( 'permissions', () ) )
+                            , expected[ 6 ] )
+            self.assertEqual( tuple( guard.get( 'roles', () ) )
+                            , expected[ 7 ] )
+            self.assertEqual( tuple( guard.get( 'groups', () ) )
+                            , expected[ 8 ] )
+            self.assertEqual( guard.get( 'expression', '' ), expected[ 9 ] )
+
 
 _WF_PERMISSIONS = \
 ( 'Open content for modifications'
@@ -1273,7 +1332,8 @@ _NORMAL_WORKFLOW_EXPORT = """\
    </guard>
  </variable>
  <worklist
-    worklist_id="alive_list">
+    worklist_id="alive_list"
+    title="Alive">
   Worklist for content not yet expired / killed
   <action
     category="workflow"
@@ -1284,7 +1344,8 @@ _NORMAL_WORKFLOW_EXPORT = """\
   <match name="state" values="open; closed"/>
  </worklist>
  <worklist
-    worklist_id="expired_list">
+    worklist_id="expired_list"
+    title="Expired">
   Worklist for expired content
   <action
     category="workflow"
