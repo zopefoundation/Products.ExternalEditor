@@ -84,7 +84,7 @@
 ##############################################################################
 import os
 from Globals import HTMLFile, package_home, default__class_init__
-from Products.PTKBase.PortalFolder import PortalFolder
+from Products.CMFCore.PortalFolder import PortalFolder
 
 
 VIEW_PERMISSION                 = 'View'
@@ -234,7 +234,7 @@ class Topic( PortalFolder ):
 
 default__class_init__( Topic )
 
-from Products.PTKBase.register import registerPortalContent
+from Products.CMFCore.register import registerPortalContent
 registerPortalContent( Topic
                      , constructors= ( addTopicForm, addTopic, )
                      , action=Topic.TOPIC_ACTION

@@ -183,7 +183,7 @@ Topic.criteriaMetatypes.append(
        }
 )
 
-from Products.PTKBase.register import registerPortalContent
+from Products.CMFCore.register import registerPortalContent
 registerPortalContent( SimpleStringCriterion
                      , constructors= ( addSimpleStringCriterionForm
                                      , addSimpleStringCriterion

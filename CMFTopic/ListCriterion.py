@@ -187,7 +187,7 @@ Topic.criteriaMetatypes.append(
        }
 )
 
-from Products.PTKBase.register import registerPortalContent
+from Products.CMFCore.register import registerPortalContent
 registerPortalContent( ListCriterion
                      , constructors= ( addListCriterionForm
                                      , addListCriterion
