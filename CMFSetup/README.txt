@@ -32,7 +32,7 @@ CMFSetup Product README
 
             o skin path definitions
 
-      - ( ) 'portal_types'
+      - (x) 'portal_types'
 
             o content type definitions, including actions
 
