@@ -89,7 +89,7 @@ ADD_CONTENT_PERMISSION = 'Add portal content'
 import Globals, StructuredText, string, utils
 from StructuredText.HTMLWithImages import HTMLWithImages
 from Globals import DTMLFile, InitializeClass
-from AccessControl import ClassSecurityInfo
+from AccessControl import ClassSecurityInfo, getSecurityManager
 from Products.CMFCore.PortalContent import PortalContent
 from DublinCore import DefaultDublinCoreImpl
 
@@ -154,6 +154,10 @@ class Document(PortalContent, DefaultDublinCoreImpl):
     effective_date = expiration_date = None
     _isDiscussable = 1
 
+    _last_safety_belt_editor = ''
+    _last_safety_belt = ''
+    _safety_belt = ''
+
     # Declarative security (replaces __ac_permissions__)
     security = ClassSecurityInfo()
 
@@ -182,7 +186,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
                 + '?manage_tabs_message=Document+updated'
                 )
 
-    def _edit(self, text_format, text, file=''):
+    def _edit(self, text_format, text, file='', safety_belt=''):
         """ Edit the Document - Parses headers and cooks the body"""
         self.text = text
         headers = {}
@@ -192,6 +196,17 @@ class Document(PortalContent, DefaultDublinCoreImpl):
                 text = self.text = contents
 
         headers, body, cooked, format = self.handleText(text, text_format)
+
+        if not safety_belt:
+            safety_belt = headers.get('SafetyBelt', '')
+        if not self._safety_belt_update(safety_belt=safety_belt):
+            msg = ("Intervening changes from elsewhere detected."
+                   " Please refetch the document and reapply your changes."
+                   " (You may be able to recover your version using the"
+                   " browser 'back' button, but will have to apply them"
+                   " to a freshly fetched copy.)")
+            raise 'EditingConflict', msg
+
         self.text_format = format
         self.cooked_text = cooked
         self.text = body
@@ -247,6 +262,57 @@ class Document(PortalContent, DefaultDublinCoreImpl):
 
         return headers, body, cooked, format
             
+    security.declarePublic( 'getMetadataHeaders' )
+    def getMetadataHeaders(self):
+        """Return RFC-822-style header spec."""
+        hdrlist = DefaultDublinCoreImpl.getMetadataHeaders(self)
+        hdrlist.append( ('SafetyBelt', self._safety_belt) )
+        return hdrlist
+
+    security.declarePublic( 'SafetyBelt' )
+    def SafetyBelt(self):
+        """Return the current safety belt setting.
+        For web form hidden button."""
+        return self._safety_belt
+
+    def _safety_belt_update(self, safety_belt=''):
+        """Check validity of safety belt and update tracking if valid.
+
+        Return 0 if safety belt is invalid, 1 otherwise.
+
+        Note that the policy is deliberately lax if no safety belt value is
+        present - "you're on your own if you don't use your safety belt".
+
+        When present, either the safety belt token:
+         - ... is the same as the current one given out, or
+         - ... is the same as the last one given out, and the person doing the
+           edit is the same as the last editor."""
+
+        this_belt = safety_belt
+        this_user = getSecurityManager().getUser().getUserName()
+
+        if (# we have a safety belt value:
+            this_belt
+            # and the safety belt doesn't match the current one:
+            and (this_belt != self._safety_belt)
+            # and safety belt and user don't match last safety belt and user:
+            and not ((this_belt == self._last_safety_belt)
+                     and (this_user == self._last_safety_belt_editor))):
+            # Fail.
+            return 0
+
+        # We qualified - either:
+        #  - the edit was submitted with safety belt stripped, or
+        #  - the current safety belt was used, or
+        #  - the last one was reused by the last person who did the last edit.
+        # In any case, update the tracking.
+
+        self._last_safety_belt_editor = this_user
+        self._last_safety_belt = this_belt
+        self._safety_belt = str(self._p_mtime)
+
+        return 1
+
     security.declareProtected(CMFCorePermissions.View, 'SearchableText')
     def SearchableText(self):
         """ Used by the catalog for basic full text indexing """
@@ -288,7 +354,15 @@ class Document(PortalContent, DefaultDublinCoreImpl):
         if ishtml: self.setFormat('text/html')
         else: self.setFormat('text/plain')
 
-        self.edit(text_format=self.text_format, text=body)
+        try:
+            self.edit(text_format=self.text_format, text=body)
+        except 'EditingConflict', msg:
+            # XXX Can we get an error msg through?  Should we be raising an
+            #     exception, to be handled in the FTP mechanism?  Inquiring
+            #     minds...
+            get_transaction().abort()
+            RESPONSE.setStatus(450)
+            return RESPONSE
 
         RESPONSE.setStatus(204)
         return RESPONSE
