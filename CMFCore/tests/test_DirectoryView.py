@@ -53,6 +53,11 @@ class DirectoryViewTests2( TestCase ):
         """ Check if DirectoryView method works """
         self.assertEqual(self.ob.fake_skin.test1(),'test1')
 
+    def test_properties(self):
+        """Make sure the directory view is reading properties"""
+        self.assertEqual(self.ob.fake_skin.testPT.title, 'Zope Pope')
+
+
 test1path = join(skin_path_name,'test1.py')
 test2path = join(skin_path_name,'test2.py')
 test3path = join(skin_path_name,'test3')
@@ -98,7 +103,7 @@ if DevelopmentMode:
         except (IOError,OSError):
             # it might be gone already
             pass
-        
+
     def test_AddNewMethod( self ):
         """
         See if a method added to the skin folder can be found

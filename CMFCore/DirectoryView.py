@@ -232,7 +232,7 @@ class DirectoryInformation:
                 
                 if t is not None:
                     properties = self._readProperties(
-                        e_filepath + '.properties')
+                        e_fp + '.properties')
                     try:
                         ob = t(name, e_filepath, fullname=entry,
                                properties=properties)
