@@ -30,7 +30,7 @@ import utils
  
 import Portal
 import Document
-import Document 
+import Link
 import NewsItem
 import File
 import Image
