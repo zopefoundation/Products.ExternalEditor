@@ -130,8 +130,8 @@ class ContentTypeInformation(Base):
     def constructInstance(container, id):
         """
             Build a "bare" instance of the appropriate type in
-            'container', using 'id' as its id.  Return the URL
-            of its "immediate" view (typically the metadata form).
+            'container', using 'id' as its id.  Return the instance,
+            seated in the container.
         """
 
     def allowDiscussion():
@@ -183,8 +183,10 @@ class portal_types(Base):
             'container'.
         """
     
-    def constructContent(contentType, container, id):
+    def constructContent(contentType, container, id, RESPONSE=None
+                        , *args, **kw):
         """
             Build an instance of the appropriate content class in
-            'container', using 'id'.
+            'container', using 'id'.  If RESPONSE is provided, redirect
+            to the new object's "initial view".
         """

@@ -489,7 +489,7 @@ class FactoryTypeInformation (TypeInformation):
         ob = container._getOb(id)
         if hasattr(ob, '_setPortalTypeName'):
             ob._setPortalTypeName(self.getId())
-        return '%s/%s' % ( ob.absolute_url(), self.immediate_view )
+        return ob
 
 InitializeClass( FactoryTypeInformation )
 
@@ -544,7 +544,7 @@ class ScriptableTypeInformation( TypeInformation ):
         if hasattr(ob, '_setPortalTypeName'):
             ob._setPortalTypeName(self.getId())
 
-        return '%s/%s' % ( ob.absolute_url(), self.immediate_view )
+        return ob
 
 InitializeClass( ScriptableTypeInformation )
 
@@ -753,10 +753,11 @@ class TypesTool( UniqueObject, OFS.Folder.Folder ):
         if info is None:
             raise 'ValueError', 'No such content type: %s' % type_name
         
-        immediate_url = apply(info.constructInstance,
-                            (container, id) + args, kw)
+        ob = apply(info.constructInstance, (container, id) + args, kw)
 
         if RESPONSE is not None:
+            immediate_url = '%s/%s' % ( ob.absolute_url()
+                                      , info.immediate_view )
             RESPONSE.redirect( immediate_url )
 
 InitializeClass( TypesTool )
