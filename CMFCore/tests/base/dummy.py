@@ -154,7 +154,11 @@ class DummyFolder(DummyObject):
         self._delOb(id)
 
     def getPhysicalPath(self):
-        return self.aq_inner.aq_parent.getPhysicalPath() + ( self._id, )
+        p = aq_parent(aq_inner(self))
+        path = (self._id, )
+        if p is not None:
+            path = p.getPhysicalPath() + path
+        return path
 
     def getId(self):
         return self._id
