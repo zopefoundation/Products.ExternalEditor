@@ -213,10 +213,10 @@ class FSPageTemplate(FSObject, Script, PageTemplate):
 
     ZScriptHTML_tryParams = ZopePageTemplate.ZScriptHTML_tryParams
 
+    source_dot_xml = Src()
 
-d = FSPageTemplate.__dict__
-d['source.xml'] = d['source.html'] = Src()
-
+setattr(FSPageTemplate, 'source.xml',  FSPageTemplate.source_dot_xml)
+setattr(FSPageTemplate, 'source.html', FSPageTemplate.source_dot_xml)
 Globals.InitializeClass(FSPageTemplate)
 
 registerFileExtension('pt', FSPageTemplate)
