@@ -1,29 +1,32 @@
+import unittest
 import Zope
-from unittest import TestCase, TestSuite, makeSuite, main
 
-from Products.CMFCore.tests.base.dummy import \
-     DummyTool
+from Products.CMFCore.tests.base.dummy import DummyTool
 
+#
+#   We have to import these here to make the "ugly sharing" test case go.
+#
 from Products.CMFCore.ActionProviderBase import ActionProviderBase
 from Products.CMFCore.ActionInformation import ActionInformation
 
 class DummyProvider( ActionProviderBase ):
 
-    _actions = [ ActionInformation( id='an_id'
+    _actions = ( ActionInformation( id='an_id'
                                   , title='A Title'
                                   , action=''
                                   , condition=''
                                   , permissions=''
                                   , category=''
                                   , visible=0
-                                  )
-               ]
+                                  ), )
 
-class ActionProviderBaseTests(TestCase):
+
+class ActionProviderBaseTests(unittest.TestCase):
     
-    def _makeProvider( self ):
+    def _makeProvider( self, dummy=0 ):
 
-        return ActionProviderBase()
+        klass = dummy and DummyProvider or ActionProviderBase
+        return klass()
 
     def test_addAction( self ):
 
@@ -46,7 +49,7 @@ class ActionProviderBaseTests(TestCase):
 
 
         apb = DummyTool()
-        old_actions = apb._actions
+        old_actions = list( apb._actions )
 
         keys = [ ( 'id_%d', None )
                , ( 'name_%d', None )
@@ -54,7 +57,7 @@ class ActionProviderBaseTests(TestCase):
                , ( 'condition_%d', '' )
                , ( 'permission_%d', None )
                , ( 'category_%d', None )
-               , ( 'visible_%d', None )
+               , ( 'visible_%d', 0 )
                ]
 
         properties = {}
@@ -98,14 +101,16 @@ class ActionProviderBaseTests(TestCase):
         apb = self._makeProvider()
         apb._actions = [ '0', '1', '2' ]  # fake out for testing
         apb.deleteActions( selections=(0,2) )
-        self.assertEqual( apb._actions, ['1'] )
+        self.assertEqual( len( apb._actions ), 1 )
+        self.failUnless( '1' in apb._actions )
 
     def test_DietersNastySharingBug( self ):
 
-        one = DummyProvider()
-        another = DummyProvider()
+        one = self._makeProvider( dummy=1 )
+        another = self._makeProvider( dummy=1 )
 
-        def idify( x ): return id( x )
+        def idify( x ):
+            return id( x )
 
         old_ids = one_ids = map( idify, one.listActions() )
         another_ids = map( idify, another.listActions() )
@@ -127,9 +132,9 @@ class ActionProviderBaseTests(TestCase):
         self.assertEqual( old_ids, another_ids )
 
 def test_suite():
-    return TestSuite((
-        makeSuite(ActionProviderBaseTests),
+    return unittest.TestSuite((
+        unittest.makeSuite(ActionProviderBaseTests),
         ))
 
 if __name__ == '__main__':
-    main(defaultTest='test_suite')
+    unittest.main(defaultTest='test_suite')
