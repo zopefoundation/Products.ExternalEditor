@@ -19,7 +19,7 @@
  <tr valign="top">
 
   <th align="right"> Identifier </th>
-  <td> <dtml-var Identifier> </td>
+  <td> <span tal:replace="here/Identifier" /> </td>
 
   <td colspan="2" align="right">
    <a href="full_metadata_edit_form"> Edit all metadata </a>
