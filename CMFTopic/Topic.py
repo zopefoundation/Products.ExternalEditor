@@ -93,15 +93,6 @@ class Topic( PortalFolder ):
     acquireCriteria = 1
     _criteriaTypes = []
 
-    # Contentish interface methods
-    # ----------------------------
-
-    security.declareProtected(View, 'icon')
-    def icon( self ):
-        """
-            For the ZMI.
-        """
-        return self.getIcon()
 
     security.declarePrivate( '_verifyActionPermissions' )
     def _verifyActionPermissions( self, action ):
@@ -267,14 +258,9 @@ class Topic( PortalFolder ):
         """
             Add a new subtopic.
         """
-        try:
-            tool = getToolByName( self, 'portal_types' )
-        except:
-            self._setOb( id, Topic( id ) )
-        else:
-            topictype = tool.getTypeInfo( self )
-            topictype.constructInstance( self, id )
-
+        ttool = getToolByName(self, 'portal_types')
+        ti = ttool.getTypeInfo('Topic')
+        ti.constructInstance(self, id)
         return self._getOb( id )
 
 # Intialize the Topic class, setting up security.

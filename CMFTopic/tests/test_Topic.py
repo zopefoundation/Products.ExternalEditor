@@ -1,4 +1,4 @@
-from unittest import TestCase, TestSuite, makeSuite, main
+from unittest import TestSuite, makeSuite, main
 
 import Testing
 import Zope
@@ -8,24 +8,35 @@ except AttributeError:
     # for Zope versions before 2.6.1
     pass
 
+from Products.CMFCore.tests.base.dummy import DummySite
+from Products.CMFCore.tests.base.testcase import SecurityTest
+from Products.CMFCore.TypesTool import FactoryTypeInformation as FTI
+from Products.CMFCore.TypesTool import TypesTool
 
-class TestTopic(TestCase):
+from Products.CMFTopic.Topic import factory_type_information as FTIDATA_TOPIC
+from Products.CMFTopic.Topic import Topic
+
+
+class TestTopic(SecurityTest):
     """
         Test all the general Topic cases
     """
 
-    def test_Empty( self ):
+    def setUp(self):
+        SecurityTest.setUp(self)
+        self.site = DummySite('site').__of__(self.root)
 
-        from Products.CMFTopic.Topic import Topic
-        topic = Topic('top')
+    def _makeOne(self, id, *args, **kw):
+        return self.site._setObject( id, Topic(id, *args, **kw) )
+
+    def test_Empty( self ):
+        topic = self._makeOne('top')
 
         query = topic.buildQuery()
         self.assertEqual( len( query ), 0 )
 
     def test_Simple( self ):
-
-        from Products.CMFTopic.Topic import Topic
-        topic = Topic('top')
+        topic = self._makeOne('top')
         topic.addCriterion( 'foo', 'String Criterion' )
         topic.getCriterion( 'foo' ).edit( 'bar' )
 
@@ -42,9 +53,10 @@ class TestTopic(TestCase):
         self.assertEqual( query[ 'baz' ], 43 )
 
     def test_Nested( self ):
-
-        from Products.CMFTopic.Topic import Topic
-        topic = Topic('top')
+        self.site._setObject( 'portal_types', TypesTool() )
+        fti = FTIDATA_TOPIC[0].copy()
+        self.site.portal_types._setObject( 'Topic', FTI(**fti) )
+        topic = self._makeOne('top')
 
         topic.addCriterion( 'foo', 'String Criterion' )
         topic.getCriterion( 'foo' ).edit( 'bar' )
