@@ -1090,11 +1090,15 @@ class PluggableAuthService( Folder ):
         """ The __before_publishing_traverse__ hook. """
         resp = req['RESPONSE']
         resp.exception = self.exception
+        resp._unauthorized = self._unauthorized
         return
 
     #
     # Response overrides
     #
+    def _unauthorized(self):
+        pass
+    
     def exception(self, fatal=0, info=None,
                   absuri_match=re.compile(r'\w+://[\w\.]+').match,
                   tag_search=re.compile('[a-zA-Z]>').search,
@@ -1103,6 +1107,8 @@ class PluggableAuthService( Folder ):
         req = self.REQUEST
         resp = req['RESPONSE']
         try: del resp.exception
+        except: pass
+        try: del resp._unauthorized
         except: pass
         
         if type(info) is type(()) and len(info) == 3:
