@@ -13,6 +13,7 @@
 
 import Globals
 from Acquisition import aq_base
+from ExtensionClass import Base
 
 from AccessControl import ClassSecurityInfo
 from CMFCorePermissions import ModifyPortalContent
@@ -22,7 +23,7 @@ from utils import getToolByName
 from utils import _dtmldir
 
 
-class CMFCatalogAware:
+class CMFCatalogAware(Base):
     """Mix-in for notifying portal_catalog and portal_workflow
     """
 
