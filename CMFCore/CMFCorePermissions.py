@@ -35,6 +35,9 @@ def setDefaultRoles(permission, roles):
 ListFolderContents = 'List folder contents'
 setDefaultRoles( ListFolderContents, ( 'Manager', 'Owner' ) )
 
+ListUndoableChanges = 'List undoable changes'
+setDefaultRoles( ListUndoableChanges, ( 'Manager', 'Member' ) )
+
 AccessInactivePortalContent = 'Access inactive portal content'
 setDefaultRoles(AccessInactivePortalContent, ('Manager',))
 

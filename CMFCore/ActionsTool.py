@@ -139,12 +139,12 @@ class ActionsTool (UniqueObject, SimpleItem):
     id = 'portal_actions'
     meta_type = 'CMF Actions Tool'
 
-    action_providers = (
-        'portal_actions',
-        'portal_discussion',
-        'portal_membership',
-        'portal_workflow',
-        )
+    action_providers = ( 'portal_actions'
+                       , 'portal_discussion'
+                       , 'portal_membership'
+                       , 'portal_workflow'
+                       , 'portal_undo'
+                       )
 
     security = ClassSecurityInfo()
 
@@ -217,7 +217,7 @@ class ActionsTool (UniqueObject, SimpleItem):
 
         actions = []
         # Include actions from specific tools.
-        for provider_name in self.action_providers:
+        for provider_name in self.listActionProviders():
             provider = getattr(self, provider_name)
             a = provider.listActions(info)
             if a:
@@ -320,10 +320,6 @@ class ActionsTool (UniqueObject, SimpleItem):
                  'url': portal_url + '/logout',
                  'permissions' : [],
                  'category': 'user'},
-                {'name': 'Undo',
-                 'url': 'undo_form',
-                 'permissions': ['Undo changes'],
-                 'category': 'global'},
                 {'name': 'Reconfigure portal',
                  'url': portal_url + '/reconfig_form',
                  'permissions': ['Manage portal'],

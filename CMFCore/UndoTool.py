@@ -96,8 +96,7 @@ from Globals import InitializeClass, DTMLFile
 from string import split
 from AccessControl import ClassSecurityInfo
 
-from CMFCorePermissions import UndoChanges
-import CMFCorePermissions
+from CMFCorePermissions import ManagePortal, UndoChanges, ListUndoableChanges
 
 class UndoTool (UniqueObject, SimpleItem):
     id = 'portal_undo'
@@ -114,14 +113,25 @@ class UndoTool (UniqueObject, SimpleItem):
     #
     #   ZMI methods
     #
-    security.declareProtected( CMFCorePermissions.ManagePortal
+    security.declareProtected( ManagePortal
                              , 'manage_overview' )
     manage_overview = DTMLFile( 'explainUndoTool', _dtmldir )
+
+    security.declarePrivate('listActions')
+    def listActions( self, info ):
+        if info.isAnonymous:
+            return []
+        return [ { 'name': 'Undo'
+                 , 'url': 'undo_form'
+                 , 'permissions': [ ListUndoableChanges ]
+                 , 'category': 'global'
+                 } ]
 
     #
     #   'portal_undo' interface methods
     #
-    security.declareProtected(UndoChanges, 'listUndoableTransactionsFor')
+    security.declareProtected( ListUndoableChanges
+                             , 'listUndoableTransactionsFor')
     def listUndoableTransactionsFor(self, object,
                                     first_transaction=None,
                                     last_transaction=None,

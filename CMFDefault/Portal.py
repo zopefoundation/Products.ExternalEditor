@@ -272,6 +272,7 @@ class PortalGenerator:
 
         mp('Set own password',        ['Member','Manager',],    1)
         mp('Set own properties',      ['Member','Manager',],    1)
+        mp('List undoable changes',   ['Member','Manager',],    1)
         mp('Add portal content',      ['Owner','Manager',],     1)
         mp('Add portal folders',      ['Owner','Manager',],     1)
         mp('Review portal content',   ['Reviewer','Manager',],  1)
