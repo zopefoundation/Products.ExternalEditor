@@ -10,7 +10,7 @@
 # FOR A PARTICULAR PURPOSE
 #
 ##############################################################################
-""" CMFActionIcons permissions
+""" CMFActionIcons product permissions.
 
 $Id$
 """
@@ -18,8 +18,8 @@ from AccessControl import ModuleSecurityInfo
 
 security = ModuleSecurityInfo('Products.CMFActionIcons.permissions')
 
-security.declarePublic('View')
-from AccessControl.Permissions import view as View
-
 security.declarePublic('ManagePortal')
 from Products.CMFCore.permissions import ManagePortal
+
+security.declarePublic('View')
+from Products.CMFCore.permissions import View
