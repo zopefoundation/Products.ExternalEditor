@@ -35,7 +35,7 @@ _wwwdir = os.path.join(os.path.dirname(__file__), 'www')
 class VersionsTool(UniqueObject, SimpleItemWithProperties):
     __doc__ = __doc__ # copy from module
     id = 'portal_versions'
-    meta_type = 'Portal Versions tool'
+    meta_type = 'Portal Versions Tool'
 
     security = ClassSecurityInfo()
 
