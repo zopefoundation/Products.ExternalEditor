@@ -243,8 +243,8 @@ class DiscussionResponse(Base):
         while parent and (not size or len(parents) < size):
             if parent in parents:
                 # Paranoia: circular thread
-                print self.absolute_url(), "is in a circular thread"
-                break
+                raise RuntimeException, ( "%s is in a circular thread"
+                                        % self.absolute_url() )
             parents.append(parent)
             parent = hasattr(parent, 'inReplyTo') and parent.inReplyTo()
         parents.reverse()
