@@ -167,13 +167,13 @@ class PortalGenerator:
         addCMFCoreTool('CMF Skins Tool', None)
         addCMFCoreTool('CMF Types Tool', None)
         addCMFCoreTool('CMF Undo Tool', None)
+        addCMFCoreTool('CMF URL Tool', None)
         addCMFCoreTool('CMF Workflow Tool', None)
 
         addCMFDefaultTool = p.manage_addProduct['CMFDefault'].manage_addTool
         addCMFDefaultTool('Default Discussion Tool', None)
         addCMFDefaultTool('Default Membership Tool', None)
         addCMFDefaultTool('Default Registration Tool', None)
-        addCMFDefaultTool('Default URL Tool', None)
         addCMFDefaultTool('Default Properties Tool', None)
         addCMFDefaultTool('Default Metadata Tool', None)
         addCMFDefaultTool('Default Syndication Tool', None)

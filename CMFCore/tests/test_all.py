@@ -21,6 +21,7 @@ def test_suite():
         'test_FSImage',
         'test_CachingPolicyManager',
         'test_FSSecurity',
+        'test_URLTool',
         ])
 
 if __name__ == '__main__':

@@ -22,7 +22,7 @@ import Zope
 from Products.CMFWorkspaces.References import ReferenceCollection
 from OFS.Folder import Folder
 from Acquisition import aq_base, aq_inner, aq_parent
-from Products.CMFDefault.URLTool import URLTool
+from Products.CMFCore.URLTool import URLTool
 
 
 class Tests(unittest.TestCase):

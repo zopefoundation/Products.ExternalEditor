@@ -19,6 +19,7 @@ import PortalObject, PortalContent, PortalFolder
 import MembershipTool, WorkflowTool, CatalogTool, DiscussionTool
 import ActionsTool, UndoTool, RegistrationTool, SkinsTool
 import MemberDataTool, TypesTool
+import URLTool
 import DirectoryView, FSImage, FSFile, FSPropertiesObject
 import FSDTMLMethod, FSPythonScript, FSSTXMethod
 import FSZSQLMethod
@@ -57,6 +58,7 @@ tools = (
     SkinsTool.SkinsTool,
     MemberDataTool.MemberDataTool,
     TypesTool.TypesTool,
+    URLTool.URLTool,
     )
 
 

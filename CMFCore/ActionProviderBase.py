@@ -24,11 +24,16 @@ from CMFCorePermissions import ManagePortal
 from Expression import Expression
 from utils import _dtmldir
 
+from interfaces.portal_actions import ActionProvider as IActionProvider
+
 
 class ActionProviderBase:
 
     """ Provide ActionTabs and management methods for ActionProviders
     """
+
+    __implements__ = IActionProvider
+
     security = ClassSecurityInfo()
 
     _actions = ()

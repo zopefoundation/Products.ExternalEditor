@@ -24,6 +24,9 @@ Future
     - (__future__) Added DCWorkflow (through-the-web configurable
       workflows) to the core set of CMF products.
 
+    - Moved URLTool to CMFCore. Added interface and basic tests.
+      (Collector #67)
+
     - Added FSFile skin object, in order to allow .swf files (et al.) in 
       skins
 

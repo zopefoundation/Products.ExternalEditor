@@ -17,7 +17,7 @@ from Products.CMFCore.WorkflowTool import WorkflowTool
 from Products.CMFDefault.DiscussionTool import \
      DiscussionTool, DiscussionNotAllowed
 
-from Products.CMFDefault.URLTool import URLTool
+from Products.CMFCore.URLTool import URLTool
 
 class DiscussionTests( SecurityTest ):
 

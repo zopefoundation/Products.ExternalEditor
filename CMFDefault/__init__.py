@@ -42,7 +42,6 @@ import PropertiesTool
 import MembershipTool
 import MetadataTool
 import RegistrationTool
-import URLTool
 import DublinCore
 import DiscussionTool
 import SyndicationTool
@@ -111,7 +110,6 @@ tools = ( DiscussionTool.DiscussionTool
         , MembershipTool.MembershipTool
         , RegistrationTool.RegistrationTool
         , PropertiesTool.PropertiesTool
-        , URLTool.URLTool
         , MetadataTool.MetadataTool
         , SyndicationTool.SyndicationTool
         )

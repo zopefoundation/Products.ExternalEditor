@@ -9,7 +9,7 @@ from Products.CMFCore.TypesTool import TypesTool
 from Products.CMFCore.PortalFolder import PortalFolder
 from Products.CMFCore.ActionInformation import ActionInformation
 from Products.CMFCore.Expression import Expression
-from Products.CMFDefault.URLTool import URLTool
+from Products.CMFCore.URLTool import URLTool
 from Products.CMFDefault.RegistrationTool import RegistrationTool
 from Products.CMFDefault.MembershipTool import MembershipTool
 
