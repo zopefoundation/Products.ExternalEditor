@@ -97,10 +97,18 @@ def semi_split(s):
 def comma_split(s):
     return map(strip, split(s, ','))
 
+def seq_strip (seq, stripper=strip):
+    if type(seq) == type([]):
+        return map ( stripper, seq)
+    if type(seq) == type(()):
+        #seq1 = list(seq)
+        return tuple (map(stripper, seq))
+    raise ValueError, "%s of unsupported sequencetype %s" % (seq, type(seq))
+
 def tuplize( valueName, value, splitter=split ):
-    if type(value) == type(()): return value
-    if type(value) == type([]): return tuple( value )
-    if type(value) == type(''): return tuple( splitter( value ) )
+    if type(value) == type(()): return seq_strip( value )
+    if type(value) == type([]): return seq_strip( tuple( value ))
+    if type(value) == type(''): return seq_strip( tuple( splitter( value ) ))
     raise ValueError, "%s of unsupported type" % valueName
 
 

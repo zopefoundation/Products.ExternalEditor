@@ -44,6 +44,10 @@ New Features
 
 Bugs Fixed
 
+  - Added stripping of leading / trailing whitespace from
+    Subject keywords (Tracker #479, thanks to Lucas Hofman
+    for the patch!)
+
   - Gave URL tool explicit __roles__, to enable use in 'nocall:'
     expressions.
 

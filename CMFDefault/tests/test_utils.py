@@ -1,6 +1,8 @@
 from unittest import TestCase,makeSuite,main
 
-from Products.CMFDefault.utils import parseHeadersBody
+import Zope
+from Products.CMFDefault.utils import parseHeadersBody, tuplize, comma_split
+from Products.CMFDefault.utils import seq_strip
 
 class DefaultUtilsTests(TestCase):
     COMMON_HEADERS = '''Author: Tres Seaver
@@ -63,3 +65,15 @@ def test_suite():
 if __name__ == '__main__':
     main(defaultTest='test_suite')
 
+
+    def test_tuplize( self ):
+        assert( tuplize('string', 'one two three') == ('one','two','three'))
+        assert( tuplize('string', 'one,two,three', comma_split) == ('one','two','three'))
+        assert( tuplize('list', ['one',' two','three ']) == ('one',' two','three '))
+        assert( tuplize('tuple', ('one','two','three')) == ('one','two','three'))
+
+    def test_seq_strip( self ):
+        assert( seq_strip(['one ', ' two', ' three '])
+                == ['one','two','three'])
+        assert( seq_strip(('one ', ' two', ' three '))
+                == ('one','two','three'))
