@@ -21,8 +21,7 @@ class RequestTest( TransactionalTest ):
     
     def setUp(self):
         TransactionalTest.setUp(self)
-        root = self.root
-        root = makerequest(root)
+        root = self.root = makerequest(self.root)
         self.REQUEST  = root.REQUEST
         self.RESPONSE = root.REQUEST.RESPONSE
 
