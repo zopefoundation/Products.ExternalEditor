@@ -1,5 +1,9 @@
 External Editor Change Log
 
+  11/02/02 - 0.6 Release
+
+    - Built Windows helper app using Python 2.2.2 and PythonWin 148.
+
     - The externalEdit_ object now accepts a path argument to the object to
       edit, allowing URLs like: http://zope/externalEdit_?path=/some/object.
       This allows external editor to play better with applications making use
