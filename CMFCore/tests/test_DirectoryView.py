@@ -5,6 +5,7 @@ Zope.startup()
 
 from os import remove, mkdir, rmdir
 from os.path import join
+from tempfile import mktemp
 
 from Globals import DevelopmentMode
 
@@ -28,46 +29,68 @@ class DirectoryViewPathTests( TestCase ):
         self.ob = DummyFolder()
         addDirectoryViews(self.ob, 'fake_skins', _prefix)
 
-    # These, in effect, test the minimalpath and expandpath functions
-    # from CMFCore.utils in combination. See DirectoryView.py for details
+    def test_getDirectoryInfo(self):
+        skin = self.ob.fake_skin
+        skin.manage_properties('CMFCore/tests/fake_skins/fake_skin')
+        self.failUnless( hasattr(self.ob.fake_skin, 'test1'),
+                         self.ob.fake_skin.getDirPath() )
 
-    def test_getDirectoryInfo1( self ):
-        """ windows INSTANCE_HOME  """
-        self.ob.fake_skin.manage_properties(r'Products\CMFCore\tests\fake_skins\fake_skin')
-        self.failUnless(hasattr(self.ob.fake_skin,'test1'),self.ob.fake_skin.getDirPath())
+    # 1 - 7, in effect, test the pre CMF 1.5 backwards compatibility code in
+    # DirectoryView's __of__ method. See DirectoryView.py for details
 
-    def test_getDirectoryInfo2( self ):
-        """ windows SOFTWARE_HOME  """
-        self.ob.fake_skin.manage_properties(r'C:\Zope\2.5.1\Products\CMFCore\tests\fake_skins\fake_skin')
-        self.failUnless(hasattr(self.ob.fake_skin,'test1'),self.ob.fake_skin.getDirPath())
+    # windows INSTANCE_HOME
+    def test_getDirectoryInfo1(self):
+        skin = self.ob.fake_skin
+        skin.manage_properties(r'Products\CMFCore\tests\fake_skins\fake_skin')
+        self.failUnless( hasattr(self.ob.fake_skin, 'test1'),
+                         self.ob.fake_skin.getDirPath() )
 
-    def test_getDirectoryInfo3( self ):
-        """ *nix INSTANCE_HOME  """
-        self.ob.fake_skin.manage_properties('Products/CMFCore/tests/fake_skins/fake_skin')
-        self.failUnless(hasattr(self.ob.fake_skin,'test1'),self.ob.fake_skin.getDirPath())
+    # windows SOFTWARE_HOME
+    def test_getDirectoryInfo2(self):
+        skin = self.ob.fake_skin
+        skin.manage_properties(
+                  r'C:\Zope\2.5.1\Products\CMFCore\tests\fake_skins\fake_skin')
+        self.failUnless( hasattr(self.ob.fake_skin, 'test1'),
+                         self.ob.fake_skin.getDirPath() )
 
-    def test_getDirectoryInfo4( self ):
-        """ *nix SOFTWARE_HOME  """
-        self.ob.fake_skin.manage_properties('/usr/local/zope/2.5.1/Products/CMFCore/tests/fake_skins/fake_skin')
-        self.failUnless(hasattr(self.ob.fake_skin,'test1'),self.ob.fake_skin.getDirPath())
+    # *nix INSTANCE_HOME
+    def test_getDirectoryInfo3(self):
+        skin = self.ob.fake_skin
+        skin.manage_properties('Products/CMFCore/tests/fake_skins/fake_skin')
+        self.failUnless( hasattr(self.ob.fake_skin, 'test1'),
+                         self.ob.fake_skin.getDirPath() )
 
-    # These tests cater for the common name scheme for PRODUCTS_PATH of something_PRODUCTS
-    def test_getDirectoryInfo5( self ):
-        """ windows PRODUCTS_PATH  """
-        from tempfile import mktemp
-        self.ob.fake_skin.manage_properties(mktemp()+r'Products\CMFCore\tests\fake_skins\fake_skin')
-        self.failUnless(hasattr(self.ob.fake_skin,'test1'),self.ob.fake_skin.getDirPath())
+    # *nix SOFTWARE_HOME
+    def test_getDirectoryInfo4(self):
+        skin = self.ob.fake_skin
+        skin.manage_properties(
+           '/usr/local/zope/2.5.1/Products/CMFCore/tests/fake_skins/fake_skin')
+        self.failUnless( hasattr(self.ob.fake_skin, 'test1'),
+                         self.ob.fake_skin.getDirPath() )
 
-    def test_getDirectoryInfo6( self ):
-        """ linux PRODUCTS_PATH  """
-        from tempfile import mktemp
-        self.ob.fake_skin.manage_properties(mktemp()+'Products/CMFCore/tests/fake_skins/fake_skin')
-        self.failUnless(hasattr(self.ob.fake_skin,'test1'),self.ob.fake_skin.getDirPath())
+    # windows PRODUCTS_PATH
+    def test_getDirectoryInfo5(self):
+        skin = self.ob.fake_skin
+        skin.manage_properties( mktemp() +
+                               r'\Products\CMFCore\tests\fake_skins\fake_skin')
+        self.failUnless( hasattr(self.ob.fake_skin, 'test1'),
+                         self.ob.fake_skin.getDirPath() )
+
+    # linux PRODUCTS_PATH
+    def test_getDirectoryInfo6(self):
+        skin = self.ob.fake_skin
+        skin.manage_properties( mktemp() +
+                                '/Products/CMFCore/tests/fake_skins/fake_skin')
+        self.failUnless( hasattr(self.ob.fake_skin, 'test1'),
+                         self.ob.fake_skin.getDirPath() )
 
     # second 'Products' in path
-    def test_getDirectoryInfo7( self ):
-        self.ob.fake_skin.manage_properties(r'C:\CoolProducts\Zope\2.5.1\Products\CMFCore\tests\fake_skins\fake_skin')
-        self.failUnless(hasattr(self.ob.fake_skin,'test1'),self.ob.fake_skin.getDirPath())
+    def test_getDirectoryInfo7(self):
+        skin = self.ob.fake_skin
+        skin.manage_properties(
+           r'C:\CoolProducts\Zope\Products\CMFCore\tests\fake_skins\fake_skin')
+        self.failUnless( hasattr(self.ob.fake_skin, 'test1'),
+                         self.ob.fake_skin.getDirPath() )
 
     # Test we do nothing if given a really wacky path
     def test_UnhandleableExpandPath( self ):
@@ -79,17 +102,20 @@ class DirectoryViewPathTests( TestCase ):
         from Products.CMFCore.utils import minimalpath, normalize
         from tempfile import mktemp
         weirdpath = mktemp()
-        # we need to normalize 'cos minimalpath does, btu we're not testing normalize in this unit test.
-        self.assertEqual(normalize(weirdpath),minimalpath(weirdpath))
+        # we need to normalize 'cos minimalpath does, btu we're not testing
+        # normalize in this unit test.
+        self.assertEqual( normalize(weirdpath), minimalpath(weirdpath) )
 
     # this test tests that registerDirectory calls minimalpath correctly
-    # the only way to test this works under SOFTWARE_HOME,INSTANCE_HOME and PRODUCTS_PATH setups is to
-    # run the test in those environments
+    # the only way to test this works under SOFTWARE_HOME,INSTANCE_HOME and
+    # PRODUCTS_PATH setups is to run the test in those environments
     def test_registerDirectoryMinimalPath(self):
         from Products.CMFCore.DirectoryView import _dirreg
-        from os.path import join
-        self.failUnless(_dirreg._directories.has_key(join('CMFCore','tests','fake_skins','fake_skin')),_dirreg._directories.keys())
-        self.assertEqual(self.ob.fake_skin.getDirPath(),join('CMFCore','tests','fake_skins','fake_skin'))
+        dirs = _dirreg._directories
+        self.failUnless( dirs.has_key('CMFCore/tests/fake_skins/fake_skin'),
+                         dirs.keys() )
+        self.assertEqual( self.ob.fake_skin.getDirPath(),
+                          'CMFCore/tests/fake_skins/fake_skin' )
 
 
 class DirectoryViewTests( FSDVTest ):

@@ -12,6 +12,7 @@ from Products.CMFCore.tests.base.dummy import DummySite
 from Products.CMFCore.tests.base.dummy import DummyUserFolder
 from Products.CMFCore.tests.base.testcase import SecurityTest
 from Products.CMFCore.utils import _checkPermission
+from Products.CMFCore.utils import normalize
 
 
 class DummyObject(Owned, DummyObject):
@@ -43,6 +44,10 @@ class CoreUtilsTests(SecurityTest):
         self.failIf( _checkPermission('View', o) )
         self.failUnless( _checkPermission('WebDAV access', o) )
         self.failIf( _checkPermission('Manage users', o) )
+
+    def test_normalize(self):
+        self.assertEqual( normalize('foo/bar'), 'foo/bar' )
+        self.assertEqual( normalize('foo\\bar'), 'foo/bar' )
 
 
 def test_suite():

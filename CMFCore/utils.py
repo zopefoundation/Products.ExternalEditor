@@ -17,6 +17,7 @@ $Id$
 
 import os
 from os import path as os_path
+from os.path import abspath
 import re
 from types import StringType
 from types import UnicodeType
@@ -668,27 +669,20 @@ def keywordsplitter( headers
 #
 security.declarePublic('normalize')
 def normalize(p):
-    # the weird .replace is needed to help normpath
-    # when dealing with Windows paths under *nix
-    return os_path.normpath(p.replace('\\','/'))
-
-separators = (os.sep, os.altsep)
+    # the first .replace is needed to help normpath when dealing with Windows
+    # paths under *nix, the second to normalize to '/'
+    return os_path.normpath(p.replace('\\','/')).replace('\\','/')
 
 import Products
-ProductsPath = []
-ProductsPath = map(normalize,Products.__path__)
+ProductsPath = [ abspath(ppath) for ppath in Products.__path__ ]
 
 security.declarePublic('expandpath')
 def expandpath(p):
-    # Converts a minimal path to an absolute path.
+    """ Convert minimal filepath to (expanded) filepath.
 
-    # This has a slight weakness in that if someone creates a new
-    # product with the same name as an old one, then the skins may
-    # become confused between the two.
-    # However, that's an acceptable risk as people don't seem
-    # to re-use product names ever (it would create ZODB persistence
-    # problems too ;-)
-
+    The (expanded) filepath is the valid absolute path on the current platform
+    and setup.
+    """
     p = os_path.normpath(p)
     if os_path.isabs(p):
         return p
@@ -704,14 +698,17 @@ def expandpath(p):
 
 security.declarePublic('minimalpath')
 def minimalpath(p):
-    # This trims down to just beyond a 'Products' root if it can.
-    # otherwise, it returns what it was given.
-    # In either case, the path is normalized.
-    p = normalize(p)
-    index = p.rfind('Products')
-    if index == -1:
-        index = p.rfind('products')
-        if index == -1:
-            # couldn't normalise
-            return p
-    return p[index+len('products/'):]
+    """ Convert (expanded) filepath to minimal filepath.
+
+    The minimal filepath is the cross-platform / cross-setup path stored in
+    persistent objects and used as key in the directory registry.
+
+    Returns a slash-separated path relative to the Products path. If it can't
+    be found, a normalized path is returned.
+    """
+    p = abspath(p)
+    for ppath in ProductsPath:
+        if p.startswith(ppath):
+            p = p[len(ppath)+1:]
+            break
+    return p.replace('\\','/')

@@ -179,6 +179,9 @@ CMF 1.5alpha (unreleased)
 
   Bug Fixes
 
+    - DirectoryView: Refactored path handling.
+      Should now work with any products path setup. (Collector #210)
+
     - Enforced new "local permissions" pattern:  each top-level CMF product
       should have a 'permissions.py' module which imports / declares all
       permissions used within the product;  other modules within the product

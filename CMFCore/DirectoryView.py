@@ -17,8 +17,8 @@ $Id$
 
 import re
 from os import path, listdir, stat
-import sys
 from sys import exc_info
+from sys import platform
 from types import StringType
 
 from AccessControl import ClassSecurityInfo
@@ -33,13 +33,14 @@ from OFS.Folder import Folder
 from OFS.ObjectManager import bad_id
 from zLOG import LOG, ERROR
 
-from permissions import AccessContentsInformation
-from permissions import ManagePortal
 from FSMetadata import FSMetadata
 from FSObject import BadFile
+from permissions import AccessContentsInformation
+from permissions import ManagePortal
 from utils import _dtmldir
-from utils import expandpath
 from utils import minimalpath
+from utils import normalize
+
 
 __reload_module__ = 0
 
@@ -68,12 +69,13 @@ class DirectoryInformation:
     _v_last_read = 0
     _v_last_filelist = [] # Only used on Win32
 
-    def __init__(self, expanded_fp, minimal_fp):
-        self.filepath = minimal_fp
+    def __init__(self, filepath, minimal_fp):
+        self._filepath = filepath
+        self._minimal_fp = minimal_fp
         subdirs = []
-        for entry in _filtered_listdir(expanded_fp):
-            e_fp = path.join(expanded_fp, entry)
-            if path.isdir(e_fp):
+        for entry in _filtered_listdir(self._filepath):
+            entry_filepath = path.join(self._filepath, entry)
+            if path.isdir(entry_filepath):
                 subdirs.append(entry)
         self.subdirs = tuple(subdirs)
 
@@ -91,13 +93,11 @@ class DirectoryInformation:
         self.data = None
 
     def _readTypesFile(self):
-        '''
-        Reads the .objects file produced by FSDump.
-        '''
+        """ Read the .objects file produced by FSDump.
+        """
         types = {}
-        fp = expandpath(self.filepath)
         try:
-            f = open( path.join(fp, '.objects'), 'rt' )
+            f = open( path.join(self._filepath, '.objects'), 'rt' )
         except IOError:
             pass
         else:
@@ -118,14 +118,13 @@ class DirectoryInformation:
             mtime=0
             filelist=[]
             try:
-                fp = expandpath(self.filepath)
-                mtime = stat(fp)[8]
-                if sys.platform == 'nt':
+                mtime = stat(self._filepath)[8]
+                if platform == 'nt':
                     # some Windows directories don't change mtime
                     # when a file is added to or deleted from them :-(
                     # So keep a list of files as well, and see if that
                     # changes
-                    path.walk(fp,_walker,filelist)
+                    path.walk(self._filepath, _walker, filelist)
                     filelist.sort()
             except:
                 LOG('DirectoryView',
@@ -164,23 +163,22 @@ class DirectoryInformation:
 
     def prepareContents(self, registry, register_subdirs=0):
         # Creates objects for each file.
-        fp = expandpath(self.filepath)
         data = {}
         objects = []
         types = self._readTypesFile()
-        for entry in _filtered_listdir(fp):
+        for entry in _filtered_listdir(self._filepath):
             if not self._isAllowableFilename(entry):
                 continue
-            e_filepath = path.join(self.filepath, entry)
-            e_fp = expandpath(e_filepath)
-            if path.isdir(e_fp):
+            entry_minimal_fp = '/'.join( (self._minimal_fp, entry) )
+            entry_filepath = path.join(self._filepath, entry)
+            if path.isdir(entry_filepath):
                 # Add a subdirectory only if it was previously registered,
                 # unless register_subdirs is set.
-                info = registry.getDirectoryInfo(e_filepath)
+                info = registry.getDirectoryInfo(entry_minimal_fp)
                 if info is None and register_subdirs:
                     # Register unknown subdirs
-                    registry.registerDirectoryByPath(e_fp)
-                    info = registry.getDirectoryInfo(e_filepath)
+                    registry.registerDirectoryByPath(entry_filepath)
+                    info = registry.getDirectoryInfo(entry_minimal_fp)
                 if info is not None:
                     mt = types.get(entry)
                     t = None
@@ -188,7 +186,7 @@ class DirectoryInformation:
                         t = registry.getTypeByMetaType(mt)
                     if t is None:
                         t = DirectoryView
-                    ob = t(entry, e_filepath)
+                    ob = t(entry, entry_minimal_fp)
                     ob_id = ob.getId()
                     data[ob_id] = ob
                     objects.append({'id': ob_id, 'meta_type': ob.meta_type})
@@ -217,10 +215,10 @@ class DirectoryInformation:
                     t = registry.getTypeByExtension(ext)
 
                 if t is not None:
-                    metadata = FSMetadata(e_fp)
+                    metadata = FSMetadata(entry_filepath)
                     metadata.read()
                     try:
-                        ob = t(name, e_filepath, fullname=entry,
+                        ob = t(name, entry_minimal_fp, fullname=entry,
                                properties=metadata.getProperties())
                     except:
                         import traceback
@@ -233,7 +231,7 @@ class DirectoryInformation:
                                  '\n'.join(exc_lines) )
 
                             ob = BadFile( name,
-                                          e_filepath,
+                                          entry_minimal_fp,
                                           exc_str='\r\n'.join(exc_lines),
                                           fullname=entry )
                         finally:
@@ -312,26 +310,23 @@ class DirectoryRegistry:
         # The idea is that the registry will only contain
         # small paths that are likely to work across platforms
         # and SOFTWARE_HOME, INSTANCE_HOME and PRODUCTS_PATH setups
-        fp = minimalpath(filepath)
-        normfilepath = path.normpath(filepath)
-        self._directories[fp] = di = DirectoryInformation(normfilepath, fp)
+        minimal_fp = minimalpath(filepath)
+        info = DirectoryInformation(filepath, minimal_fp)
+        self._directories[minimal_fp] = info
         if subdirs:
-            for entry in di.getSubdirs():
-                e_filepath = path.join(normfilepath, entry)
-                self.registerDirectoryByPath(e_filepath, subdirs)
+            for entry in info.getSubdirs():
+                entry_filepath = path.join(filepath, entry)
+                self.registerDirectoryByPath(entry_filepath, subdirs)
 
-    def reloadDirectory(self, filepath):
-        info = self.getDirectoryInfo(filepath)
+    def reloadDirectory(self, minimal_fp):
+        info = self.getDirectoryInfo(minimal_fp)
         if info is not None:
             info.reload()
 
-    def getDirectoryInfo(self, filepath):
+    def getDirectoryInfo(self, minimal_fp):
         # This is called when we need to get hold of the information
-        # for a minimal path.
-        # minimalpath is called on the supplied path on the hope
-        # that if it is incorrect, something can be done to fix it.
-        # Can return None.
-        return self._directories.get(minimalpath(filepath), None)
+        # for a minimal path. Can return None.
+        return self._directories.get(minimal_fp, None)
 
     def listDirectories(self):
         dirs = self._directories.keys()
@@ -380,8 +375,8 @@ def listFolderHierarchy(ob, path, rval, adding_meta_type=None):
 
 
 class DirectoryView (Persistent):
-    '''
-    '''
+    """ Directory views mount filesystem directories.
+    """
     meta_type = 'Filesystem Directory View'
     _dirpath = None
     _objects = ()
@@ -392,13 +387,21 @@ class DirectoryView (Persistent):
 
     def __of__(self, parent):
         info = _dirreg.getDirectoryInfo(self._dirpath)
-        if info is not None:
-            info = info.getContents(_dirreg)
+        if info is None:
+            # for DirectoryViews created with CMF versions before 1.5
+            # this is basically the old minimalpath() code
+            self._dirpath = normalize(self._dirpath)
+            index = self._dirpath.rfind('Products')
+            if index == -1:
+                index = self._dirpath.rfind('products')
+            if index != -1:
+                self._dirpath = self._dirpath[index+len('products/'):]
+            info = _dirreg.getDirectoryInfo(self._dirpath)
         if info is None:
             data = {}
             objects = ()
         else:
-            data, objects = info
+            data, objects = info.getContents(_dirreg)
         s = DirectoryViewSurrogate(self, data, objects)
         res = s.__of__(parent)
         return res
@@ -438,8 +441,7 @@ class DirectoryViewSurrogate (Folder):
 
     security.declareProtected(ManagePortal, 'manage_properties')
     def manage_properties( self, dirpath, REQUEST=None ):
-        """
-            Update the directory path of the DV.
+        """ Update the directory path of the DirectoryView.
         """
         self.__dict__['_real']._dirpath = dirpath
         if REQUEST is not None:
@@ -455,10 +457,8 @@ class DirectoryViewSurrogate (Folder):
 
     security.declareProtected(AccessContentsInformation, 'listCustFolderPaths')
     def listCustFolderPaths(self, adding_meta_type=None):
-        '''
-        Returns a list of possible customization folders
-        as key, value pairs.
-        '''
+        """ List possible customization folders as key, value pairs.
+        """
         rval = []
         ob = self.getCustomizableObject()
         listFolderHierarchy(ob, '', rval, adding_meta_type)
@@ -478,49 +478,45 @@ InitializeClass(DirectoryViewSurrogate)
 
 manage_addDirectoryViewForm = HTMLFile('dtml/addFSDirView', globals())
 
-def createDirectoryView(parent, filepath, id=None):
-    '''
-    Adds either a DirectoryView or a derivative object.
-    '''
-    info = _dirreg.getDirectoryInfo(filepath)
+def createDirectoryView(parent, minimal_fp, id=None):
+    """ Add either a DirectoryView or a derivative object.
+    """
+    info = _dirreg.getDirectoryInfo(minimal_fp)
     if info is None:
-        raise ValueError('Not a registered directory: %s' % filepath)
+        raise ValueError('Not a registered directory: %s' % minimal_fp)
     if not id:
-        id = path.split(filepath)[-1]
+        id = minimal_fp.split('/')[-1]
     else:
         id = str(id)
-    ob = DirectoryView(id, filepath)
+    ob = DirectoryView(id, minimal_fp)
     parent._setObject(id, ob)
 
 def addDirectoryViews(ob, name, _prefix):
-    '''
-    Adds a directory view for every subdirectory of the
-    given directory.
-    '''
-    # Meant to be called by filesystem-based code.
-    # Note that registerDirectory() still needs to be called
-    # by product initialization code to satisfy
-    # persistence demands.
+    """ Add a directory view for every subdirectory of the given directory.
+
+    Meant to be called by filesystem-based code. Note that registerDirectory()
+    still needs to be called by product initialization code to satisfy
+    persistence demands.
+    """
     if not isinstance(_prefix, StringType):
         _prefix = package_home(_prefix)
-    fp = path.join(_prefix, name)
-    filepath = minimalpath(fp)
-    info = _dirreg.getDirectoryInfo(filepath)
+    filepath = path.join(_prefix, name)
+    minimal_fp = minimalpath(filepath)
+    info = _dirreg.getDirectoryInfo(minimal_fp)
     if info is None:
-        raise ValueError('Not a registered directory: %s' % filepath)
+        raise ValueError('Not a registered directory: %s' % minimal_fp)
     for entry in info.getSubdirs():
-        filepath2 = path.join(filepath, entry)
-        createDirectoryView(ob, filepath2, entry)
+        entry_minimal_fp = '/'.join( (minimal_fp, entry) )
+        createDirectoryView(ob, entry_minimal_fp, entry)
 
-def manage_addDirectoryView(self, filepath, id=None, REQUEST=None):
-    '''
-    Adds either a DirectoryView or a derivative object.
-    '''
-    createDirectoryView(self, filepath, id)
+def manage_addDirectoryView(self, dirpath, id=None, REQUEST=None):
+    """ Add either a DirectoryView or a derivative object.
+    """
+    createDirectoryView(self, dirpath, id)
     if REQUEST is not None:
         return self.manage_main(self, REQUEST)
 
 def manage_listAvailableDirectories(*args):
-    '''
-    '''
+    """ List registered directories.
+    """
     return list(_dirreg.listDirectories())
