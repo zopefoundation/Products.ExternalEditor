@@ -115,7 +115,8 @@
 
   - Removed silly dependency of 'CatalogTool.searchResults' on
     REQUEST (catalog already does the Right Thing (tm) when no
-    REQUEST is available).
+    REQUEST is available).  Note that this requires updates to
+    the 'search' skins, as they didn't pass it in.
 
   - Changed redirect target after rejecting an item to the search
     page for pending content items;  this resolves the problem
