@@ -10,6 +10,7 @@ from Products.PageTemplates.TALES import Undefined
 from Products.StandardCacheManagers import RAMCacheManager
 
 from Products.CMFCore.FSPageTemplate import FSPageTemplate
+from Products.CMFCore.FSMetadata import FSMetadata
 from Products.CMFCore.tests.base.dummy import DummyCachingManager
 from Products.CMFCore.tests.base.testcase import FSDVTest
 from Products.CMFCore.tests.base.testcase import RequestTest
@@ -19,7 +20,10 @@ from Products.CMFCore.tests.base.testcase import SecurityTest
 class FSPTMaker(FSDVTest):
 
     def _makeOne( self, id, filename ):
-        return FSPageTemplate( id, path_join(self.skin_path_name, filename) )
+        path = path_join(self.skin_path_name, filename)
+        metadata = FSMetadata(path)
+        metadata.read()
+        return FSPageTemplate( id, path, properties=metadata.getProperties() )
 
 
 class FSPageTemplateTests( RequestTest, FSPTMaker ):
@@ -58,6 +62,16 @@ class FSPageTemplateTests( RequestTest, FSPTMaker ):
         script()
         self.assertEqual( self.RESPONSE.getHeader('content-type')
                         , 'text/html; charset=utf-8')
+
+    def test_ContentTypeFromFSMetadata(self):
+        # Test to see if a content_type specified in a .metadata file
+        # is respected
+        script = self._makeOne('testPT2', 'testPT2.pt')
+        script = script.__of__(self.root)
+        script()
+        self.assertEqual( self.RESPONSE.getHeader('content-type')
+                        , 'text/xml'
+                        )
 
     def test_BadCall( self ):
         script = self._makeOne( 'testPTbad', 'testPTbad.pt' )

@@ -83,13 +83,17 @@ class FSPageTemplate(FSObject, Script, PageTemplate):
             data = file.read()
         finally:
             file.close()
+
         if reparse:
-            xml_info = xml_detect_re.match(data)
-            if xml_info:
-                # Smells like xml
-                # set "content_type" from the XML declaration
-                encoding = xml_info.group(1) or 'utf-8'
-                self.content_type = 'text/xml; charset=%s' % encoding
+            # If we already have a content_type set it must come from a
+            # .metadata file and we should always honor that
+            if getattr(self, 'content_type', None) is not None:
+                xml_info = xml_detect_re.match(data)
+                if xml_info:
+                    # Smells like xml
+                    # set "content_type" from the XML declaration
+                    encoding = xml_info.group(1) or 'utf-8'
+                    self.content_type = 'text/xml; charset=%s' % encoding
 
             self.write(data)
 
