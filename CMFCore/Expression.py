@@ -1,14 +1,14 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """ Expressions in a web-configurable workflow.
 
@@ -17,13 +17,14 @@ $Id$
 
 import Globals
 from Globals import Persistent
-from Acquisition import aq_inner, aq_parent
+from Acquisition import aq_base, aq_inner, aq_parent
 from AccessControl import getSecurityManager, ClassSecurityInfo
 
 from utils import getToolByName
 from Products.PageTemplates.Expressions import getEngine
 from Products.PageTemplates.TALES import SafeMapping
 from Products.PageTemplates.Expressions import SecureModuleImporter
+
 
 class Expression (Persistent):
     text = ''
@@ -48,6 +49,36 @@ class Expression (Persistent):
         return res
 
 Globals.InitializeClass(Expression)
+
+
+def getExprContext(context, object=None):
+    request = getattr(context, 'REQUEST', None)
+    if request:
+        cache = request.get('_ec_cache', None)
+        if cache is None:
+            request['_ec_cache'] = cache = {}
+        ec = cache.get( str(object), None )
+    else:
+        ec = None
+    if ec is None:
+        utool = getToolByName(context, 'portal_url')
+        portal = utool.getPortalObject()
+        if object is None or not hasattr(object, 'aq_base'):
+            folder = portal
+        else:
+            folder = object
+            # Search up the containment hierarchy until we find an
+            # object that claims it's a folder.
+            while folder is not None:
+                if getattr(aq_base(folder), 'isPrincipiaFolderish', 0):
+                    # found it.
+                    break
+                else:
+                    folder = aq_parent(aq_inner(folder))
+        ec = createExprContext(folder, portal, object)
+        if request:
+            cache[ str(object) ] = ec
+    return ec
 
 
 def createExprContext(folder, portal, object):

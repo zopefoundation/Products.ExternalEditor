@@ -22,9 +22,8 @@ from Globals import InitializeClass, PersistentMapping, DTMLFile
 from AccessControl import ClassSecurityInfo
 from Acquisition import aq_base, aq_inner, aq_parent
 
+from ActionProviderBase import OldstyleActionProviderBase
 from CMFCorePermissions import ManagePortal
-from interfaces.portal_actions \
-        import OldstyleActionProvider as IOldstyleActionProvider
 from interfaces.portal_workflow import portal_workflow as IWorkflowTool
 from utils import _dtmldir
 from utils import getToolByName
@@ -53,13 +52,13 @@ class WorkflowInformation:
         raise KeyError, name
 
 
-class WorkflowTool (UniqueObject, Folder):
-
+class WorkflowTool(UniqueObject, Folder, OldstyleActionProviderBase):
     """ Mediator tool, mapping workflow objects
     """
     id = 'portal_workflow'
     meta_type = 'CMF Workflow Tool'
-    __implements__ = (IWorkflowTool, IOldstyleActionProvider)
+    __implements__ = (IWorkflowTool,
+                      OldstyleActionProviderBase.__implements__)
 
     _chains_by_type = None  # PersistentMapping
     _default_chain = ('default_workflow',)
@@ -344,7 +343,7 @@ class WorkflowTool (UniqueObject, Folder):
                         'Requested workflow definition not found.')
                 else:
                     return default
-        res = apply(wf.getInfoFor, (ob, name, default) + args, kw)
+        res = wf.getInfoFor(ob, name, default, *args, **kw)
         if res is _marker:
             raise WorkflowException('Could not get info: %s' % name)
         return res
@@ -590,7 +589,7 @@ class WorkflowTool (UniqueObject, Folder):
             wfs = ()
         if wf is None:
             # No workflow wraps this method.
-            return apply(func, args, kw)
+            return func(*args, **kw)
         return self._invokeWithNotification(
             wfs, ob, method_id, wf.wrapWorkflowMethod,
             (ob, method_id, func, args, kw), {})
@@ -619,7 +618,7 @@ class WorkflowTool (UniqueObject, Folder):
         for w in wfs:
             w.notifyBefore(ob, action)
         try:
-            res = apply(func, args, kw)
+            res = func(*args, **kw)
         except ObjectDeleted, ex:
             res = ex.getResult()
             reindex = 0

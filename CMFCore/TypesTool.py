@@ -252,8 +252,7 @@ class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
         return self.global_allow
 
     security.declarePublic('listActions')
-    def listActions( self, info=None ):
-
+    def listActions(self, info=None, object=None):
         """ Return a sequence of the action info objects for this type.
         """
         if self._actions and type( self._actions[0] ) == type( {} ):
@@ -888,16 +887,15 @@ class TypesTool(UniqueObject, Folder, ActionProviderBase):
             RESPONSE.redirect( immediate_url )
 
     security.declarePrivate( 'listActions' )
-    def listActions( self, info=None ):
-        """
-            List type-related actions.
+    def listActions(self, info=None, object=None):
+        """ List all the actions defined by a provider.
         """
         actions = list( self._actions )
 
-        if info is not None:
-
-            type_info = self.getTypeInfo( info.content )
-
+        if object is None and info is not None:
+            object = info.content
+        if object is not None:
+            type_info = self.getTypeInfo(object)
             if type_info is not None:
                 actions.extend( type_info.listActions() )
 

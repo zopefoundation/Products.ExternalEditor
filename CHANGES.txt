@@ -2,6 +2,28 @@ CMF 1.5alpha (unreleased)
 
   New Features
 
+    - Refactored ActionsTool and Action providers:
+
+      o Added listActionInfos() and getActionInfo() to the ActionProvider
+        Interface, added 'object' argument to listActions().
+
+      o Added OldstyleActionProvider Interface and OldstyleActionProviderBase
+        for Action providers still not using ActionInformation objects.
+        WorkflowTool and CMFCore DiscussionTool use this.
+
+      o Action providers queried by ActionsTool should implement the new
+        ActionProvider Interface. Action providers subclassing
+        ActionProviderBase inherit the necessary methods.
+
+      o To ease transition it will be sufficient to implement the
+        OldstyleActionProvider Interface, using OldstyleActionProviderBase.
+        The use of Action providers not implementing one of these Interfaces
+        or Actions provided by objects themselves is deprecated. Support for
+        them might be removed after CMF 1.5.
+
+      o Added helper methods getOAI() and getExprContext() to get computed
+        contexts from REQUEST cache or create new ones.
+
     - CMFDefault MembershipTool and zpt skin: Added 'Manage members' Action.
       The skin now provides basic membership management: Browsing members,
       registering new members and deleting members including their member

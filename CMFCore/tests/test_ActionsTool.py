@@ -1,6 +1,11 @@
-from unittest import TestCase, TestSuite, makeSuite, main
+from unittest import TestSuite, makeSuite, main
 
 import Zope
+try:
+    Zope.startup()
+except AttributeError:
+    # for Zope versions before 2.6.1
+    pass
 try:
     from Interface.Verify import verifyClass
 except ImportError:
@@ -19,20 +24,20 @@ from Products.CMFCore.URLTool import URLTool
 from Products.CMFCore.RegistrationTool import RegistrationTool
 from Products.CMFCore.MembershipTool import MembershipTool
 
+
 class ActionsToolTests( SecurityRequestTest ):
 
     def setUp( self ):
-        
+
         SecurityRequestTest.setUp(self)
-        
+
         root = self.root
         root._setObject( 'portal_actions', ActionsTool() )
-        root._setObject('foo', URLTool() )
-        root._setObject('bar', URLTool() )
+        root._setObject( 'portal_url', URLTool() )
+        root._setObject( 'foo', URLTool() )
         root._setObject('portal_membership', MembershipTool())
         root._setObject('portal_types', TypesTool())
         self.tool = root.portal_actions
-        self.ut = root.foo
         self.tool.action_providers = ('portal_actions',)
 
     def test_actionProviders(self):
@@ -44,10 +49,10 @@ class ActionsToolTests( SecurityRequestTest ):
         tool.addActionProvider('foo')
         self.assertEqual(tool.listActionProviders(),
                           ('portal_actions', 'foo'))
-        tool.addActionProvider('bar')
+        tool.addActionProvider('portal_url')
         tool.addActionProvider('foo')
         self.assertEqual(tool.listActionProviders(),
-                          ('portal_actions', 'foo', 'bar'))
+                          ('portal_actions', 'foo', 'portal_url'))
 
     def test_delActionProvider(self):
         tool = self.tool
@@ -75,7 +80,7 @@ class ActionsToolTests( SecurityRequestTest ):
                                       'category': 'object'}],
                           'folder': [],
                           'global': []})
-        
+
     def test_listDictionaryActions(self):
         """
         Check that listFilteredActionsFor works for objects

@@ -1,12 +1,20 @@
-import unittest
+from unittest import TestCase, TestSuite, makeSuite, main
+
 import Zope
+try:
+    Zope.startup()
+except AttributeError:
+    # for Zope versions before 2.6.1
+    pass
 try:
     from Interface.Verify import verifyClass
 except ImportError:
     # for Zope versions before 2.6.0
     from Interface import verify_class_implementation as verifyClass
 
+from Products.CMFCore.tests.base.dummy import DummySite
 from Products.CMFCore.tests.base.dummy import DummyTool
+from Products.CMFCore.tests.base.testcase import SecurityRequestTest
 
 #
 #   We have to import these here to make the "ugly sharing" test case go.
@@ -14,7 +22,8 @@ from Products.CMFCore.tests.base.dummy import DummyTool
 from Products.CMFCore.ActionProviderBase import ActionProviderBase
 from Products.CMFCore.ActionInformation import ActionInformation
 
-class DummyProvider( ActionProviderBase ):
+
+class DummyProvider(ActionProviderBase, DummyTool):
 
     _actions = ( ActionInformation( id='an_id'
                                   , title='A Title'
@@ -24,6 +33,7 @@ class DummyProvider( ActionProviderBase ):
                                   , category=''
                                   , visible=0
                                   ), )
+
 
 class DummyAction:
 
@@ -40,8 +50,15 @@ class DummyAction:
               or 0
                )
 
-class ActionProviderBaseTests(unittest.TestCase):
+
+class ActionProviderBaseTests(SecurityRequestTest):
     
+    def setUp( self ):
+        SecurityRequestTest.setUp(self)
+        self.site = DummySite('site').__of__(self.root)
+        utool = self.site._setObject( 'portal_url', DummyTool() )
+        mtool = self.site._setObject( 'portal_membership', DummyTool() )
+
     def _makeProvider( self, dummy=0 ):
 
         klass = dummy and DummyProvider or ActionProviderBase
@@ -65,7 +82,6 @@ class ActionProviderBaseTests(unittest.TestCase):
         self.assertEqual( apb._actions[0].permissions, () )
 
     def test_changeActions( self ):
-
 
         apb = DummyTool()
         old_actions = list( apb._actions )
@@ -147,16 +163,41 @@ class ActionProviderBaseTests(unittest.TestCase):
         self.failIf( one_ids == another_ids )
         self.assertEqual( old_ids, another_ids )
 
+    def test_listActionInfos(self):
+        wanted = [{'permissions': '', 'id': 'an_id', 'url': '',
+                   'name': 'A Title', 'visible': 0, 'category': 'object'}]
+
+        apb = self.site._setObject( 'portal_apb', self._makeProvider(1) )
+        rval = apb.listActionInfos()
+        self.assertEqual( rval, [] )
+        rval = apb.listActionInfos(check_visibility=0)
+        self.assertEqual( rval, wanted )
+        rval = apb.listActionInfos('foo/another_id', check_visibility=0)
+        self.assertEqual( rval, [] )
+
+    def test_getActionInfo(self):
+        wanted = {'permissions': '', 'id': 'an_id', 'url': '',
+                  'name': 'A Title', 'visible': 0, 'category': 'object'}
+
+        apb = self.site._setObject( 'portal_apb', self._makeProvider(1) )
+        rval = apb.getActionInfo( ('object/an_id',) )
+        self.assertEqual( rval, wanted )
+        rval = apb.getActionInfo('object/an_id')
+        self.assertEqual( rval, wanted )
+        rval = apb.getActionInfo('object/an_id', check_visibility=1)
+        self.assertEqual( rval, None )
+
     def test_interface(self):
         from Products.CMFCore.interfaces.portal_actions \
                 import ActionProvider as IActionProvider
 
         verifyClass(IActionProvider, ActionProviderBase)
 
+
 def test_suite():
-    return unittest.TestSuite((
-        unittest.makeSuite(ActionProviderBaseTests),
+    return TestSuite((
+        makeSuite(ActionProviderBaseTests),
         ))
 
 if __name__ == '__main__':
-    unittest.main(defaultTest='test_suite')
+    main(defaultTest='test_suite')

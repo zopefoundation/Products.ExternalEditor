@@ -20,13 +20,12 @@ from Globals import InitializeClass, DTMLFile
 from Acquisition import Implicit
 from AccessControl import ClassSecurityInfo
 
+from ActionProviderBase import OldstyleActionProviderBase
 from CMFCorePermissions import AccessContentsInformation
 from CMFCorePermissions import ManagePortal
 from CMFCorePermissions import ReplyToItem
 from CMFCorePermissions import View
 from interfaces.Discussions import OldDiscussable as IOldDiscussable
-from interfaces.portal_actions \
-        import OldstyleActionProvider as IOldstyleActionProvider
 from interfaces.portal_discussion \
         import oldstyle_portal_discussion as IOldstyleDiscussionTool
 from utils import _dtmldir
@@ -113,9 +112,10 @@ class OldDiscussable(Implicit):
         return ""
 
 
-class DiscussionTool (UniqueObject, SimpleItem):
+class DiscussionTool (UniqueObject, SimpleItem, OldstyleActionProviderBase):
 
-    __implements__ = (IOldstyleDiscussionTool, IOldstyleActionProvider)
+    __implements__ = (IOldstyleDiscussionTool,
+                      OldstyleActionProviderBase.__implements__)
 
     id = 'portal_discussion'
     meta_type = 'Oldstyle CMF Discussion Tool'

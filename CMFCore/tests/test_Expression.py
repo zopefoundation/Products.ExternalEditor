@@ -1,19 +1,24 @@
-import Zope
 from unittest import TestSuite, makeSuite, main
 
-from Products.CMFCore.tests.base.testcase import \
-     SecurityTest
-
-from Products.CMFCore.tests.base.dummy import \
-     DummyContent, DummyTool as DummyMembershipTool
+import Zope
+try:
+    Zope.startup()
+except AttributeError:
+    # for Zope versions before 2.6.1
+    pass
 
 from Products.CMFCore.ActionInformation import ActionInformation
-from Products.CMFCore.Expression import Expression, createExprContext
+from Products.CMFCore.Expression import createExprContext
+from Products.CMFCore.Expression import Expression
+from Products.CMFCore.tests.base.dummy import DummyContent
+from Products.CMFCore.tests.base.dummy import DummyTool as DummyMembershipTool
+from Products.CMFCore.tests.base.testcase import SecurityTest
+
 
 class ExpressionTests( SecurityTest ):
 
     def setUp( self ):
-        
+
         SecurityTest.setUp(self)
         root = self.root
         root._setObject('portal', DummyContent('portal', url='url_portal'))
@@ -57,7 +62,8 @@ class ExpressionTests( SecurityTest ):
         self.failUnless(folder)
         self.assertEqual(folder.id, 'foo')
         self.assertEqual(folder.absolute_url(), 'url_foo')
-        
+
+
 def test_suite():
     return TestSuite((
         makeSuite(ExpressionTests),

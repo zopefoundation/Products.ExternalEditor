@@ -88,17 +88,45 @@ class ActionProvider(Interface):
     """ The interface expected of an object that can provide actions.
     """
 
-    def listActions(info=None):
+    def listActions(info=None, object=None):
         """ List all the actions defined by a provider.
 
-        The info argument is currently used by 'CMF Types Tool'. It contains
-        at least a 'content' attribute.
+        If 'object' is specified, object specific actions are included.
+
+        The 'info' argument is deprecated and may be removed in a future
+        version. If 'object' isn't specified, the method uses for backwards
+        compatibility 'info.content' as object.
 
         Returns -- Tuple of ActionInformation objects
         """
 
+    def listActionInfos(action_chain=None, object=None, check_visibility=1,
+                        check_permissions=1, check_condition=1, max=-1):
+        """ List Action info mappings.
 
-class OldstyleActionProvider(Interface):
+        'action_chain' is a sequence of action 'paths' (e.g. 'object/view').
+        If specified, only these actions will be returned in the given order.
+
+        If 'object' is specified, object specific Actions are included.
+
+        If 'max' is specified, only the first max Actions are returned.
+
+        Permission -- Always available (not publishable)
+
+        Returns -- Tuple of Action info mappings
+        """
+
+    def getActionInfo(action_chain, object=None, check_visibility=0,
+                      check_condition=0):
+        """ Get an Action info mapping specified by a chain of actions.
+
+        Permission -- Always available
+
+        Returns -- Action info mapping or None
+        """
+
+
+class OldstyleActionProvider(ActionProvider):
     """ Deprecated interface expected of an object that can provide actions.
 
     Still used by 'Oldstyle CMF Discussion Tool' and 'CMF Workflow Tool'.

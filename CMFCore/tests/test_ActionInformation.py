@@ -7,17 +7,16 @@ except AttributeError:
     # for Zope versions before 2.6.1
     pass
 
-from Products.CMFCore.tests.base.testcase import \
-     TransactionalTest
-
-from Products.CMFCore.tests.base.dummy import \
-     DummyContent, DummyTool as DummyMembershipTool
-
 from Products.CMFCore.ActionInformation import ActionInformation
-from Products.CMFCore.Expression import Expression, createExprContext
+from Products.CMFCore.Expression import createExprContext
+from Products.CMFCore.Expression import Expression
+from Products.CMFCore.tests.base.dummy import DummyContent
+from Products.CMFCore.tests.base.dummy import DummyTool as DummyMembershipTool
+from Products.CMFCore.tests.base.testcase import TransactionalTest
+
 
 class ActionInformationTests(TransactionalTest):
-    
+
     def setUp( self ):
 
         TransactionalTest.setUp( self )
@@ -58,11 +57,11 @@ class ActionInformationTests(TransactionalTest):
         self.assertEqual(ai.getVisibility(), 0)
         self.assertEqual(ai.getCategory(), 'global')
         self.assertEqual(ai.getPermissions(), ())
-    
+
     def test_Condition(self):
-        portal = self.portal 
+        portal = self.portal
         folder = self.folder
-        object = self.object 
+        object = self.object
         ai = ActionInformation(id='view'
                              , title='View'
                              , action=Expression(
@@ -73,7 +72,8 @@ class ActionInformationTests(TransactionalTest):
                              , visible=1)
         ec = createExprContext(folder, portal, object)
         self.failIf(ai.testCondition(ec))
-        
+
+
 def test_suite():
     return TestSuite((
         makeSuite(ActionInformationTests),

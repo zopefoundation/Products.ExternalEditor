@@ -15,25 +15,28 @@
 $Id$
 """
 
+from types import DictionaryType
+
 from Globals import InitializeClass, DTMLFile, package_home
-from Acquisition import aq_base, aq_inner, aq_parent
 from AccessControl import ClassSecurityInfo
+from Acquisition import aq_base, aq_inner, aq_parent
 from OFS.Folder import Folder
 from OFS.SimpleItem import SimpleItem
 
-from Expression import Expression, createExprContext
-from ActionInformation import ActionInformation, oai
+from ActionInformation import ActionInformation
+from ActionInformation import getOAI
 from ActionProviderBase import ActionProviderBase
-from TypesTool import TypeInformation
 from CMFCorePermissions import ListFolderContents
 from CMFCorePermissions import ManagePortal
+from Expression import Expression
+from Expression import getExprContext
+from interfaces.portal_actions import portal_actions as IActionsTool
+from TypesTool import TypeInformation
 from utils import _checkPermission
 from utils import _dtmldir
 from utils import getToolByName
 from utils import SimpleItemWithProperties
 from utils import UniqueObject
-
-from interfaces.portal_actions import portal_actions as IActionsTool
 
 
 class ActionsTool(UniqueObject, Folder, ActionProviderBase):
@@ -51,7 +54,7 @@ class ActionsTool(UniqueObject, Folder, ActionProviderBase):
                                 , action=Expression(
                text='string: ${folder_url}/folder_contents')
                                 , condition=Expression(
-               text='python: folder is not object') 
+               text='python: folder is not object')
                                 , permissions=(ListFolderContents,)
                                 , category='object'
                                 , visible=1
@@ -89,7 +92,7 @@ class ActionsTool(UniqueObject, Folder, ActionProviderBase):
                          , 'action' : 'manage_overview'
                          }
                      ) + Folder.manage_options
-                     ) 
+                     )
 
     #
     #   ZMI methods
@@ -156,37 +159,25 @@ class ActionsTool(UniqueObject, Folder, ActionProviderBase):
     def listFilteredActionsFor(self, object=None):
         """ List all actions available to the user.
         """
-        portal = aq_parent(aq_inner(self))
-        if object is None or not hasattr(object, 'aq_base'):
-            folder = portal
-        else:
-            folder = object
-            # Search up the containment hierarchy until we find an
-            # object that claims it's a folder.
-            while folder is not None:
-                if getattr(aq_base(folder), 'isPrincipiaFolderish', 0):
-                    # found it.
-                    break
-                else:
-                    folder = aq_parent(aq_inner(folder))
-        ec = createExprContext(folder, portal, object)
         actions = []
-        append = actions.append
-        info = oai(self, folder, object)
 
         # Include actions from specific tools.
         for provider_name in self.listActionProviders():
             provider = getattr(self, provider_name)
-            self._listActions(append,provider,info,ec)
+            if hasattr( aq_base(provider), 'listActionInfos' ):
+                actions.extend( provider.listActionInfos(object=object) )
+            else:
+                # for Action Providers written for CMF versions before 1.5
+                actions.extend( self._listActionInfos(provider, object) )
 
+        # for objects written for CMF versions before 1.5
         # Include actions from object.
         if object is not None:
             base = aq_base(object)
             if hasattr(base, 'listActions'):
-                self._listActions(append,object,info,ec)
+                actions.extend( self._listActionInfos(object, object) )
 
-        # Reorganize the actions by category,
-        # filtering out disallowed actions.
+        # Reorganize the actions by category.
         filtered_actions={'user':[],
                           'folder':[],
                           'object':[],
@@ -195,44 +186,16 @@ class ActionsTool(UniqueObject, Folder, ActionProviderBase):
                           }
         for action in actions:
             category = action['category']
-            permissions = action.get('permissions', None)
-            visible = action.get('visible', 1)
-            if not visible:
-                continue
-            verified = 0
-            if not permissions:
-                # This action requires no extra permissions.
-                verified = 1
-            else:
-                # startswith() is used so that we can have several
-                # different categories that are checked in the object or
-                # folder context.
-                if (object is not None and
-                    (category.startswith('object') or
-                     category.startswith('workflow'))):
-                    context = object
-                elif (folder is not None and
-                      category.startswith('folder')):
-                    context = folder
-                else:
-                    context = portal
-                for permission in permissions:
-                    # The user must be able to match at least one of
-                    # the listed permissions.
-                    if _checkPermission(permission, context):
-                        verified = 1
-                        break
-            if verified:
-                catlist = filtered_actions.get(category, None)
-                if catlist is None:
-                    filtered_actions[category] = catlist = []
-                # Filter out duplicate actions by identity...
-                if not action in catlist:
-                    catlist.append(action)
-                # ...should you need it, here's some code that filters
-                # by equality (use instead of the two lines above)
-                #if not [a for a in catlist if a==action]:
-                #    catlist.append(action)
+            catlist = filtered_actions.get(category, None)
+            if catlist is None:
+                filtered_actions[category] = catlist = []
+            # Filter out duplicate actions by identity...
+            if not action in catlist:
+                catlist.append(action)
+            # ...should you need it, here's some code that filters
+            # by equality (use instead of the two lines above)
+            #if not [a for a in catlist if a==action]:
+            #    catlist.append(action)
         return filtered_actions
 
     # listFilteredActions() is an alias.
@@ -240,16 +203,65 @@ class ActionsTool(UniqueObject, Folder, ActionProviderBase):
     listFilteredActions = listFilteredActionsFor
 
     #
-    #   Helper methods
+    #   Helper method for backwards compatibility
     #
-    def _listActions(self,append,object,info,ec):
-        a = object.listActions(info)
-        if a and type(a[0]) is not type({}):
-            for ai in a:
-                if ai.testCondition(ec):
-                    append(ai.getAction(ec))
+    def _listActionInfos(self, provider, object):
+        """ for Action Providers written for CMF versions before 1.5
+        """
+        info = getOAI(self, object)
+        actions = provider.listActions(info)
+
+        action_infos = []
+        if actions and type(actions[0]) is not DictionaryType:
+            ec = getExprContext(self, object)
+            for ai in actions:
+                if not ai.getVisibility():
+                    continue
+                permissions = ai.getPermissions()
+                if permissions:
+                    category = ai.getCategory()
+                    if (object is not None and
+                        (category.startswith('object') or
+                         category.startswith('workflow'))):
+                        context = object
+                    elif (info['folder'] is not None and
+                          category.startswith('folder')):
+                        context = info['folder']
+                    else:
+                        context = info['portal']
+                    for permission in permissions:
+                        allowed = _checkPermission(permission, context)
+                        if allowed:
+                            break
+                    if not allowed:
+                        continue
+                if not ai.testCondition(ec):
+                    continue
+                action_infos.append( ai.getAction(ec) )
         else:
-            for i in a:
-                append(i)
+            for i in actions:
+                if not i.get('visible', 1):
+                    continue
+                permissions = i.get('permissions', None)
+                if permissions:
+                    category = i['category']
+                    if (object is not None and
+                        (category.startswith('object') or
+                         category.startswith('workflow'))):
+                        context = object
+                    elif (info['folder'] is not None and
+                          category.startswith('folder')):
+                        context = info['folder']
+                    else:
+                        context = info['portal']
+
+                    for permission in permissions:
+                        allowed = _checkPermission(permission, context)
+                        if allowed:
+                            break
+                    if not allowed:
+                        continue
+                action_infos.append(i)
+        return action_infos
 
 InitializeClass(ActionsTool)

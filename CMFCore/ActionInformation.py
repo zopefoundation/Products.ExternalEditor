@@ -15,20 +15,22 @@
 $Id$
 """
 
+from types import StringType
+
 from AccessControl import ClassSecurityInfo
 from Globals import InitializeClass
-from Acquisition import aq_inner, aq_parent
+from Acquisition import aq_base, aq_inner, aq_parent
 from OFS.SimpleItem import SimpleItem
 
 from Expression import Expression
 from CMFCorePermissions import View
 from utils import getToolByName
-from types import StringType
+
 
 class ActionInformation( SimpleItem ):
 
     """ Represent a single selectable action.
-    
+
     Actions generate links to views of content, or to specific methods
     of the site.  They can be filtered via their conditions.
     """
@@ -59,10 +61,10 @@ class ActionInformation( SimpleItem ):
         self.id = id
         self.title = title
         self.description = description
-        self.category = category 
+        self.category = category
         self.condition = condition
         self.permissions = permissions
-        self.priority = priority 
+        self.priority = priority
         self.visible = visible
         self.setActionExpression(action)
 
@@ -106,7 +108,7 @@ class ActionInformation( SimpleItem ):
         info['permissions'] = self.getPermissions()
         info['category'] = self.getCategory()
         info['visible'] = self.getVisibility()
-        return info 
+        return info
 
     security.declarePrivate( '_getActionObject' )
     def _getActionObject( self ):
@@ -192,6 +194,35 @@ class ActionInformation( SimpleItem ):
 
 InitializeClass( ActionInformation )
 
+
+def getOAI(context, object=None):
+    request = getattr(context, 'REQUEST', None)
+    if request:
+        cache = request.get('_oai_cache', None)
+        if cache is None:
+            request['_oai_cache'] = cache = {}
+        info = cache.get( str(object), None )
+    else:
+        info = None
+    if info is None:
+        if object is None or not hasattr(object, 'aq_base'):
+            folder = None
+        else:
+            folder = object
+            # Search up the containment hierarchy until we find an
+            # object that claims it's a folder.
+            while folder is not None:
+                if getattr(aq_base(folder), 'isPrincipiaFolderish', 0):
+                    # found it.
+                    break
+                else:
+                    folder = aq_parent(aq_inner(folder))
+        info = oai(context, folder, object)
+        if request:
+            cache[ str(object) ] = info
+    return info
+
+
 class oai:
     #Provided for backwards compatability
     # Provides information that may be needed when constructing the list of
@@ -223,4 +254,3 @@ class oai:
         if hasattr(self, name):
             return getattr(self, name)
         raise KeyError, name
-
