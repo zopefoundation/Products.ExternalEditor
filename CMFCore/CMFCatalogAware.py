@@ -137,7 +137,7 @@ class CMFCatalogAware(Base):
         for name in self_base.__dict__.keys():
             obj = getattr(self_base, name)
             if ICallableOpaqueItemWithHooks.isImplementedBy(obj):
-                items.append((obj.id, obj))
+                items.append((obj.getId(), obj))
         
         return tuple(items)
 
