@@ -71,6 +71,7 @@ class DocumentTests(unittest.TestCase):
         assert d.description == ''
         assert d.text == ''
         assert d.text_format == 'structured-text'
+        assert d._stx_level == 1
 
     def test_BasicHtml(self):
         d = Document('foo', text=BASIC_HTML)
@@ -79,6 +80,11 @@ class DocumentTests(unittest.TestCase):
         assert string.find(d.text, '</body>') == -1
         assert d.Description() == 'Describe me'
         assert len(d.Contributors()) == 2
+
+        # Since the format is html, the STX level operands should
+        # have no effect.
+        ct = d.CookedBody(stx_level=3, setlevel=1)
+        assert d._stx_level == 1
 
         subj = list(d.Subject())
         assert len(subj) == 4
@@ -128,6 +134,7 @@ class DocumentTests(unittest.TestCase):
         assert d.Description() == 'A document by me'
         assert len(d.Contributors()) == 3
         assert string.find(d.cooked_text, '<p>') >= 0
+        assert string.find(d.CookedBody(), '<h1') >= 0
 
         # Make sure extra HTML is NOT found
         assert string.find(d.cooked_text, '<title>') == -1, d.cooked_text
@@ -143,6 +150,29 @@ class DocumentTests(unittest.TestCase):
             'unit tests',
             'zope'
             ]
+
+    def test_STX_Levels(self):
+        d = Document('foo', text=BASIC_STRUCTUREDTEXT)
+        assert d._stx_level == 1
+
+        ct = d.CookedBody()
+        assert string.find(d.CookedBody(), '<h1') >= 0
+        assert d._stx_level == 1
+
+        ct = d.CookedBody(stx_level=2)
+        assert not (string.find(ct, '<h1') >= 0)
+        assert string.find(ct, '<h2') >= 0
+        assert d._stx_level == 1
+
+        ct = d.CookedBody(stx_level=2, setlevel=1)
+        assert not (string.find(ct, '<h1') >= 0)
+        assert string.find(ct, '<h2') >= 0
+        assert d._stx_level == 2
+
+        ct = d.CookedBody()
+        assert d._stx_level == 2
+        assert not (string.find(d.CookedBody(), '<h1') >= 0)
+        assert string.find(d.CookedBody(), '<h2') >= 0
 
     def test_Init(self):
         d = Document('foo', text=BASIC_STRUCTUREDTEXT)
