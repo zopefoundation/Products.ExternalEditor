@@ -435,7 +435,7 @@ class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
             if not perms or View in perms:
                 try:
                     viewmethod = action.action(context).strip()
-                except AttributeError, TypeError:
+                except (AttributeError, TypeError):
                     break
                 if viewmethod.startswith('/'):
                     viewmethod = viewmethod[1:]
@@ -451,7 +451,7 @@ class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
         for action in ordered:
             try:
                 defmethod = action.action(context).strip()
-            except AttributeError, TypeError:
+            except (AttributeError, TypeError):
                 break
             if defmethod.startswith('/'):
                 defmethod = defmethod[1:]
