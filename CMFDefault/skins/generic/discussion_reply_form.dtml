@@ -5,6 +5,9 @@
 </dtml-if>
 
 <form method="POST" action="<dtml-var expr="absolute_url() + '/talkback'">">
+<dtml-let member="portal_membership.getAuthenticatedMember()">
+<input type="hidden" name="Creator" value="&dtml-member;">
+</dtml-let>
 
 <table class="FormLayout">
  <tr>

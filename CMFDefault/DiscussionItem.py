@@ -285,6 +285,10 @@ class DiscussionItemContainer(Persistent, Implicit):
         item.description = title
         item.text_format = 'structured-text'
         item.text = text
+
+        if REQUEST.has_key( 'Creator' ):
+            item.Creator = REQUEST[ 'Creator' ]
+
         item.__of__(self).setReplyTo(self.aq_parent)
  
         item._parse()
