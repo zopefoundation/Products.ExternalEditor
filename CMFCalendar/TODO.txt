@@ -1,2 +1,6 @@
-Add the calendar product itself, at rev 0.1 there is only an event object.
-other todo items as I think of them....
+To-do's
+
+ o Add the calendar product itself, at rev 0.1 there is only an
+   event object.
+
+ o other todo items as I think of them....

@@ -1,13 +1,28 @@
-To install CMFCalendar, uncompress the CMFCalendar product into your zope/Products directory 
-or ln -s /path/to/installation /path/to/zope/Products
-In the root of your CMFSite installation (within the ZMI):
-	1.  Add an external method to the root of the CMF Site
-	2.  Use the following configuration values for the external method:
+Installing CMFCalendar
 
- 			id: install_events
- 			title: Install Events *optional*
- 			module name: CMFCalendar.Install
- 			function name: install
-	3. Go to the management screen for the newly added external method and click the 'Try it' tab.  
-The install function will execute and give information about the steps it took to register and install the
-CMF Events into the CMF Site instance.
+  To install CMFCalendar, uncompress the CMFCalendar product into
+  your zope/Products directory or link it there, e.g.::
+
+    ln -s /path/to/installation /path/to/zope/Products
+
+  In the root of your CMFSite installation (within the ZMI):
+
+      1.  Add an external method to the root of the CMF Site.
+
+      2.  Use the following configuration values for the external
+          method:
+
+          o id: install_events
+
+          o title: Install Events *optional*
+
+          o module name: CMFCalendar.Install
+
+          o function name: install
+
+      3. Go to the management screen for the newly added external
+         method and click the 'Try it' tab.  
+
+  The install function will execute and give information about the
+  steps it took to register and install the CMF Events into the CMF
+  Site instance.
