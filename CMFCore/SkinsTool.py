@@ -33,6 +33,7 @@ from Expression import Expression
 
 from OFS.Image import Image
 from OFS.DTMLMethod import DTMLMethod
+from OFS.ObjectManager import REPLACEABLE
 from Products.PythonScripts.PythonScript import PythonScript
 
 try:
@@ -167,6 +168,9 @@ class SkinsTool(UniqueObject, SkinsContainer, PortalFolder, ActionProviderBase):
             return DTMLMethod( __name__=name )
 
         return None
+    
+    # Make the PUT_factory replaceable
+    PUT_factory__replaceable__ = REPLACEABLE
 
 
     security.declarePrivate('testSkinPath')
