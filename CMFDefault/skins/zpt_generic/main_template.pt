@@ -22,7 +22,8 @@
 <head>
  <title tal:content="here/expanded_title"> Title goes here </title>
 
- <!-- Bug in ZPT Causes this to break-metal:block define-slot="base" / --> 
+ <metal:block define-slot="base" /> 
+
  <link rel="stylesheet" href="zpt_stylesheet.css" type="text/css"
        tal:attributes="href here/zpt_stylesheet/absolute_url">
 
