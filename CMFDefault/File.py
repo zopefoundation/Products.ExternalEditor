@@ -231,7 +231,7 @@ class File( OFS.Image.File
                            'attachment; filename=%s' % self.getId())
         return OFS.Image.File.index_html(self, REQUEST, RESPONSE)
 
-    security.declareProtected(CMFCorePermissions.ModifyPortalContent, 'PUT')
+    security.declareProtected(ModifyPortalContent, 'PUT')
     def PUT(self, REQUEST, RESPONSE):
         """ Handle HTTP (and presumably FTP?) PUT requests """
         OFS.Image.File.PUT( self, REQUEST, RESPONSE )
