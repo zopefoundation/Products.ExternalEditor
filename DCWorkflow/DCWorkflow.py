@@ -78,6 +78,8 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
     roles = None  # The role names managed by this workflow.
     # If roles is None, listRoles() provides a default.
 
+    creation_guard = None  # The guard that can veto object creation.
+
     manager_bypass = 0  # Boolean: 'Manager' role bypasses guards
 
     manage_options = (
@@ -364,12 +366,21 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
 
         return value
 
+    security.declarePrivate('allowCreate')
+    def allowCreate(self, container, type_name):
+        """Returns true if the user is allowed to create a workflow instance.
+
+        The object passed to the guard is the prospective container.
+        """
+        if self.creation_guard is not None:
+            return self.creation_guard.check(
+                getSecurityManager(), self, container)
+        return 1
+
     security.declarePrivate('notifyCreated')
     def notifyCreated(self, ob):
-        '''
-        Notifies this workflow after an object has been created
-        and put in its new place.
-        '''
+        """Notifies this workflow after an object has been created and added.
+        """
         try:
             self._changeStateOf(ob, None)
         except ( ObjectDeleted, ObjectMoved ):

@@ -23,7 +23,17 @@
 </td>
 </tr>
 
+<tr>
+<th align="left" valign="top">Instance creation conditions</th>
+<td>
+ <dtml-with getGuard>
+  <dtml-var guardForm>
+ </dtml-with>
+</td>
+</tr>
+
 </table>
+
 <input type="submit" name="submit" value="Save changes" />
 </form>
 <dtml-var manage_page_footer>

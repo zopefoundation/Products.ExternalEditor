@@ -22,6 +22,7 @@ from Acquisition import aq_get
 from Products.CMFCore.CMFCorePermissions import ManagePortal
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
+from Guard import Guard
 from utils import _dtmldir
 
 try:
@@ -43,11 +44,16 @@ class WorkflowUIMixin:
     manage_groups = PageTemplateFile('workflow_groups.pt', _dtmldir)
 
     security.declareProtected(ManagePortal, 'setProperties')
-    def setProperties(self, title, manager_bypass=0, REQUEST=None):
+    def setProperties(self, title, manager_bypass=0, props=None, REQUEST=None):
         """Sets basic properties.
         """
         self.title = str(title)
         self.manager_bypass = manager_bypass and 1 or 0
+        g = Guard()
+        if g.changeFromProperties(props or REQUEST):
+            self.creation_guard = g
+        else:
+            self.creation_guard = None
         if REQUEST is not None:
             return self.manage_properties(
                 REQUEST, manage_tabs_message='Properties changed.')
@@ -184,5 +190,17 @@ class WorkflowUIMixin:
             RESPONSE.redirect(
                 "%s/manage_groups?manage_tabs_message=Roles+changed."
                 % self.absolute_url())
+
+    security.declareProtected(ManagePortal, 'getGuard')
+    def getGuard(self):
+        """Returns the initiation guard.
+
+        If no init guard has been created, returns a temporary object.
+        """
+        if self.creation_guard is not None:
+            return self.creation_guard
+        else:
+            return Guard().__of__(self)  # Create a temporary guard.
+
 
 Globals.InitializeClass(WorkflowUIMixin)
