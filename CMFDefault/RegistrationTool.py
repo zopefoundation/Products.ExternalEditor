@@ -125,12 +125,12 @@ class RegistrationTool(BaseTool):
         member = membership.getMemberById(forgotten_userid)
 
         if member is None:
-            raise 'NotFound', 'The username you entered could not be found.'
+            raise ValueError, 'The username you entered could not be found.'
     
         # assert that we can actually get an email address, otherwise
         # the template will be made with a blank To:, this is bad
         if not member.getProperty('email'):
-            raise 'ValueError', 'That user does not have an email address.'
+            raise ValueError, 'That user does not have an email address.'
         
         # Rather than have the template try to use the mailhost, we will
         # render the message ourselves and send it from here (where we
