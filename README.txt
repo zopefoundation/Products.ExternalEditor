@@ -111,12 +111,15 @@ Zope External Editor
     
   Configuration
   
-    The helper application supports several configuration options, each of which
-    can be triggered in any combination of object meta-type and content-type.
-    This allows you to create appropriate behavior for different types of Zope
-    objects and content. The configuration file is stored in the file 
-    "~/.zope-external-edit" (Unix) or "~\ZopeEdit.ini" (Windows).
-    
+    The helper application supports several configuration options, each of
+    which can be triggered in any combination of object meta-type, content-type
+    or domain. This allows you to create appropriate behavior for different
+    types of Zope objects and content or even different servers. The
+    configuration file is stored in the file  "~/.zope-external-edit" (Unix) or
+    "~\ZopeEdit.ini" (Windows). If no configuration file is found when the
+    helper application starts, a default config file is created in your home
+    directory.
+
     The configuration file follows the standard Python ConfigParser format,
     which is pretty much like the old .ini file format from windows. The file
     consists of sections and options in the following format::
@@ -144,7 +147,8 @@ Zope External Editor
       save_interval -- (float) The interval in seconds that the helper 
       application checks the edited file for changes.
 
-      use_locks -- (1 or 0) Whether to use WebDAV locking.
+      use_locks -- (1 or 0) Whether to use WebDAV locking. The user editing must
+      have the proper WebDAV related permissions for this to work.
       
       always_borrow_locks -- (1 or 0) When use_locks is enabled this features
       suppresses warnings when trying to edit an object you have already locked.
@@ -171,13 +175,14 @@ Zope External Editor
       content that the options beneath them apply to.
       
       There is only one mandatory section '[general]', which should define all
-      of the above options. If no other section defines an option for a given
-      object, the general settings are used.
-      
-      Additional sections can apply to a particular content-type or meta-type.
-      Since objects often have both, the options are applied in this order of
-      precedence.
-      
+      of the above options that do not have a default value. If no other
+      section defines an option for a given object, the general settings are
+      used.
+
+      Additional sections can apply to a particular domain, content-type or
+      meta-type. Since objects can have all these properties, the options are
+      applied in this order of precedence.
+
       - '[content-type:text/html]' -- Options by whole content-type come first
       
       - '[content-type:text/*]' -- Options by major content-type come second.
@@ -185,13 +190,27 @@ Zope External Editor
       - '[meta-type:File]' -- Options by Zope meta-type are third.
 
       - '[domain:www.mydomain.com]' -- Options by domain follow. Several
-        sections can be added for each domain level if desired (new in 0.3).
+        sections can be added for each domain level if desired.
       
       - '[general]' -- General options are last.
       
       This scheme allows you to specify an extension by content-type, the
-      editor by meta-type, the locking setting by domain and the remaining 
+      editor by meta-type, the locking settings by domain and the remaining 
       options under general for a given object.
+      
+  Permissions
+  
+    External editing is governed by the permission "Use external editor". Users
+    with this permission can launch external editor from editable objects. In
+    order to save changes, users will need additional permissions appropriate
+    for the objects they are editing.
+    
+    If users wish to use the built-in locking support, they must have the
+    "WebDAV access", "WebDAV Lock items" and "WebDAV Unlock items" permissions
+    for the objects they are editing.
+    
+    If these permissions are not set in Zope, then the helper application will
+    receive unauthorized errors from Zope which it will present to the user.
       
   Integrating with External Editor
   
@@ -210,16 +229,36 @@ Zope External Editor
       http://zopeserver/my_stuff/externalEdit_/document
       
     Now, this may look a bit odd to you if you are used to tacking views on to
-    the end of the URL. However, because externalEdit_ is required to work on
-    Python Scripts and Page Templates, which swallow the remaining URL subpath
-    segments following themselves, you must put the call to externalEdit_
+    the end of the URL. Because externalEdit_ is required to work on Python
+    Scripts and Page Templates, which swallow the remaining path segments on
+    the URL following themselves, you must put the call to externalEdit_
     *directly before* the object to be edited. You could do this in ZPT using
     some TAL in a Page Template like::
-    
+
       <a href='edit' 
-         attributes='href string:${container/absolute_url}/externalEdit_/$id'>
+         attributes='href
+         string:${container/absolute_url}/externalEdit_/${here/getId}'>
          Edit Locally
       </a>
+      
+    External Editor also defines a global method that you can call to insert
+    pencil icon links for appropriate objects. The method automatically checks
+    if the object supports external editing and whether the user has the "Use
+    external editor" permission for that object. If both are true, it returns
+    the HTML code to insert the external editor icon link. Otherwise it returns
+    an empty string.
+
+    The method is 'externalEditLink_(object)'. The object argument is the
+    object to create the link for if appropriate. Here is some example page
+    template code that inserts links to objects in the current folder and the
+    external editor icon where appropriate::
+
+      <div tal:repeat="object here/objectValues">
+        <a href="#" 
+           tal:attributes="href object/absolute_url"
+           tal:content="object/title_or_id">Object Title</a>
+        <span tal:replace="structure python:here.externalEditorLink_(object)" />
+      </div>       
 
   Conclusion
   

@@ -30,7 +30,6 @@ methods = {'externalEdit_': ExternalEditor(),
 
 # Monkey patch in our manage_main for Object Manager
 ObjectManager.manage_main = DTMLFile('manage_main', globals())
-print 'patched'
 
 # Add our patch for the find results template
 #FindSupport.manage_findResult=DTMLFile('findResult', globals(),
