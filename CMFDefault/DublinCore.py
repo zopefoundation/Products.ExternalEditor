@@ -83,16 +83,17 @@
 # 
 ##############################################################################
  
-import string
+import string, re
 from OFS.PropertyManager import PropertyManager
 from DateTime.DateTime import DateTime
 from Acquisition import aq_base
 from Products.CMFCore.WorkflowCore import WorkflowAction
 
-from utils import tuplize, _dtmldir
+from utils import tuplize, _dtmldir, semi_split
 from Globals import InitializeClass, DTMLFile
 from AccessControl import ClassSecurityInfo
 from Products.CMFCore import CMFCorePermissions
+
 
 class DefaultDublinCoreImpl( PropertyManager ):
     """
@@ -313,7 +314,7 @@ class DefaultDublinCoreImpl( PropertyManager ):
         hdrlist.append( ( 'Publisher', self.Publisher() ) )
         hdrlist.append( ( 'Description', self.Description() ) )
         hdrlist.append( ( 'Contributors', string.join(
-            self.Contributors() ) ) )
+            self.Contributors(), '; ' ) ) )
         hdrlist.append( ( 'Effective_date', self.EffectiveDate() ) )
         hdrlist.append( ( 'Expiration_date', self.ExpirationDate() ) )
         hdrlist.append( ( 'Type', self.Type() ) )
@@ -357,7 +358,7 @@ class DefaultDublinCoreImpl( PropertyManager ):
     def setContributors( self, contributors ):
         "Dublin Core element - additional contributors to resource"
         # XXX: fixme
-        self.contributors = tuplize( 'contributors', contributors )
+        self.contributors = tuplize('contributors', contributors, semi_split)
 
     security.declareProtected( CMFCorePermissions.ModifyPortalContent
                              , 'setEffectiveDate' )
