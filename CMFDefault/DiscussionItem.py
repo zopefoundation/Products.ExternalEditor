@@ -179,6 +179,14 @@ class DiscussionItemContainer( Persistent, Implicit, Traversable ):
     def getId( self ):
         return self.id
 
+    security.declareProtected( CMFCorePermissions.View, 'getReply' )
+    def getReply( self, reply_id ):
+        """
+            Return a discussion item, given its ID;  raise KeyError
+            if not found.
+        """
+        return self._container.get( reply_id ).__of__(self)
+
     # Is this right?
     security.declareProtected( CMFCorePermissions.View, '__bobo_traverse__' )
     def __bobo_traverse__(self, REQUEST, name):
@@ -191,7 +199,7 @@ class DiscussionItemContainer( Persistent, Implicit, Traversable ):
 
         else:
             try:
-                return self._container.get(name).__of__(self)
+                return self.getReply(name)
             except:
                 parent = aq_parent( aq_inner( self ) )
                 if parent.getId() == name:

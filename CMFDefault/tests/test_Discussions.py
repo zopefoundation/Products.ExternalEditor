@@ -116,11 +116,10 @@ class DiscussionTests( unittest.TestCase ):
         assert not talkback.hasReplies( test )
         assert len( talkback.getReplies() ) == 0
 
-        talkback.createReply( title='test'
-                            , text='blah'
-                            )
+        reply_id = talkback.createReply( title='test', text='blah' )
         assert talkback.hasReplies( test )
         assert len( talkback.getReplies() ) == 1
+        assert talkback.getReply( reply_id )
 
         reply1 = talkback.getReplies()[0]
         items = talkback._container.items()
