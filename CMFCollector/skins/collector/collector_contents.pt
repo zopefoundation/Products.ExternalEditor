@@ -35,8 +35,8 @@
                  split nocall: strmod/split;
                  DateTime nocall: modules/DateTime/DateTime;
                  BATCHSIZE python: 10;
-                 TITLELEN python: 45;
-                 DESCRLEN python: 120;
+                 TITLELEN python: 35;
+                 DESCRLEN python: 150;
                  b_start python: request.get('b_start', 0);
                  searching
                     python: (request.get('searching') != 'yep'

@@ -254,7 +254,7 @@
                 tal:attributes="href python: '%s/collector_contents?b_start=%s'
                                              % (here.absolute_url(),
                                                 prev.first)">
-               Previous batch</a>
+               Previous</a>
              </span>
           </th>
 
@@ -262,8 +262,12 @@
               tal:define="total here/length;
                           found python: len(items)">
             <b>
-              <span tal:replace="python: 'Issues %s => %s of'
-                                   % (batch.start, batch.end)"/>
+              <span tal:condition="python: batch.start != batch.end"
+                    tal:replace="python: '%s=>%s of'
+                                   % (batch.start, batch.end)">X=>X of</span>
+              <span tal:condition="python: batch.start == batch.end"
+                    tal:replace="python: '%s of'
+                                   % (batch.start)">X of</span>
               <span tal:condition="python: total != found"
                     tal:replace="python: '%s found (%s total)'
                                          % (found, total)">FOUND/TOTAL</span>
@@ -278,7 +282,7 @@
                 tal:attributes="href python: '%s/collector_contents?b_start=%s'
                                              % (here.absolute_url(),
                                                 next.first)">
-              Next batch</a>
+              Next</a>
             </span>
           </th>
 
