@@ -58,10 +58,10 @@ class TypeInformation (SimpleItemWithProperties):
          'label':'Title'},
         {'id':'description', 'type': 'text', 'mode':'w',
          'label':'Description'},
-        {'id':'content_meta_type', 'type': 'string', 'mode':'w',
-         'label':'Meta type'},
         {'id':'content_icon', 'type': 'string', 'mode':'w',
          'label':'Icon'},
+        {'id':'content_meta_type', 'type': 'string', 'mode':'w',
+         'label':'Product meta type'},
         )
 
     _advanced_properties = (
@@ -435,7 +435,7 @@ class FactoryTypeInformation (TypeInformation):
         {'id':'product', 'type': 'string', 'mode':'w',
          'label':'Product name'},
         {'id':'factory', 'type': 'string', 'mode':'w',
-         'label':'Factory method in product'},
+         'label':'Product factory method'},
         ) + TypeInformation._advanced_properties)
 
     product = ''
