@@ -31,6 +31,20 @@ class RegistrationToolTests(RequestTest):
         verifyClass(IRegistrationTool, self._getTargetClass())
         verifyClass(IActionProvider, self._getTargetClass())
 
+    def test_testPropertiesValidity_email_with_plus( self ):
+
+        # CMF Collector #322
+
+        tool = self._makeOne().__of__( self.root )
+        self.root.portal_membership = FauxMembershipTool()
+
+        props = { 'email' : 'user+site@example.com'
+                , 'username' : 'username'
+                }
+
+        result = tool.testPropertiesValidity( props, None )
+
+        self.failUnless( result is None )
 
     def test_testPropertiesValidity_new_invalid_email( self ):
 

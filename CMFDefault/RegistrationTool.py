@@ -217,7 +217,7 @@ InitializeClass(RegistrationTool)
 
 # See URL: http://www.zopelabs.com/cookbook/1033402597
 
-_TESTS = ( ( re.compile("^[0-9a-zA-Z\.\-\_]+\@[0-9a-zA-Z\.\-]+$")
+_TESTS = ( ( re.compile("^[0-9a-zA-Z\.\-\_\+]+\@[0-9a-zA-Z\.\-]+$")
            , True
            , "Failed a"
            )
