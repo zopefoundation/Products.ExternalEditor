@@ -159,6 +159,38 @@ class ActionsTool (UniqueObject, SimpleItem):
                              , 'manage_overview' )
     manage_overview = DTMLFile( 'explainActionsTool', _dtmldir )
 
+
+    #
+    # Programmatically manipulate the list of action providers
+    #
+
+    security.declareProtected( CMFCorePermissions.ManagePortal
+                             , 'listActionProviders'
+                             )
+    def listActionProviders( self ):
+       """ returns a sequence of action providers known by this tool """
+       return self.action_providers
+
+    security.declareProtected( CMFCorePermissions.ManagePortal
+                             , 'addActionProvider'
+                             )
+    def addActionProvider( self, provider_name ):
+        """ add the name of a new action provider """
+        if hasattr( self, provider_name ):
+            p_old = self.action_providers
+            p_new = p_old + ( provider_name, )
+            self.action_providers = p_new
+
+    security.declareProtected( CMFCorePermissions.ManagePortal
+                             , 'deleteActionProvider'
+                             )
+    def deleteActionProvider( self, provider_name ):
+        """ remove an action provider """
+        if provider_name in self.action_providers:
+            p_old = list( self.action_providers )
+            del p_old[p_old.index( provider_name)]
+            self.action_providers = tuple( p_old )
+
     #
     #   'portal_actions' interface methods
     #
