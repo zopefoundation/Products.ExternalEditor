@@ -123,42 +123,31 @@ class ExternalEditor:
         if getattr(self, 'clean_up', 1) and hasattr(self, 'body_file'):
             os.remove(self.body_file)
             
-    def getEditorPath(self):
-        """Return the absolute path to the editor"""
-        path = self.options.get('editor')
+    def getEditor(self):
+        """Return the editor command"""
+        editor = self.options.get('editor')
         
-        if path:
-            path = whereIs(path)
-        elif has_tk():
+        if not editor and has_tk():
             from tkSimpleDialog import askstring
-            path = askstring('Zope External Editor', 
-                             'Enter the default editor name')
-            if not path: sys.exit(0)
-            path = whereIs(path)
-            if os.path.exists(path):
-                self.config.set('general', 'editor', path)
-                self.config.save()
+            editor = askstring('Zope External Editor', 
+                               'Enter the command to launch the default editor')
+            if not editor: sys.exit(0)
+            self.config.set('general', 'editor', path)
+            self.config.save()
                 
-        if not path:
-            # Try some sensible default
-            if sys.platform == 'win32':
-                path = whereIs('notepad')
-            else:
-                editors = ['xedit', 'gvim', 'emacs']
-                while not path:
-                    path = whereIs(editors.pop())
-                
-        if path is not None:            
-            return path
+        if editor is not None:            
+            return editor
         else:
-            fatalError('Editor not found at "%s"' % path)
+            fatalError('Editor not specified in configuration file.')
         
     def launch(self):
         """Launch external editor"""
-        editor = self.getEditorPath()
+        editor = self.getEditor().split()
         file = self.body_file
+        editor.append(file)
+        print editor
         last_fstat = os.stat(file)
-        pid = os.spawnl(os.P_NOWAIT, editor, editor, file)
+        pid = os.spawnvp(os.P_NOWAIT, editor[0], editor) # Note: Unix only
         use_locks = int(self.options.get('use_locks'))
         
         if use_locks:
@@ -166,14 +155,14 @@ class ExternalEditor:
             
         exit_pid = 0
         save_interval = self.config.getfloat('general', 'save_interval')
-        launched = 0
+        success = 0
         
         while exit_pid != pid:
             sleep(save_interval or 2)
             
             try:
                 exit_pid, exit_status = os.waitpid(pid, os.WNOHANG)
-                if exit_pid != pid: launched = 1
+                if exit_pid != pid: success = 1
             except OSError:
                 exit_pid = pid
             
@@ -181,13 +170,14 @@ class ExternalEditor:
             if (exit_pid == pid or save_interval) \
                and fstat[stat.ST_MTIME] != last_fstat[stat.ST_MTIME]:
                 # File was modified
-                launched = 1 # handle very short editing sessions
+                success = 1 # handle very short editing sessions
                 self.saved = self.putChanges()
                 last_fstat = fstat
                 
-        if not launched:
-            fatalError(('Editor "%s" did not launch.\n'
-                        'It may not be a graphical editor.') % editor)
+        if not success:
+            fatalError(('Editor "%s" did not launch properly.\n'
+                        'External editor lost connection '
+                        'to editor process.') % editor[0])
          
         if use_locks:
             self.unlock()
