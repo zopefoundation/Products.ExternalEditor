@@ -54,10 +54,16 @@ class CMFCatalogAware:
         #   Are we being added (or moved)?
         #
         if aq_base(container) is not aq_base(self):
+            self.indexObject()
+
+    def manage_afterClone(self, item):
+        """
+            Add self to workflow, as we have just been cloned.
+        """
+        if aq_base(item) is aq_base(self):
             wf = getToolByName(self, 'portal_workflow', None)
             if wf is not None:
                 wf.notifyCreated(self)
-            self.indexObject()
 
     def manage_beforeDelete(self, item, container):
         """
