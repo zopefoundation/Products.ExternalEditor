@@ -32,13 +32,6 @@ from Products.CMFDefault.Document import addDocument
 from Products.CMFCore import CMFCorePermissions
 from CollectorPermissions import *
 
-urlchars  = (r'[A-Za-z0-9/:@_%~#=&\.\-\?]+')
-nonpuncurlchars  = (r'[A-Za-z0-9/:@_%~#=&\-]')
-url       = (r'["=]?((http|https|ftp|mailto|file|about):%s%s)'
-             % (urlchars, nonpuncurlchars))
-urlexp    = re.compile(url)
-UPLOAD_PREFIX = "Uploaded: "
-uploadexp = re.compile('(%s)([^<,\n]*)([<,\n])' % UPLOAD_PREFIX, re.MULTILINE)
 
 DEFAULT_TRANSCRIPT_FORMAT = 'stx'
 
@@ -53,7 +46,7 @@ factory_type_information = (
      'allowed_content_types': ('Collector Issue Transcript', 'File', 'Image'), 
      'immediate_view': 'collector_edit_form',
      'actions': ({'id': 'view',
-                  'name': 'View Issue',
+                  'name': 'View',
                   'action': 'collector_issue_contents',
                   'permissions': (ViewCollector,)},
                  {'id': 'followup',
@@ -61,15 +54,15 @@ factory_type_information = (
                   'action': 'collector_issue_followup_form',
                   'permissions': (AddCollectorIssueFollowup,)},
                  {'id': 'edit',
-                  'name': 'Edit Issue',
+                  'name': 'Edit',
                   'action': 'collector_issue_edit_form',
                   'permissions': (EditCollectorIssue,)},
                  {'id': 'browse',
-                  'name': 'Browse Collector',
+                  'name': 'Browse',
                   'action': 'collector_issue_up',
                   'permissions': (ViewCollector,)},
                  {'id': 'addIssue',
-                  'name': 'New Issue',
+                  'name': 'New',
                   'action': 'collector_issue_add_issue',
                   'permissions': (ViewCollector,)},
                  ),
@@ -159,14 +152,28 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
 
     def _set_submitter_specs(self, submitter_id,
                              submitter_name, submitter_email):
-        """Given an id, set the name and email as warranted by the values."""
+        """Given an id, set the name and email as warranted."""
 
         mbrtool = getToolByName(self, 'portal_membership')
         user = mbrtool.getMemberById(submitter_id)
         changes = []
-        if submitter_name is None:
+        if self.submitter_id != submitter_id:
+            if user is None:
+                if ((string.lower(submitter_id[:len('anonymous')])
+                     == 'anonymous')
+                    or not submitter_id):
+                    user = self.acl_users._nobody
+                    submitter_id = str(user)
+                else:
+                    raise ValueError, "User '%s' not found" % submitter_id
+            changes.append("Submitter id: '%s' => '%s'" % (self.submitter_id,
+                                                           submitter_id))
+            self.submitter_id = submitter_id
+
+        if not submitter_name:
             name = util.safeGetProperty(user, 'full_name', '')
             if name: submitter_name = name
+            else: submitter_name = submitter_id
         if self.submitter_name != submitter_name:
             changes.append('submitter name')
             self.submitter_name = submitter_name
@@ -210,14 +217,24 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         If optional arg 'email' is true, then we just provide urls for uploads
         (assuming the email client will take care of linkifying URLs)."""
         if not email:
-            text = urlexp.sub(r'<a href=\1>\1</a>', text)
-            text = uploadexp.sub(r'\1<a href="%s/\2/view">\2</a>\3'
-                                 % self.absolute_url(),
-                                 text)
+            candidates = util.link_candidates(text)
+            if candidates:
+                got = []
+                cursor = 0
+                for c in candidates:
+                    start, end = c.start(), c.end()
+                    got.append(text[cursor:start])
+                    url = text[start:end]
+                    got.append('<a href="%s">%s</a>' % (url, url))
+                    cursor = end
+                text = "".join(got)
+            text = util.uploadexp.sub(r'\1<a href="%s/\2/view">\2</a>\3'
+                                      % self.absolute_url(),
+                                      text)
         else:
-            text = uploadexp.sub(r'\1 "\2" - %s/\2/view'
-                                 % self.absolute_url(),
-                                 text)
+            text = util.uploadexp.sub(r'\1 "\2" - %s/\2/view'
+                                      % self.absolute_url(),
+                                      text)
             text = string.replace(text, "<hr>", "-" * 62)
         return text
         
@@ -225,7 +242,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
     security.declareProtected(EditCollectorIssue, 'edit')
     def edit(self,
              title=None,
-             submitter_name=None, submitter_email=None,
+             submitter_id=None, submitter_name=None, submitter_email=None,
              security_related=None,
              description=None,
              topic=None,
@@ -241,7 +258,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
 
         transcript = self.get_transcript()
         text = text.replace('\r', '')
-        changes += self._set_submitter_specs(self.submitter_id,
+        changes += self._set_submitter_specs(submitter_id,
                                              submitter_name, submitter_email)
         if text is not None and text != transcript.text:
             changes.append('revised transcript')
