@@ -54,6 +54,7 @@ def suite():
         'test_utils',
         'test_WorkflowTool',
         'testCookieCrumbler',
+        'test_OpaqueItems',
         ])
 
 def test_suite():
