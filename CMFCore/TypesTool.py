@@ -22,11 +22,7 @@ from Globals import InitializeClass, DTMLFile
 from utils import UniqueObject, SimpleItemWithProperties, tuplize
 from utils import _dtmldir, _checkPermission, cookString, getToolByName
 import string
-from AccessControl import getSecurityManager, ClassSecurityInfo
-try:
-    from AccessControl import Unauthorized
-except:
-    Unauthorized = 'Unauthorized'
+from AccessControl import getSecurityManager, ClassSecurityInfo, Unauthorized
 from Acquisition import aq_base
 import Products, CMFCorePermissions
 from ActionProviderBase import ActionProviderBase
@@ -683,6 +679,13 @@ class TypesTool( UniqueObject, OFS.Folder.Folder, ActionProviderBase ):
         else:
             return None
 
+    security.declarePrivate('_checkViewType')
+    def _checkViewType(self,t):
+        try:
+            return getSecurityManager().validate(t, t, 'Type', t.Type)
+        except Unauthorized:
+            return 0        
+        
     security.declareProtected(AccessContentsInformation, 'listTypeInfo')
     def listTypeInfo( self, container=None ):
         """
@@ -698,6 +701,9 @@ class TypesTool( UniqueObject, OFS.Folder.Folder, ActionProviderBase ):
                 continue
             if not t.Type():
                 # Not ready.
+                continue
+            # check we're allowed to access the type object
+            if not self._checkViewType(t):
                 continue
             if container is not None:
                 if not t.isConstructionAllowed(container):
@@ -742,6 +748,10 @@ class TypesTool( UniqueObject, OFS.Folder.Folder, ActionProviderBase ):
         info = self.getTypeInfo( type_name )
         if info is None:
             raise 'ValueError', 'No such content type: %s' % type_name
+        
+        # check we're allowed to access the type object
+        if not self._checkViewType(info):
+            raise Unauthorized,info
         
         ob = apply(info.constructInstance, (container, id) + args, kw)
 

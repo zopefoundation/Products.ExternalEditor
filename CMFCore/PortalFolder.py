@@ -117,7 +117,7 @@ class PortalFolder( Folder, DynamicType ):
         myType = portal_types.getTypeInfo(self)
 
         if myType is not None:
-            for contentType in portal_types.listTypeInfo():
+            for contentType in portal_types.listTypeInfo(self):
                 if myType.allowType( contentType.Type() ):
                     result.append( contentType )
         else:

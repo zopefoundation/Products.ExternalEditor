@@ -1,10 +1,8 @@
 New Features
 
-  - Tweaked folder_factories so that the types listed 
-    are only those where the user has the 
-    'Access contents information' permission on the 
-    Type Information object associated with that 
-    type.
+  - Added functionality such that only users who have the
+    view permission on the relevent Type object can create
+    content of that type.
 
   - Added the ability to limit what types of object an
     object of a given Portal Type can be created in. 

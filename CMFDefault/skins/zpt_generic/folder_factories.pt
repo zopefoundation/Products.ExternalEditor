@@ -12,8 +12,8 @@
 <form action="invokeFactory" method="POST">
 <table class="FormLayout">
 <tr>
-<td tal:define="allowedContentTypes python:modules['ZTUtils'].LazyFilter(here.allowedContentTypes(),skip='')">
-<table width="100%" class="FormLayout" tal:repeat="item allowedContentTypes">
+<td>
+<table width="100%" class="FormLayout" tal:repeat="item here/allowedContentTypes">
 <tr valign="top">
   <td align="left" width="2%" NOWRAP><input type="radio" name="type_name" value="" id="" tal:attributes="value item/getId; id string:cb_${repeat/item/number}"/>
   </td>
