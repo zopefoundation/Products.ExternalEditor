@@ -433,14 +433,14 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
         automatic transitions.  tdef set to None means the object
         was just created.
         '''
-        moved = 0
+        moved_exc = None
         while 1:
             try:
                 sdef = self._executeTransition(ob, tdef, kwargs)
-            except ObjectMoved, ex:
-                moved = 1
-                ob = ex.getNewObject()
+            except ObjectMoved, moved_exc:
+                ob = moved_exc.getNewObject()
                 sdef = self._getWorkflowStateOf(ob)
+                # Re-raise after all transitions.
             if sdef is None:
                 break
             tdef = self._findAutomaticTransition(ob, sdef)
@@ -448,9 +448,9 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
                 # No more automatic transitions.
                 break
             # Else continue.
-        if moved:
+        if moved_exc is not None:
             # Re-raise.
-            raise ObjectMoved(ob)
+            raise moved_exc
 
     def _executeTransition(self, ob, tdef=None, kwargs=None):
         '''
@@ -459,7 +459,7 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
         '''
         sci = None
         econtext = None
-        moved = 0
+        moved_exc = None
 
         # Figure out the old and new states.
         old_sdef = self._getWorkflowStateOf(ob)
@@ -486,10 +486,9 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
                 ob, self, former_status, tdef, old_sdef, new_sdef, kwargs)
             try:
                 script(sci)  # May throw an exception.
-            except ObjectMoved, ex:
-                ob = ex.getNewObject()
-                moved = 1
-                # Don't re-raise
+            except ObjectMoved, moved_exc:
+                ob = moved_exc.getNewObject()
+                # Re-raise after transition
 
         # Update variables.
         state_values = new_sdef.var_values
@@ -540,17 +539,12 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
             # Pass lots of info to the script in a single parameter.
             sci = StateChangeInfo(
                 ob, self, status, tdef, old_sdef, new_sdef, kwargs)
-            try:
-                script(sci)  # May throw an exception.
-            except ObjectMoved, ex:
-                ob = ex.getNewObject()
-                moved = 1
-                # Don't re-raise
+            script(sci)  # May throw an exception.
 
         # Return the new state object.
-        if moved:
-            # Re-raise.
-            raise ObjectMoved(ob)
+        if moved_exc is not None:
+            # Propagate the notification that the object has moved.
+            raise moved_exc
         else:
             return new_sdef
 
