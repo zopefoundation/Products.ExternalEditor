@@ -47,6 +47,9 @@
    two default filesystem implementations are in CMFDefault's "control"
    skin.
 
+ - Fixed "Ever" entry in 'search_form' to use a value safe in timezones
+   east of GMT (Tracker issue #236).
+
  - Extend TypesTool to deal appropriately with DTML factory methods
    (e.g., for ZClasses).
 

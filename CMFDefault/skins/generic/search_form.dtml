@@ -93,7 +93,7 @@
               yesterday="(today-1).Date()"
               lastWeek="(today-7).Date()"
               lastMth="(today-31).Date()"
-              ever="ZopeTime(0).Date()"
+              ever="'1970/01/01 00:00:00 GMT'"
     >
     <option value="&dtml-yesterday;">     Yesterday   </option>
     <option value="&dtml-lastWeek;">      Last week   </option>
