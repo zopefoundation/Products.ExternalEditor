@@ -28,21 +28,21 @@
 
   <div metal:define-macro="transcript">
 
-    <table tal:define="transcript here/get_transcript">
+    <table>
 
       <tr>
         <th colspan="2" align="left">
-           Transcript of Issue
-             <span tal:replace="here/id">ID</span>
-             (<em><span tal:replace="here/Title">TITLE</span></em>)
+          <font size="+1">
+            Issue <span tal:replace="here/id">ID</span> Transcript
+          </font>
         </th>
       </tr>
       <tr>
         <td colspan="2">
           <table border="1">
             <tr> <td>
-           <span tal:replace="structure
-                     python: transcript.CookedBody(stx_level=3)">TRANSCRIPT
+           <span tal:replace="structure here/CookedBody">
+                  TRANSCRIPT
            </span>
             </td> </tr>
           </table>

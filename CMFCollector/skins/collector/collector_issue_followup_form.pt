@@ -33,12 +33,15 @@
 
       <tr>
         <th align="left">
-          <font size="+1"> Followup </font>
+          <font size="+1">
+            Issue <span tal:replace="here/id">ID</span> Entry
+            # <span tal:replace="python: here.action_number + 1"></span>
+          </font>
         </th>
         <td align="center">
           Click <a href="QUALIFIED" 
                    tal:attributes="href python: request.URL + '?do_cite=1'">
-                here</a> to cite the existing transcript text.
+                here</a> to cite the existing transcript.
         </td>
       </tr>
 
