@@ -15,6 +15,7 @@ __version__='$Revision$'[11:-2]
 
 from string import split, replace
 from os import stat
+import re
 
 import Globals, Acquisition
 from DateTime import DateTime
@@ -29,6 +30,8 @@ from DirectoryView import registerFileExtension, registerMetaType, expandpath
 from CMFCorePermissions import ViewManagementScreens, View, FTPAccess
 from FSObject import FSObject
 from utils import getToolByName
+
+xml_detect_re = re.compile('^\s*<\?xml\s+')
 
 class FSPageTemplate(FSObject, Script, PageTemplate):
     "Wrapper for Page Template"
@@ -68,9 +71,19 @@ class FSPageTemplate(FSObject, Script, PageTemplate):
     def _readFile(self, reparse):
         fp = expandpath(self._filepath)
         file = open(fp, 'rb')
-        try: data = file.read()
-        finally: file.close()
+        try: 
+            data = file.read()
+        finally: 
+            file.close()
         if reparse:
+            if xml_detect_re.match(data):
+                # Smells like xml
+                self.content_type = 'text/xml'
+            else:
+                try:
+                    del self.content_type
+                except (AttributeError, KeyError):
+                    pass
             self.write(data)
 
     security.declarePrivate('read')
@@ -133,14 +146,54 @@ class FSPageTemplate(FSObject, Script, PageTemplate):
                 raise RuntimeError, msg
             else:
                 raise
-            
-    # Copy over more mothods
+                
+    def _exec(self, bound_names, args, kw):
+        """Call a FSPageTemplate"""
+        if not kw.has_key('args'):
+            kw['args'] = args
+        bound_names['options'] = kw
+
+        try:
+            response = self.REQUEST.RESPONSE
+        except AttributeError:
+            response = None
+
+        security=getSecurityManager()
+        bound_names['user'] = security.getUser()
+
+        # Retrieve the value from the cache.
+        keyset = None
+        if self.ZCacheable_isCachingEnabled():
+            # Prepare a cache key.
+            keyset = {'here': self._getContext(),
+                      'bound_names': bound_names}
+            result = self.ZCacheable_get(keywords=keyset)
+            if result is not None:
+                # Got a cached value.
+                if response is not None:
+                    response.setHeader('content-type',self.content_type)
+                return result
+                
+        # Execute the template in a new security context.
+        security.addContext(self)
+        try:
+            result = self.pt_render(extra_context=bound_names)
+            if response is not None:
+                # content_type may not have been cooked until now
+                response.setHeader('content-type',self.content_type)
+            if keyset is not None:
+                # Store the result in the cache.
+                self.ZCacheable_set(result, keywords=keyset)
+            return result
+        finally:
+            security.removeContext(self)
+                        
+    # Copy over more methods
     security.declareProtected(FTPAccess, 'manage_FTPget')
     security.declareProtected(View, 'get_size')
     security.declareProtected(ViewManagementScreens, 'PrincipiaSearchSource',
         'document_src')
 
-    _exec = ZopePageTemplate._exec
     pt_getContext = ZopePageTemplate.pt_getContext
     ZScriptHTML_tryParams = ZopePageTemplate.ZScriptHTML_tryParams
     manage_FTPget = ZopePageTemplate.manage_FTPget

@@ -24,6 +24,18 @@ class FSPageTemplateTests( RequestTest, FSPTMaker ):
         script = self._makeOne( 'testPT', 'testPT.pt' )
         script = script.__of__(self.root)
         self.assertEqual(script(),'foo\n')
+        
+    def test_ContentType(self):
+        script = self._makeOne( 'testXMLPT', 'testXMLPT.pt' )
+        script = script.__of__(self.root)
+        script()
+        self.assertEqual(script.content_type, 'text/xml')
+        self.assertEqual(self.RESPONSE.getHeader('content-type'), 'text/xml')
+        script = self._makeOne( 'testPT', 'testPT.pt' )
+        script = script.__of__(self.root)
+        script()
+        self.assertEqual(script.content_type, 'text/html')
+        self.assertEqual(self.RESPONSE.getHeader('content-type'), 'text/html')
 
     def test_BadCall( self ):
 
