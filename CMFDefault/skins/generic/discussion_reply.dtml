@@ -1,0 +1,10 @@
+<dtml-var standard_html_header>
+
+<dtml-let replyID="createReply( title=REQUEST[ 'title' ]
+                              , text=REQUEST[ 'text' ]
+                              , Creator=REQUEST[ 'Creator' ]
+                              )">
+<dtml-call expr="RESPONSE.redirect( '%s/%s' % ( absolute_url(), replyID ) )">
+</dtml-let>
+
+<dtml-var standard_html_footer>
