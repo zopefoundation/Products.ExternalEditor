@@ -299,7 +299,7 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
                             'The object "%s", backed by a different '
                             'version history than "%s", '
                             'is in the way.' % (p, p2))
-                    repo.updateResource(ob, version_id)
+                    repo.updateResource(unproxied(ob), version_id)
 
 
     def _updateReferences(self, proxy, container_map, to_stages):
