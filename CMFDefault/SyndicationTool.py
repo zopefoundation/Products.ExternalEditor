@@ -125,12 +125,9 @@ class SyndicationTool (UniqueObject, SimpleItem):
         These are held on the syndication_information object.
         Not Sitewide Properties.
         """
-        mgr = SecurityManagement.getSecurityManager()
         if not _checkPermission( ManageProperties, obj ):
             raise Unauthorized
-        #import pdb; pdb.set_trace()
-        syInfo = getattr(obj, 'syndication_information',
-                         None)
+        syInfo = getattr(obj, 'syndication_information', None)
         if syInfo is None:
             raise 'Syndication is Disabled'
         if updatePeriod:
