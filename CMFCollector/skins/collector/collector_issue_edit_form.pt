@@ -13,7 +13,8 @@
   Template description: Basic view of issue characteristics and transcript.
 </span>
 
-<div metal:fill-slot="header">
+<div metal:fill-slot="header"
+     tal:define="global collector_issue_header_present python: 1">
 
   <div metal:use-macro="here/collector_macros/macros/issue_header">
     ISSUE HEADER
@@ -24,7 +25,7 @@
 <div metal:fill-slot="main">
 
   <div tal:condition="not: collector_issue_header_present|nothing">
-    <span tal:condition="nothing"> When master has no macro "header"... </span>
+    <!-- Master template has no "header" macro... -->
     <div metal:use-macro="here/collector_macros/macros/issue_header">
       ISSUE HEADER
     </div>

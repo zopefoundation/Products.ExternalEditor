@@ -14,8 +14,7 @@
         - add_artifacts_table
     </span>
 
-    <div metal:define-macro="collector_header"
-         tal:define="global collector_header_present python: 1">
+    <div metal:define-macro="collector_header">
 
       <table>
         <tr>
@@ -47,8 +46,7 @@
     </div>  <!-- End macro: collector_header -->
 
     <div metal:define-macro="issue_header"
-         tal:define="global collector_issue_header_present python: 1;
-                     TITLELEN python: 150;
+         tal:define="TITLELEN python: 150;
                      split nocall: modules/string/split;
                      TRUNCDESCR python: 150;
                      global artifacts
