@@ -356,30 +356,42 @@ class MembershipTool (UniqueObject, SimpleItem, ActionProviderBase):
 
         return tuple( member_roles )
 
-    security.declareProtected(CMFCorePermissions.View, 
-                                'setLocalRoles')
-    def setLocalRoles( self, obj, member_ids, member_role ):
+    security.declareProtected(CMFCorePermissions.View, 'setLocalRoles')
+    def setLocalRoles( self, obj, member_ids, member_role, reindex=0 ):
         """ Set local roles on an item """
         member = self.getAuthenticatedMember()
         my_roles = member.getRolesInContext( obj )
-        
+
         if 'Manager' in my_roles or member_role in my_roles:
             for member_id in member_ids:
                 roles = list(obj.get_local_roles_for_userid( userid=member_id ))
-            
+
                 if member_role not in roles:
                     roles.append( member_role )
                     obj.manage_setLocalRoles( member_id, roles )
 
-    security.declareProtected( CMFCorePermissions.View,
-                                    'deleteLocalRoles' )
-    def deleteLocalRoles( self, obj, member_ids ):
+        if reindex:
+            self.reindexSecurity(obj)
+
+    security.declareProtected(CMFCorePermissions.View, 'deleteLocalRoles')
+    def deleteLocalRoles( self, obj, member_ids, reindex=0 ):
         """ Delete local roles for members member_ids """
         member = self.getAuthenticatedMember()
         my_roles = member.getRolesInContext( obj )
 
         if 'Manager' in my_roles or 'Owner' in my_roles:
             obj.manage_delLocalRoles( userids=member_ids )
+
+        if reindex:
+            self.reindexSecurity(obj)
+
+    security.declarePrivate('reindexSecurity')
+    def reindexSecurity(self, obj):
+        catalog = getToolByName(self, 'portal_catalog')
+        obj_path = '/'.join(obj.getPhysicalPath())
+        for brain in catalog.searchResults(path=obj_path):
+            ob = brain.getObject()
+            ob.reindexObject(idxs=['allowedRolesAndUsers'])
 
     security.declarePrivate('addMember')
     def addMember(self, id, password, roles, domains, properties=None):

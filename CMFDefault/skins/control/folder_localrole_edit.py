@@ -8,10 +8,12 @@ if change_type == 'add':
     pm.setLocalRoles( obj=context
                     , member_ids=context.REQUEST.get('member_ids', ())
                     , member_role=context.REQUEST.get('member_role', '')
-                                           )
+                    , reindex=1
+                    )
 else:
     pm.deleteLocalRoles( obj=context
                        , member_ids=context.REQUEST.get('member_ids', ())
+                       , reindex=1
                        )
 
 qst='?portal_status_message=Local+Roles+changed.'

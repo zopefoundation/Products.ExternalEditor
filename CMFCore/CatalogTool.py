@@ -123,6 +123,7 @@ class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
                , ('in_reply_to', 'FieldIndex')
                , ('meta_type', 'FieldIndex')
                , ('id', 'FieldIndex')
+               , ('path', 'PathIndex')
                )
     
     security.declarePublic( 'enumerateColumns' )

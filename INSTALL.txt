@@ -26,7 +26,7 @@ Installing CMF 1.3beta2
 
   Procedure
 
-    1. Unpack the CMF-1.1beta.tar.gz tarball into a working
+    1. Unpack the CMF-1.x.tar.gz tarball into a working
        directory. For instance::
 
         $ cd /usr/local/zope
@@ -67,12 +67,11 @@ Installing CMF 1.3beta2
           installed;  if you don't have it, then don't link/copy in
           'CMFDecor'.
 
-Upgrading from CMF 1.0
-
+Upgrading from Earlier Versions
 
   Install the New Software.
 
-    0. "Download":CMF-1.1beta.tar.gz the tarball.
+    0. "Download":CMF-1.3-beta2.tar.gz the tarball.
 
     1. Copy your "working" products off to one side (in case
        you need / choose to revert).
@@ -82,6 +81,18 @@ Upgrading from CMF 1.0
        your INSTANCE_HOME.
 
     3. Restart Zope.
+
+  Follow additionnal version-specific information below.
+
+Upgrading from versions earlier than CMF 1.3beta2
+
+  Add New Index: "path"
+
+      1. From the ZMI of your CMFSite, go to the 'portal_catalog' tool,
+         and select the "Indexes" tab. Add a "PathIndex" using the Add
+         list, and give it an Id of "path".
+
+Upgrading from CMF 1.0
 
   Create and Configure New tools
 
