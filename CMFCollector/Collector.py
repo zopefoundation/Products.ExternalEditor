@@ -33,7 +33,7 @@ import util
 from Products.CMFCore import CMFCorePermissions
 from CollectorPermissions import *
 
-from CollectorIssue import addCollectorIssue
+from CollectorIssue import addCollectorIssue, CollectorIssue
 
 INTERNAL_CATALOG_ID = 'collector_catalog'
 
@@ -89,6 +89,10 @@ class Collector(SkinnedFolder):
 
     managers = ()
     dispatching = 1
+
+    # state_email - a dictionary pairing state names with email destinations
+    # for all notifications occuring within that state.
+    state_email = {}
 
     def __init__(self, id, title='', description='', abbrev='',
                  email=None,
@@ -172,7 +176,7 @@ class Collector(SkinnedFolder):
                   version_info=None,
                   assignees=None,
                   file=None, fileid=None, filetype=None):
-        """Instigate a new collector issue."""
+        """Create a new collector issue."""
         id = self.new_issue_id()
         submitter_id = str(getSecurityManager().getUser())
         
@@ -198,6 +202,7 @@ class Collector(SkinnedFolder):
     def edit(self, title=None, description=None,
              abbrev=None, email=None,
              managers=None, supporters=None, dispatching=None,
+             state_email=None,
              topics=None, classifications=None,
              importances=None,
              version_info_spiel=None):
@@ -259,6 +264,9 @@ class Collector(SkinnedFolder):
             self.dispatching = dispatching
             changes.append("Dispatching %s"
                            % ((dispatching and "on") or "off"))
+        if state_email is not None and self.state_email != state_email:
+            self.state_email = state_email
+            changes.append("State email")
         if topics is not None:
             x = filter(None, topics)
             if self.topics != x:
@@ -328,6 +336,22 @@ class Collector(SkinnedFolder):
         """For, eg, allowedRolesAndUsers recompute after local_role changes."""
         for i in self.objectValues(spec='CMF Collector Issue'):
             i.reindexObject(internal_only=internal_only)
+
+    security.declareProtected(ManageCollector, 'issue_states')
+    def issue_states(self):
+        """Return a sorted list of potential states for issues."""
+        # We use a stub issue (which we create, the first time) in order to
+        # get the workflow states.  Kinda yucky - would be nice if the
+        # workflow provided more direct introspection.
+        got = []
+        if hasattr(self, 'stub'):
+            sample = self['stub']
+        else:
+            sample = CollectorIssue('stub', self)
+        for wf in self.portal_workflow.getWorkflowsFor(sample):
+            got.extend([x.id for x in wf.states.values()])
+        got.sort()
+        return got
 
     security.declareProtected(CMFCorePermissions.View, 'Subject')
     def Subject(self):
