@@ -17,8 +17,6 @@ $Id$
 
 from sys import modules
 
-from AccessControl import allow_module
-
 import PortalObject, PortalContent, PortalFolder
 import MembershipTool, WorkflowTool, CatalogTool, DiscussionTool
 import ActionsTool, UndoTool, RegistrationTool, SkinsTool
@@ -35,8 +33,6 @@ import utils
 
 from CMFCorePermissions import AddPortalFolders
 
-
-allow_module('Products.CMFCore.CMFCoreExceptions')
 
 # Old name that some third-party packages may need.
 ADD_FOLDERS_PERMISSION = AddPortalFolders
@@ -142,4 +138,3 @@ def initialize(context):
                            PortalFolder.manage_addPortalFolder, )
                      , fti=PortalFolder.factory_type_information
                      ).initialize( context )
-

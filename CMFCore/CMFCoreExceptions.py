@@ -15,41 +15,42 @@
 $Id$
 """
 
-from AccessControl import allow_class
+from AccessControl import ModuleSecurityInfo
 from AccessControl import Unauthorized
+from OFS.CopySupport import CopyError
 from webdav.Lockable import ResourceLockedError
 
 
+security = ModuleSecurityInfo('Products.CMFCore.CMFCoreExceptions')
+security.declarePublic('CopyError')
+security.declarePublic('Unauthorized')
+
+
+security.declarePublic('CMFError')
 class CMFError(Exception):
     """ The root of all CMF evil.
     """
 
-allow_class(CMFError)
 
-
+security.declarePublic('CMFNotImplementedError')
 class CMFNotImplementedError(NotImplementedError, CMFError):
     """ NotImplementedError in CMF.
     """
 
-allow_class(CMFNotImplementedError)
 
-
+security.declarePublic('CMFResourceLockedError')
 class CMFResourceLockedError(ResourceLockedError, CMFError):
     """ ResourceLockedError in CMF.
     """
 
-allow_class(CMFResourceLockedError)
 
-
+security.declarePublic('CMFUnauthorizedError')
 class CMFUnauthorizedError(Unauthorized, CMFError):
     """ Unauthorized error in CMF.
     """
 
-allow_class(CMFUnauthorizedError)
 
-
+security.declarePublic('IllegalHTML')
 class IllegalHTML(ValueError, CMFError):
     """ Illegal HTML error.
     """
-
-allow_class(IllegalHTML)
