@@ -90,7 +90,8 @@ class RecursiveGroupsPlugin( BasePlugin ):
                 continue
             seen.append( test )
             new_groups = parent._getGroupsForPrincipal(
-                PropertiedUser( test ), ignore_plugins=( self.getId(), ) )
+                PropertiedUser( test ).__of__(parent), 
+                ignore_plugins=( self.getId(), ) )
             if new_groups:
                 set.extend( new_groups )
 
