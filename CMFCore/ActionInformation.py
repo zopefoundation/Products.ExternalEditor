@@ -101,16 +101,17 @@ class ActionInformation( SimpleItem ):
         info = {}
         info['id'] = self.id
         info['name'] = self.Title()
-        info['url'] = self.action and self.action( ec ) or ''
+        action_obj = self._getActionObject()
+        info['url'] = action_obj and action_obj( ec ) or ''
         info['permissions'] = self.getPermissions()
         info['category'] = self.getCategory()
         info['visible'] = self.getVisibility()
         return info 
 
-    security.declarePublic( 'getActionExpression' )
-    def getActionExpression( self ):
+    security.declarePrivate( '_getActionObject' )
+    def _getActionObject( self ):
 
-        """ Return the text of the TALES expression for our URL.
+        """ Find the action object, working around name changes.
         """
         action = getattr( self, 'action', None )
 
@@ -120,6 +121,14 @@ class ActionInformation( SimpleItem ):
                 self.action = self._action
                 del self._action
 
+        return action
+
+    security.declarePublic( 'getActionExpression' )
+    def getActionExpression( self ):
+
+        """ Return the text of the TALES expression for our URL.
+        """
+        action = self._getActionObject()
         return action and action.text or ''
 
     security.declarePublic( 'getCondition' )
