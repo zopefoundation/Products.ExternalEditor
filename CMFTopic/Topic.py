@@ -258,8 +258,7 @@ class Topic( PortalFolder ):
         """
             Add a new subtopic.
         """
-        ttool = getToolByName(self, 'portal_types')
-        ti = ttool.getTypeInfo('Topic')
+        ti = self.getTypeInfo()
         ti.constructInstance(self, id)
         return self._getOb( id )
 

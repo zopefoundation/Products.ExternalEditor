@@ -57,6 +57,7 @@ class TestTopic(SecurityTest):
         fti = FTIDATA_TOPIC[0].copy()
         self.site.portal_types._setObject( 'Topic', FTI(**fti) )
         topic = self._makeOne('top')
+        topic._setPortalTypeName('Topic')
 
         topic.addCriterion( 'foo', 'String Criterion' )
         topic.getCriterion( 'foo' ).edit( 'bar' )
