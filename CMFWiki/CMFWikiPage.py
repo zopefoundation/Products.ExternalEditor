@@ -33,6 +33,7 @@ from ZWikiRegexes import urlchars, url, urlexp, bracketedexpr,\
      preexp, unpreexp, citedexp, cite_prefixexp, intl_char_entities
 import CMFWikiPermissions
 from Products.CMFCore.PortalContent import PortalContent
+from Products.CMFCore.utils import _getViewFor
 from Products.CMFDefault.SkinnedFolder import SkinnedFolder
 from Products import CMFDefault
 from Products.CMFDefault.DublinCore import DefaultDublinCoreImpl
@@ -130,7 +131,7 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
         '''
         Invokes the default view.
         '''
-        view = self._getDefaultView()
+        view = _getViewFor( self )
         if getattr(aq_base(view), 'isDocTemp', 0):
             return apply(view, (self, REQUEST))
         else:

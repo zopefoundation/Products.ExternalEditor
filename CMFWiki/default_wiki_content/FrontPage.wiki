@@ -1,6 +1,6 @@
 Welcome to !CMFWiki, this is a !CMFWikiWeb.
 
-  For general Wiki help instructions, see the "Help":view_wiki_help .
+  For general Wiki help instructions, see the "Help":WikiHelp .
 
   To see the table of contents or recent changes, or to search this
   !CMFWikiWeb, use the "folder contents":folder_contents view
