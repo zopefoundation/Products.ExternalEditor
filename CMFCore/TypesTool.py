@@ -668,7 +668,6 @@ class TypesTool( UniqueObject, OFS.Folder.Folder ):
             type regisetered in the portal.
         """
         rval = []
-        sm = getSecurityManager()
         for t in self.objectValues():
             # Filter out things that aren't TypeInformation and
             # types for which the user does not have adequate permission.
