@@ -35,14 +35,15 @@
   - (__future__) Added DCWorkflow (through-the-web configurable
     workflows) to the core set of CMF products.
 
+  - Made Link objects editable via FTP / WebDAV.
+
   - Merged Chris Withers' FSSQLMethod into CMFCore.
 
-  - Perform permission checking inside personalize_form to make
-    sure Anonymous cannot access it without logging in (CMF Tracker
-    Issue 349, thanks go to Bill Anderson)
+  - Added documentation for installing from CVS.
 
-  - The Member Data Tool now uses an OOBTree instead of the old-style
-    BTree to store member data wrappers (CMF Tracker 375)
+  - Moved permission checking inside personalize_form to make
+    sure Anonymous cannot access it without logging in (CMF Tracker
+    Issue 349, thanks go to Bill Anderson).
 
   - Added initial CMF use cases as FSSTXMethods in CMFDefault/help.
 
@@ -97,16 +98,39 @@
 
  Bug fixes
 
+  - Implement the notional 'search results item' interface for
+    SkinnedFolder.
+
+  - Corrected solecism in Topic (use of 'criteria' for singular);
+    removed the need to know about the funky generated IDs for
+    criterion objects.
+
   - Modified error-logging code to avoid potential leaks of
     traceback frame.
 
-  - Made 'Document.manage_FTPget' use EditableBody, rather than
+  - Made Document's 'manage_FTPget' use 'EditableBody', rather than
     accessing 'text' attribute directly (improves reusability).
     Likewise 'Document.SearchableText'.
 
-  - Merged Seb Bacon's refactoring of getDefaultView into
-    CMFCoreutils._getView; clients can now specify a view by name,
+  - Merged Seb Bacon's refactoring of 'getDefaultView' into
+    'CMFCore.utils._getView'; clients can now specify a view by name,
     as well.
+
+  - Made the default content type for Image 'image/png', instead
+    of the unintuitive 'text/html' inherited from DefaultDublinCoreImpl
+    (tracker #384).
+
+  - Corrected typo in ActionsTool which broke actions for the root
+    portal object (tracker #379).
+
+  - Updated the MemberDataTool to use an OOBTree, instead of the
+    old-style BTree, to store member data wrappers (CMF Tracker 375).
+
+  - Corrected 'personalize_form' to use 'getProperty' where feasible,
+    rather than relying on direct attribute access (tracker #372).
+
+  - Removed an incompatibility with LoginManager in
+    CMFCore.MembershipTool (tracker #365).
 
   - Removed an infinite loop condition that arises when
     MembershipTool.createMemberArea gets called inside wrapUser
@@ -121,8 +145,8 @@
   - Corrected initial column set in catalog to include
     "ModificationDate" instead of "ModifiedDate".
 
-  - Ensure that object is recatalogued (e.g., after setting 'portal_type'
-      (thanks to Florent Guillaume)
+  - Ensured that object is recatalogued (e.g., after setting
+    'portal_type';  thanks to Florent Guillaume).
 
   - Removed silly dependency of 'CatalogTool.searchResults' on
     REQUEST (catalog already does the Right Thing (tm) when no
