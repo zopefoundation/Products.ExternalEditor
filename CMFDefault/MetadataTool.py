@@ -543,10 +543,11 @@ class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
                 raise MetadataError, \
                         'Metadata element %s is required.' % element
 
+            import pdb;pdb.set_trace()
             if policy.enforceVocabulary():
                 values = policy.isMultiValued() and value or [ value ]
                 for value in values:
-                    if not value in policy.allowedValues():
+                    if not value in policy.allowedVocabulary():
                         raise MetadataError, \
                         'Value %s is not in allowed vocabulary for' \
                         'metadata element %s.' % ( value, element )
