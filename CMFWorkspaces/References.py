@@ -108,7 +108,7 @@ class ReferenceCollection (Persistent):
 
     security = ClassSecurityInfo()
 
-    _reference_class = PortalRelativeReference
+    _reference_factory = PortalRelativeReference
     _next_id = 1
     _ignore_dups = 1
 
@@ -124,7 +124,7 @@ class ReferenceCollection (Persistent):
     security.declarePrivate('addReference')
     def addReference(self, object):
         """Store a reference under a new, unique id."""
-        r = self._reference_class(object)
+        r = self._reference_factory(object)
         if self._ignore_dups:
             for other in self._refs.values():
                 if other == r:
