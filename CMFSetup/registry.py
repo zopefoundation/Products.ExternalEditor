@@ -3,7 +3,6 @@
 $Id$
 """
 import re
-from types import StringTypes
 from xml.sax import parseString
 from xml.sax.handler import ContentHandler
 
@@ -191,12 +190,9 @@ class SetupStepRegistry( Implicit ):
             title = title or t
             description = description or d
 
-        if type( handler ) not in StringTypes:
-            handler = _getDottedName( handler )
-
         info = { 'id'           : id
                , 'version'      : version
-               , 'handler'      : handler
+               , 'handler'      : _getDottedName( handler )
                , 'dependencies' : dependencies
                , 'title'        : title
                , 'description'  : description
@@ -458,11 +454,8 @@ class ExportScriptRegistry( Implicit ):
             title = title or t
             description = description or d
 
-        if type( handler ) not in StringTypes:
-            handler = _getDottedName( handler )
-
         info = { 'id'           : id
-               , 'handler'      : handler
+               , 'handler'      : _getDottedName( handler )
                , 'title'        : title
                , 'description'  : description
                }
