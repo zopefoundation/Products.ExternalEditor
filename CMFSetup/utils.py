@@ -107,3 +107,47 @@ class HandlerBase( ContentHandler ):
 
         return content.encode( self._encoding )
 
+#
+#   DOM parsing utilities
+#
+def _getNodeAttribute( node, attr_name, encoding=None ):
+
+    """ Extract a string-valued attribute from node.
+    """
+    value = node.attributes[ attr_name ].nodeValue
+
+    if encoding is not None:
+        value = value.encode( encoding )
+
+    return value
+
+def _getNodeAttributeBoolean( node, attr_name ):
+
+    """ Extract a string-valued attribute from node.
+    """
+    value = node.attributes[ attr_name ].nodeValue.lower()
+
+    return value in ( 'true', 'yes', '1' )
+
+def _coalesceTextNodeChildren( node, encoding=None ):
+
+    """ Concatenate all childe text nodes into a single string.
+    """
+    from xml.dom import Node
+    fragments = []
+    node.normalize()
+    child = node.firstChild
+
+    while child is not None:
+
+        if child.nodeType == Node.TEXT_NODE:
+            fragments.append( child.nodeValue )
+
+        child = child.nextSibling
+
+    joined = ''.join( fragments )
+
+    if encoding is not None:
+        joined = joined.encode( encoding )
+
+    return joined

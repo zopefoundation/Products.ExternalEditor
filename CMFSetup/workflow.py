@@ -16,6 +16,9 @@ from Products.DCWorkflow.DCWorkflow import DCWorkflowDefinition
 from permissions import ManagePortal
 from utils import HandlerBase
 from utils import _xmldir
+from utils import _getNodeAttribute
+from utils import _getNodeAttributeBoolean
+from utils import _coalesceTextNodeChildren
 
 TRIGGER_TYPES = ( 'AUTOMATIC', 'USER', 'WORKFLOW_METHOD' )
 
@@ -238,21 +241,6 @@ class WorkflowToolConfigurator( Implicit ):
                , worklists
                , permissions
                , scripts
-               )
-
-        parser = _WorkflowDefinitionParser( encoding )
-        parseString( xml, parser )
-
-        return ( parser._workflow_id
-               , parser._title
-               , parser._state_variable
-               , parser._initial_state
-               , parser._states
-               , parser._transitions
-               , parser._variables
-               , parser._worklists
-               , parser._permissions
-               , parser._scripts
                )
 
     #
@@ -678,136 +666,12 @@ class _WorkflowToolParser( HandlerBase ):
 
 InitializeClass( _WorkflowToolParser )
 
-class _WorkflowDefinitionParser( HandlerBase ):
-
-    security = ClassSecurityInfo()
-
-    def __init__( self, encoding ):
-
-        self._encoding = encoding
-        self._workflow_id = None
-        self._title = None
-        self._state_variable = None
-        self._initial_state = None
-        self._states = []
-        self._transitions = []
-        self._variables = []
-        self._worklists = []
-        self._permissions = []
-        self._scripts = []
-        self._current = None
-        self._permission_map = None
-        self._permission_role = None
-
-    security.declarePrivate( 'startElement' )
-    def startElement( self, name, attrs ):
-
-        if name == 'dc-workflow':
-
-            self._workflow_id = self._extract( attrs, 'workflow_id' )
-            self._title = self._extract( attrs, 'title' )
-            self._state_variable = self._extract( attrs, 'state_variable' )
-            self._initial_state = self._extract( attrs, 'initial_state' )
-
-        elif name == 'state':
-
-            info = { 'state_id' : self._extract( attrs, 'state_id' )
-                   , 'title' : self._extract( attrs, 'title' )
-                   , 'description' : []
-                   }
-
-            self._states.append( info )
-            self._current = info
-
-        elif name == 'permission-map':
-
-            info = { 'name' : self._extract( attrs, 'name' )
-                   , 'acquired' : self._extractBoolean( attrs
-                                                      , 'acquired', True )
-                   , 'roles' : []
-                   }
-
-            self._current.setdefault( 'permission_map', [] ).append( info )
-            self._permission_map = info
-
-        elif name == 'permission-role':
-
-            self._permission_role = []
-
-    security.declarePrivate( 'endElement' )
-    def endElement( self, name ):
-
-        if name == 'permission-role':
-            self._permission_map[ 'roles' ].append(
-                                            ''.join( self._permission_role ) )
-            self._permission_role = None
-
-        elif self._current is not None:
-            desc = ''.join( self._current[ 'description' ] )
-            self._current[ 'description' ] = desc
-
-        self._current = None
-        self._permission_map = None
-
-    security.declarePrivate( 'characters' )
-    def characters( self, text ):
-
-        if self._permission_role is not None:
-            self._permission_role.append( text )
-        elif self._current is not None and 'description' in self._current:
-            self._current[ 'description' ].append( text )
-                   
-
-InitializeClass( _WorkflowDefinitionParser )
 
 def _getWorkflowFilename( workflow_id ):
 
     """ Return the name of the file which holds info for a given type.
     """
     return 'workflows/%s/definition.xml' % workflow_id.replace( ' ', '_' )
-
-
-def _getNodeAttribute( node, attr_name, encoding=None ):
-
-    """ Extract a string-valued attribute from node.
-    """
-    value = node.attributes[ attr_name ].nodeValue
-
-    if encoding is not None:
-        value = value.encode( encoding )
-
-    return value
-
-def _getNodeAttributeBoolean( node, attr_name ):
-
-    """ Extract a string-valued attribute from node.
-    """
-    value = node.attributes[ attr_name ].nodeValue.lower()
-
-    return value in ( 'true', 'yes', '1' )
-
-def _coalesceTextNodeChildren( node, encoding=None ):
-
-    """ Concatenate all childe text nodes into a single string.
-    """
-    from xml.dom import Node
-    fragments = []
-    node.normalize()
-    child = node.firstChild
-
-    while child is not None:
-
-        if child.nodeType == Node.TEXT_NODE:
-            fragments.append( child.nodeValue )
-
-        child = child.nextSibling
-
-    joined = ''.join( fragments )
-
-    if encoding is not None:
-        joined = joined.encode( encoding )
-
-    return joined
 
 def _extractStateNodes( root, encoding=None ):
 
