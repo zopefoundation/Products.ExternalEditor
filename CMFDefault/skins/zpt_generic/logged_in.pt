@@ -1,8 +1,6 @@
-<div tal:condition="exists: here/portal_skins | nothing">
-  <div tal:condition="here/portal_skins/updateSkinCookie | nothing"
-        tal:define="dummy here/setupCurrentSkin">
-  </div>
-</div>
+<tal:block tal:condition="here/portal_skins/updateSkinCookie | nothing"
+           tal:define="dummy here/setupCurrentSkin" />
+
 <html xmlns:tal="http://xml.zope.org/namespaces/tal"
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       metal:use-macro="here/main_template/macros/master">
@@ -16,7 +14,7 @@
                   isAnon mtool/isAnonymousUser|nothing;
                   member mtool/getAuthenticatedMember;
                   now here/ZopeTime;
-                  never python: here.ZopeTime( '2000/01/01' );
+                  never string:2000/01/01;
                  "
  >
 
@@ -53,7 +51,7 @@
 
     <p class="Desktop" i18n:translate="">
        This is the first time that you've logged in to
-       <span replace="p_props/title" i18n:name="portal_title">Here</span>.
+       <span tal:replace="p_props/title" i18n:name="portal_title">Here</span>.
        Before you start exploring you need to change your original password.
        This will ensure that the password we sent you via email cannot be
        used in a malicious manner.</p>

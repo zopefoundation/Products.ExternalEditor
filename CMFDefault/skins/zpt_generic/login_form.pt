@@ -23,7 +23,7 @@
   <strong i18n:translate="">Name</strong>
   </td>
   <td align="left" valign="top">
-  <input type="TEXT" name="__ac_name" size="20" value=""
+  <input type="text" name="__ac_name" size="20" value=""
          tal:attributes="value python: request.get('__ac_name') or ''" />
   </td>
 </tr>
@@ -32,7 +32,7 @@
   <strong i18n:translate="">Password</strong>
   </td>
   <td align="left" valign="top">
-  <input type="PASSWORD" name="__ac_password" size="20" />
+  <input type="password" name="__ac_password" size="20" />
   </td>
 </tr>
 
