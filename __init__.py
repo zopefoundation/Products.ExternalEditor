@@ -16,7 +16,6 @@
 
 from Globals import ImageFile, DTMLFile
 from OFS.ObjectManager import ObjectManager
-from OFS.Application import Application
 from OFS.FindSupport import FindSupport
 from ExternalEditor import ExternalEditor, EditLink
 
@@ -32,5 +31,5 @@ methods = {'externalEdit_': ExternalEditor(),
 ObjectManager.manage_main = DTMLFile('manage_main', globals())
 
 # Add our patch for the find results template
-#FindSupport.manage_findResult=DTMLFile('findResult', globals(),
-#                                       management_view='Find')
+FindSupport.manage_findResult=DTMLFile('findResult', globals(),
+                                       management_view='Find')
