@@ -1,9 +1,11 @@
 ## Script (Python) "collector_edit.py"
-##parameters=title, description, supporters, topics, classifications, importances, severities, versions, other_versions_spiel
+##parameters=title, description, email, abbrev, supporters, topics, classifications, importances, severities, versions, other_versions_spiel
 ##title=Configure Collector
  
 changed = context.edit(title=title,
                        description=description,
+                       abbrev=abbrev,
+                       email=email,
                        supporters=supporters,
                        topics=topics,
                        classifications=classifications,
