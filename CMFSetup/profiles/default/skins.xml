@@ -1,9 +1,7 @@
 <?xml version="1.0"?>
-<skins-tool default_skin="ZPT"
-            request_varname="portal_skin"
-            allow_any="False"
-            cookie_persistence="False"
-            >
+<skins-tool default_skin="None"
+            request_varname="portal_skin" allow_any="0"
+            cookie_persistence="0">
  <skin-directory id="Images"
                  directory="CMFDefault/skins/Images"/>
  <skin-directory id="content"
@@ -25,6 +23,14 @@
                  directory="CMFDefault/skins/zpt_generic"/>
  <skin-directory id="zpt_topic"
                  directory="CMFTopic/skins/zpt_topic"/>
+ <skin-path id="Basic">
+  <layer name="custom"/>
+  <layer name="topic"/>
+  <layer name="content"/>
+  <layer name="generic"/>
+  <layer name="control"/>
+  <layer name="Images"/>
+ </skin-path>
  <skin-path id="ZPT">
   <layer name="custom"/>
   <layer name="zpt_topic"/>
@@ -37,13 +43,4 @@
   <layer name="control"/>
   <layer name="Images"/>
  </skin-path>
- <skin-path id="Basic">
-  <layer name="custom"/>
-  <layer name="topic"/>
-  <layer name="content"/>
-  <layer name="generic"/>
-  <layer name="control"/>
-  <layer name="Images"/>
- </skin-path>
 </skins-tool>
-

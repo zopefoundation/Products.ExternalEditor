@@ -6,6 +6,7 @@ $Id$
 import unittest
 
 from OFS.Folder import Folder
+from OFS.SimpleItem import SimpleItem
 
 from Products.CMFCore.TypesTool import FactoryTypeInformation
 from Products.CMFCore.TypesTool import ScriptableTypeInformation
@@ -17,12 +18,21 @@ from common import BaseRegistryTests
 from common import DummyExportContext
 from common import DummyImportContext
 
+class DummyTypeInfo( SimpleItem ):
+
+    def __init__( self, info ):
+
+        self.__dict__.update( info )
+
 class DummyTypesTool( Folder ):
 
     def __init__( self, type_infos ):
 
         self._type_infos = type_infos
-        self._objects = []
+
+        for id, obj in [ ( x[ 'id' ], DummyTypeInfo( x ) )
+                            for x in type_infos ]:
+            self._setObject( id, obj )
 
     def listContentTypes( self ):
 
@@ -34,17 +44,13 @@ class DummyTypesTool( Folder ):
 
         if len( info ) == 0:
             raise KeyError, id
-        
+
         info = info[ 0 ]
 
         if 'product' in info.keys():
             return FactoryTypeInformation( **info )
         else:
             return ScriptableTypeInformation( **info )
-
-    def _setObject( self, id, ob ):
-
-        self._objects.append( ( id, ob ) )
 
 class _TypeInfoSetup( BaseRegistryTests ):
 
@@ -201,7 +207,7 @@ class TypeInfoConfiguratorTests( _TypeInfoSetup ):
             expected = _TI_LIST_WITH_FILENAME[ i ]
             self.assertEqual( found[ 'id' ], expected[ 'id' ] )
             self.assertEqual( found[ 'filename' ]
-                            , 'types/%s.xml' 
+                            , 'types/%s.xml'
                                 % expected[ 'id' ].replace( ' ', '_' )
                             )
 
@@ -276,13 +282,12 @@ class TypeInfoConfiguratorTests( _TypeInfoSetup ):
         site = self._initSite()
         tool = site.portal_types
         configurator = self._makeOne( site ).__of__( site )
-        self.assertEqual( len( tool._objects ), 0 )
+        self.assertEqual( len( tool.objectIds() ), 0 )
 
         configurator.parseTypeXML( _FOO_EXPORT % 'foo' )
-        self.assertEqual( len( tool._objects ), 1 )
+        self.assertEqual( len( tool.objectIds() ), 1 )
 
-        type_id = tool._objects[ 0 ][ 0 ]
-        ti = tool._objects[ 0 ][ 1 ]
+        type_id, ti = tool.objectItems()[ 0 ]
         self.assertEqual( type_id, 'foo' )
         self.assertEqual( ti.getId(), 'foo' )
         self.assertEqual( ti.Title(), 'Foo' )
@@ -293,17 +298,33 @@ class TypeInfoConfiguratorTests( _TypeInfoSetup ):
         site = self._initSite()
         tool = site.portal_types
         configurator = self._makeOne( site ).__of__( site )
-        self.assertEqual( len( tool._objects ), 0 )
+        self.assertEqual( len( tool.objectIds() ), 0 )
 
         configurator.parseTypeXML( _BAR_EXPORT % 'bar' )
-        self.assertEqual( len( tool._objects ), 1 )
+        self.assertEqual( len( tool.objectIds() ), 1 )
 
-        type_id = tool._objects[ 0 ][ 0 ]
-        ti = tool._objects[ 0 ][ 1 ]
+        type_id, ti = tool.objectItems()[ 0 ]
         self.assertEqual( type_id, 'bar' )
         self.assertEqual( ti.getId(), 'bar' )
         self.assertEqual( ti.Title(), 'Bar' )
         self.assertEqual( len( ti.getMethodAliases() ), 2 )
+
+    def test_parseTypeXML_actions( self ):
+
+        site = self._initSite()
+        tool = site.portal_types
+        configurator = self._makeOne( site ).__of__( site )
+
+        configurator.parseTypeXML( _FOO_EXPORT % 'foo' )
+
+        type_id, ti = tool.objectItems()[ 0 ]
+        action_list = ti.listActions()
+        self.assertEqual( len( action_list ), 3 )
+
+        info = action_list[ 0 ]
+        self.assertEqual( info.getId(), 'view' )
+        self.assertEqual( info.Title(), 'View' )
+        self.assertEqual( info.getPermissions(), ( 'View', ) )
 
 
 _TI_LIST = ( { 'id'                     : 'foo'
@@ -581,12 +602,96 @@ class Test_exportTypesTool( _TypeInfoSetup ):
         self._compareDOM( text, _BAR_EXPORT % 'bar object' )
         self.assertEqual( content_type, 'text/xml' )
 
+class Test_importTypesTool( _TypeInfoSetup ):
+
+    def test_empty_default_purge( self ):
+
+        site = self._initSite( _TI_LIST )
+        tool = site.portal_types
+
+        self.assertEqual( len( tool.objectIds() ), 2 )
+
+        context = DummyImportContext( site )
+        context._files[ 'typestool.xml' ] = _EMPTY_EXPORT
+
+        from Products.CMFSetup.typeinfo import importTypesTool
+        importTypesTool( context )
+
+        self.assertEqual( len( tool.objectIds() ), 0 )
+
+    def test_empty_explicit_purge( self ):
+
+        site = self._initSite( _TI_LIST )
+        tool = site.portal_types
+
+        self.assertEqual( len( tool.objectIds() ), 2 )
+
+        context = DummyImportContext( site, True )
+        context._files[ 'typestool.xml' ] = _EMPTY_EXPORT
+
+        from Products.CMFSetup.typeinfo import importTypesTool
+        importTypesTool( context )
+
+        self.assertEqual( len( tool.objectIds() ), 0 )
+
+    def test_empty_skip_purge( self ):
+
+        site = self._initSite( _TI_LIST )
+        tool = site.portal_types
+
+        self.assertEqual( len( tool.objectIds() ), 2 )
+
+        context = DummyImportContext( site, False )
+        context._files[ 'typestool.xml' ] = _EMPTY_EXPORT
+
+        from Products.CMFSetup.typeinfo import importTypesTool
+        importTypesTool( context )
+
+        self.assertEqual( len( tool.objectIds() ), 2 )
+
+    def test_normal( self ):
+
+        site = self._initSite()
+        tool = site.portal_types
+
+        self.assertEqual( len( tool.objectIds() ), 0 )
+
+        context = DummyImportContext( site )
+        context._files[ 'typestool.xml' ] = _NORMAL_EXPORT
+        context._files[ 'types/foo.xml' ] = _FOO_EXPORT % 'foo'
+        context._files[ 'types/bar.xml' ] = _BAR_EXPORT % 'bar'
+
+        from Products.CMFSetup.typeinfo import importTypesTool
+        importTypesTool( context )
+
+        self.assertEqual( len( tool.objectIds() ), 2 )
+        self.failUnless( 'foo' in tool.objectIds() )
+        self.failUnless( 'bar' in tool.objectIds() )
+
+    def test_with_filenames_ascii( self ):
+
+        site = self._initSite()
+        tool = site.portal_types
+
+        self.assertEqual( len( tool.objectIds() ), 0 )
+
+        context = DummyImportContext( site, encoding='ascii' )
+        context._files[ 'typestool.xml' ] = _FILENAME_EXPORT
+        context._files[ 'types/foo_object.xml' ] = _FOO_EXPORT % 'foo object'
+        context._files[ 'types/bar_object.xml' ] = _BAR_EXPORT % 'bar object'
+
+        from Products.CMFSetup.typeinfo import importTypesTool
+        importTypesTool( context )
+
+        self.assertEqual( len( tool.objectIds() ), 2 )
+        self.failUnless( 'foo object' in tool.objectIds() )
+        self.failUnless( 'bar object' in tool.objectIds() )
 
 def test_suite():
     return unittest.TestSuite((
         unittest.makeSuite( TypeInfoConfiguratorTests ),
         unittest.makeSuite( Test_exportTypesTool ),
-        #unittest.makeSuite( Test_importTypesTool ),
+        unittest.makeSuite( Test_importTypesTool ),
         ))
 
 if __name__ == '__main__':

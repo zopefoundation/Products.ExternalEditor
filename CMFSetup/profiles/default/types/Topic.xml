@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<type-info id="Topic" kind="Factory-based Type Information"
+           title="Topic" meta_type="Portal Topic"
+           icon="topic_icon.gif"
+           immediate_view="topic_edit_form"
+           filter_content_types="1" allowed_content_types=""
+           allow_discussion="0" global_allow="1"
+           product="CMFTopic" factory="addTopic">
+  <description>Topics are canned queries for organizing content with up to date queries into the catalog.</description>
+  <aliases>
+   <alias from="(Default)" to="topic_view"/>
+   <alias from="view" to="topic_view"/>
+  </aliases>
+  <action action_id="view" title="View" condition=""
+          action_expr="string:${object_url}/topic_view"
+          permissions="View" category="object"
+          visible="True"/>
+  <action action_id="edit" title="Edit" condition=""
+          action_expr="string:${object_url}/topic_edit_form"
+          permissions="Change portal topics"
+          category="object" visible="True"/>
+  <action action_id="criteria" title="Criteria" condition=""
+          action_expr="string:${object_url}/topic_criteria_form"
+          permissions="Change portal topics"
+          category="object" visible="True"/>
+  <action action_id="subtopics" title="Subtopics"
+          condition=""
+          action_expr="string:${object_url}/topic_subtopics_form"
+          permissions="Change portal topics"
+          category="object" visible="True"/>
+</type-info>

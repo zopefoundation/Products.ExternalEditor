@@ -42,9 +42,8 @@ def importTypesTool( context ):
     configurator = TypeInfoConfigurator( site )
     text = context.readDataFile( _TOOL_FILENAME )
 
-    for type_id in configurator.parseToolXML( text ):
+    for type_id, type_filename in configurator.parseToolXML( text ):
 
-        type_filename = _getTypeFilename( type_id )
         text = context.readDataFile( type_filename )
         configurator.parseTypeXML( text )
 
@@ -162,7 +161,7 @@ class TypeInfoConfigurator( Implicit ):
 
             type_info = klass_info[ 'class' ]( **info )
 
-            tool._setObject( info[ 'id' ], type_info )
+            tool._setObject( str( info[ 'id' ] ), type_info )
 
     #
     #   Helper methods
@@ -338,11 +337,14 @@ class _TypeInfoParser( HandlerBase ):
         elif name == 'action':
 
             t_info = self._info_list[ -1 ]
+            permissions = tuple( _es( 'permissions' ).split( ',' ) )
+
             a_info = { 'id'             : _es( 'action_id' )
                      , 'title'          : _es( 'title' )
+                     , 'name'           : _es( 'title' )
                      , 'action'         : _es( 'action_expr' )
                      , 'condition'      : _es( 'condition' )
-                     , 'permissions'    : _es( 'permissions' ).split( ',' )
+                     , 'permissions'    : permissions
                      , 'category'       : _es( 'category' )
                      , 'visible'        : _eb( 'visible' )
                      }

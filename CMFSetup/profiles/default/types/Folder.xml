@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<type-info id="Folder" kind="Factory-based Type Information"
+           title="Folder" meta_type="Portal Folder"
+           icon="folder_icon.gif"
+           immediate_view="folder_edit_form"
+           filter_content_types="0" allowed_content_types=""
+           allow_discussion="0" global_allow="1"
+           product="CMFCore"
+           factory="manage_addPortalFolder">
+  <description> Use folders to put content in categories.</description>
+  <aliases>
+   <alias from="(Default)" to="index_html"/>
+   <alias from="view" to="index_html"/>
+  </aliases>
+  <action action_id="view" title="View" condition=""
+          action_expr="string:${object_url}"
+          permissions="View" category="folder"
+          visible="True"/>
+  <action action_id="edit" title="Edit" condition=""
+          action_expr="string:${object_url}/folder_edit_form"
+          permissions="Manage properties" category="folder"
+          visible="True"/>
+  <action action_id="localroles" title="Local Roles"
+          condition=""
+          action_expr="string:${object_url}/folder_localrole_form"
+          permissions="Manage properties" category="folder"
+          visible="True"/>
+</type-info>
