@@ -124,6 +124,12 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
             stage = stages[stage_name]
             if stage is not None:
                 obj = stage.restrictedTraverse(rel_path, None)
+                if obj is not None and not obj.aq_inContextOf(stage, 1):
+                    # Avoid dangerous acquisition. Eg: acquiring
+                    # stuff from portal_skins or from above the stage
+                    # and being unable to stage an object with the same
+                    # id because the acquired object is non-versionable.
+                    obj = None
             else:
                 obj = None
             res[stage_name] = obj
