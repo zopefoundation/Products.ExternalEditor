@@ -23,7 +23,7 @@ class FSImageTests( RequestTest ):
         import os.path
 
         path = os.path.join( skin_path_name, 'test_image.gif' )
-        f = open( path )
+        f = open( path, 'rb' )
         try:
             data = f.read()
         finally:
