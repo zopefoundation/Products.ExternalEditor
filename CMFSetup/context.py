@@ -351,8 +351,8 @@ class SnapshotImportContext( Implicit ):
     def __init__( self
                 , tool
                 , snapshot_id
-                , encoding=None
                 , should_purge=False
+                , encoding=None
                 ):
 
         self._tool = tool = aq_inner( tool )
