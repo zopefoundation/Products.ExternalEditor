@@ -1,12 +1,17 @@
 External Editor Change Log
 
-        Eliminated spurious "Editor did not launch" errors on short sessions
-        os when other errors occurred.
+    - Added caching headers to prevent client-side caching of edit data.
+      Thanks to Gabriel Genellina for pointing this out.
 
-    5/16/02 - 0.2 Release
-    
-        Fixed product uninstallation bug
-        
-    5/15/02 - 0.1
-    
-        Initial release
+    - Added improved support for editing CMF documents
+
+    - Eliminated spurious "Editor did not launch" errors on short sessions
+      os when other errors occurred.
+
+  5/16/02 - 0.2 Release
+
+    - Fixed product uninstallation bug
+
+  5/15/02 - 0.1
+
+    - Initial release

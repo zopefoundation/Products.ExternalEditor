@@ -53,6 +53,8 @@ class ExternalEditor(Acquisition.Implicit):
             r.append(ob.document_src(REQUEST, RESPONSE))
         elif hasattr(ob, 'manage_FTPget'):
             r.append(ob.manage_FTPget(REQUEST, RESPONSE))
+        elif hasattr(ob, 'EditableBody'):
+            r.append(ob.EditableBody())
         elif hasattr(ob, 'read'):
             r.append(ob.read())
         else:
@@ -60,6 +62,8 @@ class ExternalEditor(Acquisition.Implicit):
             raise 'BadRequest', 'Object does not support external editing'
         
         RESPONSE.setHeader('Content-Type', 'application/x-zope-edit')
+        RESPONSE.setHeader('Cache-Control', 'no-cache')
+        RESPONSE.setHeader('Pragma', 'no-cache')
             
         return '\n'.join(r)
         
