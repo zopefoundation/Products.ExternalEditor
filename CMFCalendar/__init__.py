@@ -1,15 +1,20 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
+""" CMF Calendar product.
+
+$Id$
+"""
+
 import sys
 
 from Products.CMFCore import utils
@@ -18,6 +23,7 @@ from Products.CMFCore.DirectoryView import registerDirectory
 import Event
 import CalendarTool
 from permissions import AddPortalContent
+
 
 this_module = sys.modules[ __name__ ]
 
@@ -34,19 +40,18 @@ event_globals=globals()
 
 # Make the skins available as DirectoryViews
 registerDirectory('skins', globals())
-registerDirectory('skins/calendar', globals())
 
 def initialize( context ):
     utils.ToolInit('CMFCalendar Tool', tools=tools,
                    product_name='CMFCalendar', icon='tool.gif',
                    ).initialize( context )
-    
+
     utils.initializeBasesPhase2( z_bases, context )
     context.registerHelpTitle('CMF Calendar Help')
     context.registerHelp(directory='help')
     utils.ContentInit( 'CMF Event'
                      , content_types = contentClasses
-                     , permission = AddPortalContent 
+                     , permission = AddPortalContent
                      , extra_constructors = contentConstructors
                      , fti = Event.factory_type_information
-                     ).initialize( context ) 
+                     ).initialize( context )
