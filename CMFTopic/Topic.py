@@ -18,8 +18,9 @@ $Id$
 from Products.CMFTopic.TopicPermissions import ChangeTopics
 from Products.CMFTopic.TopicPermissions import AddTopics
 from Products.CMFCore.CMFCorePermissions import View
-from Products.CMFCore.utils import _checkPermission, _getViewFor,getToolByName
 from Products.CMFCore.PortalFolder import PortalFolder
+from Products.CMFCore.utils import _getViewFor
+from Products.CMFCore.utils import getToolByName
 
 from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
