@@ -43,7 +43,6 @@ class ExternalEditor(Acquisition.Implicit):
     def __before_publishing_traverse__(self, self2, request):
         path = request['TraversalRequestNameStack']
         target = path[-1]
-        print `request['TraversalRequestNameStack']`
         request.set('target', target)
         path[:] = []
     
