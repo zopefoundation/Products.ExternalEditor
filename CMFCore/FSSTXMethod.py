@@ -101,10 +101,6 @@ import StructuredText
 from DirectoryView import registerFileExtension, registerMetaType, expandpath
 from FSObject import FSObject
 
-try:
-    from AccessControl import full_read_guard
-except ImportError:
-    pass
 
 class FSSTXMethod( FSObject ):
     """
@@ -200,14 +196,6 @@ class FSSTXMethod( FSObject ):
                                        , RESPONSE=RESPONSE
                                        , cooked=self.cook()
                                        )
-
-    # Zope 2.3.x way:
-    def validate( self, inst, parent, name, value, md ):
-        return getSecurityManager().validate( inst, parent, name, value )
-
-    # Zope 2.4.x way:
-    def read_guard( self, ob ):
-        return full_read_guard( ob )
 
     security.declareProtected( CMFCorePermissions.FTPAccess, 'manage_FTPget' )
     def manage_FTPget( self ):
