@@ -98,7 +98,9 @@ import Document
 
 from Globals import InitializeClass, DTMLFile
 from AccessControl import ClassSecurityInfo
-from Products.CMFCore import CMFCorePermissions
+from Products.CMFCore.CMFCorePermissions import View, AccessContentsInformation
+from Products.CMFCore.CMFCorePermissions import ListPortalMembers
+from Products.CMFCore.CMFCorePermissions import ManagePortal
 from utils import _dtmldir
 
 default_member_content = '''Default page for %s
@@ -123,15 +125,13 @@ class MembershipTool ( Products.CMFCore.MembershipTool.MembershipTool ):
     #
     #   ZMI methods
     #
-    security.declareProtected( CMFCorePermissions.ManagePortal
-                             , 'manage_overview' )
+    security.declareProtected( ManagePortal, 'manage_overview' )
     manage_overview = DTMLFile( 'explainMembershipTool', _dtmldir )
 
     #
     #   'portal_membership' interface methods
     #
-    security.declareProtected( CMFCorePermissions.ListPortalMembers
-                             , 'getRoster' )
+    security.declareProtected( ListPortalMembers, 'getRoster' )
     def getRoster(self):
         '''
         Return a list of mappings corresponding to those users who have
@@ -157,43 +157,47 @@ class MembershipTool ( Products.CMFCore.MembershipTool.MembershipTool ):
                                                                 , domains
                                                                 , properties
                                                                 )
-        member = self.getMemberById(id)
-        if hasattr(getattr(member, 'aq_base', member), 'getUser'):
-            user = member.getUser()
-        else:
-            user = member
 
-        if hasattr(self, 'Members'):
-            # Create Member's home folder
-            # but avoid collisions
-            if not hasattr(self.Members, id):
-                manage_addPortalFolder(self.Members, id)
+        self.createMemberarea(id)
 
-            f=getattr(self.Members, id)
 
-            f.manage_permission('View',
+    security.declareProtected(ManagePortal, 'createMemberarea')
+    def createMemberarea(self, member_id):
+        """
+        create a member area
+        """
+        parent = self.aq_inner.aq_parent
+        members =  getattr(parent, 'Members', None)
+
+        if members is not None and not hasattr(members, member_id):
+            members.manage_addPortalFolder(member_id)
+            f=getattr(members, member_id)
+ 
+            f.manage_permission(View,
                                 ['Owner','Manager','Reviewer'], 0)
-            f.manage_permission('Access contents information',
+            f.manage_permission(AccessContentsInformation,
                                 ['Owner','Manager','Reviewer'], 0)
-            
+ 
             # Grant ownership to Member
+            user = self.__getPUS().getUser(member_id)
             try: f.changeOwnership(user)
             except AttributeError: pass  # Zope 2.1.x compatibility
-            f.manage_setLocalRoles(id, ['Owner'])
-
+            f.manage_setLocalRoles(member_id, ['Owner'])
+ 
             # Create Member's home page.
             # default_member_content ought to be configurable per
             # instance of MembershipTool.
-            Document.addDocument(
-                f,
-                'index_html',
-                id+"'s Home",
-                id+"'s front page",
-                "structured-text",
-                (default_member_content % id)
-                )
+            Document.addDocument( f
+                                , 'index_html'
+                                , member_id+"'s Home"
+                                , member_id+"'s front page"
+                                , "structured-text"
+                                , (default_member_content % id)
+                                )
+ 
             # Overcome an apparent catalog bug.
             f.index_html.reindexObject()
+            
 
     def getHomeFolder(self, id=None, verifyPermission=0):
         """Returns a member's home folder object."""

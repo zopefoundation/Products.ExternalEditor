@@ -298,6 +298,17 @@ class MembershipTool (UniqueObject, SimpleItem):
             f.manage_permission(CMFCorePermissions.AccessContentsInformation,
                                 ['Owner','Manager','Reviewer'], 0)  
 
+            member = self.getMemberById(member_id)
+            if hasattr(getattr(member, 'aq_base', member), 'getUser'):
+                user = member.getUser()
+            else:
+                user = member
+
+            # Grant ownership to Member
+            try: f.changeOwnership(user)
+            except AttributeError: pass  # Zope 2.1.x compatibility
+            f.manage_setLocalRoles(member_id, ['Owner'])
+
 
     security.declarePublic('isAnonymousUser')
     def isAnonymousUser(self):
