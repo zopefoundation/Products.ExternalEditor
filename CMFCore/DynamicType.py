@@ -112,5 +112,6 @@ class DynamicType:
             for id in path:
                 if id != '(Default)':
                     stack.append(id)
+            REQUEST._hacked_path = 1
 
 InitializeClass(DynamicType)
