@@ -1,5 +1,20 @@
 1.1 beta
 
+ - Fixed a bug in CMFDefault.Document with PUT that only affected
+   FTP: when a StructuredText document that contained a full HTML
+   example (complete with <html>, <head>, and <body> tags) in its
+   body, it would pass the "does it smell like HTML" test and throw
+   everything away that wasn't inside the first matching pair of
+   <body> tags it found.  Funnily enough, this bug was exposed when
+   trying to save an article about how to use FTP with Zope and the
+   CMF that contained such an example.
+
+ - CMF Topic is now installed by default when building a new CMF Site.
+
+ - CMF Topic includes a new criteria type, *FriendlyDateCriterion*,
+   for building queries like 'When effective_date is less than five
+   days old'.
+
  - Fixed glitch caused by '<dtml-return>' in
    CMFDefault/skins/control/reconfig.dtml.  Thanks to Hans de Wit
    <hw@scp.nl> for reporting this!
