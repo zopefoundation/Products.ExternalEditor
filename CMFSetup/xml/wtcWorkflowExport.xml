@@ -50,9 +50,12 @@
   </group-map>
   <assignment
         name="VAR_NAME"
+        type="VAR_TYPE"
         tal:repeat="var state/variables"
-        tal:attributes="name python: var[0]"
-        tal:content="python: var[1]">VALUE</assignment>
+        tal:attributes="name var/name;
+                        type var/type;
+                       "
+        tal:content="var/value">VALUE</assignment>
  </state>
  <transition
         transition_id="Publish"
@@ -96,8 +99,8 @@
   <assignment
         name="VAR_NAME"
         tal:repeat="var transition/variables"
-        tal:attributes="name python:var[0]"
-        tal:content="python:var[1]">EXPRESSION</assignment>
+        tal:attributes="name var/name"
+        tal:content="var/expr">EXPRESSION</assignment>
  </transition>
  <worklist
         worklist_id="reviewer_queue"

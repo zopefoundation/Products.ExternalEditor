@@ -363,8 +363,21 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
             variables = info[ 'variables' ]
             self.assertEqual( len( variables ), len( expected[ 5 ] ) )
 
-            for var_id, expr in variables:
-                self.assertEqual( expr, expected[ 5 ][ var_id ] )
+            for v_info in variables:
+
+                name, type, value = ( v_info[ 'name' ]
+                                    , v_info[ 'type' ], v_info[ 'value' ] )
+
+                self.assertEqual( value, expected[ 5 ][ name ] )
+
+                if isinstance( value, bool ):
+                    self.assertEqual( type, 'bool' )
+                elif isinstance( value, int ):
+                    self.assertEqual( type, 'int' )
+                elif isinstance( value, float ):
+                    self.assertEqual( type, 'float' )
+                elif isinstance( value, basestring ):
+                    self.assertEqual( type, 'string' )
 
     def test_getWorkflowInfo_dcworkflow_transitions( self ):
 
@@ -405,8 +418,9 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
             variables = info[ 'variables' ]
             self.assertEqual( len( variables ), len( expected[ 9 ] ) )
 
-            for var_id, expr in variables:
-                self.assertEqual( expr, expected[ 9 ][ var_id ] )
+            for v_info in variables:
+                self.assertEqual( v_info[ 'expr' ]
+                                , expected[ 9 ][ v_info[ 'name' ] ] )
 
             self._assertGuard( info, *expected[ -4: ] )
 
@@ -912,8 +926,19 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
             self.assertEqual( tuple( state[ 'groups' ] )
                             , tuple( expected[ 4 ] ) )
 
-            for k, v in state[ 'variables' ].items():
-                self.assertEqual( v, str( expected[ 5 ][ k ] ) )
+            for k, v_info in state[ 'variables' ].items():
+
+                exp_value = expected[ 5 ][ k ]
+                self.assertEqual( v_info[ 'value' ], str( exp_value ) )
+
+                if isinstance( exp_value, bool ):
+                    self.assertEqual( v_info[ 'type' ], 'bool' )
+                elif isinstance( exp_value, int ):
+                    self.assertEqual( v_info[ 'type' ], 'int' )
+                elif isinstance( exp_value, float ):
+                    self.assertEqual( v_info[ 'type' ], 'float' )
+                elif isinstance( exp_value, basestring ):
+                    self.assertEqual( v_info[ 'type' ], 'string' )
 
     def test_parseWorkflowXML_normal_transitions( self ):
 
@@ -1517,9 +1542,11 @@ _NORMAL_WORKFLOW_EXPORT = """\
    <permission-role>Manager</permission-role>
   </permission-map>
   <assignment
-    name="is_closed">False</assignment>
+    name="is_closed"
+    type="bool">False</assignment>
   <assignment
-    name="is_opened">False</assignment>
+    name="is_opened"
+    type="bool">False</assignment>
  </state>
  <state
     state_id="opened"
@@ -1541,9 +1568,11 @@ _NORMAL_WORKFLOW_EXPORT = """\
    <group-role>Owner</group-role>
   </group-map>
   <assignment
-    name="is_closed">False</assignment>
+    name="is_closed"
+    type="bool">False</assignment>
   <assignment
-    name="is_opened">True</assignment>
+    name="is_opened"
+    type="bool">True</assignment>
  </state>
  <state
     state_id="closed"
@@ -1560,9 +1589,11 @@ _NORMAL_WORKFLOW_EXPORT = """\
     name="Modify content">
   </permission-map>
   <assignment
-    name="is_closed">True</assignment>
+    name="is_closed"
+    type="bool">True</assignment>
   <assignment
-    name="is_opened">False</assignment>
+    name="is_opened"
+    type="bool">False</assignment>
  </state>
  <state
     state_id="killed"
@@ -1613,7 +1644,8 @@ _NORMAL_WORKFLOW_EXPORT = """\
   <guard>
    <guard-permission>Open content for modifications</guard-permission>
   </guard>
-  <assignment name="when_opened">object/ZopeTime</assignment>
+  <assignment
+    name="when_opened">object/ZopeTime</assignment>
  </transition>
  <transition
     transition_id="kill"
@@ -1828,6 +1860,26 @@ class Test_importWorkflow( _WorkflowSetup
                          , _GuardChecker
                          ):
 
+    def _importNormalWorkflow( self, WF_ID, WF_TITLE, WF_INITIAL_STATE ):
+
+        site = self._initSite()
+        wf_tool = site.portal_workflow
+
+        context = DummyImportContext( site )
+        context._files[ 'workflows.xml' ] = _NORMAL_TOOL_EXPORT
+        context._files[ 'workflows/dcworkflow/definition.xml'
+                      ] = ( _NORMAL_WORKFLOW_EXPORT
+                            % { 'workflow_id' : WF_ID
+                              , 'title' : WF_TITLE
+                              , 'initial_state' : WF_INITIAL_STATE
+                              , 'workflow_filename' : WF_ID.replace(' ', '_')
+                              } )
+
+        from Products.CMFSetup.workflow import importWorkflowTool
+        importWorkflowTool( context )
+
+        return wf_tool
+
     def test_empty_default_purge( self ):
 
         WF_ID_NON = 'non_dcworkflow_%s'
@@ -1948,33 +2000,135 @@ class Test_importWorkflow( _WorkflowSetup
                         , ( WF_ID_NON % 3, )
                         )
 
-    def test_from_empty_dcworkflow( self ):
+    def test_from_empty_dcworkflow_top_level( self ):
 
-        WF_ID = 'dcworkflow'
-        WF_TITLE = 'DC Workflow'
+        WF_ID = 'dcworkflow_tool'
+        WF_TITLE = 'DC Workflow testing tool'
         WF_INITIAL_STATE = 'closed'
 
-        site = self._initSite()
-        wf_tool = site.portal_workflow
+        tool = self._importNormalWorkflow( WF_ID, WF_TITLE, WF_INITIAL_STATE )
 
-        wf_tool._default_chain = ()
-        wf_tool._chains_by_type.clear()
-        self.assertEqual( len( wf_tool.objectIds() ), 0 )
+        self.assertEqual( len( tool.objectIds() ), 1 )
+        self.assertEqual( tool.objectIds()[ 0 ], WF_ID )
 
-        context = DummyImportContext( site )
-        context._files[ 'workflows.xml' ] = _NORMAL_TOOL_EXPORT
-        context._files[ 'workflows/dcworkflow/definition.xml'
-                      ] = ( _NORMAL_WORKFLOW_EXPORT
-                            % { 'workflow_id' : WF_ID
-                              , 'title' : WF_TITLE
-                              , 'initial_state' : WF_INITIAL_STATE
-                              , 'workflow_filename' : WF_ID.replace(' ', '_')
-                              } )
+    def test_from_empty_dcworkflow_workflow_attrs( self ):
 
-        from Products.CMFSetup.workflow import importWorkflowTool
-        importWorkflowTool( context )
+        WF_ID = 'dcworkflow_attrs'
+        WF_TITLE = 'DC Workflow testing attrs'
+        WF_INITIAL_STATE = 'closed'
 
-        self.assertEqual( len( wf_tool.objectIds() ), 1 )
+        tool = self._importNormalWorkflow( WF_ID, WF_TITLE, WF_INITIAL_STATE )
+
+        workflow = tool.objectValues()[ 0 ]
+        self.assertEqual( workflow.meta_type, DCWorkflowDefinition.meta_type )
+        self.assertEqual( workflow.title, WF_TITLE )
+        self.assertEqual( workflow.state_var, 'state' )
+        self.assertEqual( workflow.initial_state, WF_INITIAL_STATE )
+
+    def test_from_empty_dcworkflow_workflow_permissions( self ):
+
+        WF_ID = 'dcworkflow_permissions'
+        WF_TITLE = 'DC Workflow testing permissions'
+        WF_INITIAL_STATE = 'closed'
+
+        tool = self._importNormalWorkflow( WF_ID, WF_TITLE, WF_INITIAL_STATE )
+
+        workflow = tool.objectValues()[ 0 ]
+
+        permissions = workflow.permissions
+        self.assertEqual( len( permissions ), len( _WF_PERMISSIONS ) )
+
+        for permission in permissions:
+            self.failUnless( permission in _WF_PERMISSIONS )
+
+    def test_from_empty_dcworkflow_workflow_variables( self ):
+
+        WF_ID = 'dcworkflow_variables'
+        WF_TITLE = 'DC Workflow testing variables'
+        WF_INITIAL_STATE = 'closed'
+
+        tool = self._importNormalWorkflow( WF_ID, WF_TITLE, WF_INITIAL_STATE )
+
+        workflow = tool.objectValues()[ 0 ]
+
+        variables = workflow.variables
+
+        self.assertEqual( len( variables.objectItems() )
+                        , len( _WF_VARIABLES ) )
+
+        for id, variable in variables.objectItems():
+
+            expected = _WF_VARIABLES[ variable.getId() ]
+            self.failUnless( expected[ 0 ] in variable.description )
+            self.assertEqual( variable.default_value, expected[ 1 ] )
+            self.assertEqual( variable.getDefaultExprText(), expected[ 2 ] )
+            self.assertEqual( variable.for_catalog, expected[ 3 ] )
+            self.assertEqual( variable.for_status, expected[ 4 ] )
+            self.assertEqual( variable.update_always, expected[ 5 ] )
+
+            guard = variable.getInfoGuard()
+
+            self.assertEqual( guard.permissions, expected[ 6 ] )
+            self.assertEqual( guard.roles, expected[ 7 ] )
+            self.assertEqual( guard.groups, expected[ 8 ] )
+            self.assertEqual( guard.expr, expected[ 9 ] or None )
+
+    def test_from_empty_dcworkflow_workflow_states( self ):
+
+        WF_ID = 'dcworkflow_states'
+        WF_TITLE = 'DC Workflow testing states'
+        WF_INITIAL_STATE = 'closed'
+
+        tool = self._importNormalWorkflow( WF_ID, WF_TITLE, WF_INITIAL_STATE )
+
+        workflow = tool.objectValues()[ 0 ]
+
+        states = workflow.states
+
+        self.assertEqual( len( states.objectItems() )
+                        , len( _WF_STATES ) )
+
+        for id, state in states.objectItems():
+
+            expected = _WF_STATES[ state.getId() ]
+            self.assertEqual( state.title, expected[ 0 ] )
+            self.failUnless( expected[ 1 ] in state.description )
+
+            self.assertEqual( len( state.transitions ), len( expected[ 2 ] ) )
+
+            for transition_id in state.transitions:
+                self.failUnless( transition_id in expected[ 2 ] )
+
+            for permission in state.getManagedPermissions():
+
+                p_info = state.getPermissionInfo( permission )
+                p_expected = expected[ 3 ].get( permission, [] )
+
+                self.assertEqual( bool( p_info[ 'acquired' ] )
+                                , type( p_expected ) is type( [] ) )
+
+                self.assertEqual( len( p_info[ 'roles' ] ), len( p_expected ) )
+
+                for role in p_info[ 'roles' ]:
+                    self.failIf( role not in p_expected )
+
+            group_roles = state.group_roles or {}
+            self.assertEqual( len( group_roles ), len( expected[ 4 ] ) )
+
+            for group_id, exp_roles in expected[ 4 ]:
+
+                self.assertEqual( len( state.getGroupInfo( group_id ) )
+                                , len( exp_roles ) )
+
+                for role in state.getGroupInfo( group_id ):
+                    self.failUnless( role in exp_roles )
+
+            self.assertEqual( len( state.getVariableValues() )
+                            , len( expected[ 5 ] ) )
+
+            for var_id, value in state.getVariableValues():
+
+                self.assertEqual( value, expected[ 5 ][ var_id ] )
 
 def test_suite():
     return unittest.TestSuite((

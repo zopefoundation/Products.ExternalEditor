@@ -97,8 +97,19 @@ def importWorkflowTool( context ):
                 tool._setObject( workflow_id
                                , DCWorkflowDefinition( workflow_id ) )
 
-                # TODO: stuff variables, states, etc. into workflow
+                workflow = tool._getOb( workflow_id )
 
+                _initDCWorkflow( workflow
+                               , title
+                               , state_variable
+                               , initial_state
+                               , states
+                               , transitions
+                               , variables
+                               , worklists
+                               , permissions
+                               , scripts
+                               )
             else:
                 pass # TODO: handle non-DCWorkflows
 
@@ -434,7 +445,7 @@ class WorkflowToolConfigurator( Implicit ):
           'groups' -- a list of ( group_id, (roles,) ) tuples describing the
             group-role assignments for the state
 
-          'variables' -- a list of ( name, value ) tuples for the variables
+          'variables' -- a list of mapping for the variables
             to be set when entering the state.
 
         o Within the state_info mappings, each 'permissions' mapping
@@ -445,6 +456,16 @@ class WorkflowToolConfigurator( Implicit ):
           'roles' -- a sequence of role IDs which have the permission
 
           'acquired' -- whether roles are acquired for the permission
+
+        o Within the state_info mappings, each 'variable' mapping
+          has the keys:
+
+          'name' -- the name of the variable
+
+          'type' -- the type of the value (allowed values are:
+                    'string', 'datetime', 'bool', 'int')
+
+          'value' -- the value to be set
         """
         result = []
 
@@ -457,13 +478,21 @@ class WorkflowToolConfigurator( Implicit ):
             variables = list( v.getVariableValues() )
             variables.sort()
 
+            v_info = []
+
+            for v_name, value in variables:
+                v_info.append( { 'name' : v_name
+                               , 'type' :_guessVariableType( value )
+                               , 'value' : value
+                               } )
+
             info = { 'id'           : k
                    , 'title'        : v.title
                    , 'description'  : v.description
                    , 'transitions'  : v.transitions
                    , 'permissions'  : self._extractStatePermissions( v )
                    , 'groups'       : groups
-                   , 'variables'    : variables
+                   , 'variables'    : v_info
                    }
 
             result.append( info )
@@ -555,6 +584,11 @@ class WorkflowToolConfigurator( Implicit ):
 
             guard = v.getGuard()
 
+            v_info = []
+
+            for v_name, expr in v.getVariableExprs():
+                v_info.append( { 'name' : v_name, 'expr' : expr } )
+
             info = { 'id'                   : k
                    , 'title'                : v.title
                    , 'description'          : v.description
@@ -565,7 +599,7 @@ class WorkflowToolConfigurator( Implicit ):
                    , 'actbox_name'          : v.actbox_name
                    , 'actbox_url'           : v.actbox_url
                    , 'actbox_category'      : v.actbox_category
-                   , 'variables'            : v.getVariableExprs()
+                   , 'variables'            : v_info
                    , 'guard_permissions'    : guard.permissions
                    , 'guard_roles'          : guard.roles
                    , 'guard_groups'         : guard.groups
@@ -791,8 +825,13 @@ def _extractStateNodes( root, encoding=None ):
         for assignment in s_node.getElementsByTagName( 'assignment' ):
 
             name = _getNodeAttribute( assignment, 'name', encoding )
+            type_id = _getNodeAttribute( assignment, 'type', encoding )
             value = _coalesceTextNodeChildren( assignment, encoding )
-            var_map[ name ] = value # XXX: type lost, only know strings???
+
+            var_map[ name ] = { 'name'  : name
+                              , 'type'  : type_id
+                              , 'value' : value
+                              }
 
         result.append( info )
 
@@ -990,6 +1029,54 @@ def _extractMatchNode( parent, encoding=None ):
 
     return result
 
+def _guessVariableType( value ):
+
+    from DateTime.DateTime import DateTime
+
+    if isinstance( value, DateTime ):
+        return 'datetime'
+
+    if isinstance( value, bool ):
+        return 'bool'
+
+    if isinstance( value, float ):
+        return 'float'
+
+    if isinstance( value, int ):
+        return 'int'
+
+    if isinstance( value, basestring ):
+        return 'string'
+
+    return 'unknown'
+
+def _convertVariableValue( value, type_id ):
+
+    from DateTime.DateTime import DateTime
+
+    if type_id == 'datetime':
+
+        return DateTime( value )
+
+    if type_id == 'bool':
+
+        if isinstance( value, basestring ):
+
+            value = str( value ).lower()
+
+            return value in ( 'true', 'yes', '1' )
+
+        else:
+            return bool( value )
+
+    if type_id == 'int':
+        return int( value )
+
+    if type_id == 'float':
+        return float( value )
+
+    return value
+
 from Products.PythonScripts.PythonScript import PythonScript
 from Products.ExternalMethod.ExternalMethod import ExternalMethod
 from OFS.DTMLMethod import DTMLMethod
@@ -1005,3 +1092,96 @@ def _getWorkflowFilename( wf_id ):
     """ Return the name of the file which holds info for a given workflow.
     """
     return 'workflows/%s/definition.xml' % wf_id.replace( ' ', '_' )
+
+
+def _initDCWorkflow( workflow
+                   , title
+                   , state_variable
+                   , initial_state
+                   , states
+                   , transitions
+                   , variables
+                   , worklists
+                   , permissions
+                   , scripts
+                   ):
+    """ Initialize a DC Workflow using values parsed from XML.
+    """
+    workflow.title = title
+    workflow.state_var = state_variable
+    workflow.initial_state = initial_state
+
+    permissions = permissions[:]
+    permissions.sort()
+    workflow.permissions = permissions
+
+    _initDCWorkflowVariables( workflow, variables )
+    _initDCWorkflowStates( workflow, states )
+
+
+def _initDCWorkflowVariables( workflow, variables ):
+
+    """ Initialize DCWorkflow variables
+    """
+    from Products.DCWorkflow.Variables import VariableDefinition
+
+    for v_info in variables:
+
+        id = str( v_info[ 'variable_id' ] ) # no unicode!
+        v = VariableDefinition( id )
+
+        guard = v_info[ 'guard' ]
+        props = { 'guard_roles' : ';'.join( guard[ 'roles' ] )
+                , 'guard_permissions' : ';'.join( guard[ 'permissions' ] )
+                , 'guard_groups' : ';'.join( guard[ 'groups' ] )
+                , 'guard_expr' : guard[ 'expression' ]
+                }
+
+        v.setProperties( description = v_info[ 'description' ]
+                       , default_value = v_info[ 'default' ][ 'value' ]
+                       , default_expr = v_info[ 'default' ][ 'expression' ]
+                       , for_catalog = v_info[ 'for_catalog' ]
+                       , for_status = v_info[ 'for_status' ]
+                       , update_always = v_info[ 'update_always' ]
+                       , props = props
+                       )
+
+        workflow.variables._setObject( id, v )
+
+
+def _initDCWorkflowStates( workflow, states ):
+
+    """ Initialize DCWorkflow states
+    """
+    from Globals import PersistentMapping
+    from Products.DCWorkflow.States import StateDefinition
+
+    for s_info in states:
+
+        id = str( s_info[ 'state_id' ] ) # no unicode!
+        s = StateDefinition( id )
+
+        s.setProperties( title = s_info[ 'title' ]
+                       , description = s_info[ 'description' ]
+                       , transitions = s_info[ 'transitions' ]
+                       )
+
+        for k, v in s_info[ 'permissions' ].items():
+            s.setPermission( k, type( v ) is type( [] ), v )
+
+        gmap = s.group_roles = PersistentMapping()
+
+        for group_id, roles in s_info[ 'groups' ]:
+            gmap[ group_id ] = roles
+
+        vmap = s.var_values = PersistentMapping()
+        
+        for name, v_info in s_info[ 'variables' ].items():
+
+            value = _convertVariableValue( v_info[ 'value' ]
+                                         , v_info[ 'type' ] )
+
+            vmap[ name ] = value
+
+        workflow.states._setObject( id, s )
+
