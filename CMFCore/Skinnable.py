@@ -33,8 +33,7 @@ except:
     try:
         superGetAttr = ObjectManager.inheritedAttribute('__getattr__')
     except:
-        def superGetAttr(self, name):
-            raise AttributeError, name
+        superGetAttr = None
 
 _marker = []  # Create a new marker object.
 
@@ -50,16 +49,16 @@ class SkinnableObjectManager (ObjectManager):
         # Not implemented.
         return None
 
-    def __getattr__(self, name, _marker=_marker):
+    def __getattr__(self, name):
         '''
         Looks for the name in an object with wrappers that only reach
         up to the root skins folder.  This should be fast, flexible,
         and predictable.
         '''
-        if name[:1] != '_' and name[:3] != 'aq_':
+        if not name.startswith('_') and not name.startswith('aq_'):
             sd = self._v_skindata
             if sd is not None:
-                ob, ignore = sd
+                request, ob, ignore = sd
                 if not ignore.has_key(name):
                     subob = getattr(ob, name, _marker)
                     if subob is not _marker:
@@ -69,6 +68,8 @@ class SkinnableObjectManager (ObjectManager):
                         return aq_base(subob)
                     else:
                         ignore[name] = 1
+        if superGetAttr is None:
+            raise AttributeError, name
         return superGetAttr(self, name)
 
     security.declarePublic('setupCurrentSkin')
@@ -86,23 +87,33 @@ class SkinnableObjectManager (ObjectManager):
             # [un]restrictedTraverse messes up the skin data.)
             return
         self._v_skindata = None
+        if self._v_skindata is not None and self._v_skindata[0] is REQUEST:
+            # Already set up for this request.
+            return
         sfn = self.getSkinsFolderName()
         if sfn is not None:
             # Note that our custom __getattr__ won't get confused
             # by skins at the moment because _v_skindata is None.
             sf = getattr(self, sfn, None)
             if sf is not None:
-                sd = sf.getSkin(REQUEST)
-                if sd is not None:
-                    # Hide from acquisition.
-                    self._v_skindata = (sd, {})
+                try:
+                    sd = sf.getSkin(REQUEST)
+                except:
+                    import sys
+                    from zLOG import LOG, ERROR
+                    LOG('CMFCore', ERROR, 'Unable to get skin',
+                        error=sys.exc_info())
+                else:
+                    if sd is not None:
+                        # Hide from acquisition.
+                        self._v_skindata = (REQUEST, sd, {})
 
     def __of__(self, parent):
         '''
         Sneakily sets up the portal skin then returns the wrapper
         that Acquisition.Implicit.__of__() would return.
         '''
-        w_self = ImplicitAcquisitionWrapper(self, parent)
+        w_self = ImplicitAcquisitionWrapper(aq_base(self), parent)
         w_self.setupCurrentSkin()
         return w_self
 
