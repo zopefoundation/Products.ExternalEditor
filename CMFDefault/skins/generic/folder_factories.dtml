@@ -1,4 +1,3 @@
-<dtml-call "REQUEST.set('isDesktop', 1)">
 <dtml-var standard_html_header>
 
 <dtml-if "not portal_membership.checkPermission('Access contents information'

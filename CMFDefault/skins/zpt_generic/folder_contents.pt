@@ -1,5 +1,4 @@
-<span tal:define="dummy here/filterCookie;
-                  desktop python: request.set('isDesktop', 1)"></span>
+<tal:x define="dummy here/filterCookie;"/>
 <html xmlns:tal="http://xml.zope.org/namespaces/tal"
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       metal:use-macro="here/main_template/macros/master"
