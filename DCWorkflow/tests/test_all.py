@@ -1,10 +1,9 @@
 """Currently all stub, no substance."""
-import Zope
-from unittest import TestSuite,main
+import unittest
 from Products.CMFCore.tests.base.utils import build_test_suite
 
 def test_suite():
-    return TestSuite()
+    return unittest.TestSuite()
 
 if __name__ == '__main__':
-    main(defaultTest='test_suite')
+    unittest.main(defaultTest='test_suite')
