@@ -174,9 +174,15 @@ class CatalogTool (UniqueObject, ZCatalog):
 
         if not _checkPermission(
             CMFCorePermissions.AccessInactivePortalContent, self ):
+            base = aq_base( self )
             now = DateTime()
-            kw[ 'effective' ] = { 'query' : now, 'usage' : 'range:max' }
-            kw[ 'expires'   ] = { 'query' : now, 'usage' : 'range:min' }
+            if hasattr( base, 'addIndex' ):   # Zope 2.4 and above
+                kw[ 'effective' ] = { 'query' : now, 'range' : 'max' }
+                kw[ 'expires'   ] = { 'query' : now, 'range' : 'min' }
+            else:                             # Zope 2.3
+                kw[ 'effective'      ] = kw[ 'expires' ] = now
+                kw[ 'effective_usage'] = 'range:max'
+                kw[ 'expires_usage'  ] = 'range:min'
 
         return apply(ZCatalog.searchResults, (self, REQUEST), kw)
 
