@@ -1,18 +1,18 @@
 <dtml-var standard_html_header>
 
 <dtml-let member="portal_membership.getAuthenticatedMember()"
-  current_state="portal_workflow.getStateFor(this())"
-  transitions="portal_workflow.listAllowableTransitionsFor(this())">
+  review_state="portal_workflow.getInfoFor(this(), 'review_state')"
+  review_history="portal_workflow.getInfoFor(this(), 'review_history')">
 
 <div class="Desktop">
 
-<h1> Retract Item </h1>
+<h1> Reject Item </h1>
 
 <dtml-if message>
  <h2 class="DesktopTitle">&dtml-message;</h2>
 </dtml-if>
 
-<p>Use this form to retract a content item and setting its 
+<p>Use this form to reject the publication of a content item and set its 
    status to <b>Private</b>, thereby making it unavailable to 
    other portal members and visitors.</p>
 
@@ -24,8 +24,8 @@
     <strong>Status</strong>
    </td>
    <td valign=top align=left>
-     This item is currently in <b><dtml-var expr="current_state"></b> status.
-     <input type="hidden" name="transition" value="private">
+     This item is currently in <b>&dtml-review_state;</b> status.
+     <input type="hidden" name="workflow_action" value="reject">
    </td>
   </tr>
   <tr>
@@ -37,7 +37,7 @@
   </tr>
   <tr>
    <td></td>
-   <td><input type="submit" value=" Retract this Item "></td>
+   <td><input type="submit" value=" Reject this Item "></td>
   </tr>
  </table>
 </form>

@@ -1,20 +1,18 @@
 <dtml-var standard_html_header>
 
 <dtml-let member="portal_membership.getAuthenticatedMember()"
-  current_state="portal_workflow.getStateFor(this())"
-  transitions="portal_workflow.listAllowableTransitionsFor(this())">
+  review_state="portal_workflow.getInfoFor(this(), 'review_state')"
+  review_history="portal_workflow.getInfoFor(this(), 'review_history')">
 
 <div class="Desktop">
 
-<h1> Sumit Item for Review </h1>
+<h1> Publish Item </h1>
 
 <dtml-if message>
  <h2 class="DesktopTitle">&dtml-message;</h2>
 </dtml-if>
 
-<p>To make an item published, it
-   has to be reviewed by one of the site's Reviewers. 
-   A <b>published</b> item is available to the general
+<p>A <b>published</b> item is available to the general
    member base and anonymous visitors.</p>
 
 <p>Another way to control the visibility of an item is with its <b>effective
@@ -29,8 +27,8 @@
     <strong>Status</strong>
    </td>
    <td valign=top align=left>
-     This item is currently in <b><dtml-var expr="current_state"></b> status.
-     <input type="hidden" name="transition" value="pending">
+     This item is currently in <b>&dtml-review_state;</b> status.
+     <input type="hidden" name="workflow_action" value="publish">
    </td>
   </tr>
   <tr>
@@ -42,7 +40,7 @@
   </tr>
   <tr>
    <td></td>
-   <td><input type="submit" value=" Submit Item "></td>
+   <td><input type="submit" value=" Publish this Item "></td>
   </tr>
  </table>
 </form>

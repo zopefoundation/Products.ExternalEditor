@@ -6,8 +6,9 @@
           actions="portal_actions.listFilteredActionsFor(obj)"
           user_actions="actions['user']"
           folder_actions="actions['folder']"
-          object_actions="actions['object']"
-          global_actions="actions['global']">
+          object_actions="actions['object'] + actions['workflow']"
+          global_actions="actions['global']"
+>
 
 <table class="ActionBox" width="100%">
 
@@ -49,14 +50,17 @@
  </tr>
  <tr class="&dtml-AuthClass;">
   <td>
-     <dtml-if expr="_.hasattr(obj, 'review_state')">
-     Status: <dtml-var "obj.review_state"><br>
-     </dtml-if>
 
-  <dtml-in object_actions mapping>
-   <a href="&dtml-url;"><dtml-var name></a><br>
-  </dtml-in>
+    <dtml-let review_state="portal_workflow.getInfoFor(this(),
+                            'review_state', '')">
+    <dtml-if review_state>
+    Status: &dtml-review_state;<br>
+    </dtml-if>
+    </dtml-let>
 
+    <dtml-in object_actions mapping>
+      <a href="&dtml-url;"><dtml-var name></a><br>
+    </dtml-in>
   </td>
  </tr>
 </dtml-if>
