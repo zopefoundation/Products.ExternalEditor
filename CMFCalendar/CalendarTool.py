@@ -56,11 +56,12 @@ class CalendarTool (UniqueObject, SimpleItem):
                                    __name__='manage_configure')
 
     security.declareProtected( ManagePortal, 'edit_configuration' )
-    def edit_configuration(self, show_types, use_session, show_states):
+    def edit_configuration(self, show_types, use_session, show_states=None):
         """ Change the configuration of the calendar tool """
         self.calendar_types = tuple(show_types)
-        self.calendar_states = tuple(show_states)
         self.use_session = use_session
+        if show_states is not None:
+            self.calendar_states = tuple(show_states)
         if hasattr(self.REQUEST, 'RESPONSE'):
             self.REQUEST.RESPONSE.redirect('manage_configure')
 
