@@ -152,7 +152,7 @@ class RegistrationTool(BaseTool):
 
         check, msg = _checkEmail(member.getProperty('email'))
         if not check:
-            raise 'ValueError', msg
+            raise ValueError, msg
 
         # Rather than have the template try to use the mailhost, we will
         # render the message ourselves and send it from here (where we
@@ -188,7 +188,7 @@ class RegistrationTool(BaseTool):
 
         check, msg = _checkEmail(email)
         if not check:
-            raise 'ValueError', msg
+            raise ValueError, msg
 
         # Rather than have the template try to use the mailhost, we will
         # render the message ourselves and send it from here (where we
