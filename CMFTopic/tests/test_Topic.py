@@ -12,7 +12,7 @@ class TestCase( unittest.TestCase ):
     """ Test all the general Topic cases  """
     def test_Empty( self ):
         topic = Topic('top')
-        assert len(topic._criteriaTypes) == 3
+        assert len(topic._criteriaTypes) == 4
         query = topic.buildQuery()
         assert len( query ) == 0
     
