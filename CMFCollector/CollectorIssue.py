@@ -192,7 +192,8 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         return self._getOb(TRANSCRIPT_NAME)
     
     security.declareProtected(AddCollectorIssueFollowup, 'do_action')
-    def do_action(self, action, comment, assignees=None):
+    def do_action(self, action, comment,
+                  assignees=None, file=None, fileid=None, filetype=None):
         """Execute an action, adding comment to the transcript."""
 
         username = str(getSecurityManager().getUser())
@@ -208,13 +209,32 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
                                              username=username,
                                              assignees=assignees)
 
+        if file is not None:
+            if not fileid:
+                fileid = string.split(string.split(file.filename, '/')[-1],
+                                      '\\')[-1]
+            attachment = self._add_artifact(fileid, filetype, comment, file)
+            attachment_msg = (" - Attachment: %s\n\n" % fileid)
+        else:
+            attachment_msg = ''
+
         transcript = self.get_transcript()
         self.comment_number = self.comment_number + 1
-        entry_leader = "\n\n" + self._entry_header(action, username) + "\n"
+        entry_leader = self._entry_header(action, username) + "\n\n"
         transcript._edit('stx',
-                         transcript.EditableBody()
-                         + entry_leader
-                         + util.process_comment(comment))
+                         entry_leader
+                         + attachment_msg
+                         + util.process_comment(string.strip(comment))
+                         + "\n<hr>\n"
+                         + transcript.EditableBody())
+
+    def _add_artifact(self, id, type, description, file):
+        """Add new artifact, and return object."""
+        self.invokeFactory(type, id)
+        it = self._getOb(id)
+        it.description = description
+        it.manage_upload(file)
+        return it
 
     security.declareProtected(CMFCorePermissions.View, 'assigned_to')
     def assigned_to(self):
@@ -234,14 +254,6 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         wftool = getToolByName(self, 'portal_workflow')
         return wftool.getInfoFor(self, 'state', '??')
 
-    def _add_artifact(self, id, type, description, file):
-        """Add new artifact, and return object."""
-        self.invokeFactory(type, id)
-        it = self._getOb(id)
-        it.description = description
-        it.manage_upload(file)
-        return it
-
     def _create_transcript(self, description, container,
                            text_format=DEFAULT_TRANSCRIPT_FORMAT):
         """Create events and comments transcript, with initial entry."""
@@ -256,7 +268,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         it._edit(text_format=text_format, text=text)
         it.title = self.title
 
-    def _entry_header(self, type, user, prefix="<hr> == ", suffix=" =="):
+    def _entry_header(self, type, user, prefix=" == ", suffix=" =="):
         """Return text for the header of a new transcript entry."""
         # Ideally this would be a skin method (probly python script), but i
         # don't know how to call it from the product, sigh.
