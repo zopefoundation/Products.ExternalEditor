@@ -12,6 +12,7 @@ from os import curdir, mkdir, stat, remove
 from shutil import copytree,rmtree
 from tempfile import mktemp
 import os
+import sys
 import time
 
 class TransactionalTest( TestCase ):
@@ -90,12 +91,12 @@ class FSDVTest( TestCase ):
         # also make sure the skin folder mod time has changed
         try:
             dir_mtime = stat(self.skin_path_name)[8]
-        except:
+        except:  # XXX Why bare except?
             dir_mtime = 0
         thePath = join(self.skin_path_name,filename)
         try:
             mtime1 = stat(thePath)[8]
-        except:
+        except:  # XXX Why bare except?
             mtime1 = 0
         mtime2 = mtime1
         while mtime2==mtime1:
@@ -103,29 +104,43 @@ class FSDVTest( TestCase ):
             f.write(stuff)
             f.close()
             mtime2 = stat(thePath)[8]
-        mtime2 = dir_mtime
-        while mtime2 == dir_mtime:
-            # Many systems have a granularity of 1 second.
-            # Wait until the mod time is actually different.
-            time.sleep(0.1)
-            os.utime(self.skin_path_name, None)
-            mtime2 = stat(self.skin_path_name)[8]
+        self._addedOrRemoved(dir_mtime)
 
 
     def _deleteFile(self,filename):
         try:
             dir_mtime = stat(self.skin_path_name)[8]
-        except:
+        except:  # XXX Why bare except?
             dir_mtime = 0
-        remove(join(self.skin_path_name,filename))
-        mtime2 = dir_mtime
-        while mtime2 == dir_mtime:
+        remove(join(self.skin_path_name, filename))
+        self._addedOrRemoved(dir_mtime)
+
+
+    def _addedOrRemoved(self, old_mtime):
+        # Called after adding/removing a file from self.skin_path_name.
+        if sys.platform == 'nt':
+            # Windows doesn't reliably update directory mod times, so
+            # DirectoryView has an expensive workaround.  The
+            # workaround does not rely on directory mod times.
+            return
+        limit = time.time() + 60  # If it takes 60 seconds, give up.
+        new_mtime = old_mtime
+        while new_mtime == old_mtime:
             # Many systems have a granularity of 1 second.
-            # Wait until the mod time is actually different
+            # Add/remove a file until it actually changes the
+            # directory mod time.
+            if time.time() > limit:
+                raise RuntimeError(
+                    "This platform (%s) does not update directory mod times "
+                    "reliably." % sys.platform)
             time.sleep(0.1)
-            os.utime(self.skin_path_name, None)
-            mtime2 = stat(self.skin_path_name)[8]
-        
+            fn = join(self.skin_path_name, '.touch')
+            f = open(fn, 'w')
+            f.write('Temporary file')
+            f.close()
+            os.remove(fn)
+            new_mtime = stat(self.skin_path_name)[8]
+
     def setUp(self):
         # store the place where the skin copy will be created
         self.tempname = mktemp()
