@@ -34,7 +34,7 @@ import EventPermissions
 # with the Types Tool (portal_types)
 factory_type_information = (
     {'id': 'Event',
-     'content_icon': 'event_icon.gif',
+     'icon': 'event_icon.gif',
      'meta_type': 'CMF Event',
      'description': ('Events are objects for use in Calendar topical '
                      'queries on the catalog.'),
