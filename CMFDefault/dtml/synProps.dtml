@@ -46,7 +46,7 @@
              UpdateBase
            </td>
            <td>
-             <input type="text" name="updateBase"
+             <input type="text" name="updateBase:date"
               value="&dtml-syUpdateBase;" size="70">
            </td>
          </tr>

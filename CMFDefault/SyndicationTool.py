@@ -166,6 +166,8 @@ class SyndicationTool (UniqueObject, SimpleItem):
             try: del self.syUpdateFrequency
             except KeyError: pass
         if updateBase:
+            if type( updateBase ) is type( '' ):
+                updateBase = DateTime( updateBase )
             self.syUpdateBase = updateBase
         else:
             try: del self.syUpdateBase
