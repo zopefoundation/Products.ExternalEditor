@@ -20,11 +20,10 @@
   <tr>
    <td valign="top">
     <table class="ContentsList">
-      <tr valign="top"
+      <tbody tal:condition="python: here.portal_membership.checkPermission('List folder contents', here, 'aq_parent')">
+	  <tr valign="top"
 	      tal:define="upNav python: hasattr(here.aq_parent, 'portal_url');
-		              upID python: here.aq_parent.getId()"
-		  tal:condition="python: here.portal_membership.checkPermission('List folder contents', here, 'aq_parent')"
-	   >
+		              upID python: here.aq_parent.getId()">
         <td colspan="3" align="left">
           <span tal:condition="upNav|nothing"><a href="../folder_contents"><img src="" alt="[Link]" border="0"
 											tal:attributes="src python: here.portal_url() + '/UpFolder_icon.gif'"></a>
@@ -33,6 +32,7 @@
         <span tal:condition="python: not(upNav)"><span class="mild">Root</span></span>
 		</td>
       </tr>
+	  </tbody>
 	  <tr><td colspan="1" align="left" width="49%">
 	  <table>
 	  <tbody tal:define="global b_start string:0;b_start request/b_start | b_start;

@@ -22,12 +22,15 @@
       <a href=""
 	     tal:attributes="href newsitems/getURL"
 		 tal:content="newsitems/title">Title</a>
-      <br> By <span tal:replace="newsitems/Creator">Creator</span>
   </td>
   <td class="NewsListing" align="right" valign="top"
       tal:content="newsitems/Date">Date
   </td>
  </tr>
+ <tr><td class="NewsByLine" valign="top" colspan="2" align="left">
+      By <span tal:replace="newsitems/Creator">Creator</span>
+  </td>
+  </tr>
  <tr>
   <td colspan="2">
     <em> <span tal:define="pss modules/Products.PythonScripts.standard; niDescription newsitems/Description"

@@ -399,6 +399,16 @@ td.NewsBorder {
 td.NewsListing {
     background-color: #336699;
     color:  #FFFFFF;
+    font-size: 80%;
+    font-weight: bold;
+}
+
+td..NewsByLine {
+    background-color:  #CCCCCC;
+    color:  #336699;
+    font-size: 80%;
+    text-align: left;
+    vertical-align: top;
 }
 
 .NewsLeadin {
