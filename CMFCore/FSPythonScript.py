@@ -94,6 +94,7 @@ from AccessControl import ClassSecurityInfo, getSecurityManager
 from Products.PythonScripts.PythonScript import PythonScript
 from Shared.DC.Scripts.Script import Script, defaultBindings
 
+from utils import _dtmldir
 from CMFCorePermissions import ViewManagementScreens, View, FTPAccess
 from DirectoryView import registerFileExtension, registerMetaType, expandpath
 from FSObject import FSObject
@@ -124,7 +125,7 @@ class FSPythonScript (FSObject, Script):
         self.ZBindings_edit(defaultBindings)
 
     security.declareProtected(ViewManagementScreens, 'manage_main')
-    manage_main = Globals.DTMLFile('dtml/custpy', globals())
+    manage_main = Globals.DTMLFile('custpy', _dtmldir)
 
     def _createZODBClone(self):
         """Create a ZODB (editable) equivalent of this object."""
@@ -132,7 +133,7 @@ class FSPythonScript (FSObject, Script):
         obj.write(self.read())
         return obj
 
-    def _readFile(self):
+    def _readFile(self, reparse):
         """Read the data from the filesystem.
         
         Read the file (indicated by exandpath(self._filepath), and parse the

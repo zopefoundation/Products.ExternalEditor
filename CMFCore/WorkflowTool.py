@@ -90,20 +90,17 @@ __version__='$Revision$'[11:-2]
 
 
 import sys
-from utils import UniqueObject, _checkPermission, getToolByName
+from utils import UniqueObject, _checkPermission, getToolByName, _dtmldir
 from OFS.Folder import Folder
-from Globals import InitializeClass, PersistentMapping, DTMLFile, package_home
+from Globals import InitializeClass, PersistentMapping, DTMLFile
 from AccessControl import ClassSecurityInfo
 from Acquisition import aq_base
 from WorkflowCore import WorkflowException
 from CMFCorePermissions import ManagePortal
-import os
 from string import join, split, replace, strip
 
 AUTO_MIGRATE_WORKFLOW_TOOLS = 1  # This will later be set to 0.
 
-
-_dtmldir = os.path.join( package_home( globals() ), 'dtml' )
 
 _marker = []  # Create a new marker object.
 

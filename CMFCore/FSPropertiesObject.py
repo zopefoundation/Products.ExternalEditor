@@ -94,6 +94,7 @@ from OFS.PropertyManager import PropertyManager
 from ZPublisher.Converters import get_converter
 from AccessControl import ClassSecurityInfo
 
+from utils import _dtmldir
 from DirectoryView import registerFileExtension, registerMetaType, expandpath
 from CMFCorePermissions import ViewManagementScreens
 from FSObject import FSObject
@@ -108,7 +109,7 @@ class FSPropertiesObject (FSObject, PropertyManager):
     security = ClassSecurityInfo()
 
     security.declareProtected(ViewManagementScreens, 'manage_main')
-    manage_main = Globals.HTMLFile('dtml/custprops', globals())
+    manage_main = Globals.DTMLFile('custprops', _dtmldir)
 
     # Declare all (inherited) mutating methods private.
     security.declarePrivate('manage_addProperty',
@@ -152,7 +153,7 @@ class FSPropertiesObject (FSObject, PropertyManager):
 
         return obj
 
-    def _readFile(self):
+    def _readFile(self, reparse):
         """Read the data from the filesystem.
         
         Read the file (indicated by exandpath(self._filepath), and parse the

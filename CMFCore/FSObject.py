@@ -124,7 +124,7 @@ class FSObject(Acquisition.Implicit, Item):
         
         try: self._file_mod_time = stat(fp)[8]
         except: pass
-        self._readFile()
+        self._readFile(0)
 
     security.declareProtected(CMFCorePermissions.ViewManagementScreens,
         'manage_doCustomize')
@@ -150,11 +150,12 @@ class FSObject(Acquisition.Implicit, Item):
         """Create a ZODB (editable) equivalent of this object."""
         raise NotImplemented, "This should be implemented in a subclass."
 
-    def _readFile(self):
+    def _readFile(self, reparse):
         """Read the data from the filesystem.
         
-        Read the file (indicated by exandpath(self._filepath), and parse the
-        data if necessary.
+        Read the file indicated by exandpath(self._filepath), and parse the
+        data if necessary.  'reparse' is set when reading the second
+        time and beyond.
         """
         raise NotImplemented, "This should be implemented in a subclass."
 
@@ -167,7 +168,7 @@ class FSObject(Acquisition.Implicit, Item):
             except: mtime=0
             if mtime != self._file_mod_time:
                 self._file_mod_time = mtime
-                self._readFile()
+                self._readFile(1)
 
     security.declareProtected(CMFCorePermissions.View, 'get_size')
     def get_size(self):

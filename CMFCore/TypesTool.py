@@ -90,16 +90,14 @@
 __version__='$Revision$'[11:-2]
 
 import OFS
-from Globals import InitializeClass, HTMLFile, package_home
-from utils import UniqueObject, SimpleItemWithProperties, tuplize
-import os, string
+from Globals import InitializeClass, HTMLFile
+from utils import UniqueObject, SimpleItemWithProperties, tuplize, _dtmldir
+import string
 from AccessControl import getSecurityManager, ClassSecurityInfo
 from Acquisition import aq_base
 import Products, CMFCorePermissions
 
 from CMFCorePermissions import View, ManagePortal, AccessContentsInformation
-
-_dtmldir = os.path.join( package_home( globals() ), 'dtml' )
 
 _marker = []  # Create a new marker.
 

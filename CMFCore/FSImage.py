@@ -93,6 +93,7 @@ from AccessControl import ClassSecurityInfo
 from webdav.common import rfc1123_date
 from OFS.Image import Image, getImageInfo
 
+from utils import _dtmldir
 from CMFCorePermissions import ViewManagementScreens, View
 from FSObject import FSObject
 from DirectoryView import registerFileExtension, registerMetaType, expandpath
@@ -116,31 +117,22 @@ class FSImage(FSObject):
         FSObject.__init__(self, id, filepath, fullname, properties)
 
     security.declareProtected(ViewManagementScreens, 'manage_main')
-    manage_main = Globals.HTMLFile('dtml/custimage', globals())
+    manage_main = Globals.DTMLFile('custimage', _dtmldir)
+    content_type = 'unknown/unknown'
 
     def _createZODBClone(self):
-        return Image(self.getId(), '', self._readFile())
+        return Image(self.getId(), '', self._readFile(1))
 
-    def _readFile(self):
+    def _readFile(self, reparse):
         fp = expandpath(self._filepath)
         file = open(fp, 'rb')
         try: data = file.read()
         finally: file.close()
-
-        # Only parse out image info if the file was changed, because this file
-        # is read every time the image is requested.
-        try:    mtime=os.stat(fp)[8]
-        except: mtime=0
-        if mtime != self._file_mod_time:
-            self._file_mod_time = mtime
-        ct, width, height = getImageInfo( data )
-        if ct != getattr( self, 'content_type', None ):
+        if reparse or self.content_type == 'unknown/unknown':
+            ct, width, height = getImageInfo( data )
             self.content_type = ct
-        if width != getattr( self, 'width', None ):
             self.width = width
-        if height != getattr( self, 'height', None ):
             self.height = height
-
         return data
 
     #### The following is mainly taken from OFS/Image.py ###
@@ -149,12 +141,10 @@ class FSImage(FSObject):
 
     _image_tag = Image.tag
     security.declareProtected(View, 'tag')
-    def tag(self, height=None, width=None, alt=None,
-            scale=0, xscale=0, yscale=0, **args):
+    def tag(self, *args, **kw):
         # Hook into an opportunity to reload metadata.
-        self._readFile()
-        return apply(self._image_tag, (height, width, alt, scale, xscale, 
-            yscale), args)
+        self._updateFromFS()
+        return apply(self._image_tag, args, kw)
 
     security.declareProtected(View, 'index_html')
     def index_html(self, REQUEST, RESPONSE):
@@ -164,7 +154,8 @@ class FSImage(FSObject):
         Returns the contents of the file or image.  Also, sets the
         Content-Type HTTP header to the objects content type.
         """
-        data = self._readFile()
+        self._updateFromFS()
+        data = self._readFile(0)
         # HTTP If-Modified-Since header handling.
         header=REQUEST.get_header('If-Modified-Since', None)
         if header is not None:
@@ -200,7 +191,7 @@ class FSImage(FSObject):
 
         Returns the content type (MIME type) of a file or image.
         """
-        self._readFile()
+        self._updateFromFS()
         return self.content_type
 
 Globals.InitializeClass(FSImage)

@@ -92,6 +92,7 @@ import Globals
 from AccessControl import ClassSecurityInfo, getSecurityManager, Permissions
 from OFS.DTMLMethod import DTMLMethod, decapitate, guess_content_type
 
+from utils import _dtmldir
 from CMFCorePermissions import View, ViewManagementScreens, FTPAccess
 from DirectoryView import registerFileExtension, registerMetaType, expandpath
 from FSObject import FSObject
@@ -116,7 +117,7 @@ class FSDTMLMethod(FSObject, Globals.HTML):
     security.declareObjectProtected(View)
 
     security.declareProtected(ViewManagementScreens, 'manage_main')
-    manage_main = Globals.HTMLFile('dtml/custdtml', globals())
+    manage_main = Globals.DTMLFile('custdtml', _dtmldir)
 
     def __init__(self, id, filepath, fullname=None, properties=None):
         FSObject.__init__(self, id, filepath, fullname, properties)
@@ -128,14 +129,15 @@ class FSDTMLMethod(FSObject, Globals.HTML):
         """Create a ZODB (editable) equivalent of this object."""
         return DTMLMethod(self.read(), __name__=self.getId())
 
-    def _readFile(self):
+    def _readFile(self, reparse):
         fp = expandpath(self._filepath)
         file = open(fp, 'rb')
         try:
             data = file.read()
         finally: file.close()
         self.raw = data
-        self.cook()
+        if reparse:
+            self.cook()
 
     # Hook up chances to reload in debug mode
     security.declarePrivate('read_raw')

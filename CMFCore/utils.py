@@ -90,9 +90,14 @@ from AccessControl.Role import gather_permissions
 import Globals
 from Acquisition import aq_get, aq_inner, aq_parent
 from string import split
+import os
+from Globals import package_home
 
 try: from OFS.ObjectManager import UNIQUE
 except ImportError: UNIQUE = 2
+
+
+_dtmldir = os.path.join( package_home( globals() ), 'dtml' )
 
 
 # Tool for getting at Tools, meant to be modified as policies or Tool

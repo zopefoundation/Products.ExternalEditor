@@ -91,7 +91,7 @@ __version__='$Revision$'[11:-2]
 
 import os
 from utils import UniqueObject, _checkPermission, _getAuthenticatedUser
-from utils import getToolByName
+from utils import getToolByName, _dtmldir
 from Products.ZCatalog.ZCatalog import ZCatalog
 from Globals import InitializeClass, package_home, DTMLFile
 import urllib
@@ -102,7 +102,6 @@ from AccessControl import ClassSecurityInfo
 from utils import mergedLocalRoles
 import CMFCorePermissions
 
-_dtmldir = os.path.join( package_home( globals() ), 'dtml' )
 
 class IndexableObjectWrapper:
 
