@@ -459,8 +459,8 @@ class FactoryTypeInformation (TypeInformation):
         id = str(id)
         m(id=id)
         ob = container._getOb(id)
-        if hasattr(ob, '_setPortalType'):
-            ob._setPortalType(self.id)
+        if hasattr(ob, '_setPortalTypeName'):
+            ob._setPortalTypeName(self.id)
         return '%s/%s' % ( ob.absolute_url(), self.immediate_view )
 
 InitializeClass( FactoryTypeInformation )
@@ -514,8 +514,8 @@ class ScriptableTypeInformation( TypeInformation ):
 
         id = str(id)
         ob = constructor( container, id )
-        if hasattr(ob, '_setPortalType'):
-            ob._setPortalType(self.id)
+        if hasattr(ob, '_setPortalTypeName'):
+            ob._setPortalTypeName(self.id)
         return '%s/%s' % ( ob.absolute_url(), self.immediate_view )
 
 InitializeClass( ScriptableTypeInformation )

@@ -96,13 +96,23 @@ class DynamicType:
 
     security = ClassSecurityInfo()
 
-    def _setPortalType(self, pt):
+    def _setPortalTypeName(self, pt):
         '''
         Called by portal_types during construction, records an
         ID that will be used later to locate the correct
         ContentTypeInformation.
         '''
         self.portal_type = pt
+
+    def _getPortalTypeName(self):
+        '''
+        Returns the portal type name that can be passed to portal_types.
+        '''
+        pt = self.portal_type
+        if pt is None:
+            # Provide a fallback.
+            pt = self.meta_type
+        return pt
 
     security.declarePublic('getTypeInfo')
     def getTypeInfo(self):
@@ -112,10 +122,7 @@ class DynamicType:
         tool = getToolByName(self, 'portal_types', None)
         if tool is None:
             return None
-        pt = self.portal_type
-        if pt is None:
-            # Provide a fallback.
-            pt = self.meta_type
+        pt = self._getPortalTypeName()
         return tool.getTypeInfo(pt)  # Can return None.
 
 Globals.InitializeClass (DynamicType)
