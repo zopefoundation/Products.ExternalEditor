@@ -91,7 +91,8 @@ Zope External Editor Installation
     
  Troubleshooting
 
-    If the helper app won't launch try the following suggestions:
+    If the helper app won't launch or you receive errors try the following 
+    suggestions:
     
     - Make sure you have Pythonwin installed properly. To test this, bring up 
       the Python console and type in 'import win32api'. If it throws an
@@ -126,3 +127,13 @@ Zope External Editor Installation
 
       - Under security (near the bottom) uncheck "Do not save encrypted files 
         to disk"
+    
+    - If you are using IE and you receive an error from the helper app like
+      "FATAL ERROR [Errno 2] No such file or directory...." it means that IE is
+      refusing to save the temp file to disk. This is usually caused by a cache
+      control header such as "Cache-Control: no-cache". To use external editor
+      with IE you must prevent this header from being set. Some versions of
+      CookieCrumber inject this header for all authenticated requests. You can
+      fix this by changing the CC configuration on its properties tab in the
+      ZMI to use another cache control value such as "private".
+
