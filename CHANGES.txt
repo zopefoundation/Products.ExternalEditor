@@ -190,7 +190,7 @@ CMF 1.5alpha (unreleased)
       permissions used within the product;  other modules within the product
       should import from there.  Likewise for 'exceptions.py'.
 
-    - Removed pre Zope 2.6.4 compatibility code. Now Zope 2.6.4 or a later
+    - Removed pre Zope 2.7.0 compatibility code. Now Zope 2.7.0 or a later
       platform is required for CMF.
 
     - CatalogTool: Marked the 'meta_type' index as deprecated.

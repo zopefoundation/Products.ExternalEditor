@@ -19,7 +19,6 @@ import re
 from os import path, listdir, stat
 from sys import exc_info
 from sys import platform
-from types import StringType
 
 from AccessControl import ClassSecurityInfo
 from Acquisition import aq_inner, aq_parent
@@ -249,15 +248,6 @@ class DirectoryInformation:
                                     ERROR,
                                     'Error setting permissions',
                                     error=exc_info())
-                            except:
-                                # for Zope versions before 2.7.0
-                                if exc_info()[0] == 'Invalid Permission':
-                                    LOG('DirectoryView',
-                                        ERROR,
-                                        'Error setting permissions',
-                                        error=exc_info())
-                                else:
-                                    raise
 
                     # only DTML Methods can have proxy roles
                     if hasattr(ob, '_proxy_roles'):
@@ -298,7 +288,7 @@ class DirectoryRegistry:
     def registerDirectory(self, name, _prefix, subdirs=1):
         # This what is actually called to register a
         # file system directory to become a FSDV.
-        if not isinstance(_prefix, StringType):
+        if not isinstance(_prefix, basestring):
             _prefix = package_home(_prefix)
         filepath = path.join(_prefix, name)
         self.registerDirectoryByPath(filepath, subdirs)
@@ -498,7 +488,7 @@ def addDirectoryViews(ob, name, _prefix):
     still needs to be called by product initialization code to satisfy
     persistence demands.
     """
-    if not isinstance(_prefix, StringType):
+    if not isinstance(_prefix, basestring):
         _prefix = package_home(_prefix)
     filepath = path.join(_prefix, name)
     minimal_fp = minimalpath(filepath)

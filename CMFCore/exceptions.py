@@ -19,23 +19,9 @@ from AccessControl import ModuleSecurityInfo
 from AccessControl import Unauthorized as AccessControl_Unauthorized
 from OFS.CopySupport import CopyError
 from webdav.Lockable import ResourceLockedError
+from zExceptions import BadRequest
+from zExceptions import NotFound
 from zExceptions import Unauthorized as zExceptions_Unauthorized
-
-try:
-    from zExceptions import BadRequest
-except ImportError:
-    # for Zope versions before 2.7.0
-
-    class BadRequest(Exception):
-        pass
-
-try:
-    from zExceptions import NotFound
-except ImportError:
-    # for Zope versions before 2.7.0
-
-    class NotFound(Exception):
-        pass
 
 
 security = ModuleSecurityInfo('Products.CMFCore.exceptions')

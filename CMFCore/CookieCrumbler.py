@@ -28,12 +28,7 @@ from Globals import HTMLFile
 from zLOG import LOG, ERROR
 from ZPublisher.HTTPRequest import HTTPRequest
 from OFS.Folder import Folder
-
-try:
-    from zExceptions import Redirect
-except ImportError:
-    # Pre Zope 2.7
-    Redirect = 'Redirect'
+from zExceptions import Redirect
 
 
 # Constants.
