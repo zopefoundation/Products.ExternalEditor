@@ -302,7 +302,7 @@
             <input type=radio name="filetype" value="Image"> Image
           </td>
           <td> <input type=file name="file" size="20"> </td>
-          <th align="right" valign="top"> (Optional) Id: </th>
+          <th valign="top"> (Optional) Id: </th>
           <td> <input type=text name="fileid" size="12"> </td>
         </tr>
 
