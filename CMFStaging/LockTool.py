@@ -105,19 +105,6 @@ class LockTool(UniqueObject, SimpleItemWithProperties):
         obj.wl_setLock(lockitem.getLockToken(), lockitem)
 
 
-    security.declarePublic('autolock')
-    def autolock(self, obj=None):
-        """Tries to lock an object, swallowing LockingErrors and Unauthorized.
-        """
-        if obj is None:
-            obj = aq_parent(self)
-        try:
-            self.lock(obj)
-        except (LockingError, Unauthorized):
-            return 0
-        return 1
-
-
     security.declarePublic('breaklock')
     def breaklock(self, obj, message=''):
         """Breaks the lock in an emergency.
