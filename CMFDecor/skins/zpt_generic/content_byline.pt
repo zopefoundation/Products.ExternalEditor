@@ -1,13 +1,21 @@
-<div class="Desktop" metal:define-macro="byline"
-     tal:define="creator here/Creator; home_url python: here.portal_membership.getHomeUrl(creator)"
-     tal:condition="home_url">
-   			Created by <span class="Desktop"><a href="here.html" title="Here"
-			       tal:attributes="href home_url; title creator"
-				   tal:content="creator">Me</a>.</span>
-			<span tal:condition="python: not(home_url)"
-			      tal:replace="creator">Me</span>
-				  <br>
- <span tal:condition="here/ModificationDate">
-     Last modified on <span tal:content="here/ModificationDate">Today</span>
- </span>
- </div>
+<div id="ContentByline"
+     metal:define-macro="byline"
+     tal:define="creator here/Creator;
+                 home_url python: here.portal_membership.getHomeUrl(creator);
+                "
+>
+
+<p>
+   Created by <span tal:condition="home_url"
+     ><a href="." title="Here"
+         tal:attributes="href home_url;
+                         title creator;
+                        "
+         tal:content="creator">Creator</a>
+    </span><span tal:condition="not: home_url"
+                 tal:content="creator">Creator</span
+    >.  Last modified <span tal:content="here/ModificationDate"
+    >Today</span>.
+</p>
+
+</div>

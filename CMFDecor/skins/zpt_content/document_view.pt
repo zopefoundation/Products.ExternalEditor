@@ -2,36 +2,30 @@
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       metal:use-macro="here/main_template/macros/master">
 <body>
+
+<div metal:fill-slot="header">
+
+    <h1 id="DesktopTitle"
+        tal:content="here/Title">Document Title</h1>
+
+    <div id="DesktopDescription" tal:content="here/Description">
+        Document Description goes here.
+    </div>
+
+    <div metal:use-macro="here/content_byline/macros/byline">By Me</div>
+
+</div>
+
 <div metal:fill-slot="main">
 
-<div class="Desktop">
- <table>
- <tr>
-          <td height="20">
-<div class="aTitle" tal:content="structure here/Title">Document Title</div></td></tr>
-  <tr valign="top">
-          <td height="1" bgcolor="#000000"><img src="../zpt_images/c.gif" width="360" height="1" border="0" alt=""
-                                                          tal:attributes="src string:c.gif"></td>
-        </tr>
-		<tr><td>&nbsp;</td></tr>
-  <tr>
-    <td><div metal:use-macro="here/content_byline/macros/byline">By Me</div></td>
-  </tr>
-  <tr>
-    <td><div class="Description" tal:content="here/Description"></div></td>
-  </tr>
-  <tr>
-    <td><div tal:replace="structure here/CookedBody">Cooked Body</div></td>
-  </tr>
-  <tr>
-  <td><div class="Discussion">
+<div tal:replace="structure here/CookedBody">Cooked Body</div>
+
+<div class="Discussion">
    <span tal:replace="structure here/viewThreadsAtBottom"
          tal:condition="here/viewThreadsAtBottom|nothing"></span>
-  </div>
-  </td>
-  </tr>
-  </table>
 </div>
+
 </div>
+
 </body>
 </html>

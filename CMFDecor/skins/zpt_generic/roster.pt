@@ -7,7 +7,9 @@
 <div tal:condition="python:not(request.has_key('bs'))"
      tal:define="dummy python:request.set('bs', '25')"></div>
 
-<div class="Desktop">
+<div class="Desktop"
+     metal:define-macro="roster"
+>
 
 <h3> Portal Members </h3>
 
