@@ -151,7 +151,7 @@ class FSImage(FSObject):
     security.declareProtected(View, 'tag')
     def tag(self, height=None, width=None, alt=None,
             scale=0, xscale=0, yscale=0, **args):
-        # Hook into an oppertunity to reload metadata.
+        # Hook into an opportunity to reload metadata.
         self._readFile()
         return apply(self._image_tag, (height, width, alt, scale, xscale, 
             yscale), args)

@@ -99,9 +99,9 @@ import CMFCorePermissions
 class FSObject(Acquisition.Implicit, Item):
     """FSObject is a base class for all filesystem based look-alikes.
     
-    Subclasses of this class mimic ZODB based objects like Image and DTMLMethod,
-    but are not directly modifiable from the management interface. They provide
-    means to create a TTW editable copy, however.
+    Subclasses of this class mimic ZODB based objects like Image and
+    DTMLMethod, but are not directly modifiable from the management
+    interface. They provide means to create a TTW editable copy, however.
     """
 
     # Always empty for FS based, non-editable objects.

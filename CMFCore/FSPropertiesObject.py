@@ -82,7 +82,7 @@
 # attributions are listed in the accompanying credits file.
 # 
 ##############################################################################
-"""Customizable DTML methods that come from the filesystem."""
+"""Customizable properties that come from the filesystem."""
 __version__='$Revision$'[11:-2]
 
 from string import split, strip
