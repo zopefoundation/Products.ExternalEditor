@@ -94,6 +94,8 @@ from Acquisition import aq_inner, aq_parent
 from AccessControl import getSecurityManager, ClassSecurityInfo
 from DocumentTemplate.DT_Util import TemplateDict, InstanceDict, Eval
 
+from Products.CMFCore.WorkflowCore import ObjectDeleted, ObjectMoved
+
 try:
     # Zope 2.3.x
     from DocumentTemplate.DT_Util import expr_globals
@@ -175,6 +177,8 @@ class ExprVars:
     '''
     Provides names that are more expensive to compute.
     '''
+    ObjectDeleted = ObjectDeleted
+    ObjectMoved = ObjectMoved
 
     def __init__(self, ob, wf):
         self._ob = ob
@@ -200,3 +204,6 @@ class ExprVars:
         while ob is not None and not getattr(ob, '_isPortalRoot', 0):
             ob = aq_parent(aq_inner(ob))
         return ob
+
+    def getObjectContainer(self):
+        return aq_parent(aq_inner(self._ob))

@@ -105,7 +105,8 @@ import App
 from DocumentTemplate.DT_Util import TemplateDict
 
 # CMFCore
-from Products.CMFCore.WorkflowCore import WorkflowException
+from Products.CMFCore.WorkflowCore import WorkflowException, \
+     ObjectDeleted, ObjectMoved
 from Products.CMFCore.WorkflowTool import addWorkflowFactory
 from Products.CMFCore.CMFCorePermissions import ManagePortal
 from Products.CMFCore.utils import getToolByName
@@ -124,6 +125,18 @@ def checkId(id):
     if res != -1 and res is not None:
         raise ValueError, 'Illegal ID'
     return 1
+
+class NamespaceAccessor:
+    __allow_access_to_unprotected_subobjects__ = 1
+    def __init__(self, md):
+        self._getitem = md.getitem
+    def __getattr__(self, name):
+        try:
+            return self._getitem(name, 0)
+        except KeyError:
+            raise AttributeError, name
+    def __getitem__(self, name):
+        return self._getitem(name, 0)
 
 
 class DCWorkflowDefinition (WorkflowUIMixin, Folder):
@@ -378,7 +391,15 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
         if not self._checkTransitionGuard(tdef, ob):
             raise Unauthorized
         res = apply(func, args, kw)
-        self._changeStateOf(ob, tdef)
+        try:
+            self._changeStateOf(ob, tdef)
+        except ObjectDeleted:
+            # Re-raise with a different result.
+            raise ObjectDeleted(res)
+        except ObjectMoved, ex:
+            # Re-raise with a different result.
+            raise ObjectMoved(ex.getNewObject(), res)
+        return res
 
     security.declarePrivate('isInfoSupported')
     def isInfoSupported(self, ob, name):
@@ -423,7 +444,11 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
         Notifies this workflow after an object has been created
         and put in its new place.
         '''
-        self._changeStateOf(ob, None)
+        try:
+            self._changeStateOf(ob, None)
+        except ObjectDeleted, ObjectMoved:
+            # Swallow.
+            pass
 
     security.declarePrivate('notifyBefore')
     def notifyBefore(self, ob, action):
@@ -501,6 +526,7 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
         Private method.
         Puts object in a new state.
         '''
+        moved = 0
         if tdef is None:
             state = self.initial_state
             former_status = {}
@@ -518,7 +544,12 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
                 # Pass lots of info to the script in a single parameter.
                 md = exprNamespace(ob, self, former_status,
                                    action, state, kwargs)
-                script(md)  # May throw an exception.
+                accessor = NamespaceAccessor(md)
+                try:
+                    script(accessor)  # May throw an exception.
+                except ObjectMoved, ex:
+                    ob = ex.getNewObject()
+                    moved = 1
         sdef = self.states.get(state, None)
         if sdef is None:
             raise WorkflowException, 'Destination state undefined: ' + state
@@ -547,12 +578,16 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
             status[id] = value
         # Update state.
         status[self.state_var] = state
+        tool = aq_parent(aq_inner(self))
+        tool.setStatusOf(self.id, ob, status)
         # Update role to permission assignments.
         self.updateRoleMappingsFor(ob)
 
-        tool = aq_parent(aq_inner(self))
-        tool.setStatusOf(self.id, ob, status)
-        return sdef
+        if moved:
+            # Re-raise.
+            raise ObjectMoved(ob)
+        else:
+            return sdef
 
 
 Globals.InitializeClass(DCWorkflowDefinition)
