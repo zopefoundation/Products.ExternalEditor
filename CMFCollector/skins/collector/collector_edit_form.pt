@@ -83,7 +83,7 @@
   <td colspan="3">
        <font color="gray"> <em> Note that staff changes cause reindexing of
               all issues, so catalog local-roles/visibility caching
-              tracks. </em>
+              tracks - it'll take a while! </em>
        </font>
   </td>
  </tr>
@@ -190,7 +190,8 @@
   </td>
   <td colspan="2">
     <input type="checkbox" name="recatalog" value="1">
-    Reinstate internal catalog?
+    Reinstate internal catalog and reindex all?  (Reindexes in central catalog
+    too - slow!)
   </td>
  </tr>
 
