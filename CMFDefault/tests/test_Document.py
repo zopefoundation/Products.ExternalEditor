@@ -111,6 +111,13 @@ Title Phrase
     it shouldn't overwrite any metadata.
 """
 
+STX_NO_HEADERS_BUT_COLON = """\
+Plain STX:  No magic!
+
+    This is a "plain" STX file, with no headers.  Saving with
+    it shouldn't overwrite any metadata.
+"""
+
 class DocumentTests(unittest.TestCase):
 
     def setUp( self ):
@@ -201,7 +208,7 @@ class DocumentTests(unittest.TestCase):
     def test_StructuredText(self):
         d = Document('foo')
         assert hasattr(d, 'cooked_text')
-        d.edit(text_format='structured-text', text=BASIC_STRUCTUREDTEXT)
+        d._edit(text_format='structured-text', text=BASIC_STRUCTUREDTEXT)
         
         assert d.Format() == 'text/plain'
         assert d.Title() == 'My Document'
@@ -287,6 +294,17 @@ class DocumentTests(unittest.TestCase):
         assert len( d.Subject() ) == 2
         assert 'plain' in d.Subject()
         assert 'STX' in d.Subject()
+    
+    def test_STX_NoHeaders_but_colon( self ):
+        d = Document('foo')
+        d._editMetadata( title="Plain STX"
+                       , description="Look, Ma, no headers!"
+                       , subject=( "plain", "STX" )
+                       )
+
+        munge = '\n%s' % STX_NO_HEADERS_BUT_COLON
+        d.edit(text_format='structured-text', text=STX_NO_HEADERS_BUT_COLON)
+        self.assertEqual( d.EditableBody(), STX_NO_HEADERS_BUT_COLON )
 
 
 class TestFTPGet( unittest.TestCase ):

@@ -14,7 +14,7 @@ __version__ = "$Revision$"[11:-2]
 
 ADD_CONTENT_PERMISSION = 'Add portal content'
 
-import Globals, StructuredText, string, utils
+import Globals, StructuredText, string, utils, re
 from StructuredText.HTMLWithImages import HTMLWithImages
 from Globals import DTMLFile, InitializeClass
 from AccessControl import ClassSecurityInfo, getSecurityManager
@@ -103,7 +103,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
         self.description = description
         self.text = text
         self.text_format = text_format
-        self.edit( text_format=text_format, text=text )
+        self._edit( text_format=text_format, text=text )
 
     security.declareProtected(CMFCorePermissions.ModifyPortalContent,
                               'manage_edit')
@@ -166,13 +166,27 @@ class Document(PortalContent, DefaultDublinCoreImpl):
                           )
 
     security.declareProtected( CMFCorePermissions.ModifyPortalContent, 'edit' )
-    def edit(self, text_format, text, file='', safety_belt=''):
+    def edit( self
+            , text_format
+            , text
+            , file=''
+            , safety_belt=''
+            , FIRST_LINE_COLON=re.compile( r'^.*:.*' )
+            ):
         """
         *used to be WorkflowAction(_edit)
         To add webDav support, we need to check if the content is locked, and if
         so return ResourceLockedError if not, call _edit.
+
+        Note that this method expects to be called from a web form, and so
+        disables header processing
         """
         self.failIfLocked()
+
+        if text_format == 'structured-text' and FIRST_LINE_COLON.match( text ):
+            # WAAAA! Inject line to disable header munging.
+            text = '\n%s' % text
+
         self._edit(text_format, text, file='', safety_belt='')
 
     security.declarePrivate('guessFormat')
