@@ -97,7 +97,7 @@ class ActionProviderBase:
         """
         Adds an action to the list.
         """
-        al = self._actions 
+        al = self._actions[:]
         if not name:
             raise ValueError('A name is required.')
         if action:
@@ -128,8 +128,8 @@ class ActionProviderBase:
         """
         if properties is None:
             properties = REQUEST
-        actions = []
-        for idx in range(len(self._actions)):
+        actions = self._actions[:]
+        for idx in range(len(actions)):
             s_idx = str(idx)
             action = {
                 'id': str(properties.get('id_' + s_idx, '')),
@@ -143,7 +143,7 @@ class ActionProviderBase:
                 }
             if not action['name']:
                 raise ValueError('A name is required.')
-            a = self._actions[idx]
+            a = actions[idx]
             a.id = action['id']
             a.title = action['name']
             if action['action'] is not '':
@@ -157,6 +157,7 @@ class ActionProviderBase:
             a.permissions = action['permissions']
             a.category = action['category']
             a.visible = action['visible']
+        self._actions = actions
         if REQUEST is not None:
             return self.manage_editActionsForm(REQUEST, manage_tabs_message=
                                                'Actions changed.')
@@ -166,7 +167,7 @@ class ActionProviderBase:
         """
         Deletes actions.
         """
-        actions = list(self._actions)
+        actions = self._actions[:]
         sels = list(map(int, selections))  # Convert to a list of integers.
         sels.sort()
         sels.reverse()
