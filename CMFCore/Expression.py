@@ -104,6 +104,7 @@ def createExprContext(folder, portal, object):
         'request':      getattr( object, 'REQUEST', None ),
         'modules':      SecureModuleImporter,
         'member':       member,
+        'here':         object,
         }
     return getEngine().getContext(data)
 

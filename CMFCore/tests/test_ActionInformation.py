@@ -4,6 +4,8 @@ import Zope
 Zope.startup()
 from Interface.Verify import verifyClass
 
+from Products.PythonScripts.PythonScript import manage_addPythonScript
+
 from Products.CMFCore.Expression import createExprContext
 from Products.CMFCore.Expression import Expression
 from Products.CMFCore.tests.base.dummy import DummyContent
@@ -139,6 +141,24 @@ class ActionInformationTests(TransactionalTest):
         ec = createExprContext(folder, portal, object)
 
         self.failIf(ai.testCondition(ec))
+
+    def test_Condition_PathExpression(self):
+        portal = self.portal
+        folder = self.folder
+        object = self.object
+        manage_addPythonScript(self.root, 'test_script')
+        script = self.root.test_script
+        script.ZPythonScript_edit('', 'return context.getId()')
+        ai = self._makeOne( id='view',
+                            title='View',
+                            action=Expression(text='view'),
+                            condition=Expression(text='portal/test_script'),
+                            category='global',
+                            visible=True )
+        ec = createExprContext(folder, portal, object)
+
+        self.failUnless(ai.testCondition(ec))
+
 
 
 def test_suite():

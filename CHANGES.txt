@@ -6,6 +6,15 @@ After 1.5.0beta
 
   Bugs Fixed
 
+    - ActionInformation: If a path expression ending in an object that
+      gets called using __render_with_namespace__ (such as DTML objects
+      and Scripts (Python)) is used a KeyError for "here" would be thrown 
+      inside PageTemplates.ZRPythonExpr.call_with_ns. call_with_ns
+      expects the namespace to contain "here", which the context coming
+      from CMFCore.Expressions.createExprContext did not provide. Added
+      "here" as an alias pointing to the provided "object"
+      (http://www.zope.org/Collectors/CMF/171)
+
     - http://www.zope.org/Collectors/cmf/205: When pasting a content item,
       local roles were not changed to reflect the neew ownership.
 
