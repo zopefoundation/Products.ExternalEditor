@@ -82,46 +82,62 @@
 # attributions are listed in the accompanying credits file.
 # 
 ##############################################################################
- 
-import Topic
-import SimpleStringCriterion
-import SimpleIntCriterion
-import ListCriterion
-import DateCriteria
-import SortCriterion
-import Products.CMFCore
+"""
+    Declare simple string-match criterion class.
+"""
+from AbstractCriterion import AbstractCriterion
+from AccessControl import ClassSecurityInfo
+from Topic import Topic
+import Globals, interfaces
 
-from ZClasses import createZClassForBase
-from Products.CMFCore import utils
-from Products.CMFCore.DirectoryView import registerDirectory
+from Products.CMFCore import CMFCorePermissions
 import TopicPermissions
 
-bases = (Topic.Topic,)
+class SortCriterion(AbstractCriterion):
+    """
+        Represent a mock criterion, to allow spelling the sort order
+        and reversal items in a catalog query.
+    """
+    __implements__ = (interfaces.Criterion,)
+
+    meta_type = 'Sort Criterion'
+    security = ClassSecurityInfo()
+    field = None # Don't prevent use of field in other criteria
+
+    _editableAttributes = ('reversed',)
+
+    def __init__(self, id, index):
+        self.id = id
+        self.index = index
+        self.reversed = 0
+        
+    # inherit permissions
+    def Field( self ):
+        """
+            Map the stock Criterion interface.
+        """
+        return self.index
+
+    security.declareProtected(TopicPermissions.ChangeTopics, 'getEditForm')
+    def getEditForm(self):
+        " Return the skinned name of the edit form "
+        return 'sort_edit'
+    
+    security.declareProtected(TopicPermissions.ChangeTopics, 'edit')
+    def edit(self, reversed):
+        """ Update the value we are to match up against """
+        self.reversed = not not reversed
+    
+    security.declareProtected(CMFCorePermissions.View, 'getCriteriaItems')
+    def getCriteriaItems( self ):
+        """ Return a sequence of criteria items, used by Topic.buildQuery """
+        result = [ ( 'sort_on', self.index ) ]
+        if self.reversed:
+            result.append( ( 'sort_order', 'reverse' ) )
+        return tuple( result )
 
 
-import sys
-this_module = sys.modules[ __name__ ]
+Globals.InitializeClass(SortCriterion)
 
-for base in bases:
-    createZClassForBase( base, this_module )
-
-# This is used by a script (external method) that can be run
-# to set up Topics in an existing CMF Site instance.
-topic_globals=globals()
-
-# Make the skins available as DirectoryViews
-registerDirectory('skins', globals())
-registerDirectory('skins/topic', globals())
-
-def initialize( context ):
-    context.registerHelpTitle('CMF Topic Help')
-    context.registerHelp(directory='help')
-
-    # CMF Initializers
-    utils.ContentInit(
-        'CMF Topic Objects',
-        content_types = (Topic.Topic,),
-        permission = TopicPermissions.AddTopics,
-        extra_constructors = (Topic.addTopic,),
-        fti = Topic.factory_type_information,
-        ).initialize(context)
+# Register as a criteria type with the Topic class
+Topic._criteriaTypes.append(SortCriterion)

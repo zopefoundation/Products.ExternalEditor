@@ -1,0 +1,24 @@
+<table border="0" cellpadding="0" cellspacing="2" class="FormLayout">
+ <tr>
+  <td width="20">
+   <input type="checkbox" value="&dtml-getId;"
+    name="criterion_ids:list" id="cb_&dtml-getId;" />
+  </td>
+  <td align="left">
+   <label for="cb_&dtml-getId;">
+    <strong title="&dtml-Description;">Sort:</strong>
+    <tt>&dtml-Field;</tt>
+   </label>
+   <input type="hidden" name="criteria.id:records" value="&dtml-getId;" />
+  </td>
+ </tr>
+ <tr>
+  <td width="20">&nbsp;</td>
+  <td><strong>Reversed?</strong>
+  <dtml-let chk="reversed and 'checked' or ''">
+  <input type="hidden" name="criteria.reversed::int:default:records" value="0">
+  <input type="checkbox" name="criteria.reversed:records"
+         value="1" &dtml-chk; /></td>
+  </dtml-let>
+ </tr>
+</table>
