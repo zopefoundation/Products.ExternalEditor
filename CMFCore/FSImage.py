@@ -130,10 +130,16 @@ class FSImage(FSObject):
         # Only parse out image info if the file was changed, because this file
         # is read every time the image is requested.
         try:    mtime=os.stat(fp)[8]
-        except: mtime=-1
+        except: mtime=0
         if mtime != self._file_mod_time:
             self._file_mod_time = mtime
-            (self.content_type, self.width, self.height) = getImageInfo(data)
+        ct, width, height = getImageInfo( data )
+        if ct != getattr( self, 'content_type', None ):
+            self.content_type = ct
+        if width != getattr( self, 'width', None ):
+            self.width = width
+        if height != getattr( self, 'height', None ):
+            self.height = height
 
         return data
 
