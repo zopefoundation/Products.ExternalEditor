@@ -66,7 +66,7 @@ def _makeTestFile( filename, root_path, contents ):
 
     fqpath = os.path.join( subdir, filename )
 
-    file = open( fqpath, 'w' )
+    file = open( fqpath, 'wb' )
     file.write( contents )
     file.close()
     return fqpath

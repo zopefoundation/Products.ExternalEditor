@@ -13,6 +13,8 @@ from OFS.SimpleItem import Item
 
 from Products.CMFCore.ActionProviderBase import ActionProviderBase
 from Products.CMFCore import DirectoryView
+from Products.CMFCore.utils import expandpath
+from Products.CMFCore.utils import minimalpath
 
 from common import BaseRegistryTests
 from common import DOMComparator
@@ -60,7 +62,7 @@ class DummyFSDV( Item ):
     def __init__( self, id ):
 
         self.id = id
-        self._dirpath = os.path.join( _TESTS_PATH, id )
+        self._dirpath = minimalpath( os.path.join(_TESTS_PATH, id) )
 
 class _SkinsSetup( BaseRegistryTests ):
 
@@ -84,7 +86,7 @@ class _SkinsSetup( BaseRegistryTests ):
         self.root.site = Folder( id='site' )
 
         for id, fsdv in fsdvs:
-            self._registerDirectoryView( fsdv._dirpath )
+            self._registerDirectoryView( expandpath(fsdv._dirpath) )
 
         self.root.site.portal_skins = DummySkinsTool( selections, fsdvs )
 
