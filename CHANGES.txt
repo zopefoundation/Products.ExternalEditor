@@ -23,3 +23,8 @@ Future
 
     - Added 'listMetaTags' skin method, which filters the DublinCore
       metadata into a form suitable for inclusion as <meta> tags.
+
+  Bug Fixes
+
+    - Remove redundant VERSION.txt files;  the canonical spelling is
+      'version.txt' (Collector #13).
