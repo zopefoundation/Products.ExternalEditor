@@ -79,7 +79,7 @@ _SWALLOWABLE_PLUGIN_EXCEPTIONS = ( NameError
                                  , KeyError
                                  , TypeError
                                  , ValueError
-                                 ) 
+                                 )
 
 security.declarePublic( 'MANGLE_DELIMITER' )
 MANGLE_DELIMITER = '__'
@@ -196,7 +196,7 @@ class PluggableAuthService( Folder ):
         if not user_id:
             return None
 
-        return self._findUser( plugins, user_id, name 
+        return self._findUser( plugins, user_id, name
                            # , cache=self._getUserCache()
                              )
 
@@ -221,7 +221,7 @@ class PluggableAuthService( Folder ):
                                                      , exact_match=True )
                     assert( len( user_info ) in [ 0, 1 ] )
                 except _SWALLOWABLE_PLUGIN_EXCEPTIONS:
-                    LOG('PluggableAuthService', WARNING, 
+                    LOG('PluggableAuthService', WARNING,
                         'UserEnumerationPlugin %s error' % plugin_id,
                         error=sys.exc_info())
                 else:
@@ -252,7 +252,7 @@ class PluggableAuthService( Folder ):
         , name
         , value
         ) = self._getObjectContext( request[ 'PUBLISHED' ], request )
-        
+
         for user_id, login in user_ids:
 
             user = self._findUser( plugins, user_id, login
@@ -323,7 +323,7 @@ class PluggableAuthService( Folder ):
                     else:
                         return ()
                 except _SWALLOWABLE_PLUGIN_EXCEPTIONS:
-                    LOG('PluggableAuthService', WARNING, 
+                    LOG('PluggableAuthService', WARNING,
                         'UserEnumerationPlugin %s error' % plugin_id,
                         error=sys.exc_info())
                     return ()
@@ -332,7 +332,7 @@ class PluggableAuthService( Folder ):
         max_results = kw.get('max_results', '')
         sort_by = kw.get('sort_by', '')
 
-        # We apply sorting and slicing here across all sets, so don't 
+        # We apply sorting and slicing here across all sets, so don't
         # make the plugin do it
         if sort_by:
             del kw['sort_by']
@@ -359,7 +359,7 @@ class PluggableAuthService( Folder ):
                     result.append(info)
 
             except _SWALLOWABLE_PLUGIN_EXCEPTIONS:
-                LOG('PluggableAuthService', WARNING, 
+                LOG('PluggableAuthService', WARNING,
                     'UserEnumerationPlugin %s error' % enumerator_id,
                     error=sys.exc_info())
 
@@ -405,7 +405,7 @@ class PluggableAuthService( Folder ):
                     else:
                         return ()
                 except _SWALLOWABLE_PLUGIN_EXCEPTIONS:
-                    LOG('PluggableAuthService', WARNING, 
+                    LOG('PluggableAuthService', WARNING,
                         'GroupEnumerationPlugin %s error' % plugin_id,
                         error=sys.exc_info())
                     return ()
@@ -414,7 +414,7 @@ class PluggableAuthService( Folder ):
         max_results = kw.get('max_results', '')
         sort_by = kw.get('sort_by', '')
 
-        # We apply sorting and slicing here across all sets, so don't 
+        # We apply sorting and slicing here across all sets, so don't
         # make the plugin do it
         if sort_by:
             del kw['sort_by']
@@ -440,7 +440,7 @@ class PluggableAuthService( Folder ):
                     info[ 'title' ] = "(Group) %s" % info[ 'groupid' ]
                     result.append(info)
             except _SWALLOWABLE_PLUGIN_EXCEPTIONS:
-                LOG('PluggableAuthService', WARNING, 
+                LOG('PluggableAuthService', WARNING,
                     'GroupEnumerationPlugin %s error' % enumerator_id,
                     error=sys.exc_info())
 
@@ -508,7 +508,7 @@ class PluggableAuthService( Folder ):
                     else:
                         return ()
                 except _SWALLOWABLE_PLUGIN_EXCEPTIONS:
-                    LOG('PluggableAuthService', WARNING, 
+                    LOG('PluggableAuthService', WARNING,
                         'UserEnumeratePlugin %s error' % plugin_id,
                         error=sys.exc_info())
                     return ()
@@ -650,7 +650,7 @@ class PluggableAuthService( Folder ):
         try:
             extractors = plugins.listPlugins( IExtractionPlugin )
         except _SWALLOWABLE_PLUGIN_EXCEPTIONS:
-            LOG('PluggableAuthService', WARNING, 
+            LOG('PluggableAuthService', WARNING,
                 'Plugin listing error',
                 error=sys.exc_info())
             extractors = ()
@@ -661,7 +661,7 @@ class PluggableAuthService( Folder ):
         try:
             authenticators = plugins.listPlugins( IAuthenticationPlugin )
         except _SWALLOWABLE_PLUGIN_EXCEPTIONS:
-            LOG('PluggableAuthService', WARNING, 
+            LOG('PluggableAuthService', WARNING,
                 'Plugin listing error',
                 error=sys.exc_info())
             authenticators = ()
@@ -671,7 +671,7 @@ class PluggableAuthService( Folder ):
             try:
                 credentials = extractor.extractCredentials( request )
             except _SWALLOWABLE_PLUGIN_EXCEPTIONS:
-                LOG('PluggableAuthService', WARNING, 
+                LOG('PluggableAuthService', WARNING,
                     'ExtractionPlugin %s error' % extractor_id,
                     error=sys.exc_info())
                 continue
@@ -685,7 +685,7 @@ class PluggableAuthService( Folder ):
                     items.sort()
                     cache_key = tuple( items )
                 except _SWALLOWABLE_PLUGIN_EXCEPTIONS:
-                    LOG('PluggableAuthService', WARNING, 
+                    LOG('PluggableAuthService', WARNING,
                         'Credentials error: %s' % credentials,
                         error=sys.exc_info())
                     cache_key = None
@@ -696,7 +696,7 @@ class PluggableAuthService( Folder ):
 
                     # first try to authenticate against the emergency
                     # user, and return immediately if authenticated
-                    user_id, name = self._tryEmergencyUserAuthentication( 
+                    user_id, name = self._tryEmergencyUserAuthentication(
                                                                 credentials )
 
                     if user_id is not None:
@@ -705,12 +705,12 @@ class PluggableAuthService( Folder ):
                     for authenticator_id, auth in authenticators:
 
                         try:
-                            user_id, name = auth.authenticateCredentials( 
-                                                                credentials ) 
+                            user_id, name = auth.authenticateCredentials(
+                                                                credentials )
                         except _SWALLOWABLE_PLUGIN_EXCEPTIONS:
-                            LOG('PluggableAuthService', WARNING, 
-                                'AuthenticationPlugin %s error' % authenticator_id,
-                                error=sys.exc_info())
+                            LOG('PluggableAuthService', WARNING,
+                                'AuthenticationPlugin %s error' %
+                                authenticator_id, error=sys.exc_info())
                             continue
 
                         if user_id is not None:
@@ -725,7 +725,7 @@ class PluggableAuthService( Folder ):
                 result.extend( user_ids )
 
         if not user_ids:
-            user_id, name = self._tryEmergencyUserAuthentication( 
+            user_id, name = self._tryEmergencyUserAuthentication(
                     DumbHTTPExtractor().extractCredentials( request ) )
 
             if user_id is not None:
@@ -760,7 +760,7 @@ class PluggableAuthService( Folder ):
             eua = EmergencyUserAuthenticator()
             user_id, name = eua.authenticateCredentials( credentials )
         except _SWALLOWABLE_PLUGIN_EXCEPTIONS:
-            LOG('PluggableAuthService', WARNING, 
+            LOG('PluggableAuthService', WARNING,
                 'Credentials error: %s' % credentials,
                 error=sys.exc_info())
             user_id, name = ( None, None )
@@ -906,7 +906,7 @@ class PluggableAuthService( Folder ):
                         return self._computeMangledId( info[0] )
 
                 except _SWALLOWABLE_PLUGIN_EXCEPTIONS:
-                    LOG('PluggableAuthService', WARNING, 
+                    LOG('PluggableAuthService', WARNING,
                         'UserEnumerationPlugin %s error' % enumerator_id,
                         error=sys.exc_info())
 
@@ -1058,7 +1058,7 @@ class PluggableAuthService( Folder ):
                 try:
                     roleassigner.doAssignRoleToPrincipal( user.getId(), role )
                 except _SWALLOWABLE_PLUGIN_EXCEPTIONS:
-                    LOG('PluggableAuthService', WARNING, 
+                    LOG('PluggableAuthService', WARNING,
                         'RoleAssigner %s error' % roleassigner_id,
                         error=sys.exc_info())
                     pass
@@ -1093,51 +1093,68 @@ class PluggableAuthService( Folder ):
             BeforeTraverse.registerBeforeTraverse(container, nc, handle)
 
     def __call__(self, container, req):
-        """ The __before_publishing_traverse__ hook. 
+        """ The __before_publishing_traverse__ hook.
         """
         resp = req['RESPONSE']
-        resp.exception = self.exception
+        req._hold(ResponseCleanup(resp))
+        stack = getattr(resp, '_unauthorized_stack', [])
+        stack.append(resp._unauthorized)
+        resp._unauthorized_stack = stack
         resp._unauthorized = self._unauthorized
+        resp._has_challenged = False
 
     #
-    # Response overrides
+    # Response override
     #
     def _unauthorized(self):
-        pass
-    
-    def exception(self, fatal=0, info=None,
-                  absuri_match=re.compile(r'\w+://[\w\.]+').match,
-                  tag_search=re.compile('[a-zA-Z]>').search,
-                  abort=1
-                  ):
         req = self.REQUEST
         resp = req['RESPONSE']
-        try: del resp.exception
-        except: pass
-        try: del resp._unauthorized
-        except: pass
-        
-        if type(info) is type(()) and len(info) == 3:
-            t, v, tb = info
+        if resp._has_challenged: # Been here already
+            return
+        if not self.challenge(req, resp):
+            # Need to fall back here
+            resp = self._cleanupResponse()
+            resp._unauthorized()
         else:
-            t, v, tb = sys.exc_info()
-        
-        if t == 'Unauthorized' or t == Unauthorized or (
-            isinstance(t, types.ClassType) and issubclass(t, Unauthorized)):
-            t = 'Unauthorized'
-            self.challenge(req, resp)
-            return resp
-        
-        return resp.exception(fatal, info, absuri_match, tag_search, abort)
-    
+            resp._has_challenged = True
+
     def challenge(self, request, response):
         # Go through all challenge plugins
         plugins = self._getOb('plugins')
         challengers = plugins.listPlugins( IChallengePlugin )
+
+        protocol = None
+
         for challenger_id, challenger in challengers:
-            if challenger.challenge(request, response):
-                break
-                                
+            challenger_protocol = getattr(challenger, 'protocol',
+                                          challenger_id)
+            if protocol is None or protocol == challenger_protocol:
+                if challenger.challenge(request, response):
+                    protocol = challenger_protocol
+
+        if protocol is not None:
+            # something fired, so it was a successful PAS challenge
+            return True
+
+        # nothing fired, so trigger the fallback
+        return False
+
+    def _cleanupResponse(self):
+        resp = self.REQUEST['RESPONSE']
+        # No errors of any sort may propagate, and we don't care *what*
+        # they are, even to log them.
+        stack = getattr(resp, '_unauthorized_stack', [])
+
+        if stack:
+            resp._unauthorized = stack.pop()
+        else:
+            try:
+                del resp._unauthorized
+            except:
+                pass
+
+        return resp
+
     security.declarePublic( 'hasUsers' )
     def hasUsers(self):
         """Zope quick start sacrifice.
@@ -1152,7 +1169,7 @@ _PLUGIN_TYPE_INFO = (
     ( IExtractionPlugin
     , 'IExtractionPlugin'
     , 'extraction'
-    , "Extraction plugins are responsible for extracting credentials " 
+    , "Extraction plugins are responsible for extracting credentials "
       "from the request."
     )
   , ( IAuthenticationPlugin
@@ -1260,4 +1277,33 @@ def addPluggableAuthService( dispatcher, REQUEST=None ):
                                 '%s/manage_workspace'
                                 '?manage_tabs_message='
                                 'PluggableAuthService+added.'
-                              % dispatcher.absolute_url() ) 
+                              % dispatcher.absolute_url() )
+
+class ResponseCleanup:
+    def __init__(self, resp):
+        self.resp = resp
+
+    def __del__(self):
+        # Free the references.
+        #
+        # No errors of any sort may propagate, and we don't care *what*
+        # they are, even to log them.
+        stack = getattr(self.resp, '_unauthorized_stack', [])
+        old = None
+
+        while stack:
+            old = stack.pop()
+
+        if old is not None:
+            self.resp._unauthorized = old
+        else:
+            try:
+                del self.resp._unauthorized
+            except:
+                pass
+
+        try:
+            del self.resp
+        except:
+            pass
+

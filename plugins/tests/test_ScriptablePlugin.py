@@ -72,7 +72,7 @@ class ScriptablePluginTests( unittest.TestCase ):
         scriptable_plugin.manage_updateInterfaces( ['IFaux', 'IFauxTwo'] )
 
         self.assertEqual( len(scriptable_plugin.__implements__), 4 )
-    
+
     def test_withTwoOnlyOneWired( self ):
 
         parent = Folder()
@@ -110,8 +110,10 @@ class ScriptablePluginTests( unittest.TestCase ):
         self.assertEqual( len(scriptable_plugin.__implements__), 3 )
 
 
+if __name__ == '__main__':
+    unittest.main()
+
 def test_suite():
     return unittest.TestSuite((
         unittest.makeSuite( ScriptablePluginTests ),
-        ))               
-        
+        ))

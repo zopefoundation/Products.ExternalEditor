@@ -35,7 +35,7 @@ class FauxHTTPRequest:
             return None
 
         return self._name, self._password
-    
+
     def get(self, name, default=None):
         return getattr(self, name, default)
 
@@ -45,22 +45,26 @@ class FauxHTTPResponse:
     realm = 'unit test'
     debug_mode = 0
     headers = {}
-    
+
     def unauthorized( self ):
 
         self._unauthorized_called = 1
-        
+
     def setStatus(self, status, reason=None):
-        
+
         self.status = status
 
     def setHeader(self, name, value, literal=0):
-        
+
+        self.headers[name] = value
+
+    def addHeader(self, name, value):
+
         self.headers[name] = value
 
     def setBody(self, body, is_error=0):
         self.body = body
-        
+
 
 class HTTPBasicAuthHelperTests( unittest.TestCase
                               , ILoginPasswordHostExtractionPlugin_conformance
@@ -92,12 +96,12 @@ class HTTPBasicAuthHelperTests( unittest.TestCase
         request = FauxHTTPRequest( 'foo', 'bar' )
 
         self.assertEqual( helper.extractCredentials( request )
-                        , { 'login' : 'foo', 'password' : 'bar', 
+                        , { 'login' : 'foo', 'password' : 'bar',
                             'remote_host': '', 'remote_address': '' } )
 
     def test_challenge( self ):
         from zExceptions import Unauthorized
-        
+
         helper = self._makeOne()
         request = FauxHTTPRequest()
         response = FauxHTTPResponse()
@@ -105,9 +109,9 @@ class HTTPBasicAuthHelperTests( unittest.TestCase
         self.failIf( response._unauthorized_called )
         helper.challenge(request, response)
         self.failUnless(response.status, 401)
-        self.failUnless(response.headers['WWW-Authenticate'], 
+        self.failUnless(response.headers['WWW-Authenticate'],
             'basic realm="unit test"')
-            
+
 
     def test_resetCredentials( self ):
 
@@ -121,9 +125,8 @@ class HTTPBasicAuthHelperTests( unittest.TestCase
 
 if __name__ == "__main__":
     unittest.main()
-        
+
 def test_suite():
     return unittest.TestSuite((
         unittest.makeSuite( HTTPBasicAuthHelperTests ),
         ))
-        

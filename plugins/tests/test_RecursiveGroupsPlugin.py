@@ -194,4 +194,4 @@ if __name__ == "__main__":
 def test_suite():
     return unittest.TestSuite((
         unittest.makeSuite( RecursiveGroupsPluginTests ),
-        ))               
+        ))

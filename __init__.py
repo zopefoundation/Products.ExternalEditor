@@ -30,6 +30,7 @@ import PluggableAuthService
 from permissions import ManageGroups
 
 from plugins import HTTPBasicAuthHelper as HBAH
+from plugins import InlineAuthHelper as IAH
 from plugins import CookieAuthHelper as CAH
 from plugins import SessionAuthHelper as SAH
 from plugins import DomainAuthHelper as DAH
@@ -44,6 +45,7 @@ from plugins import RecursiveGroupsPlugin as RGP
 from plugins import DynamicGroupsPlugin as DGP
 
 registerMultiPlugin(HBAH.HTTPBasicAuthHelper.meta_type)
+registerMultiPlugin(IAH.InlineAuthHelper.meta_type)
 registerMultiPlugin(DAH.DomainAuthHelper.meta_type)
 registerMultiPlugin(SAH.SessionAuthHelper.meta_type)
 registerMultiPlugin(CAH.CookieAuthHelper.meta_type)
@@ -73,6 +75,15 @@ def initialize(context):
                             HBAH.addHTTPBasicAuthHelper, )
                          , visibility=None
                          , icon='plugins/www/HTTPBasicAuthHelper.png'
+                         )
+
+    context.registerClass( IAH.InlineAuthHelper
+                         , permission=ManageUsers
+                         , constructors=(
+                            IAH.manage_addInlineAuthHelperForm,
+                            IAH.addInlineAuthHelper, )
+                         , visibility=None
+                         , icon='plugins/www/InlineAuthHelper.png'
                          )
 
     context.registerClass( CAH.CookieAuthHelper

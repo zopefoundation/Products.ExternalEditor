@@ -98,9 +98,37 @@ class DummyGroupPlugin(DummyPlugin):
 
 class DummyChallenger( DummyPlugin ):
 
+    def __init__(self, id):
+        self.id = id
+
     def challenge(self, request, response):
         # Mark on the faux response that we have seen it:
         response.challenger = self
+        return True
+
+class DummyBadChallenger( DummyChallenger ):
+
+    def challenge(self, request, response):
+        # We don't play here.
+        return False
+
+class DummyReindeerChallenger( DummyChallenger ):
+
+    def challenge(self, request, response):
+        reindeer_games = getattr(response, 'reindeer_games', [])
+        reindeer_games.append(self.id)
+        response.reindeer_games = reindeer_games
+        return True
+
+class DummyCounterChallenger( DummyChallenger ):
+
+    def __init__(self, id):
+        self.id = id
+        self.count = 0
+
+    def challenge(self, request, response):
+        self.count += 1
+        return True
 
 class FauxRequest:
 
@@ -109,6 +137,7 @@ class FauxRequest:
         self.steps = steps
         self._dict = {}
         self._dict.update( kw )
+        self._held = []
 
     def get( self, key, default=None ):
 
@@ -126,6 +155,9 @@ class FauxRequest:
 
         self._dict[ key ] = value
 
+    def _hold(self, something):
+        self._held.append(something)
+
 class FauxNotFoundError( Exception ):
 
     pass
@@ -139,11 +171,15 @@ class FauxResponse:
         raise FauxNotFoundError, message
 
     def _unauthorized(self):
-        pass
+        self.challenger = self
 
     def unauthorized(self):
         self._unauthorized()
         raise Unauthorized, 'You can not do this!'
+
+    def exception(self):
+        self._unauthorized()
+        return "An error has occurred."
 
 class FauxObject( Implicit ):
 
@@ -339,11 +375,11 @@ class PluggableAuthServiceTests( unittest.TestCase ):
         directlyProvides( gp, (IGroupsPlugin,) )
         return gp
 
-    def _makeChallengePlugin(self, id, groups=()):
+    def _makeChallengePlugin(self, id, klass):
         from Products.PluggableAuthService.interfaces.plugins \
              import IChallengePlugin
 
-        cp = DummyChallenger(id)
+        cp = klass(id)
         directlyProvides( cp, (IChallengePlugin,) )
         return cp
 
@@ -1544,13 +1580,11 @@ class PluggableAuthServiceTests( unittest.TestCase ):
                                       , exact_match=True ) ) == 1 )
 
 
-    def test_challenge( self ):
-        from Products.PluggableAuthService.interfaces.plugins \
-             import IChallengePlugin
+    def test_no_challenger(self):
+        # make sure that the response's _unauthorized gets propogated
+        # if no challengers exist (or have fired)
         plugins = self._makePlugins()
-        zcuf = self._makeOne( plugins )
-        challenger = self._makeChallengePlugin('challenger')
-        zcuf._setObject( 'challenger', challenger )
+        zcuf = self._makeOne(plugins)
         response = FauxResponse()
         request = FauxRequest(RESPONSE=response)
         zcuf.REQUEST = request
@@ -1559,17 +1593,141 @@ class PluggableAuthServiceTests( unittest.TestCase ):
         zcuf(self, request)
         # Call unauthorized to make sure Unauthorized is raised.
         self.failUnlessRaises( Unauthorized, response.unauthorized)
-        # Enable the plugin
+        # Since no challengers are in play, we end up calling
+        # response._unauthorized(), which sets '.challenger' on
+        # response
+        self.failUnless(isinstance(response.challenger, FauxResponse))
+
+    def test_challenge( self ):
+        from Products.PluggableAuthService.interfaces.plugins \
+             import IChallengePlugin
+        plugins = self._makePlugins()
+        zcuf = self._makeOne( plugins )
+        challenger = self._makeChallengePlugin('challenger', DummyChallenger)
+        zcuf._setObject( 'challenger', challenger )
         plugins = zcuf._getOb( 'plugins' )
         plugins.activatePlugin( IChallengePlugin, 'challenger' )
 
-        # Fake Zopes exception trap.
-        try:
-            response.unauthorized()
-        except Unauthorized:
-            response.exception()
-            self.failUnless(isinstance(response.challenger, DummyChallenger))
+        response = FauxResponse()
+        request = FauxRequest(RESPONSE=response)
+        zcuf.REQUEST = request
 
+        # First call the userfolders before_traverse hook, to set things up:
+        zcuf(self, request)
+        # Call unauthorized to make sure Unauthorized is raised.
+        self.failUnlessRaises( Unauthorized, response.unauthorized)
+        # Since we have one challenger in play, we end up calling
+        # PluggableAuthService._unauthorized(), which allows the
+        # challengers to play. DummyChallenger sets '.challenger' on
+        # response
+        self.failUnless(isinstance(response.challenger, DummyChallenger))
+
+    def test_daisy_chain_challenge(self):
+        # make sure that nested PASes each get a chance to challenge a
+        # given response
+        from Products.PluggableAuthService.interfaces.plugins \
+             import IChallengePlugin
+        rc, root, folder, object = self._makeTree()
+        response = FauxResponse()
+        request = FauxRequest(RESPONSE=response)
+        root.REQUEST =  request
+
+        plugins = self._makePlugins()
+        zcuf = self._makeOne(plugins)
+        root._setObject( 'acl_users', zcuf )
+        zcuf = root._getOb('acl_users')
+
+        challenger = self._makeChallengePlugin('challenger', DummyChallenger)
+        zcuf._setObject( 'challenger', challenger )
+        zcuf.plugins.activatePlugin( IChallengePlugin, 'challenger' )
+
+        # Emulate publishing traverse through the root
+        zcuf(root, request)
+
+        inner_plugins = self._makePlugins()
+        inner_zcuf = self._makeOne(inner_plugins)
+        folder._setObject('acl_users', inner_zcuf)
+        inner_zcuf = folder._getOb('acl_users')
+
+        bad_challenger = self._makeChallengePlugin('bad_challenger',
+                                                   DummyBadChallenger)
+        inner_zcuf._setObject( 'bad_challenger', bad_challenger )
+        inner_zcuf.plugins.activatePlugin( IChallengePlugin, 'bad_challenger' )
+
+        # Emulate publishing traverse through the subfolder
+        inner_zcuf(folder, request)
+
+        # Call unauthorized to make sure Unauthorized is raised.
+        self.failUnlessRaises(Unauthorized, response.unauthorized)
+
+        # Since we have two challengers in play, we end up calling
+        # PluggableAuthService._unauthorized(), which allows the
+        # challengers to play. DummyChallenger sets '.challenger' on
+        # response
+        self.failUnless(isinstance(response.challenger, DummyChallenger))
+
+    def test_challenge_multi_protocols( self ):
+        from Products.PluggableAuthService.interfaces.plugins \
+             import IChallengePlugin
+        plugins = self._makePlugins()
+        zcuf = self._makeOne( plugins )
+
+        dasher = self._makeChallengePlugin('dasher', DummyReindeerChallenger)
+        dasher.protocol = "Reindeer Games Participant"
+        zcuf._setObject( 'dasher', dasher )
+
+        dancer = self._makeChallengePlugin('dancer', DummyReindeerChallenger)
+        dancer.protocol = "Reindeer Games Participant"
+        zcuf._setObject( 'dancer', dancer )
+
+        rudolph = self._makeChallengePlugin('rudolph', DummyReindeerChallenger)
+        rudolph.protocol = ("They never let poor Rudolph..."
+                            " join in any Reindeer Games")
+        zcuf._setObject( 'rudolph', rudolph )
+
+        plugins = zcuf._getOb( 'plugins' )
+        plugins.activatePlugin( IChallengePlugin, 'dasher' )
+        plugins.activatePlugin( IChallengePlugin, 'dancer' )
+        plugins.activatePlugin( IChallengePlugin, 'rudolph' )
+
+        response = FauxResponse()
+        request = FauxRequest(RESPONSE=response)
+        zcuf.REQUEST = request
+
+        # First call the userfolders before_traverse hook, to set things up:
+        zcuf(self, request)
+
+        # Call unauthorized to make sure Unauthorized is raised.
+        self.failUnlessRaises( Unauthorized, response.unauthorized)
+
+        # Since we have multiple challengers in play, we end up
+        # calling PluggableAuthService._unauthorized(), which allows
+        # the challengers to play. However, because of the ordering of
+        # the plugins, only "Reindeer Games Participant" challengers
+        # will play
+        self.assertEqual(response.reindeer_games, ['dasher', 'dancer'])
+
+    def test_dont_call_challenge_twice(self):
+        from Products.PluggableAuthService.interfaces.plugins \
+             import IChallengePlugin
+        plugins = self._makePlugins()
+        zcuf = self._makeOne( plugins )
+
+        counter = self._makeChallengePlugin('counter', DummyCounterChallenger)
+        zcuf._setObject( 'counter', counter )
+
+        plugins = zcuf._getOb( 'plugins' )
+        plugins.activatePlugin( IChallengePlugin, 'counter' )
+
+        response = FauxResponse()
+        request = FauxRequest(RESPONSE=response)
+        zcuf.REQUEST = request
+
+        zcuf(self, request)
+
+        self.failUnlessRaises( Unauthorized, response.unauthorized)
+
+        self.assertEqual(counter.count, 1)
 
 if __name__ == "__main__":
     unittest.main()
