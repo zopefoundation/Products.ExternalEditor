@@ -23,7 +23,7 @@ from AccessControl import ClassSecurityInfo
 from webdav.common import rfc1123_date
 from OFS.Image import Image, getImageInfo
 
-from utils import _dtmldir
+from utils import _dtmldir, _setCacheHeaders
 from CMFCorePermissions import ViewManagementScreens, View, FTPAccess
 from FSObject import FSObject
 from DirectoryView import registerFileExtension, registerMetaType, expandpath
@@ -116,11 +116,17 @@ class FSImage(FSObject):
                     RESPONSE.setStatus(304)
                     return ''
 
+        #Last-Modified will get stomped on by a cache policy it there is one set....
         RESPONSE.setHeader('Last-Modified', rfc1123_date(self._file_mod_time))
         RESPONSE.setHeader('Content-Type', self.content_type)
         RESPONSE.setHeader('Content-Length', len(data))
 
-        self.ZCacheable_set(None)
+        #There are 2 Cache Managers which can be in play....need to decide which to use
+        #to determine where the cache headers are decided on.
+        if self.ZCacheable_getManager() is not None:
+            self.ZCacheable_set(None)
+        else:
+            _setCacheHeaders(self, extra_context={})
         return data
 
     security.declareProtected(View, 'getContentType')

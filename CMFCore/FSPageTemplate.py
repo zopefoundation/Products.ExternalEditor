@@ -33,7 +33,7 @@ from CMFCorePermissions import ViewManagementScreens
 from CMFCorePermissions import View
 from CMFCorePermissions import FTPAccess
 from FSObject import FSObject
-from utils import getToolByName
+from utils import getToolByName, _setCacheHeaders
 
 xml_detect_re = re.compile('^\s*<\?xml\s+')
 
@@ -116,22 +116,6 @@ class FSPageTemplate(FSObject, Script, PageTemplate):
         self._updateFromFS()
         return FSPageTemplate.inheritedAttribute('pt_macros')(self)
 
-    security.declarePrivate('_setCacheHeaders')
-    def _setCacheHeaders(self, extra_context):
-        """Set cache headers according to cache policy manager."""
-        REQUEST = getattr(self, 'REQUEST', None)
-        if REQUEST is not None:
-            content = aq_parent(self)
-            manager = getToolByName(content, 'caching_policy_manager', None)
-            if manager is not None:
-                view_name = self.getId()
-                headers = manager.getHTTPCachingHeaders(
-                                  content, view_name, extra_context
-                                  )
-                RESPONSE = REQUEST['RESPONSE']
-                for key, value in headers:
-                    RESPONSE.setHeader(key, value)
-
     def pt_render(self, source=0, extra_context={}):
         self._updateFromFS()  # Make sure the template has been loaded.
         try:
@@ -139,7 +123,7 @@ class FSPageTemplate(FSObject, Script, PageTemplate):
                                     self, source, extra_context
                                     )
             if not source:
-                self._setCacheHeaders(extra_context)
+                _setCacheHeaders(self, extra_context)
             return result
 
         except RuntimeError:

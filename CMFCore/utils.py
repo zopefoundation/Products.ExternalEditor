@@ -254,6 +254,22 @@ def _modifyPermissionMappings(ob, map):
             something_changed = 1
     return something_changed
 
+security.declarePrivate('_setCacheHeaders')
+def _setCacheHeaders(obj, extra_context):
+    """Set cache headers according to cache policy manager for the obj."""
+    REQUEST = getattr(obj, 'REQUEST', None)
+    if REQUEST is not None:
+        obj = aq_parent(obj)
+        manager = getToolByName(obj, 'caching_policy_manager', None)
+        if manager is not None:
+            view_name = obj.getId()
+            headers = manager.getHTTPCachingHeaders(
+                              obj, view_name, extra_context
+                              )
+            RESPONSE = REQUEST['RESPONSE']
+            for key, value in headers:
+                RESPONSE.setHeader(key, value)
+
 #
 #   Base classes for tools
 #
