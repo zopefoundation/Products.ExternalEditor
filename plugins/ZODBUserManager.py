@@ -18,7 +18,7 @@ $Id$
 """
 import sha
 
-from AccessControl import ClassSecurityInfo
+from AccessControl import ClassSecurityInfo, AuthEncoding
 from AccessControl.SecurityManagement import getSecurityManager
 from App.class_init import default__class_init__ as InitializeClass
 from BTrees.OOBTree import OOBTree
@@ -91,9 +91,15 @@ class ZODBUserManager( BasePlugin ):
             return (None, None)
 
         userid = self._login_to_userid.get( login, login )
+        reference = self._user_passwords[ userid ]
+        if AuthEncoding.is_encrypted( reference ):
+            if AuthEncoding.pw_validate( reference, password ):
+                return userid, login
+
+        # Support previous naive behavior
         digested = sha.sha( password ).hexdigest()
-        
-        if self._user_passwords.get( userid ) == digested:
+
+        if reference == digested:
             return userid, login
 
         return (None, None)
@@ -225,7 +231,7 @@ class ZODBUserManager( BasePlugin ):
         if self._login_to_userid.get( login_name ) is not None:
             raise KeyError, 'Duplicate login name: %s' % login_name
 
-        self._user_passwords[ user_id ] = sha.sha( password ).hexdigest()
+        self._user_passwords[ user_id ] = AuthEncoding.pw_encrypt( password )
         self._login_to_userid[ login_name ] = user_id
         self._userid_to_login[ user_id ] = login_name
 
@@ -255,7 +261,7 @@ class ZODBUserManager( BasePlugin ):
             self._userid_to_login[ user_id ] = login_name
 
         if password:
-            digested = sha.sha( password ).hexdigest()
+            digested = AuthEncoding.pw_encrypt( password )
             self._user_passwords[ user_id ] = digested
 
     #
