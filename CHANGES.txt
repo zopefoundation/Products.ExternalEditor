@@ -1,5 +1,10 @@
 External Editor Change Log
 
+    - External editing is now governed by the "Use external editor" permission
+      to allow non-managers to use it. Users must also have the permissions to
+      edit/modify the objects they edit, plus do WebDAV locking if desired.
+      Thanks to Reineke.
+
     - Unix editor command line parsing is much more robust now and properly
       handles quoted arguments. You can also specify the "$1" placeholder in the
       editor command to denote where the content file name is inserted. If

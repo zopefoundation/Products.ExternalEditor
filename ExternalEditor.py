@@ -18,7 +18,9 @@
 
 from string import join # For Zope 2.3 compatibility
 import Acquisition
+from Globals import InitializeClass
 from AccessControl.SecurityManagement import getSecurityManager
+from AccessControl.SecurityInfo import ClassSecurityInfo
 from webdav.common import rfc1123_date
 from webdav import Lockable
 from OFS import Image
@@ -27,6 +29,9 @@ class ExternalEditor(Acquisition.Implicit):
     """Create a response that encapsulates the data needed by the
        ZopeEdit helper application
     """
+    
+    security = ClassSecurityInfo()
+    security.declareObjectProtected('Use external editor')
     
     def __before_publishing_traverse__(self, self2, request):
         path = request['TraversalRequestNameStack']
@@ -46,9 +51,6 @@ class ExternalEditor(Acquisition.Implicit):
         except AttributeError:
             # Handle objects that are methods in ZClasses
             ob = parent.propertysheets.methods[REQUEST['target']]
-        
-        if not security.checkPermission('View management screen', ob):
-            raise 'Unauthorized'
         
         r = []
         r.append('url:%s' % ob.absolute_url())
@@ -119,3 +121,5 @@ class ExternalEditor(Acquisition.Implicit):
         
         RESPONSE.setHeader('Content-Type', 'application/x-zope-edit')    
         return join(r, '\n')
+
+InitializeClass(ExternalEditor)
