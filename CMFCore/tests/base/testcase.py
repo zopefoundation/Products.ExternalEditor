@@ -1,6 +1,10 @@
 from unittest import TestCase
-import Zope
-Zope.startup()
+try:
+    import Zope2
+except ImportError:
+    # BBB: for Zope 2.7
+    import Zope as Zope2
+Zope2.startup()
 
 from os import curdir, mkdir, stat, remove
 from os.path import join, abspath, dirname
@@ -12,21 +16,36 @@ import time
 from AccessControl.SecurityManagement import newSecurityManager
 from AccessControl.SecurityManagement import noSecurityManager
 from AccessControl.SecurityManager import setSecurityPolicy
-from security import PermissiveSecurityPolicy, AnonymousUser
 from Testing.makerequest import makerequest
+try:
+    import transaction
+    has_transaction = True
+except ImportError:
+    # BBB: for Zope 2.7
+    has_transaction = False
 
 from dummy import DummyFolder
+from security import AnonymousUser
+from security import PermissiveSecurityPolicy
 
 
 class TransactionalTest( TestCase ):
 
     def setUp( self ):
-        get_transaction().begin()
-        self.connection = Zope.DB.open()
+        if has_transaction:
+            transaction.begin()
+        else:
+            # BBB: for Zope 2.7
+            get_transaction().begin()
+        self.connection = Zope2.DB.open()
         self.root =  self.connection.root()[ 'Application' ]
 
     def tearDown( self ):
-        get_transaction().abort()
+        if has_transaction:
+            transaction.abort()
+        else:
+            # BBB: for Zope 2.7
+            get_transaction().abort()
         self.connection.close()
 
 
@@ -42,15 +61,23 @@ class RequestTest( TransactionalTest ):
 class SecurityTest( TestCase ):
 
     def setUp(self):
-        get_transaction().begin()
+        if has_transaction:
+            transaction.begin()
+        else:
+            # BBB: for Zope 2.7
+            get_transaction().begin()
         self._policy = PermissiveSecurityPolicy()
         self._oldPolicy = setSecurityPolicy(self._policy)
-        self.connection = Zope.DB.open()
+        self.connection = Zope2.DB.open()
         self.root =  self.connection.root()[ 'Application' ]
         newSecurityManager( None, AnonymousUser().__of__( self.root ) )
 
     def tearDown( self ):
-        get_transaction().abort()
+        if has_transaction:
+            transaction.abort()
+        else:
+            # BBB: for Zope 2.7
+            get_transaction().abort()
         self.connection.close()
         noSecurityManager()
         setSecurityPolicy(self._oldPolicy)
