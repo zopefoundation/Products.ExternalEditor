@@ -99,10 +99,11 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
     security.declareProtected(EditCollectorIssue, 'submitter_email')
     submitter_email = None
     submitter_name = None
+    invisible = 0
     version_info = ''
 
     def __init__(self,
-                 id, container,
+                 id, container, 
                  title='', description='',
                  submitter_id=None, submitter_name=None,
                  submitter_email=None,
@@ -114,9 +115,11 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
                  creation_date=None, modification_date=None,
                  effective_date=None, expiration_date=None,
                  assignees=None,
-                 file=None, fileid=None, filetype=None):
+                 file=None, fileid=None, filetype=None,
+                 invisible=0):
         """ """
 
+        self.invisible = invisible
         SkinnedFolder.__init__(self, id, title)
         self._set_collector_path(container)
 
@@ -629,6 +632,8 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
     security.declareProtected(CMFCorePermissions.ModifyPortalContent,
                               'indexObject')
     def indexObject(self):
+        if self.invisible:
+            return
         for i in (self._get_internal_catalog(),
                   getToolByName(self, 'portal_catalog', None)):
             if i is not None:
@@ -645,6 +650,8 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
     security.declareProtected(CMFCorePermissions.ModifyPortalContent,
                               'reindexObject')
     def reindexObject(self, internal_only=0):
+        if self.invisible:
+            return
         catalogs = [self._get_internal_catalog()]
         if not internal_only:
             catalogs.append(getToolByName(self, 'portal_catalog', None))
