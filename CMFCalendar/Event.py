@@ -195,6 +195,14 @@ class Event(PortalContent, DefaultDublinCoreImpl):
         self.contact_phone=contact_phone
         self.event_url=event_url
     
+    security.declarePublic('isEffective')
+    def isEffective(self, date):
+        """
+            Overloading the DC effective requires events to show up outside their effective
+            dates
+        """
+        return 1 
+
     security.declarePublic('getExpirationStrings')
     def getExpirationStrings(self):
         """
