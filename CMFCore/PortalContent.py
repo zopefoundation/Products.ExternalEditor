@@ -99,7 +99,7 @@ from ComputedAttribute import ComputedAttribute
 from Acquisition import aq_base
 
 
-class PortalContent(SimpleItem, DynamicType):
+class PortalContent(DynamicType, SimpleItem):
     """
         Base class for portal objects.
         
@@ -128,18 +128,6 @@ class PortalContent(SimpleItem, DynamicType):
         # Should be overriden by portal objects
         return "%s %s" % (self.Title(), self.Description())
 
-    # Support for dynamic icons
-
-    security.declareProtected(AccessContentsInformation, 'getIcon')
-    def getIcon(self):
-        """
-        getIcon is the preferred method to retrieve an icon for a 
-        content item. using this method allows the content class
-        creator to grab icons on the fly instead of using a fixed
-        attribute on the class. used for the Favorites content class.
-        """
-        return getattr(self, 'icon', '/misc_/OFSP/dtmldoc.gif')
-
     # Cataloging methods
     # ------------------
 
@@ -155,7 +143,7 @@ class PortalContent(SimpleItem, DynamicType):
         if catalog is not None:
             catalog.unindexObject(self)
 
-    security.declarePrivate('reindexObject')
+    security.declareProtected(ModifyPortalContent, 'reindexObject')
     def reindexObject(self):
         catalog = getToolByName(self, 'portal_catalog', None)
         if catalog is not None:
@@ -176,7 +164,7 @@ class PortalContent(SimpleItem, DynamicType):
 
     def _index_html(self):
         '''
-        Invokes the first customizable action.
+        Invokes the action identified by the id "view" or the first action.
         '''
         ti = self.getTypeInfo()
         if ti is not None:
