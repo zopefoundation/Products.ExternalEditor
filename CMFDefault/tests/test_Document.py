@@ -257,28 +257,25 @@ class DocumentTests(RequestTest):
 
     def test_Format_methods(self):
         d = self.d
-        d.setFormat( 'plain' )
+        d.setFormat('plain')
         self.assertEqual( d.text_format, 'plain' )
         self.assertEqual( d.Format(), 'text/plain' )
         d.setFormat( d.Format() )
         self.assertEqual( d.text_format, 'plain' )
 
-        d = self.d
-        d.setFormat( 'structured-text' )
+        d.setFormat('structured-text')
         self.assertEqual( d.text_format, 'structured-text' )
         self.assertEqual( d.Format(), 'text/plain' )
         d.setFormat( d.Format() )
         self.assertEqual( d.text_format, 'structured-text' )
 
-        d = self.d
-        d.setFormat( 'html' )
+        d.setFormat('html')
         self.assertEqual( d.text_format, 'html' )
         self.assertEqual( d.Format(), 'text/html' )
         d.setFormat( d.Format() )
         self.assertEqual( d.text_format, 'html' )
 
-        d = self.d
-        d.setFormat( 'foo' )
+        d.setFormat('foo')
         self.assertEqual( d.text_format, 'structured-text' )
 
     def test_interface(self):
