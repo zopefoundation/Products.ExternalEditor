@@ -1,8 +1,17 @@
-from unittest import TestCase,makeSuite,main
+from unittest import TestCase, makeSuite, main
 
 import Zope
+from Products.CMFCore.tests.base.content import FAUX_HTML_LEADING_TEXT
+from Products.CMFCore.tests.base.content import SIMPLE_HTML
+from Products.CMFCore.tests.base.content import SIMPLE_STRUCTUREDTEXT
+from Products.CMFCore.tests.base.content import SIMPLE_XHTML
+from Products.CMFCore.tests.base.content import STX_WITH_HTML
+
 from Products.CMFDefault.utils import parseHeadersBody, tuplize, comma_split
+from Products.CMFDefault.utils import bodyfinder
+from Products.CMFDefault.utils import html_headcheck
 from Products.CMFDefault.utils import seq_strip
+
 
 class DefaultUtilsTests(TestCase):
     COMMON_HEADERS = '''Author: Tres Seaver
@@ -58,6 +67,26 @@ Header: value
         assert( len( headers ) == 3, '%d!' % len( headers ) )
         assert( preloaded[ 'Author' ] != headers[ 'Author' ] )
         assert( preloaded[ 'text_format' ] == headers[ 'text_format' ] )
+
+    def test_bodyfinder(self):
+        self.assertEqual( bodyfinder(FAUX_HTML_LEADING_TEXT),
+                          '\n  <h1>Not a lot here</h1>\n ' )
+        self.assertEqual( bodyfinder(SIMPLE_HTML),
+                          '\n  <h1>Not a lot here</h1>\n ' )
+        self.assertEqual( bodyfinder(SIMPLE_STRUCTUREDTEXT),
+                          SIMPLE_STRUCTUREDTEXT )
+        self.assertEqual( bodyfinder(SIMPLE_XHTML),
+                          '\n  <h1>Not a lot here</h1>\n ' )
+        self.assertEqual( bodyfinder(STX_WITH_HTML),
+                          '<p>Hello world, I am Bruce.</p>' )
+
+    def test_html_headcheck(self):
+        self.assertEqual( html_headcheck(FAUX_HTML_LEADING_TEXT), 0 )
+        self.assertEqual( html_headcheck(SIMPLE_HTML), 1 )
+        self.assertEqual( html_headcheck(SIMPLE_STRUCTUREDTEXT), 0 )
+        self.assertEqual( html_headcheck(SIMPLE_XHTML), 1 )
+        self.assertEqual( html_headcheck(STX_WITH_HTML), 0 )
+
 
 def test_suite():
     return makeSuite(DefaultUtilsTests)

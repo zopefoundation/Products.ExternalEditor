@@ -41,6 +41,26 @@ BASIC_HTML = '''\
 </html>
 '''
 
+SIMPLE_XHTML = """\
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+  <title>Title in tag</title>
+  <meta name="description" content="Describe me" />
+  <meta name="contributors" content="foo@bar.com; baz@bam.net;
+    Benotz, Larry J (larry@benotz.stuff)" />
+  <meta name="title" content="Title in meta" />
+  <meta name="subject" content="content management" />
+ </head>
+ <body bgcolor="#ffffff">
+  <h1>Not a lot here</h1>
+ </body>
+</html>
+"""
+
 # A document with an html-qualifying *portion*.
 FAUX_HTML_LEADING_TEXT = '''\
 The following would look like HTML but for this leading text:

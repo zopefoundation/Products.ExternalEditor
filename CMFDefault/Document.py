@@ -1,21 +1,21 @@
 ##############################################################################
 #
-# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+# Copyright (c) 2001-2003 Zope Corporation and Contributors.
+# All Rights Reserved.
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """ Basic textual content object, supporting both HTML and STX.
 
 $Id$
 """
 
-import Globals, StructuredText, string, utils, re
 from StructuredText.HTMLWithImages import HTMLWithImages
 from Globals import DTMLFile, InitializeClass
 from AccessControl import ClassSecurityInfo, getSecurityManager
@@ -29,6 +29,7 @@ from Products.CMFCore.utils import format_stx, keywordsplitter
 from DublinCore import DefaultDublinCoreImpl
 from utils import parseHeadersBody, formatRFC822Headers
 from utils import SimpleHTMLParser, bodyfinder, _dtmldir
+from utils import html_headcheck
 from DocumentTemplate.DT_Util import html_quote
 
 factory_type_information = ( { 'id'             : 'Document'
@@ -166,8 +167,9 @@ class Document(PortalContent, DefaultDublinCoreImpl):
             contents=file.read()
             if contents:
                 text = self.text = contents
-        text = bodyfinder(text)
-        self.setFormat(value=text_format)
+        if html_headcheck(text):
+            text = bodyfinder(text)
+        self.setFormat(text_format)
         self._edit(text=text, text_format=text_format, safety_belt=safety_belt)
         self.reindexObject()
 
@@ -194,14 +196,13 @@ class Document(PortalContent, DefaultDublinCoreImpl):
     security.declarePrivate('guessFormat')
     def guessFormat(self, text):
         """ Simple stab at guessing the inner format of the text """
-        if utils.html_headcheck(text): return 'html'
+        if html_headcheck(text): return 'html'
         else: return 'structured-text'
     
     security.declarePrivate('handleText')
     def handleText(self, text, format=None, stx_level=None):
-        """ Handles the raw text, returning headers, body, cooked, format """
+        """ Handles the raw text, returning headers, body, format """
         headers = {}
-        level = stx_level or self._stx_level
         if not format:
             format = self.guessFormat(text)
         if format == 'html':
@@ -210,15 +211,13 @@ class Document(PortalContent, DefaultDublinCoreImpl):
             headers.update(parser.metatags)
             if parser.title:
                 headers['Title'] = parser.title
-            bodyfound = bodyfinder(text)
-            if bodyfound:
-                body = bodyfound
+            body = bodyfinder(text)
         else:
             headers, body = parseHeadersBody(text, headers)
-            self._stx_level = level
-
+            if stx_level:
+                self._stx_level = stx_level
         return headers, body, format
-            
+
     security.declarePublic( 'getMetadataHeaders' )
     def getMetadataHeaders(self):
         """Return RFC-822-style header spec."""
@@ -327,8 +326,8 @@ class Document(PortalContent, DefaultDublinCoreImpl):
     
 
     security.declareProtected(ModifyPortalContent, 'setFormat')
-    def setFormat(self, value):
-        value = str(value)
+    def setFormat(self, format):
+        value = str(format)
         if value == 'text/html' or value == 'html':
             self.text_format = 'html'
         elif value == 'plain':
@@ -346,15 +345,15 @@ class Document(PortalContent, DefaultDublinCoreImpl):
             self.dav__init(REQUEST, RESPONSE)
             self.dav__simpleifhandler(REQUEST, RESPONSE, refresh=1)
         body = REQUEST.get('BODY', '')
-        guessedformat = REQUEST.get_header('Content-Type', 'text/plain')
-        ishtml = (guessedformat == 'text/html') or utils.html_headcheck(body)
-
-        if ishtml: self.setFormat('text/html')
-        else: self.setFormat('text/plain')
 
         try:
             headers, body, format = self.handleText(text=body)
-            safety_belt = headers.get('SafetyBelt', '') 
+            safety_belt = headers.get('SafetyBelt', '')
+            if REQUEST.get_header('Content-Type', '') == 'text/html':
+                text_format = 'html'
+            else:
+                text_format = format
+            self.setFormat(text_format)
             self.setMetadata(headers)
             self._edit(text=body, safety_belt=safety_belt)
         except 'EditingConflict', msg:
@@ -385,13 +384,11 @@ class Document(PortalContent, DefaultDublinCoreImpl):
     security.declareProtected(View, 'manage_FTPget')
     def manage_FTPget(self):
         "Get the document body for FTP download (also used for the WebDAV SRC)"
-        join = string.join
-        lower = string.lower
         hdrlist = self.getMetadataHeaders()
         if self.Format() == 'text/html':
             hdrtext = ''
             for name, content in hdrlist:
-                if lower(name) == 'title':
+                if name.lower() == 'title':
                     continue
                 else:
                     hdrtext = '%s\n <meta name="%s" content="%s" />' % (

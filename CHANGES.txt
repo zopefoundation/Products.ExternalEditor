@@ -24,6 +24,12 @@ Future
     - (__future__) Added DCWorkflow (through-the-web configurable
       workflows) to the core set of CMF products.
 
+    - utils: Changed behavior of 'bodyfinder' and 'html_headcheck'.
+      The head check in html_headcheck is now a bit different, but the result
+      should be closer to what people expect.
+      The head check in bodyfinder is removed. In most cases you want to call
+      bodyfinder only if html_headcheck is true.
+
     - Cleaned up Interfaces and API Help (Collector #96):
 
       o  Removed redundant 'Syndicatable' and 'IndexableContent' interfaces.
@@ -54,6 +60,9 @@ Future
       metadata into a form suitable for inclusion as <meta> tags.
 
   Bug Fixes
+
+    - Document: Ensured that 'edit()' and 'PUT()' strip of xhtml headers and
+      html headers including DOCTYPE declarations. (Collector #41)
 
     - Fixed some minor buglets. (Collector #80, #94 and #95)
 
