@@ -1,19 +1,8 @@
 <dtml-comment>
 folderfilter cookie maintenance.
 </dtml-comment>
-
-<dtml-if expr="REQUEST.get('clear_view_filter', 0)">
- <dtml-call clearCookie>
- <dtml-call expr="REQUEST.set('folderfilter', '')">
- <dtml-call expr="REQUEST.set('close_filter_form', '1')">
-<dtml-elif expr="REQUEST.get('set_view_filter', 0)">
- <dtml-let filter="encodeFolderFilter(REQUEST)">
-  <dtml-call expr="RESPONSE.setCookie('folderfilter', filter,
-                   path='/', expires='Wed, 19 Feb 2020 14:28:00 GMT')">
-  <dtml-call expr="REQUEST.set('folderfilter', filter)">
- </dtml-let>
-</dtml-if>
-
+<dtml-in filterCookie>
+</dtml-in>
 <dtml-comment>
 Folder contents display.
 </dtml-comment>

@@ -5,7 +5,7 @@
 
 # dont you just wish namespaces had a get(name,default) method?! ;-)
 try:
-    iconURL=_['getIcon']
+    iconURL=context.getIcon()
 except KeyError:
     try:
         iconURL=_['icon']
@@ -14,7 +14,7 @@ except KeyError:
 
 if iconURL:
     try:
-        Type = _['Type']
+        Type = context.Type()
     except:
         Type=''
     return '<img src="%s" align="left" alt="%s" border="0"/>' % (iconURL,
