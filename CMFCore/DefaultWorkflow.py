@@ -164,7 +164,9 @@ class DefaultWorkflowDefinition (Acquisition.Implicit):
         show_retract = 0
 
         if review_state == 'private':
-            if allow_request:
+            if allow_review:
+                append_action('Publish', 'content_publish_form')
+            elif allow_request:
                 append_action('Submit', 'content_submit_form')
 
         elif review_state == 'pending':
