@@ -35,6 +35,12 @@
   - (__future__) Added DCWorkflow (through-the-web configurable
     workflows) to the core set of CMF products.
 
+  - Made it possible to add CookieCrumblers in nested folders.
+    You can just drop in a cookie crumbler anywhere to change the
+    login form for that area of the site.  In fact, now you don't
+    have to create a user folder just to change the login
+    process.
+
   - Made Link objects editable via FTP / WebDAV.
 
   - Merged Chris Withers' FSSQLMethod into CMFCore.
@@ -97,6 +103,13 @@
     well as Dublin Core).
 
  Bug fixes
+
+  - Added a workaround for the problem where the CookieCrumber
+    set cookies even though the user entered an incorrect password.
+    RESPONSE.unauthorized() now cancels the cookie response
+    header.  The new login_form and logged_in form both try to
+    invoke unauthorized(), so make sure you install the new
+    forms.
 
   - Implement the notional 'search results item' interface for
     SkinnedFolder.
