@@ -132,11 +132,14 @@ Zope External Editor
     
       The available options for all sections of the config file are:
 
-      editor -- Command line used to launch the editor application. On
-      Windows, if no editor setting is found for an object you edit, the
-      helper app will search the file type registry for an appropriate editor
-      based on the content-type or file extension of the object (which can be 
-      specified using the extension option below).
+      editor -- Command line used to launch the editor application. On Windows,
+      if no editor setting is found for an object you edit, the helper app will
+      search the file type registry for an appropriate editor based on the
+      content-type or file extension of the object (which can be  specified
+      using the extension option below). By default, the file path of the local
+      file being edited is appended to this command line. To insert the file
+      path in the middle of your command, use "$1" for Unix and "%1" for
+      Windows respectively.
 
       save_interval -- (float) The interval in seconds that the helper 
       application checks the edited file for changes.
