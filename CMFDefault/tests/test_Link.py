@@ -71,30 +71,34 @@ class LinkTests(TestCase):
         self.assertEqual( d.getRemoteUrl(), 'http://bar.com' )
 
         d = Link( 'baz' )
-        d.edit( 'baz.html' )
-        self.assertEqual( d.getRemoteUrl(), 'http:baz.html' )
+        d.edit( 'baz.com' )
+        self.assertEqual( d.getRemoteUrl(), 'http://baz.com' )
+
+        d = Link( 'baz2' )
+        d.edit( 'baz2.com/index.html' )
+        self.assertEqual( d.getRemoteUrl(), 'http://baz2.com/index.html' )
 
         d = Link( 'zoinx' )
         d.edit( '/huh/zoinx.html' )
         self.assertEqual( d.getRemoteUrl(), 'http:/huh/zoinx.html' )
 
         d = Link( 'lol' )
-        d.edit( 'hmmm/lol.txt' )
-        self.assertEqual( d.getRemoteUrl(), 'http:hmmm/lol.txt' )
+        d.edit( 'hmmm.com/lol.txt' )
+        self.assertEqual( d.getRemoteUrl(), 'http://hmmm.com/lol.txt' )
 
     def test_trailingSlash(self):
         d = Link('foo', remote_url='http://foo.com/bar/')
         self.assertEqual(d.getRemoteUrl(), 'http://foo.com/bar/')
 
-        d = Link('foo', remote_url='baz/')
-        self.assertEqual(d.getRemoteUrl(), 'http:baz/')
+        d = Link('foo', remote_url='baz.com/')
+        self.assertEqual(d.getRemoteUrl(), 'http://baz.com/')
 
-        d = Link('foo', remote_url='/baz/zoinx/')
-        self.assertEqual(d.getRemoteUrl(), 'http:/baz/zoinx/')
+        d = Link('foo', remote_url='/baz.org/zoinx/')
+        self.assertEqual(d.getRemoteUrl(), 'http:/baz.org/zoinx/')
 
         d = Link('foo')
-        d.edit('/baz/foo/')
-        self.assertEqual(d.getRemoteUrl(), 'http:/baz/foo/')
+        d.edit('/baz.com/foo/')
+        self.assertEqual(d.getRemoteUrl(), 'http:/baz.com/foo/')
 
 
 def test_suite():
