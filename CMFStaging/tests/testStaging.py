@@ -28,7 +28,6 @@ from AccessControl.SecurityManagement import newSecurityManager, \
 from Products.CMFStaging.StagingTool import StagingTool, StagingError
 from Products.ZopeVersionControl.Utility import VersionControlError
 
-
 class Tests(unittest.TestCase):
 
     def setUp(self):
@@ -184,7 +183,7 @@ class Tests(unittest.TestCase):
         self.assert_(lt.auto_version)
         self.assert_(st.auto_checkin)
 
-        from testLockTool import TestUser
+        from Products.CMFStaging.tests.testLockTool import TestUser
 
         user = TestUser('andre')
         newSecurityManager(None, user.__of__(self.root.acl_users))

@@ -81,9 +81,11 @@ class LockTool(UniqueObject, SimpleItemWithProperties):
     #   'LockTool' interface methods
     #
 
-    security.declareProtected(LockObjects, 'lock')
+    security.declarePublic('lock')
     def lock(self, object):
         '''Locks an object'''
+        if not _checkPermission(LockObjects, object):
+            raise LockingError, 'Inadequate permissions to lock %s' % object
         locker = self.locker(object)
         if locker:
             raise LockingError, '%s is already locked' % pathOf(object)
@@ -100,7 +102,7 @@ class LockTool(UniqueObject, SimpleItemWithProperties):
         object.wl_setLock(lockitem.getLockToken(), lockitem)
 
 
-    security.declareProtected(UnlockObjects, 'breaklock')
+    security.declarePublic('breaklock')
     def breaklock(self, object, message=''):
         """emergency breaklock...."""
         locker = self.locker(object)
@@ -113,9 +115,12 @@ class LockTool(UniqueObject, SimpleItemWithProperties):
             if vt is not None:
                 vt.checkin(object, message)
 
-    security.declareProtected(UnlockObjects, 'unlock')
+    security.declarePublic('unlock')
     def unlock(self, object, message=''):
         '''Unlocks an object'''
+        if not _checkPermission(UnlockObjects, object):
+            raise LockingError, "Inadequate permissions to unlock %s" % object
+
         locker = self.locker(object)
         if not locker:
             raise LockingError, ("Unlocking an unlocked item: %s" %

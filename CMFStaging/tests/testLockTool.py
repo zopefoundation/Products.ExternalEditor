@@ -34,6 +34,12 @@ class TestUser(SimpleUser):
     def __init__(self, id):
         SimpleUser.__init__(self, id, '', (), ())
 
+    def has_permission(self, *arg, **kw):
+        return 1
+
+    def allowed(self, *arg, **kw):
+        return 1
+
 
 class Tests(unittest.TestCase):
 
