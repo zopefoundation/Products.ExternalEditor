@@ -38,7 +38,7 @@ def install(self):
     " Register the CMF Event with portal_types and friends "
     out = StringIO()
     typestool = getToolByName(self, 'portal_types')
-    skinstool = getToolByName(self, 'portal_skins')
+    st = getToolByName(self, 'portal_skins')
     metadatatool = getToolByName(self, 'portal_metadata')
     catalog = getToolByName(self, 'portal_catalog')
 
@@ -105,33 +105,40 @@ def install(self):
 
     # Setup the skins
     # This is borrowed from CMFDefault/scripts/addImagesToSkinPaths.pys
-    if 'calendar' not in skinstool.objectIds():
+    if 'calendar' not in st.objectIds() or 'zpt_calendar' not in st.objectIds():
         # We need to add Filesystem Directory Views for any directories
         # in our skins/ directory.  These directories should already be
         # configured.
-        addDirectoryViews(skinstool, 'skins', event_globals)
-        out.write("Added 'calendar' directory view to portal_skins\n")
+        try:  addDirectoryViews(st, 'skins', event_globals)
+        except:  pass
+        out.write("Added 'calendar' directory views to portal_skins\n")
 
     # Now we need to go through the skin configurations and insert
-    # 'calendar' into the configurations.  Preferably, this should be
-    # right before where 'content' is placed.  Otherwise, we append
+    # 'calendar' and 'zpt_calendar' into the configurations.  Preferably, this 
+    #should be right before where 'content' is placed.  Otherwise, we append
     # it to the end.
-    skins = skinstool.getSkinSelections()
+    skins = st.getSkinSelections()
     for skin in skins:
-        path = skinstool.getSkinPath(skin)
+        path = st.getSkinPath(skin)
         path = map(string.strip, string.split(path,','))
         if 'calendar' not in path:
             try: path.insert(path.index('content'), 'calendar')
             except ValueError:
                 path.append('calendar')
-                
+            if 'zpt_generic' in path:
+                if 'zpt_calendar' not in path:
+                    path.insert(path.index('calendar'), 'zpt_calendar')
             path = string.join(path, ', ')
             # addSkinSelection will replace exissting skins as well.
-            skinstool.addSkinSelection(skin, path)
+            st.addSkinSelection(skin, path)
             out.write("Added 'calendar' to %s skin\n" % skin)
         else:
+            if 'zpt_generic' in path:
+                if 'zpt_calendar' not in path:
+                    path.insert(path.index('calendar'), 'zpt_calendar')
+                path = string.join(path, ', ')
+                st.addSkinSelection(skin, path)
             out.write("Skipping %s skin, 'calendar' is already set up\n" % (
                 skin))
 
     return out.getvalue()
-

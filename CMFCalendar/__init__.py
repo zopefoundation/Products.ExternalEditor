@@ -34,6 +34,7 @@ event_globals=globals()
 # Make the skins available as DirectoryViews
 registerDirectory('skins', globals())
 registerDirectory('skins/calendar', globals())
+registerDirectory('skins/zpt_calendar', globals())
 
 def initialize( context ):
     utils.initializeBasesPhase2( z_bases, context )
