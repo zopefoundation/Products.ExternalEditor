@@ -58,26 +58,22 @@ class CMFCatalogAware:
         #
         if aq_base(container) is not aq_base(self):
             self.indexObject()
-            #
-            #   Now let our "aspects" know we were added or moved.
-            #   For instance, talkbacks.
-            #
-            for item_id, subitem in self.objectItems():
-                if hasattr(aq_base(subitem), 'manage_afterAdd'):
-                    subitem.manage_afterAdd(item, container)
+            # Recurse in opaque subitems (talkbacks for instance).
+            if hasattr(aq_base(self), 'opaqueValues'):
+                for subitem in self.opaqueValues():
+                    if hasattr(aq_base(subitem), 'manage_afterAdd'):
+                        subitem.manage_afterAdd(item, container)
 
     def manage_afterClone(self, item):
         """
             Add self to workflow, as we have just been cloned.
         """
         self.notifyWorkflowCreated()
-        #
-        #   Now let our "aspects" know we have been cloned.
-        #   For instance, talkbacks.
-        #
-        for item_id, subitem in self.objectItems():
-            if hasattr(aq_base(subitem), 'manage_afterClone'):
-                subitem.manage_afterClone(item)
+        # Recurse in opaque subitems.
+        if hasattr(aq_base(self), 'opaqueValues'):
+            for subitem in self.opaqueValues():
+                if hasattr(aq_base(subitem), 'manage_afterClone'):
+                    subitem.manage_afterClone(item)
 
     def manage_beforeDelete(self, item, container):
         """
@@ -88,15 +84,11 @@ class CMFCatalogAware:
         #
         if aq_base(container) is not aq_base(self):
             self.unindexObject()
-            #
-            #   Now let our "aspects" know we are going away.
-            #   For instance, talkbacks.
-            #
-            for item_id, subitem in self.objectItems():
-                # Carefully avoid implicit acquisition of the
-                # name "manage_beforeDelete"
-                if hasattr(aq_base(subitem), 'manage_beforeDelete'):
-                    subitem.manage_beforeDelete(item, container)
+            # Recurse in opaque subitems.
+            if hasattr(aq_base(self), 'opaqueValues'):
+                for subitem in self.opaqueValues():
+                    if hasattr(aq_base(subitem), 'manage_beforeDelete'):
+                        subitem.manage_beforeDelete(item, container)
 
     security.declarePrivate('notifyWorkflowCreated')
     def notifyWorkflowCreated(self):
