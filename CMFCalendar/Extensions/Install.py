@@ -104,16 +104,29 @@ from Products.CMFCore.utils import getToolByName
 from Products.CMFCalendar import Event, event_globals
 from cStringIO import StringIO
 import string
+from Acquisition import aq_base
 
 def install(self):
     " Register the CMF Event with portal_types and friends "
-    out = StringIO()
     catalog = getToolByName(self, 'portal_catalog')
-    c_catalog = catalog._catalog
-    c_catalog.addIndex('start', 'FieldIndex')
-    c_catalog.addIndex('end', 'FieldIndex')
-    c_catalog.addColumn('start')
-    c_catalog.addColumn('end')
+    base = aq_base(catalog)
+    if hasattr(base, 'addIndex'):
+        # Zope 2.4
+        addIndex = catalog.addIndex
+    else:
+        # Zope 2.3 and below
+        addIndex = catalog._catalog.addIndex
+    if hasattr(base, 'addColumn'):
+        # Zope 2.4
+        addColumn = catalog.addColumn
+    else:
+        # Zope 2.3 and below
+        addColumn = catalog._catalog.addColumn
+    out = StringIO()
+    addIndex('start', 'FieldIndex')
+    addIndex('end', 'FieldIndex')
+    addColumn('start')
+    addColumn('end')
     typestool = getToolByName(self, 'portal_types')
     skinstool = getToolByName(self, 'portal_skins')
     metadatatool = getToolByName(self, 'portal_metadata')
