@@ -35,10 +35,10 @@ class DummyContent(OriginalDummyContent):
             self.opaqueItem = 'noncallable'
             self.opaqueItemsId = 'opaqueItem'
         elif isinstance(opaqueItem, basestring):
-            setattr(self, opaqueItem, Hooks(opaqueItem))
+            Hooks(self, opaqueItem)
             self.opaqueItemsId = opaqueItem
         else:
-            self.opaqueItem = opaqueItem('opaqueItem')
+            opaqueItem(self, 'opaqueItem')
             self.opaqueItemsId = 'opaqueItem'
 
     # Ensure additional attributes get copied
@@ -60,10 +60,11 @@ class DummyContent(OriginalDummyContent):
 class OpaqueBase:
     """ Dummy opaque item without manage_after/before hookes
     """
-    def __init__(self, id):
-        self.id = id
+    def __init__(self, obj, id):
         self.addCount = self.cloneCount = self.deleteCount = 0
         self.addCounter = self.cloneCounter = self.deleteCounter = 1
+        self.id = id
+        setattr(obj, id, self)
         
     def __call__():
         return

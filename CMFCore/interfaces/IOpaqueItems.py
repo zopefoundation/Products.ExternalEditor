@@ -30,12 +30,16 @@ class ICallableOpaqueItem(Interface):
     get called if available. Unavailable hooks do not throw exceptions.
     """
 
+    def __init__(obj, id):
+        """Return the opaque item and assign it to 'obj' as attr with 'id'.
+        """
+    
     def __call__():
-        """Returns the opaque items value.
+        """Return the opaque items value.
         """
     
     def getId():
-        """Returns the name of the attribute the opaque item is assigend to.
+        """Return the id of the opaque item.
         """
 
 class ICallableOpaqueItemEvents(Interface):
