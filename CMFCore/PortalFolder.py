@@ -16,19 +16,21 @@ $Id$
 """
 
 import sys
-import Globals, re, base64, marshal, string
+import Globals, re, base64, marshal
 
-from CMFCorePermissions import View
-from CMFCorePermissions import ManageProperties
-from CMFCorePermissions import ListFolderContents
-from CMFCorePermissions import AddPortalFolders
-from CMFCorePermissions import AddPortalContent
-from CMFCatalogAware import CMFCatalogAware
 from OFS.Folder import Folder
 from OFS.ObjectManager import REPLACEABLE
 from Globals import DTMLFile
 from AccessControl import getSecurityManager, ClassSecurityInfo, Unauthorized
 from Acquisition import aq_parent, aq_inner, aq_base
+
+from CMFCorePermissions import AddPortalContent
+from CMFCorePermissions import AddPortalFolders
+from CMFCorePermissions import ListFolderContents
+from CMFCorePermissions import ManagePortal
+from CMFCorePermissions import ManageProperties
+from CMFCorePermissions import View
+from CMFCatalogAware import CMFCatalogAware
 from DynamicType import DynamicType
 from utils import getToolByName, _checkPermission
 
@@ -288,8 +290,8 @@ class PortalFolder(DynamicType, CMFCatalogAware, Folder):
         for key, value in REQUEST.items():
             if key[:10] == 'filter_by_':
                 filter[key[10:]] = value
-        encoded = string.strip(base64.encodestring( marshal.dumps( filter )))
-        encoded = string.join(string.split(encoded, '\n'), '')
+        encoded = base64.encodestring( marshal.dumps(filter) ).strip()
+        encoded = ''.join( encoded.split('\n') )
         return encoded
 
     security.declarePublic('decodeFolderFilter')
@@ -387,7 +389,7 @@ class PortalFolder(DynamicType, CMFCatalogAware, Folder):
         # This method prevents people other than the portal manager
         # from overriding skinned names.
         if not allow_dup:
-            if not _checkPermission( 'Manage portal', self):
+            if not _checkPermission(ManagePortal, self):
                 ob = self
                 while ob is not None and not getattr(ob, '_isPortalRoot', 0):
                     ob = aq_parent(aq_inner(ob))
@@ -530,8 +532,7 @@ class ContentFilter:
         if Subject and Subject is not self.MARKER: 
             self.filterSubject = Subject
             self.predicates.append( self.hasSubject )
-            self.description.append( 'Subject: %s'
-                                   % string.join( Subject, ', ' ) )
+            self.description.append( 'Subject: %s' % ', '.join(Subject) )
 
         if Description is not self.MARKER: 
             self.predicates.append( lambda x, pat=re.compile( Description ):
@@ -563,16 +564,15 @@ class ContentFilter:
                 Type = [ Type ]
             self.predicates.append( lambda x, Type=Type:
                                       x.Type() in Type )
-            self.description.append( 'Type: %s'
-                                   % string.join( Type, ', ' ) )
+            self.description.append( 'Type: %s' % ', '.join(Type) )
 
         if portal_type and portal_type is not self.MARKER:
             if type(portal_type) is type(''):
                 portal_type = [portal_type]
             self.predicates.append(lambda x, pt=portal_type:
                                    x.getPortalTypeName() in pt)
-            self.description.append('Portal Type: %s'
-                                    % string.join(portal_type, ', '))
+            self.description.append( 'Portal Type: %s'
+                                     % ', '.join(portal_type) )
 
     def hasSubject( self, obj ):
         """
@@ -600,7 +600,7 @@ class ContentFilter:
         """
             Return a stringified description of the filter.
         """
-        return string.join( self.description, '; ' )
+        return '; '.join(self.description)
 
 manage_addPortalFolder = PortalFolder.manage_addPortalFolder
 manage_addPortalFolderForm = DTMLFile( 'folderAdd', globals() )
