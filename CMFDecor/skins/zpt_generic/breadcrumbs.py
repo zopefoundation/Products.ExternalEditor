@@ -19,7 +19,7 @@ PATTERN = (
     )
 
 LASTPATTERN = (
-    '%(title)s &gt;'
+    '%(title)s'
     )
 
 JOINER = (
@@ -42,6 +42,6 @@ for step in steps:
                                     'title': html_quote(step), } )
 
 if last:
-    breadcrumbs.append(LASTPATTERN % { 'title': html_quote(upper(last)) })
+    breadcrumbs.append(LASTPATTERN % { 'title': html_quote(last) })
 
 return join(breadcrumbs, JOINER)
