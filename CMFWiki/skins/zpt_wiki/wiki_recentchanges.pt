@@ -28,10 +28,10 @@
       tal:content="page/getId"
    >PageID</a>
   </td>
-  <td align="right" tal:content="page/getSize">
+  <td align="left" tal:content="page/getSize">
     1234
   </td>
-  <td tal:content="page/bobobase_modification_time">
+  <td tal:content="python: page.bobobase_modification_time().aCommon()">
     2001/01/01 08:00:00 CST
   </td>
  </tr>
