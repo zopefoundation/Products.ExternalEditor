@@ -119,11 +119,9 @@ factory_type_information = (
      },
     )
 
-_dtmldir = os.path.join( package_home( globals() ), 'dtml' )
-addTopicForm = HTMLFile( 'topicAdd', _dtmldir, title='Add Topic' )
 def addTopic(self, id, title='', REQUEST=None):
     """
-        Create an empty topic.
+    Create an empty topic.
     """
     topic = Topic(id)
     topic.id = id
@@ -303,10 +301,3 @@ class Topic( PortalFolder ):
 # Intialize the Topic class, setting up security.
 InitializeClass(Topic)
 
-from Products.CMFCore.register import registerPortalContent
-registerPortalContent( Topic
-                     , constructors= ( addTopicForm, addTopic, )
-                     , action=Topic.TOPIC_ACTION
-                     , icon="images/topic.gif"
-                     , productGlobals=globals()
-                     )
