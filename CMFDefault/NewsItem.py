@@ -34,17 +34,20 @@ News Items contain short text articles and carry a title as well as an optional 
                              , 'factory'        : 'addNewsItem'
                              , 'immediate_view' : 'metadata_edit_form'
                              , 'actions'        :
-                                ( { 'name'          : 'View'
+                                ( { 'id'            : 'view'
+                                  , 'name'          : 'View'
                                   , 'action'        : 'newsitem_view'
                                   , 'permissions'   : (
                                       CMFCorePermissions.View, )
                                   }
-                                , { 'name'          : 'Edit'
+                                , { 'id'            : 'edit'
+                                  , 'name'          : 'Edit'
                                   , 'action'        : 'newsitem_edit_form'
                                   , 'permissions'   : (
                                       CMFCorePermissions.ModifyPortalContent, )
                                   }
-                                , { 'name'          : 'Metadata'
+                                , { 'id'            : 'metadata'
+                                  , 'name'          : 'Metadata'
                                   , 'action'        : 'metadata_edit_form'
                                   , 'permissions'   : (
                                       CMFCorePermissions.ModifyPortalContent, )

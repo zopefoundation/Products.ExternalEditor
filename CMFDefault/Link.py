@@ -35,17 +35,20 @@ Link items are URLs that come with additional information."""
                              , 'factory'        : 'addLink'
                              , 'immediate_view' : 'metadata_edit_form'
                              , 'actions'        :
-                                ( { 'name'          : 'View'
+                                ( { 'id'            : 'view'
+                                  , 'name'          : 'View'
                                   , 'action'        : 'link_view'
                                   , 'permissions'   : (
                                       CMFCorePermissions.View, )
                                   }
-                                , { 'name'          : 'Edit'
+                                , { 'id'            : 'edit'
+                                  , 'name'          : 'Edit'
                                   , 'action'        : 'link_edit_form'
                                   , 'permissions'   : (
                                       CMFCorePermissions.ModifyPortalContent, )
                                   }
-                                , { 'name'          : 'Metadata'
+                                , { 'id'            : 'metadata'
+                                  , 'name'          : 'Metadata'
                                   , 'action'        : 'metadata_edit_form'
                                   , 'permissions'   : (
                                       CMFCorePermissions.ModifyPortalContent, )

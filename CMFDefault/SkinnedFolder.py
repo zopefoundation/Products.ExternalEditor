@@ -33,22 +33,32 @@ Skinned folders can define custom 'view' actions."""
                              , 'filter_content_types' : 0
                              , 'immediate_view' : 'folder_edit_form'
                              , 'actions'        :
-                                ( { 'name'          : 'View'
+                                ( { 'id'            : 'view' 
+                                  , 'name'          : 'View'
                                   , 'action'        : ''
                                   , 'permissions'   :
                                      (CMFCorePermissions.View,)
                                   , 'category'      : 'folder'
                                   }
-                                , { 'name'          : 'Edit'
+                                , { 'id'            : 'edit'
+                                  , 'name'          : 'Edit'
                                   , 'action'        : 'folder_edit_form'
                                   , 'permissions'   :
                                      (CMFCorePermissions.ManageProperties,)
                                   , 'category'      : 'folder'
                                   }
-                                , { 'name'          : 'Syndication'
+                                , { 'id'            : 'syndication'
+                                  , 'name'          : 'Syndication'
                                   , 'action'        : 'synPropertiesForm'
                                   , 'permissions'   :
                                      (CMFCorePermissions.ManageProperties,)
+                                  , 'category'      : 'folder'
+                                  }
+                                , { 'id'            : 'foldercontents'
+                                  , 'name'          : 'Folder contents'
+                                  , 'action'        : 'folder_contents'
+                                  , 'permissions'   : 
+                                     (CMFCorePermissions.ListFolderContents,)
                                   , 'category'      : 'folder'
                                   }
                                 )

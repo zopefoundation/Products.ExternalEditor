@@ -33,17 +33,20 @@ A Favorite is a Link to an intra-portal resource."""
                              , 'factory'        : 'addFavorite'
                              , 'immediate_view' : 'metadata_edit_form'
                              , 'actions'        :
-                                ( { 'name'          : 'View'
+                                ( { 'id'            : 'view'
+                                  , 'name'          : 'View'
                                   , 'action'        : 'favorite_view'
                                   , 'permissions'   : (
                                       CMFCorePermissions.View, )
                                   }
-                                , { 'name'          : 'Edit'
+                                , { 'id'            : 'edit'
+                                  , 'name'          : 'Edit'
                                   , 'action'        : 'link_edit_form'
                                   , 'permissions'   : (
                                       CMFCorePermissions.ModifyPortalContent, )
                                   }
-                                , { 'name'          : 'Metadata'
+                                , { 'id'            : 'metadata'
+                                  , 'name'          : 'Metadata'
                                   , 'action'        : 'metadata_edit_form'
                                   , 'permissions'   : (
                                       CMFCorePermissions.ModifyPortalContent, )

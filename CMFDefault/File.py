@@ -38,22 +38,26 @@ File objects can contain arbitrary downloadable files."""
                              , 'factory'        : 'addFile'
                              , 'immediate_view' : 'metadata_edit_form'
                              , 'actions'        :
-                                ( { 'name'          : 'View'
+                                ( { 'id'            : 'view'
+                                  , 'name'          : 'View'
                                   , 'action'        : 'file_view'
                                   , 'permissions'   : (
                                       CMFCorePermissions.View, )
                                   }
-                                , { 'name'          : 'Download'
+                                , { 'id'            : 'download'
+                                  , 'name'          : 'Download'
                                   , 'action'        : ''
                                   , 'permissions'   : (
                                       CMFCorePermissions.View, )
                                   }
-                                , { 'name'          : 'Edit'
+                                , { 'id'            : 'edit'
+                                  , 'name'          : 'Edit'
                                   , 'action'        : 'file_edit_form'
                                   , 'permissions'   : (
                                       CMFCorePermissions.ModifyPortalContent, )
                                   }
-                                , { 'name'          : 'Metadata'
+                                , { 'id'            : 'metadata'
+                                  , 'name'          : 'Metadata'
                                   , 'action'        : 'metadata_edit_form'
                                   , 'permissions'   : (
                                       CMFCorePermissions.ModifyPortalContent, )

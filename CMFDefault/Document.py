@@ -35,17 +35,20 @@ Documents can contain text that can be formatted using 'Structured Text.'"""
                              , 'factory'        : 'addDocument'
                              , 'immediate_view' : 'metadata_edit_form'
                              , 'actions'        :
-                                ( { 'name'          : 'View'
+                                ( { 'id'            : 'view' 
+                                  , 'name'          : 'View'
                                   , 'action'        : 'document_view'
                                   , 'permissions'   : (
                                       CMFCorePermissions.View, )
                                   }
-                                , { 'name'          : 'Edit'
+                                , { 'id'            : 'edit'
+                                  , 'name'          : 'Edit'
                                   , 'action'        : 'document_edit_form'
                                   , 'permissions'   : (
                                       CMFCorePermissions.ModifyPortalContent, )
                                   }
-                                , { 'name'          : 'Metadata'
+                                , { 'id'            : 'metadata'
+                                  , 'name'          : 'Metadata'
                                   , 'action'        : 'metadata_edit_form'
                                   , 'permissions'   : (
                                       CMFCorePermissions.ModifyPortalContent, )

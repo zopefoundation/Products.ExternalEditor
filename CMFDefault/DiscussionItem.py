@@ -37,7 +37,8 @@ interface."""
                              , 'factory'        : ''
                              , 'immediate_view' : ''
                              , 'actions'        :
-                                ( { 'name'          : 'View'
+                                ( { 'id'            : 'view'
+                                  , 'name'          : 'View'
                                   , 'action'        : 'discussionitem_view'
                                   , 'permissions'   : (
                                       CMFCorePermissions.View, )
