@@ -1,14 +1,14 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """ Variables in a web-configurable workflow.
 
@@ -32,6 +32,8 @@ from utils import _dtmldir
 
 
 class VariableDefinition (SimpleItem):
+    """Variable definition"""
+
     meta_type = 'Workflow Variable'
 
     security = ClassSecurityInfo()
@@ -93,7 +95,7 @@ class VariableDefinition (SimpleItem):
             self.default_expr = Expression(default_expr)
         else:
             self.default_expr = None
-            
+
         g = Guard()
         if g.changeFromProperties(props or REQUEST):
             self.info_guard = g
@@ -109,6 +111,7 @@ Globals.InitializeClass(VariableDefinition)
 
 
 class Variables (ContainerTab):
+    """A container for variable definitions"""
 
     meta_type = 'Workflow Variables'
 

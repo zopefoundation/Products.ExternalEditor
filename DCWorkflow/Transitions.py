@@ -1,14 +1,14 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """ Transitions in a web-configurable workflow.
 
@@ -36,6 +36,8 @@ TRIGGER_WORKFLOW_METHOD = 2
 
 
 class TransitionDefinition (SimpleItem):
+    """Transition definition"""
+
     meta_type = 'Workflow Transition'
 
     security = ClassSecurityInfo()
@@ -154,7 +156,7 @@ class TransitionDefinition (SimpleItem):
             for key in ve.keys():
                 ret.append((key,self.getVarExprText(key)))
             return ret
-    
+
     def getWorkflowVariables(self):
         ''' get all variables that are available form
             workflow and not handled yet.
@@ -174,15 +176,15 @@ class TransitionDefinition (SimpleItem):
         '''
         if self.var_exprs is None:
             self.var_exprs = PersistentMapping()
-        
+
         expr = None
         if text:
           expr = Expression(str(text))
         self.var_exprs[id] = expr
-        
+
         if REQUEST is not None:
             return self.manage_variables(REQUEST, 'Variable added.')
-    
+
     def deleteVariables(self,ids=[],REQUEST=None):
         ''' delete a WorkflowVariable from State
         '''
@@ -190,7 +192,7 @@ class TransitionDefinition (SimpleItem):
         for id in ids:
             if ve.has_key(id):
                 del ve[id]
-                
+
         if REQUEST is not None:
             return self.manage_variables(REQUEST, 'Variables deleted.')
 
@@ -199,9 +201,9 @@ class TransitionDefinition (SimpleItem):
         '''
         if self.var_exprs is None:
             self.var_exprs = PersistentMapping()
- 
+
         ve = self.var_exprs
- 
+
         if REQUEST is not None:
             for id in ve.keys():
                 fname = 'varexpr_%s' % id
@@ -218,6 +220,7 @@ Globals.InitializeClass(TransitionDefinition)
 
 
 class Transitions (ContainerTab):
+    """A container for transition definitions"""
 
     meta_type = 'Workflow Transitions'
 

@@ -1,14 +1,14 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """ States in a web-configurable workflow.
 
@@ -33,6 +33,8 @@ TupleType = type(())
 
 
 class StateDefinition (SimpleItem):
+    """State definition"""
+
     meta_type = 'Workflow State'
 
     manage_options = (
@@ -128,7 +130,7 @@ class StateDefinition (SimpleItem):
             return []
         else:
             return vv.items()
-    
+
     def getWorkflowVariables(self):
         """Get all variables that are available from the workflow and
         not handled yet.
@@ -146,19 +148,19 @@ class StateDefinition (SimpleItem):
         """Add a WorkflowVariable to State."""
         if self.var_values is None:
             self.var_values = PersistentMapping()
-        
+
         self.var_values[id] = value
-        
+
         if REQUEST is not None:
             return self.manage_variables(REQUEST, 'Variable added.')
-    
+
     def deleteVariables(self,ids=[],REQUEST=None):
         """Delete a WorkflowVariable from State."""
         vv = self.var_values
         for id in ids:
             if vv.has_key(id):
                 del vv[id]
-                
+
         if REQUEST is not None:
             return self.manage_variables(REQUEST, 'Variables deleted.')
 
@@ -166,9 +168,9 @@ class StateDefinition (SimpleItem):
         """Set values for Variables set by this State."""
         if self.var_values is None:
             self.var_values = PersistentMapping()
- 
+
         vv = self.var_values
- 
+
         if REQUEST is not None:
             for id in vv.keys():
                 fname = 'varval_%s' % id
@@ -218,6 +220,7 @@ Globals.InitializeClass(StateDefinition)
 
 
 class States (ContainerTab):
+    """A container for state definitions"""
 
     meta_type = 'Workflow States'
 

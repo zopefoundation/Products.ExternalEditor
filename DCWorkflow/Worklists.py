@@ -30,6 +30,8 @@ from string import split, strip, join
 from types import TupleType
 
 class WorklistDefinition (SimpleItem):
+    """Worklist definiton"""
+
     meta_type = 'Worklist'
 
     security = ClassSecurityInfo()
@@ -139,6 +141,7 @@ Globals.InitializeClass(WorklistDefinition)
 
 
 class Worklists (ContainerTab):
+    """A container for worklist definitions"""
 
     meta_type = 'Worklists'
 
