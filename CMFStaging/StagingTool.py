@@ -100,10 +100,6 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
         for stage_name, stage_title, path in self._stages:
             stage = self._getStage(portal, path)
             stages[stage_name] = stage
-            try:
-                obj.aq_inContextOf
-            except:
-                import pdb; pdb.set_trace()
             if stage is not None and obj.aq_inContextOf(stage, 1):
                 if rel_path is not None:
                     # Can't tell what stage the object is in!
