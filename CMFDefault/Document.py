@@ -90,6 +90,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
     meta_type = 'Document'
     effective_date = expiration_date = None
     cooked_text = text = text_format = ''
+    _size = 0
     _isDiscussable = 1
 
     _stx_level = 1                      # Structured text level
@@ -134,6 +135,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
             raise EditingConflict(msg)
 
         self.text = text
+        self._size = len(text)
 
         if not text_format:
             text_format = self.text_format
@@ -415,6 +417,6 @@ class Document(PortalContent, DefaultDublinCoreImpl):
     security.declareProtected(View, 'get_size')
     def get_size( self ):
         """ Used for FTP and apparently the ZMI now too """
-        return len(self.manage_FTPget())
+        return self._size
 
 InitializeClass(Document)

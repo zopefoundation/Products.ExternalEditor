@@ -73,6 +73,7 @@ class DocumentTests(RequestTestBase):
         self.assertEqual( d.text, '' )
         self.assertEqual( d.text_format, 'structured-text' )
         self.assertEqual( d._stx_level, 1 )
+        self.assertEqual( d.get_size(), 0 )
 
     def test_editBasicHTML(self):
         d = self._makeOne('foo')
@@ -160,17 +161,29 @@ class DocumentTests(RequestTestBase):
         d.edit(text_format='html', text='', file=_file)
         self.assertEqual( d.CookedBody(), body )
 
+    def test_Html_Fragment(self):
+        """test that edits with HTML fragments behave nicely"""
+        FRAGMENT = '<div id="placeholder">CONTENT</div>'
+        d = self._makeOne('foo')
+        d.edit(text_format='html', text=FRAGMENT)
+        self.assertEqual( d.CookedBody(), FRAGMENT )
+        self.assertEqual( d.get_size(), len(FRAGMENT) )
+
     def test_plain_text(self):
         """test that plain text forrmat works"""
+        PLAIN_TEXT = '*some plain text*\nwith a newline'
         d = self._makeOne('foo')
-        d.edit(text_format='plain', text='*some plain text*\nwith a newline')
-        self.assertEqual( d.CookedBody(), '*some plain text*<br />with a newline')
+        d.edit(text_format='plain', text=PLAIN_TEXT)
+        self.assertEqual( d.CookedBody(),
+                          '*some plain text*<br />with a newline')
+        self.assertEqual( d.get_size(), len(PLAIN_TEXT) )
 
     def test_EditStructuredTextWithHTML(self):
         d = self._makeOne('foo')
         d.edit(text_format='structured-text', text=STX_WITH_HTML)
 
         self.assertEqual( d.Format(), 'text/plain' )
+        self.assertEqual( d.get_size(), len(STX_WITH_HTML) )
 
     def test_StructuredText(self):
         self.REQUEST['BODY'] = BASIC_STRUCTUREDTEXT
