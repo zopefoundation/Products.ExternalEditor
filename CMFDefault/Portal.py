@@ -202,7 +202,7 @@ class PortalGenerator:
         addCMFDefaultTool('Default Properties Tool', None)
         addCMFDefaultTool('Default Metadata Tool', None)
         addCMFDefaultTool('Default Syndication Tool', None)
-        
+
         # try to install CMFUid without raising exceptions if not available
         try:
             addCMFUidTool = p.manage_addProduct['CMFUid'].manage_addTool
@@ -212,7 +212,7 @@ class PortalGenerator:
             addCMFUidTool('Unique Id Annotation Tool', None)
             addCMFUidTool('Unique Id Generator Tool', None)
             addCMFUidTool('Unique Id Handler Tool', None)
-        
+
     def setupMailHost(self, p):
         p.manage_addProduct['MailHost'].manage_addMailHost(
             'MailHost', smtp_host='localhost')
@@ -346,11 +346,11 @@ class PortalGenerator:
 
     def setupDefaultProperties(self, p, title, description,
                                email_from_address, email_from_name,
-                               validate_email,
-                               ):
+                               validate_email, default_charset):
         p._setProperty('email_from_address', email_from_address, 'string')
         p._setProperty('email_from_name', email_from_name, 'string')
         p._setProperty('validate_email', validate_email and 1 or 0, 'boolean')
+        p._setProperty('default_charset', '', 'string')
         p.title = title
         p.description = description
 
@@ -362,15 +362,15 @@ def manage_addCMFSite(self, id, title='Portal', description='',
                          create_userfolder=1,
                          email_from_address='postmaster@localhost',
                          email_from_name='Portal Administrator',
-                         validate_email=0, RESPONSE=None):
-    '''
-    Adds a portal instance.
-    '''
+                         validate_email=0, default_charset='',
+                         RESPONSE=None):
+    """ Adds a portal instance.
+    """
     gen = PortalGenerator()
     id = id.strip()
     p = gen.create(self, id, create_userfolder)
     gen.setupDefaultProperties(p, title, description,
                                email_from_address, email_from_name,
-                               validate_email)
+                               validate_email, default_charset)
     if RESPONSE is not None:
         RESPONSE.redirect(p.absolute_url() + '/finish_portal_construction')
