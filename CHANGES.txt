@@ -46,6 +46,9 @@ New Features
 
 Bugs Fixed
 
+  - html_quote'd errors raised by FSPageTemplates. Thanks to 
+    Dieter Maurer for the patch. (Tracker #462)
+
   - Fixed typo in zpt_stylesheet.css. Thanks to Florent Guillaume
     for the patch. (Tracker #461)
 
