@@ -11,6 +11,17 @@
  
  
  </export-step>
+ <export-step id="properties"
+              handler="Products.CMFSetup.properties.exportSiteProperties"
+              title="Site Properties">
+  
+  
+  
+  Export site properties.
+ 
+ 
+ 
+ </export-step>
  <export-step id="rolemap"
               handler="Products.CMFSetup.rolemap.exportRolemap"
               title="Role / Permission Map">

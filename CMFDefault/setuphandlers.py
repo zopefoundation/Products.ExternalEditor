@@ -48,9 +48,5 @@ def importVarious(context):
     gen.setupCookieAuth(site)
     gen.setupMembersFolder(site)
     gen.setupMimetypes(site)
-    gen.setupDefaultProperties(site, title='Portal', description='',
-                               email_from_address='postmaster@localhost',
-                               email_from_name='Portal Administrator',
-                               validate_email=0, default_charset='')
 
     return 'Various settings from PortalGenerator imported.'

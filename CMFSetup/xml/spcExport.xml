@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<site xmlns:tal="http://xml.zope.org/namespaces/tal"
+><tal:span tal:define="prop_infos context/listSiteInfos"
+   tal:replace="structure python: context.generatePropertyNodes(prop_infos)"/>
+</site>

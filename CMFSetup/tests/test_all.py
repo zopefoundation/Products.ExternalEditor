@@ -28,6 +28,7 @@ def suite():
                            , [ 'test_actions'
                              , 'test_context'
                              , 'test_differ'
+                             , 'test_properties'
                              , 'test_registry'
                              , 'test_rolemap'
                              , 'test_skins'

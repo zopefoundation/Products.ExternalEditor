@@ -13,6 +13,18 @@
   
  
  </import-step>
+ <import-step id="properties" version="20041215-01"
+              handler="Products.CMFSetup.properties.importSiteProperties"
+              title="Site Properties">
+  
+  
+  
+  Import site properties.
+ 
+ 
+  
+ 
+ </import-step>
  <import-step id="rolemap" version="20040523-01"
               handler="Products.CMFSetup.rolemap.importRolemap"
               title="Role / Permission Map">
