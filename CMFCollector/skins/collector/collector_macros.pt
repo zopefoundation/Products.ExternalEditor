@@ -52,6 +52,7 @@
 
     <div metal:define-macro="issue_header"
          tal:define="global collector_issue_header_present python: 1;
+                     TITLELEN python: 40;
                      crdate python: here.creation_date.aCommon();
                      DateTime nocall: modules/DateTime/DateTime;
                      moddate python:
@@ -82,7 +83,9 @@
            <td align="right"> Title: </td>
            <td colspan="2">
              <strong>
-               <span tal:replace="here/Title">TITLE</span>
+               <span tal:replace="python: here.title[:TITLELEN]
+                                          + (here.title[TITLELEN+1:]
+                                             and '...')">TITLE</span>
              </strong>
            </td>
            <td tal:condition="here/security_related">
@@ -164,7 +167,7 @@
         </tr>
 
         <tr tal:condition="artifacts">
-          <td align="right" valign="top"> Artifacts: </td>
+          <td align="right" valign="top"> Uploads: </td>
           <td colspan="3">
             <table>
               <div tal:repeat="item artifacts">
@@ -263,7 +266,7 @@
       <table>
 
         <tr>
-          <th align="left" valign="top"> Add </th>
+          <th align="left" valign="top"> Upload </th>
           <td align="left" NOWRAP>
             <input type=radio name="filetype" value="File" checked> File or
             <br>
