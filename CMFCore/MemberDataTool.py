@@ -245,14 +245,19 @@ class MemberData (SimpleItem):
             return value
 
         # Then, check the tool for a value other than ''
-        value = tool.getProperty( id, _marker )
-        if value is not _marker:
-            return value
-
-        # Finally, try the user object.
-        value = getattr( self.getUser(), id, default )
-        if value is _marker:
-            raise 'Property not found', id
+        tool_value = tool.getProperty( id, _marker )
+        user_value = getattr( self.getUser(), id, default )
+        
+        if tool_value is not _marker:
+            if not tool_value and not user_value:
+                value = tool_value
+            elif not tool_value and user_value:
+                value = user_value
+        else:
+            if user_value:
+                value = user_value
+            else:
+                raise 'Property not found', id
 
         return value
 
