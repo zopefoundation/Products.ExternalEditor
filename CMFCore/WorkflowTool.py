@@ -95,7 +95,7 @@ from OFS.Folder import Folder
 from Globals import InitializeClass, PersistentMapping, DTMLFile
 from AccessControl import ClassSecurityInfo
 from Acquisition import aq_base, aq_inner, aq_parent
-from WorkflowCore import WorkflowException
+from WorkflowCore import WorkflowException, NoReindex, ObjectMoved
 import CMFCorePermissions
 from string import join, split, replace, strip
 
@@ -420,10 +420,15 @@ class WorkflowTool (UniqueObject, Folder):
         '''
         Private utility method.
         '''
+        reindex = 1
         for w in wfs:
             w.notifyBefore(ob, action)
         try:
             res = apply(func, args, kw)
+        except NoReindex:
+            reindex = 0
+        except ObjectMoved, ex:
+            ob = ex.getNewObject()
         except:
             exc = sys.exc_info()
             try:
@@ -432,9 +437,9 @@ class WorkflowTool (UniqueObject, Folder):
                 raise exc[0], exc[1], exc[2]
             finally:
                 exc = None
-        else:
-            for w in wfs:
-                w.notifySuccess(ob, action, res)
+        for w in wfs:
+            w.notifySuccess(ob, action, res)
+        if reindex:
             catalog = getToolByName(ob, 'portal_catalog', None)
             if catalog is not None:
                 catalog.reindexObject(ob)

@@ -99,6 +99,25 @@ class WorkflowException (Exception):
     '''
 
 
+class NoReindex (Exception):
+    '''
+    Raised to tell the workflow tool not to reindex the object.
+    Swallowed by the workflow tool.
+    '''
+
+
+class ObjectMoved (Exception):
+    '''
+    Raised to tell the workflow tool that the object has moved.
+    Swallowed by the workflow tool.
+    '''
+    def __init__(self, ob):
+        self._ob = ob  # Includes acquisition wrappers.
+
+    def getNewObject(self):
+        return self._ob
+
+
 class WorkflowMethod (Method):
     '''
     Wraps a method to workflow-enable it.
@@ -118,8 +137,15 @@ class WorkflowMethod (Method):
         '''
         wf = getToolByName(instance, 'portal_workflow', None)
         if wf is None or not hasattr(wf, 'wrapWorkflowMethod'):
-            # No workflow found.
-            res = apply(self._m, (instance,) + args, kw)
+            # No workflow tool found.
+            try:
+                res = apply(self._m, (instance,) + args, kw)
+            except NoReindex:
+                pass
+            else:
+                catalog = getToolByName(instance, 'portal_catalog', None)
+                if catalog is not None:
+                    catalog.reindexObject(ob)
         else:
             res = wf.wrapWorkflowMethod(instance, self._id, self._m,
                                         (instance,) + args, kw)
