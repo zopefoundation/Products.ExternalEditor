@@ -1,1 +1,1 @@
-CMFCalendar Product 0.2a
+CMFCalendar Product 0.2b
