@@ -410,8 +410,6 @@ class DirectoryViewSurrogate (Folder):
     all_meta_types = ()
     _isDirectoryView = 1
 
-#    _is_wrapperish = 1
-
     security = ClassSecurityInfo()
 
     def __init__(self, real, data, objects):
