@@ -11,8 +11,8 @@
 # 
 ##############################################################################
 """Views of filesystem directories as folders."""
-__version__='$Revision$'[11:-2]
 
+__version__='$Revision$'[11:-2]
 
 import Globals
 from Globals import HTMLFile, Persistent, package_home, DTMLFile
@@ -37,14 +37,22 @@ __reload_module__ = 0
 
 # Ignore version control subdirectories
 # and special names.
+def _filter(name):
+    return name not in ('CVS', 'SVN', '.', '..')
+
 def _filtered_listdir(path):
-    n = filter(lambda name: name not in ('CVS', 'SVN', '.', '..'),
+    n = filter(_filter,
                listdir(path))
     return n
+
+def _walker (listdir, dirname, names):
+    names[:]=filter(_filter,names)
+    listdir.extend(names)
 
 class DirectoryInformation:
     data = None
     _v_last_read = 0
+    _v_last_filelist = [] # Only used on Win32
 
     def __init__(self, expanded_fp, minimal_fp):
         self.filepath = minimal_fp
@@ -86,15 +94,53 @@ class DirectoryInformation:
                     types[strip(obname)] = strip(meta_type)
         return types
 
-    def getContents(self, registry):
-        changed = 0
-        if Globals.DevelopmentMode:
+    if Globals.DevelopmentMode and os.name=='nt':
+
+        def _changed(self):
+            mtime=0
+            filelist=[]
+            try:
+                fp = expandpath(self.filepath)
+                mtime = stat(fp)[8]
+                # some Windows directories don't change mtime 
+                # when a file in them changes :-(
+                # So keep a list of files as well, and see if that
+                # changes
+                path.walk(fp,_walker,filelist)
+                filelist.sort()
+            except: 
+                from zLOG import LOG, ERROR
+                import sys
+                LOG('DirectoryView',
+                    ERROR,
+                    'Error checking for directory modification',
+                    error=sys.exc_info())
+                
+            if mtime != self._v_last_read or filelist != self._v_last_filelist:
+                self._v_last_read = mtime
+                self._v_last_filelist = filelist
+                
+                return 1
+
+            return 0
+        
+    elif Globals.DevelopmentMode:
+        
+        def _changed(self):
             try: mtime = stat(expandpath(self.filepath))[8]
             except: mtime = 0
             if mtime != self._v_last_read:
                 self._v_last_read = mtime
-                changed = 1
+                return 1
+            return 0
+        
+    else:
 
+        def _changed(self):
+            return 0
+        
+    def getContents(self, registry):
+        changed = self._changed()
         if self.data is None or changed:
             try:
                 self.data, self.objects = self.prepareContents(registry,
@@ -162,6 +208,7 @@ class DirectoryInformation:
                     t = registry.getTypeByMetaType(mt)
                 if t is None:
                     t = registry.getTypeByExtension(ext)
+                
                 if t is not None:
                     try:
                         ob = t(name, e_filepath, fullname=entry)

@@ -30,6 +30,10 @@ New Features
 
 Bugs Fixed
 
+  - Fixed bug whereby DirectoryView instances were not noticing
+    some of the changes they should when Zope was running in debug mode
+    on Windows (Tracker #305)
+
   - Fixed a bug where the workflow notifyCreated method was called during
     manage_afterAdd in PortalContent, making it possible for the
     notification to occur on the wrong workflow.  The notification has 
