@@ -22,13 +22,14 @@ from AccessControl.Permission import pname
 from Globals import ApplicationDefaultPermissions
 
 # General Zope permissions
-View = Permissions.view
 AccessContentsInformation = Permissions.access_contents_information
-UndoChanges = Permissions.undo_changes
 ChangePermissions = Permissions.change_permissions
-ViewManagementScreens = Permissions.view_management_screens
-ManageProperties = Permissions.manage_properties
+DeleteObjects = Permissions.delete_objects
 FTPAccess = Permissions.ftp_access
+ManageProperties = Permissions.manage_properties
+UndoChanges = Permissions.undo_changes
+View = Permissions.view
+ViewManagementScreens = Permissions.view_management_screens
 
 def setDefaultRoles(permission, roles):
     '''
@@ -71,9 +72,6 @@ setDefaultRoles(ManagePortal, ('Manager',))
 
 ModifyPortalContent = 'Modify portal content'
 setDefaultRoles(ModifyPortalContent, ('Manager',))
-
-ManageProperties = 'Manage properties'
-setDefaultRoles(ManageProperties, ('Owner','Manager',))
 
 ListPortalMembers = 'List portal members'
 setDefaultRoles( ListPortalMembers, ('Manager',) )  # + Member
