@@ -1,28 +1,28 @@
 ## Script (Python) "newsitem_edit"
 ##parameters=text, description, text_format=None, change_and_view=''
 ##title=Edit a news item
+##
+from Products.CMFCore.CMFCoreExceptions import CMFResourceLockedError
+from Products.CMFCore.CMFCoreExceptions import IllegalHTML
+from Products.CMFDefault.utils import scrubHTML
+from Products.PythonScripts.standard import urlencode
+
 try:
-    from Products.CMFDefault.utils import scrubHTML
     text = scrubHTML( text ) # Strip Javascript, etc.
     description = scrubHTML( description )
- 
+
     context.edit(text=text, description=description, text_format=text_format)
-
-    qst='portal_status_message=News+Item+changed.'
-
+except (CMFResourceLockedError, IllegalHTML), msg:
+    message = msg
+    action_id = 'edit'
+else:
+    message = 'News Item changed.'
     if change_and_view:
-        target_action = context.getTypeInfo().getActionById( 'view' )
+        action_id = 'view'
     else:
-        target_action = context.getTypeInfo().getActionById( 'edit' )
+        action_id = 'edit'
 
-    context.REQUEST.RESPONSE.redirect( '%s/%s?%s' % ( context.absolute_url()
-                                                    , target_action
-                                                    , qst
-                                                    ) )
-except Exception, msg:
-    target_action = context.getTypeInfo().getActionById( 'edit' )
-    context.REQUEST.RESPONSE.redirect(
-        '%s/%s?portal_status_message=%s' % ( context.absolute_url()
-                                           , target_action
-                                           , msg
-                                           ) )
+target = '%s/%s' % ( context.absolute_url(),
+                     context.getTypeInfo().getActionById(action_id) )
+query = urlencode( {'portal_status_message': message} )
+context.REQUEST.RESPONSE.redirect( '%s?%s' % (target, query) )

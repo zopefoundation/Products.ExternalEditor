@@ -17,6 +17,7 @@ $Id$
 
 from AccessControl import allow_class
 from AccessControl import Unauthorized
+from webdav.Lockable import ResourceLockedError
 
 
 class CMFError(Exception):
@@ -33,8 +34,22 @@ class CMFNotImplementedError(NotImplementedError, CMFError):
 allow_class(CMFNotImplementedError)
 
 
+class CMFResourceLockedError(ResourceLockedError, CMFError):
+    """ ResourceLockedError in CMF.
+    """
+
+allow_class(CMFResourceLockedError)
+
+
 class CMFUnauthorizedError(Unauthorized, CMFError):
     """ Unauthorized error in CMF.
     """
 
 allow_class(CMFUnauthorizedError)
+
+
+class IllegalHTML(ValueError, CMFError):
+    """ Illegal HTML error.
+    """
+
+allow_class(IllegalHTML)

@@ -18,11 +18,11 @@ $Id$
 from DateTime import DateTime
 from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
-from Products.CMFDefault.DublinCore import DefaultDublinCoreImpl
-from Products.CMFCore.PortalContent import PortalContent, NoWL, ResourceLockedError
-from Products.CMFCore.WorkflowCore import WorkflowAction
+from webdav.Lockable import ResourceLockedError
 
-# Import permission names
+from Products.CMFDefault.DublinCore import DefaultDublinCoreImpl
+from Products.CMFCore.PortalContent import PortalContent
+from Products.CMFCore.WorkflowCore import WorkflowAction
 from Products.CMFCore.CMFCorePermissions import View, ModifyPortalContent
 from Products.CMFDefault.utils import formatRFC822Headers, html_headcheck
 from Products.CMFDefault.utils import SimpleHTMLParser, bodyfinder, parseHeadersBody
@@ -109,7 +109,7 @@ class Event(PortalContent, DefaultDublinCoreImpl):
     # Declarative security
     security = ClassSecurityInfo()
     security.declareObjectProtected(View)
-    
+
     __implements__ = ( PortalContent.__implements__
                      , DefaultDublinCoreImpl.__implements__
                      )
@@ -140,7 +140,7 @@ class Event(PortalContent, DefaultDublinCoreImpl):
             start_date = DateTime()
         if end_date is None:
             end_date = start_date
-        
+
         if end_date < start_date:
             end_date = start_date
 
@@ -159,7 +159,7 @@ class Event(PortalContent, DefaultDublinCoreImpl):
             if attrib is not None:
                 attrib = DateTime( attrib )
         return attrib
-    
+
     security.declarePublic('getEndStrings')
     def getEndStrings(self):
         """
@@ -195,7 +195,7 @@ class Event(PortalContent, DefaultDublinCoreImpl):
             ):
         """\
         """
-        
+
         if title is not None: 
             self.setTitle(title)
         if description is not None:
@@ -223,12 +223,12 @@ class Event(PortalContent, DefaultDublinCoreImpl):
                                          , stopAMPM
                                          )
             end_date = DateTime( exdate )
-        
+
         if start_date and end_date:
 
             if end_date < start_date:
                 end_date = start_date
- 
+
             self.setStartDate( start_date )
             self.setEndDate( end_date )
 
@@ -244,7 +244,7 @@ class Event(PortalContent, DefaultDublinCoreImpl):
             self.event_url = event_url
         self.reindexObject()
     edit = WorkflowAction(edit) 
-    
+
     security.declarePublic('buildTimes')
     def buildTimes(self):
         result = []
@@ -252,7 +252,7 @@ class Event(PortalContent, DefaultDublinCoreImpl):
             for min in (00, 30):
                 result.append('%02d:%02d' % (hour, min))
         return result
-    
+
     security.declarePublic('buildDays')
     def buildDays(self):
         result = []
@@ -266,7 +266,7 @@ class Event(PortalContent, DefaultDublinCoreImpl):
         for month in range (1, 13):
             result.append(str('%d' % (month)))
         return result
-    
+
     security.declarePublic('buildYears')
     def buildYears(self):
         result = []
@@ -282,7 +282,7 @@ class Event(PortalContent, DefaultDublinCoreImpl):
         Setting the event start date, when the event is scheduled to begin.
         """
         self.start_date = self._datify(start)
-    
+
     security.declareProtected(EventPermissions.ChangeEvents, 'setEndDate')
     def setEndDate(self, end):
         """
@@ -357,7 +357,7 @@ class Event(PortalContent, DefaultDublinCoreImpl):
                           language=headers['Language'],
                           rights=headers['Rights'],
                           )
- 
+
     security.declarePublic( 'getMetadataHeaders' )
     def getMetadataHeaders(self):
         """Return RFC-822-style header spec."""
@@ -377,9 +377,8 @@ class Event(PortalContent, DefaultDublinCoreImpl):
 
     def PUT(self, REQUEST, RESPONSE):
         """ Handle HTTP (and presumably FTP?) PUT requests """
-        if not NoWL:
-            self.dav__init(REQUEST, RESPONSE)
-            self.dav__simpleifhandler(REQUEST, RESPONSE, refresh=1)
+        self.dav__init(REQUEST, RESPONSE)
+        self.dav__simpleifhandler(REQUEST, RESPONSE, refresh=1)
         body = REQUEST.get('BODY', '')
         guessedformat = REQUEST.get_header('Content-Type', 'text/plain')
         ishtml = (guessedformat == 'text/html') or html_headcheck(body)
@@ -398,7 +397,7 @@ class Event(PortalContent, DefaultDublinCoreImpl):
              , contact_phone=headers['ContactPhone']
              , event_url=headers['EventURL']
              )
-            
+
         except ResourceLockedError, msg:
             get_transaction().abort()
             RESPONSE.setStatus(423)

@@ -1,6 +1,11 @@
 ## Script (Python) "metadata_edit"
+##parameters=allowDiscussion=None, title=None, subject=None, description=None, contributors=None, effective_date=None, expiration_date=None, format=None, language=None, rights=None, change_and_edit='', change_and_view=''
 ##title=Update Content Metadata
-##parameters=allowDiscussion=None,title=None,subject=None,description=None,contributors=None,effective_date=None,expiration_date=None,format=None,language=None,rights=None
+##
+from Products.CMFCore.CMFCoreExceptions import CMFResourceLockedError
+from Products.CMFCore.utils import getToolByName
+from Products.PythonScripts.standard import urlencode
+dtool = getToolByName(script, 'portal_discussion')
 
 def tuplify( value ):
 
@@ -41,9 +46,9 @@ if language is None:
 if rights is None:
     rights = context.Rights()
 
-context.portal_discussion.overrideDiscussionFor(context, allowDiscussion)
+dtool.overrideDiscussionFor(context, allowDiscussion)
 
-try:  
+try:
     context.editMetadata( title=title
                         , description=description
                         , subject=subject
@@ -54,21 +59,19 @@ try:
                         , language=language
                         , rights=rights
                         )
-    if context.REQUEST.get( 'change_and_edit', 0 ):
+except CMFResourceLockedError, msg:
+    message = msg
+    action_id = 'metadata'
+else:
+    message = 'Metadata changed.'
+    if change_and_edit:
         action_id = 'edit'
-    elif context.REQUEST.get( 'change_and_view', 0 ):
+    elif change_and_view:
         action_id = 'view'
     else:
         action_id = 'metadata'
 
-    action_path = context.getTypeInfo().getActionById( action_id )
-    context.REQUEST['RESPONSE'].redirect(
-              '%s/%s?portal_status_message=Metadata+changed.'
-                % ( context.absolute_url(), action_path ) )
-except Exception, msg:
-    target_action = context.getTypeInfo().getActionById( 'metadata' )
-    context.REQUEST.RESPONSE.redirect('%s/%s?portal_status_message=%s' % (
-                                                                          context.absolute_url()
-                                                                        , target_action
-                                                                        , msg
-                                                                         ))
+target = '%s/%s' % ( context.absolute_url(),
+                     context.getTypeInfo().getActionById(action_id) )
+query = urlencode( {'portal_status_message': message} )
+context.REQUEST.RESPONSE.redirect( '%s?%s' % (target, query) )

@@ -19,9 +19,9 @@ from StructuredText.HTMLWithImages import HTMLWithImages
 from Globals import DTMLFile, InitializeClass
 from AccessControl import ClassSecurityInfo, getSecurityManager
 from Acquisition import aq_base
+from webdav.Lockable import ResourceLockedError
 
 from Products.CMFCore.PortalContent import PortalContent
-from Products.CMFCore.PortalContent import NoWL, ResourceLockedError
 from Products.CMFCore.CMFCorePermissions import View
 from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
 from Products.CMFCore.WorkflowCore import WorkflowAction
@@ -203,7 +203,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
         """ Simple stab at guessing the inner format of the text """
         if html_headcheck(text): return 'html'
         else: return 'structured-text'
-    
+
     security.declarePrivate('handleText')
     def handleText(self, text, format=None, stx_level=None):
         """ Handles the raw text, returning headers, body, format """
@@ -320,7 +320,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
     def Description(self):
         """ Dublin core description, also important for indexing """
         return self.description
-    
+
     security.declareProtected(View, 'Format')
     def Format(self):
         """ Returns a content-type style format of the underlying source """
@@ -328,7 +328,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
             return 'text/html'
         else:
             return 'text/plain'
-    
+
     security.declareProtected(ModifyPortalContent, 'setFormat')
     def setFormat(self, format):
         """ Set text format and Dublin Core resource format.
@@ -350,9 +350,8 @@ class Document(PortalContent, DefaultDublinCoreImpl):
 
     def PUT(self, REQUEST, RESPONSE):
         """ Handle HTTP (and presumably FTP?) PUT requests """
-        if not NoWL:
-            self.dav__init(REQUEST, RESPONSE)
-            self.dav__simpleifhandler(REQUEST, RESPONSE, refresh=1)
+        self.dav__init(REQUEST, RESPONSE)
+        self.dav__simpleifhandler(REQUEST, RESPONSE, refresh=1)
         body = REQUEST.get('BODY', '')
 
         try:

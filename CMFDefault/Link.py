@@ -19,11 +19,11 @@ import urlparse
 
 from Globals import InitializeClass, DTMLFile
 from AccessControl import ClassSecurityInfo
+from webdav.Lockable import ResourceLockedError
 
 from Products.CMFCore.CMFCorePermissions import View
 from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
-from Products.CMFCore.PortalContent import PortalContent, NoWL
-from Products.CMFCore.PortalContent import ResourceLockedError
+from Products.CMFCore.PortalContent import PortalContent
 from Products.CMFCore.WorkflowCore import WorkflowAction
 from Products.CMFCore.utils import keywordsplitter
 
@@ -178,7 +178,7 @@ class Link( PortalContent
         for key, value in self.getMetadataHeaders():
             if key != 'Format' and not haveheader(key):
                 headers[key] = value
-        
+
         self._editMetadata(title=headers['Title'],
                           subject=headers['Subject'],
                           description=headers['Description'],
@@ -189,16 +189,15 @@ class Link( PortalContent
                           language=headers['Language'],
                           rights=headers['Rights'],
                           )
-        
+
     ## FTP handlers
     security.declareProtected(ModifyPortalContent, 'PUT')
     def PUT(self, REQUEST, RESPONSE):
         """
             Handle HTTP / WebDAV / FTP PUT requests.
         """
-        if not NoWL:
-            self.dav__init(REQUEST, RESPONSE)
-            self.dav__simpleifhandler(REQUEST, RESPONSE, refresh=1)
+        self.dav__init(REQUEST, RESPONSE)
+        self.dav__simpleifhandler(REQUEST, RESPONSE, refresh=1)
         body = REQUEST.get('BODY', '')
         try:
             self._writeFromPUT( body )

@@ -15,49 +15,39 @@
 $Id$
 """
 
-from DateTime import DateTime
 from Globals import InitializeClass
 from Acquisition import aq_base
 from OFS.SimpleItem import SimpleItem
 from AccessControl import ClassSecurityInfo
-
-from CMFCorePermissions import AccessContentsInformation, View, FTPAccess
+from webdav.WriteLockInterface import WriteLockInterface
 
 from interfaces.Contentish import Contentish
 from DynamicType import DynamicType
 from utils import _getViewFor
-
 from CMFCatalogAware import CMFCatalogAware
+from CMFCoreExceptions import CMFResourceLockedError
+from CMFCorePermissions import FTPAccess
+from CMFCorePermissions import View
 
-try:
-    from webdav.Lockable import ResourceLockedError
-except ImportError:
-    class ResourceLockedError( Exception ):
-        pass
 
-try: 
-    from webdav.WriteLockInterface import WriteLockInterface
-    NoWL = 0
-except ImportError:
-    NoWL = 1
+# Old names that some third-party packages may need.
+NoWL = 0
+from webdav.Lockable import ResourceLockedError
 
 
 class PortalContent(DynamicType, CMFCatalogAware, SimpleItem):
     """
         Base class for portal objects.
-        
+
         Provides hooks for reviewing, indexing, and CMF UI.
 
         Derived classes must implement the interface described in
         interfaces/DublinCore.py.
     """
-    
-    if not NoWL:
-        __implements__ = (WriteLockInterface,
-                          Contentish,
-                          DynamicType.__implements__)
-    else:
-        __implements__ = (Contentish, DynamicType.__implements__)
+
+    __implements__ = (Contentish,
+                      WriteLockInterface,
+                      DynamicType.__implements__)
 
     isPortalContent = 1
     _isPortalContent = 1  # More reliable than 'isPortalContent'.
@@ -91,7 +81,8 @@ class PortalContent(DynamicType, CMFCatalogAware, SimpleItem):
         Check if isLocked via webDav
         """
         if self.wl_isLocked():
-            raise ResourceLockedError, 'This resource is locked via webDAV'
+            raise CMFResourceLockedError('This resource is locked via '
+                                         'webDAV.')
         return 0
 
     #

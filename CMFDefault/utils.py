@@ -22,6 +22,8 @@ import os
 from Globals import package_home
 from AccessControl import ModuleSecurityInfo
 
+from Products.CMFCore.CMFCoreExceptions import IllegalHTML
+
 security = ModuleSecurityInfo( 'Products.CMFDefault.utils' )
 
 security.declarePrivate('_dtmldir')
@@ -218,7 +220,7 @@ class SimpleHTMLParser( SGMLParser ):
 
         if name:
             self.metatags[ name ] = content
-    
+
     def unknown_startag( self, tag, attrs ):
 
         self.setliteral()
@@ -282,9 +284,6 @@ NASTY_TAGS = { 'script'     : 1
              , 'embed'      : 1
              , 'applet'     : 1
              }
-
-class IllegalHTML( ValueError ):
-    pass
 
 class StrippingParser( SGMLParser ):
 
