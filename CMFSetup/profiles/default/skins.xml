@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<skins-tool default_skin="ZPT"
+            request_varname="portal_skin"
+            allow_any="False"
+            cookie_persistence="False"
+            >
+ <skin-directory id="Images"
+                 directory="CMFDefault/skins/Images"/>
+ <skin-directory id="content"
+                 directory="CMFDefault/skins/content"/>
+ <skin-directory id="control"
+                 directory="CMFDefault/skins/control"/>
+ <skin-directory id="generic"
+                 directory="CMFDefault/skins/generic"/>
+ <skin-directory id="no_css"
+                 directory="CMFDefault/skins/no_css"/>
+ <skin-directory id="nouvelle"
+                 directory="CMFDefault/skins/nouvelle"/>
+ <skin-directory id="topic" directory="CMFTopic/skins/topic"/>
+ <skin-directory id="zpt_content"
+                 directory="CMFDefault/skins/zpt_content"/>
+ <skin-directory id="zpt_control"
+                 directory="CMFDefault/skins/zpt_control"/>
+ <skin-directory id="zpt_generic"
+                 directory="CMFDefault/skins/zpt_generic"/>
+ <skin-directory id="zpt_topic"
+                 directory="CMFTopic/skins/zpt_topic"/>
+ <skin-path id="ZPT">
+  <layer name="custom"/>
+  <layer name="zpt_topic"/>
+  <layer name="zpt_content"/>
+  <layer name="zpt_generic"/>
+  <layer name="zpt_control"/>
+  <layer name="topic"/>
+  <layer name="content"/>
+  <layer name="generic"/>
+  <layer name="control"/>
+  <layer name="Images"/>
+ </skin-path>
+ <skin-path id="Basic">
+  <layer name="custom"/>
+  <layer name="topic"/>
+  <layer name="content"/>
+  <layer name="generic"/>
+  <layer name="control"/>
+  <layer name="Images"/>
+ </skin-path>
+</skins-tool>
+

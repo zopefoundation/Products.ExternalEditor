@@ -90,6 +90,16 @@ class HandlerBase( ContentHandler ):
 
         return self._encode( result )
 
+    def _extractBoolean( self, attrs, key, default ):
+
+        result = attrs.get( key, self._MARKER )
+
+        if result is self._MARKER:
+            return default
+
+        result = result.lower()
+        return result in ( '1', 'yes', 'true' )
+
     def _encode( self, content ):
 
         if self._encoding is None:

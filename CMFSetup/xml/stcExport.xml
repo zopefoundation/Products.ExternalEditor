@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<skins-tool xmlns:tal="http://xml.zope.org/namespaces/tal"
+            default_skin="default_skin"
+            request_varname="request_varname"
+            allow_any="False"
+            cookie_persistence="False"
+            tal:attributes="default_skin here/getDefaultSkin;
+                            request_varname here/getRequestVarName;
+                            allow_any here/getAllowAny;
+                            cookie_persistence here/getCookiePersistence;
+                           ">
+ <skin-directory id="content"
+                 directory="CMFDefault/skins/content"
+                 tal:repeat="fsdv here/listFSDirectoryViews"
+                 tal:attributes="id fsdv/id;
+                                 directory fsdv/directory;
+                                " />
+ <skin-path id="Basic"
+            tal:repeat="skin here/listSkinPaths"
+            tal:attributes="id skin/id" >
+  <layer name="generic"
+         tal:repeat="layer skin/path"
+         tal:attributes="name layer" />
+ </skin-path>
+</skins-tool>

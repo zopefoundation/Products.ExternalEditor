@@ -23,6 +23,11 @@ class DummySkinsTool( Folder ):
 
     _setup_called = False
 
+    default_skin = 'default_skin'
+    request_varname = 'request_varname'
+    allow_any = False
+    cookie_persistence = False
+
     def __init__( self, selections={}, fsdvs=[] ):
 
         self._selections = selections
@@ -159,6 +164,12 @@ class SkinsToolConfiguratorTests( _SkinsSetup ):
                  }
 
         site = self._initSite( selections=_PATHS, fsdvs=_FSDVS )
+        tool = site.portal_skins
+        tool.default_skin = 'basic'
+        tool.request_varname = 'skin_var'
+        tool.allow_any = True
+        tool.cookie_persistence = True
+
         configurator = self._makeOne( site ).__of__( site )
 
         self._compareDOM( configurator.generateXML(), _NORMAL_EXPORT )
@@ -167,13 +178,19 @@ class SkinsToolConfiguratorTests( _SkinsSetup ):
 
 _EMPTY_EXPORT = """\
 <?xml version="1.0"?>
-<skins-tool>
+<skins-tool default_skin="default_skin"
+            request_varname="request_varname"
+            allow_any="False"
+            cookie_persistence="False">
 </skins-tool>
 """
 
 _NORMAL_EXPORT = """\
 <?xml version="1.0"?>
-<skins-tool>
+<skins-tool default_skin="basic"
+            request_varname="skin_var"
+            allow_any="True"
+            cookie_persistence="True">
  <skin-directory id="one" directory="CMFSetup/tests/one" />
  <skin-directory id="three" directory="CMFSetup/tests/three" />
  <skin-directory id="two" directory="CMFSetup/tests/two" />
@@ -213,6 +230,11 @@ class Test_exportSkinsTool( _SkinsSetup ):
                  }
 
         site = self._initSite( selections=_PATHS, fsdvs=_FSDVS )
+        tool = site.portal_skins
+        tool.default_skin = 'basic'
+        tool.request_varname = 'skin_var'
+        tool.allow_any = True
+        tool.cookie_persistence = True
 
         context = DummyExportContext( site )
 
@@ -248,6 +270,11 @@ class Test_importSkinsTool( _SkinsSetup ):
         from Products.CMFSetup.skins import importSkinsTool
         importSkinsTool( context )
 
+        self.assertEqual( skins_tool.default_skin, "default_skin" )
+        self.assertEqual( skins_tool.request_varname, "request_varname" )
+        self.failIf( skins_tool.allow_any )
+        self.failIf( skins_tool.cookie_persistence )
+
         self.failUnless( skins_tool._setup_called )
         self.assertEqual( len( skins_tool.getSkinPaths() ), 0 )
         self.assertEqual( len( skins_tool.objectItems() ), 0 )
@@ -272,6 +299,11 @@ class Test_importSkinsTool( _SkinsSetup ):
 
         from Products.CMFSetup.skins import importSkinsTool
         importSkinsTool( context )
+
+        self.assertEqual( skins_tool.default_skin, "default_skin" )
+        self.assertEqual( skins_tool.request_varname, "request_varname" )
+        self.failIf( skins_tool.allow_any )
+        self.failIf( skins_tool.cookie_persistence )
 
         self.failUnless( skins_tool._setup_called )
         self.assertEqual( len( skins_tool.getSkinPaths() ), 0 )
@@ -298,6 +330,11 @@ class Test_importSkinsTool( _SkinsSetup ):
         from Products.CMFSetup.skins import importSkinsTool
         importSkinsTool( context )
 
+        self.assertEqual( skins_tool.default_skin, "default_skin" )
+        self.assertEqual( skins_tool.request_varname, "request_varname" )
+        self.failIf( skins_tool.allow_any )
+        self.failIf( skins_tool.cookie_persistence )
+
         self.failUnless( skins_tool._setup_called )
         self.assertEqual( len( skins_tool.getSkinPaths() ), 2 )
         self.assertEqual( len( skins_tool.objectItems() ), 3 )
@@ -320,6 +357,11 @@ class Test_importSkinsTool( _SkinsSetup ):
         from Products.CMFSetup.skins import importSkinsTool
         importSkinsTool( context )
 
+        self.assertEqual( skins_tool.default_skin, "basic" )
+        self.assertEqual( skins_tool.request_varname, "skin_var" )
+        self.failUnless( skins_tool.allow_any )
+        self.failUnless( skins_tool.cookie_persistence )
+
         self.failUnless( skins_tool._setup_called )
         self.assertEqual( len( skins_tool.getSkinPaths() ), 2 )
         self.assertEqual( len( skins_tool.objectItems() ), 3 )
@@ -341,6 +383,11 @@ class Test_importSkinsTool( _SkinsSetup ):
 
         from Products.CMFSetup.skins import importSkinsTool
         importSkinsTool( context )
+
+        self.assertEqual( skins_tool.default_skin, "basic" )
+        self.assertEqual( skins_tool.request_varname, "skin_var" )
+        self.failUnless( skins_tool.allow_any )
+        self.failUnless( skins_tool.cookie_persistence )
 
         self.failUnless( skins_tool._setup_called )
         self.assertEqual( len( skins_tool.getSkinPaths() ), 2 )

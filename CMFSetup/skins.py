@@ -32,11 +32,24 @@ class _SkinsParser( HandlerBase ):
         self._encoding = encoding
         self._skin_dirs = []
         self._skin_paths = []
+        self._default_skin = None
+        self._request_var = None
+        self._allow_arbitrary = False
+        self._persist_cookie = False
 
     def startElement( self, name, attrs ):
 
         if name == 'skins-tool':
-            pass
+            self._default_skin = self._extract( attrs, 'default_skin' )
+            self._request_var = self._extract( attrs, 'request_varname' )
+            self._allow_arbitrary = self._extractBoolean( attrs
+                                                        , 'allow_any'
+                                                        , False
+                                                        )
+            self._persist_cookie = self._extractBoolean( attrs
+                                                       , 'cookie_persistence'
+                                                       , False
+                                                       )
 
         elif name == 'skin-directory':
 
@@ -60,6 +73,10 @@ class _SkinsParser( HandlerBase ):
     def endDocument( self ):
 
         tool = self._skins_tool
+        tool.default_skin = str( self._default_skin )
+        tool.request_varname = str( self._request_var )
+        tool.allow_any =  self._allow_arbitrary and 1 or 0
+        tool.cookie_persistence =  self._persist_cookie and 1 or 0
 
         for id, directory in self._skin_dirs:
 
@@ -123,6 +140,35 @@ class SkinsToolConfigurator( Implicit ):
 
         return result
 
+    security.declareProtected(ManagePortal, 'getDefaultSkin' )
+    def getDefaultSkin( self ):
+
+        """ Return the tool's default skin name.
+        """
+        return self._skins_tool.default_skin
+
+    security.declareProtected(ManagePortal, 'getRequestVarName' )
+    def getRequestVarName( self ):
+
+        """ Return the tool's skin request variable name.
+        """
+        return self._skins_tool.request_varname
+
+    security.declareProtected(ManagePortal, 'getAllowAny' )
+    def getAllowAny( self ):
+
+        """ Return the tool's "allow arbitrary skin paths" setting (a boolean).
+        """
+        return self._skins_tool.allow_any
+
+    security.declareProtected(ManagePortal, 'getCookiePersistence' )
+    def getCookiePersistence( self ):
+
+        """ Return the tool's cookie persistence setting (a boolean).
+        """
+        return self._skins_tool.cookie_persistence
+
+    security.declarePrivate( '_skinsConfig' )
     _skinsConfig = PageTemplateFile( 'stcExport.xml'
                                    , _xmldir
                                    , __name__='skinsConfig'
