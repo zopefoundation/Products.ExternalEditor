@@ -196,6 +196,19 @@ class DocumentTests(unittest.TestCase):
                                 'body': body}
         d.edit(text_format=None, text=html)
         assert d.CookedBody() == body
+
+    def test_BigHtml_via_upload(self):
+        d = Document('foo')
+        s = []
+        looper = '<li> number %s</li>'
+        for i in range(12000): s.append(looper % i)
+        body = '<ul>\n%s\n</ul>' % string.join(s, '\n')
+        html = HTML_TEMPLATE % {'title': 'big document',
+                                'body': body}
+        from StringIO import StringIO
+        file = StringIO( html )
+        d.edit(text_format=None, text='', file=file)
+        assert d.CookedBody() == body
         
 
     def test_EditStructuredTextWithHTML(self):

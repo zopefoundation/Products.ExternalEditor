@@ -187,7 +187,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
             # WAAAA! Inject line to disable header munging.
             text = '\n%s' % text
 
-        self._edit(text_format, text, file='', safety_belt='')
+        self._edit(text_format, text, file, safety_belt)
 
     security.declarePrivate('guessFormat')
     def guessFormat(self, text):
