@@ -15,15 +15,17 @@
 $Id$
 """
 
-import Globals
-from Globals import HTMLFile, HTML
-from Products.CMFCore.PortalContent import PortalContent
+import string
+import urlparse
+
+from Globals import InitializeClass
+from AccessControl import ClassSecurityInfo
+
 from Products.CMFCore.utils import getToolByName
+from Products.CMFCore.CMFCorePermissions import View, ModifyPortalContent
+
 from DublinCore import DefaultDublinCoreImpl
 from Link import Link
-from Products.CMFCore import CMFCorePermissions
-from Products.CMFCore.WorkflowCore import WorkflowAction
-import string, urlparse
 
 factory_type_information = ( { 'id'             : 'Favorite'
                              , 'meta_type'      : 'Favorite'
@@ -37,20 +39,17 @@ A Favorite is a Link to an intra-portal resource."""
                                 ( { 'id'            : 'view'
                                   , 'name'          : 'View'
                                   , 'action'        : 'favorite_view'
-                                  , 'permissions'   : (
-                                      CMFCorePermissions.View, )
+                                  , 'permissions'   : ( View, )
                                   }
                                 , { 'id'            : 'edit'
                                   , 'name'          : 'Edit'
                                   , 'action'        : 'link_edit_form'
-                                  , 'permissions'   : (
-                                      CMFCorePermissions.ModifyPortalContent, )
+                                  , 'permissions'   : ( ModifyPortalContent, )
                                   }
                                 , { 'id'            : 'metadata'
                                   , 'name'          : 'Metadata'
                                   , 'action'        : 'metadata_edit_form'
-                                  , 'permissions'   : (
-                                      CMFCorePermissions.ModifyPortalContent, )
+                                  , 'permissions'   : ( ModifyPortalContent, )
                                   }
                                 )
                              }
@@ -78,6 +77,8 @@ class Favorite( Link ):
 
     meta_type='Favorite'
 
+    security = ClassSecurityInfo()
+
     def __init__( self
                 , id
                 , title=''
@@ -90,6 +91,7 @@ class Favorite( Link ):
         self.remote_url=remote_url
         self.description = description
 
+    security.declareProtected(View, 'getRemoteUrl')
     def getRemoteUrl(self):
         """
             returns the remote URL of the Link
@@ -100,6 +102,7 @@ class Favorite( Link ):
         else:
             return portal_url()
 
+    security.declareProtected(View, 'getIcon')
     def getIcon(self, relative_to_portal=0):
         """
         Instead of a static icon, like for Link objects, we want
@@ -110,6 +113,7 @@ class Favorite( Link ):
         except:
             return 'p_/broken'
 
+    security.declareProtected(View, 'getObject')
     def getObject(self):
         """
         Return the actual object that the Favorite is 
@@ -118,7 +122,8 @@ class Favorite( Link ):
         portal_url = getToolByName(self, 'portal_url')
         return portal_url.getPortalObject().restrictedTraverse(self.remote_url)
 
-    def edit( self, remote_url ):
+    security.declarePrivate('_edit')
+    def _edit( self, remote_url ):
         """
         Edit the Favorite. Unlike Links, Favorites have URLs that are
         relative to the root of the site.
@@ -135,12 +140,9 @@ class Favorite( Link ):
         if i==0:
             remote_url=remote_url[len(portal_url):]
         # if site is still absolute, make it relative
-        if remote_url[0]=='/':
+        if remote_url[:1]=='/':
             remote_url=remote_url[1:]
         self.remote_url=remote_url
 
-    edit=WorkflowAction(edit)
 
-
-Globals.default__class_init__(Link)
-
+InitializeClass(Favorite)

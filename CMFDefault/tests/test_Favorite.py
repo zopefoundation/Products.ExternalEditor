@@ -72,6 +72,14 @@ class FavoriteTests( TestCase ):
                         , '%s/portal_url' % self.tool.root )
         self.assertEqual( f.getIcon(), self.tool.getIcon() )
 
+    def test_editEmpty( self ):
+
+        f = self._makeOne( 'gnnn' )
+        f.edit( '' )
+        self.assertEqual( f.getObject(), self.site )
+        self.assertEqual( f.getRemoteUrl(), self.tool.root )
+        self.assertEqual( f.getIcon(), self.site.getIcon() )
+
 
 def test_suite():
     return TestSuite((
