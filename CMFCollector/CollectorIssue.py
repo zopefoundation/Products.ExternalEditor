@@ -242,7 +242,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
                                              submitter_name, submitter_email)
         if text is not None and text != transcript.text:
             changes.append('edited transcript')
-            transcript._edit(text_format=self.TRANSCRIPT_FORMAT, text=text)
+            transcript.edit(text_format=self.TRANSCRIPT_FORMAT, text=text)
         if changed('title', title):
             changes.append('revised title')
             self.title = title
@@ -284,7 +284,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         else:
             comment = ''
 
-        transcript._edit(self.TRANSCRIPT_FORMAT,
+        transcript.edit(self.TRANSCRIPT_FORMAT,
                          self._entry_header('Edit', username)
                          + "\n\n"
                          + " Changes: " + ", ".join(changes)
@@ -358,7 +358,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
 
         comment_header_str = "\n\n".join(comment_header) + "\n\n"
 
-        transcript._edit(self.TRANSCRIPT_FORMAT,
+        transcript.edit(self.TRANSCRIPT_FORMAT,
                          comment_header_str
                          + comment
                          + ((action_number > 1)

@@ -69,7 +69,7 @@ def collector_webtext_migration(self):
             text = text.replace('\n<hr>\n', '\n' + RULE + '\n')
             
             transcript.text = text      # Ditch garbage
-            transcript._edit('webtext', text)      # Cook the text.
+            transcript.edit('webtext', text)      # Cook the text.
             transcript._p_mtime = was_p_mtime
             transcript.creation_date = was_creation_date
             transcript.meta_type = "Collector Issue Transcript"

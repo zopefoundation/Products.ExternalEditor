@@ -100,8 +100,8 @@ class WebTextDocument(Document):
         else:
             return Document.guessFormat(self, text)
 
-    def _edit(self, text_format, text, file='', safety_belt=''):
-        got = Document._edit(self, text_format or self.text_format,
+    def edit(self, text_format, text, file='', safety_belt=''):
+        got = Document.edit(self, text_format or self.text_format,
                              text=text, file=file, safety_belt=safety_belt)
         # The document stubbornly insists on a text format it likes, despite
         # our explicit specification - set it back:
