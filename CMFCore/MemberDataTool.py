@@ -96,7 +96,7 @@ from OFS.PropertyManager import PropertyManager
 from Globals import Acquisition, Persistent, DTMLFile
 import Globals
 from AccessControl.Role import RoleManager
-from BTree import BTree
+from BTrees.OOBTree import OOBTree
 from ZPublisher.Converters import type_converters
 from Acquisition import aq_inner, aq_parent, aq_base
 from AccessControl import ClassSecurityInfo
@@ -143,7 +143,7 @@ class MemberDataTool (UniqueObject, SimpleItem, PropertyManager):
 
 
     def __init__(self):
-        self._members = BTree()
+        self._members = OOBTree()
         # Create the default properties.
         self._setProperty('email', '', 'string')
         self._setProperty('portal_skin', '', 'string')
