@@ -57,7 +57,7 @@ class SkinsContainer:
         """ Get a skin at the given path.
         """
         baseself = aq_base(self)
-        skinob = baseself
+        skinob = None
         parts = list( path.split(',') )
         parts.reverse()
         for part_path in parts:
@@ -83,7 +83,11 @@ class SkinsContainer:
                 # Build the final skinob by creating an object
                 # that puts the former skinob in the context
                 # of the new skinob.
-                skinob = partob.__of__(skinob)
+                partob = aq_base(partob)
+                if skinob is None:
+                    skinob = partob
+                else:
+                    skinob = partob.__of__(skinob)
         return skinob
 
     security.declarePrivate('getSkinByName')

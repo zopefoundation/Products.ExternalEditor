@@ -169,6 +169,10 @@ CMF 1.5alpha (unreleased)
 
   Bug Fixes
 
+    - SkinsContainer: Fixed context wrappers returned by getSkinByPath().
+      The original context of skin folders is now removed. This avoids having
+      SkinTool attributes added to the CMFSite root object.
+
     - CatalogTool: Removed deprecated 'id' from default indexes and metadata.
 
     - Skins: Fixed a DateTime related issue in search_form and doFormSearch.
