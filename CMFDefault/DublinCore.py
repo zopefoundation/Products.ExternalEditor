@@ -309,7 +309,7 @@ class DefaultDublinCoreImpl( PropertyManager ):
         """
         hdrlist = []
         hdrlist.append( ( 'Title', self.Title() ) )
-        hdrlist.append( ( 'Subject', string.join( self.Subject() ) ) )
+        hdrlist.append( ( 'Subject', string.join( self.Subject(), ', ' ) ) )
         hdrlist.append( ( 'Publisher', self.Publisher() ) )
         hdrlist.append( ( 'Description', self.Description() ) )
         hdrlist.append( ( 'Contributors', string.join(
