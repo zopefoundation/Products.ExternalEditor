@@ -1,6 +1,12 @@
 from unittest import TestCase, TestSuite, makeSuite, main
 
+import Testing
 import Zope
+try:
+    Zope.startup()
+except AttributeError:
+    # for Zope versions before 2.6.1
+    pass
 try:
     from Interface.Verify import verifyClass
 except ImportError:

@@ -13,11 +13,9 @@ except ImportError:
     # for Zope versions before 2.6.0
     from Interface import verify_class_implementation as verifyClass
 
-from Products.CMFCore.tests.base.dummy import \
-     DummyContent
-
-from Products.CMFCore.CatalogTool import IndexableObjectWrapper
 from Products.CMFCore.CatalogTool import CatalogTool
+from Products.CMFCore.CatalogTool import IndexableObjectWrapper
+from Products.CMFCore.tests.base.dummy import DummyContent
 
 
 class IndexableObjectWrapperTests(TestCase):

@@ -1,18 +1,27 @@
 from unittest import TestCase, TestSuite, makeSuite, main
 
+import Testing
 import Zope
-from Acquisition import aq_base
+try:
+    Zope.startup()
+except AttributeError:
+    # for Zope versions before 2.6.1
+    pass
 try:
     from Interface.Verify import verifyClass
 except ImportError:
     # for Zope versions before 2.6.0
     from Interface import verify_class_implementation as verifyClass
 
-from Products.CMFDefault.MetadataTool import \
-     MetadataElementPolicy, MetadataTool, ElementSpec, \
-     DEFAULT_ELEMENT_SPECS, MetadataError
+from Acquisition import aq_base
 
 from Products.CMFDefault.DublinCore import DefaultDublinCoreImpl
+from Products.CMFDefault.MetadataTool import DEFAULT_ELEMENT_SPECS
+from Products.CMFDefault.MetadataTool import ElementSpec
+from Products.CMFDefault.MetadataTool import MetadataElementPolicy
+from Products.CMFDefault.MetadataTool import MetadataError
+from Products.CMFDefault.MetadataTool import MetadataTool
+
 
 class TestMetadataElementPolicy( TestCase ):
 
@@ -83,6 +92,7 @@ class TestElementSpec( TestCase ):
         assert len( policies ) == 1
         assert policies[0][0] is None
 
+
 class Foo( DefaultDublinCoreImpl ):
 
     description = title = language = format = rights = ''
@@ -94,10 +104,12 @@ class Foo( DefaultDublinCoreImpl ):
     def getPortalTypeName( self ):
         return 'Foo'
 
+
 class Bar( Foo ):
 
     def getPortalTypeName( self ):
         return 'Bar'
+
 
 class TestMetadataTool( TestCase ):
 
@@ -137,7 +149,7 @@ class TestMetadataTool( TestCase ):
             pass
         else:
             assert 0, "Expected KeyError"
-        
+
         assert not self.tool.listAllowedSubjects()
         assert not self.tool.listAllowedFormats()
         assert not self.tool.listAllowedLanguages()
@@ -270,7 +282,7 @@ class TestMetadataTool( TestCase ):
         formats = ( 'text/plain', 'text/html' )
         fDef.edit( 0, 0, '', 0, ( 'text/plain', 'text/html' ) )
         assert self.tool.listAllowedFormats() == formats
-        
+
         foo = Foo()
         assert self.tool.listAllowedFormats( foo ) == formats
         fSpec.addPolicy( 'Foo' )

@@ -8,12 +8,15 @@ except AttributeError:
     # for Zope versions before 2.6.1
     pass
 
+from os.path import join
+from sys import exc_info
+from thread import start_new_thread
+from time import sleep
+
 from OFS.Folder import Folder
+
 from Products.CMFCore.FSPythonScript import FSPythonScript
 from Products.CMFCore.tests.base.testcase import FSDVTest
-from os.path import join
-import sys, time
-from thread import start_new_thread
 
 
 class FSPythonScriptTests( FSDVTest ):
@@ -36,12 +39,12 @@ class FSPythonScriptTests( FSDVTest ):
                 try:
                     res.append(script())
                 except:
-                    res.append('%s: %s' % sys.exc_info()[:2])
+                    res.append('%s: %s' % exc_info()[:2])
 
             start_new_thread(call_script, ())
             call_script()
             while len(res) < 2:
-                time.sleep(0.05)
+                sleep(0.05)
             self.assertEqual(res, ['test1', 'test1'], res)
 
 

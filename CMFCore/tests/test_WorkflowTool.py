@@ -1,5 +1,6 @@
 from unittest import TestCase, TestSuite, makeSuite, main
 
+import Testing
 import Zope
 try:
     Zope.startup()
@@ -24,6 +25,7 @@ class Dummy( SimpleItem ):
 
     def getId( self ):
         return self._id
+
 
 class DummyWorkflow( Dummy ):
 
@@ -100,13 +102,16 @@ class DummyContent( Dummy ):
     _isPortalContent = 1
     def _getPortalTypeName(self): return 'Dummy Content'
 
+
 class DummyNotReallyContent( Dummy ):
 
     meta_type = 'Dummy Content'
 
+
 class DummyTypeInfo( Dummy ):
 
     pass
+
 
 class DummyTypesTool( SimpleItem ):
 

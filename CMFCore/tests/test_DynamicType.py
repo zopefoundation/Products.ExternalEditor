@@ -1,5 +1,6 @@
 from unittest import TestCase, TestSuite, makeSuite, main
 
+import Testing
 import Zope
 try:
     Zope.startup()
@@ -11,6 +12,7 @@ try:
 except ImportError:
     # for Zope versions before 2.6.0
     from Interface import verify_class_implementation as verifyClass
+
 from Acquisition import Implicit
 from ZPublisher.BaseRequest import BaseRequest
 from ZPublisher.HTTPResponse import HTTPResponse

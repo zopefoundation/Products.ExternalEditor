@@ -10,19 +10,18 @@ except AttributeError:
 
 from DateTime import DateTime
 
+from Products.CMFCore.CatalogTool import CatalogTool
+from Products.CMFCore.PortalFolder import ContentFilter
+from Products.CMFCore.PortalFolder import PortalFolder
 from Products.CMFCore.tests.base.dummy import DummyContent
 from Products.CMFCore.tests.base.dummy import DummyFactory
 from Products.CMFCore.tests.base.dummy import DummyFTI
-from Products.CMFCore.tests.base.testcase import SecurityTest
-from Products.CMFCore.tests.base.testcase import newSecurityManager
-from Products.CMFCore.tests.base.utils import has_path
 from Products.CMFCore.tests.base.security import OmnipotentUser
-
-from Products.CMFCore.TypesTool import TypesTool
+from Products.CMFCore.tests.base.testcase import newSecurityManager
+from Products.CMFCore.tests.base.testcase import SecurityTest
+from Products.CMFCore.tests.base.utils import has_path
 from Products.CMFCore.TypesTool import FactoryTypeInformation as FTI
-from Products.CMFCore.CatalogTool import CatalogTool
-from Products.CMFCore.PortalFolder import PortalFolder
-from Products.CMFCore.PortalFolder import ContentFilter
+from Products.CMFCore.TypesTool import TypesTool
 
 def extra_meta_types():
     return [  { 'name' : 'Dummy', 'action' : 'manage_addFolder' } ]

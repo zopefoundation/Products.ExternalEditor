@@ -1,6 +1,6 @@
 from unittest import TestCase, TestSuite, makeSuite, main
-from types import StringType
 
+import Testing
 import Zope
 try:
     Zope.startup()
@@ -12,6 +12,8 @@ try:
 except ImportError:
     # for Zope versions before 2.6.0
     from Interface import verify_class_implementation as verifyClass
+
+from types import StringType
 
 from Products.CMFCore.TypesTool import TypesTool
 from Products.CMFCore.PortalFolder import PortalFolder
@@ -237,7 +239,8 @@ class ManageBeforeAfterTests(SecurityTest):
         self.assertEqual(dummy.isNotifiedByAfterAdd(), 2)
         self.assertEqual(dummy.isNotifiedByAfterClone(), 1)
         self.failIf(dummy.isNotifiedByBeforeDelete())
-        
+
+
 def test_suite():
     return TestSuite((
         makeSuite(ManageBeforeAfterTests),

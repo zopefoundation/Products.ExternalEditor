@@ -20,24 +20,20 @@ from AccessControl.SecurityManagement import newSecurityManager
 from AccessControl.SecurityManagement import noSecurityManager
 from AccessControl.SecurityManager import setSecurityPolicy
 from Acquisition import aq_base
-from webdav.NullResource import NullResource
 from Products.PythonScripts.PythonScript import PythonScript
 from Products.PythonScripts.standard import url_quote
+from webdav.NullResource import NullResource
 
 from Products.CMFCore.ActionInformation import ActionInformation
-from Products.CMFCore.TypesTool import FactoryTypeInformation as FTI
-from Products.CMFCore.TypesTool import ScriptableTypeInformation as STI
-from Products.CMFCore.TypesTool import TypesTool
 from Products.CMFCore.PortalFolder import PortalFolder
-from Products.CMFCore.utils import _getViewFor
-
-from Products.CMFCore.tests.base.security import OmnipotentUser
-from Products.CMFCore.tests.base.security import UserWithRoles
 from Products.CMFCore.tests.base.dummy import DummyFactory
 from Products.CMFCore.tests.base.dummy import DummyFolder
 from Products.CMFCore.tests.base.dummy import DummyObject
 from Products.CMFCore.tests.base.dummy import DummySite
 from Products.CMFCore.tests.base.dummy import DummyUserFolder
+from Products.CMFCore.tests.base.security import OmnipotentUser
+from Products.CMFCore.tests.base.security import UserWithRoles
+from Products.CMFCore.tests.base.testcase import SecurityTest
 from Products.CMFCore.tests.base.tidata import FTIDATA_ACTIONS
 from Products.CMFCore.tests.base.tidata import FTIDATA_CMF13
 from Products.CMFCore.tests.base.tidata import FTIDATA_CMF13_FOLDER
@@ -48,7 +44,10 @@ from Products.CMFCore.tests.base.tidata import FTIDATA_CMF14_SPECIAL2
 from Products.CMFCore.tests.base.tidata import FTIDATA_CMF15
 from Products.CMFCore.tests.base.tidata import FTIDATA_DUMMY
 from Products.CMFCore.tests.base.tidata import STI_SCRIPT
-from Products.CMFCore.tests.base.testcase import SecurityTest
+from Products.CMFCore.TypesTool import FactoryTypeInformation as FTI
+from Products.CMFCore.TypesTool import ScriptableTypeInformation as STI
+from Products.CMFCore.TypesTool import TypesTool
+from Products.CMFCore.utils import _getViewFor
 
 
 class TypesToolTests(SecurityTest):
@@ -60,7 +59,7 @@ class TypesToolTests(SecurityTest):
         self.ttool = self.site._setObject( 'portal_types', TypesTool() )
         fti = FTIDATA_DUMMY[0].copy()
         self.ttool._setObject( 'Dummy Content', FTI(**fti) )
- 
+
     def test_processActions( self ):
         """
         Are the correct, permitted methods returned for actions?
@@ -143,7 +142,7 @@ def test_interface(self):
 
 
 class TypeInfoTests(TestCase):
-    
+
     def test_construction( self ):
         ti = self._makeInstance( 'Foo'
                                , description='Description'
@@ -167,9 +166,9 @@ class TypeInfoTests(TestCase):
         t = self._makeInstance(id, **kw)
         tool._setObject(id,t)
         return tool[id]
-              
+
     def test_allowType( self ):
-        self.tool = TypesTool()        
+        self.tool = TypesTool()
         ti = self._makeAndSetInstance( 'Foo' )
         self.failIf( ti.allowType( 'Foo' ) )
         self.failIf( ti.allowType( 'Bar' ) )
@@ -180,9 +179,8 @@ class TypeInfoTests(TestCase):
         ti = self._makeAndSetInstance( 'Foo3', filter_content_types=0 )
         self.failUnless( ti.allowType( 'Foo3' ) )
 
-    
     def test_GlobalHide( self ):
-        self.tool = TypesTool()        
+        self.tool = TypesTool()
         tnf = self._makeAndSetInstance( 'Folder', filter_content_types=0)
         taf = self._makeAndSetInstance( 'Allowing Folder'
                                       , allowed_content_types=( 'Hidden'
@@ -205,7 +203,6 @@ class TypeInfoTests(TestCase):
                                        )
         self.failUnless ( taf2.allowType( 'Hidden' ) )
         self.failUnless ( taf2.allowType( 'Not Hidden') )
-        
 
     def test_allowDiscussion( self ):
         ti = self._makeInstance( 'Foo' )
@@ -234,7 +231,7 @@ class TypeInfoTests(TestCase):
         self.failUnless( 'Object Properties' in names )
         self.failIf( 'slot' in names )
         self.failUnless( 'Slot' in names )
-        
+
         visible = [ x.getId() for x in actions if x.getVisibility() ]
         self.failUnless( 'view' in visible )
         self.failUnless( 'edit' in visible )
@@ -253,16 +250,16 @@ class TypeInfoTests(TestCase):
         self.assertEqual( id( ti.getActionById( 'foo', marker ) )
                         , id( marker ) )
         self.assertRaises( ValueError, ti.getActionById, 'foo' )
-        
+
         action = ti.getActionById( 'view' )
         self.assertEqual( action, '' )
-        
+
         action = ti.getActionById( 'edit' )
         self.assertEqual( action, 'foo_edit' )
-        
+
         action = ti.getActionById( 'objectproperties' )
         self.assertEqual( action, 'foo_properties' )
-        
+
         action = ti.getActionById( 'slot' )
         self.assertEqual( action, 'foo_slot' )
 
@@ -426,7 +423,7 @@ class FTIDataTests( TypeInfoTests ):
                 import ContentTypeInformation as ITypeInformation
 
         verifyClass(ITypeInformation, FTI)
-        
+
 
 class STIDataTests( TypeInfoTests ):
 
@@ -450,7 +447,7 @@ class STIDataTests( TypeInfoTests ):
                 import ContentTypeInformation as ITypeInformation
 
         verifyClass(ITypeInformation, STI)
-        
+
 
 class FTIConstructionTests(TestCase):
 
@@ -508,7 +505,7 @@ class FTIConstructionTests_w_Roles(TestCase):
                   , factory='addFoo'
                   )
         folder = DummyFolder( fake_product=1,prefix=prefix )
-        
+
         return ti, folder
 
     def test_isConstructionAllowed_for_Omnipotent( self ):

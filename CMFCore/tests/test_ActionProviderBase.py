@@ -1,5 +1,6 @@
 from unittest import TestCase, TestSuite, makeSuite, main
 
+import Testing
 import Zope
 try:
     Zope.startup()
@@ -52,7 +53,7 @@ class DummyAction:
 
 
 class ActionProviderBaseTests(SecurityRequestTest):
-    
+
     def setUp( self ):
         SecurityRequestTest.setUp(self)
         self.site = DummySite('site').__of__(self.root)

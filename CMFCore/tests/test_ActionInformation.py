@@ -1,5 +1,6 @@
 from unittest import TestSuite, makeSuite, main
 
+import Testing
 import Zope
 try:
     Zope.startup()

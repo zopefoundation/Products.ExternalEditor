@@ -8,14 +8,15 @@ except AttributeError:
     # for Zope versions before 2.6.1
     pass
 
-from Products.CMFCore.tests.base.dummy import DummyFolder
-from Products.CMFCore.tests.base.testcase import FSDVTest
-from Products.CMFCore.tests.base.testcase import _prefix
+from os import remove, mkdir, rmdir
+from os.path import join
 
 from Globals import DevelopmentMode
 
-from os import remove, mkdir, rmdir
-from os.path import join
+from Products.CMFCore.tests.base.dummy import DummyFolder
+from Products.CMFCore.tests.base.testcase import _prefix
+from Products.CMFCore.tests.base.testcase import FSDVTest
+
 
 class DirectoryViewPathTests( TestCase ):
     """
@@ -24,65 +25,64 @@ class DirectoryViewPathTests( TestCase ):
     and only do nothing in the case where an appropriate skin
     can't be found.
     """
-    
+
     def setUp(self):
         from Products.CMFCore.DirectoryView import registerDirectory
         from Products.CMFCore.DirectoryView import addDirectoryViews
         registerDirectory('fake_skins', _prefix)
         self.ob = DummyFolder()
-        addDirectoryViews(self.ob, 'fake_skins', _prefix)        
-        
+        addDirectoryViews(self.ob, 'fake_skins', _prefix)
 
     # These, in effect, test the minimalpath and expandpath functions
     # from CMFCore.utils in combination. See DirectoryView.py for details
-    
+
     def test_getDirectoryInfo1( self ):
         """ windows INSTANCE_HOME  """
-        self.ob.fake_skin.manage_properties(r'Products\CMFCore\tests\fake_skins\fake_skin')        
+        self.ob.fake_skin.manage_properties(r'Products\CMFCore\tests\fake_skins\fake_skin')
         self.failUnless(hasattr(self.ob.fake_skin,'test1'),self.ob.fake_skin.getDirPath())
 
     def test_getDirectoryInfo2( self ):
         """ windows SOFTWARE_HOME  """
-        self.ob.fake_skin.manage_properties(r'C:\Zope\2.5.1\Products\CMFCore\tests\fake_skins\fake_skin')        
+        self.ob.fake_skin.manage_properties(r'C:\Zope\2.5.1\Products\CMFCore\tests\fake_skins\fake_skin')
         self.failUnless(hasattr(self.ob.fake_skin,'test1'),self.ob.fake_skin.getDirPath())
 
     def test_getDirectoryInfo3( self ):
         """ *nix INSTANCE_HOME  """
-        self.ob.fake_skin.manage_properties('Products/CMFCore/tests/fake_skins/fake_skin')        
+        self.ob.fake_skin.manage_properties('Products/CMFCore/tests/fake_skins/fake_skin')
         self.failUnless(hasattr(self.ob.fake_skin,'test1'),self.ob.fake_skin.getDirPath())
 
     def test_getDirectoryInfo4( self ):
         """ *nix SOFTWARE_HOME  """
-        self.ob.fake_skin.manage_properties('/usr/local/zope/2.5.1/Products/CMFCore/tests/fake_skins/fake_skin')        
+        self.ob.fake_skin.manage_properties('/usr/local/zope/2.5.1/Products/CMFCore/tests/fake_skins/fake_skin')
         self.failUnless(hasattr(self.ob.fake_skin,'test1'),self.ob.fake_skin.getDirPath())
 
     # These tests cater for the common name scheme for PRODUCTS_PATH of something_PRODUCTS
     def test_getDirectoryInfo5( self ):
         """ windows PRODUCTS_PATH  """
-        from tempfile import mktemp        
+        from tempfile import mktemp
         self.ob.fake_skin.manage_properties(mktemp()+r'Products\CMFCore\tests\fake_skins\fake_skin')
         self.failUnless(hasattr(self.ob.fake_skin,'test1'),self.ob.fake_skin.getDirPath())
 
     def test_getDirectoryInfo6( self ):
         """ linux PRODUCTS_PATH  """
-        from tempfile import mktemp        
+        from tempfile import mktemp
         self.ob.fake_skin.manage_properties(mktemp()+'Products/CMFCore/tests/fake_skins/fake_skin')
         self.failUnless(hasattr(self.ob.fake_skin,'test1'),self.ob.fake_skin.getDirPath())
 
     # second 'Products' in path
     def test_getDirectoryInfo7( self ):
-        self.ob.fake_skin.manage_properties(r'C:\CoolProducts\Zope\2.5.1\Products\CMFCore\tests\fake_skins\fake_skin')        
+        self.ob.fake_skin.manage_properties(r'C:\CoolProducts\Zope\2.5.1\Products\CMFCore\tests\fake_skins\fake_skin')
         self.failUnless(hasattr(self.ob.fake_skin,'test1'),self.ob.fake_skin.getDirPath())
 
     # Test we do nothing if given a really wacky path
     def test_UnhandleableExpandPath( self ):
-        from tempfile import mktemp        
+        from tempfile import mktemp
         self.ob.fake_skin.manage_properties(mktemp())
         self.assertEqual(self.ob.fake_skin.objectIds(),[])
-        
+
     def test_UnhandleableMinimalPath( self ):
-        from Products.CMFCore.utils import minimalpath,normalize      
-        from tempfile import mktemp        
+        from Products.CMFCore.utils import minimalpath, normalize
+        from tempfile import mktemp
         weirdpath = mktemp()
         # we need to normalize 'cos minimalpath does, btu we're not testing normalize in this unit test.
         self.assertEqual(normalize(weirdpath),minimalpath(weirdpath))
@@ -95,12 +95,13 @@ class DirectoryViewPathTests( TestCase ):
         from os.path import join
         self.failUnless(_dirreg._directories.has_key(join('CMFCore','tests','fake_skins','fake_skin')),_dirreg._directories.keys())
         self.assertEqual(self.ob.fake_skin.getDirPath(),join('CMFCore','tests','fake_skins','fake_skin'))
-    
+
+
 class DirectoryViewTests( FSDVTest ):
 
     def setUp( self ):
         FSDVTest.setUp(self)
-        self._registerDirectory(self)        
+        self._registerDirectory(self)
 
     def test_addDirectoryViews( self ):
         """ Test addDirectoryViews  """
@@ -137,7 +138,7 @@ if DevelopmentMode:
         self.test1path = join(self.skin_path_name,'test1.py')
         self.test2path = join(self.skin_path_name,'test2.py')
         self.test3path = join(self.skin_path_name,'test3')
-        
+
         # initialise skins
         self._registerDirectory(self)
 
@@ -149,7 +150,7 @@ if DevelopmentMode:
 
         # add a new folder
         mkdir(self.test3path)
-        
+
     def test_AddNewMethod( self ):
         """
         See if a method added to the skin folder can be found
@@ -186,20 +187,19 @@ if DevelopmentMode:
         """
         remove(self.test2path)
         self.failIf(hasattr(self.ob.fake_skin,'test2'))
-            
+
         # add method back to the fake skin folder
         self._writeFile(self.test2path, "return 'test2.2'")
-        
+
         # check
         self.assertEqual(self.ob.fake_skin.test2(),'test2.2')
 
-        
         # edit method
         self._writeFile(self.test2path, "return 'test2.3'")
 
         # check
         self.assertEqual(self.ob.fake_skin.test2(),'test2.3')
-        
+
     def test_DeleteFolder( self ):
         """
         Make sure a deleted folder goes away
@@ -212,6 +212,7 @@ else:
     class DebugModeTests( TestCase ):
         pass
 
+
 def test_suite():
     return TestSuite((
         makeSuite(DirectoryViewPathTests),
@@ -221,7 +222,3 @@ def test_suite():
 
 if __name__ == '__main__':
     main(defaultTest='test_suite')
-
-
-
-

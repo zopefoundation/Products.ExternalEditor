@@ -1,5 +1,6 @@
 from unittest import TestSuite, makeSuite, main
 
+import Testing
 import Zope
 try:
     Zope.startup()
@@ -8,6 +9,7 @@ except AttributeError:
     pass
 
 from Products.CMFCore.tests.base.testcase import TransactionalTest
+
 
 class MembershipTests( TransactionalTest ):
 
@@ -33,6 +35,7 @@ class MembershipTests( TransactionalTest ):
                           'zzyyzz',
                           properties={'username':'test_user', 'email': ''}
                           )
+
 
 def test_suite():
     return TestSuite((

@@ -28,7 +28,7 @@ class FSFileTests( RequestTest, FSDVTest):
     def _makeOne( self, id, filename ):
 
         from Products.CMFCore.FSFile import FSFile
-        
+
         return FSFile( id, path_join(self.skin_path_name, filename) )
 
     def _extractFile( self ):
@@ -78,7 +78,6 @@ class FSFileTests( RequestTest, FSDVTest):
         self.assertEqual( self.RESPONSE.getHeader( 'Last-Modified'.lower() )
                         , rfc1123_date( mod_time ) )
 
-
     def test_index_html_with_304( self ):
 
         path, ref = self._extractFile()
@@ -98,7 +97,6 @@ class FSFileTests( RequestTest, FSDVTest):
 
         self.assertEqual( data, '' )
         self.assertEqual( self.RESPONSE.getStatus(), 304 )
-
 
     def test_index_html_without_304( self ):
 

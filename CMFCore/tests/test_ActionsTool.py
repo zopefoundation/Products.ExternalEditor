@@ -1,5 +1,6 @@
 from unittest import TestSuite, makeSuite, main
 
+import Testing
 import Zope
 try:
     Zope.startup()
@@ -12,17 +13,15 @@ except ImportError:
     # for Zope versions before 2.6.0
     from Interface import verify_class_implementation as verifyClass
 
-from Products.CMFCore.tests.base.testcase import \
-     SecurityRequestTest
-
-from Products.CMFCore.ActionsTool import ActionsTool
-from Products.CMFCore.TypesTool import TypesTool
-from Products.CMFCore.PortalFolder import PortalFolder
 from Products.CMFCore.ActionInformation import ActionInformation
+from Products.CMFCore.ActionsTool import ActionsTool
 from Products.CMFCore.Expression import Expression
-from Products.CMFCore.URLTool import URLTool
-from Products.CMFCore.RegistrationTool import RegistrationTool
 from Products.CMFCore.MembershipTool import MembershipTool
+from Products.CMFCore.PortalFolder import PortalFolder
+from Products.CMFCore.RegistrationTool import RegistrationTool
+from Products.CMFCore.tests.base.testcase import SecurityRequestTest
+from Products.CMFCore.TypesTool import TypesTool
+from Products.CMFCore.URLTool import URLTool
 
 
 class ActionsToolTests( SecurityRequestTest ):

@@ -1,28 +1,34 @@
 ##############################################################################
 #
 # Copyright (c) 2002 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
-
 """ Unit / functional tests for a CMFSite.
 
 $Id$
 """
 
-import unittest
+from unittest import TestSuite, makeSuite, main
 
-import Zope     # product initialization
+import Testing
+import Zope
+try:
+    Zope.startup()
+except AttributeError:
+    # for Zope versions before 2.6.1
+    pass
+
+from Acquisition import aq_base
 
 from Products.CMFCore.tests.base.testcase import SecurityRequestTest
 
-from Acquisition import aq_base
 
 class CMFSiteTests( SecurityRequestTest ):
 
@@ -170,15 +176,11 @@ def _getMetadata( catalog, rid, field='Title' ):
     md = catalog.getMetadataForRID( rid )
     return md[ field ]
 
+
 def test_suite():
-
-    suite = unittest.TestSuite()
-
-    suite.addTest( unittest.makeSuite( CMFSiteTests ) )
-
-    return suite
-
+    return TestSuite((
+        makeSuite(CMFSiteTests),
+        ))
 
 if __name__ == '__main__':
-
-    unittest.main( defaultTest = 'test_suite' )
+    main(defaultTest='test_suite')

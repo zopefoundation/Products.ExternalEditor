@@ -29,7 +29,7 @@ class FSPageTemplateTests( RequestTest, FSPTMaker ):
     def setUp(self):
         FSPTMaker.setUp(self)
         RequestTest.setUp(self)
-    
+
     def tearDown(self):
         RequestTest.tearDown(self)
         FSPTMaker.tearDown(self)
@@ -39,7 +39,7 @@ class FSPageTemplateTests( RequestTest, FSPTMaker ):
         script = self._makeOne( 'testPT', 'testPT.pt' )
         script = script.__of__(self.root)
         self.assertEqual(script(),'foo\n')
-        
+
     def test_ContentType(self):
         script = self._makeOne( 'testXMLPT', 'testXMLPT.pt' )
         script = script.__of__(self.root)
