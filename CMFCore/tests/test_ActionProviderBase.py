@@ -20,6 +20,20 @@ class DummyProvider( ActionProviderBase ):
                                   , visible=0
                                   ), )
 
+class DummyAction:
+
+    def __init__( self, value ):
+        self.value = value
+
+    def clone( self ):
+        return self.__class__( self.value )
+
+    def __cmp__( self, other ):
+        return ( cmp( type( self ), type( other ) )
+              or cmp( self.__class__, other.__class__ )
+              or cmp( self.value, other.value )
+              or 0
+               )
 
 class ActionProviderBaseTests(unittest.TestCase):
     
@@ -96,10 +110,10 @@ class ActionProviderBaseTests(unittest.TestCase):
     def test_deleteActions( self ):
 
         apb = self._makeProvider()
-        apb._actions = [ '0', '1', '2' ]  # fake out for testing
+        apb._actions = tuple( map( DummyAction, [ '0', '1', '2' ] ) )
         apb.deleteActions( selections=(0,2) )
         self.assertEqual( len( apb._actions ), 1 )
-        self.failUnless( '1' in apb._actions )
+        self.failUnless( DummyAction('1') in apb._actions )
 
     def test_DietersNastySharingBug( self ):
 

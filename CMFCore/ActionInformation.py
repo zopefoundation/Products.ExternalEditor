@@ -138,6 +138,22 @@ class ActionInformation( SimpleItem ):
         """
         return self.visible
 
+    security.declarePrivate( 'clone' )
+    def clone( self ):
+
+        """ Return a newly-created AI just like us.
+        """
+        return self.__class__( id=self.id
+                             , title=self.title
+                             , description=self.description
+                             , category =self.category
+                             , condition=self.condition
+                             , permissions=self.permissions
+                             , priority =self.priority
+                             , visible=self.visible
+                             , action=self.action
+                             )
+
 InitializeClass( ActionInformation )
 
 class oai:

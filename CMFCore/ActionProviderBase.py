@@ -40,6 +40,9 @@ class ActionProviderBase:
                      , 
                      )
 
+    #
+    #   ActionProvider interface
+    #
     security.declarePrivate( 'listActions' )
     def listActions( self, info=None ):
 
@@ -47,6 +50,9 @@ class ActionProviderBase:
         """
         return self._actions or None
 
+    #
+    #   ZMI methods
+    #
     security.declareProtected( ManagePortal, 'manage_editActionsForm' )
     def manage_editActionsForm( self, REQUEST, manage_tabs_message=None ):
 
@@ -107,23 +113,129 @@ class ActionProviderBase:
         c_expr = condition and Expression(text=str(condition)) or ''
         perm = permission and (str(permission),) or ()
 
-        info = ActionInformation( id=str(id)
-                                , title=str(name)
-                                , action=a_expr
-                                , condition=c_expr
-                                , permissions=perm
-                                , category=str(category)
-                                , visible=int(visible)
-                                )
+        new_actions = self._cloneActions()
 
-        al = list( self._actions )
-        al.append( info )
-        self._actions = tuple( al )
+        new_action = ActionInformation( id=str(id)
+                                      , title=str(name)
+                                      , action=a_expr
+                                      , condition=c_expr
+                                      , permissions=perm
+                                      , category=str(category)
+                                      , visible=int(visible)
+                                      )
+
+        new_actions.append( new_action )
+        self._actions = tuple( new_actions )
 
         if REQUEST is not None:
             return self.manage_editActionsForm(
                 REQUEST, manage_tabs_message='Added.')
-    
+
+    security.declareProtected( ManagePortal, 'changeActions' )
+    def changeActions( self, properties=None, REQUEST=None ):
+
+        """ Update our list of actions.
+        """
+        if properties is None:
+            properties = REQUEST
+
+        actions = []
+
+        for index in range( len( self._actions ) ):
+            actions.append( self._extractAction( properties, index ) )
+
+        self._actions = tuple( actions )
+
+        if REQUEST is not None:
+            return self.manage_editActionsForm(REQUEST, manage_tabs_message=
+                                               'Actions changed.')
+
+    security.declareProtected( ManagePortal, 'deleteActions' )
+    def deleteActions( self, selections=(), REQUEST=None ):
+
+        """ Delete actions indicated by indexes in 'selections'.
+        """
+        sels = list( map( int, selections ) )  # Convert to a list of integers.
+
+        old_actions = self._cloneActions()
+        new_actions = []
+
+        for index in range( len( old_actions ) ):
+            if index not in sels:
+                new_actions.append( old_actions[ index ] )
+
+        self._actions = tuple( new_actions )
+
+        if REQUEST is not None:
+            return self.manage_editActionsForm(
+                REQUEST, manage_tabs_message=(
+                'Deleted %d action(s).' % len(sels)))
+
+    security.declareProtected( ManagePortal, 'moveUpActions' )
+    def moveUpActions( self, selections=(), REQUEST=None ):
+
+        """ Move the specified actions up one slot in our list.
+        """
+        sels = list( map( int, selections ) )  # Convert to a list of integers.
+        sels.sort()
+
+        new_actions = self._cloneActions()
+
+        for idx in sels:
+            idx2 = idx - 1
+            if idx2 < 0:
+                # Wrap to the bottom.
+                idx2 = len(new_actions) - 1
+            # Swap.
+            a = new_actions[idx2]
+            new_actions[idx2] = new_actions[idx]
+            new_actions[idx] = a
+
+        self._actions = tuple( actions )
+
+        if REQUEST is not None:
+            return self.manage_editActionsForm(
+                REQUEST, manage_tabs_message=(
+                'Moved up %d action(s).' % len(sels)))
+
+    security.declareProtected( ManagePortal, 'moveDownActions' )
+    def moveDownActions( self, selections=(), REQUEST=None ):
+
+        """ Move the specified actions down one slot in our list.
+        """
+        sels = list( map( int, selections ) )  # Convert to a list of integers.
+        sels.sort()
+        sels.reverse()
+
+        new_actions = self._cloneActions()
+
+        for idx in sels:
+            idx2 = idx + 1
+            if idx2 >= len(new_actions):
+                # Wrap to the top.
+                idx2 = 0
+            # Swap.
+            a = actions[idx2]
+            new_actions[idx2] = new_actions[idx]
+            new_actions[idx] = a
+
+        self._actions = tuple( new_actions )
+
+        if REQUEST is not None:
+            return self.manage_editActionsForm(
+                REQUEST, manage_tabs_message=(
+                'Moved down %d action(s).' % len(sels)))
+
+    #
+    #   Helper methods
+    #
+    security.declarePrivate( '_cloneActions' )
+    def _cloneActions( self ):
+
+        """ Return a list of actions, cloned from our current list.
+        """
+        return map( lambda x: x.clone(), list( self._actions ) )
+ 
     security.declarePrivate( '_extractAction' )
     def _extractAction( self, properties, index ):
 
@@ -163,97 +275,3 @@ class ActionProviderBase:
                                 , category=category
                                 , visible=visible
                                 )
-
-    security.declareProtected( ManagePortal, 'changeActions' )
-    def changeActions( self, properties=None, REQUEST=None ):
-
-        """ Update our list of actions.
-        """
-        if properties is None:
-            properties = REQUEST
-
-        actions = []
-
-        for index in range( len( self._actions ) ):
-            actions.append( self._extractAction( properties, index ) )
-
-        self._actions = tuple( actions )
-
-        if REQUEST is not None:
-            return self.manage_editActionsForm(REQUEST, manage_tabs_message=
-                                               'Actions changed.')
-
-    security.declareProtected( ManagePortal, 'deleteActions' )
-    def deleteActions( self, selections=(), REQUEST=None ):
-
-        """ Delete actions indicated by indexes in 'selections'.
-        """
-        sels = list( map( int, selections ) )  # Convert to a list of integers.
-        sels.sort()
-        sels.reverse()  # Delete from end to avoid stepping on indexes
-
-        actions = list( self._actions )
-        for idx in sels:
-            del actions[idx]
-
-        self._actions = tuple( actions )
-
-        if REQUEST is not None:
-            return self.manage_editActionsForm(
-                REQUEST, manage_tabs_message=(
-                'Deleted %d action(s).' % len(sels)))
-
-    security.declareProtected( ManagePortal, 'moveUpActions' )
-    def moveUpActions( self, selections=(), REQUEST=None ):
-
-        """ Move the specified actions up one slot in our list.
-        """
-        sels = list( map( int, selections ) )  # Convert to a list of integers.
-        sels.sort()
-
-        actions = list( self._actions )
-
-        for idx in sels:
-            idx2 = idx - 1
-            if idx2 < 0:
-                # Wrap to the bottom.
-                idx2 = len(actions) - 1
-            # Swap.
-            a = actions[idx2]
-            actions[idx2] = actions[idx]
-            actions[idx] = a
-
-        self._actions = tuple( actions )
-
-        if REQUEST is not None:
-            return self.manage_editActionsForm(
-                REQUEST, manage_tabs_message=(
-                'Moved up %d action(s).' % len(sels)))
-
-    security.declareProtected( ManagePortal, 'moveDownActions' )
-    def moveDownActions( self, selections=(), REQUEST=None ):
-
-        """ Move the specified actions down one slot in our list.
-        """
-        sels = list( map( int, selections ) )  # Convert to a list of integers.
-        sels.sort()
-        sels.reverse()
-
-        actions = list(self._actions)
-
-        for idx in sels:
-            idx2 = idx + 1
-            if idx2 >= len(actions):
-                # Wrap to the top.
-                idx2 = 0
-            # Swap.
-            a = actions[idx2]
-            actions[idx2] = actions[idx]
-            actions[idx] = a
-
-        self._actions = tuple( actions )
-
-        if REQUEST is not None:
-            return self.manage_editActionsForm(
-                REQUEST, manage_tabs_message=(
-                'Moved down %d action(s).' % len(sels)))
