@@ -18,8 +18,8 @@ Event registered in with the configuration:
 
  id: install_collector
  title (optional): Install Collector 
- module name: CMFCollector.InstallCollector
- function name: install_collector
+ module name: CMFCollector.Install
+ function name: install
 
 Then go to the management screen for the newly added external method
 and click the 'Try it' tab.  The install function will execute and give
