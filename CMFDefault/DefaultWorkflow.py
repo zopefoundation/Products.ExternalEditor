@@ -257,6 +257,7 @@ class DefaultWorkflowDefinition (SimpleItemWithProperties):
         Notifies this workflow after an object has been created
         and put in its new place.
         '''
+        self.setReviewStateOf( ob, 'private', 'joined', '' )
         self.updateRoleMappingsFor(ob)
 
     security.declarePrivate('notifyBefore')

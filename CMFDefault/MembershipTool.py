@@ -188,6 +188,8 @@ class MembershipTool ( Products.CMFCore.MembershipTool.MembershipTool ):
 
             # Overcome an apparent catalog bug.
             f.index_html.reindexObject()
+            wftool = getToolByName( f, 'portal_workflow' )
+            wftool.notifyCreated( f.index_html )
             
 
     def getHomeFolder(self, id=None, verifyPermission=0):

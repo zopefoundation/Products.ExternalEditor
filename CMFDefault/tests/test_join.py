@@ -15,7 +15,13 @@ class MembershipTests( TransactionalTest ):
                                                        , 'email' : 'foo@bar.com'
                                                        }
                                           )
-        assert site.acl_users.getUser( 'test_user' )
+        self.failUnless( site.acl_users.getUser( 'test_user' ) )
+        memberfolder = site.Members.test_user
+        homepage = memberfolder.index_html
+        self.assertEqual( memberfolder.Title(), "test_user's Home" )
+        tool = site.portal_workflow
+        self.assertEqual( tool.getInfoFor( homepage, 'review_state' )
+                        , "private" )
 
 
 def test_suite():

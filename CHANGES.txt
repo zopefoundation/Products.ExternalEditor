@@ -52,6 +52,9 @@ New Features
 
 Bugs Fixed
 
+  - Made generated home pages for new members participate fully in
+    workflow (Tracker #467).
+
   - Added 'text_format' wiget to NewsItem's edit forms (Tracker #460).
 
   - Fix sharing bug pointed out by Dieter Maurer (Tracker #484)
