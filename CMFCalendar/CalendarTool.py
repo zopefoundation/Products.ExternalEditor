@@ -129,7 +129,7 @@ class CalendarTool (UniqueObject, SimpleItem):
 	## last_date=DateTime(str(month)+'/'+str(last_day)+'/'+str(year))
 	last_date=first_date + last_day    
         
-	query=self.portal_catalog(Type=self.calendar_types,
+	query=self.portal_catalog(portal_type=self.calendar_types,
                                   review_state='published',	                          
                                   start=(first_date, last_date),
                                   start_usage='range:min:max',
@@ -142,7 +142,7 @@ class CalendarTool (UniqueObject, SimpleItem):
         # but I don't know how to do that in one search query :(  - AD
 
         # if you look at calendar_slot you can see how to do this in 1 query - runyaga
-        query+=self.portal_catalog(Type=self.calendar_types,
+        query+=self.portal_catalog(portal_type=self.calendar_types,
                                    review_state='published',
                                    end=(first_date, last_date),
                                    end_usage='range:min:max',
@@ -208,19 +208,19 @@ class CalendarTool (UniqueObject, SimpleItem):
         #last_date=DateTime(thisDay.Date()+" 23:59:59")
 
         # Get all events that Start on this day
-        query=self.portal_catalog(Type=self.calendar_types,
+        query=self.portal_catalog(portal_type=self.calendar_types,
                                   review_state='published',	                          
                                   start=(first_date,last_date),
                                   start_usage='range:min:max')
         
         # Get all events that End on this day
-        query+=self.portal_catalog(Type=self.calendar_types,
+        query+=self.portal_catalog(portal_type=self.calendar_types,
                                   review_state='published',	                          
                                   end=(first_date,last_date),
                                   end_usage='range:min:max')
 
         # Get all events that Start before this day AND End after this day
-        query+=self.portal_catalog(Type=self.calendar_types,
+        query+=self.portal_catalog(portal_type=self.calendar_types,
                                   review_state='published',
                                   start=first_date,
                                   start_usage='range:max',

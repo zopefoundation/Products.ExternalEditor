@@ -39,3 +39,7 @@ Future
     - FSPageTemplates overwrote a user-generated 'Content-Type' header.
       We now check to make sure a Content-Type header is not already set
       before allowing a page template to set its own.
+
+    - Fixed CalendarTool to use portal_type and not Type to search for
+      events in the catalog (Collector #28, thanks to Heimo Laukkanen
+      for the report).
