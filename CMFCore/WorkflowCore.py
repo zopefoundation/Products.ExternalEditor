@@ -125,7 +125,7 @@ class WorkflowAction (Method):
             try:
                 res = apply(self._m, (instance,) + args, kw)
             except:
-                wf.notifyFailure(instance, action, sys.exc_info())
+                wf.notifyException(instance, action, sys.exc_info())
                 raise
             else:
                 wf.notifySuccess(instance, action, res)
