@@ -195,7 +195,7 @@ class PortalFolder( Folder, DynamicType ):
         '''
         new_spec = []
         types_tool = getToolByName(self, 'portal_types')
-        types = types_tool.listContentTypes( container=self, by_metatype=1 )
+        types = types_tool.listContentTypes( by_metatype=1 )
         if spec is not None:
             if type(spec) == type(''):
                 spec = [spec]
