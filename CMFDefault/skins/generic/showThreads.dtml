@@ -13,6 +13,7 @@
  <p>
 </dtml-if>
 
+<dtml-let URL=absolute_url>
 <dtml-if expr="PARENTS[0].meta_type == 'Discussion Item'">
  Replies:
   <dtml-tree branches="getReplies">
@@ -29,4 +30,5 @@
    on <dtml-var Date>
   </dtml-tree>
 </dtml-if>
+</dtml-let>
 
