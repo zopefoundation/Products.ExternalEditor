@@ -22,12 +22,12 @@ from utils import getToolByName, _dtmldir
 from OFS.SimpleItem import SimpleItem
 from Globals import InitializeClass, DTMLFile, MessageDialog, \
      PersistentMapping
+from Acquisition import aq_base
 from AccessControl.User import nobody
 from AccessControl import ClassSecurityInfo
 from CMFCorePermissions import ManagePortal
 import CMFCorePermissions
 from ActionProviderBase import ActionProviderBase
-import Acquisition
 
 default_member_content = '''Default page for %s
  
@@ -371,7 +371,7 @@ class MembershipTool (UniqueObject, SimpleItem, ActionProviderBase):
                     obj.manage_setLocalRoles( member_id, roles )
 
         if reindex:
-            self.reindexSecurity(obj)
+            self.reindexObjectSecurity(obj)
 
     security.declareProtected(CMFCorePermissions.View, 'deleteLocalRoles')
     def deleteLocalRoles( self, obj, member_ids, reindex=1 ):
@@ -383,15 +383,32 @@ class MembershipTool (UniqueObject, SimpleItem, ActionProviderBase):
             obj.manage_delLocalRoles( userids=member_ids )
 
         if reindex:
-            self.reindexSecurity(obj)
+            self.reindexObjectSecurity(obj)
 
-    security.declarePrivate('reindexSecurity')
-    def reindexSecurity(self, obj):
-        catalog = getToolByName(self, 'portal_catalog')
-        obj_path = '/'.join(obj.getPhysicalPath())
-        for brain in catalog.searchResults(path=obj_path):
-            ob = brain.getObject()
-            ob.reindexObject(idxs=['allowedRolesAndUsers'])
+    # This is not in CMFCatalogAware because all catalogged objects
+    # are not necessarily CatalogAware, especially folders.
+    security.declareProtected(CMFCorePermissions.ModifyPortalContent,
+                              'reindexObjectSecurity')
+    def reindexObjectSecurity(self, obj):
+        """
+            Reindex security-related indexes on the object
+            (and its descendants).
+        """
+        catalog = getToolByName(self, 'portal_catalog', None)
+        if catalog is not None:
+            path = '/'.join(obj.getPhysicalPath())
+            for brain in catalog.searchResults(path=path):
+                ob = brain.getObject()
+                catalog.reindexObject(ob, idxs=['allowedRolesAndUsers'])
+
+            # We must also reindex the object itself, as the PathIndex
+            # only gave us the descendants. We have no way to do it
+            # reliably, and we don't want to reindex objects that
+            # weren't indexed in the first place. As a heuristic, check
+            # if the object has a reindexObject method, and use it.
+
+            if hasattr(aq_base(obj), 'reindexObject'):
+                obj.reindexObject(idxs=['allowedRolesAndUsers'])
 
     security.declarePrivate('addMember')
     def addMember(self, id, password, roles, domains, properties=None):

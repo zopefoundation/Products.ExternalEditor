@@ -294,7 +294,7 @@ class PortalFolder( Folder, DynamicType ):
         """
         return None
 
-    def reindexObject( self ):
+    def reindexObject( self, idxs=[] ):
         """
             Make content-assuming factory mechanism happy.
         """

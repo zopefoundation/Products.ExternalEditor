@@ -72,7 +72,7 @@ class CMFSite ( PortalObjectBase
         """
         return 1
 
-    def reindexObject( self ):
+    def reindexObject( self, idxs=[] ):
         """
             Override DefaultDublinCoreImpl's method (so that we can play
             in 'editMetadata').
