@@ -8,12 +8,10 @@
 
 <dtml-if talkback>
 
-  <dtml-let replyCount="talkback.hasReplies()"
-            str="(replyCount == 1 and 'comment') or 'comments'"
-            is_at_top="this().Type() != 'Discussion Item'">
+  <dtml-let hasReplies="talkback.hasReplies( this() )">
 
-    <dtml-if replyCount>
-      <h4>Comments<dtml-if is_at_top> (&dtml-replyCount; &dtml-str; total)</dtml-if>:</h4>
+    <dtml-if hasReplies>
+      <h4>Comments:</h4>
       <dtml-var showThreads>
     </dtml-if>
 

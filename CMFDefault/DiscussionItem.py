@@ -336,11 +336,41 @@ class DiscussionItemContainer( Persistent, Implicit, Traversable ):
         return id
 
     security.declareProtected( CMFCorePermissions.View, 'hasReplies' )
-    def hasReplies( self ):
+    def hasReplies( self, content_obj ):
         """
             Test to see if there are any dicussion items
         """
-        return len( self._container )
+        outer = self._getDiscussable( outer=1 )
+        if content_obj == outer: 
+            return not not len( self._container )
+        else:
+            return not not len( content_obj.talkback._getReplyResults() ) 
+
+    security.declareProtected( CMFCorePermissions.View, 'replyCount' )
+    def replyCount( self, content_obj ):
+        """ How many replies do i have? """
+        outer = self._getDiscussable( outer=1 )
+        if content_obj == outer:
+            return len( self._container )
+        else:
+            replies = content_obj.talkback.getReplies()
+            return self._repcount( replies )
+
+    security.declarePrivate('_repcount')
+    def _repcount( self, replies ):
+        """  counts the total number of replies by recursing thru the various levels
+        """
+        count = 0
+
+        for reply in replies:
+            count = count + 1
+
+            #if there is at least one reply to this reply
+            replies = reply.talkback.getReplies()
+            if replies:
+                count = count + self._repcount( replies )
+
+        return count
 
     security.declareProtected( CMFCorePermissions.View, 'getReplies' )
     def getReplies( self ):
