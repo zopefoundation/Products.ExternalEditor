@@ -114,8 +114,8 @@
   </th>
   <td>
    <select name="Type:list" multiple size="5">
-    <dtml-in expr="portal_types.listTypeInfo()" reverse>
-     <option><dtml-var expr="_['sequence-item'].getId()"></option>
+    <dtml-in expr="portal_types.listContentTypes()">
+     <option><dtml-var sequence-item></option>
     </dtml-in>
    </select>
 
