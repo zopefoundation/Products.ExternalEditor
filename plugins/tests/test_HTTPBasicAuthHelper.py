@@ -106,3 +106,12 @@ class HTTPBasicAuthHelperTests( unittest.TestCase
         self.failIf( response._unauthorized_called )
         helper.resetCredentials( request, response )
         self.failUnless( response._unauthorized_called )
+
+if __name__ == "__main__":
+    unittest.main()
+        
+def test_suite():
+    return unittest.TestSuite((
+        unittest.makeSuite( HTTPBasicAuthHelperTests ),
+        ))
+        

@@ -109,3 +109,9 @@ class ScriptablePluginTests( unittest.TestCase ):
 
         self.assertEqual( len(scriptable_plugin.__implements__), 3 )
 
+
+def test_suite():
+    return unittest.TestSuite((
+        unittest.makeSuite( ScriptablePluginTests ),
+        ))               
+        

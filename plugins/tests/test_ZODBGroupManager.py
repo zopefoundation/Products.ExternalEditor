@@ -231,3 +231,8 @@ class ZODBGroupManagerTests( unittest.TestCase
 
 if __name__ == "__main__":
     unittest.main()
+
+def test_suite():
+    return unittest.TestSuite((
+        unittest.makeSuite( ZODBGroupManagerTests ),
+        ))               
