@@ -57,7 +57,7 @@
 
  <tr valign="top">
   <th>Subject</th>
-  <td><select name="Subject:list" multiple>
+  <td><select name="Subject:list" multiple size="5">
      <option value=""
 		   tal:define="items python: here.portal_catalog.uniqueValuesFor('Subject')"
 		   tal:repeat="item items"
