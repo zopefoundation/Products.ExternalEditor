@@ -77,7 +77,8 @@ class HTTPBasicAuthHelperTests( unittest.TestCase
         request = FauxHTTPRequest( 'foo', 'bar' )
 
         self.assertEqual( helper.extractCredentials( request )
-                        , { 'login' : 'foo', 'password' : 'bar' } )
+                        , { 'login' : 'foo', 'password' : 'bar', 
+                            'remote_host': '', 'remote_address': '' } )
 
     def test_challenge( self ):
         from zExceptions import Unauthorized
