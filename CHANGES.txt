@@ -2,12 +2,21 @@ CMF 1.5.0-beta (unreleased)
 
   New Features
 
+    - Added CMFUid which provides unique id functionality. 
+
+    - As example of how to use unique ids CMFDefaults Favorite content 
+      type was enhanced by using unique ids to track moved or renamed 
+      content items.
+
+    - Added __init__ method to the IOpaqueItems.ICallableOpaqueItem 
+      interface.
+
     - CookieCrumber now supports logging the authenticated user id to
       the access log just like basic auth.
 
     - 'portal_setup' tool can now disply / download diffs between profiles
       and / or snapshots.
-
+      
   Bug Fixes
 
     - DCWorkflow DefaultWorkflowClassic: Fixed 'pending' state permissions.
