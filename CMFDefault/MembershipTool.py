@@ -83,7 +83,7 @@
 # 
 ##############################################################################
 
-"""CMFBasic portal_membership tool.
+"""CMFDefault portal_membership tool.
 
 $Id$
 """

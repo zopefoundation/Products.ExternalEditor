@@ -170,11 +170,11 @@ def initialize( context ):
 
     utils.initializeBasesPhase2( z_bases, context )
     utils.initializeBasesPhase2( z_tool_bases, context )
-    utils.ToolInit('CMFBasic Tool', tools=tools,
-                   product_name='CMFBasic', icon='tool.gif',
+    utils.ToolInit('CMFDefault Tool', tools=tools,
+                   product_name='CMFDefault', icon='tool.gif',
                    ).initialize( context )
 
-    utils.ContentInit( 'CMFBasic Content'
+    utils.ContentInit( 'CMFDefault Content'
                      , content_types=contentClasses
                      , permission=ADD_CONTENT_PERMISSION
                      , extra_constructors=contentConstructors

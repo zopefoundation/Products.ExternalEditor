@@ -96,20 +96,20 @@ factory_type_information = (
     {'id': 'News Item', 'meta_type': 'News Item', 'description':
      'News Items contain short text articles and carry a title '
      'as well as an optional description.',
-     'product':'CMFBasic', 'factory':'addNewsItem',
+     'product':'CMFDefault', 'factory':'addNewsItem',
      'immediate_view':'metadata_edit_form', 'actions_for':'newsitem',
      },
 
     {'id': 'Document', 'meta_type': 'Document', 'description':
      'Documents can contain text that can be formatted using '
      'Structured Text.',
-     'product':'CMFBasic', 'factory':'addDocument',
+     'product':'CMFDefault', 'factory':'addDocument',
      'immediate_view':'metadata_edit_form', 'actions_for':'document',
      },
 
     {'id': 'File', 'meta_type': 'File', 'description':
      'File objects can contain arbitrary downloadable files.',
-     'product':'CMFBasic', 'factory':'addFile',
+     'product':'CMFDefault', 'factory':'addFile',
      'immediate_view':'metadata_edit_form', 'actions':
      ({'name': 'View statistics',
        'action': 'file_view',
@@ -128,7 +128,7 @@ factory_type_information = (
 
     {'id': 'Image', 'meta_type': 'Image', 'description':
      'Image objects can be embedded in Portal documents.',
-     'product':'CMFBasic', 'factory':'addImage',
+     'product':'CMFDefault', 'factory':'addImage',
      'immediate_view':'metadata_edit_form', 'actions':
      ({'name': 'View',
        'action': 'image_view',
@@ -145,7 +145,7 @@ factory_type_information = (
     {'id': 'Link', 'meta_type': 'Link', 'description':
      'Link items are URLs that come with additional information '
      'such as a Title and a Description.',
-     'product':'CMFBasic', 'factory':'addLink',
+     'product':'CMFDefault', 'factory':'addLink',
      'immediate_view':'metadata_edit_form', 'actions_for':'link',
      },
 
@@ -166,7 +166,7 @@ factory_type_information = (
 
     {'id': 'Favorite', 'meta_type': 'Favorite', 'description':
      'A Favorite is a Link to an intra-portal resource.',
-     'product': 'CMFBasic', 'factory': 'addFavorite',
+     'product': 'CMFDefault', 'factory': 'addFavorite',
      'immediate_view': 'metadata_edit_form', 'actions':
      ({'name': 'View',
        'action': 'favorite_view',
@@ -320,12 +320,12 @@ class PortalGenerator:
         addCMFCoreTool('CMF Undo Tool', None)
         addCMFCoreTool('CMF Workflow Tool', None)
 
-        addCMFBasicTool = p.manage_addProduct['CMFBasic'].manage_addTool
-        addCMFBasicTool('Default Discussion Tool', None)
-        addCMFBasicTool('Default Membership Tool', None)
-        addCMFBasicTool('Default Registration Tool', None)
-        addCMFBasicTool('Default URL Tool', None)
-        addCMFBasicTool('Default Properties Tool', None)
+        addCMFDefaultTool = p.manage_addProduct['CMFDefault'].manage_addTool
+        addCMFDefaultTool('Default Discussion Tool', None)
+        addCMFDefaultTool('Default Membership Tool', None)
+        addCMFDefaultTool('Default Registration Tool', None)
+        addCMFDefaultTool('Default URL Tool', None)
+        addCMFDefaultTool('Default Properties Tool', None)
 
     def setupMailHost(self, p):
         p.manage_addProduct['MailHost'].manage_addMailHost(

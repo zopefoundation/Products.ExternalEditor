@@ -83,7 +83,7 @@
 # 
 ##############################################################################
 
-"""CMFBasic portal_properties tool.
+"""CMFDefault portal_properties tool.
 
 $Id$
 """
