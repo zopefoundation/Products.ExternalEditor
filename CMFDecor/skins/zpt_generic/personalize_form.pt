@@ -1,0 +1,74 @@
+<html xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="here/main_template/macros/master">
+<body>
+<div metal:fill-slot="main">
+  <div tal:define="member python: here.portal_membership.getAuthenticatedMember()">
+
+
+<div class="Desktop">
+
+<h1> Member Preferences </h1>
+<span tal:replace="request/msg"
+   tal:condition="request/msg|nothing"><hr></span>
+   
+<p><a href="password_form">Click here</a> to change your password.</p>
+
+<form action="personalize" method="post">
+ <table class="FormLayout">
+  <tr>
+   <th>Email address</th>
+   <td><input type="text" name="email" value=""
+              tal:attributes="value member/email">
+   </td>
+  </tr>
+  <tr>
+   <th valign="top">Listed status</th>
+   <td>
+     <input type="radio" name="listed" 
+	        tal:attributes="checked member/listed"
+            value="on" id="cb_listed" />
+     <label for="cb_listed">Listed</label>
+
+     <dl class="FieldHelp">
+       <dd>You will show up on the public membership roster.</dd>
+     </dl>
+
+     <input type="radio" name="listed" 
+	        tal:attributes="checked python: not(member.listed)"
+            value="" id="cb_unlisted" />
+	<label for="cb_unlisted">Unlisted</label>
+     <dl class="FieldHelp">
+       <dd> You will <i>not</i> show up on the public membership roster.
+            Your Member folder will still be publicly accessible unless
+            you change its security settings.</dd>
+     </dl>
+   </td>
+  </tr>
+  <div tal:condition="here/portal_skins | nothing">
+   <tr>
+    <th>Skin</th>
+    <td>
+     <select name="portal_skin">
+        <option value=""
+		  tal:define="skins python: here.portal_skins.getSkinSelections()"
+		  tal:repeat="skin skins"
+		  tal:attributes="value skin; selected python: request.get('portal_skin', '') == skin"
+		  tal:content="skin">
+		</option>
+     </select>
+    </td>
+   </tr>
+  </div>
+  <tr>
+   <td></td>
+   <td><input type="submit" value=" Change "></td>
+  </tr>
+ </table>
+</form>
+
+  </div>
+</div>
+</div>
+</body>
+</html>
