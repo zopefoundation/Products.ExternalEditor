@@ -40,13 +40,11 @@ class DynamicType:
 
     security.declarePublic('getPortalTypeName')
     def getPortalTypeName(self):
-        '''
+        """
         Returns the portal type name that can be passed to portal_types.
-        '''
+        If the object is uninitialized, returns None.
+        """
         pt = self.portal_type
-        if pt is None:
-            # Provide a fallback.
-            pt = self.meta_type
         if callable( pt ):
             pt = pt()
         return pt

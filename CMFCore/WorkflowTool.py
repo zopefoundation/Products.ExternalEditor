@@ -533,9 +533,10 @@ class WorkflowTool (UniqueObject, Folder):
         elif hasattr(aq_base(ob), '_getPortalTypeName'):
             pt = ob._getPortalTypeName()
         else:
-            pt = getattr(ob, 'portal_type', None)
-            if pt is None:
-                return ()
+            pt = None
+
+        if pt is None:
+            return ()
 
         chain = None
         if cbt is not None:

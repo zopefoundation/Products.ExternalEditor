@@ -730,14 +730,13 @@ class TypesTool( UniqueObject, OFS.Folder.Folder, ActionProviderBase ):
             TypeInformation interface, corresponding to
             the specified 'contentType'.  If contentType is actually
             an object, rather than a string, attempt to look up
-            the appropriate type info using its portal_type or meta_type.
+            the appropriate type info using its portal_type.
         """
         if type( contentType ) is not type( '' ):
-            try:
+            if hasattr(aq_base(contentType), '_getPortalTypeName'):
                 contentType = contentType._getPortalTypeName()
-            except AttributeError:
-                # if we can't get or call it for any reason, fall back...
-                contentType = contentType.meta_type
+            else:
+                return None
         ob = getattr( self, contentType, None )
         if getattr(aq_base(ob), '_isTypeInformation', 0):
             return ob
