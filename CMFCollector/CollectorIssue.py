@@ -530,8 +530,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
                 mh.send(message)
             except:
                 import sys
-                err = sys.exc_info()
-                return "Email notice error: '%s'"  % str(err[1])
+                return "Email notice error: '%s'"  % str(sys.exc_info()[1])
 
     def _process_file(self, file, fileid, filetype, comment):
         """Upload file to issue if it is substantial (has a name).
