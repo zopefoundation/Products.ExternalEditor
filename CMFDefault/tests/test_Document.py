@@ -255,6 +255,32 @@ class DocumentTests(RequestTest):
                              , text=STX_NO_HEADERS_BUT_COLON)
         self.assertEqual( d.EditableBody(), STX_NO_HEADERS_BUT_COLON )
 
+    def test_Format_methods(self):
+        d = self.d
+        d.setFormat( 'plain' )
+        self.assertEqual( d.text_format, 'plain' )
+        self.assertEqual( d.Format(), 'text/plain' )
+        d.setFormat( d.Format() )
+        self.assertEqual( d.text_format, 'plain' )
+
+        d = self.d
+        d.setFormat( 'structured-text' )
+        self.assertEqual( d.text_format, 'structured-text' )
+        self.assertEqual( d.Format(), 'text/plain' )
+        d.setFormat( d.Format() )
+        self.assertEqual( d.text_format, 'structured-text' )
+
+        d = self.d
+        d.setFormat( 'html' )
+        self.assertEqual( d.text_format, 'html' )
+        self.assertEqual( d.Format(), 'text/html' )
+        d.setFormat( d.Format() )
+        self.assertEqual( d.text_format, 'html' )
+
+        d = self.d
+        d.setFormat( 'foo' )
+        self.assertEqual( d.text_format, 'structured-text' )
+
     def test_interface(self):
         from Products.CMFCore.interfaces.Dynamic \
                 import DynamicType as IDynamicType
@@ -275,7 +301,7 @@ class DocumentTests(RequestTest):
         # verifyClass(IMutableDublinCore, Document)
 
 
-class TestFTPGet( RequestTest ):
+class DocumentFTPGetTests(RequestTest):
 
     def testHTML( self ):
         self.REQUEST['BODY']=BASIC_HTML
@@ -351,7 +377,8 @@ class TestFTPGet( RequestTest ):
         for header in simple_headers:
             self.failUnless( header in get_headers )
 
-class TestDocumentPUT(RequestTest):
+
+class DocumentPUTTests(RequestTest):
 
     def setUp(self):
         RequestTest.setUp(self)
@@ -421,8 +448,8 @@ class TestDocumentPUT(RequestTest):
 def test_suite():
     return TestSuite((
         makeSuite(DocumentTests),
-        makeSuite(TestFTPGet),
-        makeSuite(TestDocumentPUT),
+        makeSuite(DocumentFTPGetTests),
+        makeSuite(DocumentPUTTests),
         ))
 
 if __name__ == '__main__':

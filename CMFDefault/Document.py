@@ -10,7 +10,7 @@
 # FOR A PARTICULAR PURPOSE
 #
 ##############################################################################
-""" Basic textual content object, supporting both HTML and STX.
+""" Basic textual content object, supporting HTML, STX and plain text.
 
 $Id$
 """
@@ -323,12 +323,16 @@ class Document(PortalContent, DefaultDublinCoreImpl):
         else:
             return 'text/plain'
     
-
     security.declareProtected(ModifyPortalContent, 'setFormat')
     def setFormat(self, format):
+        """ Set text format and Dublin Core resource format.
+        """
         value = str(format)
         if value == 'text/html' or value == 'html':
             self.text_format = 'html'
+        elif value == 'text/plain':
+            if self.text_format not in ('structured-text', 'plain'):
+                self.text_format = 'structured-text'
         elif value == 'plain':
             self.text_format = 'plain'
         else:
