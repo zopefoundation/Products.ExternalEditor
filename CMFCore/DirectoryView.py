@@ -359,6 +359,9 @@ class DirectoryView (Persistent):
         res = s.__of__(parent)
         return res
 
+    def getId(self):
+        return self.id
+
 Globals.InitializeClass(DirectoryView)
 
 
