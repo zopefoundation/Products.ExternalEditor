@@ -95,16 +95,17 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
 
     _collector_path = None
 
+    version_info = ''
+
     def __init__(self,
                  id, container,
                  title='', description='',
                  submitter_id=None, submitter_name=None,
                  kibitzers=None,
-                 topic=None, classification=None,
                  security_related=0,
-                 importance=None, severity=None,
+                 topic=None, classification=None, importance=None, 
                  resolution=None,
-                 reported_version=None, other_version_info=None,
+                 version_info=None,
                  creation_date=None, modification_date=None,
                  effective_date=None, expiration_date=None,
                  assignees=None,
@@ -135,10 +136,8 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         self.classification = classification
         self.security_related = (security_related and 1) or 0
         self.importance = importance
-        self.severity = severity
         self.resolution = resolution
-        self.reported_version = reported_version
-        self.other_version_info = other_version_info
+        self.version_info = version_info
 
         self.portal_type = 'Collector Issue'
         container._setObject(id, self)
@@ -194,9 +193,8 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
              topic=None,
              classification=None,
              importance=None,
-             severity=None,
-             reported_version=None,
-             other_version_info=None,
+             version_info=None,
+             comment=None,
              text=None):
         """Update the explicitly passed fields."""
 
@@ -231,17 +229,12 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
             changes.append('classification (%s => %s)'
                            % (self.classification, classification))
             self.classification = classification
-        if changed('severity', severity):
-            changes.append('severity (%s => %s)'
-                           % (self.severity, severity))
-            self.severity = severity
-        if changed('reported_version', reported_version):
-            changes.append('reported_version (%s => %s)'
-                           % (self.reported_version, reported_version))
-            self.reported_version = reported_version
-        if changed('other_version_info', other_version_info):
-            changes.append('revised other_version_info')
-            self.other_version_info = other_version_info
+        if changed('version_info', version_info):
+            changes.append('revised version_info')
+            self.version_info = version_info
+
+        if comment:
+            changes.append('new comment')
 
         if not changes:
             return 'No changes.'
@@ -250,11 +243,17 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
 
         username = str(getSecurityManager().getUser())
 
+        if comment:
+            comment = "\n\n" + util.process_comment(string.strip(comment))
+        else:
+            comment = ''
+
         transcript._edit('stx',
                          self._entry_header('Edit', username)
                          + "\n\n"
                          + " Changes: " + ", ".join(changes)
-                         + ((self.action_number > 1) and "\n\n<hr>\n")
+                         + comment
+                         + ((self.action_number > 1) and "\n<hr>\n")
                          + transcript.EditableBody())
         self.reindexObject()
         self._send_update_notice('Edit', username)
@@ -426,7 +425,6 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
                           klass=self.classification,
                           topic=self.topic,
                           importance=self.importance,
-                          severity=self.severity,
                           issue_url=self.absolute_url(),
                           body=body,
                           candidates=candidates)
@@ -617,11 +615,9 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
                 + self.topic + ' '
                 + self.classification + ' '
                 + self.importance + ' '
-                + self.severity + ' '
                 + self.status() + ' '
                 + (self.resolution or '') + ' '
-                + self.reported_version + ' '
-                + self.other_version_info + ' '
+                + self.version_info + ' '
                 + ((self.security_related and 'security_related') or ''))
 
     def Subject(self):
@@ -629,7 +625,6 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         return (self.topic,
                 self.classification,
                 self.importance,
-                self.severity,
                 )
 
     def __len__(self):
@@ -656,9 +651,7 @@ def addCollectorIssue(self,
                       classification=None,
                       security_related=0,
                       importance=None,
-                      severity=None,
-                      reported_version=None,
-                      other_version_info=None,
+                      version_info=None,
                       assignees=None,
                       file=None, fileid=None, filetype=None,
                       REQUEST=None):
@@ -677,9 +670,7 @@ def addCollectorIssue(self,
                         classification=classification,
                         security_related=security_related,
                         importance=importance,
-                        severity=severity,
-                        reported_version=reported_version,
-                        other_version_info=other_version_info,
+                        version_info=version_info,
                         assignees=assignees,
                         file=file, fileid=fileid, filetype=filetype)
     return id

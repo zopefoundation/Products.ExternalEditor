@@ -120,42 +120,12 @@
         </tr>
 
         <tr>
-          <td> Severity </td>
-          <td metal:fill-slot="issue_severity_slot">
-            <select name="severity">
-              <option value=""
-                      tal:repeat="it here/aq_parent/severities"
-                      tal:attributes="value it;
-                                      selected python: here.severity == it"
-                      tal:content="python: it.capitalize()">
-              </option>
-            </select>
-          </td>
-        </tr>
-
-        <tr>
-          <td> Version </td>
-          <td metal:fill-slot="issue_version_slot">
-            <select name="reported_version">
-              <option value=""
-                      tal:repeat="it here/aq_parent/versions"
-                      tal:attributes="value it;
-                                      selected python: here.reported_version
-                                                       == it"
-                      tal:content="python: it.capitalize()">
-              </option>
-            </select>
-          </td>
-        </tr>
-
-        <tr>
-          <td> Other versions </td>
-          <td rowspan="2" colspan="2"
-              metal:fill-slot="issue_other_versions_slot">
-            <textarea name="other_version_info" rows="2" cols="30"
-                      tal:content="here/other_version_info">
+          <td> Version info </td>
+          <td colspan="3"
+              metal:fill-slot="issue_version_info_slot">
+            <textarea name="version_info" rows="2" cols="40"
+                      tal:content="here/version_info">
 </textarea>
-
           </td>
         </tr>
 
@@ -174,7 +144,17 @@
 
     <table>
       <tr>
-        <th> Transcript </th>
+        <th> Comment </th>
+      </tr>
+      <tr>
+        <td>
+          <textarea name="comment" rows="3" cols="75" wrap="soft">
+</textarea>
+        </td>
+      </tr>
+
+      <tr>
+        <th> Edit Transcript </th>
       </tr>
       <tr tal:define="transcript here/get_transcript">
         <td>
