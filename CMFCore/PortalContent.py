@@ -87,14 +87,13 @@ import string, urllib
 from DateTime import DateTime
 from Globals import InitializeClass
 from OFS.SimpleItem import SimpleItem
-from AccessControl import ClassSecurityInfo
+from AccessControl import ClassSecurityInfo, getSecurityManager
 from CMFCorePermissions import AccessContentsInformation, View, \
      ReviewPortalContent, ModifyPortalContent
 import CMFCorePermissions
 from DynamicType import DynamicType
 from utils import getToolByName
 
-from ComputedAttribute import ComputedAttribute
 from Acquisition import aq_base
 
 
@@ -109,7 +108,7 @@ class PortalContent(DynamicType, SimpleItem):
     """
 
     isPortalContent = 1
-    _isPortalContent = 1  # More secure than 'isPortalContent'.
+    _isPortalContent = 1  # More reliable than 'isPortalContent'.
 
     manage_options = ( ( { 'label'  : 'Dublin Core'
                          , 'action' : 'manage_metadata'
@@ -174,43 +173,53 @@ class PortalContent(DynamicType, SimpleItem):
     # Contentish interface methods
     # ----------------------------
 
-    def _index_html(self):
-        '''
-        Invokes the action identified by the id "view" or the first action.
-        '''
+    def _verifyActionPermissions(self, action):
+        pp = action.get('permissions', ())
+        if not pp:
+            return 1
+        sm = getSecurityManager()
+        for p in pp:
+            if sm.checkPermission(p, self):
+                return 1
+        return 0
+
+    def _getDefaultView(self):
         ti = self.getTypeInfo()
         if ti is not None:
-            path = ti.getActionById('view', None)
-            if path is not None:
-                view = self.restrictedTraverse(path)
-                return view
             actions = ti.getActions()
-            if actions:
-                path = actions[0]['action']
-                view = self.restrictedTraverse(path)
-                return view
-            raise 'Not Found', ('No default view defined for type "%s"'
-                                % ti.getId())
+            for action in actions:
+                if action.get('id', None) == 'view':
+                    if self._verifyActionPermissions(action):
+                        return self.restrictedTraverse(action['action'])
+            # "view" action is not present or not allowed.
+            # Find something that's allowed.
+            for action in actions:
+                if self._verifyPermissions(action):
+                    return self.restrictedTraverse(action['action'])
+            raise Unauthorized, ('No accessible views available for %s' %
+                                 string.join(self.getPhysicalPath(), '/'))
         else:
-            raise 'Not Found', ('Cannot find default view for "%s"'
-                                % string.join( self.getPhysicalPath() ) )
+            raise 'Not Found', ('Cannot find default view for "%s"' %
+                                string.join(self.getPhysicalPath(), '/'))
 
-    security.declareProtected(CMFCorePermissions.View, 'index_html')
-    index_html = ComputedAttribute(_index_html, 1)
-
-    security.declareProtected(CMFCorePermissions.View, 'view')
-    view = index_html  # Necessary for catalog searches.
-
-    security.declareProtected(CMFCorePermissions.View, 'asHTML')
-    def asHTML(self):
+    def __call__(self):
         '''
-        Called when this object is the index_html for a folder.
+        Invokes the default view.
         '''
-        view = self.view
+        view = self._getDefaultView()
         if getattr(aq_base(view), 'isDocTemp', 0):
             return apply(view, (self, self.REQUEST))
         else:
             return view()
+
+    index_html = None  # This special value informs ZPublisher to use __call__
+
+    security.declareProtected(CMFCorePermissions.View, 'view')
+    def view(self):
+        '''
+        Returns the default view even if index_html is overridden.
+        '''
+        return self()
 
     # Overridden methods to support cataloging items that might
     # be stored in attributes unknown to the content object, such
@@ -219,8 +228,8 @@ class PortalContent(DynamicType, SimpleItem):
     security.declareProtected(AccessContentsInformation, 'objectItems')
     def objectItems(self):
         """
-        since "talkback" is the only opaque item on content
-        right now i will return that. should be replaces with
+        since 'talkback' is the only opaque item on content
+        right now, I will return that. Should be replaced with
         a list of tuples for every opaque item!
         """
         talkback = getattr(self, 'talkback', None)
