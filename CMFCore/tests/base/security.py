@@ -77,3 +77,6 @@ class AnonymousUser( Implicit ):
             else:
                 return 0
         return 1
+
+    def getRoles(self):
+        return ('Anonymous',)

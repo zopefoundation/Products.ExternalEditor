@@ -689,6 +689,8 @@ class WorkflowTool (UniqueObject, Folder):
     def _reindexWorkflowVariables(self, ob):
 
         """ Reindex the variables that the workflow may have changed.
+
+        Also reindexes the security.
         """
         if not self._default_cataloging:
             return
@@ -696,9 +698,12 @@ class WorkflowTool (UniqueObject, Folder):
         if hasattr(aq_base(ob), 'reindexObject'):
             # XXX We only need the keys here, no need to compute values.
             mapping = self.getCatalogVariablesFor(ob) or {}
-            mapping['allowedRolesAndUsers'] = None
             vars = mapping.keys()
             ob.reindexObject(idxs=vars)
+
+        # Reindex security of subobjects.
+        if hasattr(aq_base(ob), 'reindexObjectSecurity'):
+            ob.reindexObjectSecurity()
 
 InitializeClass(WorkflowTool)
 

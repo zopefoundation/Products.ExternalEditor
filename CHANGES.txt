@@ -96,6 +96,10 @@ CMF 1.4 alpha
 
   Bug Fixes
 
+    - Ensure that the security attributes are reindexed on all
+      subobjects too when a folderish object changes state in the
+      workflow (Collector #115).
+
     - MembershipTool (CMFDefault): Fixed acquisition bug. (Collector #102)
 
     - Skinnable: Changed docstring for setupCurrentSkin and added 
