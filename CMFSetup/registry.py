@@ -188,6 +188,13 @@ class SetupStepRegistry( Implicit ):
             raise KeyError( 'Existing registration for step %s, version %s'
                           % ( id, already[ 'version' ] ) )
 
+        if title is None or description is None:
+
+            t, d = _extractDocstring( callable, id, '' )
+
+            title = title or t
+            description = description or d
+
         info = { 'id'           : id
                , 'version'      : version
                , 'callable'     : callable

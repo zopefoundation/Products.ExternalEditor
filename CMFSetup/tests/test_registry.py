@@ -7,6 +7,23 @@ import os
 
 from Products.CMFCore.tests.base.testcase import SecurityRequestTest
 
+#==============================================================================
+#   Dummy callables
+#==============================================================================
+def ONE_FUNC( context ): pass
+def TWO_FUNC( context ): pass
+def THREE_FUNC( context ): pass
+def FOUR_FUNC( context ): pass
+
+ONE_FUNC_NAME = '%s.%s' % ( __name__, ONE_FUNC.__name__ )
+TWO_FUNC_NAME = '%s.%s' % ( __name__, TWO_FUNC.__name__ )
+THREE_FUNC_NAME = '%s.%s' % ( __name__, THREE_FUNC.__name__ )
+FOUR_FUNC_NAME = '%s.%s' % ( __name__, FOUR_FUNC.__name__ )
+
+
+#==============================================================================
+#   SSR tests
+#==============================================================================
 class SetupStepRegistryTests( SecurityRequestTest ):
 
     def _getTargetClass( self ):
@@ -45,6 +62,63 @@ class SetupStepRegistryTests( SecurityRequestTest ):
         self.failUnless( registry.getStep( 'nonesuch', default ) is default )
         self.failUnless( registry.getStepMetadata( 'nonesuch'
                                                  , default ) is default )
+
+    def test_getStep_defaulted( self ):
+
+        registry = self._makeOne()
+        default = object()
+
+        self.failUnless( registry.getStep( 'nonesuch', default ) is default )
+        self.assertEqual( registry.getStepMetadata( 'nonesuch', {} ), {} )
+
+    def test_registerStep_docstring( self ):
+
+        def func_with_doc( site ):
+            """This is the first line.
+
+            This is the second line.
+            """
+        FUNC_NAME = '%s.%s' % ( __name__, func_with_doc.__name__ )
+
+        registry = self._makeOne()
+
+        registry.registerStep( id='docstring'
+                             , version='1'
+                             , callable=func_with_doc
+                             , dependencies=()
+                             )
+
+        info = registry.getStepMetadata( 'docstring' )
+        self.assertEqual( info[ 'id' ], 'docstring' )
+        self.assertEqual( info[ 'callable' ], FUNC_NAME )
+        self.assertEqual( info[ 'dependencies' ], () )
+        self.assertEqual( info[ 'title' ], 'This is the first line.' )
+        self.assertEqual( info[ 'description' ] , 'This is the second line.' )
+
+    def test_registerStep_docstring_override( self ):
+
+        def func_with_doc( site ):
+            """This is the first line.
+
+            This is the second line.
+            """
+        FUNC_NAME = '%s.%s' % ( __name__, func_with_doc.__name__ )
+
+        registry = self._makeOne()
+
+        registry.registerStep( id='docstring'
+                             , version='1'
+                             , callable=func_with_doc
+                             , dependencies=()
+                             , title='Title'
+                             )
+
+        info = registry.getStepMetadata( 'docstring' )
+        self.assertEqual( info[ 'id' ], 'docstring' )
+        self.assertEqual( info[ 'callable' ], FUNC_NAME )
+        self.assertEqual( info[ 'dependencies' ], () )
+        self.assertEqual( info[ 'title' ], 'Title' )
+        self.assertEqual( info[ 'description' ] , 'This is the second line.' )
 
     def test_registerStep_single( self ):
 
@@ -366,7 +440,7 @@ class SetupStepRegistryTests( SecurityRequestTest ):
 
         xml = registry.exportAsXML()
 
-        self._compareDOM( registry.exportAsXML(), _EMPTY_EXPORT )
+        self._compareDOM( registry.exportAsXML(), _EMPTY_STEPS_EXPORT )
 
     def test_export_single( self ):
 
@@ -380,7 +454,7 @@ class SetupStepRegistryTests( SecurityRequestTest ):
                              , description='One small step'
                              )
 
-        self._compareDOM( registry.exportAsXML(), _SINGLE_EXPORT )
+        self._compareDOM( registry.exportAsXML(), _SINGLE_STEPS_EXPORT )
 
     def test_export_ordered( self ):
 
@@ -410,7 +484,7 @@ class SetupStepRegistryTests( SecurityRequestTest ):
                              , description='Gimme three steps'
                              )
 
-        self._compareDOM( registry.exportAsXML(), _ORDERED_EXPORT )
+        self._compareDOM( registry.exportAsXML(), _ORDERED_STEPS_EXPORT )
 
     def test_import_empty( self ):
 
@@ -423,7 +497,7 @@ class SetupStepRegistryTests( SecurityRequestTest ):
                              , description='One small step'
                              )
 
-        registry.importFromXML( _EMPTY_EXPORT )
+        registry.importFromXML( _EMPTY_STEPS_EXPORT )
 
         self.assertEqual( len( registry.listSteps() ), 0 )
         self.assertEqual( len( registry.listStepMetadata() ), 0 )
@@ -441,7 +515,7 @@ class SetupStepRegistryTests( SecurityRequestTest ):
                              , description='Texas two step'
                              )
 
-        registry.importFromXML( _SINGLE_EXPORT )
+        registry.importFromXML( _SINGLE_STEPS_EXPORT )
 
         self.assertEqual( len( registry.listSteps() ), 1 )
         self.failUnless( 'one' in registry.listSteps() )
@@ -457,7 +531,7 @@ class SetupStepRegistryTests( SecurityRequestTest ):
 
         registry = self._makeOne().__of__( self.root )
 
-        registry.importFromXML( _ORDERED_EXPORT )
+        registry.importFromXML( _ORDERED_STEPS_EXPORT )
 
         self.assertEqual( len( registry.listSteps() ), 3 )
         self.failUnless( 'one' in registry.listSteps() )
@@ -472,26 +546,14 @@ class SetupStepRegistryTests( SecurityRequestTest ):
 
         self.failUnless( 0 <= three < two < one )
 
-#
-#   Dummy callables
-#
-def ONE_FUNC( context ): pass
-def TWO_FUNC( context ): pass
-def THREE_FUNC( context ): pass
-def FOUR_FUNC( context ): pass
 
-ONE_FUNC_NAME = '%s.%s' % ( __name__, ONE_FUNC.__name__ )
-TWO_FUNC_NAME = '%s.%s' % ( __name__, TWO_FUNC.__name__ )
-THREE_FUNC_NAME = '%s.%s' % ( __name__, THREE_FUNC.__name__ )
-FOUR_FUNC_NAME = '%s.%s' % ( __name__, FOUR_FUNC.__name__ )
-
-_EMPTY_EXPORT = """\
+_EMPTY_STEPS_EXPORT = """\
 <?xml version="1.0"?>
 <setup-steps>
 </setup-steps>
 """
 
-_SINGLE_EXPORT = """\
+_SINGLE_STEPS_EXPORT = """\
 <?xml version="1.0"?>
 <setup-steps>
  <setup-step id="one"
@@ -503,7 +565,7 @@ _SINGLE_EXPORT = """\
 </setup-steps>
 """ % ( ONE_FUNC_NAME, )
 
-_ORDERED_EXPORT = """\
+_ORDERED_STEPS_EXPORT = """\
 <?xml version="1.0"?>
 <setup-steps>
  <setup-step id="three"
@@ -530,6 +592,9 @@ _ORDERED_EXPORT = """\
 """ % ( THREE_FUNC_NAME, TWO_FUNC_NAME, ONE_FUNC_NAME )
 
 
+#==============================================================================
+#   ESR tests
+#==============================================================================
 class ExportScriptRegistryTests( unittest.TestCase ):
 
     def _getTargetClass( self ):
@@ -551,13 +616,21 @@ class ExportScriptRegistryTests( unittest.TestCase ):
 
         registry = self._makeOne()
         self.assertEqual( registry.getScript( 'nonesuch' ), None )
-        self.assertEqual( registry.getScriptMetadata( 'nonesuch' ), None )
 
     def test_getScript_defaulted( self ):
 
         registry = self._makeOne()
         default = lambda x: false
         self.assertEqual( registry.getScript( 'nonesuch', default ), default )
+
+    def test_getScriptMetadata_nonesuch( self ):
+
+        registry = self._makeOne()
+        self.assertEqual( registry.getScriptMetadata( 'nonesuch' ), None )
+
+    def test_getScriptMetadata_defaulted( self ):
+
+        registry = self._makeOne()
         self.assertEqual( registry.getScriptMetadata( 'nonesuch', {} ), {} )
 
     def test_registerScript_simple( self ):
@@ -571,7 +644,7 @@ class ExportScriptRegistryTests( unittest.TestCase ):
         self.assertEqual( info[ 'title' ], 'one' )
         self.assertEqual( info[ 'description' ], '' )
 
-    def test_registerScript_no_desc( self ):
+    def test_registerScript_docstring( self ):
 
         def func_with_doc( site ):
             """This is the first line.
@@ -589,7 +662,7 @@ class ExportScriptRegistryTests( unittest.TestCase ):
         self.assertEqual( info[ 'title' ], 'This is the first line.' )
         self.assertEqual( info[ 'description' ] , 'This is the second line.' )
 
-    def test_registerScript_w_desc( self ):
+    def test_registerScript_docstring_with_override( self ):
 
         def func_with_doc( site ):
             """This is the first line.
