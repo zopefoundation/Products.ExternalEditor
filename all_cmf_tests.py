@@ -35,6 +35,7 @@ CMF_PACKAGES = [ ( 'CMFCore',        1 )
                , ( 'DCWorkflow',     1 )
                , ( 'CMFActionIcons', 1 )
                , ( 'CMFSetup',       1 )
+               , ( 'CMFUid',         1 )
                , ( 'CMFCalendar',    0 )
                ]
 
