@@ -257,6 +257,8 @@ class ToolInit:
             tool.icon = 'misc_/%s/%s' % (self.product_name, self.icon)
 
 
+Globals.InitializeClass( ToolInit )
+
 def manage_addToolForm(self, REQUEST):
     '''
     Shows the add tool form.
@@ -335,6 +337,8 @@ class ContentInit:
         for ct in self.content_types:
             ct.__factory_meta_type__ = self.meta_type
 
+Globals.InitializeClass( ContentInit )
+
 def manage_addContentForm(self, REQUEST):
     '''
     Shows the add content type form.
@@ -406,6 +410,8 @@ class SimpleItemWithProperties (PropertyManager, SimpleItem):
                 return p.get('label', id)
         return id
 
+
+Globals.InitializeClass( SimpleItemWithProperties )
 
 
 import OFS

@@ -19,6 +19,7 @@ __version__='$Revision$'[11:-2]
 from string import split, join, strip
 from Acquisition import aq_base
 from AccessControl import ClassSecurityInfo
+from Globals import InitializeClass
 
 class SkinPathError (Exception):
     'Invalid skin path'
@@ -108,3 +109,5 @@ class SkinsContainer:
                 skinob = self.getSkinByPath('')
         return skinob
 
+
+InitializeClass( SkinsContainer )
