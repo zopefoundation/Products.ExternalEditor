@@ -148,9 +148,18 @@ class CookieCrumbler (SimpleItemWithProperties):
         try: del req.environ[name]
         except: pass
 
-    security.declarePrivate('setAuthCookie')
-    def setAuthCookie(self, resp, ac):
-        resp.setCookie(self.auth_cookie, quote(ac), path='/')
+    # Allow overridable cookie set/expiration methods.
+    security.declarePrivate('getCookieMethod')
+    def getCookieMethod( self, name='setAuthCookie', default=None ):
+        return getattr( self.aq_inner.aq_parent, name, default )
+
+    security.declarePrivate('setDefaultAuthCookie')
+    def defaultSetAuthCookie( self, resp, cookie_name, cookie_value ):
+        resp.setCookie( cookie_name, cookie_value, path='/')
+
+    security.declarePrivate('defaultExpireAuthCookie')
+    def defaultExpireAuthCookie( self, cookie_name ):
+        resp.expireCookie( cookie_name, path='/')
 
     security.declarePrivate('modifyRequest')
     def modifyRequest(self, req, resp):
@@ -172,7 +181,9 @@ class CookieCrumbler (SimpleItemWithProperties):
                 else:
                     # Expire the user name
                     resp.expireCookie(self.name_cookie, path='/')
-                self.setAuthCookie(resp, ac)
+                method = self.getCookieMethod( 'setAuthCookie'
+                                             , self.defaultSetAuthCookie )
+                method( resp, self.auth_cookie, quote( ac ) )
                 self.delRequestVar(req, self.name_cookie)
                 self.delRequestVar(req, self.pw_cookie)
                 return ATTEMPT_LOGIN
@@ -269,7 +280,9 @@ class CookieCrumbler (SimpleItemWithProperties):
         '''
         req = self.REQUEST
         resp = req['RESPONSE']
-        resp.expireCookie(self.auth_cookie, path='/')
+        method = self.getCookieMethod( 'expireAuthCookie'
+                                     , self.defaultExpireAuthCookie )
+        method( cookie_name=self.auth_cookie )
         redir = 0
         if self.logout_page:
             iself = getattr(self, 'aq_inner', self)

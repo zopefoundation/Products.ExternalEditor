@@ -42,6 +42,11 @@
  - DirectoryView objects now reload when the directory they represent has
    changed, if Zope is running in debug mode.
 
+ - Added hooks to CookieCrumbler to permit site managers to customize
+   seting/expiring of the authentication cookie by adding PythonScripts;
+   two default filesystem implementations are in CMFDefault's "control"
+   skin.
+
 1.0 final (2001/03/29)
 
  - Removed embedded spaces in 'portal_status_message' strings
