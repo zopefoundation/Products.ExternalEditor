@@ -124,10 +124,10 @@ class ExternalEditor:
             # Write the body of the input file to a separate file
             content_file = urllib.unquote('-%s%s' % (self.host, self.path))\
                            .replace('/', ',').replace(':',',').replace(' ','_')
-            ext = self.options.get('extension')
+            extension = self.options.get('extension')
             
-            if ext and not content_file.endswith(ext):
-                content_file = content_file + ext
+            if extension and not content_file.endswith(extension):
+                content_file = content_file + extension
             
             if self.options.has_key('temp_dir'):
                 while 1:
@@ -145,7 +145,11 @@ class ExternalEditor:
             in_f.close()
             body_f.close()
             self.clean_up = int(self.options.get('cleanup_files', 1))
-            if self.clean_up: os.remove(input_file)
+            if self.clean_up: 
+                try:
+                    os.remove(input_file)
+                except OSError:
+                    pass # Sometimes we aren't allowed to delete it
             
             if self.ssl:
                 # See if our Python build supports ssl
@@ -176,12 +180,68 @@ class ExternalEditor:
     def getEditorCommand(self):
         """Return the editor command"""
         editor = self.options.get('editor')
+        
+        if win32 and editor is None:
+            from win32api import FindExecutable, RegOpenKeyEx, RegQueryValueEx
+            from win32con import HKEY_CLASSES_ROOT
+            # Find editor application based on mime type and extension
+            content_type = self.metadata.get('content_type')
+            extension = self.metadata.get('extension')
+            
+            if content_type:
+                # Search registry for the extension by MIME type
+                try:
+                    reg_key = 'MIME\\Database\\Content Type\\%s' % content_type
+                    hk = RegOpenKeyEx(HKEY_CLASSES_ROOT, reg_key)
+                    extension, nil = RegQueryValueEx(hk, 'Extension')
+                except:
+                    traceback.print_exc(file=sys.stderr)
+                    pass
+            
+            if extension is None:
+                url = self.metadata['url']
+                dot = url.rfind('.')
+
+                if dot != -1 and dot > url.rfind('/'):
+                    extension = url[dot:]
+
+            if extension is not None:
+                hk = RegOpenKeyEx(HKEY_CLASSES_ROOT, extension)
+                classname, nil = RegQueryValueEx(hk, None)
+                try:
+                    hk = RegOpenKeyEx(HKEY_CLASSES_ROOT, 
+                                      classname+'\\Shell\\Edit\\Command')
+                    editor, nil = RegQueryValueEx(hk, None)
+                except:
+                    traceback.print_exc(file=sys.stderr)
+                    pass
+
+                if editor is None:
+                    try:
+                        hk = RegOpenKeyEx(HKEY_CLASSES_ROOT, 
+                                          classname+'\\Shell\\Open\\Command')
+                        editor, nil = RegQueryValueEx(hk, None)
+                    except: 
+                        traceback.print_exc(file=sys.stderr)
+                        pass
+
+                if editor is None:
+                    try:
+                        nil, editor = FindExecutable(self.body_file, '')
+                    except:
+                        traceback.print_exc(file=sys.stderr)
+                        pass
+            
+            # Don't use IE as an "editor"
+            if editor.find('\\iexplore.exe') != -1:
+                editor = None
 
         if not editor and not win32 and has_tk():
             from tkSimpleDialog import askstring
             editor = askstring('Zope External Editor', 
                                'Enter the command to launch the default editor')
-            if not editor: sys.exit(0)
+            if not editor: 
+                sys.exit(0)
             self.config.set('general', 'editor', path)
             self.config.save()
 
