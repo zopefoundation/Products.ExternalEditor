@@ -42,4 +42,65 @@ Zope External Editor Installation
     
     - for Application, select the helper application python file
 
- 
+  Tips
+  
+    The helper application can run any graphical editor that does not detach
+    itself from the controlling process.
+    
+    To get terminal editors to work, you need to create a small shell script to
+    spawn them inside an xterm. For example, the following short shell script
+    fires up vi in an xterm and passes it the file to edit::
+    
+      #!/bin/sh
+      xterm -e vi "$@"
+      
+    You can of course modify the above to fire up your favorite editor or add
+    any command line arguments you want.
+    
+    Specify the shell script as the editor (in ~/.zope-external-edit) and you
+    should be good to go.
+    
+    As for editors that insist on detaching from the controlling process (gvim
+    does this by default), you need to configure them so that they do not do
+    this. (The -f option turns this off for gvim).
+    
+ Troubleshooting
+
+    If the helper app won't launch try the following suggestions:
+    
+    - Make sure you have Tk installed properly. To test this, bring up Python
+      in a terminal and enter 'import Tkinter'. If it throws an exception,
+      that is your problem.
+
+    - Netscape 4 users, add a "%s" at the end of the application command line. 
+      It appears the Netscape  likes to alert you with spurious things coming
+      from stderr. I'll see if I can come up with a solution to that.
+
+    - Make sure the file is marked as executable for your user ('chmod +x zopeedit.py' should do it)
+
+    - Make sure the first line of the helper app file points to the correct 
+      path to your Python binary (the default is '/usr/local/bin/python' which 
+      may not be correct on all systems)
+
+    - Make sure the browser is properly configured. Use a full path to the 
+      helper app.
+
+    - Make sure you are using a graphical editor (that uses X windows). To use
+      a terminal based editor (like vi), create a shell script that spawns it 
+      inside an xterm. See tips above.
+
+    - Try downloading and saving the external editor data to a file manually
+      (right click on the pencil icon). Then try running the helper app from 
+      the command line, passing it the path to this file. If it runs, then
+      there is something wrong with the browser configuration. If not, then it
+      should output a traceback to your terminal. Email me a copy of this
+      traceback, and the data file and I will try to fix it.
+
+    - If the editor launches, but the helper app complains that it didn't, its
+      probably because your editor detached from the parent process (the helper
+      app). Configure the editor such that it does not do this. Unfortunately
+      this prevents you from using a multi-headed text edit server (like nedit
+      and emacs can provide). This is a limitation I have not found a way
+      around yet (any ideas??)
+
+    

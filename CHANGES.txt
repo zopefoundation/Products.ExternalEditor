@@ -1,5 +1,7 @@
 External Editor Change Log
 
+    - Removed implicit save in Configuration class destructor
+
     - Added caching headers to prevent client-side caching of edit data.
       Thanks to Gabriel Genellina for pointing this out.
 

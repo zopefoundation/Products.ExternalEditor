@@ -34,18 +34,11 @@ class Configuration:
         self.changed = 0
         self.config = ConfigParser()
         self.config.readfp(open(path))
-        
-        
-    def __del__(self):
-        # Save changes on destruction
-        if self.changed:
-            self.save()
             
     def save(self):
         """Save config options to disk"""
         self.config.write(open(self.path, 'w'))
         self.changed = 0
-        
             
     def set(self, section, option, value):
         self.config.set(section, option, value)
@@ -107,11 +100,11 @@ class ExternalEditor:
                 body_file = body_file + ext
             body_f = open(body_file, 'wb')
             body_f.write(in_f.read())
+            self.body_file = body_file
             in_f.close()
             body_f.close()
             self.clean_up = int(self.options.get('cleanup_files', 1))
             if self.clean_up: os.remove(input_file)
-            self.body_file = body_file
         except:
             # for security, always delete the input file even if
             # a fatal error occurs, unless explicitly stated otherwise
@@ -133,7 +126,7 @@ class ExternalEditor:
         
     def __del__(self):
         # for security we always delete the files by default
-        if getattr(self, 'clean_up', 1):
+        if getattr(self, 'clean_up', 1) and hasattr(self, 'body_file'):
             os.remove(self.body_file)
             
     def getEditorPath(self):
@@ -164,7 +157,7 @@ class ExternalEditor:
         if path is not None:            
             return path
         else:
-            self.fatalError('Editor not found at "%s"' % path)
+            fatalError('Editor not found at "%s"' % path)
         
     def launch(self):
         """Launch external editor"""
