@@ -78,7 +78,6 @@ class SkinnableObjectManager (ObjectManager):
         """Returns the requested skin.
         """
         skinob = None
-        skinstool = None
         sfn = self.getSkinsFolderName()
 
         if sfn is not None:
