@@ -15,59 +15,92 @@ from permissions import ManagePortal
 from utils import HandlerBase
 from utils import _xmldir
 
-class _FauxContent:
+#
+#   Configurator entry points
+#
+_FILENAME = 'actions.xml'
 
-    # Dummy object for passing to listActions
+def importActionProviders( context ):
 
-    def __init__( self, **kw ):
-        self.__dict__.update( kw )
+    """ Import action providers and their actions rom an XML file
 
-class _ActionProviderParser( HandlerBase ):
+    o 'context' must implement IImportContext.
 
-    security = ClassSecurityInfo()
-    security.declareObjectPrivate()
-    security.setDefaultAccess( 'deny' )
+    o Register via Python:
 
-    def __init__( self, encoding ):
+      registry = site.portal_setup.getImportStepRegistry()
+      registry.registerStep( 'importActionProviders'
+                           , '20040518-01'
+                           , Products.CMFSetup.actions.importActionProviders
+                           , ()
+                           , 'Action Provider import'
+                           , 'Import  action providers registered with '
+                             'the actions tool, and their actions.'
+                           )
 
-        self._encoding = encoding
-        self._provider_info = {}
-        self._provider_ids = []
+    o Register via XML:
+ 
+      <setup-step id="importActionProviders"
+                  version="20040524-01"
+                  handler="Products.CMFSetup.actions.importActionProviders"
+                  title="Action Provider import"
+      >Import action providers registered with the actions tool,
+       and their actions.</setup-step>
 
-    def startElement( self, name, attrs ):
+    """
+    site = context.getSite()
+    encoding = context.getEncoding()
 
-        if name == 'actions-tool':
-            pass
+    if context.shouldPurge():
 
-        elif name == 'action-provider':
+        actions_tool = getToolByName( site, 'portal_actions' )
+        for provider_id in actions_tool.listActionProviders():
+            actions_tool.deleteActionProvider( provider_id )
 
-            id = self._extract( attrs, 'id' )
+    text = context.readDataFile( _FILENAME )
 
-            if id not in self._provider_ids:
-                self._provider_ids.append( id )
+    if text is not None:
 
-        elif name == 'action':
+        apc = ActionProvidersConfigurator( site ).__of__( site )
+        apc.parseXML( text, encoding )
 
-            provider_id = self._provider_ids[ -1 ]
-            actions = self._provider_info.setdefault( provider_id, [] )
-
-            info = { 'action_id' : self._extract( attrs, 'action_id' )
-                   , 'category' : self._extract( attrs, 'category' )
-                   , 'name' : self._extract( attrs, 'title' )
-                   , 'action' : self._extract( attrs, 'action_expr' )
-                   , 'condition' : self._extract( attrs, 'condition_expr' )
-                   , 'permission' : self._extract( attrs, 'permission' )
-                   , 'category' : self._extract( attrs, 'category' )
-                   , 'visible' : self._extract( attrs, 'visible' )
-                   }
-
-            actions.append( info )
-
-        else:
-            raise ValueError, 'Unknown element %s' % name
+    return 'Action providers imported.'
 
 
-InitializeClass( _ActionProviderParser )
+def exportActionProviders( context ):
+
+    """ Export action providers and their actions as an XML file
+
+    o 'context' must implement IExportContext.
+
+    o Register via Python:
+
+      registry = site.portal_setup.getExportStepRegistry()
+      registry.registerStep( 'exportActionProviders'
+                           , Products.CMFSetup.actions.exportActionProviders
+                           , 'Action Provider export'
+                           , 'Export action providers registered with '
+                             'the actions tool, and their actions.'
+                           )
+
+    o Register via XML:
+ 
+      <export-script id="exportActionProviders"
+                     version="20040518-01"
+                     handler="Products.CMFSetup.actions.exportActionProviders"
+                     title="Action Provider export"
+      >Export action providers registered with the actions tool,
+       and their actions.</export-script>
+
+    """
+    site = context.getSite()
+    apc = ActionProvidersConfigurator( site ).__of__( site )
+    text = apc.generateXML()
+
+    context.writeDataFile( _FILENAME, text, 'text/xml' )
+
+    return 'Action providers exported.'
+
 
 class ActionProvidersConfigurator( Implicit ):
 
@@ -169,89 +202,56 @@ class ActionProvidersConfigurator( Implicit ):
 
 InitializeClass( ActionProvidersConfigurator )
 
+class _FauxContent:
 
-#
-#   Configurator entry points
-#
-_FILENAME = 'actions.xml'
+    # Dummy object for passing to listActions
 
-def importActionProviders( context ):
+    def __init__( self, **kw ):
+        self.__dict__.update( kw )
 
-    """ Import action providers and their actions rom an XML file
+class _ActionProviderParser( HandlerBase ):
 
-    o 'context' must implement IImportContext.
+    security = ClassSecurityInfo()
+    security.declareObjectPrivate()
+    security.setDefaultAccess( 'deny' )
 
-    o Register via Python:
+    def __init__( self, encoding ):
 
-      registry = site.portal_setup.getImportStepRegistry()
-      registry.registerStep( 'importActionProviders'
-                           , '20040518-01'
-                           , Products.CMFSetup.actions.importActionProviders
-                           , ()
-                           , 'Action Provider import'
-                           , 'Import  action providers registered with '
-                             'the actions tool, and their actions.'
-                           )
+        self._encoding = encoding
+        self._provider_info = {}
+        self._provider_ids = []
 
-    o Register via XML:
- 
-      <setup-step id="importActionProviders"
-                  version="20040524-01"
-                  handler="Products.CMFSetup.actions.importActionProviders"
-                  title="Action Provider import"
-      >Import action providers registered with the actions tool,
-       and their actions.</setup-step>
+    def startElement( self, name, attrs ):
 
-    """
-    site = context.getSite()
-    encoding = context.getEncoding()
+        if name == 'actions-tool':
+            pass
 
-    if context.shouldPurge():
+        elif name == 'action-provider':
 
-        actions_tool = getToolByName( site, 'portal_actions' )
-        for provider_id in actions_tool.listActionProviders():
-            actions_tool.deleteActionProvider( provider_id )
+            id = self._extract( attrs, 'id' )
 
-    text = context.readDataFile( _FILENAME )
+            if id not in self._provider_ids:
+                self._provider_ids.append( id )
 
-    if text is not None:
+        elif name == 'action':
 
-        apc = ActionProvidersConfigurator( site ).__of__( site )
-        apc.parseXML( text, encoding )
+            provider_id = self._provider_ids[ -1 ]
+            actions = self._provider_info.setdefault( provider_id, [] )
 
-    return 'Action providers imported.'
+            info = { 'action_id' : self._extract( attrs, 'action_id' )
+                   , 'category' : self._extract( attrs, 'category' )
+                   , 'name' : self._extract( attrs, 'title' )
+                   , 'action' : self._extract( attrs, 'action_expr' )
+                   , 'condition' : self._extract( attrs, 'condition_expr' )
+                   , 'permission' : self._extract( attrs, 'permission' )
+                   , 'category' : self._extract( attrs, 'category' )
+                   , 'visible' : self._extract( attrs, 'visible' )
+                   }
+
+            actions.append( info )
+
+        else:
+            raise ValueError, 'Unknown element %s' % name
 
 
-def exportActionProviders( context ):
-
-    """ Export action providers and their actions as an XML file
-
-    o 'context' must implement IExportContext.
-
-    o Register via Python:
-
-      registry = site.portal_setup.getExportStepRegistry()
-      registry.registerStep( 'exportActionProviders'
-                           , Products.CMFSetup.actions.exportActionProviders
-                           , 'Action Provider export'
-                           , 'Export action providers registered with '
-                             'the actions tool, and their actions.'
-                           )
-
-    o Register via XML:
- 
-      <export-script id="exportActionProviders"
-                     version="20040518-01"
-                     handler="Products.CMFSetup.actions.exportActionProviders"
-                     title="Action Provider export"
-      >Export action providers registered with the actions tool,
-       and their actions.</export-script>
-
-    """
-    site = context.getSite()
-    apc = ActionProvidersConfigurator( site ).__of__( site )
-    text = apc.generateXML()
-
-    context.writeDataFile( _FILENAME, text, 'text/xml' )
-
-    return 'Action providers exported.'
+InitializeClass( _ActionProviderParser )
