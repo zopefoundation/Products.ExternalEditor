@@ -61,12 +61,26 @@ Initiated by WorkflowMethod
 </tr>
 
 <tr>
-<th align="left">Script</th>
+<th align="left">Script (before)</th>
 <td>
 <select name="script_name">
 <option value="">(None)</option>
 <dtml-in getAvailableScriptIds sort>
  <dtml-let selected="script_name == _['sequence-item'] and 'selected' or ' '">
+  <option value="&dtml-sequence-item;" &dtml-selected;>&dtml-sequence-item;</option>
+ </dtml-let>
+</dtml-in>
+</select>
+</td>
+</tr>
+
+<tr>
+<th align="left">Script (after)</th>
+<td>
+<select name="after_script_name">
+<option value="">(None)</option>
+<dtml-in getAvailableScriptIds sort>
+ <dtml-let selected="after_script_name == _['sequence-item'] and 'selected' or ' '">
   <option value="&dtml-sequence-item;" &dtml-selected;>&dtml-sequence-item;</option>
  </dtml-let>
 </dtml-in>

@@ -548,7 +548,7 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
             raise WorkflowException, (
                 'Destination state undefined: ' + new_state)
 
-        # Execute a script if specified.
+        # Execute the "before" script.
         if tdef is not None and tdef.script_name:
             script = self.scripts[tdef.script_name]
             # Pass lots of info to the script in a single parameter.
@@ -603,6 +603,19 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
 
         # Update role to permission assignments.
         self.updateRoleMappingsFor(ob)
+
+        # Execute the "after" script.
+        if tdef is not None and tdef.after_script_name:
+            script = self.scripts[tdef.after_script_name]
+            # Pass lots of info to the script in a single parameter.
+            sci = StateChangeInfo(
+                ob, self, status, tdef, old_sdef, new_sdef, kwargs)
+            try:
+                script(sci)  # May throw an exception.
+            except ObjectMoved, ex:
+                ob = ex.getNewObject()
+                moved = 1
+                # Don't re-raise
 
         # Return the new state object.
         if moved:

@@ -122,7 +122,8 @@ class TransitionDefinition (SimpleItem):
     actbox_url = ''
     actbox_category = 'workflow'
     var_exprs = None  # A mapping.
-    script_name = None
+    script_name = None  # Executed before transition
+    after_script_name = None  # Executed after transition
 
     manage_options = (
         {'label': 'Properties', 'action': 'manage_properties'},
@@ -181,6 +182,7 @@ class TransitionDefinition (SimpleItem):
 
     def setProperties(self, title, new_state_id,
                       trigger_type=TRIGGER_USER_ACTION, script_name='',
+                      after_script_name='',
                       actbox_name='', actbox_url='',
                       actbox_category='workflow',
                       props=None, REQUEST=None):
@@ -190,6 +192,7 @@ class TransitionDefinition (SimpleItem):
         self.new_state_id = str(new_state_id)
         self.trigger_type = int(trigger_type)
         self.script_name = str(script_name)
+        self.after_script_name = str(after_script_name)
         g = Guard()
         if g.changeFromProperties(props or REQUEST):
             self.guard = g
