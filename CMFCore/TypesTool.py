@@ -130,6 +130,8 @@ class TypeInformation (SimpleItemWithProperties):
          'label':'Description'},
         {'id':'content_meta_type', 'type': 'string', 'mode':'w',
          'label':'Meta type'},
+        {'id':'content_icon', 'type': 'string', 'mode':'w',
+         'label':'Icon'},
         )
 
     _advanced_properties = (
@@ -151,6 +153,7 @@ class TypeInformation (SimpleItemWithProperties):
     title = ''
     description = ''
     content_meta_type = ''
+    content_icon = ''
     immediate_view = ''
     filter_content_types = 1
     allowed_content_types = ()
@@ -164,6 +167,9 @@ class TypeInformation (SimpleItemWithProperties):
             if (not kw.has_key('content_meta_type')
                 and kw.has_key('meta_type')):
                 kw['content_meta_type'] = kw['meta_type']
+            if (not kw.has_key('content_icon')
+                and kw.has_key('icon')):
+                kw['content_icon'] = kw['icon']
             apply(self.manage_changeProperties, (), kw)
             if kw.has_key('actions'):
                 aa = kw['actions']
@@ -210,6 +216,13 @@ class TypeInformation (SimpleItemWithProperties):
             meta types.
         """
         return self.content_meta_type
+
+    security.declareProtected(View, 'getIcon')
+    def getIcon(self):
+        """
+            Returns the icon for this content object.
+        """
+        return self.content_icon
 
     security.declarePublic('allowType')
     def allowType( self, contentType ):
