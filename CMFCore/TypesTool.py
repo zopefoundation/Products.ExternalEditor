@@ -899,7 +899,7 @@ class TypesTool(UniqueObject, Folder, ActionProviderBase):
             type_info = self.getTypeInfo( info.content )
 
             if type_info is not None:
-                actions.extend( type_info.listActions( info ) )
+                actions.extend( type_info.listActions() )
 
         return actions
 

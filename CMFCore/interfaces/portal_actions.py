@@ -24,80 +24,107 @@ except ImportError:
 
 
 class portal_actions(Interface):
-    '''Gathers a list of links which the user is allowed to view according to
+    """ Gathers a list of links which the user is allowed to view according to
     the current context.
-    '''
+    """
     id = Attribute('id', 'Must be set to "portal_actions"')
 
-    # listActionProviders__roles__ = ( 'Manager', )
     def listActionProviders():
-        """ Lists all action provider names registered with the 
-        actions tool.
+        """ List the ids of all Action Providers queried by this tool.
+
+        Permission -- Manage portal
+
+        Returns -- Tuple of Action Provider ids
         """
 
-    # addActionProvider__roles__ = ( 'Manager', )
-    def addActionProvider( provider_name ):
-        """ Add a new action provider to the providers known by the actions
-        tool. A provider must implement listActions.
-        The provider is only added is the actions tool can find the 
-        object corresponding to the provider_name
+    def addActionProvider(provider_name):
+        """ Add an Action Provider id to the providers queried by this tool.
+
+        A provider must implement the ActionProvider Interface.
+        OldstyleActionProviders are currently also supported.
+
+        The provider is only added if the actions tool can find the object
+        corresponding to the provider_name.
+
+        Permission -- Manage portal
         """
 
-    # deleteActionProvider__roles__ = ( 'Manager', )
-    def deleteActionProvider( provider_name ):
-        """ Deletes an action provider name from the providers known to
-        the actions tool. The deletion only takes place if provider_name
-        is actually found among the known action providers.
+    def deleteActionProvider(provider_name):
+        """ Delete an Action Provider id from providers queried by this tool.
+
+        The deletion only takes place if provider_name is actually found among
+        the known action providers.
+
+        Permission -- Manage portal
         """
 
-    # listFilteredActionsFor__roles__ = None
-    def listFilteredActionsFor(object):
-        '''Gets all actions available to the user and returns a mapping
-        containing a list of user actions, folder actions, object actions,
-        and global actions.  Each action has the following keys:
-           name: An identifying action name
-           url: The URL to visit to access the action
-           permissions: A list. The user must have at least of the listed
-             permissions to access the action.  If the list is empty,
-             the user is allowed.  (Note that listFilteredActions() filters
-             out actions according to this field.)
-           category: One of "user", "folder", "object", or "globals".
-        '''
+    def listFilteredActionsFor(object=None):
+        """ List all actions available to the user.
 
-    # listFilteredActions__roles__ = None
-    def listFilteredActions():
-        '''Gets all actions available to the user in no particular context.
-        '''
+        Each action has the following keys:
+
+        - name: An identifying action name
+
+        - url: The URL to visit to access the action
+
+        - permissions: A list. The user must have at least one of the listed
+          permissions to access the action. If the list is empty, the user is
+          allowed. (Note that listFilteredActionsFor() filters out actions
+          according to this field.)
+
+        - category: One of "user", "folder", "object", "global" or "workflow"
+
+        Permission -- Always available
+
+        Returns -- Dictionary of category / action list pairs.
+        """
+
+    def listFilteredActions(object=None):
+        """ Deprecated alias of listFilteredActionsFor.
+        """
 
 
 class ActionProvider(Interface):
-    '''The interface expected of an object that can provide actions.
-    '''
+    """ The interface expected of an object that can provide actions.
+    """
 
-    # listActions__roles__ = ()  # No permission.
     def listActions(info=None):
-        """ Return all the actions defined by a provider.
+        """ List all the actions defined by a provider.
 
-        The info argument is currently used by 'Oldstyle CMF Discussion Tool'
-        and 'CMF Workflow Tool'.
+        The info argument is currently used by 'CMF Types Tool'. It contains
+        at least a 'content' attribute.
 
         Returns -- Tuple of ActionInformation objects
-
-        Oldstyle dictionary actions are currently also supported:
-        Returns a list of mappings describing actions.  Each action
-        should contain the keys "name", "url", "permissions", and
-        "category", conforming to the specs outlined in
-        portal_actions.listFilteredActionsFor().  The info argument
-        contains at least the following attributes, some of which
-        may be set to "None":
-
-          isAnonymous
-          portal
-          portal_url
-          folder
-          folder_url
-          content
-          content_url
-          The new way of doing this is....
         """
 
+
+class OldstyleActionProvider(Interface):
+    """ Deprecated interface expected of an object that can provide actions.
+
+    Still used by 'Oldstyle CMF Discussion Tool' and 'CMF Workflow Tool'.
+    """
+
+    def listActions(info):
+        """ List all the actions defined by a provider.
+
+        Each action should contain the keys "name", "url", "permissions" and
+        "category", conforming to the specs outlined in
+        portal_actions.listFilteredActionsFor(). The info argument contains
+        at least the following attributes, some of which may be set to "None":
+
+        - isAnonymous
+
+        - portal
+
+        - portal_url
+
+        - folder
+
+        - folder_url
+
+        - content
+
+        - content_url
+
+        Returns -- Tuple of mappings describing actions
+        """

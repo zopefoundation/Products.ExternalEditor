@@ -1,7 +1,21 @@
-import unittest
+from unittest import TestCase, TestSuite, makeSuite, main
 
-import Zope # Sigh, make product initialization happen
+import Zope
+try:
+    Zope.startup()
+except AttributeError:
+    # for Zope versions before 2.6.1
+    pass
+try:
+    from Interface.Verify import verifyClass
+except ImportError:
+    # for Zope versions before 2.6.0
+    from Interface import verify_class_implementation as verifyClass
+
 from OFS.SimpleItem import SimpleItem
+
+from Products.CMFCore.WorkflowTool import WorkflowTool
+
 
 class Dummy( SimpleItem ):
 
@@ -103,9 +117,9 @@ class DummyTypesTool( SimpleItem ):
         if getattr( ob, 'meta_type', None ) is 'Dummy':
             return DummyTypeInfo( 'Dummy Content' )
         return None
-        
 
-class WorkflowToolTests( unittest.TestCase ):
+
+class WorkflowToolTests(TestCase):
 
     def setUp( self ):
         from Products.CMFCore.WorkflowTool import addWorkflowFactory
@@ -116,8 +130,6 @@ class WorkflowToolTests( unittest.TestCase ):
         _removeWorkflowFactory( DummyWorkflow )
 
     def _makeOne( self, workflow_ids=() ):
-
-        from Products.CMFCore.WorkflowTool import WorkflowTool
         tool = WorkflowTool()
 
         for workflow_id in workflow_ids:
@@ -142,16 +154,6 @@ class WorkflowToolTests( unittest.TestCase ):
         tool = self._makeWithTypes()
         tool.setChainForPortalTypes( ( 'Dummy Content', ), ( 'a', 'b' ) )
         return tool
-
-    def test_interface( self ):
-        from Products.CMFCore.WorkflowTool import WorkflowTool
-        from Products.CMFCore.interfaces.portal_workflow import portal_workflow
-        try:
-            from Interface import verify_class_implementation as verifyClass
-        except ImportError:
-            from Interface.Verify import verifyClass
-
-        verifyClass(portal_workflow, WorkflowTool)
 
     def test_empty( self ):
 
@@ -308,18 +310,27 @@ class WorkflowToolTests( unittest.TestCase ):
             self.assertEqual( len( notified ), 1 )
             self.assertEqual( notified[0], ( ob, 'action', 'exception' ) )
 
-
     def xxx_test_updateRoleMappings( self ):
         """
             Build a tree of objects, invoke tool.updateRoleMappings,
             and then check to see that the workflows each got called;
             check the resulting count, as well.
         """
-        
+
+    def test_interface(self):
+        from Products.CMFCore.interfaces.portal_workflow \
+                import portal_workflow as IWorkflowTool
+        from Products.CMFCore.interfaces.portal_actions \
+                import OldstyleActionProvider as IOldstyleActionProvider
+
+        verifyClass(IWorkflowTool, WorkflowTool)
+        verifyClass(IOldstyleActionProvider, WorkflowTool)
+
+
 def test_suite():
-    return unittest.TestSuite((
-        unittest.makeSuite(WorkflowToolTests),
+    return TestSuite((
+        makeSuite(WorkflowToolTests),
         ))
 
 if __name__ == '__main__':
-    unittest.main()
+    main(defaultTest='test_suite')

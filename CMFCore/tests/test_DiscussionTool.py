@@ -2,6 +2,11 @@ from unittest import TestCase, TestSuite, makeSuite, main
 
 import Zope
 try:
+    Zope.startup()
+except AttributeError:
+    # for Zope versions before 2.6.1
+    pass
+try:
     from Interface.Verify import verifyClass
 except ImportError:
     # for Zope versions before 2.6.0
@@ -16,8 +21,11 @@ class DiscussionToolTests(TestCase):
     def test_interface(self):
         from Products.CMFCore.interfaces.portal_discussion \
                 import oldstyle_portal_discussion as IOldstyleDiscussionTool
+        from Products.CMFCore.interfaces.portal_actions \
+                import OldstyleActionProvider as IOldstyleActionProvider
 
         verifyClass(IOldstyleDiscussionTool, DiscussionTool)
+        verifyClass(IOldstyleActionProvider, DiscussionTool)
 
 
 class OldDiscussableTests(TestCase):

@@ -15,21 +15,23 @@
 $Id$
 """
 
-from utils import _dtmldir
-from utils import getToolByName
-from utils import UniqueObject
-from CMFCorePermissions import AccessContentsInformation
-from CMFCorePermissions import ManagePortal
-from CMFCorePermissions import ReplyToItem
-from CMFCorePermissions import View
 from OFS.SimpleItem import SimpleItem
 from Globals import InitializeClass, DTMLFile
 from Acquisition import Implicit
 from AccessControl import ClassSecurityInfo
 
+from CMFCorePermissions import AccessContentsInformation
+from CMFCorePermissions import ManagePortal
+from CMFCorePermissions import ReplyToItem
+from CMFCorePermissions import View
 from interfaces.Discussions import OldDiscussable as IOldDiscussable
+from interfaces.portal_actions \
+        import OldstyleActionProvider as IOldstyleActionProvider
 from interfaces.portal_discussion \
         import oldstyle_portal_discussion as IOldstyleDiscussionTool
+from utils import _dtmldir
+from utils import getToolByName
+from utils import UniqueObject
 
 
 class OldDiscussable(Implicit):
@@ -113,7 +115,7 @@ class OldDiscussable(Implicit):
 
 class DiscussionTool (UniqueObject, SimpleItem):
 
-    __implements__ = IOldstyleDiscussionTool
+    __implements__ = (IOldstyleDiscussionTool, IOldstyleActionProvider)
 
     id = 'portal_discussion'
     meta_type = 'Oldstyle CMF Discussion Tool'
@@ -153,7 +155,6 @@ class DiscussionTool (UniqueObject, SimpleItem):
             return typeInfo.allowDiscussion()
         return 0
 
-
     security.declarePrivate('listActions')
     def listActions(self, info):
         # Return actions for reply and show replies
@@ -176,6 +177,5 @@ class DiscussionTool (UniqueObject, SimpleItem):
             )
 
         return actions
-
 
 InitializeClass(DiscussionTool)

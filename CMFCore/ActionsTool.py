@@ -127,15 +127,13 @@ class ActionsTool(UniqueObject, Folder, ActionProviderBase):
     #
     security.declareProtected(ManagePortal, 'listActionProviders')
     def listActionProviders(self):
-        """
-        Return a sequence of action providers known by this tool.
+        """ List the ids of all Action Providers queried by this tool.
         """
         return self.action_providers
 
     security.declareProtected(ManagePortal, 'addActionProvider')
     def addActionProvider( self, provider_name ):
-        """
-        Add the name of a new action provider.
+        """ Add an Action Provider id to the providers queried by this tool.
         """
         ap = list( self.action_providers )
         if hasattr( self, provider_name ) and provider_name not in ap:
@@ -144,8 +142,7 @@ class ActionsTool(UniqueObject, Folder, ActionProviderBase):
 
     security.declareProtected(ManagePortal, 'deleteActionProvider')
     def deleteActionProvider( self, provider_name ):
-        """
-        Remove an action provider.
+        """ Delete an Action Provider id from providers queried by this tool.
         """
         ap = list( self.action_providers )
         if provider_name in ap:
@@ -157,9 +154,7 @@ class ActionsTool(UniqueObject, Folder, ActionProviderBase):
     #
     security.declarePublic('listFilteredActionsFor')
     def listFilteredActionsFor(self, object=None):
-        """
-        Return a mapping containing of all actions available to the
-        user against object, bucketing into categories.
+        """ List all actions available to the user.
         """
         portal = aq_parent(aq_inner(self))
         if object is None or not hasattr(object, 'aq_base'):
@@ -256,6 +251,5 @@ class ActionsTool(UniqueObject, Folder, ActionProviderBase):
         else:
             for i in a:
                 append(i)
-        
 
 InitializeClass(ActionsTool)
