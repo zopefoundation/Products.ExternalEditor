@@ -14,6 +14,7 @@ from Products.DCWorkflow.Transitions import TRIGGER_AUTOMATIC
 
 from common import BaseRegistryTests
 from common import DummyExportContext
+from common import DummyImportContext
 
 class DummyWorkflowTool( Folder ):
 
@@ -29,6 +30,22 @@ class DummyWorkflowTool( Folder ):
     def getWorkflowById( self, workflow_id ):
 
         return self._getOb( workflow_id )
+
+    def setDefaultChain( self, chain ):
+
+        chain = chain.replace( ',', ' ' )
+        self._default_chain = tuple( chain.split() )
+
+    def setChainForPortalTypes( self, pt_names, chain ):
+
+        chain = chain.replace( ',', ' ' )
+        chain = tuple( chain.split() )
+
+        if self._chains_by_type is None:
+            self._chains_by_type = {}
+
+        for pt_name in pt_names:
+            self._chains_by_type[ pt_name ] = chain
 
 class DummyWorkflow( Folder ):
 
@@ -1399,6 +1416,24 @@ _EMPTY_TOOL_EXPORT = """\
 </workflow-tool>
 """
 
+_BINDINGS_TOOL_EXPORT = """\
+<?xml version="1.0"?>
+<workflow-tool>
+ <bindings>
+  <default>
+   <bound-workflow workflow_id="non_dcworkflow_0" />
+   <bound-workflow workflow_id="non_dcworkflow_1" />
+  </default>
+  <type type_id="sometype">
+   <bound-workflow workflow_id="non_dcworkflow_2" />
+  </type>
+  <type type_id="anothertype">
+   <bound-workflow workflow_id="non_dcworkflow_3" />
+  </type>
+ </bindings>
+</workflow-tool>
+"""
+
 _OVERRIDE_TOOL_EXPORT = """\
 <?xml version="1.0"?>
 <workflow-tool>
@@ -1789,13 +1824,135 @@ class Test_exportWorkflow( _WorkflowSetup
                             } )
         self.assertEqual( content_type, 'text/xml' )
 
+class Test_importWorkflow( _WorkflowSetup
+                         , _GuardChecker
+                         ):
 
+    def test_empty_default_purge( self ):
+
+        WF_ID_NON = 'non_dcworkflow_%s'
+        WF_TITLE_NON = 'Non-DCWorkflow #%s'
+
+        site = self._initSite()
+        wf_tool = site.portal_workflow
+
+        for i in range( 4 ):
+            nondcworkflow = DummyWorkflow( WF_TITLE_NON % i )
+            nondcworkflow.title = WF_TITLE_NON % i
+            wf_tool._setObject( WF_ID_NON % i, nondcworkflow )
+
+        wf_tool._default_chain = ( WF_ID_NON % 1, )
+        wf_tool._chains_by_type[ 'sometype' ] = ( WF_ID_NON % 2, )
+        self.assertEqual( len( wf_tool.objectIds() ), 4 )
+
+        context = DummyImportContext( site )
+        context._files[ 'workflows.xml' ] = _EMPTY_TOOL_EXPORT
+
+        from Products.CMFSetup.workflow import importWorkflowTool
+        importWorkflowTool( context )
+
+        self.assertEqual( len( wf_tool.objectIds() ), 0 )
+        self.assertEqual( len( wf_tool._default_chain ), 0 )
+        self.assertEqual( len( wf_tool._chains_by_type ), 0 )
+
+    def test_empty_explicit_purge( self ):
+
+        WF_ID_NON = 'non_dcworkflow_%s'
+        WF_TITLE_NON = 'Non-DCWorkflow #%s'
+
+        site = self._initSite()
+        wf_tool = site.portal_workflow
+
+        for i in range( 4 ):
+            nondcworkflow = DummyWorkflow( WF_TITLE_NON % i )
+            nondcworkflow.title = WF_TITLE_NON % i
+            wf_tool._setObject( WF_ID_NON % i, nondcworkflow )
+
+        wf_tool._default_chain = ( WF_ID_NON % 1, )
+        wf_tool._chains_by_type[ 'sometype' ] = ( WF_ID_NON % 2, )
+        self.assertEqual( len( wf_tool.objectIds() ), 4 )
+
+        context = DummyImportContext( site, True )
+        context._files[ 'workflows.xml' ] = _EMPTY_TOOL_EXPORT
+
+        from Products.CMFSetup.workflow import importWorkflowTool
+        importWorkflowTool( context )
+
+        self.assertEqual( len( wf_tool.objectIds() ), 0 )
+        self.assertEqual( len( wf_tool._default_chain ), 0 )
+        self.assertEqual( len( wf_tool._chains_by_type ), 0 )
+
+    def test_empty_skip_purge( self ):
+
+        WF_ID_NON = 'non_dcworkflow_%s'
+        WF_TITLE_NON = 'Non-DCWorkflow #%s'
+
+        site = self._initSite()
+        wf_tool = site.portal_workflow
+
+        for i in range( 4 ):
+            nondcworkflow = DummyWorkflow( WF_TITLE_NON % i )
+            nondcworkflow.title = WF_TITLE_NON % i
+            wf_tool._setObject( WF_ID_NON % i, nondcworkflow )
+
+        wf_tool._default_chain = ( WF_ID_NON % 1, )
+        wf_tool._chains_by_type[ 'sometype' ] = ( WF_ID_NON % 2, )
+        self.assertEqual( len( wf_tool.objectIds() ), 4 )
+
+        context = DummyImportContext( site, False )
+        context._files[ 'typestool.xml' ] = _EMPTY_TOOL_EXPORT
+
+        from Products.CMFSetup.workflow import importWorkflowTool
+        importWorkflowTool( context )
+
+        self.assertEqual( len( wf_tool.objectIds() ), 4 )
+        self.assertEqual( len( wf_tool._default_chain ), 1 )
+        self.assertEqual( wf_tool._default_chain[ 0 ], WF_ID_NON % 1 )
+        self.assertEqual( len( wf_tool._chains_by_type ), 1 )
+        self.assertEqual( wf_tool._chains_by_type[ 'sometype' ]
+                        , ( WF_ID_NON % 2, )
+                        )
+
+    def test_bindings_skip_purge( self ):
+
+        WF_ID_NON = 'non_dcworkflow_%s'
+        WF_TITLE_NON = 'Non-DCWorkflow #%s'
+
+        site = self._initSite()
+        wf_tool = site.portal_workflow
+
+        for i in range( 4 ):
+            nondcworkflow = DummyWorkflow( WF_TITLE_NON % i )
+            nondcworkflow.title = WF_TITLE_NON % i
+            wf_tool._setObject( WF_ID_NON % i, nondcworkflow )
+
+        wf_tool._default_chain = ( WF_ID_NON % 1, )
+        wf_tool._chains_by_type[ 'sometype' ] = ( WF_ID_NON % 2, )
+        self.assertEqual( len( wf_tool.objectIds() ), 4 )
+
+        context = DummyImportContext( site, False )
+        context._files[ 'workflows.xml' ] = _BINDINGS_TOOL_EXPORT
+
+        from Products.CMFSetup.workflow import importWorkflowTool
+        importWorkflowTool( context )
+
+        self.assertEqual( len( wf_tool.objectIds() ), 4 )
+        self.assertEqual( len( wf_tool._default_chain ), 2 )
+        self.assertEqual( wf_tool._default_chain[ 0 ], WF_ID_NON % 0 )
+        self.assertEqual( wf_tool._default_chain[ 1 ], WF_ID_NON % 1 )
+        self.assertEqual( len( wf_tool._chains_by_type ), 2 )
+        self.assertEqual( wf_tool._chains_by_type[ 'sometype' ]
+                        , ( WF_ID_NON % 2, )
+                        )
+        self.assertEqual( wf_tool._chains_by_type[ 'anothertype' ]
+                        , ( WF_ID_NON % 3, )
+                        )
 
 def test_suite():
     return unittest.TestSuite((
         unittest.makeSuite( WorkflowToolConfiguratorTests ),
         unittest.makeSuite( Test_exportWorkflow ),
-        #unittest.makeSuite( Test_importWorkflow ),
+        unittest.makeSuite( Test_importWorkflow ),
         ))
 
 if __name__ == '__main__':

@@ -57,19 +57,56 @@ def importWorkflowTool( context ):
     """
     site = context.getSite()
     encoding = context.getEncoding()
+    tool = getToolByName( site, 'portal_workflow' )
 
     if context.shouldPurge():
 
-        workflow_tool = getToolByName( site, 'portal_workflow' )
-        for provider_id in workflow_tool.listWorkflowTool():
-            workflow_tool.deleteActionProvider( provider_id )
+        tool.setDefaultChain( '' )
+        tool._chains_by_type.clear()
+
+        for workflow_id in tool.getWorkflowIds():
+            tool._delObject( workflow_id )
 
     text = context.readDataFile( _FILENAME )
 
     if text is not None:
 
         wtc = WorkflowToolConfigurator( site ).__of__( site )
-        wtc.parseXML( text, encoding )
+        workflows, bindings = wtc.parseToolXML( text, encoding )
+
+        for workflow_id, meta_type, filename in workflows:
+
+            if meta_type == DCWorkflowDefinition.meta_type:
+
+                wf_text = context.readDataFile( filename )
+
+                ( workflow_id
+                , title
+                , state_variable
+                , initial_state
+                , states
+                , transitions
+                , variables
+                , worklists
+                , permissions
+                , scripts
+                ) = wtc.parseWorkflowXML( wf_text )
+
+                tool._setObject( workflow_id
+                               , DCWorkflowDefinition( workflow_id ) )
+
+                # TODO: stuff variables, states, etc. into workflow
+
+            else:
+                pass # TODO: handle non-DCWorkflows
+
+        for type_id, workflow_ids in bindings.items():
+ 
+            chain = ','.join( workflow_ids )
+            if type_id is None:
+                tool.setDefaultChain( chain )
+            else:
+                tool.setChainForPortalTypes( ( type_id, ), chain )
 
     return 'Workflows imported.'
 
