@@ -93,7 +93,7 @@ from CMFCorePermissions import AccessContentsInformation, View, \
 import CMFCorePermissions
 from interfaces.Contentish import Contentish
 from DynamicType import DynamicType
-from utils import getToolByName, _checkPermission
+from utils import getToolByName, _checkPermission, _getViewFor
 try: 
     from webdav.WriteLockInterface import WriteLockInterface
     NoWL = 0
@@ -206,39 +206,11 @@ class PortalContent(DynamicType, SimpleItem):
     # Contentish interface methods
     # ----------------------------
 
-    def _verifyActionPermissions(self, action):
-        pp = action.get('permissions', ())
-        if not pp:
-            return 1
-        for p in pp:
-            if _checkPermission(p, self):
-                return 1
-        return 0
-
-    def _getDefaultView(self):
-        ti = self.getTypeInfo()
-        if ti is not None:
-            actions = ti.getActions()
-            for action in actions:
-                if action.get('id', None) == 'view':
-                    if self._verifyActionPermissions(action):
-                        return self.restrictedTraverse(action['action'])
-            # "view" action is not present or not allowed.
-            # Find something that's allowed.
-            for action in actions:
-                if self._verifyActionPermissions(action):
-                    return self.restrictedTraverse(action['action'])
-            raise 'Unauthorized', ('No accessible views available for %s' %
-                                 string.join(self.getPhysicalPath(), '/'))
-        else:
-            raise 'Not Found', ('Cannot find default view for "%s"' %
-                                string.join(self.getPhysicalPath(), '/'))
-
     def __call__(self):
         '''
         Invokes the default view.
         '''
-        view = self._getDefaultView()
+        view = _getViewFor(self)
         if getattr(aq_base(view), 'isDocTemp', 0):
             return apply(view, (self, self.REQUEST))
         else:

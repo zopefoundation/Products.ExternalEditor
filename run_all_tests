@@ -1,5 +1,5 @@
 #! /bin/sh
-/usr/bin/find Products -name "*.pyc" | xargs rm
+/usr/bin/find Products -follow -name "*.pyc" | xargs rm
 
 for d in Products/{CMF,DC}*; do
     echo Testing package $d

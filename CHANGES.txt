@@ -97,6 +97,9 @@
 
  Bug fixes
 
+  - Refactored getDefaultView into CMFCore.utils._getView;
+    can now specify a view to get by name.
+
   - Removed an infinite loop condition that arises when
     MembershipTool.createMemberArea gets called inside wrapUser
     (this could only happen if "Create Member Area" was checked

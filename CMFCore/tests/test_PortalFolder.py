@@ -208,7 +208,6 @@ class PortalFolderTests( unittest.TestCase ):
         assert 'foo' in catalog.uniqueValuesFor( 'id' )
         assert has_path( catalog._catalog, '/test/folder/sub/foo' )
 
-        #import pdb; pdb.set_trace()
         folder.manage_renameObject( id='sub', new_id='new_sub' )
         assert 'foo' in catalog.uniqueValuesFor( 'id' )
         assert len( catalog ) == 1

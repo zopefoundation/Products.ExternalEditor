@@ -152,6 +152,34 @@ def _checkPermission(permission, obj, StringType = type('')):
         return 1
     return 0
 
+def _verifyActionPermissions(obj, action):
+    pp = action.get('permissions', ())
+    if not pp:
+        return 1
+    for p in pp:
+        if _checkPermission(p, obj):
+            return 1
+    return 0
+
+def _getViewFor(obj, view='view'):
+    ti = obj.getTypeInfo()
+    if ti is not None:
+        actions = ti.getActions()
+        for action in actions:
+            if action.get('id', None) == view:
+                if _verifyActionPermissions(obj, action):
+                    return obj.restrictedTraverse(action['action'])
+        # "view" action is not present or not allowed.
+        # Find something that's allowed.
+        for action in actions:
+            if _verifyActionPermissions(obj, action):
+                return obj.restrictedTraverse(action['action'])
+        raise 'Unauthorized', ('No accessible views available for %s' %
+                               string.join(obj.getPhysicalPath(), '/'))
+    else:
+        raise 'Not Found', ('Cannot find default view for "%s"' %
+                            string.join(obj.getPhysicalPath(), '/'))
+
 
 # If Zope ever provides a call to getRolesInContext() through
 # the SecurityManager API, the method below needs to be updated.

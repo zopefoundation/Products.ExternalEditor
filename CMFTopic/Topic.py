@@ -169,30 +169,11 @@ class Topic(PortalFolder):
                 return 1
         return 0
 
-    def _getDefaultView(self):
-        ti = self.getTypeInfo()
-        if ti is not None:
-            actions = ti.getActions()
-            for action in actions:
-                if action.get('id', None) == 'view':
-                    if self._verifyActionPermissions(action):
-                        return self.restrictedTraverse(action['action'])
-            # "view" action is not present or not allowed.
-            # Find something that's allowed.
-            for action in actions:
-                if self._verifyActionPermissions(action):
-                    return self.restrictedTraverse(action['action'])
-            raise 'Unauthorized', ('No accessible views available for %s' %
-                                 string.join(self.getPhysicalPath(), '/'))
-        else:
-            raise 'Not Found', ('Cannot find default view for "%s"' %
-                                string.join(self.getPhysicalPath(), '/'))
-
     def __call__(self):
         '''
         Invokes the default view.
         '''
-        view = self._getDefaultView()
+        view = utils._getViewFor(self)
         if getattr(aq_base(view), 'isDocTemp', 0):
             return apply(view, (self, self.REQUEST))
         else:

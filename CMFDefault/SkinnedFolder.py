@@ -92,6 +92,8 @@ from Products.CMFCore import CMFCorePermissions
 from AccessControl import ClassSecurityInfo, Owned
 from Globals import InitializeClass
 from ComputedAttribute import ComputedAttribute
+from Products.CMFCore.utils import _getViewFor
+from Acquisition import aq_base
 
 factory_type_information = ( { 'id'             : 'Skinned Folder'
                              , 'meta_type'      : 'Skinned Folder'
@@ -133,31 +135,17 @@ class SkinnedFolder( PortalFolder ):
 
     security = ClassSecurityInfo()
 
-    def _index_html( self ):
+    def __call__(self):
         '''
-            Invoke the action identified by the id "view",
-            or the first action.
+        Invokes the default view.
         '''
-        tool = getToolByName( self, 'portal_types' )
-        ti = tool.getTypeInfo( self )
-        if ti is not None:
-            path = ti.getActionById('view', None)
-            if path is not None:
-                view = self.restrictedTraverse(path)
-                return view
-            actions = ti.getActions()
-            if actions:
-                path = actions[0][ 'action' ]
-                view = self.restrictedTraverse(path)
-                return view
-            raise 'Not Found', ('No default view defined for type "%s"'
-                                % ti.getId())
+        view = _getViewFor(self)
+        if getattr(aq_base(view), 'isDocTemp', 0):
+            return apply(view, (self, self.REQUEST))
         else:
-            raise 'Not Found', ('Cannot find default view for "%s"'
-                                % self.getPhysicalPath())
+            return view()
 
-    security.declareProtected( CMFCorePermissions.View, 'index_html' )
-    index_html = ComputedAttribute( _index_html, 1 )
+    index_html = None  # This special value informs ZPublisher to use __call__
 
     security.declareProtected( CMFCorePermissions.View, 'Creator' )
     def Creator( self ):
