@@ -179,7 +179,6 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
     def getStageOf(self, obj):
         """Returns the stage name the object is in the context of.
         """
-        verifyPermission(StageObjects, obj)
         portal = aq_parent(aq_inner(self))
         for stage_name, stage_title, path in self._stages:
             stage = self._getStage(portal, path)
@@ -421,8 +420,11 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
         """Returns a structure suitable for presentation of staging status.
         """
         res = []
-        revisions = self._getObjectVersionIds(source, include_status=1)
         source_stage = self.getStageOf(source)
+        if not source_stage:
+            # Not in any stage.
+            return res
+        revisions = self._getObjectVersionIds(source, include_status=1)
         objs = self._getObjectStages(source)
         for stage_name, stage_title, path in self._stages:
             stageable = (stage_name != source_stage) and (

@@ -229,6 +229,43 @@ class StagingTests(unittest.TestCase):
         self.assertEqual(versions['dev'], versions['review'])
         self.assertEqual(versions['dev'], versions['prod'])
 
+    def testGetObjectStats(self):
+        st = self.root.portal_staging
+        st.updateStages2(self.dev_stage.c1, ['review'])
+        all_stats = st.getObjectStats(self.dev_stage.c1)
+        expect_stats = (
+            {'exists': True,
+             'is_source': True,
+             'name': 'dev',
+             'revision': '1',
+             'stageable': False,
+             'title': 'Development',
+             'url': 'testroot/Stages/Development/c1'},
+            {'exists': True,
+             'is_source': False,
+             'name': 'review',
+             'revision': '1',
+             'stageable': False,
+             'title': 'Review',
+             'url': 'testroot/Stages/Review/c1'},
+            {'exists': False,
+             'is_source': False,
+             'name': 'prod',
+             'object': None,
+             'revision': None,
+             'stageable': True,
+             'title': 'Production',
+             'url': None})
+        for got, expect in zip(all_stats, expect_stats):
+            for k in expect.keys():
+                self.assertEqual(got[k], expect[k])
+
+    def testGetObjectStatsWithoutStages(self):
+        # getObjectStats() should return an empty list
+        # when there are no stages.
+        st = self.root.portal_staging
+        st._stages = ()
+        self.assertEqual(st.getObjectStats(self.dev_stage.c1), [])
 
 
 def test_suite():
