@@ -126,6 +126,22 @@ class TypesToolTests(SecurityTest):
         dropdown_representation = [x[0] for x in types]
         self.failIf(dropdown_representation[0]==dropdown_representation[1])
 
+        # Backwards-compatibility tests
+        # Make sure the old representation still works, for now
+        ti_factory = self.ttool.manage_addTypeInformation
+        ti_type = 'Factory-based Type Information'
+        new_repr = 'product1: Dummy Content (Dummy)'
+        old_repr = 'product1: Dummy'
+
+        # This one uses the new representation. We do not expect an Exception
+        ti_factory(ti_type, id='NewType1', typeinfo_name=new_repr)
+        self.failUnless('NewType1' in self.ttool.objectIds())
+
+        # Now try with the old representation, which will throw a BadRequest
+        # unless the workaround in the code is used
+        ti_factory(ti_type, id='NewType2', typeinfo_name=old_repr)
+        self.failUnless('NewType2' in self.ttool.objectIds())
+
 
 def test_interface(self):
         from Products.CMFCore.interfaces.portal_types \
