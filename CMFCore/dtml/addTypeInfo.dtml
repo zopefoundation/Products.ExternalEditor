@@ -1,4 +1,4 @@
-<dtml-let form_title="'Add %s' % type_type or 'Factory-based Type Information'">
+<dtml-let form_title="'Add %s' % add_meta_type">
 <dtml-if manage_page_header>
   <dtml-var manage_page_header>
   <dtml-var manage_form_title>
@@ -10,7 +10,7 @@
 </dtml-let>
 
 <form action="&dtml.url-portal_types;/manage_addTypeInformation" method="POST">
-<input type="hidden" name="type_type" value="&dtml.missing-type_type;" />
+<input type="hidden" name="add_meta_type" value="&dtml-add_meta_type;" />
 <table cellspacing="0" cellpadding="2" border="0">
   <tr>
     <td align="left" valign="top">

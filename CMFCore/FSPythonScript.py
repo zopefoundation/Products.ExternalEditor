@@ -71,10 +71,21 @@ class FSPythonScript (FSObject, Script):
         file = open(fp, 'r')
         try: data = file.read()
         finally: file.close()
-        self._write(data, reparse)
+        if reparse:
+            self._write(data, reparse)
 
     def _validateProxy(self, roles=None):
         pass
+
+    def __render_with_namespace__(self, namespace):
+        '''Calls the script.'''
+        self._updateFromFS()
+        return Script.__render_with_namespace__(self, namespace)
+
+    def __call__(self, *args, **kw):
+        '''Calls the script.'''
+        self._updateFromFS()
+        return Script.__call__(self, *args, **kw)
 
     #### The following is mainly taken from PythonScript.py ###
 
@@ -83,15 +94,11 @@ class FSPythonScript (FSObject, Script):
 
         Calling a Python Script is an actual function invocation.
         """
-        self._updateFromFS()
         # Prepare the function.
         f = self._v_f
         if f is None:
-            # Not yet compiled.
-            self._write(self._source, 1)
-            f = self._v_f
-            if f is None:
-                raise RuntimeError, '%s has errors.' % self._filepath
+            # The script has errors.
+            raise RuntimeError, '%s has errors.' % self._filepath
 
         __traceback_info__ = bound_names, args, kw, self.func_defaults
 
@@ -185,15 +192,21 @@ class FSPythonScript (FSObject, Script):
         # This ensures func_code and func_defaults are
         # set when the code hasn't been compiled yet,
         # just in time for mapply().  Truly odd, but so is mapply(). :P
-        self._write(self._source, 1)
+        self._updateFromFS()
         return self.__dict__.get('func_defaults', None)
     func_defaults = ComputedAttribute(func_defaults, 1)
 
     def func_code(self):
         # See func_defaults.
-        self._write(self._source, 1)
+        self._updateFromFS()
         return self.__dict__.get('func_code', None)
     func_code = ComputedAttribute(func_code, 1)
+
+    def title(self):
+        # See func_defaults.
+        self._updateFromFS()
+        return self.__dict__.get('title', None)
+    title = ComputedAttribute(title, 1)
 
 
 Globals.InitializeClass(FSPythonScript)

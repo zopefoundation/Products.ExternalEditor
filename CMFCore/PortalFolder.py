@@ -19,6 +19,7 @@ __version__='$Revision$'[11:-2]
 ADD_FOLDERS_PERMISSION = 'Add portal folders'
 ADD_CONTENT_PERMISSION = 'Add portal content'
 
+import sys
 import Globals, re, base64, marshal, string
 import CMFCorePermissions
 
@@ -328,6 +329,17 @@ class PortalFolder( Folder, DynamicType ):
              , (type_name, self, id, RESPONSE) + args
              , kw
              )
+
+    security.declareProtected(AddPortalContent, 'checkIdAvailable')
+    def checkIdAvailable(self, id):
+        try:
+            self._checkId(id)
+        except:
+            if sys.exc_info()[0] == 'Bad Request':
+                return 0
+            raise  # Some other exception.
+        else:
+            return 1
 
     def MKCOL_handler(self,id,REQUEST=None,RESPONSE=None):
         """

@@ -67,7 +67,8 @@ class FSPageTemplate(FSObject, Script, PageTemplate):
         file = open(fp, 'rb')
         try: data = file.read()
         finally: file.close()
-        self.write(data)
+        if reparse:
+            self.write(data)
 
     security.declarePrivate('read')
     def read(self):
@@ -90,23 +91,22 @@ class FSPageTemplate(FSObject, Script, PageTemplate):
         self._updateFromFS()
         return FSPageTemplate.inheritedAttribute('pt_macros')(self)
 
-    if Globals.DevelopmentMode:
-        
-        # Redefine pt_render if in debug mode to give a bit more info
-        
-        def pt_render(self, source=0, extra_context={}):
-            # Tie in on an opportunity to auto-reload
-            self._updateFromFS()
-            try:
-                return FSPageTemplate.inheritedAttribute('pt_render')( self,
-                    source, extra_context )
-            except RuntimeError:
+    def pt_render(self, source=0, extra_context={}):
+        self._updateFromFS()  # Make sure the template has been loaded.
+        try:
+            return FSPageTemplate.inheritedAttribute('pt_render')(
+                self, source, extra_context )
+        except RuntimeError:
+            if Globals.DevelopmentMode:
                 err = FSPageTemplate.inheritedAttribute( 'pt_errors' )( self )
                 err_type = err[0]
                 err_msg = '<pre>%s</pre>' % replace( err[1], "\'", "'" )
                 msg = 'FS Page Template %s has errors: %s.<br>%s' % (
                     self.id, err_type, html_quote(err_msg) )
                 raise RuntimeError, msg
+            else:
+                raise
+            
             
     # Copy over more mothods
     security.declareProtected(FTPAccess, 'manage_FTPget')

@@ -95,6 +95,26 @@ class DirectoryInformation:
                     types[strip(obname)] = strip(meta_type)
         return types
 
+
+    def _readProperties(self, fp):
+        """Reads the properties file next to an object.
+        """
+        try:
+            f = open(fp, 'rt')
+        except IOError:
+            return None
+        else:
+            lines = f.readlines()
+            f.close()
+            props = {}
+            for line in lines:
+                try: key, value = split(line, '=')
+                except: pass
+                else:
+                    props[strip(key)] = strip(value)
+            return props
+
+
     if Globals.DevelopmentMode and os.name=='nt':
 
         def _changed(self):
@@ -211,8 +231,11 @@ class DirectoryInformation:
                     t = registry.getTypeByExtension(ext)
                 
                 if t is not None:
+                    properties = self._readProperties(
+                        e_filepath + '.properties')
                     try:
-                        ob = t(name, e_filepath, fullname=entry)
+                        ob = t(name, e_filepath, fullname=entry,
+                               properties=properties)
                     except:
                         import traceback
                         typ, val, tb = exc_info()

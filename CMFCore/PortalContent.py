@@ -24,11 +24,12 @@ from OFS.SimpleItem import SimpleItem
 from AccessControl import ClassSecurityInfo
 
 from CMFCorePermissions import AccessContentsInformation, View, FTPAccess
-from CMFCorePermissions import ReviewPortalContent, ModifyPortalContent
 
 from interfaces.Contentish import Contentish
 from DynamicType import DynamicType
-from utils import getToolByName, _checkPermission, _getViewFor
+from utils import _checkPermission, _getViewFor
+
+from CMFCatalogAware import CMFCatalogAware
 
 try:
     from webdav.Lockable import ResourceLockedError
@@ -43,7 +44,7 @@ except ImportError:
     NoWL = 1
 
 
-class PortalContent(DynamicType, SimpleItem):
+class PortalContent(DynamicType, CMFCatalogAware, SimpleItem):
     """
         Base class for portal objects.
         
@@ -100,58 +101,6 @@ class PortalContent(DynamicType, SimpleItem):
         "Returns a concatination of all searchable text"
         # Should be overriden by portal objects
         return "%s %s" % (self.Title(), self.Description())
-
-    # Cataloging methods
-    # ------------------
-
-    security.declareProtected(ModifyPortalContent, 'indexObject')
-    def indexObject(self):
-        catalog = getToolByName(self, 'portal_catalog', None)
-        if catalog is not None:
-            catalog.indexObject(self)
-
-    security.declareProtected(ModifyPortalContent, 'unindexObject')
-    def unindexObject(self):
-        catalog = getToolByName(self, 'portal_catalog', None)
-        if catalog is not None:
-            catalog.unindexObject(self)
-
-    security.declareProtected(ModifyPortalContent, 'reindexObject')
-    def reindexObject(self):
-        catalog = getToolByName(self, 'portal_catalog', None)
-        if catalog is not None:
-            catalog.reindexObject(self)
-        
-    def manage_afterAdd(self, item, container):
-        """
-            Add self to the workflow and catalog.
-        """
-        #
-        #   Are we being added (or moved)?
-        #
-        if aq_base(container) is not aq_base(self):
-            wf = getToolByName(self, 'portal_workflow', None)
-            if wf is not None:
-                wf.notifyCreated(self)
-            self.indexObject()
-
-    def manage_beforeDelete(self, item, container):
-        """
-            Remove self from the catalog.
-        """
-        #
-        #   Are we going away?
-        #
-        if aq_base(container) is not aq_base(self):
-            self.unindexObject()
-            #
-            #   Now let our "aspects" know we are going away.
-            #
-            for it, subitem in self.objectItems():
-                si_m_bD = getattr( subitem, 'manage_beforeDelete', None )
-                if si_m_bD is not None:
-                    si_m_bD( item, container )
-
 
     # Contentish interface methods
     # ----------------------------

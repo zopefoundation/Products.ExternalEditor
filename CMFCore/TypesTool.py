@@ -20,7 +20,6 @@ __version__='$Revision$'[11:-2]
 import OFS
 from Globals import InitializeClass, DTMLFile
 from utils import UniqueObject, SimpleItemWithProperties, tuplize
-from utils import _dtmldir, _checkPermission, cookString
 from utils import _dtmldir, _checkPermission, cookString, getToolByName
 import string
 from AccessControl import getSecurityManager, ClassSecurityInfo
@@ -37,22 +36,6 @@ from Expression import Expression
 from CMFCorePermissions import View, ManagePortal, AccessContentsInformation
 
 _marker = []  # Create a new marker.
-
-
-_type_factories = {}
-allowedTypes = ( 'Script (Python)'
-               , 'Python Method'
-               , 'DTML Method'
-               , 'External Method'
-               )
-
-def addTypeFactory(factory, id=None):
-    # modeled after WorkflowTool.addWorkflowFactory()
-    global allowedTypes
-    if id is None:
-        id = getattr(factory, 'id', '') or getattr(factory, 'meta_type', '')
-    _type_factories[id] = factory
-    allowedTypes = allowedTypes + (factory.meta_type,)
 
 class TypeInformation (SimpleItemWithProperties):
     """
@@ -469,7 +452,7 @@ class FactoryTypeInformation (TypeInformation):
         return ob
 
 InitializeClass( FactoryTypeInformation )
-addTypeFactory(FactoryTypeInformation)
+
 
 class ScriptableTypeInformation( TypeInformation ):
     """
@@ -524,12 +507,31 @@ class ScriptableTypeInformation( TypeInformation ):
         return ob
 
 InitializeClass( ScriptableTypeInformation )
-addTypeFactory(ScriptableTypeInformation)
+
 
 # Provide aliases for backward compatibility.
 ContentFactoryMetadata = FactoryTypeInformation
 ContentTypeInformation = ScriptableTypeInformation
 
+
+typeClasses = [
+    {'class':FactoryTypeInformation,
+     'name':FactoryTypeInformation.meta_type,
+     'action':'manage_addFactoryTIForm',
+     'permission':'Manage portal'},
+    {'class':ScriptableTypeInformation,
+     'name':ScriptableTypeInformation.meta_type,
+     'action':'manage_addScriptableTIForm',
+     'permission':'Manage portal'},
+    ]
+
+
+allowedTypes = [
+    'Script (Python)',
+    'Python Method',
+    'DTML Method',
+    'External Method',
+    ]
 
 
 class TypesTool( UniqueObject, OFS.Folder.Folder, ActionProviderBase ):
@@ -563,36 +565,23 @@ class TypesTool( UniqueObject, OFS.Folder.Folder, ActionProviderBase ):
         """
         return self._actions
 
-    def __bobo_traverse__(self, TraversalRequest, name):
-        # Nasty hack to get around main.dtml's quoting of
-        # all_meta_types' actions
-        
-        if name=='manage_addTypeInfoForm':
-            stack = TraversalRequest['TraversalRequestNameStack']
-            if stack:
-                TraversalRequest['type_type']=stack[0]
-                stack[:]=[]
-            
-        return getattr(self,name)
-
     def all_meta_types(self):
+        """Adds TypesTool-specific meta types."""
         all = TypesTool.inheritedAttribute('all_meta_types')(self)
-        factypes = []
-        for name, fac in _type_factories.items():
-            factypes.append({
-                'name': fac.meta_type,
-                'action': 'manage_addTypeInfoForm/%s' % name,
-                'permission': CMFCorePermissions.ManagePortal,
-                })
-        factypes.extend(all)
-        return factypes
+        return tuple(typeClasses) + tuple(all)
 
     def filtered_meta_types(self, user=None):
         # Filters the list of available meta types.
+        allowed = {}
+        for tc in typeClasses:
+            allowed[tc['name']] = 1
+        for name in allowedTypes:
+            allowed[name] = 1
+
         all = TypesTool.inheritedAttribute('filtered_meta_types')(self)
         meta_types = []
         for meta_type in self.all_meta_types():
-            if meta_type['name'] in allowedTypes:
+            if allowed.get(meta_type['name']):
                 meta_types.append(meta_type)
         return meta_types
 
@@ -620,17 +609,28 @@ class TypesTool( UniqueObject, OFS.Folder.Folder, ActionProviderBase ):
 
     _addTIForm = DTMLFile( 'addTypeInfo', _dtmldir )
 
-    security.declareProtected(ManagePortal, 'manage_addTypeInfoForm')
-    def manage_addTypeInfoForm(self, REQUEST={}, type_type=''):
-        """ Return the type info form while keeping the list of
-        prefab type information up to date """
-        return self._addTIForm(self, REQUEST, type_type=type_type,
-                               types=self.listDefaultTypeInformation())
+    security.declareProtected(ManagePortal, 'manage_addFactoryTIForm')
+    def manage_addFactoryTIForm(self, REQUEST):
+        ' '
+        return self._addTIForm(
+            self, REQUEST,
+            add_meta_type=FactoryTypeInformation.meta_type,
+            types=self.listDefaultTypeInformation())
+
+    security.declareProtected(ManagePortal, 'manage_addScriptableTIForm')
+    def manage_addScriptableTIForm(self, REQUEST):
+        ' '
+        return self._addTIForm(
+            self, REQUEST,
+            add_meta_type=ScriptableTypeInformation.meta_type,
+            types=self.listDefaultTypeInformation())
 
     security.declareProtected(ManagePortal, 'manage_addTypeInformation')
-    def manage_addTypeInformation(self, id=None, type_type=None,
+    def manage_addTypeInformation(self, add_meta_type, id=None,
                                   typeinfo_name=None, RESPONSE=None):
-        """ Create a TypeInformation in self. """
+        """
+        Create a TypeInformation in self.
+        """
         fti = None
         if typeinfo_name:
             info = self.listDefaultTypeInformation()
@@ -644,11 +644,13 @@ class TypesTool( UniqueObject, OFS.Folder.Folder, ActionProviderBase ):
                 id = fti.get('id', None)
         if not id:
             raise 'Bad Request', 'An id is required.'
-
-        if type_type in _type_factories.keys():
-            klass = _type_factories[type_type]
+        for mt in typeClasses:
+            if mt['name'] == add_meta_type:
+                klass = mt['class']
+                break
         else:
-            klass = FactoryTypeInformation
+            raise ValueError, (
+                'Meta type %s is not a type class.' % add_meta_type)
         id = str(id)
         if fti is not None:
             fti = fti.copy()

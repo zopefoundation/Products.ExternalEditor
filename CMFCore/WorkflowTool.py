@@ -26,7 +26,7 @@ from WorkflowCore import WorkflowException, ObjectDeleted, ObjectMoved
 import CMFCorePermissions
 from string import join, split, replace, strip
 
-AUTO_MIGRATE_WORKFLOW_TOOLS = 1  # This will later be set to 0.
+AUTO_MIGRATE_WORKFLOW_TOOLS = 0  # Set to 1 to auto-migrate
 
 
 _marker = []  # Create a new marker object.

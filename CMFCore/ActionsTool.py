@@ -214,6 +214,7 @@ class ActionsTool(UniqueObject, OFS.Folder.Folder, ActionProviderBase):
                         actions.append({
                             'id': d.get('id', None),
                             'name': d['name'],
+                            'action': d['action'],
                             'url': url,
                             'permissions': d['permissions'],
                             'category': d.get('category', 'object'),

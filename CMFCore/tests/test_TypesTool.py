@@ -4,7 +4,7 @@ from unittest import TestCase, TestSuite, makeSuite, main
 from Products.CMFCore.TypesTool import\
      FactoryTypeInformation as FTI,\
      ScriptableTypeInformation as STI,\
-     TypesTool,addTypeFactory,Unauthorized
+     TypesTool,Unauthorized
 
 from Products.CMFCore.PortalFolder import PortalFolder
 from Products.CMFCore.utils import _getViewFor
@@ -58,29 +58,6 @@ class TypesToolTests( SecurityRequestTest ):
         self.failIf(unpermitted_view == 'edit')
         self.failUnlessEqual(unpermitted_view, 'view')
 
-    def test_AddingOtherTypeInfos(self):
-        addTypeFactory(DummyTypeInfo)
-        tool = self.root.portal_types
-        type_type = DummyTypeInfo.meta_type
-
-        fmt = [ mt['name'] for mt in tool.filtered_meta_types() ]
-        self.failUnless(DummyTypeInfo.meta_type in fmt,
-                        "Subfactory meta type not registered")
-
-        atif = tool.manage_addTypeInfoForm(self.root.REQUEST,
-                                           type_type=type_type)
-        self.failUnless(atif.find(type_type) > -1,
-                        "'%s' not found in type info form" % type_type)
-
-        tool.manage_addTypeInformation(id='foo_default', type_type=None)
-        fd = tool.foo_default
-        self.failUnless(isinstance(fd, FTI))
-        self.failIf(isinstance(fd, DummyTypeInfo))
-
-        tool.manage_addTypeInformation(id='foo_sub', type_type=type_type)
-        fs = tool.foo_sub
-        self.failUnless(isinstance(fs, DummyTypeInfo), fs.__class__)
-
     def test_allMetaTypes(self):
         """
         Test that everything returned by allMetaTypes can be
@@ -98,7 +75,6 @@ class TypesToolTests( SecurityRequestTest ):
 
         # Check the ones we're expecting are there
         self.failUnless(meta_types.has_key('Scriptable Type Information'))
-        self.failUnless(meta_types.has_key('Dummy Test Type Info'))
         self.failUnless(meta_types.has_key('Factory-based Type Information'))
 
 class TypeInfoTests( TestCase ):

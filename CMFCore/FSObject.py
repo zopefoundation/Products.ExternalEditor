@@ -39,12 +39,15 @@ class FSObject(Acquisition.Implicit, Item):
     security.declareObjectProtected(CMFCorePermissions.View)
 
     _file_mod_time = 0
+    _parsed = 0
 
     def __init__(self, id, filepath, fullname=None, properties=None):
         if properties:
             # Since props come from the filesystem, this should be
             # safe.
             self.__dict__.update(properties)
+            if fullname and properties.get('keep_extension', 0):
+                id = fullname
 
         self.id = id
         self.__name__ = id # __name__ is used in traceback reporting
@@ -92,11 +95,13 @@ class FSObject(Acquisition.Implicit, Item):
     # Refresh our contents from the filesystem if that is newer and we are
     # running in debug mode.
     def _updateFromFS(self):
-        if Globals.DevelopmentMode:
+        parsed = self._parsed
+        if not parsed or Globals.DevelopmentMode:
             fp = expandpath(self._filepath)
             try:    mtime=stat(fp)[8]
             except: mtime=0
-            if mtime != self._file_mod_time:
+            if not parsed or mtime != self._file_mod_time:
+                self._parsed = 1
                 self._file_mod_time = mtime
                 self._readFile(1)
 

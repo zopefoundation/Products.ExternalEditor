@@ -21,6 +21,7 @@ from AccessControl import ClassSecurityInfo, Owned
 from Globals import InitializeClass
 from ComputedAttribute import ComputedAttribute
 from Products.CMFCore.utils import _getViewFor
+from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
 from Acquisition import aq_base
 
 factory_type_information = ( { 'id'             : 'Skinned Folder'
@@ -66,7 +67,8 @@ Skinned folders can define custom 'view' actions."""
                            ,
                            )
 
-class SkinnedFolder( PortalFolder ):
+
+class SkinnedFolder(CMFCatalogAware, PortalFolder):
     """
     """
     meta_type = 'Skinned Folder'
