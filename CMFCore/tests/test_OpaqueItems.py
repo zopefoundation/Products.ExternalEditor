@@ -4,8 +4,6 @@ import Zope
 Zope.startup()
 from Interface.Verify import verifyClass
 
-from types import StringType
-
 from Products.CMFCore.interfaces.IOpaqueItems \
     import ICallableOpaqueItem, ICallableOpaqueItemEvents
 from Products.CMFCore.PortalFolder import PortalFolder
@@ -36,8 +34,8 @@ class DummyContent(OriginalDummyContent):
         if opaqueItem is None:
             self.opaqueItem = 'noncallable'
             self.opaqueItemsId = 'opaqueItem'
-        elif type(opaqueItem) is StringType:
-            setattr(self, opaqueItem, HooksOnly(opaqueItem))
+        elif isinstance(opaqueItem, basestring):
+            setattr(self, opaqueItem, Hooks(opaqueItem))
             self.opaqueItemsId = opaqueItem
         else:
             self.opaqueItem = opaqueItem('opaqueItem')
@@ -73,14 +71,14 @@ class OpaqueBase:
     def getId(self):
         return self.id
 
-class MarkerOnly(OpaqueBase):
+class Marker(OpaqueBase):
     """ Opaque item without manage_after/before hookes but marked as callable
     """
     __implements__ = (
         ICallableOpaqueItem,
     )
 
-class HooksOnly(OpaqueBase):
+class Hooks(OpaqueBase):
     """ Opaque item with manage_after/before hooks but not marked as callable
     """
     __implements__ = (
@@ -100,10 +98,10 @@ class HooksOnly(OpaqueBase):
         self.deleteCounter += 1
 
 
-class HooksAndMarker(HooksOnly, MarkerOnly):
+class MarkerAndHooks(Marker, Hooks):
     """ Opaque item with manage_after/before hookes and marked as callable
     """
-    __implements__ = HooksOnly.__implements__ + MarkerOnly.__implements__
+    __implements__ = Marker.__implements__ + Hooks.__implements__
 
 
 # -------------------------------------------
@@ -159,7 +157,7 @@ class ManageBeforeAfterTests(SecurityTest):
     def test_callableItemWithMarkerOnly(self):
         folder = self.folder
         sub = self.sub
-        dummy = addDummyContent(folder, 'dummy', MarkerOnly)
+        dummy = addDummyContent(folder, 'dummy', Marker)
 
         self.failIf(dummy.isNotifiedByAfterAdd())
         self.failIf(dummy.isNotifiedByAfterClone())
@@ -180,7 +178,7 @@ class ManageBeforeAfterTests(SecurityTest):
     def test_callableItemWithHooksOnly(self):
         folder = self.folder
         sub = self.sub
-        dummy = addDummyContent(folder, 'dummy', HooksOnly)
+        dummy = addDummyContent(folder, 'dummy', Hooks)
 
         self.failIf(dummy.isNotifiedByAfterAdd())
         self.failIf(dummy.isNotifiedByAfterClone())
@@ -198,10 +196,10 @@ class ManageBeforeAfterTests(SecurityTest):
         self.failIf(dummy.isNotifiedByAfterClone())
         self.failIf(dummy.isNotifiedByBeforeDelete())
 
-    def test_callableItemWithHooksAndMarker(self):
+    def test_callableItemWithMarkerAndHooks(self):
         folder = self.folder
         sub = self.sub
-        dummy = addDummyContent(folder, 'dummy', HooksAndMarker)
+        dummy = addDummyContent(folder, 'dummy', MarkerAndHooks)
 
         self.assertEqual(dummy.isNotifiedByAfterAdd(), 1)
         self.failIf(dummy.isNotifiedByAfterClone())
