@@ -13,10 +13,11 @@
   <th> Review Status
   </th>
   <td>
-   <select name="review_state" size="3" multiple>
-    <option>private</option>
-    <option>pending</option>
-    <option>published</option>
+   <select name="review_state:list" size="3" multiple>
+    <option value="" selected>-- any --</option>
+    <option value="private">private</option>
+    <option value="pending">pending</option>
+    <option value="published">published</option>
    </select>
    <dl class="FieldHelp">
     <dd> As a reviewer, you may search for items based on their
@@ -56,6 +57,7 @@
   <th>Subject</th>
   <td>
    <select name="Subject:list" multiple size="4">
+    <option value="" selected>-- any --</option>
     <dtml-in expr="portal_catalog.uniqueValuesFor( 'Subject' )">
      <option value="&dtml-sequence-item;"> &dtml-sequence-item; </option>
     </dtml-in>
@@ -114,6 +116,7 @@
   </th>
   <td>
    <select name="Type:list" multiple size="5">
+    <option value="" selected>-- any --</option>
     <dtml-in expr="portal_types.listContentTypes()">
      <option><dtml-var sequence-item></option>
     </dtml-in>

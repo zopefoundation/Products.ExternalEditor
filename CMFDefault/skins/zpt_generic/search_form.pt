@@ -18,6 +18,7 @@
   </th>
   <td>
    <select name="review_state" size="3" multiple>
+    <option value="" selected>-- any --</option>
     <option>private</option>
     <option>pending</option>
     <option>published</option>
@@ -57,12 +58,13 @@
 
  <tr valign="top">
   <th>Subject</th>
-  <td><select name="Subject:list" multiple size="5">
-     <option value=""
-		   tal:define="items python: here.portal_catalog.uniqueValuesFor('Subject')"
-		   tal:repeat="item items"
-		   tal:attributes="value item"
-		   tal:content="item">
+  <td tal:define="items python: here.portal_catalog.uniqueValuesFor('Subject')">
+   <select name="Subject:list" multiple size="5">
+    <option value="" selected>-- any --</option>
+    <option value=""
+		    tal:repeat="item items"
+		    tal:attributes="value item"
+		    tal:content="item">
       </option>
     </select>
   </td>
@@ -85,23 +87,24 @@
  <tr>
   <th> Find new items since...
   </th>
-  <td>
-   <select name="created:date"
-           tal:define="today python: here.ZopeTime().earliestTime()">
+  <td tal:define="today python: here.ZopeTime().earliestTime();
+			      mtool here/portal_membership;
+                  member python:mtool.getAuthenticatedMember();
+                  lastLogin member/last_login_time|nothing;
+	              yesterday python:(today-1).Date();
+	              lastWeek python:(today-7).Date();
+	              lastMth python:(today-31).Date();
+                 ">
+   <select name="created:date">
     <option value="1970/01/01 00:00:00 GMT">Ever</option>
 	<option value=""
 	        tal:condition="python:not(here.portal_membership.isAnonymousUser())"
-			tal:define="member python:here.portal_membership.getAuthenticatedMember();
-                        lastLogin member/last_login_time|nothing"
 			tal:attributes="value lastLogin">Last login</option>
     <option value=""
-	        tal:define="yesterday python:(today-1).Date()"
 			tal:attributes="value yesterday">Yesterday</option>
     <option value=""
-	        tal:define="lastWeek python:(today-7).Date()"
 			tal:attributes="value lastWeek">Last week</option>
     <option value=""
-	        tal:define="lastMth python:(today-31).Date()"
 			tal:attributes="value lastMth">Last month</option>
    </select>
    <input type="hidden" name="created_usage" value="range:min">
@@ -115,14 +118,13 @@
  <tr>
   <th> Item type
   </th>
-  <td>
-  <select name="Type:list" multiple size="5">
-     <option value=""
-		   tal:define="items python: here.portal_types.listContentTypes()"
-		   tal:repeat="item items"
-		   tal:attributes="value item"
-		   tal:content="item">
-      </option>
+  <td tal:define="items python: here.portal_types.listContentTypes()" >
+   <select name="Type:list" multiple size="5">
+    <option value="" selected>-- any --</option>
+    <option value=""
+		    tal:repeat="item items"
+		    tal:attributes="value item"
+		    tal:content="item"></option>
     </select> 
    <dl class="FieldHelp">
     <dd> You may limit your results to particular kinds of

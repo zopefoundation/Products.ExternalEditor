@@ -8,7 +8,7 @@
 <h3> Search Results </h3>
 
 <div tal:define="b_start python:0;b_start request/b_start | b_start;
-                 results python:here.portal_catalog( REQUEST=request );
+                 results python:here.doFormSearch( REQUEST=request );
 	             Batch python:modules['ZTUtils'].Batch;
 	             global batch python:Batch(results, 25, b_start, orphan=1);
                 ">

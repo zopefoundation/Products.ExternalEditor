@@ -4,7 +4,7 @@
 
 <h1> Search Results </h1>
 
-<dtml-let results="portal_catalog( REQUEST=REQUEST )">
+<dtml-let results="doFormSearch( REQUEST=REQUEST )">
 
 <p>Found <dtml-var expr="_.len(results)" thousands_commas> 
 items<dtml-if name="SearchableText"> matching "&dtml-SearchableText;"</dtml-if>.</p>
