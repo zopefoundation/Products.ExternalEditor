@@ -357,12 +357,14 @@ class PortalFolder(DynamicType, CMFCatalogAware, OrderedFolder):
         pass
 
     def PUT_factory( self, name, typ, body ):
+        """ Factory for PUT requests to objects which do not yet exist.
+
+        Used by NullResource.PUT.
+
+        Returns -- Bare and empty object of the appropriate type (or None, if
+        we don't know what to do)
         """
-            Dispatcher for PUT requests to non-existent IDs.  Returns
-            an object of the appropriate type (or None, if we don't
-            know what to do).
-        """
-        registry = getToolByName( self, 'content_type_registry' )
+        registry = getToolByName(self, 'content_type_registry', None)
         if registry is None:
             return None
 
@@ -372,7 +374,7 @@ class PortalFolder(DynamicType, CMFCatalogAware, OrderedFolder):
 
         self.invokeFactory( typeObjectName, name )
 
-        # XXX: this is butt-ugly.
+        # invokeFactory does too much, so the object has to be removed again
         obj = aq_base( self._getOb( name ) )
         self._delObject( name )
         return obj

@@ -91,8 +91,8 @@ class DefaultDublinCoreImpl( PropertyManager ):
         """ Add creator to Dublin Core creators.
         """
         if creator is None:
-            mtool = getToolByName(self, 'portal_membership')
-            creator = mtool.getAuthenticatedMember().getId()
+            mtool = getToolByName(self, 'portal_membership', None)
+            creator = mtool and mtool.getAuthenticatedMember().getId()
 
         # call self.listCreators() to make sure self.creators exists
         if creator and not creator in self.listCreators():

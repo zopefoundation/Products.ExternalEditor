@@ -19,10 +19,10 @@ from unittest import TestCase, TestSuite, makeSuite, main
 import Testing
 import Zope
 Zope.startup()
+from Interface.Verify import verifyClass
 
 from DateTime import DateTime
 
-from Products.CMFCalendar.Event import Event
 from Products.CMFCore.tests.base.dummy import DummySite
 from Products.CMFCore.tests.base.dummy import DummyTool
 from Products.CMFCore.tests.base.testcase import RequestTest
@@ -30,19 +30,21 @@ from Products.CMFCore.tests.base.testcase import RequestTest
 
 class TestEvent(TestCase):
 
-    def setUp(self):
-        self.site = DummySite('site')
-        self.site._setObject( 'portal_membership', DummyTool() )
+    def _makeOne(self, id, *args, **kw):
+        from Products.CMFCalendar.Event import Event
+
+        return Event(id, *args, **kw)
 
     def test_new(self):
-        event = Event('test')
-        assert event.getId() == 'test'
-        assert not event.Title()
+        event = self._makeOne('test')
+
+        self.assertEqual( event.getId(), 'test' )
+        self.failIf( event.Title() )
 
     def test_edit(self):
         # Year month and day were processed in the wrong order
         # Also see http://collector.zope.org/CMF/202
-        event = self.site._setObject( 'testimage', Event('editing') )
+        event = self._makeOne('foo')
         event.edit( title='title'
                   , description='description'
                   , eventType=( 'eventType', )
@@ -57,17 +59,19 @@ class TestEvent(TestCase):
                   , stop_time="11:59"
                   , stopAMPM="PM"
                   )
-        assert event.Title() == 'title'
-        assert event.Description() == 'description'
-        assert event.Subject() == ( 'eventType', ), event.Subject()
-        assert event.effective_date == None
-        assert event.expiration_date == None
-        assert event.end() == DateTime('1999/12/31 23:59')
-        assert event.start() == DateTime('1999/05/01 00:00')
-        assert not event.contact_name
+
+        self.assertEqual( event.Title(), 'title' )
+        self.assertEqual( event.Description(), 'description' )
+        self.assertEqual( event.Subject(), ( 'eventType', ), event.Subject() )
+        self.assertEqual( event.effective_date, None )
+        self.assertEqual( event.expiration_date, None )
+        self.assertEqual( event.end(), DateTime('1999/12/31 23:59') )
+        self.assertEqual( event.start(), DateTime('1999/05/01 00:00') )
+        self.failIf( event.contact_name )
 
     def test_puke(self):
-        event = Event( 'shouldPuke' )
+        event = self._makeOne('shouldPuke')
+
         self.assertRaises( DateTime.DateError
                          , event.edit
                          , effectiveDay=31
@@ -77,21 +81,39 @@ class TestEvent(TestCase):
                          , startAMPM="AM"
                          )
 
+    def test_interface(self):
+        from Products.CMFCore.interfaces.Dynamic \
+                import DynamicType as IDynamicType
+        from Products.CMFCore.interfaces.Contentish \
+                import Contentish as IContentish
+        from Products.CMFCore.interfaces.DublinCore \
+                import DublinCore as IDublinCore
+        from Products.CMFCore.interfaces.DublinCore \
+                import CatalogableDublinCore as ICatalogableDublinCore
+        from Products.CMFCore.interfaces.DublinCore \
+                import MutableDublinCore as IMutableDublinCore
+        from Products.CMFCalendar.Event import Event
+
+        verifyClass(IDynamicType, Event)
+        verifyClass(IContentish, Event)
+        verifyClass(IDublinCore, Event)
+        verifyClass(ICatalogableDublinCore, Event)
+        verifyClass(IMutableDublinCore, Event)
+
 
 class EventPUTTests(RequestTest):
 
-    def setUp(self):
-        RequestTest.setUp(self)
-        self.site = DummySite('site')
-        self.site._setObject( 'portal_membership', DummyTool() )
-
     def _makeOne(self, id, *args, **kw):
-        return self.site._setObject( id, Event(id, *args, **kw) )
+        from Products.CMFCalendar.Event import Event
+
+        # NullResource.PUT calls the PUT method on the bare object!
+        return Event(id, *args, **kw)
 
     def test_PutWithoutMetadata(self):
         self.REQUEST['BODY'] = ''
         d = self._makeOne('foo') 
         d.PUT(self.REQUEST, self.RESPONSE)
+
         self.assertEqual( d.Title(), '' )
         self.assertEqual( d.Format(), 'text/plain' )
         self.assertEqual( d.Description(), '' )

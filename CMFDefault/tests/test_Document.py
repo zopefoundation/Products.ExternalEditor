@@ -1,3 +1,20 @@
+##############################################################################
+#
+# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE
+#
+##############################################################################
+""" Unit tests for Document module.
+
+$Id$
+"""
+
 from unittest import TestSuite, makeSuite, main
 import Testing
 import Zope
@@ -31,7 +48,6 @@ from Products.CMFCore.tests.base.tidata import FTIDATA_CMF15
 from Products.CMFCore.TypesTool import FactoryTypeInformation as FTI
 from Products.CMFCore.TypesTool import TypesTool
 from Products.CMFDefault import utils
-from Products.CMFDefault.Document import Document
 
 
 class RequestTestBase(RequestTest):
@@ -42,6 +58,8 @@ class RequestTestBase(RequestTest):
         self.site._setObject( 'portal_membership', DummyTool() )
 
     def _makeOne(self, id, *args, **kw):
+        from Products.CMFDefault.Document import Document
+
         return self.site._setObject( id, Document(id, *args, **kw) )
 
 
@@ -49,6 +67,7 @@ class DocumentTests(RequestTestBase):
 
     def test_Empty(self):
         d = self._makeOne('foo', text_format='structured-text')
+
         self.assertEqual( d.title, '' )
         self.assertEqual( d.description, '' )
         self.assertEqual( d.text, '' )
@@ -58,6 +77,7 @@ class DocumentTests(RequestTestBase):
     def test_editBasicHTML(self):
         d = self._makeOne('foo')
         d.edit('html', BASIC_HTML)
+
         self.failUnless( hasattr(d, 'cooked_text') )
         self.assertEqual( d.Format(), 'text/html' )
         self.assertEqual( d.text.find('</body>'), -1 )
@@ -71,6 +91,7 @@ class DocumentTests(RequestTestBase):
     def test_editSimpleXHTML(self):
         d = self._makeOne('foo')
         d.edit('html', SIMPLE_XHTML)
+
         self.failUnless( hasattr(d, 'cooked_text') )
         self.assertEqual( d.Format(), 'text/html' )
         self.assertEqual( d.cooked_text, '\n  <h1>Not a lot here</h1>\n ')
@@ -79,6 +100,7 @@ class DocumentTests(RequestTestBase):
         self.REQUEST['BODY'] = BASIC_HTML.upper()
         d = self._makeOne('foo')
         d.PUT(self.REQUEST, self.RESPONSE)
+
         self.assertEqual( d.Format(), 'text/html' )
         self.assertEqual( d.title, 'TITLE IN TAG' )
         self.assertEqual( d.text.find('</BODY'), -1 )
@@ -89,18 +111,21 @@ class DocumentTests(RequestTestBase):
         self.REQUEST['BODY'] = ENTITY_IN_TITLE
         d = self._makeOne('foo')
         d.PUT(self.REQUEST, self.RESPONSE)
+
         self.assertEqual( d.title, '&Auuml;rger' )
 
     def test_HtmlWithDoctype(self):
         self.REQUEST['BODY'] = '%s\n%s' % (DOCTYPE, BASIC_HTML)
         d = self._makeOne('foo')
         d.PUT(self.REQUEST, self.RESPONSE)
+
         self.assertEqual( d.Description(), 'Describe me' )
 
     def test_HtmlWithoutNewlines(self):
         self.REQUEST['BODY'] = ''.join((BASIC_HTML.split('\n')))
         d = self._makeOne('foo')
         d.PUT(self.REQUEST, self.RESPONSE)
+
         self.assertEqual( d.Format(), 'text/html' )
         self.assertEqual( d.Description(), 'Describe me' )
 
@@ -151,6 +176,7 @@ class DocumentTests(RequestTestBase):
         self.REQUEST['BODY'] = BASIC_STRUCTUREDTEXT
         d = self._makeOne('foo')
         d.PUT(self.REQUEST, self.RESPONSE)
+
         self.failUnless( hasattr(d, 'cooked_text') )
         self.assertEqual( d.Format(), 'text/plain' )
         self.assertEqual( d.Title(), 'My Document' )
@@ -295,6 +321,12 @@ class DocumentTests(RequestTestBase):
         d.setFormat('foo')
         self.assertEqual( d.text_format, 'structured-text' )
 
+    def test_default_format( self ):
+        d = self._makeOne('foo', text='')
+
+        self.assertEqual( d.Format(), 'text/plain' )
+        self.assertEqual( d.text_format, 'structured-text' )
+
     def test_interface(self):
         from Products.CMFCore.interfaces.Dynamic \
                 import DynamicType as IDynamicType
@@ -306,6 +338,7 @@ class DocumentTests(RequestTestBase):
                 import CatalogableDublinCore as ICatalogableDublinCore
         from Products.CMFCore.interfaces.DublinCore \
                 import MutableDublinCore as IMutableDublinCore
+        from Products.CMFDefault.Document import Document
 
         verifyClass(IDynamicType, Document)
         verifyClass(IContentish, Document)
@@ -410,12 +443,19 @@ class DocumentFTPGetTests(RequestTestBase):
             self.failUnless( header in get_headers )
 
 
-class DocumentPUTTests(RequestTestBase):
+class DocumentPUTTests(RequestTest):
+
+    def _makeOne(self, id, *args, **kw):
+        from Products.CMFDefault.Document import Document
+
+        # NullResource.PUT calls the PUT method on the bare object!
+        return Document(id, *args, **kw)
 
     def test_PUTBasicHTML(self):
         self.REQUEST['BODY'] = BASIC_HTML
         d = self._makeOne('foo')
         r = d.PUT(self.REQUEST, self.RESPONSE)
+
         self.failUnless( hasattr(d, 'cooked_text') )
         self.assertEqual( d.Format(), 'text/html' )
         self.assertEqual( d.title, 'Title in tag' )
@@ -440,6 +480,7 @@ class DocumentPUTTests(RequestTestBase):
         self.REQUEST['BODY'] = SIMPLE_XHTML
         d = self._makeOne('foo')
         r = d.PUT(self.REQUEST, self.RESPONSE)
+
         self.failUnless( hasattr(d, 'cooked_text') )
         self.assertEqual( d.Format(), 'text/html' )
         self.assertEqual( d.Description(), 'Describe me' )
@@ -450,6 +491,7 @@ class DocumentPUTTests(RequestTestBase):
         self.REQUEST['BODY'] = STX_WITH_HTML
         d = self._makeOne('foo')
         r = d.PUT(self.REQUEST, self.RESPONSE)
+
         self.assertEqual( d.Format(), 'text/plain' )
         self.assertEqual( r.status, 204 )
 
@@ -457,6 +499,7 @@ class DocumentPUTTests(RequestTestBase):
         self.REQUEST['BODY'] = BASIC_STRUCTUREDTEXT
         d = self._makeOne('foo')
         r = d.PUT(self.REQUEST, self.RESPONSE)
+
         self.assertEqual( d.Format(), 'text/plain' )
         self.assertEqual( r.status, 204 )
 
@@ -465,6 +508,7 @@ class DocumentPUTTests(RequestTestBase):
         self.REQUEST['BODY'] = html
         d = self._makeOne('foo')
         r = d.PUT(self.REQUEST, self.RESPONSE)
+
         self.assertEqual( d.Format(), 'text/html' )
         self.assertEqual( d.Description(), 'Describe me' )
         self.assertEqual( r.status, 204 )
@@ -474,6 +518,7 @@ class DocumentPUTTests(RequestTestBase):
         self.REQUEST['BODY'] = html
         d = self._makeOne('foo')
         r = d.PUT(self.REQUEST, self.RESPONSE)
+
         self.assertEqual( d.Title(), 'Foo' )
         self.assertEqual( d.Format(), 'text/html' )
         self.assertEqual( d.Description(), '' )
@@ -484,12 +529,6 @@ class DocumentPUTTests(RequestTestBase):
         self.assertEqual( d.Language(), '' )
         self.assertEqual( d.Rights(), '' )
         self.assertEqual( r.status, 204 )
-
-    def test_default_format( self ):
-        d = self._makeOne('foo', text='')
-        self.assertEqual( d.Format(), 'text/plain' )
-        self.assertEqual( d.text_format, 'structured-text' )
-
 
 
 def test_suite():

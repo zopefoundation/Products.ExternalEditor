@@ -1,7 +1,25 @@
-from unittest import TestSuite, makeSuite, main
+##############################################################################
+#
+# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE
+#
+##############################################################################
+""" Unit tests for NewsItem module.
+
+$Id$
+"""
+
+from unittest import TestCase, TestSuite, makeSuite, main
 import Testing
 import Zope
 Zope.startup()
+from Interface.Verify import verifyClass
 
 from Products.CMFCore.tests.base.content import BASIC_HTML
 from Products.CMFCore.tests.base.content import BASIC_STRUCTUREDTEXT
@@ -10,18 +28,14 @@ from Products.CMFCore.tests.base.content import ENTITY_IN_TITLE
 from Products.CMFCore.tests.base.dummy import DummySite
 from Products.CMFCore.tests.base.dummy import DummyTool
 from Products.CMFCore.tests.base.testcase import RequestTest
-from Products.CMFDefault.NewsItem import NewsItem
 
 
-class NewsItemTests(RequestTest):
-
-    def setUp(self):
-        RequestTest.setUp(self)
-        self.site = DummySite('site').__of__(self.root)
-        self.site._setObject( 'portal_membership', DummyTool() )
+class NewsItemTests(TestCase):
 
     def _makeOne(self, id, *args, **kw):
-        return self.site._setObject( id, NewsItem(id, *args, **kw) )
+        from Products.CMFDefault.NewsItem import NewsItem
+
+        return NewsItem(id, *args, **kw)
 
     def test_Empty_html(self):
         d = self._makeOne('empty', text_format='html')
@@ -40,6 +54,62 @@ class NewsItemTests(RequestTest):
         self.assertEqual( d.Format(), 'text/plain' )
         self.assertEqual( d.text_format, 'structured-text' )
         self.assertEqual( d.text, '' )
+
+    def test_Init_with_stx( self ):
+        d = self._makeOne('foo', text_format='structured-text',
+                          title='Foodoc')
+
+        self.assertEqual( d.Title(), 'Foodoc' )
+        self.assertEqual( d.Description(), '' )
+        self.assertEqual( d.Format(), 'text/plain' )
+        self.assertEqual( d.text_format, 'structured-text' )
+        self.assertEqual( d.text, '' )
+
+    def test_default_format( self ):
+        d = self._makeOne('foo', text='')
+
+        self.assertEqual( d.Format(), 'text/plain' )
+        self.assertEqual( d.text_format, 'structured-text' )
+
+    def test_interface(self):
+        from Products.CMFCore.interfaces.Dynamic \
+                import DynamicType as IDynamicType
+        from Products.CMFCore.interfaces.Contentish \
+                import Contentish as IContentish
+        from Products.CMFCore.interfaces.DublinCore \
+                import DublinCore as IDublinCore
+        from Products.CMFCore.interfaces.DublinCore \
+                import CatalogableDublinCore as ICatalogableDublinCore
+        from Products.CMFCore.interfaces.DublinCore \
+                import MutableDublinCore as IMutableDublinCore
+        from Products.CMFDefault.NewsItem import NewsItem
+
+        verifyClass(IDynamicType, NewsItem)
+        verifyClass(IContentish, NewsItem)
+        verifyClass(IDublinCore, NewsItem)
+        verifyClass(ICatalogableDublinCore, NewsItem)
+        verifyClass(IMutableDublinCore, NewsItem)
+
+
+class NewsItemPUTTests(RequestTest):
+
+    def _makeOne(self, id, *args, **kw):
+        from Products.CMFDefault.NewsItem import NewsItem
+
+        # NullResource.PUT calls the PUT method on the bare object!
+        return NewsItem(id, *args, **kw)
+
+    def test_Init(self):
+        self.REQUEST['BODY'] = BASIC_STRUCTUREDTEXT
+        d = self._makeOne('foo', text='')
+        d.PUT(self.REQUEST, self.RESPONSE)
+
+        self.assertEqual( d.Title(), 'My Document' )
+        self.assertEqual( d.Description(), 'A document by me' )
+        self.assertEqual( d.Format(), 'text/plain' )
+        self.assertEqual( d.text_format, 'structured-text' )
+        self.assertEqual( len(d.Contributors()), 3 )
+        self.failUnless( d.cooked_text.find('<p>') >= 0 )
 
     def test_PUT_basic_html(self):
         self.REQUEST['BODY']=BASIC_HTML
@@ -103,38 +173,11 @@ class NewsItemTests(RequestTest):
         self.assertEqual( len(d.Contributors()), 3 )
         self.failUnless( d.cooked_text.find('<p>') >= 0 )
 
-    def test_Init(self):
-        self.REQUEST['BODY'] = BASIC_STRUCTUREDTEXT
-        d = self._makeOne('foo', text='')
-        d.PUT(self.REQUEST, self.RESPONSE)
-
-        self.assertEqual( d.Title(), 'My Document' )
-        self.assertEqual( d.Description(), 'A document by me' )
-        self.assertEqual( d.Format(), 'text/plain' )
-        self.assertEqual( d.text_format, 'structured-text' )
-        self.assertEqual( len(d.Contributors()), 3 )
-        self.failUnless( d.cooked_text.find('<p>') >= 0 )
-
-    def test_Init_with_stx( self ):
-        d = self._makeOne('foo', text_format='structured-text',
-                          title='Foodoc')
-
-        self.assertEqual( d.Title(), 'Foodoc' )
-        self.assertEqual( d.Description(), '' )
-        self.assertEqual( d.Format(), 'text/plain' )
-        self.assertEqual( d.text_format, 'structured-text' )
-        self.assertEqual( d.text, '' )
-
-    def test_default_format( self ):
-        d = self._makeOne('foo', text='')
-        self.assertEqual( d.Format(), 'text/plain' )
-        self.assertEqual( d.text_format, 'structured-text' )
-
-
 
 def test_suite():
     return TestSuite((
         makeSuite(NewsItemTests),
+        makeSuite(NewsItemPUTTests),
         ))
 
 if __name__ == '__main__':
