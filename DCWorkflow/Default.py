@@ -215,18 +215,18 @@ def setupDefaultWorkflowRev2(wf):
     vdef = wf.variables['action']
     vdef.setProperties(description='The last transition',
                        default_expr='transition/getId|nothing',
-                       for_status=1)
+                       for_status=1, update_always=1)
 
     vdef = wf.variables['actor']
     vdef.setProperties(description='The ID of the user who performed '
                        'the last transition',
                        default_expr='user/getUserName',
-                       for_status=1)
+                       for_status=1, update_always=1)
 
     vdef = wf.variables['comments']
     vdef.setProperties(description='Comments about the last transition',
                        default_expr="python:state_change.kwargs.get('comment', '')",
-                       for_status=1)
+                       for_status=1, update_always=1)
 
     vdef = wf.variables['review_history']
     vdef.setProperties(description='Provides access to workflow history',
@@ -237,7 +237,7 @@ def setupDefaultWorkflowRev2(wf):
     vdef = wf.variables['time']
     vdef.setProperties(description='Time of the last transition',
                        default_expr="state_change/getDateTime",
-                       for_status=1)
+                       for_status=1, update_always=1)
 
     ldef = wf.worklists['reviewer_queue']
     ldef.setProperties(description='Reviewer tasks',
@@ -347,18 +347,18 @@ def setupDefaultWorkflowClassic(wf):
     vdef = wf.variables['action']
     vdef.setProperties(description='The last transition',
                        default_expr='transition/getId|nothing',
-                       for_status=1)
+                       for_status=1, update_always=1)
 
     vdef = wf.variables['actor']
     vdef.setProperties(description='The ID of the user who performed '
                        'the last transition',
                        default_expr='user/getUserName',
-                       for_status=1)
+                       for_status=1, update_always=1)
 
     vdef = wf.variables['comments']
     vdef.setProperties(description='Comments about the last transition',
                        default_expr="python:state_change.kwargs.get('comment', '')",
-                       for_status=1)
+                       for_status=1, update_always=1)
 
     vdef = wf.variables['review_history']
     vdef.setProperties(description='Provides access to workflow history',
@@ -369,7 +369,7 @@ def setupDefaultWorkflowClassic(wf):
     vdef = wf.variables['time']
     vdef.setProperties(description='Time of the last transition',
                        default_expr="state_change/getDateTime",
-                       for_status=1)
+                       for_status=1, update_always=1)
 
     ldef = wf.worklists['reviewer_queue']
     ldef.setProperties(description='Reviewer tasks',
