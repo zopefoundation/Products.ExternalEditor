@@ -31,8 +31,6 @@ from Products.CMFCore.Expression import Expression
 from Products.CMFCore import CMFCorePermissions
 from utils import _dtmldir
 
-import pdb; pdb.set_trace()
-
 class URLTool (UniqueObject, SimpleItem, ActionProviderBase):
     id = 'portal_url'
     meta_type = 'Default URL Tool'
