@@ -347,7 +347,7 @@ class DirectoryRegistry:
         # This is called when we need to get hold of the information
         # for a minimal path.
         # minimalpath is called on the supplied path on the hope
-        # that if it is incorrect, something ca
+        # that if it is incorrect, something can be done to fix it.
         # Can return None.
         return self._directories.get(minimalpath(filepath), None)
 
