@@ -4,7 +4,7 @@
     <td>
       <small>
         <dtml-var id size=30> page of
-        <dtml-with aq_parent> <dtml-var id size=25> </dtml-with>
+        <dtml-with "aq_parent"> <dtml-var id size=25> </dtml-with>
       </small>
     </td>
     <td align="right">
