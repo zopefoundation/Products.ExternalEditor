@@ -10,6 +10,7 @@ from AccessControl.SecurityManagement import newSecurityManager
 from AccessControl.SecurityManagement import noSecurityManager
 from AccessControl.User import UnrestrictedUser
 from Products.CMFCore.PortalContent import PortalContent
+from Products.CMFDefault.Portal import PortalGenerator
 
 
 class PortalContentTests(TestCase):
@@ -32,8 +33,8 @@ class TestContentCopyPaste(RequestTest):
         RequestTest.setUp(self)
         try:
             newSecurityManager(None, UnrestrictedUser('manager', '', ['Manager'], []))
-            factory = self.root.manage_addProduct['CMFSetup'].addConfiguredSite
-            factory('cmf', 'default', snapshot=False)
+            site_generator = PortalGenerator()
+            site_generator.create(self.root, 'cmf', 1)
             self.site = self.root.cmf
             get_transaction().commit(1) # Make sure we have _p_jars
         except:
