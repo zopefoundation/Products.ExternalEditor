@@ -93,14 +93,15 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
     ACTIONS_ORDER = ['Accept', 'Resign', 'Assign',
                      'Resolve', 'Reject', 'Defer'] 
 
+    # Accumulated instance-data backwards-compatability values:
     _collector_path = None
-
+    submitter_email = None
     version_info = ''
 
     def __init__(self,
                  id, container,
                  title='', description='',
-                 submitter_id=None, submitter_name=None,
+                 submitter_id=None, submitter_name=None, submitter_email=None,
                  kibitzers=None,
                  security_related=0,
                  topic=None, classification=None, importance=None, 
@@ -120,13 +121,16 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
             submitter_id = str(user)
         self.submitter_id = submitter_id
         if submitter_name is None:
-            if hasattr(user, 'full_name'):
-                submitter_name = user.full_name
-        elif (submitter_name
-              and (getattr(user, 'full_name', None) != submitter_name)):
-            # XXX We're being cavalier about stashing the full_name.
-            user.full_name = submitter_name
+            n = user.getProperty('full_name', '')
+            if n: submitter_name = n
         self.submitter_name = submitter_name
+        email_pref = user.getProperty('email', '')
+        if submitter_email and submitter_email == email_pref:
+            # A bit different than you'd expect: only stash the specified
+            # email if it's different than the member-preference.  Otherwise,
+            # stash None, so the preference is tracked at send time.
+            submitter_email = None
+        self.submitter_email = submitter_email
 
         if kibitzers is None:
             kibitzers = ()
@@ -161,6 +165,17 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         # For getting the internal catalog when being indexed - at which 
         # time we don't have an acquisition content to use...
         self._collector_path = "/".join(collector.getPhysicalPath())
+
+    security.declareProtected(EditCollectorIssue, 'no_submitter_email')
+    def no_submitter_email(self):
+        """True if there's no way to get an email address for the submitter."""
+        if self.submitter_email:
+            return 0
+        if self.submitter_id != str(self.acl_users._nobody):
+            member = self.portal_membership.getMemberById(self.submitter_id)
+            if member and member.getProperty('email', ''):
+                return 0
+        return 1
 
     security.declareProtected(CMFCorePermissions.View, 'CookedBody')
     def CookedBody(self):
@@ -351,7 +366,6 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         new_status = string.split(self.status(), '_')[0]
 
         recipients = []
-        didids = []; gotemails = []     # Duplicate prevention.
 
         # Who to notify:
         # 
@@ -370,7 +384,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         # - Any supporters being removed from the issue by the current action
 
         # We're liberal about duplicates - they'll be filtered before the send.
-        candidates = [self.submitter_id] + self.assigned_to()
+        candidates = [self.submitter_id] + list(self.assigned_to())
         if orig_status and not ('accepted' == string.lower(new_status) == 
                                 string.lower(orig_status)):
             candidates.extend(self.aq_parent.managers)
@@ -385,11 +399,24 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
             # manager is deassigning them).
             candidates.extend(removals)
 
+        didids = []; gotemails = []
         for userid in candidates:
             if userid in didids:
+                # Cull duplicates.
                 continue
             didids.append(userid)
             name, email = util.get_email_fullname(self, userid)
+            if (userid == self.submitter_id) and self.submitter_email:
+                if self.submitter_email == email:
+                    # Explicit one same as user preference - clear the
+                    # explicit, so issue notification destination will track
+                    # changes to the preference.
+                    self.submitter_email = None
+                else:
+                    # Explicitly specified email overrides user pref email.
+                    email = self.submitter_email
+                if self.submitter_name:
+                    name = self.submitter_name
             if email:
                 if email in gotemails:
                     continue
@@ -654,6 +681,7 @@ def addCollectorIssue(self,
                       description='',
                       submitter_id=None,
                       submitter_name=None,
+                      submitter_email=None,
                       kibitzers=None,
                       topic=None,
                       classification=None,
@@ -673,6 +701,7 @@ def addCollectorIssue(self,
                         description=description,
                         submitter_id=submitter_id,
                         submitter_name=submitter_name,
+                        submitter_email=submitter_email,
                         kibitzers=kibitzers,
                         topic=topic,
                         classification=classification,
