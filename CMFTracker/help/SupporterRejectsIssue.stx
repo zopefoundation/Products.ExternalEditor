@@ -1,0 +1,66 @@
+"Supporter Rejects Issue" Use Case
+
+  Actors
+
+    - Supporter
+
+  Goal
+
+    - Reject submitted issues which are not "well-formed", or for
+      which the target tracker's owners are not responsible.
+
+  Preconditions
+
+    - Supporter is authenticated WRT the CMFSite, and is
+      authorized to accept issues into a tracker.
+
+    - One or more issues has already been
+      "created":../SubmitterDescribesIssue.stx and
+      "submitted":../SubmitterRequestsResolution.stx to that
+      tracker.
+
+  Main Flow
+
+    1. Supporter receives notification that one or more issues
+       are pending against a tracker for which she is
+       responsible (e.g., by email, or by a topic-like slashbox).
+       Supporter browses to that tracker and selects the "Review
+       pending issues" action.
+
+       System displays a summary listing of all issues which are
+       in "pending acceptance" state.
+
+    2. Supporter clicks through to an issue, reviewing it, and
+       selects its "Reject" action.
+
+       System prompts for a log message.
+
+    3. Supporter supplies the log message an confirms rejection.
+
+       System logs a "workflow
+       transition":../WorkflowTransitionLogging.stx to the
+       "Private" state.
+
+       System "notifies":../NotificationStrategy.stx Submitter
+       and tracker owners of the rejection of the issue.
+       
+  See Also
+
+    - "Overview":../Overview.stx
+
+    - "Submitter Describes Issue":../SubmitterDescribesIssue.stx
+
+    - "Submitter Requests Issue
+      Resolution":../SubmitterRequestsResolution.stx
+
+    - "Supporter Accepts Issue":../SupporterAcceptsIssue.stx
+
+    - "Supporter Redirects Issue":../SupporterRedirectsIssue.stx
+
+    - "Correspondent Adds Note to Issue":../CorrespondentAddsNote.stx
+
+    - "Supporter Closes Issue":../SupporterClosesIssue.stx
+
+    - "Tracker Issue Lifecycle":../Lifecycle.stx
+
+    - "Notification Strategy":../NotificationStrategy.stx

@@ -1,0 +1,41 @@
+Installing CMF Tracker
+
+  Installing the Product into Zope
+
+    1. Unpack the tarball and copy / link the CMFTracker
+       directory into the Products directory of the INSTANCE_HOME
+       (preferred) or SOFTWARE_HOME.
+       
+       *Note that this product depends on having a current
+       installation of the CMFCore and CMFDefault products.*
+    
+    2. Restart Zope, and verify that the product has installed
+       correctly by checking the Products folder in the Control
+       Panel.
+
+  Registering Tracker with CMFSite
+
+    1. Create an ExternalMethod in the CMFSite instance, using
+       the following parameter values:
+
+       - ID:            install_tracker
+
+       - Title:         Install CMFTracker
+
+       - Module name:   CMFTracker.Install
+
+       - Function name: install
+    
+    2. Run the method from the 'Test' tab.  Note that it creates
+       new type objects (for 'Tracker' and 'TrackerIssue') and
+       registers a new skins directory.
+
+  Creating a Tracker Instance
+
+    1. From the 'folder_contents' view of the site, or of one of
+       its folders, select the "New" button;  select the
+       "Tracker" radio button and supply an ID for the new
+       tracker.  Click the "Add" button.
+
+    2. Fill out the metadata for the tracker (see "Configuring
+       CMFTracker Instances":../Configuration.stx).

@@ -1,0 +1,53 @@
+"Submitter Requests Issue Resolution" Use Case
+
+  Actors
+
+    - Submitter
+
+  Goal
+
+    - Request that an issue be resolved by the team assigned to
+      its category.
+
+  Preconditions
+
+    - Submitter is authenticated WRT the CMFSite in which she
+      wishes to create an issue.
+      
+    - Submitter has previously "created an
+      IssueDescription":../SubmitterDescribesIssue.stx in the
+      location where she is browsing the site, and now desires
+      to submit it to the group who will evaluate and resolve it.
+
+  Main Flow
+
+    1. Submitter browses to an existing IssueDescription object
+       for which she has "Owner" local role.
+
+    2. After reviewing the issue, Submitter selects its "Submit"
+       action.  The system prompts Submitter to designate the
+       "target" Tracker (if this designation has not already been
+       made);  it then "logs a workflow
+       transition":../WorkflowTransitionLogging.stx to the
+       "Pending Review" state, and catalogs it such that the
+       owners of the target Tracker are
+       "notified":../NotificationStrategy.stx of its submission.
+
+       At this point, the IssueDescription is not generally
+       "discussable" (although workflow transitions can create
+       replies);  nor is the issue "public" while in this
+       "pupal" phase.
+
+  See Also
+
+    - "Overview":../Overview.stx
+
+    - "Submitter Describes Issue":../SubmitterDescribesIssue.stx
+
+    - "Supporter Accepts Issue":../SupporterAcceptsIssue.stx
+
+    - "Supporter Redirects ISsue":../SupporterRedirectsIssue.stx
+
+    - "Supporter Rejects ISsue":../SupporterRejectsIssue.stx
+
+    - "Tracker Issue Lifecycle":../Lifecycle.stx

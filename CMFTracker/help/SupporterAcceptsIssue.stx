@@ -1,0 +1,75 @@
+"Supporter Accepts Issue" Use Case
+
+  Actors
+
+    - Supporter
+
+  Goal
+
+    - Take responsibility for an issue submitted to a given
+      tracker.
+
+  Preconditions
+
+    - Supporter is authenticated WRT the CMFSite, and is
+      authorized to accept issues into a tracker.
+
+    - One or more issues has already been
+      "created":../SubmitterDescribesIssue.stx and
+      "submitted":../SubmitterRequestsResolution.stx to that
+      tracker.
+
+  Main Flow
+
+    1. Supporter receives notification that one or more issues
+       are pending against a tracker for which she is
+       responsible (e.g., by email, or by a topic-like slashbox).
+       Supporter browses to that tracker and selects the "Review
+       pending issues" action.
+
+       System displays a summary listing of all issues which are
+       in "pending acceptance" state.
+
+    2. Supporter clicks through to an issue, reviewing it, and
+       selects the "Accept" action.
+
+       System prompts for a log message.
+
+    3. Supporter supplies the log message and confirms acceptance.
+
+       System **moves the accepted issue into the tracker**,
+       renaming it and readjusting ownership and role mappings to
+       accomodate the "tracker issue lifecycle":../Lifecycle.stx.
+       In its original place, system creates a TrackerTicket, a
+       Favorite-based pointer to the newly-moved Issue.  Supporter
+       becomes the new owner of the issue;  Submitter retains
+       "Submitter" local role.
+
+       System "notifies":../NotificationStrategy.stx Submitter and
+       tracker owners of the acceptance of the issue.
+
+       At this point, the issue becomes
+       "discussable":../CorrespondentAddsNote.stx by both the
+       submitter and by the owners of the tracker into which it
+       has been accepted.
+       
+  See Also
+
+    - "Overview":../Overview.stx
+
+    - "Submitter Describes Issue":../SubmitterDescribesIssue.stx
+
+    - "Submitter Requests Issue
+      Resolution":../SubmitterRequestsResolution.stx
+
+    - "Supporter Redirects Issue":../SupporterRedirectsIssue.stx
+
+    - "Supporter Rejects Issue":../SupporterRejectsIssue.stx
+
+    - "Correspondent Adds Note to Issue":../CorrespondentAddsNote.stx
+
+    - "Supporter Closes Issue":../SupporterClosesIssue.stx
+
+    - "Tracker Issue Lifecycle":../Lifecycle.stx
+
+    - "Notification Strategy":../NotificationStrategy.stx

@@ -1,0 +1,60 @@
+CMFTracker Overview
+
+  Goals
+
+    - Allow site members to view, search, and create content related
+      to issues using the same tools and techniques used to with
+      other CMF content.
+
+    - Provide a migration target for existing "Collector",
+         http://classic.zope.org:8080/Collector
+      and "Tracker",
+         http://www.zope.org/Members/klm/Tracker
+      issues.
+
+
+  Use Cases
+
+    - "Submitter Describes Issue":../SubmitterDescribesIssue.stx
+
+    - "Submitter Requests Issue
+      Resolution":../SubmitterRequestsResolution.stx
+
+    - "Supporter Accepts Issue":../SupporterAcceptsIssue.stx
+
+    - "Supporter Redirects Issue":../SupporterRedirectsIssue.stx
+
+    - "Supporter Rejects Issue":../SupporterRejectsIssue.stx
+
+    - "Correspondent Adds Note to Issue":../CorrespondentAddsNote.stx
+
+    - "Supporter Closes Issue":../SupporterClosesIssue.stx
+
+
+  Design Notes
+
+    - "Tracker Issue Lifecycle":../Lifecycle.stx
+
+    - "Notification Strategy":../NotificationStrategy.stx
+
+    - "Workflow Transition
+      Logging":../WorkflowTransitionLogging.stx
+
+
+  Administrator Guide
+
+    - "Installing CMFTracker":../Installation.stx
+
+    - "Configuring CMFTracker":../Configuration.stx
+
+
+  User Guide
+
+    - "Submitter's Guide":../SubmitterGuide.stx
+
+    - "Supporter's Guide":../SupporterGuide.stx
+
+
+  Developer's Reference
+
+    - "Skinning CMFTracker":../SkinningCMFTracker.stx 

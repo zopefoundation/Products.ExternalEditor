@@ -1,0 +1,16 @@
+Workflow Transition Logging
+
+  Each workflow transition (e.g., from "private" to "pending review",
+  or from "in work" to "resolved"), adds both a "workflow
+  history" entry (standard CMF mechanism) *and* a "reply" to the
+  issue, where the reply is populated with the contents of the
+  log message entered by the actor.
+  
+  This reply will be "decorated" with the name of the target
+  workflow state.  For example, when a Supporter
+  "closes an issue":../SupporterClosesIssue.stx as "Resolved",
+  the reply would look like::
+
+    <<Resolved>>
+
+    <Body of log message goes here.>

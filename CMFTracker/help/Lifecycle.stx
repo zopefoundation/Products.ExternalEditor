@@ -1,0 +1,27 @@
+Tracker Issue Lifecycle
+
+  States
+
+    Unsubmitted -- The "larva" state, in which the submitter has
+      begun to describe the issue, but has not yet completed the
+      description and submitted it to a tracker.
+
+    Pending Acceptance -- The "pupa" state, in which no supporter
+      in the target tracker has yet accepted or rejected the issue.
+
+    In Work -- At least one supporter has accepted the issue.
+
+    Rejected -- A supporter has rejected the issue;  it can no longer
+      be considered open, nor should it be revived.
+
+    Resolved -- One of the supporters assigned to the issue has
+      completed all work related to the issue, which is now "closed"
+
+    Deferred -- One of the supporters has determined that the issue
+      cannot be dealt with during the current phase of the project;
+      it is marked closed, but can be revived later.
+
+    Diverted -- A supporter has determined that the issue either
+      duplicates another issue, or will be resolved by the same
+      effort required to resolve the other;  the issue shows up
+      as a dependency of the original.

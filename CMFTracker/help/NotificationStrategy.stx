@@ -1,0 +1,17 @@
+Tracker Notification Strategy
+
+  Problem
+
+    People who create or resolve tracker issues need to be able
+    to find *their* issues quickly, and know what actions they
+    are to perform on them.
+
+  Alternatives
+
+    - Create "slashbox"-style views which query the tracker or
+      trackers a person is interested in, showing the issues in
+      which they have a stake.
+
+    - Have each tracker create a daily email summary, showing
+      responsibility and status of each open issue, including
+      clickable URLs.
