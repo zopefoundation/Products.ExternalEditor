@@ -24,4 +24,9 @@
    - Added a working implementation behind the CMFCalendar product.
      Thanks to Andy Dawkins for the work.
 
+   - You can now add .security files to control the role to permissions
+     mappings on skin methods.
+     See CMFCore/tests/fake_skins/fake_skin/test4.py.security for an
+     example.
+
  Bugs Fixed
