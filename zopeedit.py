@@ -24,7 +24,7 @@ from os import path
 import traceback
 from tempfile import mktemp
 from ConfigParser import ConfigParser
-from httplib import HTTPConnection, HTTPSConnection
+from httplib import HTTPConnection, HTTPSConnection, HTTPException
 from urlparse import urlparse
 import urllib
 
@@ -249,19 +249,14 @@ class ExternalEditor:
         if hasattr(self, 'lock_token'):
             headers['If'] = '<%s> (<%s>)' % (self.path, self.lock_token)
         
-        response = self.zope_request('PUT', headers, body)
+        response = self.zopeRequest('PUT', headers, body)
         del body # Don't keep the body around longer then we need to
 
         if response.status / 100 != 2:
             # Something went wrong
-            sys.stderr.write('Error occurred during HTTP put:\n%d %s\n' \
-                             % (response.status, response.reason))
-            sys.stderr.write('\n----\n%s\n----\n' % response.read())
-            message = response.getheader('Bobo-Exception-Type')
-            
-            if askRetryCancel('Could not save to Zope.\nError '
-                              'occurred during HTTP put:\n%d %s\n%s' \
-                              % (response.status, response.reason, message)):
+            if self.askRetryAfterError(response, 
+                                       'Could not save to Zope.\n'
+                                       'Error occurred during HTTP put'):
                 return self.putChanges()
             else:
                 return 0
@@ -285,7 +280,7 @@ class ExternalEditor:
                 '</d:lockinfo>'
                 )
         
-        response = self.zope_request('LOCK', headers, body)
+        response = self.zopeRequest('LOCK', headers, body)
         
         if response.status / 100 == 2:
             # We got our lock, extract the lock token and return it
@@ -297,16 +292,13 @@ class ExternalEditor:
         else:
             # We can't lock her sir!
             if response.status == 423:
-                message = '\n(Object already locked)'
+                message = '(object already locked)'
             else:
-                message = response.getheader('Bobo-Exception-Type')
-
-            sys.stderr.write('Error occurred during lock request:\n%d %s\n' \
-                             % (response.status, response.reason))
-            sys.stderr.write('\n----\n%s\n----\n' % response.read())
-
-            if askRetryCancel('Lock request failed:\n%d %s\n%s' \
-                              % (response.status, response.reason, message)):
+                message = ''
+                
+            if self.askRetryAfterError(response, 
+                                       'Lock request failed', 
+                                       message):
                 return self.lock()
             else:
                 return 0
@@ -318,23 +310,18 @@ class ExternalEditor:
             return 0
             
         headers = {'Lock-Token':self.lock_token}
-        response = self.zope_request('UNLOCK', headers)
+        response = self.zopeRequest('UNLOCK', headers)
         
         if response.status / 100 != 2:
             # Captain, she's still locked!
-            message = response.getheader('Bobo-Exception-Type')
-            sys.stderr.write('Error occurred during unlock request:'
-                             '\n%d %s\n%s\n' \
-                             % (response.status, response.reason, message))
-            sys.stderr.write('\n----\n%s\n----\n' % response.read())
-            if askRetryCancel('Unlock request failed:\n%d %s'
-                              % (response.status, response.reason)):
+            if self.askRetryAfterError(response, 
+                                       'Unlock request failed'):
                 return self.unlock(token)
             else:
                 return 0
         return 1
         
-    def zope_request(self, method, headers={}, body=''):
+    def zopeRequest(self, method, headers={}, body=''):
         """Send a request back to Zope"""
         try:
             if self.ssl:
@@ -362,8 +349,10 @@ class ExternalEditor:
             return h.getresponse()
         except:
             # On error return a null response with error info
-            class NullResponse:
-                def getheader(n,d): return d
+            class NullResponse:                
+                def getheader(self, n, d=None):
+                    return d
+                    
                 def read(self): 
                     return '(No Response From Server)'
             
@@ -378,6 +367,26 @@ class ExternalEditor:
                 response.status = 0
             
             return response
+            
+    def askRetryAfterError(self, response, operation, message=''):
+        """Dumps response data to stderr"""
+        if not message \
+           and response.getheader('Bobo-Exception-Type') is not None:
+            message = '%s: %s' % (response.getheader('Bobo-Exception-Type'),
+                                  response.getheader('Bobo-Exception-Value'))
+                                  
+        sys.stderr.write('Error occurred: %s:\n%d %s\n%s\n'
+                         % (operation, response.status, 
+                            response.reason, message))
+                            
+        if hasattr(response, 'msg'):
+            headers = ''.join(response.msg.headers)
+        else:
+            headers = ''
+            
+        sys.stderr.write('\n----\n%s\n%s\n----\n' % (headers, response.read()))
+        return askRetryCancel('%s:\n%d %s\n%s' % (operation, response.status, 
+                                               response.reason, message))
 
 title = 'Zope External Editor'
 
@@ -424,8 +433,8 @@ else: # Posix platform
         """Sets up a suitable tk root window if one has not
            already been setup. Returns true if tk is happy,
            false if tk throws an error (like its not available)"""
-        if not hasattr(globals(), 'tk_root'):
             # create a hidden root window to make Tk happy
+        if not locals().has_key('tk_root'):
             try:
                 global tk_root
                 from Tkinter import Tk
@@ -454,7 +463,7 @@ else: # Posix platform
             return r
 
     def askYesNo(message):
-        if has_tk:
+        if has_tk():
             from tkMessageBox import askyesno
             r = askyesno(title, message)
             has_tk() # must...make...tk...happy
