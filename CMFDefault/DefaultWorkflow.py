@@ -373,6 +373,11 @@ class DefaultWorkflowDefinition (SimpleItemWithProperties):
             anon_view = 1
             owner_modify = 0
             reviewer_view = 1
+        else:   # This object is in an unknown state
+            anon_view = 0
+            owner_modify = 1
+            reviewer_view = 0
+
         # Modify role to permission mappings directly.
 
         return modifyPermissionMappings(ob,
