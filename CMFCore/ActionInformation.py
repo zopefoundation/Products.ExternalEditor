@@ -91,6 +91,8 @@ class ActionInformation( SimpleItem ):
                 condition = Expression(condition)
             self.condition = condition
         if permissions is not _unchanged:
+            if permissions == ('',):
+                permissions = ()
             self.permissions = permissions
         if priority is not _unchanged:
             self.priority = priority

@@ -197,7 +197,7 @@ class ActionProviderBase:
         c_expr = condition and Expression(text=str(condition)) or ''
 
         if type( permission ) != type( () ):
-            permission = permission and (str(permission),) or ()
+            permission = (str(permission),)
 
         new_actions = self._cloneActions()
 

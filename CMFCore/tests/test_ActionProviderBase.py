@@ -70,8 +70,63 @@ class ActionProviderBaseTests(SecurityRequestTest):
                      )
         self.failUnless( apb._actions )
         self.failIf( apb._actions is old_actions )
+
+    def test_addActionBlankPermission(self):
         # make sure a blank permission gets stored as an empty tuple
-        self.assertEqual( apb._actions[0].permissions, () )
+        # '' and () and ('',) should mean no permission.
+
+        apb = self._makeProvider()
+        apb.addAction(id='foo',
+                      name='foo_action',
+                      action='',
+                      condition='',
+                      permission='',
+                      category='',
+                      )
+        self.assertEqual(apb._actions[0].permissions, ())
+
+        apb.addAction(id='foo',
+                      name='foo_action',
+                      action='',
+                      condition='',
+                      permission=('',),
+                      category='',
+                      )
+        self.assertEqual(apb._actions[1].permissions, ())
+
+        apb.addAction(id='foo',
+                      name='foo_action',
+                      action='',
+                      condition='',
+                      permission=(),
+                      category='',
+                      )
+        self.assertEqual(apb._actions[2].permissions, ())
+
+    def test_extractActionBlankPermission(self):
+        # make sure a blank permission gets stored as an empty tuple
+        # both () and ('',) should mean no permission.
+
+        apb = self._makeProvider()
+
+        index = 5
+        properties = {
+            'id_5': 'foo',
+            'name_5': 'foo_action',
+            'permission_5': (),
+            }
+        action = apb._extractAction(properties, index)
+        self.assertEqual(action.permissions, ())
+
+        index = 2
+        properties = {
+            'id_2': 'foo',
+            'name_2': 'foo_action',
+            'permission_2': ('',),
+            }
+        action = apb._extractAction(properties, index)
+        self.assertEqual(action.permissions, ())
+
 
     def test_changeActions( self ):
 
