@@ -128,6 +128,59 @@
     </div>
 
   </form>
+  <form action="collector_search" method="get">
+  <input type="hidden" name="Type" value="Collector Issue">
+  <input type="hidden" name="path" value=""
+         tal:attributes="value python: here.absolute_url(1)">
+  Fulltext Search:  <input type="text" name="SearchableText" size="40">
+  <div>
+    Requestor:  <select name="Creator:list" multiple size="5">
+                  <option value=""
+                          tal:define="items python: here.portal_catalog.uniqueValuesFor('Creator')"
+                          tal:repeat="item items"
+                          tal:attributes="value item"
+                          tal:content="item">
+                  </option>
+                </select>
+  </div>
+  <div>
+    Status:  <select name="status:list" multiple size="5">
+               <option value=""
+                       tal:define="items python: here.portal_catalog.uniqueValuesFor('review_state')"
+                       tal:repeat="item items"
+                       tal:attributes="value item"
+                       tal:content="item">
+               </option>
+             </select>
+  </div>
+  <div>
+    Security Related:  <input type="checkbox" name="security_related" value="1">
+  </div>
+  <div>
+    Classification:  <select name="classifications:list" multiple size="5">
+                       <option value=""
+                               tal:define="items here/classifications"
+                               tal:repeat="item items"
+                               tal:attributes="value item"
+                               tal:content="item">
+                       </option>
+                     </select>
+  </div>
+  <div>
+    Severity: <select name="severities:list" multiple size="5">
+                <option value=""
+                        tal:define="items here/severities"
+                        tal:repeat="item items"
+                        tal:attributes="value item"
+                        tal:content="item">
+                </option>
+              </select>
+  </div>
+  <div>
+    <input type="Submit" value="Search">
+  </div>
+</form>
+
 </div>
 </div>
 </body>

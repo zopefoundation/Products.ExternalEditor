@@ -1,0 +1,79 @@
+<html xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="here/main_template/macros/master">
+<body>
+<div metal:fill-slot="main">
+<div class="Desktop">
+
+<h3> Search Results </h3>
+
+<div tal:define="b_start python:0;b_start request/b_start | b_start;
+                 results python:apply(here.search_collector, (), request.form);
+	             Batch python:modules['ZTUtils'].Batch;
+	             global batch python:Batch(results, 25, b_start, orphan=1);
+                ">
+    <p>Found <span tal:define="pss modules/Products.PythonScripts.standard"
+               tal:replace="python:pss.thousands_commas(len(results))">100</span> items 
+		 <span tal:condition="exists: request/SearchableText"
+		       tal:replace="string:matching ${request/SearchableText}"></span>.
+    </p>
+<table class="SearchResults">
+ <tr>
+  <td width="16"><br></td>
+  <th> Title
+  </th>
+  <th> Type
+  </th>
+  <th> Date
+  </th>
+  </tr>
+<tbody tal:repeat="results batch"
+    tal:condition="results">
+  <tr>
+  <td tal:define="global objURL python: results.getURL()">
+   <span tal:condition="results/getIcon|nothing">
+     <a href="" tal:attributes="href objURL"><img src="" border="0" alt="" title=""
+	                                              tal:define="alt results/Type"
+	                                              tal:attributes="src results/getIcon; alt alt; title alt">
+	 </a>
+    </span>
+  </td>
+  <td>
+     <a href="" tal:attributes="href objURL"><span tal:condition="results/Title" 
+                                                 tal:content="results/Title">Title</span><span tal:condition="not:results/Title" tal:content="string:(No title)"></span></a>
+  </td>
+  <td><span tal:content="results/Type">Type</span></td>
+  <td tal:content="results/Date">Date</td>
+</tr>
+<tr>
+  <td>&nbsp;</td>
+  <td colspan="3">
+  <em><span tal:condition="results/Description"
+            tal:content="results/Description">Description</span>
+	  <span tal:condition="not:results/Description"
+	        tal:content="string:(No description)"></span></em>
+  </td>
+</tr>
+</tbody>
+  </table>
+<div tal:condition="not:results"
+     tal:replace="string:There are no items matching your specified criteria"></div>
+
+ <p class="Desktop" tal:define="mq python:modules['ZTUtils'].make_query">
+ <span tal:define="p batch/previous" tal:condition="p">
+   <a href=""
+      tal:attributes="href python: '?' + mq( request.form, b_start=p.first )"
+   >Previous <span tal:replace="p/length">n</span> items</a>
+ </span>&nbsp;&nbsp;
+ <span tal:define="n batch/next" tal:condition="n">
+   <a href=""
+      tal:attributes="href python: '?' + mq( request.form, b_start=n.first )"
+   >Next <span tal:replace="n/length">n</span> items</a>
+ </span> 
+ </p>
+</div>
+</div>
+</div>
+</body>
+</html>
+
