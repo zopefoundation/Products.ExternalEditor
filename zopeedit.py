@@ -283,15 +283,6 @@ class ExternalEditor:
             if editor is not None and editor.find('\\iexplore.exe') != -1:
                 editor = None
 
-        if not editor and not win32 and has_tk():
-            from tkSimpleDialog import askstring
-            editor = askstring('Zope External Editor', 
-                               'Enter the command to launch the default editor')
-            if not editor: 
-                sys.exit(0)
-            self.config.set('general', 'editor', editor)
-            self.config.save()
-
         if editor is not None:            
             return editor
         else:

@@ -1,5 +1,12 @@
 External Editor Change Log
 
+  Next Release
+  
+    - Do not ask the user what editor to use on Posix platforms. Instead just
+      tell the user to edit the config file. The askstring()
+      function does not work with a hidden root Tk window in Python 2.3.4.
+      Thanks to Christopher Mann.
+
   7/13/04 - 0.8 release
   
     - Add external editor icon to ZMI breadcrumbs for editable objects.
