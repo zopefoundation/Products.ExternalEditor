@@ -204,7 +204,7 @@ class SkinsToolConfiguratorTests( _SkinsSetup ):
         self.assertEqual( len( skins_tool.getSkinPaths() ), 2 )
         self.assertEqual( len( skins_tool.objectItems() ), 3 )
 
-    def test_normal( self ):
+    def test_parseXML_normal( self ):
 
         site = self._initSite()
         self._registerDirectoryView( os.path.join( _TESTS_PATH, 'one' ) )

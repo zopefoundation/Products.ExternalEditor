@@ -11,11 +11,71 @@ from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
 from Products.CMFCore.TypesTool import FactoryTypeInformation
 from Products.CMFCore.TypesTool import ScriptableTypeInformation
+from Products.CMFCore.TypesTool import typeClasses
 from Products.CMFCore.utils import getToolByName
 
 from permissions import ManagePortal
 from utils import HandlerBase
 from utils import _xmldir
+
+#
+#   Entry points
+#
+_TOOL_FILENAME = 'typestool.xml'
+
+def importTypesTool( context ):
+
+    """ Import types tool and content types from XML files.
+    """
+    site = context.getSite()
+    encoding = context.getEncoding()
+
+    types_tool = getToolByName( site, 'portal_types' )
+    #if config_file is None:
+    #    config_file = context.getDataFile('types.xml')
+
+    if context.shouldPurge():
+
+        for type in types_tool.objectIds():
+            types_tool._delObject(type)
+
+    configurator = TypeInfoConfigurator( site )
+    text = context.readDataFile( _TOOL_FILENAME )
+
+    for type_id in configurator.parseToolXML( text ):
+
+        type_filename = _getTypeFilename( type_id )
+        text = context.readDataFile( type_filename )
+        configurator.parseTypeXML( text )
+
+
+    # XXX: YAGNI?
+    # importScriptsToContainer(types_tool, ('typestool_scripts',),
+    #                          context)
+
+    return 'Type tool imported'
+
+def exportTypesTool( context ):
+
+    """ Export types tool content types as a set of XML files.
+    """
+    site = context.getSite()
+    types_tool = getToolByName( site, 'portal_types' )
+    configurator = TypeInfoConfigurator( site ).__of__( site )
+
+    tool_xml = configurator.generateToolXML()
+    context.writeDataFile( _TOOL_FILENAME, tool_xml )
+
+    for type_id in types_tool.listContentTypes():
+
+        type_filename = _getTypeFilename( type_id )
+        type_xml = configurator.generateTypeXML( type_id )
+        context.writeDataFile( type_filename, type_xml )
+
+    # XXX: YAGNI?
+    # exportScriptsFromContainer(types_tool, ('typestool_scripts',))
+
+    return 'Types tool exported'
 
 class TypeInfoConfigurator( Implicit ):
 
@@ -77,6 +137,33 @@ class TypeInfoConfigurator( Implicit ):
         """
         return self._typeConfig( type_id=type_id )
 
+    security.declareProtected( ManagePortal, 'parseToolXML' )
+    def parseToolXML( self, xml, encoding=None ):
+
+        """ Pseudo API.
+        """
+        parser = _TypesToolParser( encoding )
+        parseString( xml, parser )
+        return parser._types
+
+    security.declareProtected( ManagePortal, 'parseTypeXML' )
+    def parseTypeXML( self, xml, encoding=None ):
+
+        """ Pseudo API.
+        """
+        tool = getToolByName( self._site, 'portal_types' )
+        parser = _TypeInfoParser( encoding )
+        parseString( xml, parser )
+
+        for info in parser._info_list:
+
+            klass_info = [ x for x in typeClasses
+                              if x[ 'name' ] == info[ 'kind' ] ][ 0 ]
+
+            type_info = klass_info[ 'class' ]( **info )
+
+            tool._setObject( info[ 'id' ], type_info )
+
     #
     #   Helper methods
     #
@@ -109,6 +196,10 @@ class TypeInfoConfigurator( Implicit ):
                  , 'allow_discussion'       : ti.allow_discussion
                  , 'aliases'                : ti.getMethodAliases()
                  }
+
+        if ' ' in ti.getId():
+
+            result[ 'filename' ]    = ti.getId().replace( ' ', '_' )
 
         if isinstance( ti, FactoryTypeInformation ):
 
@@ -143,3 +234,153 @@ class TypeInfoConfigurator( Implicit ):
                }
 
 InitializeClass( TypeInfoConfigurator )
+
+class _TypesToolParser( HandlerBase ):
+
+    security = ClassSecurityInfo()
+
+    def __init__( self, encoding ):
+
+        self._encoding = encoding
+        self._types = []
+
+    security.declarePrivate( 'startElement' )
+    def startElement( self, name, attrs ):
+
+        if name == 'types-tool':
+            pass
+
+        if name == 'type':
+
+            id = self._extract( attrs, 'id' )
+            filename = self._extract( attrs, 'filename', id )
+            filename = _getTypeFilename( filename )
+
+            self._types.append( ( id, filename ) )
+
+InitializeClass( _TypesToolParser )
+
+_TYPE_INTS = ['global_allow', 'filter_content_types', 'allow_discussion']
+
+class _TypeInfoParser( HandlerBase ):
+
+    security = ClassSecurityInfo()
+
+    def __init__( self, encoding ):
+
+        self._encoding = encoding
+        self._info_list = []
+        self._description = None
+
+    security.declarePrivate( 'startElement' )
+    def startElement( self, name, attrs ):
+
+        def _es( key, default=None ):
+            return self._extract( attrs, key, default )
+
+        def _eb( key, default=None ):
+            return self._extractBoolean( attrs, key, default )
+
+        if name == 'type-info':
+
+            type_id                 = _es( 'id' )
+            kind                    = _es( 'kind' )
+            title                   = _es( 'title', type_id )
+            meta_type               = _es( 'meta_type', type_id )
+            icon                    = _es( 'icon', '%s.png' % type_id )
+            immediate_view          = _es( 'icon', '%s_edit' % type_id )
+            global_allow            = _eb( 'global_allow', True )
+            filter_content_types    = _eb( 'filter_content_types', False )
+            allowed_content_types   = _es( 'allowed_content_types', '' )
+            allowed_content_types   = allowed_content_types.split( ',' )
+            allow_discussion        = _eb( 'allow_discussion', False )
+
+            info = { 'id'                    : type_id
+                   , 'kind'                  : kind
+                   , 'title'                 : title
+                   , 'description'           : ''
+                   , 'meta_type'             : meta_type
+                   , 'icon'                  : icon
+                   , 'immediate_view'        : immediate_view
+                   , 'global_allow'          : global_allow
+                   , 'filter_content_types'  : filter_content_types
+                   , 'allowed_content_types' : allowed_content_types
+                   , 'allow_discussion'      : allow_discussion
+                   , 'aliases'               : {}
+                   , 'actions'               : []
+                   }
+
+            if kind == FactoryTypeInformation.meta_type:
+
+                info[ 'product' ]           = _es( 'product' )
+                info[ 'factory' ]           = _es( 'factory' )
+
+            elif kind == ScriptableTypeInformation.meta_type:
+
+                info[ 'constructor_path' ]  = _es( 'constructor_path' )
+                info[ 'permission' ]        = _es( 'permission' )
+
+            self._info_list.append( info )
+
+        elif name == 'aliases':
+            pass
+
+        elif name == 'alias':
+
+            t_info = self._info_list[ -1 ]
+            alias_from  = _es( 'from' )
+            alias_to    = _es( 'to' )
+
+            t_info[ 'aliases' ][ alias_from ] = alias_to
+
+        elif name == 'action':
+
+            t_info = self._info_list[ -1 ]
+            a_info = { 'id'             : _es( 'action_id' )
+                     , 'title'          : _es( 'title' )
+                     , 'action'         : _es( 'action_expr' )
+                     , 'condition'      : _es( 'condition' )
+                     , 'permissions'    : _es( 'permissions' ).split( ',' )
+                     , 'category'       : _es( 'category' )
+                     , 'visible'        : _eb( 'visible' )
+                     }
+
+            t_info[ 'actions' ].append( a_info )
+
+        elif name == 'description':
+            self._description = ''
+
+        else:
+            raise ValueError, 'Unknown element %s' % name
+
+    security.declarePrivate('endElement')
+    def endElement(self, name):
+
+        if name == 'description':
+
+            info = self._info_list[ -1 ]
+            info[ 'description' ] = _cleanDescription( self._description )
+            self._description = None
+
+    security.declarePrivate( 'characters' )
+    def characters( self, chars ):
+
+        if self._description is not None:
+
+            if self._encoding:
+                chars = chars.encode( self._encoding )
+
+            self._description += chars
+
+
+InitializeClass( _TypeInfoParser )
+
+def _getTypeFilename( type_id ):
+
+    """ Return the name of the file which holds info for a given type.
+    """
+    return 'types/%s.xml' % type_id
+
+def _cleanDescription( desc ):
+
+    return ''.join( map( lambda x: x.lstrip(), desc.splitlines( 1 ) ) )

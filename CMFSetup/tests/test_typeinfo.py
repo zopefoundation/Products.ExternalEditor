@@ -22,6 +22,7 @@ class DummyTypesTool( Folder ):
     def __init__( self, type_infos ):
 
         self._type_infos = type_infos
+        self._objects = []
 
     def listContentTypes( self ):
 
@@ -40,6 +41,10 @@ class DummyTypesTool( Folder ):
             return FactoryTypeInformation( **info )
         else:
             return ScriptableTypeInformation( **info )
+
+    def _setObject( self, id, ob ):
+
+        self._objects.append( ( id, ob ) )
 
 class TypeInfoConfiguratorTests( BaseRegistryTests ):
 
@@ -170,17 +175,33 @@ class TypeInfoConfiguratorTests( BaseRegistryTests ):
 
         self.assertEqual( len( configurator.listTypeInfo() ), len( _TI_LIST ) )
 
-    #
-    #   XXX:  Design Issue
-    #
-    #   These tests presume a single, "monolithic" XML file, output for
-    #   the whole tool;  while this is doable, it tends to lead to files
-    #   which are hard to maintain (for humans).
-    #
-    #   We should consider breaking them up, with the output for each
-    #   type information object in a separate file, all grouped in a
-    #   'typeinfo' subdirectory within the export.
-    #
+        info_list = configurator.listTypeInfo()
+        self.assertEqual( len( info_list ), len( _TI_LIST ) )
+
+        _marker = object()
+
+        for i in range( len( _TI_LIST ) ):
+            found = info_list[ i ]
+            expected = _TI_LIST[ i ]
+            self.assertEqual( found[ 'id' ], expected[ 'id' ] )
+            self.failUnless( found.get( 'filename', _marker ) is _marker )
+
+    def test_listTypeInfo_with_filename ( self ):
+
+        site = self._initSite( _TI_LIST_WITH_FILENAME )
+        configurator = self._makeOne( site ).__of__( site )
+
+        info_list = configurator.listTypeInfo()
+        self.assertEqual( len( info_list ), len( _TI_LIST_WITH_FILENAME ) )
+
+        for i in range( len( _TI_LIST_WITH_FILENAME ) ):
+            found = info_list[ i ]
+            expected = _TI_LIST_WITH_FILENAME[ i ]
+            self.assertEqual( found[ 'id' ], expected[ 'id' ] )
+            self.assertEqual( found[ 'filename' ]
+                            , expected[ 'id' ].replace( ' ', '_' )
+                            )
+
     def test_generateToolXML_empty( self ):
 
         site = self._initSite()
@@ -191,6 +212,13 @@ class TypeInfoConfiguratorTests( BaseRegistryTests ):
 
         site = self._initSite( _TI_LIST )
         configurator = self._makeOne( site ).__of__( site )
+        self._compareDOM( configurator.generateToolXML(), _NORMAL_EXPORT )
+
+    def test_generateToolXML_explicit_filename( self ):
+
+        site = self._initSite( _TI_LIST_WITH_FILENAME )
+        configurator = self._makeOne( site ).__of__( site )
+        self._compareDOM( configurator.generateToolXML(), _FILENAME_EXPORT )
 
     def test_generateTypeXML_FTI( self ):
 
@@ -204,6 +232,73 @@ class TypeInfoConfiguratorTests( BaseRegistryTests ):
         configurator = self._makeOne( site ).__of__( site )
         self._compareDOM( configurator.generateTypeXML( 'bar' ), _BAR_EXPORT )
 
+    def test_parseToolXML_empty( self ):
+
+        site = self._initSite()
+        configurator = self._makeOne( site ).__of__( site )
+
+        id_file_list = configurator.parseToolXML( _EMPTY_EXPORT )
+        self.assertEqual( len( id_file_list ), 0 )
+
+    def test_parseToolXML_normal( self ):
+
+        site = self._initSite()
+        configurator = self._makeOne( site ).__of__( site )
+
+        id_file_list = configurator.parseToolXML( _NORMAL_EXPORT )
+        self.assertEqual( len( id_file_list ), 2 )
+
+        self.assertEqual( id_file_list[ 0 ][ 0 ], 'foo' )
+        self.assertEqual( id_file_list[ 0 ][ 1 ], 'types/foo.xml' )
+        self.assertEqual( id_file_list[ 1 ][ 0 ], 'bar' )
+        self.assertEqual( id_file_list[ 1 ][ 1 ], 'types/bar.xml' )
+
+    def test_parseToolXML_with_filename( self ):
+
+        site = self._initSite()
+        configurator = self._makeOne( site ).__of__( site )
+
+        id_file_list = configurator.parseToolXML( _FILENAME_EXPORT )
+        self.assertEqual( len( id_file_list ), 2 )
+
+        self.assertEqual( id_file_list[ 0 ][ 0 ], 'foo object' )
+        self.assertEqual( id_file_list[ 0 ][ 1 ], 'types/foo_object.xml' )
+        self.assertEqual( id_file_list[ 1 ][ 0 ], 'bar object' )
+        self.assertEqual( id_file_list[ 1 ][ 1 ], 'types/bar_object.xml' )
+
+    def test_parseTypeXML_FTI( self ):
+
+        site = self._initSite()
+        tool = site.portal_types
+        configurator = self._makeOne( site ).__of__( site )
+        self.assertEqual( len( tool._objects ), 0 )
+
+        configurator.parseTypeXML( _FOO_EXPORT )
+        self.assertEqual( len( tool._objects ), 1 )
+
+        type_id = tool._objects[ 0 ][ 0 ]
+        ti = tool._objects[ 0 ][ 1 ]
+        self.assertEqual( type_id, 'foo' )
+        self.assertEqual( ti.getId(), 'foo' )
+        self.assertEqual( ti.Title(), 'Foo' )
+        self.assertEqual( len( ti.getMethodAliases() ), 2 )
+
+    def test_parseTypeXML_STI( self ):
+
+        site = self._initSite()
+        tool = site.portal_types
+        configurator = self._makeOne( site ).__of__( site )
+        self.assertEqual( len( tool._objects ), 0 )
+
+        configurator.parseTypeXML( _BAR_EXPORT )
+        self.assertEqual( len( tool._objects ), 1 )
+
+        type_id = tool._objects[ 0 ][ 0 ]
+        ti = tool._objects[ 0 ][ 1 ]
+        self.assertEqual( type_id, 'bar' )
+        self.assertEqual( ti.getId(), 'bar' )
+        self.assertEqual( ti.Title(), 'Bar' )
+        self.assertEqual( len( ti.getMethodAliases() ), 2 )
 
 
 _TI_LIST = ( { 'id'                     : 'foo'
@@ -279,6 +374,13 @@ _TI_LIST = ( { 'id'                     : 'foo'
              }
            )
 
+_TI_LIST_WITH_FILENAME = []
+
+for original in _TI_LIST:
+    duplicate = original.copy()
+    duplicate[ 'id' ] = '%s object' % original[ 'id' ]
+    _TI_LIST_WITH_FILENAME.append( duplicate )
+
 _EMPTY_EXPORT = """\
 <?xml version="1.0"?>
 <types-tool>
@@ -288,8 +390,16 @@ _EMPTY_EXPORT = """\
 _NORMAL_EXPORT = """\
 <?xml version="1.0"?>
 <types-tool>
- <type>foo</type>
- <type>bar</type>
+ <type id="foo" />
+ <type id="bar" />
+</types-tool>
+"""
+
+_FILENAME_EXPORT = """\
+<?xml version="1.0"?>
+<types-tool>
+ <type id="foo object" filename="foo_object" />
+ <type id="bar object" filename="bar_object" />
 </types-tool>
 """
 

@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <types-tool xmlns:tal="http://xml.zope.org/namespaces/tal">
- <type tal:repeat="info here/listTypeInfo"
-       tal:content="nfo/id">TYPE_ID</type>
+ <type id="TYPE_ID"
+       tal:repeat="info here/listTypeInfo"
+       tal:attributes="id info/id;
+                       filename info/filename | default;
+                      " />
 </types-tool>
