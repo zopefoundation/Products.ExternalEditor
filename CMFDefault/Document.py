@@ -95,6 +95,7 @@ from DublinCore import DefaultDublinCoreImpl
 
 from Products.CMFCore import CMFCorePermissions
 from Products.CMFCore.WorkflowCore import WorkflowAction, afterCreate
+from Products.CMFCore.utils import _format_stx
 from utils import parseHeadersBody, SimpleHTMLParser, bodyfinder, _dtmldir
 
 factory_type_information = ( { 'id'             : 'Document'
@@ -242,20 +243,10 @@ class Document(PortalContent, DefaultDublinCoreImpl):
                 cooked = body = bodyfound.group('bodycontent')
         else:
             headers, body = parseHeadersBody(text, headers)
-            cooked = self._format_stx(text=body)
+            cooked = _format_stx(text=body)
 
         return headers, body, cooked, format
             
-    def _format_stx(self, text, level=1):
-        """ Renders structured text """
-        st = StructuredText.Basic(text) # Creates the basic DOM
-        if not st:                      # If it's an empty object
-            return ""                   # return now or have errors!
-
-        doc = StructuredText.DocumentWithImages(st)
-        html = CMFHtmlWithImages(doc, level)
-        return html
-
     security.declareProtected(CMFCorePermissions.View, 'SearchableText')
     def SearchableText(self):
         """ Used by the catalog for basic full text indexing """

@@ -90,7 +90,8 @@ import PortalObject, PortalContent, PortalFolder
 import MembershipTool, WorkflowTool, CatalogTool, DiscussionTool
 import ActionsTool, UndoTool, RegistrationTool, SkinsTool
 import MemberDataTool, TypesTool
-import DirectoryView, FSDTMLMethod, FSImage, FSPropertiesObject, FSPythonScript
+import DirectoryView, FSImage, FSPropertiesObject
+import FSDTMLMethod, FSPythonScript, FSSTXMethod
 import CookieCrumbler
 import ContentTypeRegistry
 import utils

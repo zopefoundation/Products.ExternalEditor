@@ -90,7 +90,7 @@ from AccessControl.Role import gather_permissions
 import Globals
 from Acquisition import aq_get, aq_inner, aq_parent
 from string import split
-import os
+import os, re
 from Globals import package_home
 
 try: from OFS.ObjectManager import UNIQUE
@@ -470,6 +470,60 @@ def registerIcon(klass, iconspec, _prefix=None):
         setattr(OFS.misc_.misc_, pid, OFS.misc_.Misc_(pid, {}))
     getattr(OFS.misc_.misc_, pid)[name]=icon
 
+#
+#   StructuredText handling.
+#
+import StructuredText
+from StructuredText.HTMLWithImages import HTMLWithImages
+
+_STXDWI = StructuredText.DocumentWithImages.__class__
+
+class CMFDocumentClass( StructuredText.DocumentWithImages.__class__ ):
+    """
+        Override DWI to get '_' into links.
+    """
+    _URL_AND_PUNC = r'([a-zA-Z0-9_\@\.\,\?\!\/\:\;\-\#\~]+)'
+    def doc_href( self
+                , s
+                , expr1 = re.compile( _STXDWI._DQUOTEDTEXT
+                                    + "(:)"
+                                    + _URL_AND_PUNC
+                                    + _STXDWI._SPACES
+                                    ).search
+                , expr2 = re.compile( _STXDWI._DQUOTEDTEXT
+                                    + r'(\,\s+)'
+                                    + _URL_AND_PUNC
+                                    + _STXDWI._SPACES
+                                    ).search
+                ):
+        return _STXDWI.doc_href( self, s, expr1, expr2 )
+
+CMFDocumentClass = CMFDocumentClass()
+
+class CMFHtmlWithImages( HTMLWithImages ):
+    """ Special subclass of HTMLWithImages, overriding document() """
+    def document(self, doc, level, output):
+        """\
+        HTMLWithImages.document renders full HTML (head, title, body).  For
+        CMF Purposes, we don't want that.  We just want those nice juicy
+        body parts perfectly rendered.
+        """
+        for c in doc.getChildNodes():
+           getattr(self, self.element_types[c.getNodeName()])(c, level, output)
+
+CMFHtmlWithImages = CMFHtmlWithImages()
+            
+def _format_stx( text, level=1 ):
+    """
+        Render STX to HTML.
+    """
+    st = StructuredText.Basic( text )   # Creates the basic DOM
+    if not st:                          # If it's an empty object
+        return ""                       # return now or have errors!
+
+    doc = CMFDocumentClass( st )
+    html = CMFHtmlWithImages( doc, level )
+    return html
 
 if 0:
     # Hopefully we can use this.
