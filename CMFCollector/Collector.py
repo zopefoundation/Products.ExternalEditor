@@ -364,7 +364,8 @@ class CollectorCatalog(CatalogTool):
                   ('security_related', 'FieldIndex'),
                   ('confidential', 'FieldIndex'),
                   ('resolution', 'TextIndex'),
-                  ('submitter_email', 'TextIndex'),
+                  ('submitter_id', 'FieldIndex'),
+                  ('submitter_email', 'FieldIndex'),
                   ('version_info', 'TextIndex'),
                   ('assigned_to', 'KeywordIndex'),
                   ('upload_number', 'KeywordIndex')
@@ -375,6 +376,7 @@ class CollectorCatalog(CatalogTool):
         """Return field names of data to be cached on query results."""
         standard = CatalogTool.enumerateColumns(self)
         custom = ('status',
+                  'submitter_id',
                   'topic',
                   'classification',
                   'importance',
