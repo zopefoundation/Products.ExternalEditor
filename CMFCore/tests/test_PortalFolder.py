@@ -82,7 +82,7 @@ class PortalFolderTests( unittest.TestCase ):
     def setUp( self ):
         get_transaction().begin()
         self._policy = UnitTestSecurityPolicy()
-        SecurityManager.setSecurityPolicy(self._policy)
+        self._oldPolicy = SecurityManager.setSecurityPolicy(self._policy)
         self.connection = Zope.DB.open()
         self.root = self.connection.root()[ 'Application' ]
         newSecurityManager( None, UnitTestUser().__of__( self.root ) )
@@ -90,6 +90,8 @@ class PortalFolderTests( unittest.TestCase ):
     def tearDown( self ):
         get_transaction().abort()
         self.connection.close()
+        SecurityManager.setSecurityPolicy( self._oldPolicy )
+        
 
     def test_deletePropagation( self ):
 
@@ -348,7 +350,7 @@ class PortalFolderPermissionTests( unittest.TestCase ):
     def setUp( self ):
         get_transaction().begin()
         self._policy = UnitTestSecurityPolicy()
-        SecurityManager.setSecurityPolicy(self._policy)
+        self._oldPolicy = SecurityManager.setSecurityPolicy(self._policy)
         self.connection = Zope.DB.open()
         self.root = self.connection.root()[ 'Application' ]
         self.manager = UnitTestUser().__of__( self.root )
@@ -362,6 +364,7 @@ class PortalFolderPermissionTests( unittest.TestCase ):
     def tearDown( self ):
         get_transaction().abort()
         self.connection.close()
+        SecurityManager.setSecurityPolicy( self._oldPolicy )
 
     def test_listFolderContentsPerms( self ):
         pass

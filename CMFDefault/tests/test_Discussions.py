@@ -34,7 +34,7 @@ class DiscussionTests( unittest.TestCase ):
     def setUp( self ):
         get_transaction().begin()
         self._policy = UnitTestSecurityPolicy()
-        SecurityManager.setSecurityPolicy( self._policy )
+        self._oldPolicy = SecurityManager.setSecurityPolicy(self._policy)
         self.connection = Zope.DB.open()
         self.root = self.connection.root()[ 'Application' ]
         self.root._setObject( 'portal_discussion', DiscussionTool() )
@@ -58,6 +58,7 @@ class DiscussionTests( unittest.TestCase ):
         del self._policy
         get_transaction().abort()
         self.connection.close()
+        SecurityManager.setSecurityPolicy( self._oldPolicy )
 
     def test_policy( self ):
 
