@@ -143,9 +143,9 @@ class ContentTypeInformation( Base ):
             Can this type of object support discussion?
         """
 
-    def actionByName( self, action_name ):
+    def getActionById( self, id ):
         """
-            Return the URL of the action whose 'Name' is 'action_name'.
+            Return the URL of the action whose ID is id.
         """
 
 class portal_types( Base ):
