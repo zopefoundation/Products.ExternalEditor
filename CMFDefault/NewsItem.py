@@ -222,9 +222,3 @@ class NewsItem( PortalContent
 
 Globals.default__class_init__(NewsItem)
 
-from Products.CMFCore.register import registerPortalContent
-registerPortalContent(NewsItem,
-                      constructors=(addNewsItem,),
-                      action='Wizards/NewsItem',
-                      icon="newsitem.gif",
-                      productGlobals=globals())

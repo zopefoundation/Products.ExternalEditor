@@ -239,11 +239,3 @@ class File( OFS.Image.File
 
 Globals.default__class_init__(File)
 
-# PortalContent classes need to be registered.  This installs the
-# class's factory method and icon.
-from Products.CMFCore.register import registerPortalContent
-registerPortalContent(File,                    # The class to be registered
-                      constructors=(addFile,), # It's factory (constructor)
-                      action='Wizards/File',   # The URL of it's add interface
-                      icon="file.gif",         # Filename to take icon from
-                      productGlobals=globals())

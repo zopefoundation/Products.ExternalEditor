@@ -359,9 +359,3 @@ class DiscussionItemContainer(Persistent, Implicit):
 Globals.default__class_init__(DiscussionItemContainer)
 
 
-from Products.CMFCore.register import registerPortalContent
-registerPortalContent(DiscussionItem,
-                      constructors=(addDiscussionItem,),
-                      action="",
-                      icon="discussionitem.gif",
-                      productGlobals=globals())

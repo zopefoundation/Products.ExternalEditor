@@ -272,9 +272,3 @@ class Document(PortalContent, DefaultDublinCoreImpl):
 
 Globals.default__class_init__(Document)
 
-from Products.CMFCore.register import registerPortalContent
-registerPortalContent(Document,
-                      constructors=(addDocument,),
-                      action='Wizards/Document',
-                      icon="document.gif",
-                      productGlobals=globals())

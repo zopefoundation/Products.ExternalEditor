@@ -160,9 +160,3 @@ class Link( PortalContent
 
 Globals.default__class_init__(Link)
 
-from Products.CMFCore.register import registerPortalContent
-registerPortalContent(Link,
-                      constructors=(addLink,),
-                      action='Wizards/Link',
-                      icon="link.gif",
-                      productGlobals=globals())

@@ -157,9 +157,3 @@ class Favorite( Link ):
 
 Globals.default__class_init__(Link)
 
-from Products.CMFCore.register import registerPortalContent
-registerPortalContent(Favorite,
-                      constructors=(addFavorite,),
-                      action='Wizards/Link',
-                      icon="link.gif",
-                      productGlobals=globals())
