@@ -64,8 +64,6 @@ class StagingTool(UniqueObject, SimpleItem):
         """Returns a mapping from stage name to object in that stage.
 
         Objects not in a stage are represented as None."""
-        res = {}
-
         root = aq_parent(aq_inner(self))
         stages = {}
         rel_path = None
@@ -81,7 +79,6 @@ class StagingTool(UniqueObject, SimpleItem):
                 stage_path = stage.getPhysicalPath()
                 assert ob_path[:len(stage_path)] == stage_path
                 rel_path = ob_path[len(stage_path):]
-                res[stage_name] = object
 
         if rel_path is None:
             raise StagingError, "Object %s is not in any stage" % (
@@ -92,9 +89,8 @@ class StagingTool(UniqueObject, SimpleItem):
             # To do that, we just traverse to one less path element.
             rel_path = rel_path[:-1]
 
+        res = {}
         for stage_name, path in self._stages.items():
-            if res.has_key(stage_name):
-                continue
             stage = stages[stage_name]
             object = stage.restrictedTraverse(rel_path, None)
             res[stage_name] = object
@@ -181,10 +177,7 @@ class StagingTool(UniqueObject, SimpleItem):
         id = object.getId()
         for stage_name, container in container_map.items():
             if container is not None and stage_name in stages:
-                try:
-                    container._delOb(id)
-                except KeyError:
-                    pass
+                container._delObject(id)
 
 
     security.declareProtected(StageObjects, 'versions')
@@ -210,12 +203,12 @@ class StagingTool(UniqueObject, SimpleItem):
 
 
     security.declareProtected(StageObjects, 'getURLForStage')
-    def getURLForStage(self, object, stage):
+    def getURLForStage(self, object, stage, relative=0):
         """Returns the URL of the object on the given stage."""
         stages = self._getObjectStages(object)
         ob = stages[stage]
         if ob is not None:
-            return ob.absolute_url()
+            return ob.absolute_url(relative)
         else:
             return None
 
