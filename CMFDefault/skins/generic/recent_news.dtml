@@ -13,31 +13,26 @@
 
 <dtml-in newsitems size="10" start="batch_start">
  <dtml-if sequence-start>
-  <table cellspacing="0" border="0" width="90%">
+ <table cellspacing="0" border="0" width="90%">
  </dtml-if>
  <tr>
   <td class="NewsListing" align="left" valign="top">
-   <p class="NewsHeadline"><a href="&dtml-getURL;">
-    &dtml-title;
-   </a><br><span class="NewsByLine">By &dtml-Creator;</span>
-   </p>
+      <a href="&dtml-getURL;"> &dtml-title; </a>
+   <br> By &dtml-Creator;
   </td>
   <td class="NewsListing" align="right" valign="top">
-   <p class="NewsDateline">
     <dtml-var Date>
-   </p>
   </td>
  </tr>
  <tr>
   <td colspan="2">
-   <p class="NewsLeadin">
-    &dtml-Description;
-   </p>
-   <p>&nbsp;</p>
+    <em> &dtml-Description; </em>
   </td>
  </tr>
  <dtml-if sequence-end>
   </table>
+ <dtml-else>
+  <tr> <td> <br /> </td> </tr>
  </dtml-if>
 <dtml-else>
  <p class="Desktop">
