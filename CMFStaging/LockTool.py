@@ -24,7 +24,7 @@ import os
 from Globals import InitializeClass, DTMLFile
 from AccessControl import ClassSecurityInfo, getSecurityManager
 from Products.CMFCore.utils import UniqueObject, getToolByName, \
-     SimpleItemWithProperties
+     SimpleItemWithProperties, _checkPermission
 from Products.CMFCore.CMFCorePermissions import ManagePortal
 
 from webdav.WriteLockInterface import WriteLockInterface
@@ -154,6 +154,30 @@ class LockTool(UniqueObject, SimpleItemWithProperties):
         if not WriteLockInterface.isImplementedBy(object):
             return 0
         return not not self.locker(object)
+
+
+    security.declarePublic('canLock')
+    def canLock(self, object):
+        """Returns true if the current user can lock the given object."""
+        if self.locked(object):
+            return 0
+        if not WriteLockInterface.isImplementedBy(object):
+            return 0
+        if _checkPermission(LockObjects, object):
+            return 1
+        return 0
+
+
+    security.declarePublic('canUnlock')
+    def canUnlock(self, object):
+        """Returns true if the current user can unlock the given object."""
+        if not self.locked(object):
+            return 0
+        if self.isLockedOut(object):
+            return 0
+        if _checkPermission(UnlockObjects, object):
+            return 1
+        return 0
         
 
 InitializeClass(LockTool)
