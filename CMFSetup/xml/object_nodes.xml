@@ -1,0 +1,11 @@
+<tal:loop xmlns:tal="http://xml.zope.org/namespaces/tal"
+   tal:repeat="obj_info options/objects">
+ <object name="ID" meta_type="META TYPE"
+    tal:attributes="name obj_info/id;
+                    meta_type obj_info/meta_type"
+ ><tal:span tal:define="prop_infos obj_info/properties"
+     tal:replace="structure python: context.generatePropertyNodes(prop_infos)"
+/><tal:span tal:define="sub_infos obj_info/subobjects"
+     tal:condition="sub_infos"
+     tal:replace="structure python: context.generateObjectNodes(sub_infos)"/>
+ </object></tal:loop>

@@ -1,0 +1,10 @@
+<tal:loop xmlns:tal="http://xml.zope.org/namespaces/tal"
+   tal:repeat="prop_info options/properties">
+  <property name="ID"
+     tal:attributes="name prop_info/id;
+                     type prop_info/type;
+                     select_variable prop_info/select_variable"
+  ><tal:span tal:content="prop_info/value"
+ /><tal:loop tal:repeat="element prop_info/elements">
+   <element value="VALUE"
+      tal:attributes="value element"/></tal:loop></property></tal:loop>
