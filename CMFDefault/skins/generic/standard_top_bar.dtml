@@ -21,7 +21,7 @@
     <a href="&dtml-portal_url;">home</a>&nbsp;
     <dtml-let member="portal_membership.getAuthenticatedMember()"
               listMembers="portal_membership.checkPermission('List portal members', member)">
-    <dtml-if listMembers>`
+    <dtml-if listMembers>
     <a href="&dtml-portal_url;/roster">members</a>&nbsp;
     </dtml-if>
     </dtml-let>
