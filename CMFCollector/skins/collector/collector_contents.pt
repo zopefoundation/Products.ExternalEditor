@@ -65,10 +65,9 @@
           <td>
              <a href=""
                 tal:attributes="href item/getURL">
-                <img src="" alt="" border="0"
+                <img src="" alt="Issue" border="0"
                      tal:condition="icon"
-                     tal:attributes="src icon;
-                                     alt itemtype">
+                     tal:attributes="src icon">
                 <span tal:replace="itemtype"
                       tal:condition="not: icon"></span>
             </a>
