@@ -73,7 +73,7 @@
        <th align="right"> Subject </th>
   <td tal:define="subj_lines python: modules['string'].join(
                                          here.subjectsList(), '\n' )">
-     <textarea name="subject:lines" rows="3" cols="20" wrap="soft"
+     <textarea name="subject:lines" rows="3" cols="20"
 	           tal:content="subj_lines"></textarea>
  <br> 
    <select name="subject:list" multiple>
