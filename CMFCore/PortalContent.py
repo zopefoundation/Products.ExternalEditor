@@ -194,7 +194,7 @@ class PortalContent(DynamicType, SimpleItem):
             # "view" action is not present or not allowed.
             # Find something that's allowed.
             for action in actions:
-                if self._verifyPermissions(action):
+                if self._verifyActionPermissions(action):
                     return self.restrictedTraverse(action['action'])
             raise Unauthorized, ('No accessible views available for %s' %
                                  string.join(self.getPhysicalPath(), '/'))
