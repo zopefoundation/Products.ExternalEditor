@@ -14,7 +14,7 @@ calendar.setfirstweekday(6) #start day  Mon(0)-Sun(6)
 from DateTime import DateTime
 
 from Products.CMFCore.utils import UniqueObject
-from Products.CMFCore.utils import _checkPermission, _getAuthenticatedUser, limitGrantedRoles
+from Products.CMFCore.utils import _checkPermission, _getAuthenticatedUser
 from Products.CMFCore.utils import getToolByName, _dtmldir
 from OFS.SimpleItem import SimpleItem
 from Globals import InitializeClass

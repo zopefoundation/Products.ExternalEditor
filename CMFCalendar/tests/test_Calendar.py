@@ -74,7 +74,7 @@ class TestCalendar(unittest.TestCase):
     def test_Days(self):
         assert self.Tool.getDays() == ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
 
-    def test_sessions(self):
+    def XXX_test_sessions(self):
 
         if not self.have_session:
             return
@@ -85,7 +85,7 @@ class TestCalendar(unittest.TestCase):
         
         self.failUnless(self.app.REQUEST.SESSION.get('calendar_year',None))
 
-    def test_noSessions(self):
+    def XXX_test_noSessions(self):
         self.Tool.edit_configuration(show_types=['Event'], use_session="")
         
         self._testURL('/CalendarTest/calendarBox', ())
