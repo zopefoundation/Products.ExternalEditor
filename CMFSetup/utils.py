@@ -110,14 +110,34 @@ class HandlerBase( ContentHandler ):
 #
 #   DOM parsing utilities
 #
+_marker = object()
+
+def _queryNodeAttribute( node, attr_name, default, encoding=None ):
+
+    """ Extract a string-valued attribute from node.
+
+    o Return 'default' if the attribute is not present.
+    """
+    attr_node = node.attributes.get( attr_name, _marker )
+
+    if attr_node is _marker:
+        return default
+
+    value = attr_node.nodeValue
+
+    if encoding is not None:
+        value = value.encode( encoding )
+
+    return value
+
 def _getNodeAttribute( node, attr_name, encoding=None ):
 
     """ Extract a string-valued attribute from node.
     """
-    value = node.attributes[ attr_name ].nodeValue
+    value = _queryNodeAttribute( node, attr_name, _marker, encoding )
 
-    if encoding is not None:
-        value = value.encode( encoding )
+    if value is _marker:
+        raise ValueError, 'Invaid attribute: %s' % attr_name
 
     return value
 

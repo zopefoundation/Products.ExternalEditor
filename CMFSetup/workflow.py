@@ -17,6 +17,7 @@ from permissions import ManagePortal
 from utils import HandlerBase
 from utils import _xmldir
 from utils import _getNodeAttribute
+from utils import _queryNodeAttribute
 from utils import _getNodeAttributeBoolean
 from utils import _coalesceTextNodeChildren
 
@@ -225,7 +226,7 @@ class WorkflowToolConfigurator( Implicit ):
         initial_state = _getNodeAttribute( root, 'initial_state', encoding )
 
         states = _extractStateNodes( root )
-        transitions = []
+        transitions = _extractTransitionNodes( root )
         variables = []
         worklists = []
         permissions = []
@@ -684,7 +685,8 @@ def _extractStateNodes( root, encoding=None ):
                , 'description' : _coalesceTextNodeChildren( s_node, encoding )
                }
 
-        info[ 'transitions' ] = [ _getNodeAttribute( x, 'transition_id' )
+        info[ 'transitions' ] = [ _getNodeAttribute( x, 'transition_id'
+                                                   , encoding )
                                   for x in s_node.getElementsByTagName(
                                                         'exit-transition' ) ]
 
@@ -695,7 +697,7 @@ def _extractStateNodes( root, encoding=None ):
             name = _getNodeAttribute( p_map, 'name', encoding )
             acquired = _getNodeAttributeBoolean( p_map, 'acquired' )
 
-            roles = [ _coalesceTextNodeChildren( x )
+            roles = [ _coalesceTextNodeChildren( x, encoding )
                         for x in p_map.getElementsByTagName(
                                             'permission-role' ) ]
 
@@ -710,7 +712,7 @@ def _extractStateNodes( root, encoding=None ):
 
             name = _getNodeAttribute( g_map, 'name', encoding )
 
-            roles = [ _coalesceTextNodeChildren( x )
+            roles = [ _coalesceTextNodeChildren( x, encoding )
                         for x in g_map.getElementsByTagName(
                                             'group-role' ) ]
 
@@ -720,10 +722,85 @@ def _extractStateNodes( root, encoding=None ):
 
         for assignment in s_node.getElementsByTagName( 'assignment' ):
 
-            name = _getNodeAttribute( assignment, 'name' )
-            value = _coalesceTextNodeChildren( assignment )
+            name = _getNodeAttribute( assignment, 'name', encoding )
+            value = _coalesceTextNodeChildren( assignment, encoding )
             var_map[ name ] = value # XXX: type lost, only know strings???
 
         result.append( info )
 
     return result
+
+def _extractTransitionNodes( root, encoding=None ):
+
+    result = []
+
+    for t_node in root.getElementsByTagName( 'transition' ):
+
+        info = { 'transition_id' : _getNodeAttribute( t_node, 'transition_id'
+                                                    , encoding )
+               , 'title' : _getNodeAttribute( t_node, 'title', encoding )
+               , 'description' : _coalesceTextNodeChildren( t_node, encoding )
+               , 'new_state' : _getNodeAttribute( t_node, 'new_state'
+                                                , encoding )
+               , 'trigger' : _getNodeAttribute( t_node, 'trigger', encoding )
+               , 'before_script' : _getNodeAttribute( t_node, 'before_script'
+                                                  , encoding )
+               , 'after_script' : _getNodeAttribute( t_node, 'after_script'
+                                                   , encoding )
+               , 'action' : _extractActionNode( t_node, encoding )
+               , 'guard' : _extractGuardNode( t_node, encoding )
+               }
+
+        info[ 'variables' ] = var_map = {}
+
+        for assignment in t_node.getElementsByTagName( 'assignment' ):
+
+            name = _getNodeAttribute( assignment, 'name', encoding )
+            value = _coalesceTextNodeChildren( assignment, encoding )
+            var_map[ name ] = value # XXX: type lost, only know strings???
+
+        result.append( info )
+
+    return result
+
+def _extractActionNode( parent, encoding=None ):
+
+    nodes = parent.getElementsByTagName( 'action' )
+    assert len( nodes ) <= 1, nodes
+
+    if len( nodes ) < 1:
+        return { 'name' : '', 'url' : '', 'category' : '' }
+
+    node = nodes[ 0 ]
+
+    return { 'name' : _coalesceTextNodeChildren( node, encoding )
+           , 'url' : _getNodeAttribute( node, 'url', encoding )
+           , 'category' : _getNodeAttribute( node, 'category', encoding )
+           }
+
+def _extractGuardNode( parent, encoding=None ):
+
+    nodes = parent.getElementsByTagName( 'guard' )
+    assert len( nodes ) <= 1, nodes
+
+    if len( nodes ) < 1:
+        return { 'permissions' : (), 'roles' : (), 'groups' : (), 'expr' : '' }
+
+    node = nodes[ 0 ]
+
+    expr_nodes = node.getElementsByTagName( 'expression' )
+    assert( len( expr_nodes ) <= 1 )
+
+    expr_text = expr_nodes and _coalesceTextNodeChildren( expr_nodes[ 0 ]
+                                                        , encoding
+                                                        ) or ''
+
+    return { 'permissions' : [ _coalesceTextNodeChildren( x, encoding )
+                                for x in node.getElementsByTagName(
+                                                            'permission' ) ]
+           , 'roles' : [ _coalesceTextNodeChildren( x, encoding )
+                          for x in node.getElementsByTagName( 'role' ) ]
+           , 'groups' : [ _coalesceTextNodeChildren( x, encoding )
+                          for x in node.getElementsByTagName( 'group' ) ]
+           , 'expression' : expr_text
+           }

@@ -824,6 +824,71 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
             for k, v in state[ 'variables' ].items():
                 self.assertEqual( v, str( expected[ 5 ][ k ] ) )
 
+    def test_parseWorkflowXML_normal_transitions( self ):
+
+        from Products.CMFSetup.workflow import TRIGGER_TYPES
+
+        WF_ID = 'normal'
+        WF_TITLE = 'Normal DCWorkflow'
+        WF_INITIAL_STATE = 'closed'
+
+        site = self._initSite()
+
+        configurator = self._makeOne( site ).__of__( site )
+
+        ( workflow_id
+        , title
+        , state_variable
+        , initial_state
+        , states
+        , transitions
+        , variables
+        , worklists
+        , permissions
+        , scripts
+        ) = configurator.parseWorkflowXML( _NORMAL_WORKFLOW_EXPORT
+                                         % ( WF_ID
+                                           , WF_TITLE
+                                           , WF_INITIAL_STATE
+                                           ) )
+
+        self.assertEqual( len( transitions ), len( _WF_TRANSITIONS ) )
+
+        for transition in transitions:
+
+            transition_id = transition[ 'transition_id' ]
+            self.failUnless( transition_id in _WF_TRANSITIONS )
+
+            expected = _WF_TRANSITIONS[ transition_id ]
+
+            self.assertEqual( transition[ 'title' ], expected[ 0 ] )
+
+            description = ''.join( transition[ 'description' ] )
+            self.failUnless( expected[ 1 ] in description )
+
+            self.assertEqual( transition[ 'new_state' ], expected[ 2 ] )
+            self.assertEqual( transition[ 'trigger' ]
+                            , TRIGGER_TYPES[ expected[ 3 ] ] )
+            self.assertEqual( transition[ 'before_script' ], expected[ 4 ] )
+            self.assertEqual( transition[ 'after_script' ]
+                            , expected[ 5 ] )
+
+            action = transition[ 'action' ]
+            self.assertEqual( action.get( 'name', '' ), expected[ 6 ] )
+            self.assertEqual( action.get( 'url', '' ), expected[ 7 ] )
+            self.assertEqual( action.get( 'category', '' ), expected[ 8 ] )
+
+            self.assertEqual( transition[ 'variables' ], expected[ 9 ] )
+
+            guard = transition[ 'guard' ]
+            self.assertEqual( tuple( guard.get( 'permissions', () ) )
+                            , expected[ 10 ] )
+            self.assertEqual( tuple( guard.get( 'roles', () ) )
+                            , expected[ 11 ] )
+            self.assertEqual( tuple( guard.get( 'groups', () ) )
+                            , expected[ 12 ] )
+            self.assertEqual( guard.get( 'expression', '' ), expected[ 13 ] )
+
 
 _WF_PERMISSIONS = \
 ( 'Open content for modifications'
