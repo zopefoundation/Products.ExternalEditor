@@ -169,6 +169,11 @@ class LockTool(UniqueObject, SimpleItemWithProperties):
             return 0
         return not not self.locker(object)
 
+    security.declarePublic('isLockable')
+    def isLockable(self, object):
+        """Return true if object supports locking, regardless of lock
+           state or whether the current user can actually lock."""
+        return WriteLockInterface.isImplementedBy(object)
 
     security.declarePublic('canLock')
     def canLock(self, object):
