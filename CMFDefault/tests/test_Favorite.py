@@ -10,14 +10,13 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-"""
-    Unit tests for Favorites.
+""" Unit tests for Favorites.
 
 $Id$
 """
-__version__ = "$Revision$"[11:-2]
-import Zope
+
 from unittest import TestCase, TestSuite, makeSuite, main
+import Zope
 
 from Products.CMFCore.tests.base.dummy import \
      DummyTool as DummyURLTool, \
@@ -72,6 +71,14 @@ class FavoriteTests( TestCase ):
         self.assertEqual( f.getRemoteUrl()
                         , '%s/portal_url' % self.tool.root )
         self.assertEqual( f.getIcon(), self.tool.getIcon() )
+
+    def test_editEmpty( self ):
+
+        f = self._makeOne( 'gnnn' )
+        f.edit( '' )
+        self.assertEqual( f.getObject(), self.site )
+        self.assertEqual( f.getRemoteUrl(), self.tool.root )
+        self.assertEqual( f.getIcon(), self.site.getIcon() )
 
 
 def test_suite():

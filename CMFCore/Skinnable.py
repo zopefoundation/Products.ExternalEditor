@@ -10,13 +10,13 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-'''
+""" Base class for object managers which can be "skinned".
+
 Skinnable object managers inherit attributes from a skin specified in
 the browser request.  Skins are stored in a fixed-name subobject.
-$Id$
-'''
 
-__version__='$Revision$'[11:-2]
+$Id$
+"""
 
 import Globals
 from OFS.ObjectManager import ObjectManager

@@ -10,11 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-"""Home of the abstract Criterion base class.
+""" Home of the abstract Criterion base class.
 
 $Id$
 """
-__version__ = '$Revision$'[11:-2]
 
 from Products.CMFTopic.TopicPermissions import ChangeTopics
 

@@ -10,11 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-'''
-States in a web-configurable workflow.
+""" States in a web-configurable workflow.
+
 $Id$
-'''
-__version__='$Revision$'[11:-2]
+"""
 
 from string import join
 
@@ -43,6 +42,7 @@ class StateDefinition (SimpleItem):
         )
 
     title = ''
+    description = ''
     transitions = ()  # The ids of possible transitions.
     permission_roles = None
     var_values = None  # PersistentMapping if set.  Overrides transition exprs.
@@ -104,10 +104,11 @@ class StateDefinition (SimpleItem):
                                      manage_tabs_message=manage_tabs_message,
                                      )
 
-    def setProperties(self, title='', transitions=(), REQUEST=None):
+    def setProperties(self, title='', transitions=(), REQUEST=None, description=''):
         '''
         '''
         self.title = str(title)
+        self.description = str(description)
         self.transitions = tuple(map(str, transitions))
         if REQUEST is not None:
             return self.manage_properties(REQUEST, 'Properties changed.')

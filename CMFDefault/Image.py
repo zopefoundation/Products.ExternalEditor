@@ -16,12 +16,10 @@ This module implements a portal-managed Image class.  It is based on
 Zope's built-in Image object.
 """
 
-ADD_CONTENT_PERMISSION = 'Add portal content'
+from Globals import InitializeClass
+from AccessControl import ClassSecurityInfo
 
-
-from Globals import HTMLFile, HTML
 from Products.CMFCore.PortalContent import PortalContent
-import Globals
 from DublinCore import DefaultDublinCoreImpl
 
 from Products.CMFCore import CMFCorePermissions
@@ -129,10 +127,8 @@ class Image( OFS.Image.Image
     _isDiscussable = 1
     icon = PortalContent.icon
 
-    __ac_permissions__ = (
-        (CMFCorePermissions.ModifyPortalContent, ('edit',)),
-        )
-    
+    security = ClassSecurityInfo()
+
     def __init__( self
                 , id
                 , title=''
@@ -153,7 +149,8 @@ class Image( OFS.Image.Image
         DefaultDublinCoreImpl.__init__( self, title, subject, description
                                , contributors, effective_date, expiration_date
                                , format, language, rights )
-    
+
+    security.declareProtected(CMFCorePermissions.View, 'SearchableText')
     def SearchableText(self):
         """
             SeachableText is used for full text seraches of a portal.
@@ -161,16 +158,19 @@ class Image( OFS.Image.Image
         """
         return "%s %s" % (self.title, self.description)
 
+    security.declarePrivate('manage_beforeDelete')
     def manage_afterAdd(self, item, container):
         """Both of my parents have an afterAdd method"""
         OFS.Image.Image.manage_afterAdd(self, item, container)
         PortalContent.manage_afterAdd(self, item, container)
 
+    security.declarePrivate('manage_beforeDelete')
     def manage_beforeDelete(self, item, container):
         """Both of my parents have a beforeDelete method"""
         PortalContent.manage_beforeDelete(self, item, container)
         OFS.Image.Image.manage_beforeDelete(self, item, container)
-        
+
+    security.declarePrivate('_isNotEmpty')
     def _isNotEmpty(self, file):
         """ Do various checks on 'file' to try to determine non emptiness. """
         if not file:
@@ -188,6 +188,7 @@ class Image( OFS.Image.Image
             if t: return 1
             else: return 0
 
+    security.declarePrivate('_edit')
     def _edit(self, precondition='', file=''):
         """ Update image. """
         if precondition: self.precondition = precondition
@@ -198,6 +199,7 @@ class Image( OFS.Image.Image
 
         self.setFormat(self.content_type)
 
+    security.declareProtected(CMFCorePermissions.ModifyPortalContent, 'edit')
     def edit(self, precondition='', file=''):
         """ Update and reindex. """
         self._edit( precondition, file )
@@ -205,6 +207,7 @@ class Image( OFS.Image.Image
 
     edit = WorkflowAction(edit)
 
+    security.declareProtected(CMFCorePermissions.View, 'index_html')
     def index_html(self, REQUEST, RESPONSE):
         """
         Display the image, with or without standard_html_[header|footer],
@@ -214,6 +217,12 @@ class Image( OFS.Image.Image
         #    return self.view(self, REQUEST)
         return OFS.Image.Image.index_html(self, REQUEST, RESPONSE)
 
-Globals.default__class_init__(Image)
+    security.declareProtected(CMFCorePermissions.ModifyPortalContent, 'PUT')
+    def PUT(self, REQUEST, RESPONSE):
+        """ Handle HTTP (and presumably FTP?) PUT requests """
+        OFS.Image.Image.PUT( self, REQUEST, RESPONSE )
+        self.reindexObject()
+
+InitializeClass(Image)
 
 

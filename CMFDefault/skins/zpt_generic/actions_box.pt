@@ -10,7 +10,7 @@
 				 folder_actions actions/folder;
 				 object_actions python:( actions['object']
                                        + actions['workflow'] );
-				 global_actions python:actions/global;
+				 global_actions actions/global;
                 ">
 <table class="ActionBox" width="100%">
  <tbody tal:condition="object_actions">

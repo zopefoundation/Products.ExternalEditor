@@ -10,10 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-"""register: register portal content types with the CMF.
+""" register: register portal content types with the CMF.
+
 $Id$
 """
-__version__='$Revision$'[11:-2]
 
 import urllib
 import OFS, Globals

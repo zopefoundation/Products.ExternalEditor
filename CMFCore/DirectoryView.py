@@ -10,9 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-"""Views of filesystem directories as folders."""
+""" Views of filesystem directories as folders.
 
-__version__='$Revision$'[11:-2]
+$Id$
+"""
 
 import Globals
 from Globals import HTMLFile, Persistent, package_home, DTMLFile
@@ -497,7 +498,7 @@ def createDirectoryView(parent, filepath, id=None):
     Adds either a DirectoryView or a derivative object.
     '''
     info = _dirreg.getDirectoryInfo(filepath)
-    if dir is None:
+    if info is None:
         raise ValueError('Not a registered directory: %s' % filepath)
     if not id:
         id = path.split(filepath)[-1]

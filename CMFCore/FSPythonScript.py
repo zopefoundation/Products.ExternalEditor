@@ -10,8 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-"""Customizable Python scripts that come from the filesystem."""
-__version__='$Revision$'[11:-2]
+""" Customizable Python scripts that come from the filesystem.
+
+$Id$
+"""
 
 from string import strip, split
 from os import path, stat

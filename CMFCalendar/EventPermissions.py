@@ -10,10 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 #
 ##############################################################################
-"""EventPermissions: Permissions used in the CMF Events class
+""" EventPermissions: Permissions used in the CMF Events class
+
 $Id$
 """
-__version__='$Revision$'[11:-2]
 
 from Products.CMFCore.CMFCorePermissions import setDefaultRoles
 

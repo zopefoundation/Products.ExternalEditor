@@ -10,12 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
+""" Basic undo tool.
 
-"""Basic undo tool.
 $Id$
 """
-__version__='$Revision$'[11:-2]
-
 
 from utils import UniqueObject, _getAuthenticatedUser, _checkPermission
 from utils import getToolByName, _dtmldir
@@ -82,6 +80,9 @@ class UndoTool (UniqueObject, SimpleItem, ActionProviderBase):
             first_transaction=first_transaction,
             last_transaction=last_transaction,
             PrincipiaUndoBatchSize=PrincipiaUndoBatchSize)
+        for t in transactions:
+            # Ensure transaction ids don't have embedded LF.
+            t['id'] = t['id'].replace('\n', '')
         if not _checkPermission('Manage portal', portal):
             # Filter out transactions done by other members of the portal.
             user_name = _getAuthenticatedUser(self).getUserName()

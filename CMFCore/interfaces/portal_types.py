@@ -10,11 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
+""" Type registration tool interface description.
 
+$Id$
 """
-    Type registration tool interface description.
-"""
-__version__='$Revision$'[11:-2]
 
 from Interface import Attribute, Base
 
@@ -88,7 +87,7 @@ class portal_types(Base):
             ContentTypeInformation interface, corresponding to
             the specified 'contentType'.  If contentType is actually
             an object, rather than a string, attempt to look up
-            the appropriate type info using its portal_type or meta_type.
+            the appropriate type info using its portal_type.
         """
 
     # listTypeInfo__roles__ = None  # Public

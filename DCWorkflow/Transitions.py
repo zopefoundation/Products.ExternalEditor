@@ -10,11 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-'''
-Transitions in a web-configurable workflow.
+""" Transitions in a web-configurable workflow.
+
 $Id$
-'''
-__version__='$Revision$'[11:-2]
+"""
 
 from string import join, split, strip
 
@@ -43,6 +42,7 @@ class TransitionDefinition (SimpleItem):
     security.declareObjectProtected(ManagePortal)
 
     title = ''
+    description = ''
     new_state_id = ''
     trigger_type = TRIGGER_USER_ACTION
     guard = None
@@ -74,7 +74,7 @@ class TransitionDefinition (SimpleItem):
         if self.guard is not None:
             return self.guard
         else:
-            return Guard()  # Create a temporary guard.
+            return Guard().__of__(self)  # Create a temporary guard.
 
     def getVarExprText(self, id):
         if not self.var_exprs:
@@ -113,10 +113,11 @@ class TransitionDefinition (SimpleItem):
                       after_script_name='',
                       actbox_name='', actbox_url='',
                       actbox_category='workflow',
-                      props=None, REQUEST=None):
+                      props=None, REQUEST=None, description=''):
         '''
         '''
         self.title = str(title)
+        self.description = str(description)
         self.new_state_id = str(new_state_id)
         self.trigger_type = int(trigger_type)
         self.script_name = str(script_name)

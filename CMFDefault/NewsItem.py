@@ -13,11 +13,7 @@
 """
 """
 
-ADD_CONTENT_PERMISSION = 'Add portal content'
-
- 
-import Globals
-from Globals import HTMLFile, HTML
+from Globals import InitializeClass
 from Document import Document
 from utils import parseHeadersBody
 
@@ -99,5 +95,5 @@ class NewsItem( Document ):
         Document.edit( self, text_format, text )
 
 
-Globals.InitializeClass( NewsItem )
+InitializeClass( NewsItem )
 

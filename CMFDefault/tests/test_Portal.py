@@ -52,12 +52,15 @@ class CMFSiteTests( SecurityRequestTest ):
 
         site = self._makeSite()
         catalog = site.portal_catalog
+        site.portal_membership.memberareaCreationFlag = 0
 
         portal_types = [ x for x in site.portal_types.listContentTypes()
                            if x not in ( 'Discussion Item'
                                        , 'Folder'
                                        , 'Topic'
                                        ) ]
+
+        self.assertEqual( len( catalog ), 0 )
 
         for portal_type in portal_types:
 

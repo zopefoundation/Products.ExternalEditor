@@ -10,12 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
+""" Type registration tool.
 
+$Id$
 """
-    Type registration tool.
-    $Id$
-"""
-__version__='$Revision$'[11:-2]
 
 import OFS
 from Globals import InitializeClass, DTMLFile
@@ -28,7 +26,8 @@ import Products, CMFCorePermissions
 from ActionProviderBase import ActionProviderBase
 from ActionInformation import ActionInformation
 from Expression import Expression
-from zLOG import LOG, WARNING
+from zLOG import LOG, WARNING, ERROR
+import sys
 
 from CMFCorePermissions import View, ManagePortal, AccessContentsInformation
 
@@ -59,10 +58,10 @@ class TypeInformation (SimpleItemWithProperties):
          'label':'Title'},
         {'id':'description', 'type': 'text', 'mode':'w',
          'label':'Description'},
-        {'id':'content_meta_type', 'type': 'string', 'mode':'w',
-         'label':'Meta type'},
         {'id':'content_icon', 'type': 'string', 'mode':'w',
          'label':'Icon'},
+        {'id':'content_meta_type', 'type': 'string', 'mode':'w',
+         'label':'Product meta type'},
         )
 
     _advanced_properties = (
@@ -306,19 +305,20 @@ class TypeInformation (SimpleItemWithProperties):
         actions = []
         for idx in range(len(self._actions)):
             s_idx = str(idx)
-            action = {
-                'id': str(properties.get('id_' + s_idx, '')),
-                'name': str(properties.get('name_' + s_idx, '')),
-                'action': str(properties.get('action_' + s_idx, '')),
-                'permissions':
-                (properties.get('permission_' + s_idx, ()),),
-                'category': str(properties.get('category_' + s_idx, '')),
-                'visible': not not properties.get('visible_' + s_idx, 0),
-                }
+            action = self._actions[idx].copy()
+            action.update( {
+                    'id': str(properties.get('id_' + s_idx, '')),
+                    'name': str(properties.get('name_' + s_idx, '')),
+                    'action': str(properties.get('action_' + s_idx, '')),
+                    'permissions':
+                    (properties.get('permission_' + s_idx, ()),),
+                    'category': str(properties.get('category_' + s_idx, '')),
+                    'visible': not not properties.get('visible_' + s_idx, 0),
+                    } )
             if not action['name']:
                 raise ValueError('A name is required.')
-            actions.append(action)
-        self._actions = tuple(actions)
+            actions.append( action )
+        self._actions = tuple( actions )
         if REQUEST is not None:
             return self.manage_editActionsForm(REQUEST, manage_tabs_message=
                                                'Actions changed.')
@@ -435,7 +435,7 @@ class FactoryTypeInformation (TypeInformation):
         {'id':'product', 'type': 'string', 'mode':'w',
          'label':'Product name'},
         {'id':'factory', 'type': 'string', 'mode':'w',
-         'label':'Factory method in product'},
+         'label':'Product factory method'},
         ) + TypeInformation._advanced_properties)
 
     product = ''
@@ -444,28 +444,51 @@ class FactoryTypeInformation (TypeInformation):
     #
     #   Agent methods
     #
-    def _getFactoryMethod(self, container, raise_exc=0):
+    def _getFactoryMethod(self, container):
         if not self.product or not self.factory:
-            return None
+            raise ValueError, ('Product factory for %s was undefined' %
+                               self.getId())
+        p = container.manage_addProduct[self.product]
+        m = getattr(p, self.factory, None)
+        if m is None:
+            raise ValueError, ('Product factory for %s was invalid' %
+                               self.getId())
+        if getSecurityManager().validate(p, p, self.factory, m):
+            return m
+        raise Unauthorized, ('Cannot create %s' % self.getId())
+
+    def _queryFactoryMethod(self, container, default=None):
+        if not self.product or not self.factory:
+            return default
         try:
             p = container.manage_addProduct[self.product]
             m = getattr(p, self.factory, None)
-            if m is not None:
+            if m is None:
+                return default
+            try:
+                # validate() can either raise Unauthorized or return 0 to
+                # mean unauthorized.
                 if getSecurityManager().validate(p, p, self.factory, m):
                     return m
-            return None
-        except: # only raise if allowed
-            if raise_exc:
-                raise
-            return None
+            except Unauthorized:
+                pass
+            return default
+        except:
+            LOG('Types Tool', ERROR, '_queryFactoryMethod raised an exception',
+                error=sys.exc_info())
+        return default
 
     security.declarePublic('isConstructionAllowed')
-    def isConstructionAllowed ( self, container, raise_exc=0):
+    def isConstructionAllowed ( self, container ):
         """
-        Does the current user have the permission required in
-        order to construct an instance?
+        a. Does the factory method exist?
+
+        b. Is the factory method usable?
+
+        c. Does the current user have the permission required in
+        order to invoke the factory method?
         """
-        m = self._getFactoryMethod(container, raise_exc)
+        m = self._queryFactoryMethod(container)
         return (m is not None)
 
     security.declarePublic('constructInstance')
@@ -476,10 +499,8 @@ class FactoryTypeInformation (TypeInformation):
         """
         # Get the factory method, performing a security check
         # in the process.
-        m = self._getFactoryMethod(container, raise_exc=1)
 
-        if m is None:
-            raise Unauthorized, ('Cannot create %s' % self.getId())
+        m = self._getFactoryMethod(container)
 
         id = str(id)
 
@@ -710,14 +731,15 @@ class TypesTool( UniqueObject, OFS.Folder.Folder, ActionProviderBase ):
             TypeInformation interface, corresponding to
             the specified 'contentType'.  If contentType is actually
             an object, rather than a string, attempt to look up
-            the appropriate type info using its portal_type or meta_type.
+            the appropriate type info using its portal_type.
         """
         if type( contentType ) is not type( '' ):
-            try:
+            if hasattr(aq_base(contentType), '_getPortalTypeName'):
                 contentType = contentType._getPortalTypeName()
-            except AttributeError:
-                # if we can't get or call it for any reason, fall back...
-                contentType = contentType.meta_type
+                if contentType is None:
+                    return None
+            else:
+                return None
         ob = getattr( self, contentType, None )
         if getattr(aq_base(ob), '_isTypeInformation', 0):
             return ob

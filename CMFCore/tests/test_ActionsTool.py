@@ -22,6 +22,7 @@ class ActionsToolTests( SecurityRequestTest ):
         root = self.root
         root._setObject( 'portal_actions', ActionsTool() )
         root._setObject('foo', URLTool() )
+        root._setObject('bar', URLTool() )
         root._setObject('portal_membership', MembershipTool())
         root._setObject('portal_types', TypesTool())
         self.tool = root.portal_actions
@@ -37,6 +38,10 @@ class ActionsToolTests( SecurityRequestTest ):
         tool.addActionProvider('foo')
         self.assertEqual(tool.listActionProviders(),
                           ('portal_actions', 'foo'))
+        tool.addActionProvider('bar')
+        tool.addActionProvider('foo')
+        self.assertEqual(tool.listActionProviders(),
+                          ('portal_actions', 'foo', 'bar'))
 
     def test_delActionProvider(self):
         tool = self.tool

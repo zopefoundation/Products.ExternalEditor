@@ -1,0 +1,2 @@
+<?xml version="1.0"?>
+<test tal:content="here/test">This is only a test</test>

@@ -11,14 +11,16 @@
 # FOR A PARTICULAR PURPOSE
 #
 ##############################################################################
-__doc__='''CMFWorkspaces Product Initialization
-$Id$'''
-__version__='$Revision$'[11:-2]
+""" CMFWorkspaces Product Initialization
+
+$Id$
+"""
 
 import sys
 
 from Products.CMFCore import utils
 from Products.CMFCore.DirectoryView import registerDirectory
+from Products.CMFCore.CMFCorePermissions import AddPortalFolders
 
 import Workspace, OrganizationTool
 
@@ -39,12 +41,10 @@ def initialize(context):
     utils.initializeBasesPhase2(z_tool_bases, context)
     context.registerBaseClass(Workspace.Workspace)
 
-    ADD_FOLDERS_PERMISSION = 'Add portal folders'
-
     utils.ContentInit(
         'CMF Workspace',
         content_types=(Workspace.Workspace,),
-        permission=ADD_FOLDERS_PERMISSION,
+        permission=AddPortalFolders,
         extra_constructors=(Workspace.addWorkspace,),
         fti=Workspace.factory_type_information
         ).initialize(context)

@@ -11,23 +11,25 @@
 # 
 ##############################################################################
 """FSSTXMethod: Filesystem methodish Structured Text document.
+
 $Id$
 """
-__version__='$Revision$'[11:-2]
-
-from string import split
-from os import path, stat
-import re
 
 import Globals
-from AccessControl import ClassSecurityInfo, getSecurityManager, Permissions
-from OFS.DTMLMethod import DTMLMethod, decapitate, guess_content_type
-
-from utils import _dtmldir, _format_stx
-import CMFCorePermissions
+from AccessControl import ClassSecurityInfo
 import StructuredText
-from DirectoryView import registerFileExtension, registerMetaType, expandpath
+
+from DirectoryView import registerFileExtension
+from DirectoryView import registerMetaType
+from DirectoryView import expandpath
 from FSObject import FSObject
+
+from CMFCorePermissions import View
+from CMFCorePermissions import ViewManagementScreens
+from CMFCorePermissions import FTPAccess
+
+from utils import _dtmldir
+from utils import format_stx
 
 
 class FSSTXMethod( FSObject ):
@@ -50,10 +52,9 @@ class FSSTXMethod( FSObject ):
                    )
 
     security = ClassSecurityInfo()
-    security.declareObjectProtected( CMFCorePermissions.View )
+    security.declareObjectProtected( View )
 
-    security.declareProtected( CMFCorePermissions.ViewManagementScreens
-                             , 'manage_main')
+    security.declareProtected( ViewManagementScreens, 'manage_main')
     manage_main = Globals.DTMLFile( 'custstx', _dtmldir )
 
     #
@@ -101,7 +102,7 @@ class FSSTXMethod( FSObject ):
 
     def cook( self ):
         if not hasattr( self, '_v_cooked' ):
-            self._v_cooked = _format_stx( text=self.raw )
+            self._v_cooked = format_stx( text=self.raw )
         return self._v_cooked
 
     _default_template = Globals.HTML( """\
@@ -136,14 +137,14 @@ class FSSTXMethod( FSObject ):
         
         return apply( template, posargs, { 'cooked' : self.cook() } )
 
-    security.declareProtected( CMFCorePermissions.FTPAccess, 'manage_FTPget' )
+    security.declareProtected( FTPAccess, 'manage_FTPget' )
     def manage_FTPget( self ):
         """
             Fetch our source for delivery via FTP.
         """
         return self.raw
 
-    security.declareProtected( CMFCorePermissions.ViewManagementScreens
+    security.declareProtected( ViewManagementScreens
                              , 'PrincipiaSearchSource' )
     def PrincipiaSearchSource( self ):
         """
@@ -151,7 +152,7 @@ class FSSTXMethod( FSObject ):
         """
         return self.raw
 
-    security.declareProtected( CMFCorePermissions.ViewManagementScreens
+    security.declareProtected( ViewManagementScreens
                              , 'document_src' )
     def document_src( self ):
         """

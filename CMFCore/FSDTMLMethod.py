@@ -10,8 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-"""Customizable DTML methods that come from the filesystem."""
-__version__='$Revision$'[11:-2]
+""" Customizable DTML methods that come from the filesystem.
+
+$Id$
+"""
 
 from string import split
 from os import path, stat
@@ -52,6 +54,8 @@ class FSDTMLMethod(RestrictedDTML, FSObject, Globals.HTML):
     security.declareProtected(ViewManagementScreens, 'manage_main')
     manage_main = Globals.DTMLFile('custdtml', _dtmldir)
 
+    _reading = 0
+
     def __init__(self, id, filepath, fullname=None, properties=None):
         FSObject.__init__(self, id, filepath, fullname, properties)
         # Normally called via HTML.__init__ but we don't need the rest that
@@ -67,15 +71,21 @@ class FSDTMLMethod(RestrictedDTML, FSObject, Globals.HTML):
         file = open(fp, 'rb')
         try:
             data = file.read()
-        finally: file.close()
+        finally:
+            file.close()
         self.raw = data
         if reparse:
-            self.cook()
+            self._reading = 1  # Avoid infinite recursion
+            try:
+                self.cook()
+            finally:
+                self._reading = 0
 
     # Hook up chances to reload in debug mode
     security.declarePrivate('read_raw')
     def read_raw(self):
-        self._updateFromFS()
+        if not self._reading:
+            self._updateFromFS()
         return Globals.HTML.read_raw(self)
 
     #### The following is mainly taken from OFS/DTMLMethod.py ###

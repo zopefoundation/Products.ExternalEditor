@@ -7,8 +7,8 @@ from Products.CMFCore.tests.base.testcase import \
 from Products.CMFCore.tests.base.utils import \
      has_path
 
-from Products.CMFCore.tests.base.dummy import \
-     DummyFTI
+from Products.CMFCore.tests.base.dummy import DummyFTI
+from Products.CMFCore.tests.base.dummy import DummyContent
 
 from Products.CMFCore.CatalogTool import CatalogTool
 from Products.CMFCore.TypesTool import TypesTool
@@ -17,7 +17,6 @@ from Products.CMFCore.WorkflowTool import WorkflowTool
 from Products.CMFDefault.DiscussionTool import \
      DiscussionTool, DiscussionNotAllowed
 
-from Products.CMFDefault.Document import Document
 from Products.CMFDefault.URLTool import URLTool
 
 class DiscussionTests( SecurityTest ):
@@ -39,7 +38,7 @@ class DiscussionTests( SecurityTest ):
         types_tool = self.types_tool = root.portal_types
         try: root._delObject('test')
         except AttributeError: pass
-        root._setObject( 'test', Document( 'test' ) )
+        root._setObject( 'test', DummyContent( 'test', catalog=1 ) )
             
     def test_policy( self ):
 
@@ -56,19 +55,20 @@ class DiscussionTests( SecurityTest ):
 
         del test.talkback
         del test.allow_discussion
-        self.types_tool._setObject( 'Document', DummyFTI )
+        self.types_tool._setObject( 'Dummy Content', DummyFTI )
         self.assertRaises( DiscussionNotAllowed
                          , self.discussion_tool.getDiscussionFor
                          , test
                          )
         assert getattr( test, 'talkback', None ) is None
 
-        self.types_tool.Document.allow_discussion = 1
+        ti = getattr(self.types_tool, 'Dummy Content')
+        ti.allow_discussion = 1
         assert self.discussion_tool.getDiscussionFor( test )
         assert test.talkback
 
         del test.talkback
-        self.types_tool.Document.allow_discussion = 0
+        ti.allow_discussion = 0
         self.assertRaises( DiscussionNotAllowed
                          , self.discussion_tool.getDiscussionFor
                          , test

@@ -78,12 +78,9 @@
     </select> 
   </td>
   <th align="right"> Contributors </th>
-  <td>
-   <textarea name="contributors:lines" rows="5"
-             cols="30" wrap="soft"
-			 tal:define="items here/Contributors"
-			 tal:repeat="item items"
-			 tal:content="item"></textarea>
+  <td tal:define="contrib_lines python: '\n'.join( here.Contributors() )">
+   <textarea name="contributors:lines" rows="5" cols="30"
+			 tal:content="contrib_lines"></textarea>
   </td>
  </tr>
  <tr valign="top">

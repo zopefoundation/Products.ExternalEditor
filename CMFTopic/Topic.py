@@ -10,11 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-"""Topic: Canned catalog queries
+""" Topic: Canned catalog queries
 
 $Id$
 """
-__version__ = '$Revision$'[11:-2]
 
 from Products.CMFTopic import TopicPermissions
 

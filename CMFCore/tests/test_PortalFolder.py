@@ -35,7 +35,7 @@ class PortalFolderFactoryTests( SecurityTest ):
                                   , filter_content_types=0
                                   )
                              )
-        types_tool._setObject( 'Dummy', DummyFTI )
+        types_tool._setObject( 'Dummy Content', DummyFTI )
 
     def _makeOne( self, id ):
         return PortalFolder( id ).__of__( self.root )
@@ -46,13 +46,13 @@ class PortalFolderFactoryTests( SecurityTest ):
 
         self.failIf( 'foo' in f.objectIds() )
 
-        f.invokeFactory( type_name='Dummy', id='foo' )
+        f.invokeFactory( type_name='Dummy Content', id='foo' )
 
         self.failUnless( 'foo' in f.objectIds() )
         foo = f.foo
         self.assertEqual( foo.getId(), 'foo' )
-        self.assertEqual( foo.getPortalTypeName(), 'Dummy' )
-        self.assertEqual( foo.Type(), 'Dummy Content' )
+        self.assertEqual( foo._getPortalTypeName(), 'Dummy Content' )
+        self.assertEqual( foo.Type(), 'Dummy Content Title' )
 
     def test_invokeFactory_disallowed_type( self ):
 
@@ -69,7 +69,8 @@ class PortalFolderFactoryTests( SecurityTest ):
         self.failUnless( 'sub' in f.objectIds() )
 
         self.assertRaises( ValueError
-                         , f.invokeFactory, type_name='Dummy', id='foo' )
+                         , f.invokeFactory
+                         , type_name='Dummy Content', id='foo' )
 
 
 class PortalFolderTests( SecurityTest ):
@@ -265,7 +266,7 @@ class PortalFolderTests( SecurityTest ):
 
         # First, test default behavior
         test.manage_addFolder( id='simple', title='Simple' )
-        self.assertEqual( test.simple.getPortalTypeName(), 'Folder' )
+        self.assertEqual( test.simple._getPortalTypeName(), 'Folder' )
         self.assertEqual( test.simple.Type(), 'Folder or Directory' )
         self.assertEqual( test.simple.getId(), 'simple' )
         self.assertEqual( test.simple.Title(), 'Simple' )
@@ -293,7 +294,7 @@ class PortalFolderTests( SecurityTest ):
         self.root.grabbed = Grabbed( test )
 
         test.manage_addFolder( id='indirect', title='Indirect' )
-        self.assertEqual( test.indirect.getPortalTypeName(), 'Grabbed' )
+        self.assertEqual( test.indirect._getPortalTypeName(), 'Grabbed' )
         self.assertEqual( test.indirect.Type(), 'Grabbed Content' )
         self.assertEqual( test.indirect.getId(), 'indirect' )
         self.assertEqual( test.indirect.Title(), 'Indirect' )
@@ -306,7 +307,7 @@ class PortalFolderTests( SecurityTest ):
 
         self.root._setObject( 'portal_types', TypesTool() )
         types_tool = self.root.portal_types
-        types_tool._setObject( 'Dummy', DummyFTI )
+        types_tool._setObject( 'Dummy Content', DummyFTI )
 
         self.root._setObject( 'portal_catalog', CatalogTool() )
         catalog = self.root.portal_catalog
@@ -388,22 +389,40 @@ class ContentFilterTests( TestCase ):
         cfilter = ContentFilter( Type='foo' )
         dummy = self.dummy
         assert not cfilter( dummy )
-        cfilter = ContentFilter( Type='Dummy Content' )
+        cfilter = ContentFilter( Type='Dummy Content Title' )
         assert cfilter( dummy )
         desc = str( cfilter )
         lines = desc.split('; ')
         assert len( lines ) == 1
-        assert lines[0] == 'Type: Dummy Content'
+        assert lines[0] == 'Type: Dummy Content Title'
 
         cfilter = ContentFilter( Type=( 'foo', 'bar' ) )
         dummy = self.dummy
         assert not cfilter( dummy )
-        cfilter = ContentFilter( Type=( 'Dummy Content', 'something else' ) )
+        cfilter = ContentFilter( Type=( 'Dummy Content Title',
+                                        'something else' ) )
         assert cfilter( dummy )
         desc = str( cfilter )
         lines = desc.split('; ')
         assert len( lines ) == 1
-        assert lines[0] == 'Type: Dummy Content, something else'
+        assert lines[0] == 'Type: Dummy Content Title, something else'
+
+    def test_portal_type( self ):
+        cfilter = ContentFilter( portal_type='some_pt' )
+        dummy = self.dummy
+        assert not cfilter( dummy )
+        dummy.portal_type = 'asdf'
+        assert not cfilter( dummy )
+        dummy.portal_type = 'some_ptyyy'
+        assert not cfilter( dummy )
+        dummy.portal_type = 'xxxsome_ptyyy'
+        assert not cfilter( dummy )
+        dummy.portal_type = 'some_pt'
+        assert cfilter( dummy )
+        desc = str( cfilter )
+        lines = desc.split('; ')
+        assert len( lines ) == 1
+        assert lines[0] == 'Portal Type: some_pt'
 
     def test_Title( self ):
         cfilter = ContentFilter( Title='foo' )

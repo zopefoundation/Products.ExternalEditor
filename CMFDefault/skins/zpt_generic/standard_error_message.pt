@@ -15,10 +15,10 @@
   <p>An error was encountered while publishing this resource.</p>
   
   <p> <strong>Error Type:
-        <span tal:replace="structure options/error_type" />
+        <span tal:replace="options/error_type" />
       </strong>
   <br><strong>Error Value:
-      <span tal:replace="structure options/error_value" /></strong>
+      <span tal:replace="options/error_value" /></strong>
   <br> 
   </p>
  

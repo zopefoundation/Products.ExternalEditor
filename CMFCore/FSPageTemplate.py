@@ -10,11 +10,14 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##########################################################################
-"""Customizable page templates that come from the filesystem."""
-__version__='$Revision$'[11:-2]
+""" Customizable page templates that come from the filesystem.
+
+$Id$
+"""
 
 from string import split, replace
 from os import stat
+import re, sys
 
 import Globals, Acquisition
 from DateTime import DateTime
@@ -29,6 +32,8 @@ from DirectoryView import registerFileExtension, registerMetaType, expandpath
 from CMFCorePermissions import ViewManagementScreens, View, FTPAccess
 from FSObject import FSObject
 from utils import getToolByName
+
+xml_detect_re = re.compile('^\s*<\?xml\s+')
 
 class FSPageTemplate(FSObject, Script, PageTemplate):
     "Wrapper for Page Template"
@@ -68,9 +73,19 @@ class FSPageTemplate(FSObject, Script, PageTemplate):
     def _readFile(self, reparse):
         fp = expandpath(self._filepath)
         file = open(fp, 'rb')
-        try: data = file.read()
-        finally: file.close()
+        try: 
+            data = file.read()
+        finally: 
+            file.close()
         if reparse:
+            if xml_detect_re.match(data):
+                # Smells like xml
+                self.content_type = 'text/xml'
+            else:
+                try:
+                    del self.content_type
+                except (AttributeError, KeyError):
+                    pass
             self.write(data)
 
     security.declarePrivate('read')
@@ -126,21 +141,38 @@ class FSPageTemplate(FSObject, Script, PageTemplate):
         except RuntimeError:
             if Globals.DevelopmentMode:
                 err = FSPageTemplate.inheritedAttribute( 'pt_errors' )( self )
+                if not err:
+                    err = sys.exc_info()
                 err_type = err[0]
-                err_msg = '<pre>%s</pre>' % replace( err[1], "\'", "'" )
+                err_msg = '<pre>%s</pre>' % replace( str(err[1]), "\'", "'" )
                 msg = 'FS Page Template %s has errors: %s.<br>%s' % (
                     self.id, err_type, html_quote(err_msg) )
                 raise RuntimeError, msg
             else:
                 raise
-            
-    # Copy over more mothods
+                
+    security.declarePrivate( '_ZPT_exec' )
+    _ZPT_exec = ZopePageTemplate._exec
+
+    security.declarePrivate( '_exec' )
+    def _exec(self, bound_names, args, kw):
+        """Call a FSPageTemplate"""
+        try:
+            response = self.REQUEST.RESPONSE
+        except AttributeError:
+            response = None
+        # Read file first to get a correct content_type default value.
+        self._updateFromFS()
+        # call "inherited"
+        result = self._ZPT_exec( bound_names, args, kw )
+        return result
+ 
+    # Copy over more methods
     security.declareProtected(FTPAccess, 'manage_FTPget')
     security.declareProtected(View, 'get_size')
     security.declareProtected(ViewManagementScreens, 'PrincipiaSearchSource',
         'document_src')
 
-    _exec = ZopePageTemplate._exec
     pt_getContext = ZopePageTemplate.pt_getContext
     ZScriptHTML_tryParams = ZopePageTemplate.ZScriptHTML_tryParams
     manage_FTPget = ZopePageTemplate.manage_FTPget

@@ -21,6 +21,7 @@
 		  tal:attributes="value here/title"
           size="65">
   </td>
+ </tr>
   
  <tr valign="top">
   <th align="right"> Description

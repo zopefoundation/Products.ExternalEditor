@@ -10,11 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
+""" DynamicType: Mixin for dynamic properties.
 
-"""DynamicType: Mixin for dynamic properties.
 $Id$
 """
-__version__='$Revision$'[11:-2]
 
 from AccessControl import ClassSecurityInfo
 from utils import getToolByName
@@ -41,13 +40,11 @@ class DynamicType:
 
     security.declarePublic('getPortalTypeName')
     def getPortalTypeName(self):
-        '''
+        """
         Returns the portal type name that can be passed to portal_types.
-        '''
+        If the object is uninitialized, returns None.
+        """
         pt = self.portal_type
-        if pt is None:
-            # Provide a fallback.
-            pt = self.meta_type
         if callable( pt ):
             pt = pt()
         return pt
