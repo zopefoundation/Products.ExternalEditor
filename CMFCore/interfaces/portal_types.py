@@ -176,6 +176,14 @@ class portal_types( Base ):
             is specified, the list will be filtered according to
             the user's permissions.
         """
+
+    def listContentTypes( self, container=None, by_metatype=0 ):
+        """
+            Return list of content types, or the equivalent
+            metatypes;  if 'container' is passed, then filter
+            the list to include only types which are addable in
+            'container'.
+        """
     
     def constructContent( self, contentType, container, id ):
         """

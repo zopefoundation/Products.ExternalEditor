@@ -697,17 +697,22 @@ class TypesTool( UniqueObject, OFS.Folder.Folder ):
         return rval
 
     security.declareProtected(AccessContentsInformation, 'listContentTypes')
-    def listContentTypes( self ):
+    def listContentTypes( self, container=None, by_metatype=0 ):
         """
             Return list of content metatypes.
         """
-        result = []
-        for t in self.objectValues():
-            if not getattr(aq_base(t), '_isTypeInformation', 0):
-                continue
-            name = t.Type()
+        typenames = {}
+        for t in self.listTypeInfo( container ):
+
+            if by_metatype:
+                name = t.Metatype()
+            else:
+                name = t.Type()
+
             if name:
-                result.append(name)
+                typenames[ name ] = 1
+
+        result = typenames.keys()
         result.sort()
         return result
 

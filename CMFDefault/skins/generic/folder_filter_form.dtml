@@ -28,7 +28,7 @@
     <TD ALIGN="left" VALIGN="TOP" WIDTH="*">Content Type:</TD>
     <TD ALIGN="left" VALIGN="TOP">
      <select name="filter_by_Type:list" multiple size="3">
-      <dtml-in listContentTypes sort>
+      <dtml-in expr="portal_types.listContentTypes( container=this() )" sort>
        <dtml-unless "_['sequence-item'] == 'Portal Folder'">
         <option value="&dtml-sequence-item;"
          <dtml-if expr="not Type or (_['sequence-item'] in Type)">selected

@@ -18,7 +18,7 @@ are found will be automatically added to the catalog.
   <div class="form-element">
   <select name="obj_metatypes:list" size="4" multiple>
   <option value="all" selected> All types
-<dtml-in expr="portal_types.listContentTypes()">
+<dtml-in expr="portal_types.listContentTypes( by_metatype=1 )">
   <option value="&dtml-sequence-item;"> &dtml-sequence-item; </option>
 </dtml-in>
 <dtml-in all_meta_types mapping>

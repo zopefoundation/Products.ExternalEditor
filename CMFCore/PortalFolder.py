@@ -187,19 +187,6 @@ class PortalFolder( Folder, DynamicType ):
             return self.folder_contents(
                 self, REQUEST, portal_status_message="Folder added")
     
-    security.declarePublic('listContentTypes')
-    def listContentTypes(self, by_meta_type=0):
-        """
-           List all registered portal content types.
-        """
-        mtSet = {}
-        for info in getToolByName(self, 'portal_types').listTypeInfo():
-            if by_meta_type:
-                mtSet[info.Metatype()] = 1
-            else:
-                mtSet[info.Type()] = 1
-        return mtSet.keys()
-
     def _morphSpec(self, spec):
         '''
         spec is a sequence of meta_types, a string containing one meta type,
@@ -208,7 +195,8 @@ class PortalFolder( Folder, DynamicType ):
         contentish.
         '''
         new_spec = []
-        types = self.listContentTypes(1)
+        types_tool = getToolByName(self, 'portal_types')
+        types = types_tool.listContentTypes( container=self, by_metatype=1 )
         if spec is not None:
             if type(spec) == type(''):
                 spec = [spec]
