@@ -14,7 +14,6 @@ import sys
 
 from Products.CMFCore import utils
 from Products.CMFCore.DirectoryView import registerDirectory
-from Products.CMFDefault import Portal
 
 import Event
 import CalendarTool
