@@ -22,6 +22,7 @@ from Products.CMFCore.DirectoryView import registerDirectory
 from Products.CMFCore import utils
 
 import VersionsTool, StagingTool, LockTool
+import WorkflowRepository, WorkflowWithRepositoryTool
 
 registerDirectory('skins', globals())
 
@@ -29,6 +30,7 @@ tools = (
     VersionsTool.VersionsTool,
     StagingTool.StagingTool,
     LockTool.LockTool,
+    WorkflowWithRepositoryTool.WorkflowWithRepositoryTool,
     )
 
 this_module = sys.modules[ __name__ ]
@@ -39,4 +41,11 @@ def initialize(context):
     utils.ToolInit('CMFStaging Tool', tools=tools,
                    product_name='CMFStaging', icon='tool.gif',
                    ).initialize(context)
+
+    context.registerClass(
+        WorkflowRepository.WorkflowRepository,
+        constructors=(WorkflowRepository.manage_addWorkflowRepositoryForm,
+                      WorkflowRepository.manage_addWorkflowRepository),
+        icon='tool.gif',
+        )
 
