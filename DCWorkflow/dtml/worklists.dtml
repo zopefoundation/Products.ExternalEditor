@@ -21,7 +21,11 @@
    <dtml-if var_matches>
     Catalog matches:
     <dtml-in expr="var_matches.items()" sort>
-     <code>&dtml-sequence-key;</code> = <code>&dtml-sequence-item;</code>
+     <code>&dtml-sequence-key;</code> =
+     <dtml-in sequence-item>
+       <code>&dtml-sequence-item;</code>
+       <dtml-unless sequence-end>or</dtml-unless>
+     </dtml-in>
     <dtml-unless sequence-end>;</dtml-unless>
     </dtml-in>
     <br />

@@ -13,6 +13,8 @@ The following names are available:
 
 - content_url
 
+- user_id
+
 - count (Available in work lists only. Represents the number of items in
   the work list.)
 

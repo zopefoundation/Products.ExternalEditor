@@ -19,7 +19,7 @@
 <tr>
 <th align="left" valign="top">
   <div class="form-label">
-  Cataloged variable matches
+  Cataloged variable matches (formatted)
   </div>
 </th>
 <td>
@@ -28,7 +28,7 @@
     <tr>
      <th align="left">&dtml-sequence-item; =</th>
      <td>
-      <dtml-let value="getVarMatch(_['sequence-item'])">
+      <dtml-let value="getVarMatchText(_['sequence-item'])">
        <input type="text" name="var_match_&dtml-sequence-item;"
         value="&dtml-value;" />
       </dtml-let>

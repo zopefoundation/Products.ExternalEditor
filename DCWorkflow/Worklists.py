@@ -27,7 +27,9 @@ from Products.CMFCore.CMFCorePermissions import ManagePortal
 from ContainerTab import ContainerTab
 from Guard import Guard
 from utils import _dtmldir
+from string import split, strip, join
 
+StringType = type('')
 
 class WorklistDefinition (SimpleItem):
     meta_type = 'Worklist'
@@ -75,9 +77,18 @@ class WorklistDefinition (SimpleItem):
 
     def getVarMatch(self, id):
         if self.var_matches:
-            return self.var_matches.get(id, '')
+            matches = self.var_matches.get(id, ())
+            if type(matches) is StringType:
+                # Old version, convert it.
+                matches = (matches,)
+                self.var_matches[id] = matches
+            return matches
         else:
-            return ''
+            return ()
+
+    def getVarMatchText(self, id):
+        values = self.getVarMatch(id)
+        return join(values, '; ')
 
     _properties_form = DTMLFile('worklist_properties', _dtmldir)
 
@@ -104,7 +115,8 @@ class WorklistDefinition (SimpleItem):
             if v:
                 if not self.var_matches:
                     self.var_matches = PersistentMapping()
-                self.var_matches[key] = str(v)
+                v = map(strip, split(v, ';'))
+                self.var_matches[key] = tuple(v)
             else:
                 if self.var_matches and self.var_matches.has_key(key):
                     del self.var_matches[key]

@@ -217,8 +217,10 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
                         # Check the catalog for items in the worklist.
                         catalog = getToolByName(self, 'portal_catalog')
                         dict = {}
-                        for k, v in qdef.var_matches.items():
-                            dict[k] = v
+                        for k in qdef.var_matches.keys():
+                            v = qdef.getVarMatch(k)
+                            v_fmt = map(lambda x, info=info: x%info, v)
+                            dict[k] = v_fmt
                         searchres = apply(catalog.searchResults, (), dict)
                         if not searchres:
                             continue

@@ -25,6 +25,10 @@ CMF 1.3 beta2 (2002/06/30)
 
   New Features
 
+    - Made the DCWorkflow worklists accept a list of formatted values
+      for cataloged variable matches. The separator is a semicolon
+      (Tracker #496).
+
     - Made the security-related indexes of the portal catalog be updated
       for all impacted objects whenever local roles are changed (Tracker
       #494). This feature makes use of the 'path' index.
