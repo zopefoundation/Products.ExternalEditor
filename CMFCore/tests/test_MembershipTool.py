@@ -57,6 +57,7 @@ class MembershipToolSecurityTests(SecurityTest):
         mtool.setMemberareaCreationFlag()
         mtool.createMemberarea('user_foo')
         self.failIf( hasattr(members.aq_self, 'user_foo') )
+        newSecurityManager(None, acl_users.all_powerful_Oz)
         mtool.setMemberareaCreationFlag()
         mtool.createMemberarea('user_foo')
         self.failUnless( hasattr(members.aq_self, 'user_foo') )
