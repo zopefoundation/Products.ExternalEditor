@@ -240,11 +240,12 @@ class SkinsTool(UniqueObject, SkinsContainer, PortalFolder):
         rval.sort()
         return rval
 
-    security.declarePublic('updateSkinCookie')
+    security.declareProtected('View', 'updateSkinCookie')
     def updateSkinCookie(self):
         '''
         If needed, updates the skin cookie based on the member preference.
         '''
+        import pdb; pdb.set_trace()
         pm = getToolByName(self, 'portal_membership')
         member = pm.getAuthenticatedMember()
         if hasattr(aq_base(member), 'portal_skin'):
@@ -252,7 +253,7 @@ class SkinsTool(UniqueObject, SkinsContainer, PortalFolder):
             if mskin:
                 req = self.REQUEST
                 cookie = req.cookies.get(self.request_varname, None)
-                if cookie is not None and cookie != mskin:
+                if cookie != mskin:
                     resp = req.RESPONSE
                     expires = (DateTime('GMT') + 365).rfc822()
                     resp.setCookie(self.request_varname, mskin,
