@@ -446,8 +446,8 @@ class MembershipTool(UniqueObject, Folder, ActionProviderBase):
         already been performed.  Called by portal_registration.
         '''
         acl_users = self.acl_users
-        if hasattr(acl_users, '_addUser'):
-            acl_users._addUser(id, password, password, roles, domains)
+        if hasattr(acl_users, '_doAddUser'):
+            acl_users._doAddUser(id, password, roles, domains)
         else:
             # The acl_users folder is a LoginManager.  Search for a UserSource
             # with the needed support.
