@@ -452,7 +452,7 @@ class MetadataTool( UniqueObject, SimpleItem ):
         return result
 
     #
-    #   Site-wide queries.
+    #   'portal_metadata' interface
     #
     security.declarePrivate( 'getFullName' )
     def getFullName( self, userid ):
@@ -473,9 +473,6 @@ class MetadataTool( UniqueObject, SimpleItem ):
         """
         return self.publisher
 
-    #
-    #   Content-specific queries.
-    #
     security.declarePrivate( '_listAllowedVocabulary' )
     def _listAllowedVocabulary( self, element, content=None ):
         """
@@ -518,10 +515,6 @@ class MetadataTool( UniqueObject, SimpleItem ):
         """
         return self._listAllowedVocabulary( 'Rights', content )
 
-
-    #
-    #   Validation policy hooks.
-    #
     security.declarePrivate( 'setInitialMetadata' )
     def setInitialMetadata( self, content ):
         """
