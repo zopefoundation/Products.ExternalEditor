@@ -33,7 +33,7 @@
           </th>
         </tr>
         <tr>
-          <td>
+          <td valign="top">
             <div id="DesktopDescription"
                  tal:define="stx nocall:
                        modules/Products/PythonScripts/standard/structured_text"
@@ -117,7 +117,7 @@
          </tr>
 
          <tr>
-           <td align="right"> Description: </td>
+           <td align="right" valign="top"> Description: </td>
            <td colspan="3" metal:define-slot="issue_description_slot">
              <font color="gray">
                <span tal:replace="python: here.description[:TRUNCDESCR]
@@ -186,8 +186,9 @@
          </tr>
 
          <tr>
-           <td align="right"> Version info: </td>
-           <td metal:define-slot="issue_version_info_slot"
+           <td align="right" valign="top"> Version info: </td>
+           <td valign="top"
+	       metal:define-slot="issue_version_info_slot"
                colspan="3"
                tal:content="python: here.version_info[:120]
                               + ((here.version_info[121:] and '...') or '')">
