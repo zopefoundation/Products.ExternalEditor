@@ -212,7 +212,7 @@ class PortalFolderTests( SecurityTest ):
         sub._setObject( 'foo', DummyContent( 'foo', catalog=1 ) )
         foo = sub.foo
         assert len( catalog ) == 1
-        assert 'foo' in catalog.uniqueValuesFor( 'id' )
+        self.failUnless( 'foo' in catalog.uniqueValuesFor('getId') )
         assert has_path( catalog._catalog, '/test/folder/sub/foo' )
 
         # WAAAA! must get _p_jar set
@@ -221,13 +221,13 @@ class PortalFolderTests( SecurityTest ):
             folder.manage_renameObject( id='sub', new_id='new_sub' )
         finally:
             sub._p_jar = old
-        assert 'foo' in catalog.uniqueValuesFor( 'id' )
+        self.failUnless( 'foo' in catalog.uniqueValuesFor('getId') )
         assert len( catalog ) == 1
         assert has_path( catalog._catalog, '/test/folder/new_sub/foo' )
 
         folder._setObject( 'bar', DummyContent( 'bar', catalog=1 ) )
         bar = folder.bar
-        assert 'bar' in catalog.uniqueValuesFor( 'id' )
+        self.failUnless( 'bar' in catalog.uniqueValuesFor('getId') )
         assert len( catalog ) == 2
         assert has_path( catalog._catalog, '/test/folder/bar' )
 
@@ -246,8 +246,8 @@ class PortalFolderTests( SecurityTest ):
         finally:
             bar._p_jar = old
 
-        assert 'foo' in catalog.uniqueValuesFor( 'id' )
-        assert 'bar' in catalog.uniqueValuesFor( 'id' )
+        self.failUnless( 'foo' in catalog.uniqueValuesFor('getId') )
+        self.failUnless( 'bar' in catalog.uniqueValuesFor('getId') )
         assert len( catalog ) == 2
         assert has_path( catalog._catalog, '/test/folder/sub2/bar' )
 
