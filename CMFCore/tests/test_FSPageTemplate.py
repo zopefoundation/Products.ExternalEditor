@@ -30,7 +30,13 @@ class FSPageTemplateTests( RequestTest, FSPTMaker ):
         from Products.PageTemplates.TALES import Undefined
         script = self._makeOne( 'testPTbad', 'testPTbad.pt' )
         script = script.__of__(self.root)
-        self.assertRaises(Undefined,script)
+
+        try: # can't use assertRaises, because different types raised.
+            script()
+        except (Undefined, KeyError):
+            pass
+        else:
+            self.fail('Calling a bad template did not raise an exception')
 
     def test_caching( self ):
         """
