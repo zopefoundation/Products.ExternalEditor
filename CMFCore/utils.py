@@ -631,6 +631,20 @@ def keywordsplitter( headers
     return out
 
 #
+#   Metadata Contributors splitter utilities
+#
+CONTRIBSPLITRE = re.compile(r';')
+
+security.declarePublic('contributorsplitter')
+def contributorsplitter( headers
+                       , names=('Contributors',)
+                       , splitter=CONTRIBSPLITRE.split
+                       ):
+    """ Split contributors out of headers, keyed on names.  Returns list.
+    """
+    return keywordsplitter( headers, names, splitter )
+
+#
 #   Directory-handling utilities
 #
 security.declarePublic('normalize')

@@ -2,6 +2,9 @@ CMF 1.5.0-beta (unreleased)
 
   New Features
 
+    - CMFCore.utils: Introduced contributorsplitter() utility function 
+      along the lines of keywordsplitter().
+
     - Actions and Action providers: Further refactoring.
 
       o Removed again OldstyleActionProvider Interface and
