@@ -4,19 +4,30 @@
 <body>
 <div metal:fill-slot="main">
 <div class="Desktop">
-<div metal:use-macro="here/content_byline/macros/byline">By Me</div>
-<br>
-<div>
+<table>
+ <tr>
+   <td>
+      <div metal:use-macro="here/content_byline/macros/byline">By Me</div>
+   </td>
+ </tr>
+ <tr>
+   <td> 
 <a href="favorite.html" title="ZopeOrg"
    tal:define="favorite python:here.portal_url.getPortalPath() + '/' + here.remote_url"
    tal:attributes="href favorite; title favorite"><span tal:replace="favorite">www.zope.org</span></a>
-</div>
-
+   </td>
+  </tr>
+ <tr>
+   <td>
 <div class="Discussion">
 <span tal:replace="here/viewThreadsAtBottom"
        tal:condition="here/viewThreadsAtBottom|nothing">Dicussions</span>
 </div>
+ </td>
+</tr>
+</table>
 </div>
 </div>
 </body>
 </html>
+
