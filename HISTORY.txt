@@ -17,6 +17,10 @@
  - Updated CatalogTool to handle searchable vs. displayable DublinCore
    dates properly.
 
+ - Replaced usage of .id with .getId() all through the CMF, to conform with the
+   new SimpleItem API. Thanks to Jens Quade <jq@jquade.de> for pointing this
+   out. (Issue PTK(241)[]).
+
 1.0 final (2001/03/29)
 
  - Removed embedded spaces in 'portal_status_message' strings
