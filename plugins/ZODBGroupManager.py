@@ -113,11 +113,11 @@ class ZODBGroupManager( BasePlugin ):
 
                 info = {}
                 info.update( self._groups[ group_id ] )
-                
+
                 info[ 'pluginid' ] = plugin_id
                 info[ 'properties_url' ] = '%s?%s' % ( e_url, p_qs )
                 info[ 'members_url' ] = '%s?%s' % ( e_url, m_qs )
-                
+
                 if not group_filter or group_filter( info ):
                     group_info.append( info )
 
@@ -229,7 +229,7 @@ class ZODBGroupManager( BasePlugin ):
                 if ( group_id not in self._principal_groups.get( id, () )
                  and group_id != id ):
                     result.append( ( id, title ) )
-        
+
         return result
 
     security.declareProtected( ManageGroups, 'listAssignedPrincipals' )
@@ -245,9 +245,13 @@ class ZODBGroupManager( BasePlugin ):
 
                 parent = aq_parent( self )
                 info = parent.searchPrincipals( id=k, exact_match=True )
-                assert( len( info ) == 1 )
-                result.append( ( k, info[0].get( 'title', k ) ) )
-        
+                assert( len( info ) in ( 0, 1 ) )
+                if len( info ) == 0:
+                    title = '<%s: not found>' % k
+                else:
+                    title = info[0].get( 'title', k )
+                result.append( ( k, title ) )
+
         return result
 
     security.declareProtected( ManageGroups, 'addPrincipalToGroup' )
@@ -371,7 +375,7 @@ class ZODBGroupManager( BasePlugin ):
             message = 'no+groups+selected'
 
         else:
-        
+
             for group_id in group_ids:
                 self.removeGroup( group_id )
 
@@ -420,7 +424,7 @@ class ZODBGroupManager( BasePlugin ):
         """ Remove one or more principals from a group via the ZMI.
         """
         removed = []
-        
+
         for principal_id in principal_ids:
             if self.removePrincipalFromGroup( principal_id, group_id ):
                 removed.append( principal_id )
