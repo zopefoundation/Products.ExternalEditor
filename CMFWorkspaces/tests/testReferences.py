@@ -40,6 +40,9 @@ class Tests(unittest.TestCase):
         f4 = Folder()
         f4.id = 'f4'
         self.f1.f2.f4 = f4
+        f4_1 = Folder()
+        f4_1.id = 'f4'
+        self.f1.f4 = f4_1
         f1.portal_url = URLTool()
         f1.refs = ReferenceCollection()
 
@@ -47,6 +50,11 @@ class Tests(unittest.TestCase):
         self.f1.refs.addReference(self.f1.f2.f3)
         self.f1.refs.addReference(self.f1.f2.f4)
         self.assertEqual(len(self.f1.refs), 2)
+        
+    def testAddSameIds(self):
+        self.f1.refs.addReference(self.f1.f2.f4)
+        self.f1.refs.addReference(self.f1.f4)
+        self.assertEqual(len(self.f1.refs), 2)        
 
     def testMappingInterface(self):
         self.f1.refs.addReference(self.f1.f2.f3)

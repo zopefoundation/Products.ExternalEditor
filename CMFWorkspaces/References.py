@@ -111,16 +111,18 @@ class ReferenceCollection (Persistent):
     security = ClassSecurityInfo()
 
     _reference_factory = PortalRelativeReference
-    _next_id = 1
     _ignore_dups = 1
 
     def __init__(self):
         self._refs = {}
 
-    def _new_id(self):
-        """Produce a new, unique string id."""
-        id = str(self._next_id)
-        self._next_id += 1
+    def _new_id(self, object):
+        """Produce a new, locally unique string id for an object."""
+        id = object.getId()
+        i = 0
+        while self._refs.has_key(id):
+            i += 1
+            id = '%s~%d' % (object.getId(), i)
         return id
 
     security.declarePrivate('addReference')
@@ -132,7 +134,7 @@ class ReferenceCollection (Persistent):
                 if other == r:
                     # We already have a reference to this object.
                     return
-        self._refs[self._new_id()] = r
+        self._refs[self._new_id(object)] = r
         self._p_changed = 1
 
     security.declarePrivate('removeReference')
@@ -148,6 +150,11 @@ class ReferenceCollection (Persistent):
     def keys(self):
         """Return all reference ids."""
         return self._refs.keys()
+        
+    security.declarePrivate('has_key')
+    def has_key(self, key):
+        """Check for existence of key"""
+        return self._refs.has_key(key)
 
     security.declarePrivate('values')
     def values(self):

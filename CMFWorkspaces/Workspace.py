@@ -39,10 +39,11 @@ $Id$
 """
 
 from types import StringType
+import marshal
 
 import Globals
 from DateTime import DateTime
-from AccessControl import ClassSecurityInfo
+from AccessControl import ClassSecurityInfo, User, getSecurityManager
 from Products.CMFCore import CMFCorePermissions, PortalContent
 from Products.CMFDefault.DublinCore import DefaultDublinCoreImpl
 
@@ -151,7 +152,66 @@ class Workspace (PortalContent.PortalContent, DefaultDublinCoreImpl):
             seq.reverse()
 
         return map(lambda item: item[1:], seq)
+        
+    ## Basic FTP Support ##
+    
+    # The main thing we are punting on right now is generic PUT support into
+    # the workspace. Subobjects can implement there own PUT factories to deal
+    # with it down below.
+    
+    def manage_FTPlist(self, REQUEST):
+        """ FTP dir list """
+        # Things currently missing: recursion and globbing support
+        # Hey, I said it was basic ;^)
+        out = []
+        for id, ob in self.listReferencedItems():
+            try:
+                stat = marshal.loads(ob.manage_FTPstat(REQUEST))
+            except:
+                pass # Skip broken objects
+            else:
+                out.append((id, stat))
+        
+        return marshal.dumps(out)
+        
+    def manage_FTPstat(self, REQUEST):
+        """ FTP stat for listings """
+        mode = 0040000
+        
+        try:
+            if getSecurityManager().validateValue(self.manage_FTPlist):
+                mode=mode | 0770
+        except: 
+            pass
+        
+        # Check for anonymous access
+        if User.nobody.allowed(
+                    self.manage_FTPlist,
+                    self.manage_FTPlist.__roles__):
+            mode=mode | 0007
+            
+        mtime=self.bobobase_modification_time().timeTime()
+        
+        # get owner and group
+        owner=group='Zope'
+        for user, roles in self.get_local_roles():
+            if 'Owner' in roles:
+                owner=user
+                break
+                
+        return marshal.dumps((mode,0,0,1,owner,group,0,mtime,mtime,mtime))
+        
+    ## Basic traversal support ##        
 
+    def __getitem__(self, key):
+        """ Returns an object based on its unique workspace key """
+        # Return the referenced object wrapped in our context
+        return self._refs[key].dereference(self)
+        
+    def has_key(self, key):
+        """ read-only mapping interface """
+        return self._refs.has_key(key)
+        
 Globals.InitializeClass(Workspace)
 
 
