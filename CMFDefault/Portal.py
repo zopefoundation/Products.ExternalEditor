@@ -79,8 +79,7 @@ class CMFSite ( PortalObjectBase
     title = ''
     description = ''
 
-    __ac_permissions__=( ( ManagePortal, ('manage_migrate_content',) )
-                       , ( AddPortalContent, () )
+    __ac_permissions__=( ( AddPortalContent, () )
                        , ( AddPortalFolders, () )
                        , ( ListPortalMembers, () )
                        , ( ReplyToItem, () )
@@ -103,77 +102,6 @@ class CMFSite ( PortalObjectBase
             in 'editMetadata').
         """
         pass
-
-    #
-    #   The following two methods allow conversion of portal content from
-    #   PTK version 0.7.1.
-    #   DO NOT REMOVE!!!
-    #
-    if 0:
-        def manage_migrate_content(self, REQUEST):
-            """
-                Converts instances of Products.PTKBase.<content> to
-                instances of Products.PTKDemo.<content>.
-            """
-            import Products.PTKBase.Document
-            import Products.PTKBase.File
-            import Products.PTKBase.Image
-            import Products.PTKBase.Link
-            import Products.PTKBase.NewsItem
-            import NewsItem, Link, Document, File, Image
-
-            migrations = {
-                Products.PTKBase.Document.Document : Document.Document,
-                Products.PTKBase.File.File         : File.File,
-                Products.PTKBase.Image.Image       : Image.Image,
-                Products.PTKBase.Link.Link         : Link.Link,
-                Products.PTKBase.NewsItem.NewsItem : NewsItem.NewsItem,
-                }
-
-            visited = []
-            migrated = []
-            self.__migrate_branches(migrations, self, migrated, visited)
-            return 'Converted:\n%s\n\nDone.' % '\n'.join(migrated)
-
-        def __migrate_branches(self, migrations, branch, migrated, visited):
-            base = getattr(branch, 'aq_base', branch)
-            if base in visited:
-                # Don't visit again!
-                return
-            visited.append(base)
-
-            try: changed = branch._p_changed
-            except: changed = 1
-            for id in branch.objectIds():
-                obj = branch._getOb(id)
-                obase = getattr(obj, 'aq_base', obj)
-                klass = obase.__class__
-                if migrations.has_key(klass):
-                    # Replace this object.
-                    changed = 1
-                    newob = migrations[klass](obase.id)
-                    newob.id = obase.id   # This line activates obase.
-                    newob.__dict__.update(obase.__dict__)
-                    setattr(branch, id, newob)
-                    migrated.append(obj.absolute_url())
-                elif hasattr(obase, 'objectIds'):
-                    # Enter a sub-branch.
-                    self.__migrate_branches(migrations, obj, migrated, visited)
-                else:
-                    # Unload this object if it has not been changed.
-                    try:
-                        if obj._p_changed is None:
-                            obj._p_deactivate()
-                    except: pass
-            if changed is None:
-                # Unload this branch.
-                object._p_deactivate()
-
-        del visited[-1]
-
-    else:   # placeholder
-        def manage_migrate_content( self, REQUEST ):
-            pass
 
 InitializeClass(CMFSite)
 

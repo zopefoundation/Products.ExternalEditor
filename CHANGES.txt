@@ -7,6 +7,9 @@ HEAD only (unreleased)
       CMFWiki package that comes as part of Simon Michael's ZWiki
       package. More information at http://zwiki.org.
 
+    - CMFDefault: Cleaned out some super-ancient code for migrating
+      or fixing PTK content so it would work with CMF.
+
   Bug Fixes
 
     - Document/NewsItem: If the "plain text" format is selected the 
