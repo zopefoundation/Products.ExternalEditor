@@ -2,6 +2,9 @@ HEAD only (unreleased)
 
   Bug Fixes
 
+    - FSFile: Allow setting a content_type value using a .metadata file
+      (http://www.zope.org/Collectors/CMF/281)
+
     - ActionsTool: Removed deprecated support for oldstyle Action Providers.
       If Action Providers don't implement the ActionProvider interface they
       are now ignored.

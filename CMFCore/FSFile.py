@@ -59,13 +59,25 @@ class FSFile(FSObject):
         return File(self.getId(), '', self._readFile(1))
 
     def _get_content_type(self, file, body, id, content_type=None):
+        # Consult self.content_type first, this is either
+        # the default (unknown/unknown) or it got a value from a
+        # .metadata file
+        default_type = 'unknown/unknown'
+        if getattr(self, 'content_type', default_type) != default_type:
+            return self.content_type
+
+        # Next, look at file headers
         headers=getattr(file, 'headers', None)
         if headers and headers.has_key('content-type'):
             content_type=headers['content-type']
         else:
+            # Last resort: Use the (imperfect) content type guessing
+            # mechanism from OFS.Image, which ultimately uses the
+            # Python mimetypes module.
             if type(body) is not type(''): body=body.data
             content_type, enc=guess_content_type(
                 getattr(file, 'filename',id), body, content_type)
+
         return content_type
 
     def _readFile(self, reparse):
