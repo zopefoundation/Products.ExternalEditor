@@ -142,3 +142,14 @@ def allTests( from_dir=product_dir, test_prefix='test' ):
             suite.addTest( s )
 
     return suite
+
+def createViewName(method_name, user_handle=None):
+    """
+        Centralized place for creating the "View Name" that identifies
+        a ZCacheable record in a PASRAMCacheManager
+    """
+    if not user_handle:
+        return method_name
+    else:
+        return '%s-%s' % (method_name, user_handle)
+

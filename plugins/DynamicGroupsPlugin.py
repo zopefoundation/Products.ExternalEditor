@@ -16,11 +16,14 @@
 
 $Id$
 """
+import copy
+
 from Acquisition import aq_inner, aq_parent
 from AccessControl import ClassSecurityInfo
 from OFS.SimpleItem import SimpleItem
 from OFS.PropertyManager import PropertyManager
 from OFS.Folder import Folder
+from OFS.Cache import Cacheable
 from Globals import InitializeClass
 from Persistence import PersistentMapping
 
@@ -36,6 +39,8 @@ from Products.PluggableAuthService.interfaces.plugins \
 from Products.PluggableAuthService.permissions import ManageGroups
 
 from Products.PluggableAuthService.plugins.BasePlugin import BasePlugin
+
+from Products.PluggableAuthService.utils import createViewName
 
 
 manage_addDynamicGroupsPluginForm = PageTemplateFile(
@@ -157,7 +162,7 @@ class DynamicGroupDefinition( SimpleItem, PropertyManager ):
 InitializeClass( DynamicGroupDefinition )
 
 
-class DynamicGroupsPlugin( Folder, BasePlugin ):
+class DynamicGroupsPlugin( Folder, BasePlugin, Cacheable ):
 
     """ Define groups via business rules.
 
@@ -210,6 +215,23 @@ class DynamicGroupsPlugin( Folder, BasePlugin ):
         group_info = []
         group_ids = []
         plugin_id = self.getId()
+        view_name = createViewName('enumerateGroups', id)
+
+        # Look in the cache first...
+        keywords = copy.deepcopy(kw)
+        keywords.update( { 'id' : id
+                         , 'exact_match' : exact_match
+                         , 'sort_by' : sort_by
+                         , 'max_results' : max_results
+                         }
+                       )
+        cached_info = self.ZCacheable_get( view_name=view_name
+                                         , keywords=keywords
+                                         , default=None
+                                         )
+
+        if cached_info is not None:
+            return tuple(cached_info)
 
         if isinstance( id, str ):
             id = [ id ]
@@ -238,6 +260,9 @@ class DynamicGroupsPlugin( Folder, BasePlugin ):
             if not group_filter or group_filter( info ):
                 if info[ 'active' ]:
                     group_info.append( info )
+
+        # Put the computed value into the cache
+        self.ZCacheable_set(group_info, view_name=view_name, keywords=keywords)
 
         return tuple( group_info )
 
@@ -322,6 +347,10 @@ class DynamicGroupsPlugin( Folder, BasePlugin ):
                                      )
 
         self._setObject( group_id, info )
+
+        # This method changes the enumerateGroups return value
+        view_name = createViewName('enumerateGroups')
+        self.ZCacheable_invalidate(view_name=view_name)
             
     security.declareProtected( ManageGroups, 'updateGroup' )
     def updateGroup( self
@@ -354,6 +383,12 @@ class DynamicGroupsPlugin( Folder, BasePlugin ):
 
         if active is not None:
             group.active = active
+
+        # This method changes the enumerateGroups return value
+        view_name = createViewName('enumerateGroups')
+        self.ZCacheable_invalidate(view_name=view_name)
+        view_name = createViewName('enumerateGroups', group_id)
+        self.ZCacheable_invalidate(view_name=view_name)
             
     security.declareProtected( ManageGroups, 'removeGroup' )
     def removeGroup( self, group_id ):
@@ -368,6 +403,12 @@ class DynamicGroupsPlugin( Folder, BasePlugin ):
 
         self._delObject( group_id )
 
+        # This method changes the enumerateGroups return value
+        view_name = createViewName('enumerateGroups')
+        self.ZCacheable_invalidate(view_name=view_name)
+        view_name = createViewName('enumerateGroups', group_id)
+        self.ZCacheable_invalidate(view_name=view_name)
+
     #
     #   ZMI
     #
@@ -379,6 +420,7 @@ class DynamicGroupsPlugin( Folder, BasePlugin ):
                      + Folder.manage_options[:1]
                      + BasePlugin.manage_options[:1]
                      + Folder.manage_options[1:]
+                     + Cacheable.manage_options
                      )
 
     manage_groups = PageTemplateFile( 'www/dgpGroups'

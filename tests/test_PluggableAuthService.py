@@ -632,68 +632,6 @@ class PluggableAuthServiceTests( unittest.TestCase ):
         self.assertEqual( len( user_ids ), 1 )
         self.assertEqual( user_ids[ 0 ][0], 'login__foo' )
 
-    def test__extractUserIds_cache( self ):
-
-        from Products.PluggableAuthService.interfaces.plugins \
-            import IExtractionPlugin, IAuthenticationPlugin
-
-        plugins = self._makePlugins()
-        zcuf = self._makeOne( plugins )
-
-        login = DummyPlugin()
-        directlyProvides( login, ( IExtractionPlugin, IAuthenticationPlugin ) )
-        login.extractCredentials = _extractLogin
-        login.authenticateCredentials = _authLogin
-
-        zcuf._setObject( 'login', login )
-
-        extra = DummyPlugin()
-        directlyProvides( extra, ( IExtractionPlugin, IAuthenticationPlugin ) )
-        extra.extractCredentials = _extractExtra
-        extra.authenticateCredentials = _authExtra
-
-        zcuf._setObject( 'extra', extra )
-
-        plugins = zcuf._getOb( 'plugins' )
-
-        plugins.activatePlugin( IExtractionPlugin, 'extra' )
-        plugins.activatePlugin( IExtractionPlugin, 'login' )
-        plugins.activatePlugin( IAuthenticationPlugin, 'extra' )
-        plugins.activatePlugin( IAuthenticationPlugin, 'login' )
-
-        cache = {}
-        request = FauxRequest( form={ 'login' : 'foo' , 'password' : 'bar' }
-                             , extra='qux'
-                             )
-
-
-        user_ids = zcuf._extractUserIds( request=request
-                                       , plugins=zcuf.plugins
-                                       , cache=cache
-                                       )
-
-        self.assertEqual( len( user_ids ), 2 )
-        self.assertEqual( user_ids[ 0 ][0], 'extra__qux' )
-        self.assertEqual( user_ids[ 1 ][0], 'login__foo' )
-
-        self.assertEqual( len( cache ), 2 )
-        self.failUnless( [ ('login__foo', 'foo') ] in cache.values() )
-        self.failUnless( [ ('extra__qux', 'qux') ] in cache.values() )
-
-        key = [ x[0] for x in cache.items()
-                      if x[1] == [('login__foo', 'foo')] ][0]
-        cache[ key ].append( ('forced__baz', 'baz' ) )
-
-        user_ids = zcuf._extractUserIds( request=request
-                                       , plugins=zcuf.plugins
-                                       , cache=cache
-                                       )
-
-        self.assertEqual( len( user_ids ), 3, user_ids )
-        self.assertEqual( user_ids[ 0 ][0], 'extra__qux' )
-        self.assertEqual( user_ids[ 1 ][0], 'login__foo' )
-        self.assertEqual( user_ids[ 2 ][0], 'forced__baz' )
-
     def test__getObjectContext_no_steps( self ):
 
         zcuf = self._makeOne()
@@ -1026,28 +964,6 @@ class PluggableAuthServiceTests( unittest.TestCase ):
         self.assertEqual( len( groups ), 2 )
         self.failIf( 'bar:group3' in groups )
         self.failIf( 'bar:group4' in groups )
-
-    def test__findUser_from_cache( self ):
-
-        plugins = self._makePlugins()
-        zcuf = self._makeOne(plugins)
-        faux = FauxUser( 'faux' )
-        cache = { 'faux' : faux }
-
-        user = zcuf._findUser( plugins, 'faux', 'faux', cache )
-
-        self.failUnless( aq_base( user ) is faux )
-        self.failUnless( aq_parent( user ) is zcuf )
-
-    def test__findUser_loads_cache( self ):
-
-        plugins = self._makePlugins()
-
-        zcuf = self._makeOne(plugins)
-        cache = {}
-        user = zcuf._findUser( plugins, 'someone', 'someone', cache )
-
-        self.failUnless( aq_base(cache[ 'someone' ]) is aq_base( user ) )
 
     def test__authorizeUser_force_ok( self ):
 

@@ -7,6 +7,10 @@ PluggableAuthService changelog
       - Group and user plugins can now specify their own title for a
         principal entry (PAS will not compute one if they do).
 
+      - PAS and/or plugins can now take advantage of caching using the
+        Zope ZCacheable framework with RAM Cache Managers. See
+        doc/caching.stx for the details.
+
     Bugs Fixed
 
       - Clarified interface of IAuthenticationPlugin, which should return
@@ -18,7 +22,7 @@ PluggableAuthService changelog
 
       - If an IAuthenticationPlugin returns None instead of a tuple
         from authenticateCredentials, don't log a tuple-unpack error in PAS
-	itself.
+	    itself.
 
   PluggableAuthService 1.0.3 (2004/10/16)
 

@@ -37,6 +37,8 @@ from zLOG import LOG, WARNING
 from zExceptions import Unauthorized
 from Persistence import PersistentMapping
 from OFS.Folder import Folder
+from OFS.Cache import Cacheable
+from Products.StandardCacheManagers.RAMCacheManager import RAMCacheManager
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from ZTUtils import Batch
 from App.class_init import default__class_init__ as InitializeClass
@@ -68,6 +70,7 @@ from permissions import SearchPrincipals
 
 from PropertiedUser import PropertiedUser
 from utils import _wwwdir
+from utils import createViewName
 
 
 security = ModuleSecurityInfo(
@@ -152,7 +155,7 @@ class EmergencyUserAuthenticator( Implicit ):
 InitializeClass( EmergencyUserAuthenticator )
 
 
-class PluggableAuthService( Folder ):
+class PluggableAuthService( Folder, Cacheable ):
 
     """ All-singing, all-dancing user folder.
     """
@@ -188,9 +191,7 @@ class PluggableAuthService( Folder ):
         if not user_id:
             return None
 
-        return self._findUser( plugins, user_id, name
-                           # , cache=self._getUserCache()
-                             )
+        return self._findUser( plugins, user_id, name )
 
     security.declareProtected( ManageUsers, 'getUserById' )
     def getUserById( self, id, default=None ):
@@ -223,9 +224,7 @@ class PluggableAuthService( Folder ):
         if not user_id:
             return default
 
-        return self._findUser( plugins, user_id
-                           # , cache=self._getUserCache()
-                             )
+        return self._findUser( plugins, user_id )
 
     security.declarePublic( 'validate' )     # XXX: public?
     def validate( self, request, auth='', roles=_noroles ):
@@ -235,10 +234,7 @@ class PluggableAuthService( Folder ):
         plugins = self._getOb( 'plugins' )
         is_top = self._isTop()
 
-        user_ids = self._extractUserIds( request
-                                       , plugins
-                                     # , cache=self._v_credentials_cache
-                                       )
+        user_ids = self._extractUserIds(request, plugins)
         ( accessed
         , container
         , name
@@ -247,10 +243,7 @@ class PluggableAuthService( Folder ):
 
         for user_id, login in user_ids:
 
-            user = self._findUser( plugins, user_id, login
-                               # , cache=self._getUserCache()
-                                 , request=request
-                                 )
+            user = self._findUser(plugins, user_id, login, request=request)
 
             if aq_base( user ) is emergency_user:
 
@@ -579,6 +572,7 @@ class PluggableAuthService( Folder ):
                         ,
                         )
                       + Folder.manage_options[2:]
+                      + Cacheable.manage_options
                       )
 
     security.declareProtected(ManageUsers, 'resultsBatch')
@@ -645,7 +639,7 @@ class PluggableAuthService( Folder ):
     #   Helper methods
     #
     security.declarePrivate( '_extractUserIds' )
-    def _extractUserIds( self, request, plugins, cache=None ):
+    def _extractUserIds( self, request, plugins ):
 
         """ request -> [ validated_user_id ]
 
@@ -653,9 +647,6 @@ class PluggableAuthService( Folder ):
           a user;  accumulate a list of the IDs of such users over all
           our authentication and extraction plugins.
         """
-        if cache is None:
-            cache = {}
-
         result = []
         user_ids = []
 
@@ -693,16 +684,13 @@ class PluggableAuthService( Folder ):
                 try:
                     credentials[ 'extractor' ] = extractor_id # XXX: in key?
                     items = credentials.items()
-                  # credentials[ 'extractor' ] = extractor_id # XXX: in key?
                     items.sort()
-                    cache_key = tuple( items )
                 except _SWALLOWABLE_PLUGIN_EXCEPTIONS:
                     LOG('PluggableAuthService', WARNING,
                         'Credentials error: %s' % credentials,
                         error=sys.exc_info())
-                    cache_key = None
                 else:
-                    user_ids = cache.get( cache_key, [] )
+                    user_ids = []
 
                 if not user_ids:
 
@@ -736,10 +724,6 @@ class PluggableAuthService( Folder ):
                                                         user_id)
                             user_ids.append( (mangled_id, name) )
 
-
-                    if cache_key is not None:
-                        cache[ cache_key ] = user_ids
-
                 result.extend( user_ids )
 
         if not user_ids:
@@ -748,6 +732,7 @@ class PluggableAuthService( Folder ):
 
             if user_id is not None:
                 result.append( ( user_id, name ) )
+
         return result
 
     security.declarePrivate( '_unmangleId' )
@@ -854,18 +839,22 @@ class PluggableAuthService( Folder ):
         return PropertiedUser( user_id, name ).__of__( self )
 
     security.declarePrivate( '_findUser' )
-    def _findUser( self, plugins, user_id, name=None, cache=None
-                 , request=None ):
+    def _findUser( self, plugins, user_id, name=None, request=None ):
 
         """ user_id -> decorated_user
         """
         if user_id == self._emergency_user.getUserName():
             return self._emergency_user
 
-        if cache is None:
-            cache = {}
-
-        user = cache.get( user_id )
+        # See if the user can be retrieved from the cache
+        view_name = '_findUser-%s' % user_id
+        keywords = { 'user_id' : user_id
+                   , 'name' : name
+                   }
+        user = self.ZCacheable_get( view_name=view_name
+                                  , keywords=keywords
+                                  , default=None
+                                  )
 
         if user is None:
 
@@ -894,7 +883,14 @@ class PluggableAuthService( Folder ):
                     user._addRoles( roles )
 
             user._addRoles( ['Authenticated'] )
-            cache[ user_id ] = user
+
+            # Cache the user if caching is enabled
+            base_user = aq_base(user)
+            if getattr(base_user, '_p_jar', None) is None:
+                self.ZCacheable_set( base_user
+                                   , view_name=view_name
+                                   , keywords=keywords
+                                   )
 
         return user.__of__( self )
 
@@ -913,6 +909,15 @@ class PluggableAuthService( Folder ):
             criteria[ 'login' ] = login
 
         if criteria:
+            view_name = createViewName('_verifyUser', user_id or login)
+            cached_info = self.ZCacheable_get( view_name=view_name
+                                             , keywords=criteria
+                                             , default=None
+                                             )
+
+            if cached_info is not None:
+                return cached_info
+
 
             enumerators = plugins.listPlugins( IUserEnumerationPlugin )
 
@@ -921,7 +926,13 @@ class PluggableAuthService( Folder ):
                     info = enumerator.enumerateUsers( **criteria )
 
                     if info:
-                        return self._computeMangledId( info[0] )
+                        id = self._computeMangledId( info[0] )
+                        # Put the computed value into the cache
+                        self.ZCacheable_set( id
+                                           , view_name=view_name
+                                           , keywords=criteria
+                                           )
+                        return id
 
                 except _SWALLOWABLE_PLUGIN_EXCEPTIONS:
                     LOG('PluggableAuthService', WARNING,
@@ -1085,7 +1096,7 @@ class PluggableAuthService( Folder ):
     def all_meta_types(self):
         """ What objects can be put in here?
         """
-        allowed_types = tuple(MultiPlugins)
+        allowed_types = tuple(MultiPlugins) + (RAMCacheManager.meta_type,)
 
         return [x for x in Products.meta_types if x['name'] in allowed_types]
 
