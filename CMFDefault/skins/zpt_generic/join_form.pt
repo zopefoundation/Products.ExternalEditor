@@ -34,7 +34,7 @@
       to send you a randomly-generated password.  Once you have logged
       in with this password, you may change it to anything you like.</p>
 
-  <div class="DesktopStatusBar"
+  <div id="DesktopStatusBar"
        tal:content="request/error|nothing">
      <hr />
   </div>
