@@ -88,6 +88,7 @@ from Products.CMFCore.PortalObject import PortalObjectBase
 from Products.CMFCore import PortalFolder
 from Products.CMFCore.TypesTool import ContentFactoryMetadata
 from Products.CMFCore.utils import getToolByName
+from Products.CMFTopic import Topic, topic_globals
 from DublinCore import DefaultDublinCoreImpl
 
 import Document, Image, File, Link, NewsItem, Favorite
@@ -277,14 +278,15 @@ class PortalGenerator:
         from Products.CMFCore.DirectoryView import addDirectoryViews
         ps = getToolByName(p, 'portal_skins')
         addDirectoryViews(ps, 'skins', globals())
+        addDirectoryViews(ps, 'skins', topic_globals)
         ps.manage_addProduct['OFSP'].manage_addFolder(id='custom')
         ps.addSkinSelection('Basic',
-            'custom, content, generic, control, Images',
+            'custom, topic, content, generic, control, Images',
             make_default=1)
         ps.addSkinSelection('Nouvelle',
-            'nouvelle, custom, content, generic, control, Images')
+            'nouvelle, custom, topic, content, generic, control, Images')
         ps.addSkinSelection('No CSS',
-            'no_css, custom, content, generic, control, Images')
+            'no_css, custom, topic, content, generic, control, Images')
         p.setupCurrentSkin()
 
     def setupTypes(self, p, initial_types=factory_type_information):
@@ -315,6 +317,7 @@ class PortalGenerator:
         self.setupDefaultSkins(p)
         self.setupTypes(p)
         self.setupTypes(p, PortalFolder.factory_type_information)
+        self.setupTypes(p, Topic.factory_type_information)
         self.setupWorkflow(p)
 
     def create(self, parent, id, create_userfolder):
