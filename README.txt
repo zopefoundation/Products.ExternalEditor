@@ -92,7 +92,7 @@ Zope External Editor
     4. The helper app, reads its config file and the response data file. The
        meta-data from the file is parsed and the content is copied to a new
        temporary file. The appropriate editor program is determined based on
-       the data file and the configuration (or alternately by asking the user).
+       the data file and the configuration.
        
     5. The editor is launched as a sub-process of the helper app, passing it the
        file containing the content data.
