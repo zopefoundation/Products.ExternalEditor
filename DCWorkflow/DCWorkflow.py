@@ -400,7 +400,7 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
         '''
         changed = 0
         sdef = self._getWorkflowStateOf(ob)
-        if self.permissions:
+        if sdef is not None and self.permissions:
             for p in self.permissions:
                 roles = []
                 if sdef.permission_roles is not None:
