@@ -109,23 +109,25 @@ class ActionProvidersConfiguratorTests( _ActionSetup ):
                      }
                    , { 'id' : 'portal_foo'
                      , 'actions' : [ { 'id' : 'foo'
-                                     , 'name' : 'Foo'
+                                     , 'title' : 'Foo'
+                                     , 'description' : ''
                                      , 'action' : 'string:${object_url}/foo'
                                      , 'condition' : 'python:1'
-                                     , 'permission' : ''
+                                     , 'permissions' : ()
                                      , 'category' : 'dummy'
-                                     , 'visible' : 1
+                                     , 'visible' : True
                                      }
                                    ]
                      }
                    , { 'id' : 'portal_bar'
                      , 'actions' : [ { 'id' : 'bar'
-                                     , 'name' : 'Bar'
+                                     , 'title' : 'Bar'
+                                     , 'description' : ''
                                      , 'action' : 'string:${object_url}/bar'
                                      , 'condition' : 'python:0'
-                                     , 'permission' : 'Manage portal'
+                                     , 'permissions' : ('Manage portal',)
                                      , 'category' : 'dummy'
-                                     , 'visible' : 0
+                                     , 'visible' : False
                                      }
                                    ]
                      }
@@ -183,28 +185,28 @@ class ActionProvidersConfiguratorTests( _ActionSetup ):
         self.assertEqual( len( info[ 'actions' ] ), 1 )
 
         action = info[ 'actions' ][ 0 ]
-        self.assertEqual( action[ 'action_id' ], 'foo' )
-        self.assertEqual( action[ 'name' ], 'Foo' )
+        self.assertEqual( action[ 'id' ], 'foo' )
+        self.assertEqual( action[ 'title' ], 'Foo' )
         self.assertEqual( action[ 'action' ]
                         , 'string:${object_url}/foo' )
         self.assertEqual( action[ 'condition' ], 'python:1' )
-        self.assertEqual( action[ 'permission' ], '' )
+        self.assertEqual( action[ 'permissions' ], () )
         self.assertEqual( action[ 'category' ], 'dummy' )
-        self.assertEqual( action[ 'visible' ], '1' )
+        self.assertEqual( action[ 'visible' ], True )
 
         info = info_list[ 2 ]
         self.assertEqual( info[ 'id' ], 'portal_bar' )
         self.assertEqual( len( info[ 'actions' ] ), 1 )
 
         action = info[ 'actions' ][ 0 ]
-        self.assertEqual( action[ 'action_id' ], 'bar' )
-        self.assertEqual( action[ 'name' ], 'Bar' )
+        self.assertEqual( action[ 'id' ], 'bar' )
+        self.assertEqual( action[ 'title' ], 'Bar' )
         self.assertEqual( action[ 'action' ]
                         , 'string:${object_url}/bar' )
         self.assertEqual( action[ 'condition' ], 'python:0' )
-        self.assertEqual( action[ 'permission' ], 'Manage portal' )
+        self.assertEqual( action[ 'permissions' ], ('Manage portal',) )
         self.assertEqual( action[ 'category' ], 'dummy' )
-        self.assertEqual( action[ 'visible' ], '0' )
+        self.assertEqual( action[ 'visible' ], False )
 
 
 
@@ -224,20 +226,21 @@ _NORMAL_EXPORT = """\
  <action-provider id="portal_foo">
   <action action_id="foo"
           title="Foo"
-          action_expr="string:${object_url}/foo"
+          url_expr="string:${object_url}/foo"
           condition_expr="python:1"
-          permission=""
           category="dummy"
-          visible="1" />
- </action-provider>
+          visible="True">
+  </action>
+</action-provider>
  <action-provider id="portal_bar">
   <action action_id="bar"
           title="Bar"
-          action_expr="string:${object_url}/bar"
+          url_expr="string:${object_url}/bar"
           condition_expr="python:0"
-          permission="Manage portal"
           category="dummy"
-          visible="0" />
+          visible="False">
+   <permission>Manage portal</permission>
+  </action>
  </action-provider>
 </actions-tool>
 """

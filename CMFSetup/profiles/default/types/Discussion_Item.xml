@@ -4,18 +4,18 @@
            title="Discussion Item"
            meta_type="Discussion Item"
            icon="discussionitem_icon.gif" immediate_view=""
-           filter_content_types="1" allowed_content_types=""
-           allow_discussion="0" global_allow="1" product=""
-           factory="">
+           filter_content_types="True"
+           allow_discussion="False" global_allow="True"
+           product="" factory="">
   <description>Discussion Items are documents which reply to other content.
-They should *not* be addable through the standard 'folder_factories' interface.
-</description>
+They should *not* be addable through the standard 'folder_factories' interface.</description>
   <aliases>
    <alias from="(Default)" to="discussionitem_view"/>
    <alias from="view" to="discussionitem_view"/>
   </aliases>
-  <action action_id="view" title="View" condition=""
-          action_expr="string:${object_url}/discussionitem_view"
-          permissions="View" category="object"
-          visible="True"/>
+  <action action_id="view" title="View" condition_expr=""
+          url_expr="string:${object_url}/discussionitem_view"
+          category="object" visible="True">
+   <permission>View</permission>
+  </action>
 </type-info>

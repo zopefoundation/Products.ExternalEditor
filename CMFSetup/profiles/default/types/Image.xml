@@ -3,25 +3,28 @@
            title="Image" meta_type="Portal Image"
            icon="image_icon.gif"
            immediate_view="metadata_edit_form"
-           filter_content_types="1" allowed_content_types=""
-           allow_discussion="0" global_allow="1"
+           filter_content_types="True"
+           allow_discussion="False" global_allow="True"
            product="CMFDefault" factory="addImage">
-  <description>Image objects can be embedded in Portal documents.
-</description>
+  <description>Image objects can be embedded in Portal documents.</description>
   <aliases>
    <alias from="(Default)" to="index_html"/>
    <alias from="view" to="image_view"/>
   </aliases>
-  <action action_id="view" title="View" condition=""
-          action_expr="string:${object_url}/image_view"
-          permissions="View" category="object"
-          visible="True"/>
-  <action action_id="edit" title="Edit" condition=""
-          action_expr="string:${object_url}/image_edit_form"
-          permissions="Modify portal content"
-          category="object" visible="True"/>
-  <action action_id="metadata" title="Metadata" condition=""
-          action_expr="string:${object_url}/metadata_edit_form"
-          permissions="Modify portal content"
-          category="object" visible="True"/>
+  <action action_id="view" title="View" condition_expr=""
+          url_expr="string:${object_url}/image_view"
+          category="object" visible="True">
+   <permission>View</permission>
+  </action>
+  <action action_id="edit" title="Edit" condition_expr=""
+          url_expr="string:${object_url}/image_edit_form"
+          category="object" visible="True">
+   <permission>Modify portal content</permission>
+  </action>
+  <action action_id="metadata" title="Metadata"
+          condition_expr=""
+          url_expr="string:${object_url}/metadata_edit_form"
+          category="object" visible="True">
+   <permission>Modify portal content</permission>
+  </action>
 </type-info>

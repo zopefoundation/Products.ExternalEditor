@@ -66,8 +66,9 @@ class ActionsToolTests( SecurityRequestTest ):
                           'folder': [{'permissions': ('List folder contents',),
                                       'id': 'folderContents',
                                       'url': 'http://foo/folder_contents',
+                                      'title': 'Folder contents',
                                       'name': 'Folder contents',
-                                      'visible': 1,
+                                      'visible': True,
                                       'category': 'folder'}],
                           'global': []})
 
@@ -94,8 +95,9 @@ class ActionsToolTests( SecurityRequestTest ):
                           [{'permissions': (),
                             'id': 'test',
                             'url': ' a_url',
+                            'title': 'Test',
                             'name': 'Test',
-                            'visible': 1,
+                            'visible': True,
                             'category': 'object'}])
 
     def test_interface(self):

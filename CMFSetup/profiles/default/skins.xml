@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<skins-tool default_skin="None"
+<skins-tool default_skin="Basic"
             request_varname="portal_skin" allow_any="0"
             cookie_persistence="0">
  <skin-directory id="Images"
@@ -25,18 +25,24 @@
                  directory="CMFTopic/skins/zpt_topic"/>
  <skin-path id="Basic">
   <layer name="custom"/>
+  <layer name="zpt_topic"/>
+  <layer name="zpt_content"/>
+  <layer name="zpt_generic"/>
+  <layer name="zpt_control"/>
+  <layer name="Images"/>
+ </skin-path>
+ <skin-path id="No CSS">
+  <layer name="no_css"/>
+  <layer name="custom"/>
   <layer name="topic"/>
   <layer name="content"/>
   <layer name="generic"/>
   <layer name="control"/>
   <layer name="Images"/>
  </skin-path>
- <skin-path id="ZPT">
+ <skin-path id="Nouvelle">
+  <layer name="nouvelle"/>
   <layer name="custom"/>
-  <layer name="zpt_topic"/>
-  <layer name="zpt_content"/>
-  <layer name="zpt_generic"/>
-  <layer name="zpt_control"/>
   <layer name="topic"/>
   <layer name="content"/>
   <layer name="generic"/>

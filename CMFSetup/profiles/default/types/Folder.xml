@@ -3,26 +3,47 @@
            title="Folder" meta_type="Portal Folder"
            icon="folder_icon.gif"
            immediate_view="folder_edit_form"
-           filter_content_types="0" allowed_content_types=""
-           allow_discussion="0" global_allow="1"
+           filter_content_types="False"
+           allow_discussion="False" global_allow="True"
            product="CMFCore"
            factory="manage_addPortalFolder">
-  <description> Use folders to put content in categories.</description>
+  <description>Use folders to put content in categories.</description>
   <aliases>
+   <alias from="index.html" to="index_html"/>
    <alias from="(Default)" to="index_html"/>
    <alias from="view" to="index_html"/>
   </aliases>
-  <action action_id="view" title="View" condition=""
-          action_expr="string:${object_url}"
-          permissions="View" category="folder"
-          visible="True"/>
-  <action action_id="edit" title="Edit" condition=""
-          action_expr="string:${object_url}/folder_edit_form"
-          permissions="Manage properties" category="folder"
-          visible="True"/>
+  <action action_id="view" title="View" condition_expr=""
+          url_expr="string:${object_url}" category="object"
+          visible="True">
+   <permission>View</permission>
+  </action>
+  <action action_id="edit" title="Edit" condition_expr=""
+          url_expr="string:${object_url}/folder_edit_form"
+          category="object" visible="True">
+   <permission>Manage properties</permission>
+  </action>
   <action action_id="localroles" title="Local Roles"
-          condition=""
-          action_expr="string:${object_url}/folder_localrole_form"
-          permissions="Manage properties" category="folder"
-          visible="True"/>
+          condition_expr=""
+          url_expr="string:${object_url}/folder_localrole_form"
+          category="object" visible="True">
+   <permission>Change local roles</permission>
+  </action>
+  <action action_id="folderContents" title="Folder contents"
+          condition_expr=""
+          url_expr="string:${object_url}/folder_contents"
+          category="object" visible="True">
+   <permission>List folder contents</permission>
+  </action>
+  <action action_id="new" title="New..." condition_expr=""
+          url_expr="string:${object_url}/folder_factories"
+          category="object" visible="False">
+   <permission>Add portal content</permission>
+  </action>
+  <action action_id="rename_items" title="Rename items"
+          condition_expr=""
+          url_expr="string:${object_url}/folder_rename_form"
+          category="object" visible="False">
+   <permission>Add portal content</permission>
+  </action>
 </type-info>

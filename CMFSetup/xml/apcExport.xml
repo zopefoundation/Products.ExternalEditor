@@ -5,20 +5,21 @@
                   tal:attributes="id info/id;" >
   <action action_id="folder_contents"
           title="Folder Contents"
-          category="folder"
-          action_expr="${folder_url}/folder_contents"
           condition_expr=""
-          visible="1"
-          permission="View"
+          url_expr="string:${folder_url}/folder_contents"
+          category="folder"
+          visible="True"
           tal:repeat="action info/actions"
           tal:attributes="action_id action/id;
-                          title action/name;
-                          category action/category;
-                          action_expr action/action;
+                          title action/title;
                           condition_expr action/condition;
+                          url_expr action/action;
+                          category action/category;
                           visible action/visible;
-                          permission action/permission;
-                         " />
+                         ">
+   <permission
+      tal:repeat="permission action/permissions"
+      tal:content="permission">View</permission>
+  </action>
  </action-provider></tal:loop>
 </actions-tool>
-

@@ -15,19 +15,18 @@
 $Id$
 """
 
-from types import StringType
-
-from Globals import DTMLFile, InitializeClass
 from AccessControl import ClassSecurityInfo
+from Globals import DTMLFile
+from Globals import InitializeClass
 
 from ActionInformation import ActionInformation
 from ActionInformation import getOAI
-from permissions import ManagePortal
 from Expression import Expression
 from Expression import getExprContext
 from interfaces.portal_actions import ActionProvider as IActionProvider
 from interfaces.portal_actions \
         import OldstyleActionProvider as IOldstyleActionProvider
+from permissions import ManagePortal
 from utils import _checkPermission
 from utils import _dtmldir
 
@@ -73,7 +72,7 @@ class ActionProviderBase:
         for ai in self.listActions():
             if id == ai.getId() and category == ai.getCategory():
                 return ai
-        
+
         # no action found
         return None
 
@@ -89,7 +88,7 @@ class ActionProviderBase:
 
         if action_chain:
             filtered_actions = []
-            if isinstance(action_chain, StringType):
+            if isinstance(action_chain, basestring):
                 action_chain = (action_chain,)
             for action_ident in action_chain:
                 sep = action_ident.rfind('/')
@@ -149,23 +148,7 @@ class ActionProviderBase:
 
         """ Show the 'Actions' management tab.
         """
-        actions = []
-
-        for a in self.listActions():
-
-            a1 = {}
-            a1['id'] = a.getId()
-            a1['name'] = a.Title()
-            p = a.getPermissions()
-            if p:
-                a1['permission'] = p[0]
-            else:
-                a1['permission'] = ''
-            a1['category'] = a.getCategory() or 'object'
-            a1['visible'] = a.getVisibility()
-            a1['action'] = a.getActionExpression()
-            a1['condition'] = a.getCondition()
-            actions.append(a1)
+        actions = [ ai.getMapping() for ai in self.listActions() ]
 
         # possible_permissions is in AccessControl.Role.RoleManager.
         pp = self.possible_permissions()
@@ -196,7 +179,7 @@ class ActionProviderBase:
         a_expr = action and Expression(text=str(action)) or ''
         c_expr = condition and Expression(text=str(condition)) or ''
 
-        if type( permission ) != type( () ):
+        if not isinstance(permission, tuple):
             permission = (str(permission),)
 
         new_actions = self._cloneActions()
@@ -328,36 +311,24 @@ class ActionProviderBase:
         """ Extract an ActionInformation from the funky form properties.
         """
         id          = str( properties.get( 'id_%d'          % index, '' ) )
-        name        = str( properties.get( 'name_%d'        % index, '' ) )
+        title       = str( properties.get( 'name_%d'        % index, '' ) )
         action      = str( properties.get( 'action_%d'      % index, '' ) )
         condition   = str( properties.get( 'condition_%d'   % index, '' ) )
         category    = str( properties.get( 'category_%d'    % index, '' ))
-        visible     =      properties.get( 'visible_%d'     % index, 0  )
+        visible     = bool( properties.get('visible_%d'     % index, False) )
         permissions =      properties.get( 'permission_%d'  % index, () )
 
-        if not name:
-            raise ValueError('A name is required.')
-
-        if action is not '':
-            action = Expression( text=action )
-
-        if condition is not '':
-            condition = Expression( text=condition )
+        if not title:
+            raise ValueError('A title is required.')
 
         if category == '':
             category = 'object'
 
-        if type( visible ) is not type( 0 ):
-            try:
-                visible = int( visible )
-            except:
-                visible = 0
-
-        if type( permissions ) is type( '' ):
+        if isinstance(permissions, basestring):
             permissions = ( permissions, )
 
         return ActionInformation( id=id
-                                , title=name
+                                , title=title
                                 , action=action
                                 , condition=condition
                                 , permissions=permissions
@@ -402,7 +373,7 @@ class OldstyleActionProviderBase:
 
         if action_chain:
             filtered_actions = []
-            if isinstance(action_chain, StringType):
+            if isinstance(action_chain, basestring):
                 action_chain = (action_chain,)
             for action_ident in action_chain:
                 sep = action_ident.rfind('/')

@@ -1,29 +1,24 @@
 <?xml version="1.0"?>
 <export-steps>
- <export-step id="rolemap"
-              handler="Products.CMFSetup.rolemap.exportRolemap"
-              title="Role / Permission Map">
-  
-  
-  Export custom roles and non-default role-permission mappings.
- 
- 
- </export-step>
- <export-step id="toolset"
-              handler="Products.CMFSetup.tool.exportToolset"
-              title="Required Tools">
-  
-  
-  Export required / forbidden tools.
- 
- 
- </export-step>
  <export-step id="actions"
               handler="Products.CMFSetup.actions.exportActionProviders"
               title="Action Providers">
   
   
+  
   Export actions tool's action providers and their actions.
+ 
+ 
+ 
+ </export-step>
+ <export-step id="rolemap"
+              handler="Products.CMFSetup.rolemap.exportRolemap"
+              title="Role / Permission Map">
+  
+  
+  
+  Export custom roles and non-default role-permission mappings.
+ 
  
  
  </export-step>
@@ -32,7 +27,9 @@
               title="Skins Tool">
   
   
+  
   Export skins tool's filesystem directory views and skin path definitions.
+ 
  
  
  </export-step>
@@ -41,7 +38,20 @@
               title="Step Registries">
   
   
+  
   Export current contents of import step registry and export step registry.
+ 
+ 
+ 
+ </export-step>
+ <export-step id="toolset"
+              handler="Products.CMFSetup.tool.exportToolset"
+              title="Required Tools">
+  
+  
+  
+  Export required / forbidden tools.
+ 
  
  
  </export-step>
@@ -50,7 +60,9 @@
               title="Types Tool">
   
   
+  
   Export types tool's type information objects.
+ 
  
  
  </export-step>
@@ -59,7 +71,9 @@
               title="Workflow Tool">
   
   
+  
   Export workflow tool's workflow definitions and supporting scripts.
+ 
  
  
  </export-step>

@@ -7,7 +7,7 @@ FTIDATA_ACTIONS = (
       , 'meta_type' : 'Dummy'
       , 'actions' : (
             { 'id':'view',
-              'name':'View',
+              'title': 'View',
               'action':'string:',
               'permissions':('View',),
               'category':'object',
@@ -38,13 +38,16 @@ FTIDATA_DUMMY = (
       , 'product' : 'FooProduct'
       , 'factory' : 'addFoo'
       , 'actions' : (
-            { 'name':'View',
+            { 'id': 'view',
+              'title': 'View',
               'action':'string:view',
               'permissions':('View',) }
-          , { 'name':'View2',
+          , { 'id': 'view2',
+              'title': 'View2',
               'action':'string:view2',
               'permissions':('View',) }
-          , { 'name':'Edit',
+          , { 'id': 'edit',
+              'title': 'Edit',
               'action':'string:edit',
               'permissions':('forbidden permission',) }
           )
@@ -259,15 +262,15 @@ FTIDATA_CMF15 = (
            'gethtml':'source_html'}
       , 'actions' : (
             { 'id':'view',
-              'name':'View',
+              'title': 'View',
               'action':'string:${object_url}/view.html',
               'permissions':(View,) }
           , { 'id':'edit',
-              'name':'Edit',
+              'title': 'Edit',
               'action':'string:${object_url}/edit.html',
               'permissions':(ModifyPortalContent,) }
           , { 'id':'metadata',
-              'name':'Metadata',
+              'title': 'Metadata',
               'action':'string:${object_url}/metadata.html',
               'permissions':(ModifyPortalContent,) }
           )

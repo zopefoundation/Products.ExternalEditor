@@ -16,8 +16,8 @@ $Id$
 """
 
 from AccessControl import ClassSecurityInfo
-from Globals import InitializeClass
 from Acquisition import aq_base, aq_inner, aq_parent
+from Globals import InitializeClass
 from OFS.SimpleItem import SimpleItem
 
 from Expression import Expression
@@ -47,7 +47,7 @@ class ActionInformation( SimpleItem ):
                 , condition=''
                 , permissions=()
                 , priority=10
-                , visible=1
+                , visible=True
                 , action=''
                 ):
         """ Set up an instance.
@@ -62,7 +62,7 @@ class ActionInformation( SimpleItem ):
                  , visible
                  , action
                  )
-        
+
     security.declarePrivate('edit')
     def edit( self
             , id=_unchanged
@@ -77,7 +77,7 @@ class ActionInformation( SimpleItem ):
             ):
         """Edit the specified properties.
         """
-        
+
         if id is not _unchanged:
             self.id = id
         if title is not _unchanged:
@@ -135,7 +135,7 @@ class ActionInformation( SimpleItem ):
         """
         info = {}
         info['id'] = self.id
-        info['name'] = self.Title()
+        info['title'] = info['name'] = self.Title()
         expr = self.getActionExpression()
         __traceback_info__ = (info['id'], info['name'], expr)
         action_obj = self._getActionObject()
@@ -209,23 +209,26 @@ class ActionInformation( SimpleItem ):
 
         """ Return whether the action should be visible in the CMF UI.
         """
-        return self.visible
+        return bool(self.visible)
 
-    security.declarePrivate( 'clone' )
-    def clone( self ):
-
-        """ Return a newly-created AI just like us.
+    security.declarePrivate('getMapping')
+    def getMapping(self):
+        """ Get a mapping of this object's data.
         """
-        return self.__class__( id=self.id
-                             , title=self.title
-                             , description=self.description
-                             , category =self.category
-                             , condition=self.getCondition()
-                             , permissions=self.permissions
-                             , priority =self.priority
-                             , visible=self.visible
-                             , action=self.getActionExpression()
-                             )
+        return { 'id': self.getId(),
+                 'title': self.Title(),
+                 'description': self.Description(),
+                 'category': self.getCategory(),
+                 'condition': self.getCondition(),
+                 'permissions': self.getPermissions(),
+                 'visible': self.getVisibility(),
+                 'action': self.getActionExpression() }
+
+    security.declarePrivate('clone')
+    def clone( self ):
+        """ Get a newly-created AI just like us.
+        """
+        return self.__class__( priority=self.priority, **self.getMapping() )
 
 InitializeClass( ActionInformation )
 

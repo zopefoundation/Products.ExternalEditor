@@ -6,6 +6,28 @@
  <permission>Access contents information</permission>
  <permission>Modify portal content</permission>
  <permission>View</permission>
+ <state state_id="private"
+        title="Non-visible and editable only by owner">
+  
+  <exit-transition transition_id="submit"/>
+  <exit-transition transition_id="publish"/>
+  <permission-map name="Modify portal content"
+                  acquired="False">
+   <permission-role>Manager</permission-role>
+   <permission-role>Owner</permission-role>
+  </permission-map>
+  <permission-map name="Access contents information"
+                  acquired="False">
+   <permission-role>Manager</permission-role>
+   <permission-role>Owner</permission-role>
+  </permission-map>
+  <permission-map name="View" acquired="False">
+   <permission-role>Manager</permission-role>
+   <permission-role>Owner</permission-role>
+  </permission-map>
+
+
+ </state>
  <state state_id="pending" title="Waiting for reviewer">
   
   <exit-transition transition_id="publish"/>
@@ -27,26 +49,8 @@
    <permission-role>Owner</permission-role>
    <permission-role>Reviewer</permission-role>
   </permission-map>
- </state>
- <state state_id="private"
-        title="Non-visible and editable only by owner">
-  
-  <exit-transition transition_id="submit"/>
-  <exit-transition transition_id="publish"/>
-  <permission-map name="Modify portal content"
-                  acquired="False">
-   <permission-role>Manager</permission-role>
-   <permission-role>Owner</permission-role>
-  </permission-map>
-  <permission-map name="Access contents information"
-                  acquired="False">
-   <permission-role>Manager</permission-role>
-   <permission-role>Owner</permission-role>
-  </permission-map>
-  <permission-map name="View" acquired="False">
-   <permission-role>Manager</permission-role>
-   <permission-role>Owner</permission-role>
-  </permission-map>
+
+
  </state>
  <state state_id="published" title="Public">
   
@@ -65,6 +69,8 @@
    <permission-role>Anonymous</permission-role>
    <permission-role>Manager</permission-role>
   </permission-map>
+
+
  </state>
  <transition transition_id="retract"
              title="Member retracts submission"
@@ -75,20 +81,11 @@
           category="workflow">Retract</action>
   <guard>
    <guard-permission>Request review</guard-permission>
+
+
    
   </guard>
- </transition>
- <transition transition_id="submit"
-             title="Member requests publishing"
-             new_state="pending" trigger="USER"
-             before_script="" after_script="">
-  
-  <action url="%(content_url)s/content_submit_form"
-          category="workflow">Submit</action>
-  <guard>
-   <guard-permission>Request review</guard-permission>
-   
-  </guard>
+
  </transition>
  <transition transition_id="publish"
              title="Reviewer publishes content"
@@ -99,8 +96,26 @@
           category="workflow">Publish</action>
   <guard>
    <guard-permission>Review portal content</guard-permission>
+
+
    
   </guard>
+
+ </transition>
+ <transition transition_id="submit"
+             title="Member requests publishing"
+             new_state="pending" trigger="USER"
+             before_script="" after_script="">
+  
+  <action url="%(content_url)s/content_submit_form"
+          category="workflow">Submit</action>
+  <guard>
+   <guard-permission>Request review</guard-permission>
+
+
+   
+  </guard>
+
  </transition>
  <transition transition_id="reject"
              title="Reviewer rejects submission"
@@ -111,8 +126,11 @@
           category="workflow">Reject</action>
   <guard>
    <guard-permission>Review portal content</guard-permission>
+
+
    
   </guard>
+
  </transition>
  <worklist worklist_id="reviewer_queue" title="">
   Reviewer tasks
@@ -120,6 +138,8 @@
           category="global">Pending (%(count)d)</action>
   <guard>
    <guard-permission>Review portal content</guard-permission>
+
+
    
   </guard>
   <match name="review_state" values="pending"/>
@@ -132,39 +152,9 @@
     <expression>transition/getId|nothing</expression>
    </default>
    <guard>
-    
-   </guard>
- </variable>
- <variable variable_id="time" for_catalog="False"
-           for_status="True" update_always="True">
-   Time of the last transition
-   <default>
-    
-    <expression>state_change/getDateTime</expression>
-   </default>
-   <guard>
-    
-   </guard>
- </variable>
- <variable variable_id="comments" for_catalog="False"
-           for_status="True" update_always="True">
-   Comments about the last transition
-   <default>
-    
-    <expression>python:state_change.kwargs.get('comment', '')</expression>
-   </default>
-   <guard>
-    
-   </guard>
- </variable>
- <variable variable_id="actor" for_catalog="False"
-           for_status="True" update_always="True">
-   The ID of the user who performed the last transition
-   <default>
-    
-    <expression>user/getId</expression>
-   </default>
-   <guard>
+
+
+
     
    </guard>
  </variable>
@@ -178,7 +168,52 @@
    <guard>
     <guard-permission>Request review</guard-permission>
     <guard-permission>Review portal content</guard-permission>
+
+
     
    </guard>
  </variable>
+ <variable variable_id="actor" for_catalog="False"
+           for_status="True" update_always="True">
+   The ID of the user who performed the last transition
+   <default>
+    
+    <expression>user/getId</expression>
+   </default>
+   <guard>
+
+
+
+    
+   </guard>
+ </variable>
+ <variable variable_id="comments" for_catalog="False"
+           for_status="True" update_always="True">
+   Comments about the last transition
+   <default>
+    
+    <expression>python:state_change.kwargs.get('comment', '')</expression>
+   </default>
+   <guard>
+
+
+
+    
+   </guard>
+ </variable>
+ <variable variable_id="time" for_catalog="False"
+           for_status="True" update_always="True">
+   Time of the last transition
+   <default>
+    
+    <expression>state_change/getDateTime</expression>
+   </default>
+   <guard>
+
+
+
+    
+   </guard>
+ </variable>
+
 </dc-workflow>

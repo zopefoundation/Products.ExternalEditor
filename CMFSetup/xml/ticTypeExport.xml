@@ -7,7 +7,6 @@
    icon="foo.png"
    immediate_view="foo_view"
    filter_content_types="False"
-   allowed_content_types=""
    allow_discussion="False"
    global_allow="False"
    tal:define="info python: here.getTypeInfo( options[ 'type_id' ] )"
@@ -22,13 +21,15 @@
                    constructor_path info/constructor_path | default;
                    immediate_view info/immediate_view;
                    filter_content_types info/filter_content_types;
-                   allowed_content_types python:
-                       ','.join( info[ 'allowed_content_types' ] );
                    allow_discussion info/allow_discussion;
                    global_allow info/global_allow;
                   "
    >
-  <description tal:content="info/description">Foo things</description>
+  <description tal:content="info/description">Foo things</description
+ ><tal:case tal:condition="info/allowed_content_types">
+  <allowed_content_type
+     tal:repeat="act info/allowed_content_types"
+     tal:content="act">foo</allowed_content_type></tal:case>
   <aliases>
    <alias from="(Default)" to="foo_view"
           tal:repeat="item info/aliases/items"
@@ -38,20 +39,21 @@
   <action
      action_id="view"
      title="View"
-     condition=""
-     action_expr="string:${object_url}/foo_view"
-     permissions="View"
+     condition_expr=""
+     url_expr="string:${object_url}/foo_view"
      category="object"
      visible="True"
      tal:repeat="action info/actions"
      tal:attributes="action_id action/id;
                      title action/title;
-                     condition action/condition;
-                     action_expr action/action;
-                     permissions python:
-                       ','.join( action[ 'permissions' ] );
+                     condition_expr action/condition;
+                     url_expr action/action;
                      category action/category;
                      visible action/visible;
                     "
-     />
+  ><tal:case tal:condition="action/permissions">
+   <permission
+      tal:repeat="permission action/permissions"
+      tal:content="permission">View</permission></tal:case>
+  </action>
 </type-info>

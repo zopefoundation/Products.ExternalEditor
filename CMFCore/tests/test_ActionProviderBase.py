@@ -21,9 +21,9 @@ class DummyProvider(ActionProviderBase, DummyTool):
                                   , title='A Title'
                                   , action=''
                                   , condition=''
-                                  , permissions=''
+                                  , permissions=()
                                   , category=''
-                                  , visible=0
+                                  , visible=False
                                   ), )
 
 
@@ -211,8 +211,9 @@ class ActionProviderBaseTests(SecurityRequestTest):
         self.assertEqual( old_ids, another_ids )
 
     def test_listActionInfos(self):
-        wanted = [{'permissions': '', 'id': 'an_id', 'url': '',
-                   'name': 'A Title', 'visible': 0, 'category': 'object'}]
+        wanted = [{'id': 'an_id', 'title': 'A Title', 'name': 'A Title',
+                   'url': '', 'permissions': (), 'category': 'object',
+                   'visible': False }]
 
         apb = self.site._setObject( 'portal_apb', self._makeProvider(1) )
         rval = apb.listActionInfos()
@@ -231,8 +232,9 @@ class ActionProviderBaseTests(SecurityRequestTest):
         self.assertRaises(ValueError, apb.getActionObject, 'wrong_format')
 
     def test_getActionInfo(self):
-        wanted = {'permissions': '', 'id': 'an_id', 'url': '',
-                  'name': 'A Title', 'visible': 0, 'category': 'object'}
+        wanted = {'id': 'an_id', 'title': 'A Title', 'name': 'A Title',
+                  'url': '', 'permissions': (), 'category': 'object',
+                  'visible': False }
 
         apb = self.site._setObject( 'portal_apb', self._makeProvider(1) )
         rval = apb.getActionInfo( ('object/an_id',) )

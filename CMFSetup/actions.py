@@ -2,21 +2,24 @@
 
 $Id$
 """
-from xml.sax import parseString
+from xml.dom.minidom import parseString as domParseString
 
 from AccessControl import ClassSecurityInfo
 from Acquisition import Implicit
 from Globals import InitializeClass
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
+from Products.CMFCore.ActionInformation import ActionInformation
 from Products.CMFCore.ActionProviderBase import IActionProvider
 from Products.CMFCore.ActionProviderBase import IOldstyleActionProvider
-from Products.CMFCore.ActionInformation import getOAI
 from Products.CMFCore.utils import getToolByName
 
 from permissions import ManagePortal
-from utils import HandlerBase
+from utils import _coalesceTextNodeChildren
+from utils import _getNodeAttribute
+from utils import _getNodeAttributeBoolean
 from utils import _xmldir
+from utils import HandlerBase
 
 #
 #   Configurator entry points
@@ -42,7 +45,7 @@ def importActionProviders( context ):
                            )
 
     o Register via XML:
- 
+
       <setup-step id="importActionProviders"
                   version="20040524-01"
                   handler="Products.CMFSetup.actions.importActionProviders"
@@ -75,21 +78,10 @@ def importActionProviders( context ):
                 actions_tool.addActionProvider( p_info[ 'id' ] )
 
             provider = getToolByName( site, p_info[ 'id' ] )
-            provider._actions = ()
-
-            for a_info in p_info[ 'actions' ]:
-
-                provider.addAction( id=a_info[ 'action_id' ]
-                                  , name=a_info[ 'name' ]
-                                  , action=a_info[ 'action' ]
-                                  , condition=a_info[ 'condition' ]
-                                  , permission=a_info[ 'permission' ]
-                                  , category=a_info[ 'category' ]
-                                  , visible=a_info[ 'visible' ]
-                                  )
+            provider._actions = [ ActionInformation(**a_info)
+                                  for a_info in p_info['actions'] ]
 
     return 'Action providers imported.'
-
 
 def exportActionProviders( context ):
 
@@ -108,7 +100,7 @@ def exportActionProviders( context ):
                            )
 
     o Register via XML:
- 
+
       <export-script id="exportActionProviders"
                      version="20040518-01"
                      handler="Products.CMFSetup.actions.exportActionProviders"
@@ -130,9 +122,9 @@ class ActionProvidersConfigurator( Implicit ):
 
     """ Synthesize XML description of site's action providers.
     """
-    security = ClassSecurityInfo()   
+    security = ClassSecurityInfo()
     security.setDefaultAccess( 'allow' )
-    
+
     def __init__( self, site ):
         self._site = site
 
@@ -147,15 +139,12 @@ class ActionProvidersConfigurator( Implicit ):
         """ Return a sequence of mappings for each action provider.
         """
         actions_tool = getToolByName( self._site, 'portal_actions' )
-        faux = _FauxContent( content=None, isAnonymous=1 )
-        info = getOAI( self._site, faux )
         result = []
 
         for provider_id in actions_tool.listActionProviders():
 
             provider_info = { 'id' : provider_id, 'actions' : [] }
             result.append( provider_info )
-            append = provider_info[ 'actions' ].append
 
             provider = getToolByName( self._site, provider_id )
 
@@ -165,27 +154,8 @@ class ActionProvidersConfigurator( Implicit ):
             if IOldstyleActionProvider.isImplementedBy( provider ):
                 continue
 
-            actions = provider.listActions( info=info ) or []
-            
-            for action in actions:
-
-                ainfo = {}
-                ainfo[ 'id'] = action.getId()
-                ainfo[ 'name'] = action.Title()
-
-                p = action.getPermissions()
-
-                if p:
-                    ainfo[ 'permission'] = p[ 0 ]
-                else:
-                    ainfo[ 'permission'] = ''
-
-                ainfo[ 'category'] = action.getCategory() or 'object'
-                ainfo[ 'visible'] = action.getVisibility()
-                ainfo[ 'action'] = action.getActionExpression()
-                ainfo[ 'condition'] = action.getCondition()
-
-                append( ainfo )
+            actions = provider.listActions()
+            provider_info['actions'] = [ ai.getMapping() for ai in actions ]
 
         return result
 
@@ -201,82 +171,67 @@ class ActionProvidersConfigurator( Implicit ):
 
         """ Pseudo API.
         """
-        result = []
         reader = getattr( text, 'read', None )
 
         if reader is not None:
             text = reader()
 
-        parser = _ActionProviderParser( encoding )
-        parseString( text, parser )
+        dom = domParseString(text)
 
-        for provider_id in parser._provider_ids:
-
-            p_info = { 'id' : provider_id, 'actions' : [] }
-
-            for a_info in parser._provider_info.get( provider_id, () ):
-
-                p_info[ 'actions' ].append( a_info )
-
-            result.append( p_info )
-
-        return result
+        root = dom.getElementsByTagName('actions-tool')[0]
+        return _extractActionProviderNodes(root, encoding)
 
 InitializeClass( ActionProvidersConfigurator )
 
-class _FauxContent:
 
-    # Dummy object for passing to listActions
+def _extractActionProviderNodes(parent, encoding=None):
 
-    def __init__( self, **kw ):
-        self.__dict__.update( kw )
+    result = []
 
-    def absolute_url( self ):
-        return 'http://localhost/faux_content'
+    for ap_node in parent.getElementsByTagName('action-provider'):
 
-class _ActionProviderParser( HandlerBase ):
+        id = _getNodeAttribute(ap_node, 'id', encoding)
+        actions = _extractActionNodes(ap_node, encoding)
 
-    security = ClassSecurityInfo()
-    security.declareObjectPrivate()
-    security.setDefaultAccess( 'deny' )
+        result.append( { 'id': id, 'actions': actions } )
 
-    def __init__( self, encoding ):
+    return result
 
-        self._encoding = encoding
-        self._provider_info = {}
-        self._provider_ids = []
+def _extractActionNodes(parent, encoding=None):
 
-    def startElement( self, name, attrs ):
+    result = []
 
-        if name == 'actions-tool':
-            pass
+    for a_node in parent.getElementsByTagName('action'):
 
-        elif name == 'action-provider':
+        def _es(key):
+            return _getNodeAttribute(a_node, key, encoding)
 
-            id = self._extract( attrs, 'id' )
+        action_id      = _es('action_id')
+        title          = _es('title')
+        category       = _es('category')
+        condition_expr = _es('condition_expr')
+        permissions    = _extractPermissionNodes(a_node, encoding)
+        category       = _es('category')
+        visible        = _getNodeAttributeBoolean(a_node, 'visible')
+        url_expr       = _es('url_expr')
 
-            if id not in self._provider_ids:
-                self._provider_ids.append( id )
+        result.append( { 'id': action_id,
+                         'title': title,
+#                         'description': description,
+                         'category': category,
+                         'condition': condition_expr,
+                         'permissions': permissions,
+                         'visible': visible,
+                         'action': url_expr } )
 
-        elif name == 'action':
+    return result
 
-            provider_id = self._provider_ids[ -1 ]
-            actions = self._provider_info.setdefault( provider_id, [] )
+def _extractPermissionNodes(parent, encoding=None):
 
-            info = { 'action_id' : self._extract( attrs, 'action_id' )
-                   , 'category' : self._extract( attrs, 'category' )
-                   , 'name' : self._extract( attrs, 'title' )
-                   , 'action' : self._extract( attrs, 'action_expr' )
-                   , 'condition' : self._extract( attrs, 'condition_expr' )
-                   , 'permission' : self._extract( attrs, 'permission' )
-                   , 'category' : self._extract( attrs, 'category' )
-                   , 'visible' : self._extract( attrs, 'visible' )
-                   }
+    result = []
 
-            actions.append( info )
+    for p_node in parent.getElementsByTagName('permission'):
+        value = _coalesceTextNodeChildren(p_node, encoding)
+        result.append(value)
 
-        else:
-            raise ValueError, 'Unknown element %s' % name
-
-
-InitializeClass( _ActionProviderParser )
+    return tuple(result)

@@ -4,7 +4,6 @@ $Id$
 """
 import os
 from inspect import getdoc
-from types import StringTypes, InstanceType
 from xml.sax.handler import ContentHandler
 
 from Globals import package_home
@@ -16,7 +15,7 @@ _xmldir = os.path.join( _pkgdir, 'xml' )
 
 def _getDottedName( named ):
 
-    if isinstance( named, StringTypes ):
+    if isinstance( named, basestring ):
         return str( named )
 
     try:
@@ -141,6 +140,21 @@ def _getNodeAttribute( node, attr_name, encoding=None ):
 
     return value
 
+def _queryNodeAttributeBoolean( node, attr_name, default ):
+
+    """ Extract a string-valued attribute from node.
+
+    o Return 'default' if the attribute is not present.
+    """
+    attr_node = node.attributes.get( attr_name, _marker )
+
+    if attr_node is _marker:
+        return default
+
+    value = node.attributes[ attr_name ].nodeValue.lower()
+
+    return value in ( 'true', 'yes', '1' )
+
 def _getNodeAttributeBoolean( node, attr_name ):
 
     """ Extract a string-valued attribute from node.
@@ -170,4 +184,4 @@ def _coalesceTextNodeChildren( node, encoding=None ):
     if encoding is not None:
         joined = joined.encode( encoding )
 
-    return joined
+    return ''.join( [ line.lstrip() for line in joined.splitlines(True) ] )

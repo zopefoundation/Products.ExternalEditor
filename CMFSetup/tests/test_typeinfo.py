@@ -439,7 +439,6 @@ _FOO_EXPORT = """\
    factory="addFoo"
    immediate_view="foo_view"
    filter_content_types="False"
-   allowed_content_types=""
    allow_discussion="False"
    global_allow="False" >
   <description>Foo things</description>
@@ -450,30 +449,30 @@ _FOO_EXPORT = """\
   <action
      action_id="view"
      title="View"
-     action_expr="string:${object_url}/foo_view"
-     condition=""
-     permissions="View"
+     url_expr="string:${object_url}/foo_view"
+     condition_expr=""
      category="object"
-     visible="True"
-     />
+     visible="True">
+   <permission>View</permission>
+  </action>
   <action
      action_id="edit"
      title="Edit"
-     action_expr="string:${object_url}/foo_edit_form"
-     condition=""
-     permissions="Modify portal content"
+     url_expr="string:${object_url}/foo_edit_form"
+     condition_expr=""
      category="object"
-     visible="True"
-     />
+     visible="True">
+   <permission>Modify portal content</permission>
+  </action>
   <action
      action_id="metadata"
      title="Metadata"
-     action_expr="string:${object_url}/metadata_edit_form"
-     condition=""
-     permissions="Modify portal content"
+     url_expr="string:${object_url}/metadata_edit_form"
+     condition_expr=""
      category="object"
-     visible="True"
-     />
+     visible="True">
+   <permission>Modify portal content</permission>
+  </action>
 </type-info>
 """
 
@@ -488,10 +487,10 @@ _BAR_EXPORT = """\
    permission="Add portal content"
    immediate_view="bar_view"
    filter_content_types="True"
-   allowed_content_types="foo"
    allow_discussion="True"
    global_allow="True" >
   <description>Bar things</description>
+  <allowed_content_type>foo</allowed_content_type>
   <aliases>
    <alias from="(Default)" to="bar_view" />
    <alias from="view" to="bar_view" />
@@ -499,39 +498,39 @@ _BAR_EXPORT = """\
   <action
      action_id="view"
      title="View"
-     action_expr="string:${object_url}/bar_view"
-     condition=""
-     permissions="View"
+     url_expr="string:${object_url}/bar_view"
+     condition_expr=""
      category="object"
-     visible="True"
-     />
+     visible="True">
+   <permission>View</permission>
+  </action>
   <action
      action_id="edit"
      title="Edit"
-     action_expr="string:${object_url}/bar_edit_form"
-     condition=""
-     permissions="Modify portal content"
+     url_expr="string:${object_url}/bar_edit_form"
+     condition_expr=""
      category="object"
-     visible="True"
-     />
+     visible="True">
+   <permission>Modify portal content</permission>
+  </action>
   <action
      action_id="contents"
      title="Contents"
-     action_expr="string:${object_url}/folder_contents"
-     condition=""
-     permissions="Access contents information"
+     url_expr="string:${object_url}/folder_contents"
+     condition_expr=""
      category="object"
-     visible="True"
-     />
+     visible="True">
+   <permission>Access contents information</permission>
+  </action>
   <action
      action_id="metadata"
      title="Metadata"
-     action_expr="string:${object_url}/metadata_edit_form"
-     condition=""
-     permissions="Modify portal content"
+     url_expr="string:${object_url}/metadata_edit_form"
+     condition_expr=""
      category="object"
-     visible="True"
-     />
+     visible="True">
+   <permission>Modify portal content</permission>
+  </action>
 </type-info>
 """
 

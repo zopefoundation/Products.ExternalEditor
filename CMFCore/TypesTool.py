@@ -301,11 +301,11 @@ class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
         for action in aa:
 
             # Some backward compatibility stuff.
-            if not action.has_key('id'):
+            if not 'id' in action:
                 action['id'] = cookString(action['name'])
 
-            if not action.has_key('name'):
-                action['name'] = action['id'].capitalize()
+            if not 'title' in action:
+                action['title'] = action.get('name', action['id'].capitalize())
 
             # historically, action['action'] is simple string
             actiontext = action.get('action').strip() or 'string:${object_url}'
@@ -314,12 +314,12 @@ class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
 
             self.addAction(
                   id=action['id']
-                , name=action['name']
+                , name=action['title']
                 , action=actiontext
                 , condition=action.get('condition')
                 , permission=action.get( 'permissions', () )
                 , category=action.get('category', 'object')
-                , visible=action.get('visible', 1)
+                , visible=action.get('visible', True)
                 )
 
     security.declarePublic('constructInstance')
@@ -430,7 +430,7 @@ class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
             if not perms or View in perms:
                 try:
                     viewmethod = action.action(context).strip()
-                except AttributeError:
+                except AttributeError, TypeError:
                     break
                 if viewmethod.startswith('/'):
                     viewmethod = viewmethod[1:]
@@ -446,7 +446,7 @@ class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
         for action in ordered:
             try:
                 defmethod = action.action(context).strip()
-            except AttributeError:
+            except AttributeError, TypeError:
                 break
             if defmethod.startswith('/'):
                 defmethod = defmethod[1:]

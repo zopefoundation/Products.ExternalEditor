@@ -8,8 +8,10 @@
    <bound-workflow workflow_id="default_workflow"/>
   </default>
   <type type_id="Folder">
+
   </type>
   <type type_id="Topic">
+
   </type>
  </bindings>
 </workflow-tool>
