@@ -18,12 +18,17 @@
 
  <tr valign="top">
 
-  <th align="right"> Identifier </th>
-  <td> <span tal:replace="here/Identifier" /> </td>
-
+  <td> </td> <td> </td>
   <td colspan="2" align="right">
    <a href="full_metadata_edit_form"> Edit all metadata </a>
   </td>
+
+ </tr>
+
+ <tr valign="top">
+
+  <th align="right"> Identifier </th>
+  <td colspan="3"> <span tal:replace="here/Identifier" /> </td>
 
  </tr>
 
@@ -56,7 +61,7 @@
   <td>
      <textarea name="subject:lines" rows="3"
                cols="20"
-			   tal:define="lines here/subjectsList"><span tal:repeat="line lines" tal:replace="line"></span></textarea>
+	   tal:define="lines here/subjectsList"><span tal:repeat="line lines" tal:replace="line"></span></textarea>
  <br> 
    <select name="subject:list" multiple>
      <option value=""
