@@ -1,18 +1,158 @@
 Chapter 4: Content
 
-  Overview
+  As its name suggests, the central purpose of the CMF is managing
+  content. In this chapter you'll learn about how you can create,
+  manage content using the CMF.
 
   Content Types
 
-    Using Folders
+    As you learned in the last chapter, Zope treats content as
+    "objects" such as Documents, Files, Images, etc. Different types
+    of content objects are known as different content types. The CMF
+    comes with a collection of basic content types, and you can create
+    new content types. In the following sections you'll learn about
+    the basic CMF content types.
 
     Using Documents
 
+      The Document is the most important content type. It contains
+      text. You can use a document to hold plain text, or text marked
+      up in Structured Text or HTML format. Structured Text is covered
+      in the "Structured Text" section later in the chapter.
+
+      Documents are appropriate to use for ad hoc and miscellaneous
+      text and web pages. If you are creating formal, structured
+      documents such as a purchase orders, or reports, you should
+      probably create a custom content type.
+
+      To create a document, enter the "Desktop" view by clicking "My
+      Stuff" or "Folder contents". Then click the "New..."
+      button. You'll be presented with a list of content types to
+      choose from. Select "Document" and enter an ID for your
+      document. The ID is like a filename. It should be unique within
+      its folder and it can include a file extension. For Documents
+      you may wish to use IDs like "Readme.txt" or "MyPage.html". Then
+      click the "Add" button.
+
+      Next you'll be taken to the metadata editing form. This form
+      allows you to enter information about your document. You should
+      always provide metadata for your content. Adding metadata may
+      seem like a pain, but it really pays off because it makes your
+      web site much easier to search and maintain. See the "Using
+      Metadata" section later in this chapter for more information
+      about metadata. As a rule of thumb, always provide at least a
+      title and a one sentence description for your document. Then
+      click the "Change and Edit" button.
+
+      Now you can type in your document. Enter the contents of your
+      document in the "Edit" field. If you already have the text of
+      your document in a file, you can upload that file using the
+      "Upload" field and the "Browse" button. Once you've entered your
+      content click the "Change and View" button. This will show you
+      what your Document looks like.
+
+      When viewing your document, notice how there is a document icon
+      and with the ID of your document in your action box. This
+      indicates which object you are currently working on. You can
+      navigate back to the editing form by clicking the "Edit" link in
+      the action box. Likewise, you can change your document's
+      metadata with the "Metadata" link. You can also see what your
+      document looks like with the "View" link.
+
+      The "Status", "Publish" and "Status History" links provide
+      workflow actions. They are discussed in the "Using Workflow"
+      section later in this chapter.
+
     Using Files
+
+      You can store binary data and multi-media content (such as PDF,
+      Flash, and Java applet files) in Files. Just as Documents are
+      meant to hold ad hoc and miscellanious text content, Files are
+      used for all sorts of binary content. You should not use Files
+      for specialized binary content that is supported by other
+      content types. For example, you should use Image objects for
+      pictures such as JPG, GIF, and PNG files. You may also use cutom
+      content types to support other special types of binary data.
+
+      The process of creating a file is very similar to creating a
+      document. In fact, all CMF content types are created and edited
+      in basically the same fashion. First, enter the "Desktop"
+      view. Then click the "New..." button. Next select the content
+      type (in this case File), provide an ID and click the "Add
+      button". 
+
+      You'll then be taken to the metadata editing form. Notice how
+      this form is exactly the same for Files as it is for
+      Documents. The CMF requires that all content use the same
+      metadata. This makes it easy to classify and search for content
+      of all types. See the "Using Metadata" section later in this
+      chapter for more information on metadata.
+
+      Once you have provided metadata for your file you can edit
+      it. Click the "Edit" link and you'll be taken to a form where
+      you can upload your file. Use the "Browse" button to locate the
+      file on your local machine and click the "Change and View"
+      button to upload it.
+
+      The "View" link shows you information about your file (filename,
+      size, etc.) and allows you to download it. You can also download
+      a file by clicking on its "Download" link in the action box.
+
+      If you look carefully you'll notice that the URL of the download
+      link is simply the URL of the File. This allows you to easily
+      create hyperlinks to your Files. There's no need for special
+      URLs when referencing your PDF, Flash, Java applet, or other
+      files.
 
     Using Images
 
+      Images hold picture data such as JGP, GIF, and PNG files. Images
+      are designed to hold pictures which are displayed on web pages.
+
+      You can create an Image in the same way as you create other CMF
+      content types: navigate to the "Desktop" view, click "New..."
+      select "Image", provide an ID, and click "Add". As usual, you'll
+      be taken to the metadata editing page. Type in some metadata for
+      your image and click "Change and Edit".
+
+      You edit images the same way you edit files: by uploading a
+      file. Once you upload your picture you can view it by clicking
+      on the "View" link.
+
+      You can display Images in your HTML pages either using the HTML
+      IMG tag. Simply create an IMG tag that refers to the URL of the
+      Image, and it will work normally. Zope also provides some
+      convenience functions for creating IMG tags. For more
+      information see the description of Image objects in "The Zope
+      Book":http://www.zope.org/Members/michel/ZB/BasicObject.dtml
+
     Using Links and Favorites
+
+      Links and Favorites hold URLs. Links point to external
+      resources, while Favorites point to objects within your
+      site. Favorites are part of the CMF user interface and provide
+      you with a simple book marking mechanism. Links come in handy to
+      collect metadata about external resources.
+
+      In Chapter 3. you learned how to create and manage Favorites
+      with the "Add to Favorites" and "My Favorites" links. You can
+      also create Favorites and Links using the normal content adding
+      procedure. Navigate to the "Desktop" view. Click the "New..."
+      button, select "Link" or "Favorite", type in an ID, and click
+      "Add". Next you'll be taken to the metadata editing page. Enter
+      metadata about the Link or Favorite and click "Change and Edit".
+
+      The "Edit" view for Links and Favorites looks the same. In both
+      cases you enter the URL. However, there's an important
+      difference. For Links you should provide an absolute URL such
+      as, "http://www.zope.org". For Favorites you should use a URL
+      that's relative to your site object, for example,
+      "Members/Joe/Doc.html".
+
+      Once you provide a URL for your Favorite or Link you can view it
+      by clicking the "View" link. The "View" page shows you
+      information about your Favorite or Link and gives you a
+      hyperlink to the resource.
 
     Using News Items
 

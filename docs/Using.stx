@@ -314,6 +314,32 @@ Chapter 3: Using the CMF
 
     Using Discussion
 
+      Sometimes when reading content you may want to provide feedback
+      to the author or to add comments to aid readers. You can discuss
+      content using the CMF's discussion feature.
+
+      To offer a comment or provide feedback on content click the
+      "Reply" link in the action box. This will take you to a form
+      where you can provide your input. Note that depending on how
+      your site is configured you may or may not see a "Reply" link in
+      your action box when viewing content.
+
+      Give you comment a short title and then type the body of your
+      comment in the "Reply body" field. When you're done you can
+      preview your comment by clicking the "Preview" button. If you're
+      statisfied with your comment click the "Reply" button, otherwise
+      click the "Edit" button to change your comment.
+
+      Once you submit your comment, it will be visible at the bottom
+      of the page. This way site visitors will be able to read your
+      comment when viewing the content.
+
+      In addition to replying to content, you can reply to a
+      comment. The CMF supported threaded discussions. You reply to a
+      comment in excactly the same way you reply to other content;
+      simply click the "Reply" link while reading the comment.  Zope
+      displays threaded comments using a tree widget.
+
       XXX doesn't seem to be turned on by default. The discussion tool
       offers no knobs. Argh.
 
