@@ -708,7 +708,7 @@ class TypesTool( UniqueObject, OFS.Folder.Folder ):
         """
         info = self.getTypeInfo( type_name )
         if info is None:
-            raise 'ValueError', 'No such content type: %s' % contentType
+            raise 'ValueError', 'No such content type: %s' % type_name
         
         immediate_url = apply(info.constructInstance,
                               (container, id) + args, kw)
