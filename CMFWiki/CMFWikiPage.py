@@ -1859,6 +1859,15 @@ class CMFWikiFolder(PortalFolder):
         if find(typ, 'text') != -1:
             return makeCMFWikiPage(name, '', body)
 
+    def index_html(self):
+        """Redirects to FrontPage, if any, else does acquired index_html."""
+        if hasattr(self, 'FrontPage'):
+            response = self.REQUEST.RESPONSE
+            return response.redirect(self['FrontPage'].absolute_url())
+        else:
+            return apply(getattr(self.aq_parent, 'index_html'),
+                         (self, self.REQUEST))
+
 def makeCMFWikiPage(id, title, file):
     ob = CMFWikiPage(source_string=file, __name__=id)
     ob.title = title
