@@ -73,6 +73,39 @@
         </tr>
 
         <tr>
+          <td> FROM </td>
+          <td>
+            <span metal:fill-slot="issue_from_slot">
+              <input name="submitter_name" value="NAME" size="25"
+                     tal:attributes="value python: here.submitter_name">
+            </span>
+          </td>
+        </tr>
+
+        <tr>
+          <td> FROM </td>
+          <td>
+            <span metal:fill-slot="issue_submitter_id_slot">
+              <input name="submitter_id" value="ID" size="10"
+                     tal:attributes="value python: here.submitter_id">
+                @
+              <input name="submitter_email" value="EMAIL" size="20"
+                     tal:attributes="value python: here.submitter_email or ''">
+            </span>
+          </td>
+        </tr>
+
+        <tr>
+          <td> FROM </td>
+          <td>
+            <span metal:fill-slot="issue_submitter_email_slot">
+              <input name="submitter_email" value="EMAIL" size="20"
+                     tal:attributes="value python: here.submitter_email or ''">
+            </span>
+          </td>
+        </tr>
+
+        <tr>
           <td> Topic </td>
           <td>
             <span metal:fill-slot="issue_topic_slot">
