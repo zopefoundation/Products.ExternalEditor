@@ -254,6 +254,8 @@ class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
         context = getActionContext( self )
         for action in self.listActions() or ():
 
+            __traceback_info__ = (self.getId(), action)
+
             if action.getId() == id:
                 return action.action( context )
             else:

@@ -24,6 +24,7 @@ from Expression import Expression
 from CMFCorePermissions import View
 from CMFCorePermissions import ManagePortal
 from utils import getToolByName
+from types import StringType
 
 class ActionInformation( SimpleItem ):
 
@@ -64,7 +65,7 @@ class ActionInformation( SimpleItem ):
         self.permissions = permissions
         self.priority = priority 
         self.visible = visible
-        self.action = action
+        self.setActionExpression(action)
 
     security.declareProtected( View, 'Title' )
     def Title(self):
@@ -99,6 +100,8 @@ class ActionInformation( SimpleItem ):
         info = {}
         info['id'] = self.id
         info['name'] = self.Title()
+        expr = self.getActionExpression()
+        __traceback_info__ = (info['id'], info['name'], expr)
         action_obj = self._getActionObject()
         info['url'] = action_obj and action_obj( ec ) or ''
         info['permissions'] = self.getPermissions()
@@ -127,7 +130,20 @@ class ActionInformation( SimpleItem ):
         """ Return the text of the TALES expression for our URL.
         """
         action = self._getActionObject()
-        return action and action.text or ''
+        expr = action and action.text or ''
+        if expr and type( expr ) is StringType:
+            if not expr.startswith('python:') and not expr.startswith('string:'):
+                expr = 'string:%s' % expr
+                self.action = Expression( expr )
+        return expr
+
+    security.declarePrivate( 'setActionExpression' )
+    def setActionExpression(self, action):
+        if action and type( action ) is StringType:
+            if not action.startswith('python:')  and not action.startswith('string:'):
+                action = 'string:%s' % action
+                action = Expression( action )
+        self.action = action
 
     security.declarePublic( 'getCondition' )
     def getCondition(self):

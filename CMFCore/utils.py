@@ -157,13 +157,17 @@ def _getViewFor(obj, view='view'):
 
             if action.getId() == view:
                 if _verifyActionPermissions( obj, action ):
-                    return obj.restrictedTraverse( action.action( context ) )
+                    target = action.action( context )
+                    __traceback_info__ = ( ti.getId(), target )
+                    return obj.restrictedTraverse( target )
 
         # "view" action is not present or not allowed.
         # Find something that's allowed.
         for action in actions:
             if _verifyActionPermissions(obj, action):
-                return obj.restrictedTraverse( action.action( context ) )
+                target = action.action( context )
+                __traceback_info__ = ( ti.getId(), target )
+                return obj.restrictedTraverse( target )
 
         raise 'Unauthorized', ('No accessible views available for %s' %
                                '/'.join(obj.getPhysicalPath()))
