@@ -21,12 +21,8 @@ Installing CMFCalendar
           o function name: install
 
       3. Go to the management screen for the newly added external
-         method and click the 'Try it' tab.  
+         method and click the 'Try it' tab.
 
   The install function will execute and give information about the
   steps it took to register and install the CMF Events into the CMF
   Site instance.
-
-  If you wish to use the zpt_calendar skins, you will need to
-  have PageTemplates installed, and the CMFDecor product
-  installed.

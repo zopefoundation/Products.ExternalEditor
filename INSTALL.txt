@@ -35,7 +35,7 @@ Installing CMF 1.5x
         $ ln -s /usr/local/zope/CMF-1.5x/CMFTopic .
         $ ln -s /usr/local/zope/CMF-1.5x/CMFCalendar .
         $ ln -s /usr/local/zope/CMF-1.5x/DCWorkflow .
-        
+
        or, as a shortcut::
 
         $ ln -s /usr/local/zope/CMF-1.5x/CMF* .
@@ -50,6 +50,9 @@ Installing CMF 1.5x
 
     4. Create a CMF Site object. join, and begin adding content.
        Enjoy!
+
+    5. If you want to use CMFCalendar: Build and run the installation
+       ExternalMethod as described in CMFCalendar/INSTALL.txt.
 
 Installing Internationalization (I18N) Support for CMF
 
@@ -156,9 +159,3 @@ Upgrading from CMF 1.0
          policies for outbound syndication.  Once enabled, you
          will be able to toggle syndication and policies for
          individual folders as well.
-
-  Add New Content Type:  Event
-
-      1. Build and run the installation ExternalMethod as
-         described in CMFCalendar/INSTALL.txt.
-
