@@ -1,12 +1,20 @@
+from unittest import TestSuite, makeSuite, main
+
 import Testing
 import Zope
+try:
+    Zope.startup()
+except AttributeError:
+    # for Zope versions before 2.6.1
+    pass
+
 from OFS.Folder import Folder
-from unittest import TestCase, TestSuite, makeSuite, main
 from Products.CMFCore.FSPythonScript import FSPythonScript
 from Products.CMFCore.tests.base.testcase import FSDVTest
 from os.path import join
 import sys, time
 from thread import start_new_thread
+
 
 class FSPythonScriptTests( FSDVTest ):
 
@@ -36,6 +44,7 @@ class FSPythonScriptTests( FSDVTest ):
                 time.sleep(0.05)
             self.assertEqual(res, ['test1', 'test1'], res)
 
+
 def test_suite():
     return TestSuite((
         makeSuite(FSPythonScriptTests),
@@ -43,4 +52,3 @@ def test_suite():
 
 if __name__ == '__main__':
     main(defaultTest='test_suite')
-

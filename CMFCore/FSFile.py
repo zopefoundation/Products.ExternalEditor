@@ -80,7 +80,7 @@ class FSFile(FSObject):
 
     #### The following is mainly taken from OFS/File.py ###
 
-    __str__ = File.__str__
+    __str__ = File.__str__.im_func
 
     security.declareProtected(View, 'index_html')
     def index_html(self, REQUEST, RESPONSE):

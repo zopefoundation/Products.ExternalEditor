@@ -397,6 +397,8 @@ InitializeClass(DirectoryView)
 
 
 class DirectoryViewSurrogate (Folder):
+    """ Folderish DirectoryView.
+    """
 
     meta_type = 'Filesystem Directory View'
     all_meta_types = ()

@@ -347,8 +347,8 @@ class SimpleItemWithProperties (PropertyManager, SimpleItem):
         """
         my_kw = kw.copy()
         my_kw['property_extensible_schema__'] = 0
-        return PropertyManager.manage_propertiesForm(self, self, REQUEST,
-                                                     *args, **my_kw)
+        form = PropertyManager.manage_propertiesForm.__of__(self)
+        return form(self, REQUEST, *args, **my_kw)
 
     security.declarePublic('propertyLabel')
     def propertyLabel(self, id):

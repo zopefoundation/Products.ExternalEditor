@@ -36,6 +36,8 @@ from Products.CMFCore.interfaces.portal_workflow \
 
 
 class DefaultWorkflowDefinition (SimpleItemWithProperties):
+    """ Default workflow definition.
+    """
 
     __implements__ = IWorkflowDefinition
 
@@ -142,7 +144,7 @@ class DefaultWorkflowDefinition (SimpleItemWithProperties):
         '''
         Allows this workflow to include actions to be displayed
         in the actions box.  Called on every request.
-        
+
         Returns the actions to be displayed to the user.
         '''
         if info.isAnonymous:
@@ -322,4 +324,3 @@ class DefaultWorkflowDefinition (SimpleItemWithProperties):
 InitializeClass(DefaultWorkflowDefinition)
 
 addWorkflowClass(DefaultWorkflowDefinition)
-

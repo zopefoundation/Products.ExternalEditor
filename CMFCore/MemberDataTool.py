@@ -215,7 +215,7 @@ class MemberDataTool (UniqueObject, SimpleItem, PropertyManager, ActionProviderB
     def registerMemberData(self, m, id):
         """ Add the given member data to the _members btree.
         """
-        self._members[id] = m
+        self._members[id] = aq_base(m)
 
     security.declarePrivate('deleteMemberData')
     def deleteMemberData(self, member_id):

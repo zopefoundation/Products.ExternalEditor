@@ -95,7 +95,7 @@ class FSDTMLMethod(RestrictedDTML, RoleManager, FSObject, Globals.HTML):
         return Globals.HTML.read_raw(self)
 
     #### The following is mainly taken from OFS/DTMLMethod.py ###
-        
+
     index_html=None # Prevent accidental acquisition
 
     # Documents masquerade as functions:
@@ -121,7 +121,6 @@ class FSDTMLMethod(RestrictedDTML, RoleManager, FSObject, Globals.HTML):
         security=getSecurityManager()
         security.addContext(self)
         try:
-        
             if client is None:
                 # Called as subtemplate, so don't need error propagation!
                 r = Globals.HTML.__call__(self, client, REQUEST, **kw)
@@ -159,7 +158,7 @@ class FSDTMLMethod(RestrictedDTML, RoleManager, FSObject, Globals.HTML):
         Returns the cacheNamespaceKeys.
         '''
         return self._cache_namespace_keys
-        
+
     def setCacheNamespaceKeys(self, keys, REQUEST=None):
         '''
         Sets the list of names that should be looked up in the
@@ -179,16 +178,16 @@ class FSDTMLMethod(RestrictedDTML, RoleManager, FSObject, Globals.HTML):
         return getSecurityManager().validate(inst, parent, name, value)
 
     security.declareProtected(FTPAccess, 'manage_FTPget')
-    manage_FTPget = DTMLMethod.manage_FTPget
+    manage_FTPget = DTMLMethod.manage_FTPget.im_func
 
     security.declareProtected(ViewManagementScreens, 'PrincipiaSearchSource')
-    PrincipiaSearchSource = DTMLMethod.PrincipiaSearchSource
+    PrincipiaSearchSource = DTMLMethod.PrincipiaSearchSource.im_func
 
     security.declareProtected(ViewManagementScreens, 'document_src')
-    document_src = DTMLMethod.document_src
+    document_src = DTMLMethod.document_src.im_func
 
     security.declareProtected(ViewManagementScreens, 'manage_haveProxy')
-    manage_haveProxy = DTMLMethod.manage_haveProxy
+    manage_haveProxy = DTMLMethod.manage_haveProxy.im_func
 
 Globals.InitializeClass(FSDTMLMethod)
 

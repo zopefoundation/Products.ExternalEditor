@@ -593,5 +593,5 @@ class ContentFilter:
         """
         return '; '.join(self.description)
 
-manage_addPortalFolder = PortalFolder.manage_addPortalFolder
+manage_addPortalFolder = PortalFolder.manage_addPortalFolder.im_func
 manage_addPortalFolderForm = DTMLFile( 'folderAdd', globals() )
