@@ -2,6 +2,9 @@ External Editor Change Log
 
   Next Release
 
+    - Changes to documents intermittently may not have been saved back to Zope
+      when using any plugin that involved COM (Word, Excel, Powerpoint, etc).
+
     - If Word was exited before a user actively saved, if there were
       outstanding changes in the document being edited, those changes
       would not be saved to the server despite the user answering
