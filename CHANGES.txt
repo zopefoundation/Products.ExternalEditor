@@ -6,6 +6,10 @@ After 1.5.0beta
 
   Bugs Fixed
 
+    - FSPageTemplate: Refine the XML content type detection so that
+      addtional data such as encoding is preserved
+      (http://www.zope.org/Collectors/CMF/228)
+
     - ActionInformation: If a path expression ending in an object that
       gets called using __render_with_namespace__ (such as DTML objects
       and Scripts (Python)) is used a KeyError for "here" would be thrown 
@@ -15,7 +19,7 @@ After 1.5.0beta
       "here" as an alias pointing to the provided "object"
       (http://www.zope.org/Collectors/CMF/171)
 
-    - http://www.zope.org/Collectors/cmf/205: When pasting a content item,
+    - http://www.zope.org/Collectors/CMF/205: When pasting a content item,
       local roles were not changed to reflect the neew ownership.
 
     - ActionsTool: Removed deprecated support for oldstyle Action Providers.

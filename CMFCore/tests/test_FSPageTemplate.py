@@ -41,8 +41,8 @@ class FSPageTemplateTests( RequestTest, FSPTMaker ):
         script = self._makeOne( 'testXMLPT', 'testXMLPT.pt' )
         script = script.__of__(self.root)
         script()
-        self.assertEqual(script.content_type, 'text/xml')
-        self.assertEqual(self.RESPONSE.getHeader('content-type'), 'text/xml')
+        self.assertEqual(script.content_type, 'text/xml; charset=utf-8')
+        self.assertEqual(self.RESPONSE.getHeader('content-type'), 'text/xml; charset=utf-8')
         # purge RESPONSE Content-Type header for new test
         del self.RESPONSE.headers['content-type']
         script = self._makeOne( 'testPT', 'testPT.pt' )

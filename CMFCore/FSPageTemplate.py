@@ -34,7 +34,7 @@ from FSObject import FSObject
 from utils import _setCacheHeaders
 from utils import expandpath
 
-xml_detect_re = re.compile('^\s*<\?xml\s+')
+xml_detect_re = re.compile('^\s*<\?xml\s+(?:[^>]*?encoding=["\']([^"\'>]+))?')
 _marker = []  # Create a new marker object.
 
 
@@ -84,14 +84,13 @@ class FSPageTemplate(FSObject, Script, PageTemplate):
         finally:
             file.close()
         if reparse:
-            if xml_detect_re.match(data):
+            xml_info = xml_detect_re.match(data)
+            if xml_info:
                 # Smells like xml
-                self.content_type = 'text/xml'
-            else:
-                try:
-                    del self.content_type
-                except (AttributeError, KeyError):
-                    pass
+                # set "content_type" from the XML declaration
+                encoding = xml_info.group(1) or 'utf-8'
+                self.content_type = 'text/xml; charset=%s' % encoding
+
             self.write(data)
 
     security.declarePrivate('read')
