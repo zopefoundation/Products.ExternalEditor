@@ -22,23 +22,22 @@ from Acquisition import aq_parent
 from Globals import DTMLFile
 from Globals import InitializeClass
 
+from Products.CMFCore.ActionInformation import ActionInformation as AI
+from Products.CMFCore.ActionProviderBase import ActionProviderBase
+from Products.CMFCore.Expression import Expression
 from Products.CMFCore.MembershipTool import MembershipTool as BaseTool
 from Products.CMFCore.utils import _checkPermission
 from Products.CMFCore.utils import _getAuthenticatedUser
 from Products.CMFCore.utils import getToolByName
-from Products.CMFCore.ActionProviderBase import ActionProviderBase
-from Products.CMFCore.ActionsTool import ActionInformation as AI
-from Products.CMFCore.Expression import Expression
 
 from Document import addDocument
+from interfaces.portal_membership \
+        import portal_membership as IMembershipTool
 from permissions import ListPortalMembers
 from permissions import ManagePortal
 from permissions import ManageUsers
 from permissions import View
 from utils import _dtmldir
-
-from interfaces.portal_membership \
-        import portal_membership as IMembershipTool
 
 
 DEFAULT_MEMBER_CONTENT = """\
@@ -50,6 +49,7 @@ Default page for %s
   To change the content just select "Edit"
   in the Tool Box on the left.
 """
+
 
 class MembershipTool( BaseTool ):
     """ Implement 'portal_membership' interface using "stock" policies.
