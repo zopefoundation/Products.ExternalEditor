@@ -4,7 +4,7 @@ CMFWorkspaces Changelog
 
     - CVS-only release
 
-    - CVS tag CMFWorkspaces-0_10
+    - CVS tag CMFWorkspaces-0_9_1
 
     - Clean up imports
     
