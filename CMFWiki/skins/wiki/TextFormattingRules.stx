@@ -1,5 +1,6 @@
 <h3>TextFormattingRules</h3>
-<p>  (See HowDoIEdit for general information ZWiki editing info.)</p>
+<p>  (See "HowDoIEdit":HowDoIEdit for general information ZWiki editing
+info.)</p>
 
 <p>  ZWiki formatting conventions make it easy for everyone to create
   nice web pages <em>without</em> making it hard for anyone to read and edit
@@ -182,7 +183,8 @@
 
 <p>        Some examples: StructuredText, WikiWikiWeb, TextFormattingRules</p>
 
-<p>        See RemoteWikiLinks for a way to link to wiki pages in other Wikis.</p>
+<p>        See "RemoteWikiLinks":RemoteWikiLinks for a way to link to wiki
+pages in other Wikis.</p>
 
 
 </li></ul>
@@ -338,7 +340,6 @@
 
 </li></ul>
 
-<p>  See Also StructuredText and ZWikiWeb:TextFormattingRules
-</p>
+<p>  See Also "StructuredText":StructuredText.</p>
 
 

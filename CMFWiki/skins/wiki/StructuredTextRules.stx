@@ -1,7 +1,7 @@
-StructuredText rules, from the ZoPe source:
+"StructuredText":StructuredText rules, from the Zope source:
 
 "Structured text is text that uses indentation and simple
-symbology to indicate the structure of a document.  
+symbology to indicate the structure of a document.
 
 A structured string consists of a sequence of paragraphs separated by
 one or more blank lines.  Each paragraph has a level which is defined
@@ -94,4 +94,3 @@ Special symbology is used to indicate special constructs:
   Together with the previous rule this allows easy coding of references or
   end notes.
 
-*See also:* -- ClassicWiki, WikiWikiMarkupLanguage

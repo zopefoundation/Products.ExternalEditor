@@ -17,6 +17,9 @@
       (<a href="&dtml-wiki_page_url;/get_wiki_toc#&dtml-id;">Table of Contents</a>)
          </small>
     </td>
+    <td align="center">
+        <small><a href="&dtml-wiki_page_url;/page_recent_wiki_changes">Recent Changes</a></small>
+    </td>
     <td align="right">
         <small>
           Last 
