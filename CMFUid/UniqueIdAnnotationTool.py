@@ -135,7 +135,7 @@ class UniqueIdAnnotationTool(UniqueObject, SimpleItem, PropertyManager, ActionPr
      'label': 'Remove the objects unique id on clone (CAUTION !!!)'},
     )
     
-    security.declareProtected(ManagePortal, '__call__')
+    security.declarePrivate('__call__')
     def __call__(self, obj, id):
         """See IUniqueIdAnnotationManagement.
         """

@@ -59,13 +59,14 @@ class UniqueIdGeneratorTool(UniqueObject, SimpleItem, ActionProviderBase):
         # counter handles zodb conflicts for us.
         self._uid_counter = Length(0)
     
-    security.declareProtected(ManagePortal, '__call__')
+    security.declarePrivate('__call__')
     def __call__(self):
         """See IUniqueIdGenerator.
         """
         self._uid_counter.change(+1)
         return self._uid_counter()
         
+    security.declarePrivate('convert')
     def convert(self, uid):
         """See IUniqueIdGenerator.
         """
