@@ -16,6 +16,17 @@ BASIC_HTML = '''\
 </html>
 '''
 
+ENTITY_IN_TITLE = '''\
+<html>
+ <head>
+  <title>&Auuml;rger</title>
+ </head>
+ <bOdY>
+  <h2>Not a lot here either</h2>
+ </bodY>
+</html>
+'''
+
 BASIC_STRUCTUREDTEXT = '''\
 Title: My Document
 Description: A document by me
@@ -55,6 +66,12 @@ class TestCase(unittest.TestCase):
         assert string.find(d.text, '</BODY') == -1
         assert d.Description() == 'DESCRIBE ME'
         assert len(d.Contributors()) == 2
+
+    def test_EntityInTitle(self):
+        d = Document('foo')
+        d.edit(text_format='html', text=ENTITY_IN_TITLE)
+        assert d.title == '&Auuml;rger', "Title '%s' being lost" % (
+            d.title )
 
     def test_HtmlWithDoctype(self):
         d = Document('foo')
