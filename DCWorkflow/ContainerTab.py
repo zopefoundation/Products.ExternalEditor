@@ -90,6 +90,9 @@ class ContainerTab (Folder):
         else:
             return default
 
+    def has_key(self, key):
+        return self._mapping.has_key(key)
+
     def objectIds(self, spec=None):
         # spec is not important for now...
         return self._mapping.keys()

@@ -60,7 +60,8 @@ class StateDefinition (SimpleItem):
         return aq_parent(aq_inner(aq_parent(aq_inner(self))))
 
     def getTransitions(self):
-        return list(self.transitions)
+        return filter(self.getWorkflow().transitions.has_key,
+                      self.transitions)
 
     def getTransitionTitle(self, tid):
         t = self.getWorkflow().transitions.get(tid, None)
