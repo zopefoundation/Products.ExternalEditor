@@ -120,6 +120,6 @@ CMF TODO's
 
       - Tracker #506:  Invalid relative URL on metadata_edit_form
 
-      - ( ) Documentation fixes
+      - (/) Documentation fixes
 
-        ( ) Tracker #489:  Dependency on TAL breaks Zope 2.4.x
+        (/) Tracker #489:  Dependency on TAL breaks Zope 2.4.x

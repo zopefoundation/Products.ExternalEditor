@@ -1,8 +1,21 @@
-Installing CMF 1.1beta
+Installing CMF 1.3beta2
 
   Requirements
 
-    - Zope v. 2.3.3, 2.4.3 or 2.5 and later (*not* 2.4.2 or 2.4.1)
+    - Zope v. 2.4.3 or later, v. 2.5 and later (*not* 2.4.2 or 2.4.1)
+      
+      o Note:  For Zope 2.4.x, you will also need to install the most
+        recent versions of the following packages:
+        
+        * PageTemplates product
+
+        * TAL package
+
+        * ZTUtils package
+
+        These packages are available at:
+
+          http://www.zope.org/Members/4am/ZPT/
 
   Assumptions
 

@@ -40,6 +40,10 @@ CMF 1.3 beta2 (2002/06/30)
 
   Bugs Fixed
 
+    - Updated INSTALL.txt to note the dependency of CMF on the TAL and
+      ZTUtils packages and on the PageTemplates product for Zopes < 2.5.
+      (Tracker #489).
+
     - Updated CatalogTool to create a Vocabulary if none present (as
       won't be for catalogs created under Zope 2.6).
 
