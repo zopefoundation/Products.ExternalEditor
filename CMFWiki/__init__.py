@@ -18,3 +18,4 @@ def initialize(context):
         fti = CMFWikiPage.factory_type_information,
         ).initialize(context)
         
+wiki_globals=globals()
