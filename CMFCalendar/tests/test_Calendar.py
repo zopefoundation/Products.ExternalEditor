@@ -172,7 +172,7 @@ class TestCalendar(unittest.TestCase):
 
     def test_singleEventCalendarRendering(self):
 
-        self.Site.Members.folder_factories.invokeFactory(type_name="Event",id='Event1')
+        self.Site.Members.invokeFactory(type_name="Event",id='Event1')
         event = self.app.restrictedTraverse('/CalendarTest/Members/Event1')
         event.edit( title='title'
                     , description='description'
@@ -245,7 +245,7 @@ class TestCalendar(unittest.TestCase):
 
     def test_spanningEventCalendarRendering(self):
 
-        self.Site.Members.folder_factories.invokeFactory(type_name="Event",id='Event1')
+        self.Site.Members.invokeFactory(type_name="Event",id='Event1')
         event = self.app.restrictedTraverse('/CalendarTest/Members/Event1')
         event.edit( title='title'
                     , description='description'
@@ -331,7 +331,7 @@ class TestCalendar(unittest.TestCase):
 
     def test_singleDayRendering(self):
 
-        self.Site.Members.folder_factories.invokeFactory(type_name="Event",id='Event1')
+        self.Site.Members.invokeFactory(type_name="Event",id='Event1')
         event = self.app.restrictedTraverse('/CalendarTest/Members/Event1')
         event.edit( title='title'
                     , description='description'
@@ -354,7 +354,7 @@ class TestCalendar(unittest.TestCase):
 
         assert len(self.Site.portal_calendar.getEventsForThisDay(thisDay=DateTime('2002/5/1'))) == 1
 
-        self.Site.Members.folder_factories.invokeFactory(type_name="Event",id='Event2')
+        self.Site.Members.invokeFactory(type_name="Event",id='Event2')
         event = self.app.restrictedTraverse('/CalendarTest/Members/Event2')
         event.edit( title='title'
                     , description='description'
@@ -377,7 +377,7 @@ class TestCalendar(unittest.TestCase):
 
         assert len(self.Site.portal_calendar.getEventsForThisDay(thisDay=DateTime('2002/5/1'))) == 2
 
-        self.Site.Members.folder_factories.invokeFactory(type_name="Event",id='Event3')
+        self.Site.Members.invokeFactory(type_name="Event",id='Event3')
         event = self.app.restrictedTraverse('/CalendarTest/Members/Event3')
         event.edit( title='title'
                     , description='description'
@@ -400,7 +400,7 @@ class TestCalendar(unittest.TestCase):
 
         assert len(self.Site.portal_calendar.getEventsForThisDay(thisDay=DateTime('2002/5/1'))) == 3
 
-        self.Site.Members.folder_factories.invokeFactory(type_name="Event",id='Event4')
+        self.Site.Members.invokeFactory(type_name="Event",id='Event4')
         event = self.app.restrictedTraverse('/CalendarTest/Members/Event4')
         event.edit( title='title'
                     , description='description'
@@ -423,7 +423,7 @@ class TestCalendar(unittest.TestCase):
 
         assert len(self.Site.portal_calendar.getEventsForThisDay(thisDay=DateTime('2002/5/1'))) == 4
 
-        self.Site.Members.folder_factories.invokeFactory(type_name="Event",id='Event5')
+        self.Site.Members.invokeFactory(type_name="Event",id='Event5')
         event = self.app.restrictedTraverse('/CalendarTest/Members/Event5')
         event.edit( title='title'
                     , description='description'
