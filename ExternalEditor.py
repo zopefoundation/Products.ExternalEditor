@@ -64,7 +64,10 @@ class ExternalEditor(Acquisition.Implicit):
         r.append('')
         
         if hasattr(ob, 'manage_FTPget'):
-            r.append(ob.manage_FTPget())
+            try:
+                r.append(ob.manage_FTPget())
+            except TypeError: # some need the R/R pair!
+                r.append(ob.manage_FTPget(REQUEST, RESPONSE))
         elif hasattr(ob, 'EditableBody'):
             r.append(ob.EditableBody())
         elif hasattr(ob, 'document_src'):
