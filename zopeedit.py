@@ -184,9 +184,7 @@ class ExternalEditor:
         if win32 and editor is None:
             from _winreg import HKEY_CLASSES_ROOT, OpenKeyEx, \
                                 QueryValueEx, EnumKey
-            from win32api import FindExecutable, RegOpenKeyEx, \
-                                 RegQueryValueEx, RegEnumKey
-            from win32con import HKEY_CLASSES_ROOT
+            from win32api import FindExecutable
             import pywintypes
             # Find editor application based on mime type and extension
             content_type = self.metadata.get('content_type')
