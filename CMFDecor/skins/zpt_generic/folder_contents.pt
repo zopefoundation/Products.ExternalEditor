@@ -1,0 +1,66 @@
+<span tal:define="dummy here/filterCookie; desktop python: request.set('isDesktop', 1)"></span>
+
+<html xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="here/main_template/macros/master">
+<body>
+<div metal:fill-slot="main">
+  <div tal:condition="python: not(here.portal_membership.checkPermission('List folder contents', here))">
+	<span tal:define="redirect python: request.RESPONSE.redirect(here.absolute_url())"></span>
+	</div>
+
+<!-- This is the desktop area -->
+<div class="Desktop">
+
+<h1> Desktop </h1>
+
+<form action="" METHOD="POST"
+      tal:attributes="action here/absolute_url">
+ <table class="FormLayout">
+  <tr>
+   <td valign="top">
+    <table class="ContentsList">
+      <tr valign="top"
+	      tal:define="upNav python: hasattr(here.aq_parent, 'portal_url');
+		              upID python: here.aq_parent.getId()"
+		  tal:condition="python: here.portal_membership.checkPermission('List folder contents', here, 'aq_parent')"
+	   >
+        <td width="16"><br></td>
+        <td tal:condition="upNav|nothing">
+          <a href="../folder_contents"><img src="" alt="[Link]" border="0"
+		                                    tal:attributes="src python: here.portal_url() + '/UpFolder_icon.gif'"></a>
+        </td>
+        <td tal:condition="upNav">Up to <a href="../folder_contents" tal:content="upID">Up ID</a></td>
+        <td tal:condition="python: not(upNav)"><span class="mild">Root</span></td>
+      </tr>
+	  <tr tal:replace="structure here/folderContentList"><td>Folder Content Listing Here</td></tr>
+</table>
+
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING=2>
+<TR>
+  <TD ALIGN="LEFT" VALIGN="TOP" WIDTH="16"></TD>
+  <TD ALIGN="LEFT" VALIGN="TOP">
+  <dtml-if expr="portal_membership.checkPermission('Add portal content', this())">
+    <INPUT TYPE="SUBMIT" NAME="folder_factories:method" VALUE="New...">
+  </dtml-if>
+  <span tal:condition="python: here.portal_membership.checkPermission('View management screens', here)">
+    <INPUT TYPE="SUBMIT" NAME="folder_rename_form:method" VALUE="Rename">
+    <INPUT TYPE="SUBMIT" NAME="folder_cut:method" VALUE="Cut"> 
+    <INPUT TYPE="SUBMIT" NAME="folder_copy:method" VALUE="Copy">
+    <span tal:condition="here/cb_dataValid">
+    <INPUT TYPE="SUBMIT" NAME="folder_paste:method" VALUE="Paste">
+    </span>
+  </span>
+  <dtml-if expr="portal_membership.checkPermission('Delete objects', this())">
+    <INPUT TYPE="SUBMIT" NAME="folder_delete:method" VALUE="Delete">
+  </dtml-if>
+  </TD>
+</TR>
+</TABLE>
+</table>
+</form>
+<span tal:replace="structure here/folder_filter_form">Filter Form Here</span>
+</div>
+</div>
+</body>
+</html>

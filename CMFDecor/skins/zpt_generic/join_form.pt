@@ -19,8 +19,8 @@
 	   <p> You must submit a valid email address. This address will be used to send you your randomly-generated password.  
 	   Once you have logged in with this password, you may change it to anything you like.</p>
 	   </span>
-<div class="error"
-     tal:replace="request/error|nothing">
+<div class="DesktopStatusBar"
+     tal:content="request/error|nothing">
      <hr>
 </div>
 <form action="register" method="POST">

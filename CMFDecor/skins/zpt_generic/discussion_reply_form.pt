@@ -3,7 +3,7 @@
       metal:use-macro="here/main_template/macros/master">
 <body>
 <div metal:fill-slot="main">	
-
+<div tal:define="dummy python:here.portal_discussion.getDiscussionFor(here)">This is evaluated.</div>
 
 <form method="POST" action="" 
       tal:attributes="action python: here.absolute_url() + '/talkback'">
@@ -30,7 +30,8 @@
    <input type="submit" value="Preview" name=""
           tal:define="hId here/getId"
           tal:attributes="name python: hId + '/discussion_reply_preview:method'">
-   <input type="submit" value="Reply" name="discussion_reply:method'">
+   <input type="submit" value="Reply" name=""
+          tal:attributes="name string:discussion_reply:method">
   </td>
  </tr>
 </table>

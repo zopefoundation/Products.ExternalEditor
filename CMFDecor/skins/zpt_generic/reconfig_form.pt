@@ -1,0 +1,101 @@
+<html xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="here/main_template/macros/master">
+<body>
+<div metal:fill-slot="main">
+
+<div class="Desktop">
+
+<h3> Configure the Portal </h3>
+
+<p> This form is used to set the portal configuration options.</p>
+
+<div tal:define="pprops here/portal_properties">
+
+<form action="" method="Post"
+      tal:attributes="action python:here.portal_url() + '/reconfig'">
+ <table class="FormLayout">
+  <tr>
+   <th valign="top" align="left"> Portal 'From' name
+   </th>
+   <td>
+    <input name="email_from_name" value=""
+	       tal:attributes="value pprops/email_from_name">
+    <dl class="FieldHelp">
+     <dd> When the portal generates mail, it uses this name
+          as its (apparent) sender. </dd>
+    </dl>
+   </td>
+  </tr>
+  <tr>
+   <th valign="top" align="left"> Portal 'From' address
+   </th>
+   <td><input name="email_from_address" value=""
+              tal:attributes="value pprops/email_from_address">
+    <dl class="FieldHelp">
+     <dd> When the portal generates mail, it uses this address
+          as its (apparent) return address. </dd>
+    </dl>
+   </td>
+  </tr>
+  <tr>
+   <th valign="top" align="left"> SMTP server
+   </th>
+   <td>
+    <input name="smtp_server" value=""
+	       tal:attributes="value pprops/smtp_server">
+    <dl class="FieldHelp">
+     <dd> This is the address of your local SMTP (out-going
+          mail) server.</dd>
+    </dl>
+   </td>
+  </tr>
+  <tr>
+   <th valign="top" align="left"> Portal title
+   </th>
+   <td>
+    <input name="title" value=""
+	       tal:attributes="value pprops/title">
+    <dl class="FieldHelp">
+     <dd> This is the title which appears at the top of every
+          portal page.</dd>
+    </dl>
+  </td>
+  </tr>
+  <tr>
+   <th valign="top" align="left"> Portal description
+   </th>
+   <td>
+     <textarea cols="40" rows="6" name="description"
+        style="width: 100%" wrap="soft"
+		tal:content="pprops/description"></textarea>
+     <dl class="FieldHelp">
+      <dd> This description is made available via syndicated
+           content and elsewhere.  It should be fairly brief.</dd>
+     </dl>
+   </td>
+  </tr>
+  <tr>
+   <th valign="top" align="left"> Password policy
+   </th>
+   <td>
+    <input type=radio name="validate_email:int"
+           value="1" tal:attributes="checked pprops/validate_email">
+           Generate and email members' initial password<br>
+    <input type=radio name="validate_email:int" value="0" 
+	       tal:define="aec pprops/validate_email"
+           tal:attributes="checked python:not(aec)">
+           Allow members to select their initial password
+   </td>
+  </tr>
+  <tr>
+   <td></td>
+   <td colspan="2"><input type="Submit" value="Change"></td>
+  </tr>
+ </table>
+</form>
+</div>
+</div>
+</div>
+</body>
+</html>

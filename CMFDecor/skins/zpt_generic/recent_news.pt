@@ -1,0 +1,51 @@
+<html xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="here/main_template/macros/master">
+<body>
+<div metal:fill-slot="main">
+  <div tal:define="b_start string:0;b_start request/b_start | b_start;
+       newsitems python: here.portal_catalog.searchResults(meta_type='News Item', sort_on='Date', sort_order='reverse', review_state='published');
+	   Batch python:modules['ZTUtils'].Batch;
+	   global batch python:Batch(newsitems, 10, int(b_start), orphan=1)">
+
+ <p class="Desktop" 
+    tal:define="p batch/previous" tal:condition="p">
+ <a href=""
+    tal:attributes="href string:?b_start=${p/first}"><span tal:replace="p/length">n</span> more recent articles</a>
+ </p>
+
+ <table cellspacing="0" border="0" width="90%"
+        tal:repeat="newsitems batch"
+		tal:condition="newsitems">
+ <tr>
+  <td class="NewsListing" align="left" valign="top">
+      <a href=""
+	     tal:attributes="href newsitems/getURL"
+		 tal:content="newsitems/title">Title</a>
+      <br> By <span tal:replace="newsitems/Creator">Creator</span>
+  </td>
+  <td class="NewsListing" align="right" valign="top"
+      tal:content="newsitems/Date">Date
+  </td>
+ </tr>
+ <tr>
+  <td colspan="2">
+    <em> <span tal:define="pss modules/Products.PythonScripts.standard; niDescription newsitems/Description"
+	           tal:replace="structure python:pss.structured_text(niDescription)">Description</span></em>
+  </td>
+ </tr>
+  </table>
+<div tal:condition="python:not(newsitems)">
+ <p class="Desktop">
+  No news is good news!
+ </p>
+</div>
+ <p class="Desktop" 
+    tal:define="n batch/next" tal:condition="n">
+ <a href=""
+    tal:attributes="href string:?b_start=${batch/end}"><span tal:replace="n/length">n</span> older articles</a>
+ </p>
+</div>
+</div>
+</body>
+</html>

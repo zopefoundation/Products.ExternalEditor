@@ -4,11 +4,6 @@
 <body>
 <div metal:fill-slot="main">	  
 <div class="Desktop">
-
-
-<div class="DesktopStatusBar" tal:content="request/portal_status_message|nothing">
- <hr></div>
-
 <div class="Document">
 
 <h2>Edit <span tal:replace="here/getId">My ID</span></h2>

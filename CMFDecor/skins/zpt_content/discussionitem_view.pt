@@ -18,7 +18,7 @@
   <div tal:replace="structure here/CookedBody">Body</div>
 
   <div class="Discussion">
-  <span tal:replace="here/viewThreadsAtBottom"
+  <span tal:replace="structure here/viewThreadsAtBottom"
        tal:condition="here/viewThreadsAtBottom|nothing">Dicussions</span>
   </div>
 

@@ -22,7 +22,7 @@
 
    <td class="Desktop" colspan="2" width="84%" valign="top">
 
-   <p tal:condition="exists:options/portal_status_message" tal:content="options/portal_status_message" class="DesktopStatusBar"></p>
+   <p tal:condition="request/portal_status_message|nothing" tal:content="request/portal_status_message" class="DesktopStatusBar"></p>
 
    <div tal:condition="exists:here/localHeader" replace="structure here/localHeader"/>
    <div metal:define-slot="main"/>
