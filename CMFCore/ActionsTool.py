@@ -114,7 +114,7 @@ class ActionInformation:
             self.folder_url = folder.absolute_url()
             self.folder = folder
         else:
-            self.folder_url = portal_url
+            self.folder_url = self.portal_url
             self.folder = portal
         self.content = object
         if object is not None:
