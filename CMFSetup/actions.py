@@ -177,7 +177,7 @@ _FILENAME = 'actions.xml'
 
 def importActionProviders( context ):
 
-    """ Import roles / permission map from an XML file
+    """ Import action providers and their actions rom an XML file
 
     o 'context' must implement IImportContext.
 
