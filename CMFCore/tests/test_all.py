@@ -8,6 +8,7 @@ from Products.CMFCore.tests import test_ActionInformation
 from Products.CMFCore.tests import test_ActionProviderBase
 from Products.CMFCore.tests import test_Expression
 from Products.CMFCore.tests import test_CatalogTool
+from Products.CMFCore.tests import test_DirectoryView
 
 def test_suite():
     suite = unittest.TestSuite()
@@ -19,6 +20,7 @@ def test_suite():
     suite.addTest( test_ActionProviderBase.test_suite() )
     suite.addTest( test_Expression.test_suite() )
     suite.addTest( test_CatalogTool.test_suite() )
+    suite.addTest( test_DirectoryView.test_suite() )
     return suite
 
 def run():
