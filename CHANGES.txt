@@ -57,6 +57,11 @@ HEAD only (unreleased)
 
   Others
 
+    - To document how to create a CMF release from CMF a description is now
+      included in RELEASE.txt at the root of the CMF package. This text can
+      guide release managers or volunteers with the appropriate release
+      privileges.
+
     - Added DeprecationWarning to the all_cmf_tests.py script. The canonical
       way to run the tests is using "zopectl test".
       (http://www.zope.org/Collectors/CMF/272)

@@ -1,0 +1,69 @@
+RELEASE.txt - notes for creating a CMF release
+
+  Most of the work necessary to create a CMF release is done by the script
+  'slurp_release.py', which can always be found in the root of the CMF 
+  package on CVS-HEAD. The script will CVS export the CMF package, build the
+  tarballs, and upload them and the respective READMEs to the CMF area on
+  www.zope.org.
+
+  Before running 'slurp_release.py' the respective branch needs to be cleaned
+  up and tagged properly.
+
+
+  **Naming conventions**
+
+    In order to stay consistent the following naming conventions for CMF
+    versions and for CVS tags used to tag releases should be used,
+    demonstrated with the help of a notional 1.8.4 release:
+
+      - CMF beta versions are '1.8.4beta' and '1.8.4beta2' for the second
+        beta. The same is true for alpha releases if one is desired.
+        '1.8.4alpha2' follows '1.8.4alpha'. Alpha releases should only
+        be necessary for the first release off a new release branch. The final
+        version would then be '1.8.4'
+
+      - CVS tags follow the convention 'CMF-1_8_4-release' or
+        'CMF-1_8_4-beta'. As with version numbers, 'CMF-1_8_4-beta2' would
+        indicate the second beta release.
+
+      - Branch tags in CVS look like 'CMF-1_8-branch' for the branch that
+        would yield e.g. version 1.8.4
+
+
+  **Preparing the branch**
+
+    To release version '1.8.4beta2' off the 'CMF-1_8-branch' the following
+    steps are needed. It is assumed the release manager is using the HEAD
+    of the 'CMF-1_8-branch' to make these changes:
+
+      - At the top of 'CHANGES.txt', enter the current date as YYYY/MM/DD
+        in parentheses next to the CMF version number.
+
+      - Find all 'version.txt' files throughout the CMF pacckage and adjust 
+        the version number, in this case 'CMF-1.8.4beta2'.
+
+      - Check these changes into the CVS repository
+
+      - Tag the sandbox, in this case with the tag 'CMF-1_8_4beta2'
+
+
+  **Creating and publishing the release**
+
+    With CVS preparations done the 'slurp_release.py' script will do the
+    remaining work. You run it with the CVS tag and version ID as parameters::
+
+      slurp_release.py [options] release_tag version_id
+
+    Without any options it will complete the whole procedure including upload
+    to the zope.org site. Use 'slurp_release.py --help' to find out more.
+
+    Once 'slurp_release.py' has completed the upload step you need to visit
+    the uploaded files on zope.org and make sure they get published on the 
+    site.
+
+
+  **Announcing the release**
+
+    An announcement email should go out to zope-announce@zope.org, 
+    zope-cmf@zope.org and zope@zope.org. Also, a NewsItem for the release
+    should be created on the zope.org site.
