@@ -19,6 +19,7 @@ $Id$
 import os
 from time import sleep
 import win32com
+import pythoncom
 from win32com import client # Initialize Client module
 
 class EditorProcess:
@@ -48,12 +49,27 @@ class EditorProcess:
             
     def isAlive(self):
         """Returns true if the editor process is still alive"""
+        tries = 0
         head, tail = os.path.split(self.file)
         head, tail = head.lower(), tail.lower()
-        for doc in self.excelapp.Workbooks:
-            if head == doc.Path.lower() and tail == doc.Name.lower():
+
+        try:
+            for doc in self.excelapp.Workbooks:
+                if head == doc.Path.lower() and tail == doc.Name.lower():
+                    return 1
+                return 0
+        except pythoncom.com_error, why:
+            # COM will reject the call to enumerate the docs if the user is
+            # doing anything interactive at the time the call is made.  The
+            # symptom is a COM error numbered -2147418111 named "Call rejected
+            # by callee".  This could happen indefinitely while a user is
+            # camped on a cell waiting for input, so the only sane thing to do
+            # is to return true and wait til the next call to really do the
+            # check.
+            if why[0] == -2147418111:
                 return 1
-        return 0
+            else:
+                raise
 
 def test():
     import os
