@@ -487,7 +487,8 @@ class CollectorCatalog(CatalogTool):
     def enumerateColumns( self ):
         """Return field names of data to be cached on query results."""
         standard = CatalogTool.enumerateColumns(self)
-        custom = ('status',
+        custom = ('id',
+                  'status',
                   'submitter_id',
                   'topic',
                   'classification',
