@@ -174,9 +174,11 @@ class RegistrationTool (UniqueObject, SimpleItem):
         if failMessage is not None:
             raise 'Bad Request', failMessage
 
-        failMessage = self.testPropertiesValidity(properties)
-        if failMessage is not None:
-            raise 'Bad Request', failMessage
+        if properties is not None:
+            failMessage = self.testPropertiesValidity(properties)
+
+            if failMessage is not None:
+                raise 'Bad Request', failMessage
 
         # Limit the granted roles.
         # Anyone is always allowed to grant the 'Member' role.
