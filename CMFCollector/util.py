@@ -204,3 +204,56 @@ def sorted(l):
     x = list(l[:])
     x.sort()
     return x
+
+urlchars  = (r'[A-Za-z0-9/:@_%~#=&\.\-\?]+')
+nonpuncurlchars  = (r'[A-Za-z0-9/:@_%~#=&\-]')
+url       = (r'["=]?((http|https|ftp|mailto|file|about):%s%s)'
+             % (urlchars, nonpuncurlchars))
+urlexp    = re.compile(url)
+UPLOAD_PREFIX = "Uploaded: "
+uploadexp = re.compile('(%s)([^<,\n]*)([<,\n])' % UPLOAD_PREFIX, re.MULTILINE)
+excludeexpr=re.compile(r'(<a [^>]*href=[^>]+>[^<>]*</a>|<img [^>]*src=[^>]*>)')
+
+def link_candidates(text):
+    """Return match objs for URLS, excluding targets contained in tags.
+
+    (See the excludeexpr for the exact excluded tag contexts.)"""
+
+    excludes = list_search_hits(text, excludeexpr)
+    candidates = list_search_hits(text, urlexp)
+    got = []
+    for c in candidates:
+        cstart, cend = c.start(), c.end()
+        good = 1
+        while excludes:
+            e = excludes[0]
+            if e.end() < cend:
+                # Ditch exclude_match that's prior to remaining candidates.
+                del excludes[0]
+                continue
+            elif e.start() > cstart:
+                # Remaining segments are after candidate - it passes.
+                good = 1
+                break
+            else:
+                # Candidate is contained in segment - baad.
+                good = 0
+                break
+
+        if good:
+            got.append(c)
+
+    return got
+    
+def list_search_hits(text, exprobj):
+    """Return a list of match objects for non-overlapping text hits."""
+    cursor = 0
+    got = []
+    while 1:
+        hit = exprobj.search(text, cursor)
+        if hit:
+            cursor = hit.end()
+            got.append(hit)
+        else:
+            break
+    return got
