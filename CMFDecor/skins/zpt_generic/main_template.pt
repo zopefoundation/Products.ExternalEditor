@@ -240,6 +240,14 @@
 
  <td id="ForematterCell" width="78%">
 
+  <p id="Breadcrumbs" style="padding-top: 5px">
+   <span tal:repeat="bc here/breadcrumbs"
+    ><a href="."
+        tal:attributes="href bc/url" tal:content="bc/id"
+     >ID</a><span tal:condition="not: repeat/bc/end">&nbsp;/&nbsp;</span>
+   </span>
+  </p>
+
   <p id="DesktopStatusBar"
      tal:condition="request/portal_status_message|nothing"
      tal:content="request/portal_status_message"> Status message.</p>
