@@ -119,6 +119,15 @@ class MembershipTool( BaseTool ):
                                    +  'getHomeFolder(), "Favorites")')
         , visible=1
         )
+    , AI( id='managemembers'
+        , title='Manage members'
+        , description='Manage portal members'
+        , action=Expression(text='string:${portal_url}/members_manage_form')
+        , permissions=(ManageUsers,)
+        , category='global'
+        , condition=None
+        , visible=1
+        )
     )
 
     membersfolder_id = 'Members'

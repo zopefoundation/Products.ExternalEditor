@@ -1,0 +1,17 @@
+<html>
+<body>
+
+<tal:test tal:define="buttons python: ( {'name': 'delete_items',
+                                         'value': 'Delete'}, );
+                      global form python: {'listButtonInfos': buttons}" />
+
+ <metal:block metal:define-macro="buttons"
+><div class="FormButtons">
+  <tal:loop tal:repeat="button form/listButtonInfos"
+  ><input type="submit" name="ButtonName" value="ButtonValue"
+      tal:attributes="name button/name; value button/value"
+      i18n:attributes="value" /></tal:loop></div
+></metal:block>
+
+</body>
+</html>

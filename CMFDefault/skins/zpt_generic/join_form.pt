@@ -10,7 +10,8 @@
 <h1 tal:content="control/title" i18n:translate="">Become a member</h1>
 </metal:block>
 
-<metal:block metal:fill-slot="main" i18n:domain="cmf_default">
+<metal:block metal:fill-slot="main" i18n:domain="cmf_default"
+   tal:define="form control/form">
 <div class="Desktop">
 
 <tal:case tal:condition="control/isOrdinaryMember">
@@ -29,17 +30,16 @@
 <tal:case tal:condition="not: control/validate_email">
 <p>Click the button to log in immediately.</p>
 <form action="logged_in" method="post"
-      tal:attributes="action string:${control/portal_url}/logged_in">
+      tal:attributes="action form/action">
 <input type="hidden" name="__ac_name"  value=""
        tal:attributes="value control/member_id" />
 <input type="hidden" name="__ac_password" value=""
        tal:attributes="value control/password" />
-<input type="submit" name="login" value="Log in"
-       i18n:attributes="value" />
+<metal:block metal:use-macro="here/form_widgets/macros/buttons" />
 </form>
 </tal:case>
 
-<p><a href="" tal:attributes="href string:${control/portal_url}"
+<p><a href="" tal:attributes="href control/portal_url"
       i18n:translate="">Return to homepage</a></p>
 </tal:case>
 
@@ -58,7 +58,7 @@
 
 <tal:case tal:condition="control/isAnonOrUserManager">
   <form action="join_form" method="post"
-        tal:attributes="action string:${control/portal_url}/join_form">
+        tal:attributes="action form/action">
    <table class="FormLayout">
     <tr>
      <th i18n:translate="">Member ID</th>
@@ -98,10 +98,7 @@
     <tr>
      <td>&nbsp;</td>
      <td>
-      <input type="submit" name="add" value="Register"
-             i18n:attributes="value" />
-      <input type="submit" name="cancel" value="Cancel"
-             i18n:attributes="value" />
+      <metal:block metal:use-macro="here/form_widgets/macros/buttons" />
      </td>
     </tr>
    </table>

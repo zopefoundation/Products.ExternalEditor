@@ -360,3 +360,26 @@ td.NewsTitle {
 p.NewsHeadline {
     background-color:  #336699;
 }
+
+.BatchTable {
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+
+.BatchTable tr.list-header {
+    background-color: #c0c0c0;
+    text-align: left;
+    font: 90%/120% sans-serif;
+}
+
+.BatchTable tr.row-normal {
+    background-color: #ffffff;
+}
+
+.BatchTable tr.row-hilite {
+    background-color: #efefef;
+}
+
+.FormButtons {
+    margin-top: 8pt;
+}

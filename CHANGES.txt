@@ -2,6 +2,11 @@ CMF 1.5alpha (unreleased)
 
   New Features
 
+    - CMFDefault MembershipTool and zpt skin: Added 'Manage members' Action.
+      The skin now provides basic membership management: Browsing members,
+      registering new members and deleting members including their member
+      data, member area and Local Roles.
+
     - The caching policy manager now sets the header
       'X-Cache-Headers-Set-By' when it sets cache headers
       in a response.

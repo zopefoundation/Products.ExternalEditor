@@ -49,7 +49,10 @@ if add:
                 is_anon = 0
 
 elif cancel:
-    target = portal_url
+    if is_usermanager:
+        target = '%s/members_manage_form' % portal_url
+    else:
+        target = portal_url
     context.REQUEST.RESPONSE.redirect(target)
 
 if message:
@@ -69,5 +72,16 @@ control['isAnonOrUserManager'] = is_anon or is_usermanager
 control['isNewMember'] = is_newmember
 control['isOrdinaryMember'] = not (is_anon or is_newmember or is_usermanager)
 control['validate_email'] = validate_email
+
+buttons = []
+if is_newmember:
+    target = '%s/logged_in' % portal_url
+    buttons.append( {'name': 'login', 'value': 'Log in'} )
+else:
+    target = '%s/join_form' % portal_url
+    buttons.append( {'name': 'add', 'value': 'Register'} )
+    buttons.append( {'name': 'cancel', 'value': 'Cancel'} )
+control['form'] = { 'action': target,
+                    'listButtonInfos': tuple(buttons) }
 
 return control
