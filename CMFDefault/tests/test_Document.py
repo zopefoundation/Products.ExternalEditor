@@ -97,6 +97,10 @@ class DocumentTests(unittest.TestCase):
         assert len(d.Contributors()) == 3
         assert string.find(d.cooked_text, '<p>') >= 0
 
+        # Make sure extra HTML is NOT found
+        assert string.find(d.cooked_text, '<title>') == -1, d.cooked_text
+        assert string.find(d.cooked_text, '<body>') == -1, d.cooked_text
+
     def test_Init(self):
         d = Document('foo', text=BASIC_STRUCTUREDTEXT)
         assert d.Format() == 'text/plain'
