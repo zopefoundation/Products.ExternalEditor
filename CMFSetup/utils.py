@@ -204,7 +204,7 @@ class ConfiguratorBase(Implicit):
                 else:
                     info[key] = v[DEFAULT]
 
-            if CONVERTER in v and key in info:
+            elif CONVERTER in v and key in info:
                 info[key] = v[CONVERTER]( info[key] )
 
             if key is None:
@@ -232,10 +232,8 @@ class ConfiguratorBase(Implicit):
             { '#text':           {KEY: None} } }
 
     def _convertToBoolean(self, val):
-        if isinstance(val, basestring):
-            return val.lower() in ('true', 'yes', '1')
-        else:
-            return val
+
+        return val.lower() in ('true', 'yes', '1')
 
     def _convertToUnique(self, val):
 
