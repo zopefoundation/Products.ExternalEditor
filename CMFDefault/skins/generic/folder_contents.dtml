@@ -46,7 +46,7 @@ Folder contents display.
       <td>
         <dtml-if upNav>
          <a href="../folder_contents"
-         ><img src="&dtml-portal_url;/Images/UpFolder_icon.gif"
+         ><img src="&dtml-portal_url;/UpFolder_icon.gif"
                alt="[Link]" border="0"></a>
         </dtml-if>
       </td>

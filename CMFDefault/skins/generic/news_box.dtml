@@ -1,7 +1,7 @@
  <table class="NewsItems" cellspacing="0" cellpadding="0" border="0" width="100%">
   <tr>
    <td class="NewsBorder" width="1" rowspan="13" bgcolor="#6699CC">
-    <img src="Images/spacer.gif" alt=" "
+    <img src="spacer.gif" alt=" "
          width="1" height="2" border="0">
    </td>
    <td valign="top" class="NewsTitle" width="100%">

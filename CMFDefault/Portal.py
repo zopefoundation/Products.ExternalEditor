@@ -379,12 +379,12 @@ class PortalGenerator:
         addDirectoryViews(ps, 'skins', globals())
         ps.manage_addProduct['OFSP'].manage_addFolder(id='custom')
         ps.addSkinSelection('Basic',
-                            'custom, content, generic, control',
-                            make_default=1)
+            'custom, content, generic, control, Images',
+            make_default=1)
         ps.addSkinSelection('Nouvelle',
-                            'nouvelle, custom, content, generic, control')
+            'nouvelle, custom, content, generic, control, Images')
         ps.addSkinSelection('No CSS',
-                            'no_css, custom, content, generic, control')
+            'no_css, custom, content, generic, control, Images')
         p.setupCurrentSkin()
 
     def setupTypes(self, p, initial_types=factory_type_information):

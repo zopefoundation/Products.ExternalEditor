@@ -1,3 +1,10 @@
+1.0 xxx (2001/xx/xx)
+
+ * Removed references to 'Images/' in skin DTML, adding an extra item
+   to the default skins' lookup path. In CMFDefault/scripts you will find
+   'addImagesToSkinPaths.pys', a Python Script that adds the extra name to
+   all your skin paths.
+
 1.0 beta (2001/03/05)
 
  * Migrated from old PTK repository on cvs.zope.org.

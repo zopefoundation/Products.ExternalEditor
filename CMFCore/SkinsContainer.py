@@ -147,8 +147,7 @@ class SkinsContainer:
                 if partob is None:
                     # Not found.  Cancel the search.
                     if raise_exc:
-                        raise SkinPathError('Name not found: %s' %
-                                            join(skinpath + [p], '/'))
+                        raise SkinPathError('Name not found: %s' % part_path)
                     break
             if partob is not None:
                 # Now partob has containment and context.
