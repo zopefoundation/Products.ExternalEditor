@@ -36,6 +36,12 @@ class LinkTests(TestCase):
         d.edit('')
         self.assertEqual(d.getRemoteUrl(), '')
 
+        d = Link('foo', remote_url='http://')
+        self.assertEqual(d.getRemoteUrl(), '')
+
+        d = Link('foo', remote_url='http:')
+        self.assertEqual(d.getRemoteUrl(), '')
+
     def test_StructuredText( self ):
         d = Link('foo')
         d._writeFromPUT( body=BASIC_STRUCTUREDTEXT )
@@ -72,33 +78,33 @@ class LinkTests(TestCase):
 
         d = Link( 'baz' )
         d.edit( 'baz.com' )
-        self.assertEqual( d.getRemoteUrl(), 'http://baz.com' )
+        self.assertEqual( d.getRemoteUrl(), 'baz.com' )
 
         d = Link( 'baz2' )
         d.edit( 'baz2.com/index.html' )
-        self.assertEqual( d.getRemoteUrl(), 'http://baz2.com/index.html' )
+        self.assertEqual( d.getRemoteUrl(), 'baz2.com/index.html' )
 
         d = Link( 'zoinx' )
         d.edit( '/huh/zoinx.html' )
-        self.assertEqual( d.getRemoteUrl(), 'http:/huh/zoinx.html' )
+        self.assertEqual( d.getRemoteUrl(), '/huh/zoinx.html' )
 
         d = Link( 'lol' )
         d.edit( 'hmmm.com/lol.txt' )
-        self.assertEqual( d.getRemoteUrl(), 'http://hmmm.com/lol.txt' )
+        self.assertEqual( d.getRemoteUrl(), 'hmmm.com/lol.txt' )
 
     def test_trailingSlash(self):
         d = Link('foo', remote_url='http://foo.com/bar/')
         self.assertEqual(d.getRemoteUrl(), 'http://foo.com/bar/')
 
         d = Link('foo', remote_url='baz.com/')
-        self.assertEqual(d.getRemoteUrl(), 'http://baz.com/')
+        self.assertEqual(d.getRemoteUrl(), 'baz.com/')
 
         d = Link('foo', remote_url='/baz.org/zoinx/')
-        self.assertEqual(d.getRemoteUrl(), 'http:/baz.org/zoinx/')
+        self.assertEqual(d.getRemoteUrl(), '/baz.org/zoinx/')
 
         d = Link('foo')
         d.edit('/baz.com/foo/')
-        self.assertEqual(d.getRemoteUrl(), 'http:/baz.com/foo/')
+        self.assertEqual(d.getRemoteUrl(), '/baz.com/foo/')
 
 
 def test_suite():

@@ -151,17 +151,13 @@ class Link( PortalContent
         if tokens[1]:
             # We have a nethost. All is well.
             url = urlparse.urlunparse(tokens)
-        elif remote_url[:1] == '/':
-            # Starts with a slash, site-relative URL,
-            # no way to completely absolutize it.
-            url = urlparse.urlunparse(tokens)
-        else:
-            # Starts with a host without http:// qualification,
-            # add it correctly because urlparse didn't do it.
-            tokens = urlparse.urlparse('http://'+remote_url)
-            url = urlparse.urlunparse(tokens)
-        if url == 'http:':
+        elif tokens[2:] == ('', '', '', ''):
+            # Empty URL
             url = ''
+        else:
+            # Relative URL, keep it that way, without http:
+            tokens = ('', '') + tokens[2:]
+            url = urlparse.urlunparse(tokens)
         self.remote_url = url
 
     security.declareProtected( CMFCorePermissions.ModifyPortalContent, 'edit' )
