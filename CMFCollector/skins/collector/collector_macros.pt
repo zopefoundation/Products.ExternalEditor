@@ -194,7 +194,7 @@
          </tr>
 
          <tr>
-           <td align="right">Version:</td>
+           <td align="right">Versions:</td>
            <td metal:define-slot="issue_version_slot">
                <span tal:content="here/reported_version">VERSION
                </span>
