@@ -66,12 +66,6 @@ Use folders to put content in categories."""
                                   , 'permissions'   : (ManageProperties,)
                                   , 'category'      : 'folder'
                                   }
-                                , { 'id'            : 'foldercontents'
-                                  , 'name'          : 'Folder contents'
-                                  , 'action'        : 'folder_contents'
-                                  , 'permissions'   : (CMFCorePermissions.ListFolderContents,)
-                                  , 'category'      : 'folder'
-                                  }
                                 )
                              }
                            ,

@@ -58,6 +58,7 @@ class RegistrationTool (RegistrationTool):
     def listActions(self, info):
         """
         """
+        return None
 
     security.declarePublic( 'testPropertiesValidity' )
     def testPropertiesValidity(self, props, member=None):

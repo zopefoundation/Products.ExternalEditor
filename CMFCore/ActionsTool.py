@@ -67,7 +67,8 @@ class ActionsTool (UniqueObject, SimpleItem):
     id = 'portal_actions'
     meta_type = 'CMF Actions Tool'
 
-    action_providers = ( 'portal_memberdata'
+    action_providers = ( 'portal_actions'
+                       , 'portal_memberdata'
                        , 'portal_registration'
                        , 'portal_discussion'
                        , 'portal_membership'
@@ -112,7 +113,23 @@ class ActionsTool (UniqueObject, SimpleItem):
 
     security.declarePrivate('listActions')
     def listActions(self, info):
-        return None
+        """
+        List actions available from this tool
+        """
+        if info.isAnonymous:
+            return None
+        else:
+            actions = []
+            folder_url = info.folder_url   
+            content_url = info.content_url   
+            if folder_url is not None: 
+                actions.append(
+                    { 'name'          : 'Folder contents'
+                    , 'url'        : folder_url + '/folder_contents'
+                    , 'permissions'   : ['List folder contents']
+                    , 'category'      : 'folder'
+                   })
+            return actions
 
     security.declareProtected( CMFCorePermissions.ManagePortal
                              , 'deleteActionProvider'
