@@ -91,19 +91,19 @@ items_add_allowed = mtool.checkPermission(AddPortalContent, context)
 upitems_list_allowed = mtool.checkPermission(ListFolderContents, context,
                                              'aq_parent')
 
-up = {}
+up_info = {}
 if upitems_list_allowed:
     up_obj = context.aq_parent
     if hasattr(up_obj, 'portal_url'):
         up_url = atool.getActionInfo('folder/folderContents', up_obj)['url']
-        up = { 'icon': '%s/UpFolder_icon.gif' % portal_url,
-               'id': up_obj.getId(),
-               'url': up_url }
+        up_info = { 'icon': '%s/UpFolder_icon.gif' % portal_url,
+                    'id': up_obj.getId(),
+                    'url': up_url }
     else:
-        up = { 'icon': '',
-               'id': 'Root',
-               'url': '' }
-control['up'] = up
+        up_info = { 'icon': '',
+                    'id': 'Root',
+                    'url': '' }
+control['up_info'] = up_info
 
 target = atool.getActionInfo('folder/folderContents', context)['url']
 context.filterCookie()

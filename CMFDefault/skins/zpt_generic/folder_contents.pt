@@ -9,19 +9,20 @@
 <metal:block metal:fill-slot="main"
    tal:define="batch control/batch;
                form control/form;
-               up control/up">
+               up_info control/up_info">
 <div class="Desktop" i18n:domain="cmf_default">
 
 <h2 i18n:translate="">Desktop</h2>
 
-<tal:case tal:condition="up"
-><tal:case tal:condition="up/url"
- ><a href="" tal:attributes="href up/url"
-  ><img src="" alt="[Link]" border="0" tal:attributes="src up/icon"
+<tal:case tal:condition="up_info"
+><tal:case tal:condition="up_info/url"
+ ><a href="" tal:attributes="href up_info/url"
+  ><img src="" alt="[Link]" border="0" tal:attributes="src up_info/icon"
       i18n:attributes="alt" /></a>
   <span tal:omit-tag="" i18n:translate="">Up to</span>
-  <a href="" tal:attributes="href up/url" tal:content="up/id">ID</a></tal:case
-><tal:case tal:condition="not: up/url"
+  <a href="" tal:attributes="href up_info/url"
+     tal:content="up_info/id">ID</a></tal:case
+><tal:case tal:condition="not: up_info/url"
  ><span class="mild" i18n:translate="">Root</span></tal:case></tal:case>
 
 <form action="folder_contents" method="post"
@@ -30,42 +31,46 @@
   <tr>
    <td width="49%">
     <table>
-     <tr tal:repeat="item batch/listItemInfos1">
+     <tr tal:repeat="item_info batch/listItemInfos1">
       <td width="5"
       ><input type="checkbox" name="ids:tuple" value="" id=""
-          tal:attributes="value item/id; id item/checkbox"
-          tal:condition="item/checkbox" /></td>
+          tal:attributes="value item_info/id; id item_info/checkbox"
+          tal:condition="item_info/checkbox" /></td>
       <td
-      ><a href="" tal:attributes="href item/url" tal:condition="item/icon"
+      ><a href="" tal:attributes="href item_info/url"
+          tal:condition="item_info/icon"
        ><img src="" alt="" border="0"
-           tal:attributes="src item/icon; alt item/type"
+           tal:attributes="src item_info/icon; alt item_info/type"
            i18n:attributes="alt" /></a></td>
       <td
-      ><a href="" tal:attributes="href item/url"
-       ><tal:span tal:content="item/id">ID</tal:span>
-        <tal:case tal:condition="item/title"
-           tal:content="string:(${item/title})">(Title)</tal:case></a></td>
+      ><a href="" tal:attributes="href item_info/url"
+       ><tal:span tal:content="item_info/id">ID</tal:span>
+        <tal:case tal:condition="item_info/title"
+           tal:content="string:(${item_info/title})">(Title)</tal:case
+      ></a></td>
      </tr>
     </table>
    </td>
    <td width="2%">&nbsp;</td>
    <td width="49%" tal:condition="batch/listItemInfos2">
     <table>
-     <tr tal:repeat="item batch/listItemInfos2">
+     <tr tal:repeat="item_info batch/listItemInfos2">
       <td width="5"
       ><input type="checkbox" name="ids:tuple" value="" id=""
-          tal:attributes="value item/id; id item/checkbox"
-          tal:condition="item/checkbox" /></td>
+          tal:attributes="value item_info/id; id item_info/checkbox"
+          tal:condition="item_info/checkbox" /></td>
       <td
-      ><a href="" tal:attributes="href item/url" tal:condition="item/icon"
+      ><a href="" tal:attributes="href item_info/url"
+          tal:condition="item_info/icon"
        ><img src="" alt="" border="0"
-           tal:attributes="src item/icon; alt item/type"
+           tal:attributes="src item_info/icon; alt item_info/type"
            i18n:attributes="alt" /></a></td>
       <td
-      ><a href="" tal:attributes="href item/url"
-       ><tal:span tal:content="item/id">ID</tal:span>
-        <tal:case tal:condition="item/title"
-           tal:content="string:(${item/title})">(Title)</tal:case></a></td>
+      ><a href="" tal:attributes="href item_info/url"
+       ><tal:span tal:content="item_info/id">ID</tal:span>
+        <tal:case tal:condition="item_info/title"
+           tal:content="string:(${item_info/title})">(Title)</tal:case
+      ></a></td>
      </tr>
     </table>
    </td>

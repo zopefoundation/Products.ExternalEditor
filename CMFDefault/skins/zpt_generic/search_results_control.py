@@ -42,7 +42,7 @@ summary = { 'length': length and thousands_commas(length) or '',
             'match': kw.get('SearchableText') }
 navigation = context.getBatchNavigation(batch_obj, target, **kw)
 control['batch'] = { 'summary': summary,
-                     'listItemInfos': batch_obj,
+                     'listItemBrains': batch_obj,
                      'navigation': navigation }
 
 return control

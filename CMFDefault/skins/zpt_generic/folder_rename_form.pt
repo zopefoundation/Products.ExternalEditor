@@ -16,20 +16,20 @@
 <form action="members_manage" method="post"
    tal:attributes="action form/action">
  <table class="FormLayout">
-  <tr tal:repeat="item batch/listItemInfos">
+  <tr tal:repeat="item_info batch/listItemInfos">
    <td width="8%"
    ><img src="" alt="" border="0"
-       tal:attributes="src item/icon; alt item/type"
+       tal:attributes="src item_info/icon; alt item_info/type"
        i18n:attributes="alt" /></td>
    <td width="20%"
-   ><tal:span tal:replace="item/id">ID</tal:span>
+   ><tal:span tal:replace="item_info/id">ID</tal:span>
     <input type="hidden" name="ids:list" value=""
-       tal:attributes="value item/id" /></td>
+       tal:attributes="value item_info/id" /></td>
    <td width="5%"
    ><strong i18n:translate="">to</strong></td>
    <td
    ><input type="text" name="new_ids:list" value=""
-       tal:attributes="value item/id" size="20" /></td>
+       tal:attributes="value item_info/id" size="20" /></td>
   </tr>
  </table>
  <metal:block metal:use-macro="here/form_widgets/macros/buttons" />
