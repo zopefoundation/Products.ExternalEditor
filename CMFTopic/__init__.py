@@ -103,8 +103,12 @@ this_module = sys.modules[ __name__ ]
 for base in bases:
     createZClassForBase( base, this_module )
 
+# This is used by a script (external method) that can be run
+# to set up Topics in an existing CMF Site instance.
+topic_globals=globals()
 
 # Make the skins available as DirectoryViews
+registerDirectory('skins', globals())
 registerDirectory('skins/topic', globals())
 
 def initialize( context ):
