@@ -250,9 +250,34 @@ class SetupTool( UniqueObject, Folder ):
         """ Import the steps selected by the user.
         """
         if not ids:
-            RESPONSE.redirect( '%s/manage_importSteps?manage_tabs_message=%s'
-                             % ( self.absolute_url(), 'No+steps+selected.' )
-                             )
+            message = 'No+steps+selected.'
+
+        else:
+            steps_run = []
+            for step_id in ids:
+                result = self.runImportStep( step_id
+                                           , run_dependencies
+                                           , purge_old
+                                           )
+                steps_run.extend( result[ 'steps' ] )
+
+            message = 'Steps+run:%s' % '+,'.join( steps_run )
+
+        RESPONSE.redirect( '%s/manage_importSteps?manage_tabs_message=%s'
+                         % ( self.absolute_url(), message )
+                         )
+
+    security.declareProtected( ManagePortal, 'manage_importSelectedSteps' )
+    def manage_importAllSteps( self, purge_old, RESPONSE ):
+
+        """ Import all steps.
+        """
+        result = self.runAllImportSteps( purge_old )
+        message = 'Steps+run:%s' % '+,'.join( result[ 'steps' ] )
+
+        RESPONSE.redirect( '%s/manage_importSteps?manage_tabs_message=%s'
+                         % ( self.absolute_url(), message )
+                         )
 
     security.declareProtected( ManagePortal, 'manage_exportSteps' )
     manage_exportSteps = PageTemplateFile( 'sutExportSteps', _wwwdir )
