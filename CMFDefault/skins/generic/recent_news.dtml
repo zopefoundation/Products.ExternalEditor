@@ -17,7 +17,7 @@
  </dtml-if>
  <tr>
   <td class="NewsListing" align="left" valign="top">
-   <p class="NewsHeadline"><a href="<dtml-var "portal_catalog.getpath(data_record_id_)">">
+   <p class="NewsHeadline"><a href="<dtml-var getURL()">">
     &dtml-title;
    </a><br><span class="NewsByLine">By &dtml-Creator;</span>
    </p>
