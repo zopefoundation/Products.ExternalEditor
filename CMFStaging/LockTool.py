@@ -40,6 +40,8 @@ from permissions import ModifyPortalContent
 from permissions import LockObjects
 from permissions import UnlockObjects
 from staging_utils import verifyPermission
+from BTrees.OOBTree import OOBTree
+from BTrees.OIBTree import OIBTree
 
 _wwwdir = os.path.join(os.path.dirname(__file__), 'www') 
 
@@ -87,6 +89,32 @@ class LockTool(UniqueObject, SimpleItemWithProperties):
     #   'LockTool' interface methods
     #
 
+
+    security.declarePublic('getLocksForUserId')
+    def getLocksForUserId(self, user_id):
+        """Returns a sequence of path strings representing objects
+           currently locked by the given user id. Each path is a
+           slash-separated path suitable to pass to traversal apis."""
+        mapping = getattr(self, '_locks', None)
+        if mapping is None:
+            return []
+        items = mapping.get(user_id, None)
+        if items is None:
+            return []
+        return items.keys()   
+
+    security.declarePrivate('noteLock')
+    def noteLock(self, obj, user_id):
+        mapping = getattr(self, '_locks', None)
+        if mapping is None:
+            mapping = self._locks = OOBTree()
+        path = '/'.join(obj.getPhysicalPath())
+        items = mapping.get(user_id, None)
+        if items is None:
+            items = OIBTree()
+            mapping[user_id] = items
+        items[path] = 1
+
     security.declarePublic('lock')
     def lock(self, obj):
         """Locks an object.
@@ -106,7 +134,19 @@ class LockTool(UniqueObject, SimpleItemWithProperties):
         user = getSecurityManager().getUser()
         lockitem = LockItem(user, timeout=(self.timeout_days * 86400))
         obj.wl_setLock(lockitem.getLockToken(), lockitem)
+        self.noteLock(obj, user.getId())
 
+    security.declarePrivate('noteUnlock')
+    def noteUnlock(self, obj, user_id):
+        mapping = getattr(self, '_locks', None)
+        if mapping is None:
+            return
+        path = '/'.join(obj.getPhysicalPath())
+        items = mapping.get(user_id, None)
+        if items is None:
+            return
+        if items.get(path):
+            del items[path]
 
     security.declarePublic('breaklock')
     def breaklock(self, obj, message=''):
@@ -121,7 +161,8 @@ class LockTool(UniqueObject, SimpleItemWithProperties):
                 if (vt.isUnderVersionControl(obj)
                     and vt.isCheckedOut(obj)):
                     vt.checkin(obj, message)
-
+        if locker:
+            self.noteUnlock(obj, locker)
 
     security.declarePublic('unlock')
     def unlock(self, obj, message=''):
@@ -149,6 +190,7 @@ class LockTool(UniqueObject, SimpleItemWithProperties):
                     and vt.isCheckedOut(obj)):
                     vt.checkin(obj, message)
 
+        self.noteUnlock(obj, locker)
 
     security.declarePublic('locker')
     def locker(self, obj):
