@@ -158,17 +158,35 @@ class PortalContent(DynamicType, SimpleItem):
             catalog.reindexObject(self)
         
     def manage_afterAdd(self, item, container):
-        "Add self to the workflow and catalog."
-        if aq_base(item) is aq_base(self):
+        """
+            Add self to the workflow and catalog.
+        """
+        #
+        #   Are we being added (or moved)?
+        #
+        if aq_base(container) is not aq_base(self):
             wf = getToolByName(self, 'portal_workflow', None)
             if wf is not None:
                 wf.notifyCreated(self)
             self.indexObject()
 
     def manage_beforeDelete(self, item, container):
-        "Remove self from the catalog."
-        if aq_base(item) is aq_base(self):
+        """
+            Remove self from the catalog.
+        """
+        #
+        #   Are we going away?
+        #
+        if aq_base(container) is not aq_base(self):
             self.unindexObject()
+            #
+            #   Now let our "aspects" know we are going away.
+            #
+            for it, subitem in self.objectItems():
+                si_m_bD = getattr( subitem, 'manage_beforeDelete', None )
+                if si_m_bD is not None:
+                    si_m_bD( item, container )
+
 
     # Contentish interface methods
     # ----------------------------
