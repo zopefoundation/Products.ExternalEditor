@@ -47,6 +47,9 @@
    two default filesystem implementations are in CMFDefault's "control"
    skin.
 
+ - Extend TypesTool to deal appropriately with DTML factory methods
+   (e.g., for ZClasses).
+
 1.0 final (2001/03/29)
 
  - Removed embedded spaces in 'portal_status_message' strings
