@@ -91,7 +91,7 @@ __version__='$Revision$'[11:-2]
 
 
 from Products.CMFCore.utils import _getAuthenticatedUser, _checkPermission
-from Products.CMFCore.MembershipTool import MembershipTool
+import Products.CMFCore.MembershipTool
 from Products.CMFCore.PortalFolder import manage_addPortalFolder
 from Globals import default__class_init__
 import Document
@@ -107,7 +107,10 @@ default_member_content = '''Default page for %s
 '''
 
 
-class MembershipTool (MembershipTool):
+class MembershipTool ( Products.CMFCore.MembershipTool.MembershipTool ):
+    """
+    """
+
     meta_type = 'Default Membership Tool'
 
     __ac_permissions__ = (
@@ -132,7 +135,8 @@ class MembershipTool (MembershipTool):
         '''Adds a new member to the user folder.  Security checks will have
         already been performed.  Called by portal_registration.
         '''
-        MembershipTool.addMember(self, id, password, roles, domains)
+        Products.CMFCore.MembershipTool.MembershipTool.addMember( self, id, password
+                                                                , roles, domains )
         member = self.getMemberById(id)
         if hasattr(getattr(member, 'aq_base', member), 'getUser'):
             user = member.getUser()
