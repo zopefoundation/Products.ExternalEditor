@@ -14,6 +14,7 @@ def test_suite():
         'test_MetadataTool',
         'test_utils',
         'test_join',
+        'test_Portal',
         ])
 
 if __name__ == '__main__':

@@ -188,7 +188,7 @@ class Image( OFS.Image.Image
             if t: return 1
             else: return 0
 
-    def edit(self, precondition='', file=''):
+    def _edit(self, precondition='', file=''):
         """ Update image. """
         if precondition: self.precondition = precondition
         elif self.precondition: del self.precondition
@@ -197,6 +197,12 @@ class Image( OFS.Image.Image
             self.manage_upload(file)
 
         self.setFormat(self.content_type)
+
+    def edit(self, precondition='', file=''):
+        """ Update and reindex. """
+        self._edit( precondition, file )
+        self.reindexObject()
+
     edit = WorkflowAction(edit)
 
     def index_html(self, REQUEST, RESPONSE):
