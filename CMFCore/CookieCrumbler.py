@@ -98,6 +98,7 @@ import sys
 from ZPublisher.HTTPRequest import HTTPRequest
 
 # Constants.
+ATTEMPT_DISABLED = -1
 ATTEMPT_NONE = 0
 ATTEMPT_LOGIN = 1
 ATTEMPT_CONT = 2
@@ -168,12 +169,10 @@ class CookieCrumbler (SimpleItemWithProperties):
         # Returns flags indicating what the user is trying to do.
 
         if req.__class__ is not HTTPRequest:
-            req[ 'disable_cookie_login__' ] = 1
-            return ATTEMPT_NONE
+            return ATTEMPT_DISABLED
 
         if not req[ 'REQUEST_METHOD' ] in ( 'GET', 'PUT', 'POST' ):
-            req[ 'disable_cookie_login__' ] = 1
-            return ATTEMPT_NONE
+            return ATTEMPT_DISABLED
 
         if not req._auth:
             if (req.has_key(self.pw_cookie) and
@@ -211,6 +210,8 @@ class CookieCrumbler (SimpleItemWithProperties):
         '''The __before_publishing_traverse__ hook.'''
         resp = self.REQUEST['RESPONSE']
         attempt = self.modifyRequest(req, resp)
+        if attempt == ATTEMPT_DISABLED:
+            return
         if self.auto_login_page:
             if not req.get('disable_cookie_login__', 0):
                 if (attempt == ATTEMPT_LOGIN or
