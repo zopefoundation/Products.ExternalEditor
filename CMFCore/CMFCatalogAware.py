@@ -78,6 +78,9 @@ class CMFCatalogAware:
             path = '/'.join(self.getPhysicalPath())
             for brain in catalog.searchResults(path=path):
                 ob = brain.getObject()
+                if ob is None:
+                    # Ignore old references to deleted objects.
+                    continue
                 s = getattr(ob, '_p_changed', 0)
                 catalog.reindexObject(ob, idxs=['allowedRolesAndUsers'])
                 if s is None: ob._p_deactivate()
