@@ -287,14 +287,14 @@ class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
     security.declarePrivate('unrestrictedSearchResults')
     def unrestrictedSearchResults(self, REQUEST=None, **kw):
         """Calls ZCatalog.searchResults directly without restrictions.
-        
-        This method returns every also not yet effective and already expired 
+
+        This method returns every also not yet effective and already expired
         objects regardless of the roles the caller has.
-        
-        CAUTION: Care must be taken not to open security holes by 
+
+        CAUTION: Care must be taken not to open security holes by
         exposing the results of this method to non authorized callers!
-        
-        If you're in doubth if you should use this method or
+
+        If you're in doubt if you should use this method or
         'searchResults' use the latter.
         """
         return ZCatalog.searchResults(self, REQUEST, **kw)
