@@ -89,7 +89,7 @@ import Globals
 from Globals import DTMLFile
 import Acquisition
 from AccessControl import getSecurityManager
-from OFS.SimpleItem import Item_w__name__
+from OFS.SimpleItem import Item
 from DirectoryView import registerFileExtension, registerMetaType, expandpath
 from string import split
 from os import path, stat
@@ -102,7 +102,7 @@ from Products.PythonScripts.PythonScript import PythonScript
 from Shared.DC.Scripts.Script import Script, defaultBindings
 
 
-class FSPythonScript (Script, Acquisition.Implicit, Item_w__name__):
+class FSPythonScript (Script, Acquisition.Implicit, Item):
     """FSPythonScripts act like Python Scripts but are not directly
     modifiable from the management interface."""
 
