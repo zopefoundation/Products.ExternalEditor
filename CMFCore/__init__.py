@@ -94,7 +94,6 @@ import DirectoryView, FSDTMLMethod, FSImage, FSPropertiesObject, FSPythonScript
 import CookieCrumbler
 import utils
 
-
 ADD_FOLDERS_PERMISSION = 'Add portal folders'
 
 bases = (
@@ -133,7 +132,7 @@ def initialize(context):
     utils.initializeBasesPhase2(z_tool_bases, context)
 
     context.registerClass(
-        DirectoryView.DirectoryView,
+        DirectoryView.DirectoryViewSurrogate,
         constructors=(('manage_addDirectoryViewForm',
                        DirectoryView.manage_addDirectoryViewForm),
                       DirectoryView.manage_addDirectoryView,
