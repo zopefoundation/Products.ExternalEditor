@@ -63,10 +63,10 @@
 
  <tr valign="top">
   <th align="right"> Subject </th>
-  <td>
-   <textarea name="subject:lines" rows="3"
-               cols="20" wrap="soft"
-			   tal:define="lines here/subjectsList"><span tal:repeat="line lines" tal:replace="line"></span></textarea>
+  <td tal:define="subj_lines python: modules['string'].join(
+                                         here.subjectsList(), '\n' )">
+     <textarea name="subject:lines" rows="3" cols="20"
+	           tal:content="subj_lines"></textarea>
  <br> 
    <select name="subject:list" multiple>
      <option value=""
