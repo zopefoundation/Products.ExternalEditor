@@ -122,6 +122,20 @@ class CookieAuthHelperTests( unittest.TestCase
         helper.resetCredentials(request, response)
         self.assertEqual(len(response.cookies), 0)
 
+    def test_loginWithoutCredentialsUpdate( self ):
+        helper = self._makeOne()
+        response = FauxCookieResponse()
+        request = FauxSettableRequest( __ac_name='foo'
+                                     , __ac_password='bar'
+                                     , RESPONSE=response
+                                     )
+        request.form = {'came_from':''}
+        helper.REQUEST = request
+
+        helper.login()
+        self.assertEqual(len(response.cookies), 0)
+
+
 if __name__ == "__main__":
     unittest.main()
 

@@ -4,6 +4,16 @@ PluggableAuthService changelog
 
     Features Added
 
+      - Enabled the usage of the CookieAuthHelper login screen functionality
+        without actually using the CookieAuthHelper to maintain the 
+        credentials store in its own auth cookie by ensuring that only
+        active updateCredentials plugins are informed about a successful
+        login so they can store the credentials.
+
+      - Added a _getPAS method to the BasePlugin base class to be used
+        as the canonical way of getting at the PAS instance from within
+        plugins.
+
       - Group and user plugins can now specify their own title for a
         principal entry (PAS will not compute one if they do).
 

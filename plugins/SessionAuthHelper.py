@@ -95,10 +95,8 @@ class SessionAuthHelper(BasePlugin):
     security.declarePrivate('updateCredentials')
     def updateCredentials(self, request, response, login, new_password):
         """ Respond to change of credentials. """
-        name = request.SESSION.get('__ac_name', '')
-
-        if name:
-            request.SESSION.set('__ac_password', new_password)
+        request.SESSION.set('__ac_name', login)
+        request.SESSION.set('__ac_password', new_password)
         
     security.declarePrivate('resetCredentials')
     def resetCredentials(self, request, response):

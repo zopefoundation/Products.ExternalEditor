@@ -207,7 +207,17 @@ class CookieAuthHelper(Folder, BasePlugin):
         login = request.get('__ac_name', '')
         password = request.get('__ac_password', '')
 
-        self.updateCredentials(request, response, login, password)
+        # In order to use the CookieAuthHelper for its nice login page
+        # facility but store and manage credentials somewhere else we need
+        # to make sure that upon login only plugins activated as
+        # IUpdateCredentialPlugins get their updateCredentials method
+        # called. If the method is called on the CookieAuthHelper it will
+        # simply set its own auth cookie, to the exclusion of any other
+        # plugins that might want to store the credentials.
+        pas_instance = self._getPAS()
+
+        if pas_instance is not None:
+            pas_instance.updateCredentials(request, response, login, password)
 
         came_from = request.form['came_from']
 

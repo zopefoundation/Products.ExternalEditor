@@ -1192,6 +1192,24 @@ class PluggableAuthService( Folder, Cacheable ):
         """
         return True
 
+    security.declarePrivate('updateCredentials')
+    def updateCredentials(self, request, response, login, new_password):
+        """Central updateCredentials method
+
+        This method is needed for cases where the credentials storage and
+        the credentials extraction is handled by different plugins. Example
+        case would be if the CookieAuthHelper is used as a Challenge and
+        Extraction plugin only to take advantage of the login page feature
+        but the credentials are not stored in the CookieAuthHelper cookie
+        but somewhere else, like in a Session.
+        """
+        plugins = self._getOb('plugins')
+        cred_updaters = plugins.listPlugins(ICredentialsUpdatePlugin)
+
+        for updater_id, updater in cred_updaters:
+            updater.updateCredentials(request, response, login, new_password)
+
+
 InitializeClass( PluggableAuthService )
 
 _PLUGIN_TYPE_INFO = (
