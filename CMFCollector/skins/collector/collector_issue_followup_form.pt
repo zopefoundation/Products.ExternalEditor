@@ -93,6 +93,7 @@
       <tr>
         <td colspan="2">
           <textarea name="comment" rows="10" cols="65" wrap="soft"
+                    style="overflow: auto"
                     tal:content="python: (request.get('do_cite')
                                           and here.cited_text()) or ''">
 </textarea>
@@ -122,17 +123,24 @@
 
       </tr>
 
-    </table>
+      <tr>
+        <td colspan="3">
 
-    <div metal:use-macro="here/collector_macros/macros/add_artifacts_table">
-       add_artifacts_excerpt
-    </div>
+          <div metal:use-macro=
+                           "here/collector_macros/macros/add_artifacts_table">
+             ADD-ARTIFACTS TABLE
+          </div>
+
+        </td>
+      </tr>
 
       <tr>
-        <td colspan="5">
+        <td colspan="3">
             <input type="submit" name="submit" value="Submit">
         </td>
       </tr>
+
+    </table>
 
   </form>
 
