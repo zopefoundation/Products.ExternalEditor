@@ -2,6 +2,12 @@ CMF 1.5alpha (unreleased)
 
   New Features
 
+    - The caching policy manager now sets the header
+      'X-Cache-Headers-Set-By' when it sets cache headers
+      in a response.
+
+    - FSDTMLMethods now play nicely with the caching policy manager.
+
     - zpt skin: Added batch_widgets.pt and getBatchNavigation.py.
       roster and search use now the new navigation macro. Looks like before,
       but i18n works better and it's easier to reuse or replace the code.
