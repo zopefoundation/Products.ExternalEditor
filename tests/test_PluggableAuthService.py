@@ -75,13 +75,18 @@ class DummyGroupEnumerator( DummyPlugin ):
                    } ]
 
         if id:
-            if exact_match:
-                if id == 'groups:%s' % self._group_id:
-                    return result
-            else:            
-                if self._group_id.find( id ) >= 0:
-                    return result
+            if self._group_id.find( id ) >= 0:
+                return result
         return []
+
+class DummySuperEnumerator(DummyUserEnumerator, DummyGroupEnumerator):
+
+    PLUGINID = 'super'
+
+    def __init__(self, user_id, login, group_id):
+        self._user_id = user_id
+        self._login = login
+        self._group_id = group_id
 
 class DummyGroupPlugin(DummyPlugin):
 
@@ -164,7 +169,7 @@ class FauxRoot( FauxContainer ):
 
 class FauxUser( Implicit ):
 
-    def __init__( self, id, name=None, roles=(), groups={} ):
+    def __init__( self, id, name=None, roles={}, groups={} ):
 
         self._id = id
         self._name = name
@@ -198,6 +203,10 @@ class FauxUser( Implicit ):
     def _addGroups(self, groups):
         for group in groups:
             self._groups[group] = 1
+
+    def _addRoles(self, roles):
+        for role in roles:
+            self._roles[role] = 1
 
     def __repr__( self ):
 
@@ -293,6 +302,19 @@ class PluggableAuthServiceTests( unittest.TestCase ):
 
         enumerator = DummyGroupEnumerator( group_id )
         directlyProvides( enumerator, ( IGroupEnumerationPlugin, ) )
+
+        return enumerator
+
+    def _makeSuperEnumerator( self, user_id, login, group_id ):
+
+        from Products.PluggableAuthService.interfaces.plugins \
+             import IUserEnumerationPlugin
+        from Products.PluggableAuthService.interfaces.plugins \
+             import IGroupEnumerationPlugin
+
+        enumerator = DummySuperEnumerator( user_id, login, group_id )
+        directlyProvides( enumerator, ( IUserEnumerationPlugin,
+                                        IGroupEnumerationPlugin ) )
 
         return enumerator
 
@@ -1430,13 +1452,13 @@ class PluggableAuthServiceTests( unittest.TestCase ):
 
         foo = self._makeGroupEnumerator( 'foo' )
         zcuf._setObject( 'foo', foo )
-        
+
         plugins = zcuf._getOb( 'plugins' )
         plugins.activatePlugin( IGroupEnumerationPlugin, 'foo' )
 
-        self.failIf(      zcuf.searchGroups( id='groups:bar' ) )
-        self.failUnless(  zcuf.searchGroups( id='groups:foo' ) )
-        self.assertEqual( len(zcuf.searchGroups( id='groups:foo' )), 1 )
+        self.failIf(      zcuf.searchGroups( id='bar' ) )
+        self.failUnless(  zcuf.searchGroups( id='foo' ) )
+        self.assertEqual( len(zcuf.searchGroups( id='foo' )), 1 )
 
     def test_searchPrincipals( self ):
 
@@ -1458,10 +1480,37 @@ class PluggableAuthServiceTests( unittest.TestCase ):
         plugins.activatePlugin( IGroupEnumerationPlugin, 'foobar' )
 
         self.failIf(      zcuf.searchPrincipals( id='zope' ) )
-        self.failUnless(  len( zcuf.searchPrincipals( id='foo' ) ) == 1 )
-        self.failUnless(  len( zcuf.searchPrincipals( id='foo', 
-                                                      exact_match=False ) 
-                             ) == 2 )
+        self.failUnless(  len( zcuf.searchPrincipals( id='foo__foo'
+                                                    , exact_match=True )
+                               ) == 1 )
+        self.failUnless(  len( zcuf.searchPrincipals( id='foo'
+                                                    , exact_match=False )
+                               ) == 2 )
+
+    def test_searchPrincipalsWithSuperEnumerator( self ):
+
+        from Products.PluggableAuthService.interfaces.plugins \
+             import IUserEnumerationPlugin
+        from Products.PluggableAuthService.interfaces.plugins \
+             import IGroupEnumerationPlugin
+
+        plugins = self._makePlugins()
+        zcuf = self._makeOne( plugins )
+
+        s00per = self._makeSuperEnumerator( 'user', 'login', 'group' )
+        zcuf._setObject( 's00per', s00per )
+
+        plugins = zcuf._getOb( 'plugins' )
+        plugins.activatePlugin( IUserEnumerationPlugin, 's00per' )
+        plugins.activatePlugin( IGroupEnumerationPlugin, 's00per' )
+
+        self.failIf(      zcuf.searchPrincipals( id='zope' ) )
+        self.failUnless(
+            len( zcuf.searchPrincipals( id='s00per__user'
+                                      , exact_match=True ) ) == 1 )
+        self.failUnless(
+            len( zcuf.searchPrincipals( id='s00per__group'
+                                      , exact_match=True ) ) == 1 )
 
 if __name__ == "__main__":
     unittest.main()
