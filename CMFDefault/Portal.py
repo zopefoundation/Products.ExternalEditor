@@ -220,13 +220,13 @@ class CMFSite ( PortalObjectBase
     title = ''
     description = ''
 
-    __ac_permissions__=(
-        ('Manage portal', ('manage_migrate_content',)),
-        ('Add portal content', ()),
-        ('Add portal folders', ()),
-        ('List portal members', ()),
-        ('Reply to item', ()),
-        )
+    __ac_permissions__=( ( 'Manage portal', ('manage_migrate_content',) )
+                       , ( 'Add portal content', () )
+                       , ( 'Add portal folders', () )
+                       , ( 'List portal members', () )
+                       , ( 'Reply to item', () )
+                       , ( 'View',  ( 'isEffective', ) )
+                       )
 
     def isEffective( self, date ):
         """
