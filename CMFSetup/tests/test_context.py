@@ -23,6 +23,10 @@ class DummySite( Folder ):
 
     pass
 
+class DummyTool( Folder ):
+
+    pass
+
 class ImportContextTests( FilesystemTestBase
                         , ConformsToISetupContext
                         , ConformsToIImportContext
@@ -389,11 +393,181 @@ class TarballExportContextTests( FilesystemTestBase
         self._verifyTarballEntry( fileish, 'bar/baz.txt', digits )
 
 
+class SnapshotExportContextTests( SecurityRequestTest
+                                , ConformsToISetupContext
+                                , ConformsToIExportContext
+                                ):
+
+    def _getTargetClass( self ):
+
+        from Products.CMFSetup.context import SnapshotExportContext
+        return SnapshotExportContext
+
+    def _makeOne( self, *args, **kw ):
+
+        return self._getTargetClass()( *args, **kw )
+
+    def test_writeDataFile_simple_image( self ):
+
+        from OFS.Image import Image
+        _FILENAME = 'simple.txt'
+        _CONTENT_TYPE = 'image/png'
+        png_filename = os.path.join( os.path.split( __file__ )[0], 'test.png' )
+        png_file = open( png_filename, 'rb' )
+        png_data = png_file.read()
+        png_file.close()
+
+        site = DummySite( 'site' ).__of__( self.root )
+        site.portal_setup = DummyTool( 'portal_setup' )
+        tool = site.portal_setup
+        ctx = self._makeOne( tool, 'simple' )
+
+        ctx.writeDataFile( _FILENAME, png_data, _CONTENT_TYPE )
+
+        snapshot = tool.snapshots._getOb( 'simple' )
+
+        self.assertEqual( len( snapshot.objectIds() ), 1 )
+        self.failUnless( _FILENAME in snapshot.objectIds() )
+
+        fileobj = snapshot._getOb( _FILENAME )
+
+        self.assertEqual( fileobj.getId(), _FILENAME )
+        self.assertEqual( fileobj.meta_type, Image.meta_type )
+        self.assertEqual( fileobj.getContentType(), _CONTENT_TYPE )
+        self.assertEqual( fileobj.data, png_data )
+
+    def test_writeDataFile_simple_plain_text( self ):
+
+        from string import digits
+        from OFS.Image import File
+        _FILENAME = 'simple.txt'
+        _CONTENT_TYPE = 'text/plain'
+
+        site = DummySite( 'site' ).__of__( self.root )
+        site.portal_setup = DummyTool( 'portal_setup' )
+        tool = site.portal_setup
+        ctx = self._makeOne( tool, 'simple' )
+
+        ctx.writeDataFile( _FILENAME, digits, _CONTENT_TYPE )
+
+        snapshot = tool.snapshots._getOb( 'simple' )
+
+        self.assertEqual( len( snapshot.objectIds() ), 1 )
+        self.failUnless( _FILENAME in snapshot.objectIds() )
+
+        fileobj = snapshot._getOb( _FILENAME )
+
+        self.assertEqual( fileobj.getId(), _FILENAME )
+        self.assertEqual( fileobj.meta_type, File.meta_type )
+        self.assertEqual( fileobj.getContentType(), _CONTENT_TYPE )
+        self.assertEqual( str( fileobj ), digits )
+
+    def test_writeDataFile_simple_xml( self ):
+
+        from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
+        _FILENAME = 'simple.xml'
+        _CONTENT_TYPE = 'text/xml'
+        _XML = """<?xml version="1.0"?><simple />"""
+
+        site = DummySite( 'site' ).__of__( self.root )
+        site.portal_setup = DummyTool( 'portal_setup' )
+        tool = site.portal_setup
+        ctx = self._makeOne( tool, 'simple' )
+
+        ctx.writeDataFile( _FILENAME, _XML, _CONTENT_TYPE )
+
+        snapshot = tool.snapshots._getOb( 'simple' )
+
+        self.assertEqual( len( snapshot.objectIds() ), 1 )
+        self.failUnless( _FILENAME in snapshot.objectIds() )
+
+        template = snapshot._getOb( _FILENAME )
+
+        self.assertEqual( template.getId(), _FILENAME )
+        self.assertEqual( template.meta_type, ZopePageTemplate.meta_type )
+        self.assertEqual( template.read(), _XML )
+        self.failIf( template.html() )
+
+    def test_writeDataFile_subdir_dtml( self ):
+
+        from OFS.DTMLDocument import DTMLDocument
+        _FILENAME = 'simple.dtml'
+        _CONTENT_TYPE = 'text/html'
+        _HTML = """<html><body><h1>HTML</h1></body></html>"""
+
+        site = DummySite( 'site' ).__of__( self.root )
+        site.portal_setup = DummyTool( 'portal_setup' )
+        tool = site.portal_setup
+        ctx = self._makeOne( tool, 'simple' )
+
+        ctx.writeDataFile( _FILENAME, _HTML, _CONTENT_TYPE, 'sub1' )
+
+        snapshot = tool.snapshots._getOb( 'simple' )
+        sub1 = snapshot._getOb( 'sub1' )
+
+        self.assertEqual( len( sub1.objectIds() ), 1 )
+        self.failUnless( _FILENAME in sub1.objectIds() )
+
+        template = sub1._getOb( _FILENAME )
+
+        self.assertEqual( template.getId(), _FILENAME )
+        self.assertEqual( template.meta_type, DTMLDocument.meta_type )
+        self.assertEqual( template.read(), _HTML )
+
+    def test_writeDataFile_nested_subdirs_html( self ):
+
+        from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
+        _FILENAME = 'simple.html'
+        _CONTENT_TYPE = 'text/html'
+        _HTML = """<html><body><h1>HTML</h1></body></html>"""
+
+        site = DummySite( 'site' ).__of__( self.root )
+        site.portal_setup = DummyTool( 'portal_setup' )
+        tool = site.portal_setup
+        ctx = self._makeOne( tool, 'simple' )
+
+        ctx.writeDataFile( _FILENAME, _HTML, _CONTENT_TYPE, 'sub1/sub2' )
+
+        snapshot = tool.snapshots._getOb( 'simple' )
+        sub1 = snapshot._getOb( 'sub1' )
+        sub2 = sub1._getOb( 'sub2' )
+
+        self.assertEqual( len( sub2.objectIds() ), 1 )
+        self.failUnless( _FILENAME in sub2.objectIds() )
+
+        template = sub2._getOb( _FILENAME )
+
+        self.assertEqual( template.getId(), _FILENAME )
+        self.assertEqual( template.meta_type, ZopePageTemplate.meta_type )
+        self.assertEqual( template.read(), _HTML )
+        self.failUnless( template.html() )
+
+    def test_writeDataFile_multiple( self ):
+
+        from string import printable
+        from string import digits
+
+        site = DummySite( 'site' ).__of__( self.root )
+        site.portal_setup = DummyTool( 'portal_setup' )
+        tool = site.portal_setup
+        ctx = self._makeOne( tool, 'multiple' )
+
+        ctx.writeDataFile( 'foo.txt', printable, 'text/plain' ) 
+        ctx.writeDataFile( 'bar.txt', digits, 'text/plain' ) 
+
+        snapshot = tool.snapshots._getOb( 'multiple' )
+
+        self.assertEqual( len( snapshot.objectIds() ), 2 )
+
+        for id in [ 'foo.txt', 'bar.txt' ]:
+            self.failUnless( id in snapshot.objectIds() )
+
 def test_suite():
     return unittest.TestSuite((
         unittest.makeSuite( ImportContextTests ),
         unittest.makeSuite( ExportContextTests ),
         unittest.makeSuite( TarballExportContextTests ),
+        unittest.makeSuite( SnapshotExportContextTests ),
         ))
 
 if __name__ == '__main__':

@@ -15,6 +15,12 @@ from Acquisition import Implicit
 from Acquisition import aq_inner
 from Acquisition import aq_parent
 from Globals import InitializeClass
+from OFS.DTMLDocument import DTMLDocument
+from OFS.Folder import Folder
+from OFS.Image import File
+from OFS.Image import Image
+from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
+from Products.PythonScripts.PythonScript import PythonScript
 
 from permissions import ManagePortal
 from interfaces import IImportContext
@@ -123,7 +129,6 @@ class ExportContext( Implicit ):
         """
         return self._site
 
-
     security.declareProtected( ManagePortal, 'writeDataFile' )
     def writeDataFile( self, filename, text, content_type, subdir=None ):
 
@@ -147,7 +152,7 @@ class ExportContext( Implicit ):
 
 InitializeClass( ExportContext )
 
-class TarballExportContext( ExportContext ):
+class TarballExportContext( Implicit ):
 
     __implements__ = ( IExportContext, )
 
@@ -164,6 +169,13 @@ class TarballExportContext( ExportContext ):
         self._archive_filename = archive_name
         self._archive = TarFile.open( archive_name, 'w:gz'
                                     , self._archive_stream )
+
+    security.declareProtected( ManagePortal, 'getSite' )
+    def getSite( self ):
+
+        """ See ISetupContext.
+        """
+        return self._site
 
     security.declareProtected( ManagePortal, 'writeDataFile' )
     def writeDataFile( self, filename, text, content_type, subdir=None ):
@@ -192,3 +204,88 @@ class TarballExportContext( ExportContext ):
         """ Close the archive, and return it as a big string.
         """
         return self._archive_filename
+
+InitializeClass( TarballExportContext )
+
+class SnapshotExportContext( Implicit ):
+
+    __implements__ = ( IExportContext, )
+
+    security = ClassSecurityInfo()
+
+    def __init__( self, tool, snapshot_id ):
+
+        self._tool = aq_inner( tool )
+        self._site = aq_parent( self._tool )
+        self._snapshot_id = snapshot_id
+
+    security.declareProtected( ManagePortal, 'getSite' )
+    def getSite( self ):
+
+        """ See ISetupContext.
+        """
+        return self._site
+
+    security.declareProtected( ManagePortal, 'writeDataFile' )
+    def writeDataFile( self, filename, text, content_type, subdir=None ):
+
+        """ See IExportContext.
+        """
+        folder = self._ensureSnapshotsFolder( subdir )
+
+        # TODO: switch on content_type
+        ob = self._createObjectByType( filename, text, content_type )
+        folder._setObject( filename, ob )
+
+    #
+    #   Helper methods
+    #
+    security.declarePrivate( '_createObjectByType' )
+    def _createObjectByType( self, name, body, content_type ):
+
+        if name.endswith('.py'):
+
+            ob = PythonScript( name )
+            ob.write( body )
+
+        elif name.endswith('.dtml'):
+
+            ob = DTMLDocument( '', __name__=name )
+            ob.munge( body )
+
+        elif content_type in ('text/html', 'text/xml' ):
+
+            ob = ZopePageTemplate( name, body, content_type=content_type )
+
+        elif content_type[:6]=='image/':
+
+            ob=Image( name, '', body, content_type=content_type )
+
+        else:
+            ob=File( name, '', body, content_type=content_type )
+
+        return ob
+
+    security.declarePrivate( '_ensureSnapshotsFolder' )
+    def _ensureSnapshotsFolder( self, subdir=None ):
+
+        """ Ensure that the appropriate snapshot folder exists.
+        """
+        path = [ 'snapshots', self._snapshot_id ]
+
+        if subdir is not None:
+            path.extend( subdir.split( '/' ) )
+
+        current = self._tool
+
+        for element in path:
+
+            if element not in current.objectIds():
+                current._setObject( element, Folder( 'element' ) )
+
+            current = current._getOb( element )
+
+        return current
+
+
+InitializeClass( SnapshotExportContext )
