@@ -105,6 +105,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
                  reported_version=None, other_version_info=None,
                  creation_date=None, modification_date=None,
                  effective_date=None, expiration_date=None,
+                 assignees=None,
                  file=None, fileid=None, filetype=None):
         """ """
 
@@ -145,12 +146,12 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         self.reported_version = reported_version
         self.other_version_info = other_version_info
 
+        container._setObject(id, self)
+        contained = container._getOb(id)
         # Following is acquisition-wrapped so, eg, invokeFactory can work.
-        contained = self.__of__(container)
-        contained.do_action('Request', description, None,
+        contained._setPortalTypeName('Collector Issue')
+        contained.do_action('request', description, assignees,
                             file, fileid, filetype)
-
-        return self
 
     security.declareProtected(CMFCorePermissions.View, 'CookedBody')
     def CookedBody(self):
@@ -269,9 +270,9 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         # Strip off '_confidential' from status, if any.
         orig_status = string.split(self.status(), '_')[0]
 
-        if string.lower(action)  not in ['comment', 'request']:
+        if string.lower(action) != 'comment':
             # Confirm against portal actions tool:
-            if action not in self._valid_actions():
+            if action != 'request' and action not in self._valid_actions():
                 raise 'Unauthorized', "Invalid action '%s'" % action
 
             self.portal_workflow.doActionFor(self,
@@ -288,7 +289,9 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
 
         comment_header = [self._entry_header(action, username)]
 
-        if orig_status and (new_status != orig_status):
+        if (orig_status
+            and (orig_status != 'New')
+            and (new_status != orig_status)):
             comment_header.append(" Status: %s => %s"
                                   % (orig_status, new_status))
 
@@ -447,13 +450,13 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
     def assigned_to(self):
         """Return the current supporters list, according to workflow."""
         wftool = getToolByName(self, 'portal_workflow')
-        return wftool.getInfoFor(self, 'assigned_to', [])
+        return wftool.getInfoFor(self, 'assigned_to', ()) or ()
 
     security.declareProtected(CMFCorePermissions.View, 'is_assigned')
     def is_assigned(self):
         """True iff the current user is among .assigned_to()."""
         username = str(getSecurityManager().getUser())
-        return username in self.assigned_to()
+        return username in (self.assigned_to() or ())
 
     security.declareProtected(CMFCorePermissions.View, 'status')
     def status(self):
@@ -628,6 +631,7 @@ def addCollectorIssue(self,
                       severity=None,
                       reported_version=None,
                       other_version_info=None,
+                      assignees=None,
                       file=None, fileid=None, filetype=None,
                       REQUEST=None):
     """
@@ -648,7 +652,6 @@ def addCollectorIssue(self,
                         severity=severity,
                         reported_version=reported_version,
                         other_version_info=other_version_info,
+                        assignees=assignees,
                         file=file, fileid=fileid, filetype=filetype)
-    it._setPortalTypeName('Collector Issue')
-    self._setObject(id, it)
     return id
