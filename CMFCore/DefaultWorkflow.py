@@ -154,56 +154,38 @@ class DefaultWorkflowDefinition (Acquisition.Implicit):
         allow_review = _checkPermission('Review portal content', content)
         allow_request = _checkPermission('Request review', content)
 
-        make_url = lambda p, url=content_url: url + '/' + p
+        append_action = (lambda name, p, url=content_url, a=actions.append:
+                         a({'name': name,
+                            'url': url + '/' + p,
+                            'permissions': (),
+                            'category': 'workflow'}))
+
+        show_reject = 0
+        show_retract = 0
 
         if review_state == 'private':
             if allow_request:
-                actions.append(
-                    {'name': 'Submit',
-                     'url': make_url('content_submit_form'),
-                     'permissions': (),
-                     'category': 'workflow' })
+                append_action('Submit', 'content_submit_form')
 
         elif review_state == 'pending':
-            if allow_review:
-                actions.extend([
-                    {'name': 'Publish',
-                     'url': make_url('content_publish_form'),
-                     'permissions': (),
-                     'category': 'workflow' },
-                    {'name': 'Reject',
-                     'url': make_url('content_reject_form'),
-                     'permissions': (),
-                     'category': 'workflow' }])
-
             if content_creator == current_user and allow_request:
-                actions.append(
-                    {'name': 'Retract',
-                     'url': make_url('content_retract_form'),
-                     'permissions': (),
-                     'category': 'workflow' })
+                show_retract = 1
+            if allow_review:
+                append_action('Publish', 'content_publish_form')
+                show_reject = 1
 
         elif review_state == 'published':
-            if allow_review:
-                actions.append(
-                    {'name': 'Reject',
-                     'url': make_url('content_reject_form'),
-                     'permissions': (),
-                     'category': 'workflow' })
             if content_creator == current_user and allow_request:
-                actions.append(
-                    {'name': 'Retract',
-                     'url': make_url('content_retract_form'),
-                     'permissions': (),
-                     'category': 'workflow' })
+                show_retract = 1
+            if allow_review:
+                show_reject = 1
 
+        if show_retract:
+            append_action('Retract', 'content_retract_form')
+        if show_reject:
+            append_action('Reject', 'content_reject_form')
         if allow_review or allow_request:
-            actions.append(
-                {'name':'Status history',
-                 'url': make_url('content_status_history'),
-                 'permissions': (),
-                 'category': 'workflow'
-                 })
+            append_action('Status history', 'content_status_history')
 
         return actions
 
@@ -334,7 +316,7 @@ class DefaultWorkflowDefinition (Acquisition.Implicit):
         Notifies this workflow after an object has been created
         and put in its new place.
         '''
-        self.updateRoleMappings(ob)
+        self.updateRoleMappingsFor(ob)
 
     security.declarePrivate('notifyBefore')
     def notifyBefore(self, ob, action):
@@ -351,7 +333,7 @@ class DefaultWorkflowDefinition (Acquisition.Implicit):
         '''
         Notifies this workflow that an action has taken place.
         '''
-        self.updateRoleMappings(ob)
+        self.updateRoleMappingsFor(ob)
 
     security.declarePrivate('notifyException')
     def notifyException(self, ob, action, exc):
@@ -360,8 +342,8 @@ class DefaultWorkflowDefinition (Acquisition.Implicit):
         '''
         pass
 
-    security.declarePrivate('updateRoleMappings')
-    def updateRoleMappings(self, ob):
+    security.declarePrivate('updateRoleMappingsFor')
+    def updateRoleMappingsFor(self, ob):
         '''
         Changes the object permissions according to the current
         review_state.
