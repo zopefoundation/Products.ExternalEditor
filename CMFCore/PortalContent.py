@@ -25,14 +25,13 @@ from interfaces.Contentish import Contentish
 from DynamicType import DynamicType
 from utils import _getViewFor
 from CMFCatalogAware import CMFCatalogAware
-from CMFCoreExceptions import CMFResourceLockedError
+from CMFCoreExceptions import ResourceLockedError
 from CMFCorePermissions import FTPAccess
 from CMFCorePermissions import View
 
 
 # Old names that some third-party packages may need.
 NoWL = 0
-from webdav.Lockable import ResourceLockedError
 
 
 class PortalContent(DynamicType, CMFCatalogAware, SimpleItem):
@@ -81,8 +80,7 @@ class PortalContent(DynamicType, CMFCatalogAware, SimpleItem):
         Check if isLocked via webDav
         """
         if self.wl_isLocked():
-            raise CMFResourceLockedError('This resource is locked via '
-                                         'webDAV.')
+            raise ResourceLockedError('This resource is locked via webDAV.')
         return 0
 
     #

@@ -2,8 +2,8 @@
 ##parameters=text, description, text_format=None, change_and_view=''
 ##title=Edit a news item
 ##
-from Products.CMFCore.CMFCoreExceptions import CMFResourceLockedError
 from Products.CMFCore.CMFCoreExceptions import IllegalHTML
+from Products.CMFCore.CMFCoreExceptions import ResourceLockedError
 from Products.CMFDefault.utils import scrubHTML
 from Products.PythonScripts.standard import urlencode
 
@@ -12,7 +12,7 @@ try:
     description = scrubHTML( description )
 
     context.edit(text=text, description=description, text_format=text_format)
-except (CMFResourceLockedError, IllegalHTML), msg:
+except (ResourceLockedError, IllegalHTML), msg:
     message = msg
     action_id = 'edit'
 else:

@@ -19,9 +19,10 @@ from StructuredText.HTMLWithImages import HTMLWithImages
 from Globals import DTMLFile, InitializeClass
 from AccessControl import ClassSecurityInfo, getSecurityManager
 from Acquisition import aq_base
-from webdav.Lockable import ResourceLockedError
 
 from Products.CMFCore.PortalContent import PortalContent
+from Products.CMFCore.CMFCoreExceptions import EditingConflict
+from Products.CMFCore.CMFCoreExceptions import ResourceLockedError
 from Products.CMFCore.CMFCorePermissions import View
 from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
 from Products.CMFCore.utils import format_stx, keywordsplitter
@@ -140,7 +141,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
                    " (You may be able to recover your version using the"
                    " browser 'back' button, but will have to apply them"
                    " to a freshly fetched copy.)")
-            raise 'EditingConflict', msg
+            raise EditingConflict(msg)
         if text_format == 'html':
             self.text = self.cooked_text = text
         elif text_format == 'plain':
@@ -357,7 +358,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
             self.setFormat(text_format)
             self.setMetadata(headers)
             self._edit(text=body, safety_belt=safety_belt)
-        except 'EditingConflict', msg:
+        except EditingConflict, msg:
             # XXX Can we get an error msg through?  Should we be raising an
             #     exception, to be handled in the FTP mechanism?  Inquiring
             #     minds...

@@ -2,6 +2,13 @@ CMF 1.5alpha (unreleased)
 
   New Features
 
+    - CMFCoreExceptions: Added some Exceptions.
+      AccessControl.Unauthorized is a subclass of zExceptions.Unauthorized, so
+      for best results use 'AccessControl_Unauthorized' to raise Unauthorized
+      and 'zExceptions_Unauthorized' to catch them all. 'CopyError' and
+      'ResourceLockedError' are now also available for TTW code.
+      'EditingConflict' is a new CMF class replacing the old string exception.
+
     - Callable Opaque Items, CMFCatalogAware: Added a marker interface 
       'ICallableOpaqueItemWithHooks'. CMF now calls the manage_after*
       and manage_before* hooks of a marked opaque item on copying, 
@@ -114,8 +121,7 @@ CMF 1.5alpha (unreleased)
 
     - Added CMFCoreExceptions: Errors defined in this module are available for
       import by Scripts. In the long run, all Errors defined in CMF should be
-      moved to this module and subclassed from CMFError. Subclassed standard
-      errors should only be used for end user focused raise statements.
+      moved to this module.
 
     - CMFCore and CMFDefault MembershipTool: Changed permissions.
       'createMemberarea()' for someone else and 'getRoster()' including hidden

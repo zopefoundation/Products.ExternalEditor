@@ -18,14 +18,17 @@ $Id$
 import sys
 import re, base64, marshal
 
+from AccessControl import ClassSecurityInfo
+from AccessControl import getSecurityManager
 from Globals import DTMLFile
 from Globals import InitializeClass
 from OFS.Folder import Folder
 from OFS.ObjectManager import REPLACEABLE
-from AccessControl import getSecurityManager, ClassSecurityInfo, Unauthorized
 from Acquisition import aq_parent, aq_inner, aq_base
 
 from CMFCatalogAware import CMFCatalogAware
+from CMFCoreExceptions import AccessControl_Unauthorized
+from CMFCoreExceptions import zExceptions_Unauthorized
 from CMFCorePermissions import AddPortalContent
 from CMFCorePermissions import AddPortalFolders
 from CMFCorePermissions import ChangeLocalRoles
@@ -34,7 +37,8 @@ from CMFCorePermissions import ManagePortal
 from CMFCorePermissions import ManageProperties
 from CMFCorePermissions import View
 from DynamicType import DynamicType
-from utils import getToolByName, _checkPermission
+from utils import _checkPermission
+from utils import getToolByName
 
 factory_type_information = (
   { 'id'             : 'Folder'
@@ -160,8 +164,7 @@ class PortalFolder(DynamicType, CMFCatalogAware, Folder):
                 spec = [spec]
             for meta_type in spec:
                 if not meta_type in types:
-                    raise ValueError, ('%s is not a content type'
-                                       % meta_type )
+                    raise ValueError('%s is not a content type' % meta_type)
                 new_spec.append(meta_type)
         return new_spec or types
 
@@ -243,7 +246,7 @@ class PortalFolder(DynamicType, CMFCatalogAware, Folder):
             try:
                 if getSecurityManager().validate(self, self, id, v):
                     l.append(obj)
-            except Unauthorized:
+            except zExceptions_Unauthorized:  # Catch *all* Unauths!
                 pass
         return l
 
@@ -354,7 +357,7 @@ class PortalFolder(DynamicType, CMFCatalogAware, Folder):
 
         if myType is not None:
             if not myType.allowType( type_name ):
-                raise ValueError, 'Disallowed subobject type: %s' % type_name
+                raise ValueError('Disallowed subobject type: %s' % type_name)
 
         pt.constructContent(type_name, self, id, RESPONSE, *args, **kw)
 
@@ -422,9 +425,9 @@ class PortalFolder(DynamicType, CMFCatalogAware, Folder):
                                                      None, object):
                         # validation succeeded
                         return
-                    raise 'Unauthorized', object.getId()
+                    raise AccessControl_Unauthorized( object.getId() )
                 else:
-                    raise 'Unauthorized', permission_name
+                    raise AccessControl_Unauthorized(permission_name)
             #
             # Old validation for objects that may not have registered
             # themselves in the proper fashion.
@@ -446,10 +449,9 @@ class PortalFolder(DynamicType, CMFCatalogAware, Folder):
                     if getSecurityManager().validate(None, parent,
                                                      None, object):
                         return
-                    id = object.getId()
-                    raise 'Unauthorized', id
+                    raise AccessControl_Unauthorized( object.getId() )
                 else:
-                    raise 'Unauthorized', method_name
+                    raise AccessControl_Unauthorized(method_name)
         PortalFolder.inheritedAttribute(
             '_verifyObjectPaste')(self, object, validate_src)
 

@@ -30,8 +30,7 @@ from Globals import MessageDialog
 from Globals import PersistentMapping
 
 from ActionProviderBase import ActionProviderBase
-from CMFCoreExceptions import CMFNotImplementedError
-from CMFCoreExceptions import CMFUnauthorizedError
+from CMFCoreExceptions import AccessControl_Unauthorized
 from CMFCorePermissions import AccessContentsInformation
 from CMFCorePermissions import ChangeLocalRoles
 from CMFCorePermissions import ListPortalMembers
@@ -123,7 +122,7 @@ class MembershipTool(UniqueObject, Folder, ActionProviderBase):
             u = u.__of__(self.acl_users)
         if (b is nobody and not wrap_anon) or hasattr(b, 'getMemberId'):
             # This user is either not recognized by acl_users or it is
-            # already registered with something that implements the 
+            # already registered with something that implements the
             # member data tool at least partially.
             return u
 
@@ -158,7 +157,7 @@ class MembershipTool(UniqueObject, Folder, ActionProviderBase):
     def getPortalRoles(self):
         """
         Return all local roles defined by the portal itself,
-        which means roles that are useful and understood 
+        which means roles that are useful and understood
         by the portal object
         """
         parent = self.aq_inner.aq_parent
@@ -173,7 +172,7 @@ class MembershipTool(UniqueObject, Folder, ActionProviderBase):
     security.declareProtected(ManagePortal, 'setRoleMapping')
     def setRoleMapping(self, portal_role, userfolder_role):
         """
-        set the mapping of roles between roles understood by 
+        set the mapping of roles between roles understood by
         the portal and roles coming from outside user sources
         """
         if not hasattr(self, 'role_map'): self.role_map = PersistentMapping()
@@ -212,7 +211,7 @@ class MembershipTool(UniqueObject, Folder, ActionProviderBase):
         """
         Returns the flag indicating whether the membership tool
         will create a member area if an authenticated user from
-        an underlying user folder logs in first without going 
+        an underlying user folder logs in first without going
         through the join process
         """
         return self.memberareaCreationFlag
@@ -262,7 +261,7 @@ class MembershipTool(UniqueObject, Folder, ActionProviderBase):
                 if member:
                     member = member.__of__(self.acl_users)
                 else:
-                    raise ValueError, 'Member %s does not exist' % member_id
+                    raise ValueError('Member %s does not exist' % member_id)
             else:
                 return None
         if hasattr( aq_base(members), member_id ):
@@ -479,10 +478,10 @@ class MembershipTool(UniqueObject, Folder, ActionProviderBase):
             try:
                 acl_users.userFolderDelUsers(member_ids)
             except (NotImplementedError, 'NotImplemented'):
-                raise CMFNotImplementedError('The underlying User Folder '
+                raise NotImplementedError('The underlying User Folder '
                                          'doesn\'t support deleting members.')
         else:
-            raise CMFUnauthorizedError('You need the \'Manage users\' '
+            raise AccessControl_Unauthorized('You need the \'Manage users\' '
                                  'permission for the underlying User Folder.')
 
         # Delete member data in portal_memberdata.

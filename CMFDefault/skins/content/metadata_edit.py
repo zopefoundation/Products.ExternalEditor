@@ -2,7 +2,7 @@
 ##parameters=allowDiscussion=None, title=None, subject=None, description=None, contributors=None, effective_date=None, expiration_date=None, format=None, language=None, rights=None, change_and_edit='', change_and_view=''
 ##title=Update Content Metadata
 ##
-from Products.CMFCore.CMFCoreExceptions import CMFResourceLockedError
+from Products.CMFCore.CMFCoreExceptions import ResourceLockedError
 from Products.CMFCore.utils import getToolByName
 from Products.PythonScripts.standard import urlencode
 dtool = getToolByName(script, 'portal_discussion')
@@ -59,7 +59,7 @@ try:
                         , language=language
                         , rights=rights
                         )
-except CMFResourceLockedError, msg:
+except ResourceLockedError, msg:
     message = msg
     action_id = 'metadata'
 else:

@@ -16,41 +16,30 @@ $Id$
 """
 
 from AccessControl import ModuleSecurityInfo
-from AccessControl import Unauthorized
+from AccessControl import Unauthorized as AccessControl_Unauthorized
 from OFS.CopySupport import CopyError
 from webdav.Lockable import ResourceLockedError
+from zExceptions import Unauthorized as zExceptions_Unauthorized
 
 
 security = ModuleSecurityInfo('Products.CMFCore.CMFCoreExceptions')
+
+# Use AccessControl_Unauthorized to raise Unauthorized errors and
+# zExceptions_Unauthorized to catch them all.
+
+security.declarePublic('AccessControl_Unauthorized')
 security.declarePublic('CopyError')
-security.declarePublic('Unauthorized')
-
-
-security.declarePublic('CMFError')
-class CMFError(Exception):
-    """ The root of all CMF evil.
-    """
-
-
-security.declarePublic('CMFNotImplementedError')
-class CMFNotImplementedError(NotImplementedError, CMFError):
-    """ NotImplementedError in CMF.
-    """
-
-
-security.declarePublic('CMFResourceLockedError')
-class CMFResourceLockedError(ResourceLockedError, CMFError):
-    """ ResourceLockedError in CMF.
-    """
-
-
-security.declarePublic('CMFUnauthorizedError')
-class CMFUnauthorizedError(Unauthorized, CMFError):
-    """ Unauthorized error in CMF.
-    """
+security.declarePublic('ResourceLockedError')
+security.declarePublic('zExceptions_Unauthorized')
 
 
 security.declarePublic('IllegalHTML')
-class IllegalHTML(ValueError, CMFError):
+class IllegalHTML(ValueError):
     """ Illegal HTML error.
+    """
+
+
+security.declarePublic('EditingConflict')
+class EditingConflict(Exception):
+    """ Editing conflict error.
     """
