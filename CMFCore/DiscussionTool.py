@@ -1,29 +1,31 @@
 ##############################################################################
 #
-# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+# Copyright (c) 2001-2003 Zope Corporation and Contributors.
+# All Rights Reserved.
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """ Basic portal discussion access tool.
 
 $Id$
 """
 
-from utils import UniqueObject, getToolByName
-from utils import getToolByName, _dtmldir
+from utils import _dtmldir
+from utils import getToolByName
+from utils import UniqueObject
 from CMFCorePermissions import ReplyToItem
 from CMFCorePermissions import View
 from CMFCorePermissions import AccessContentsInformation
 from CMFCorePermissions import ManagePortal
 from OFS.SimpleItem import SimpleItem
 from Globals import InitializeClass, DTMLFile
-import Acquisition
+from Acquisition import Implicit
 from AccessControl import ClassSecurityInfo
 
 from interfaces.Discussions import OldDiscussable as IOldDiscussable
@@ -31,7 +33,7 @@ from interfaces.portal_discussion \
         import oldstyle_portal_discussion as IOldstyleDiscussionTool
 
 
-class OldDiscussable(Acquisition.Implicit):
+class OldDiscussable(Implicit):
     """
         Adapter for PortalContent to implement "old-style" discussions.
     """

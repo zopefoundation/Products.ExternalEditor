@@ -1,27 +1,26 @@
 ##############################################################################
 #
-# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+# Copyright (c) 2001-2003 Zope Corporation and Contributors.
+# All Rights Reserved.
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
-
 """ Basic member data tool.
 
 $Id$
 """
 
-import string
 from utils import UniqueObject, getToolByName, _dtmldir
 from OFS.SimpleItem import SimpleItem
 from OFS.PropertyManager import PropertyManager
-from Globals import Acquisition, Persistent, DTMLFile
-import Globals
+from Globals import DTMLFile
+from Globals import InitializeClass
 from AccessControl.Role import RoleManager
 from BTrees.OOBTree import OOBTree
 from ZPublisher.Converters import type_converters
@@ -116,7 +115,7 @@ class MemberDataTool (UniqueObject, SimpleItem, PropertyManager, ActionProviderB
 
         for user_wrapper in self._members.values():
             searched = getattr( user_wrapper, search_param, None )
-            if searched is not None and string.find( searched, search_term ) != -1:
+            if searched is not None and searched.find(search_term) != -1:
                 res.append( { 'username' : getattr( user_wrapper, 'id' )
                             , 'email' : getattr( user_wrapper, 'email', '' )
                             }
@@ -178,7 +177,7 @@ class MemberDataTool (UniqueObject, SimpleItem, PropertyManager, ActionProviderB
         '''
         self._members[id] = m
 
-Globals.InitializeClass(MemberDataTool)
+InitializeClass(MemberDataTool)
 
 
 class MemberData (SimpleItem):
@@ -352,4 +351,4 @@ class MemberData (SimpleItem):
     # There are other parts of the interface but they are
     # deprecated for use with CMF applications.
 
-Globals.InitializeClass(MemberData)
+InitializeClass(MemberData)

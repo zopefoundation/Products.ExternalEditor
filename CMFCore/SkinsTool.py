@@ -1,24 +1,25 @@
 ##############################################################################
 #
-# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+# Copyright (c) 2001-2003 Zope Corporation and Contributors.
+# All Rights Reserved.
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """Portal skins tool.
 
 $Id$
 """
 
-from string import split
 from utils import UniqueObject, getToolByName, _dtmldir
-import Globals
-from Globals import DTMLFile, PersistentMapping
+from Globals import DTMLFile
+from Globals import InitializeClass
+from Globals import PersistentMapping
 from SkinsContainer import SkinsContainer
 from Acquisition import aq_base
 from DateTime import DateTime
@@ -158,7 +159,7 @@ class SkinsTool(UniqueObject, SkinsContainer, Folder, ActionProviderBase):
             an object of the appropriate type (or None, if we don't
             know what to do).
         """
-        major, minor = split( typ, '/' )
+        major, minor = typ.split('/', 1)
 
         if major == 'image':
             return Image( id=name
@@ -185,9 +186,8 @@ class SkinsTool(UniqueObject, SkinsContainer, Folder, ActionProviderBase):
 
     security.declarePrivate('testSkinPath')
     def testSkinPath(self, p):
-        '''
-        Calls SkinsContainer.getSkinByPath().
-        '''
+        """ Calls SkinsContainer.getSkinByPath().
+        """
         self.getSkinByPath(p, raise_exc=1)
 
     #
@@ -309,4 +309,4 @@ class SkinsTool(UniqueObject, SkinsContainer, Folder, ActionProviderBase):
         if make_default:
             self.default_skin = skinname
 
-Globals.InitializeClass(SkinsTool)
+InitializeClass(SkinsTool)

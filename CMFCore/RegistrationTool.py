@@ -1,16 +1,16 @@
 ##############################################################################
 #
-# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+# Copyright (c) 2001-2003 Zope Corporation and Contributors.
+# All Rights Reserved.
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
-
 """ Basic user registration tool.
 
 $Id$
@@ -20,6 +20,10 @@ from Globals import InitializeClass
 from Globals import DTMLFile
 from OFS.SimpleItem import SimpleItem
 from AccessControl import ClassSecurityInfo
+from random import choice
+from string import lowercase
+from string import uppercase
+from string import digits
 
 from ActionProviderBase import ActionProviderBase
 
@@ -31,7 +35,6 @@ from CMFCorePermissions import ManagePortal
 
 from utils import UniqueObject
 from utils import _checkPermission
-from utils import _getAuthenticatedUser
 from utils import _limitGrantedRoles
 from utils import getToolByName
 from utils import _dtmldir
@@ -92,12 +95,11 @@ class RegistrationTool(UniqueObject, SimpleItem, ActionProviderBase):
         '''Generates a password which is guaranteed to comply
         with the password policy.
         '''
-        import string, random
-        chars = string.lowercase[:26] + string.uppercase[:26] + string.digits
+        chars = lowercase[:26] + uppercase[:26] + digits
         result = []
         for n in range(6):
-            result.append(random.choice(chars))
-        return string.join(result, '')
+            result.append( choice(chars) )
+        return ''.join(result)
 
     security.declareProtected(AddPortalMember, 'addMember')
     def addMember(self, id, password, roles=('Member',), domains='',

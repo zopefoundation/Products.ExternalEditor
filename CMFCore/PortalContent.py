@@ -1,21 +1,20 @@
 ##############################################################################
 #
-# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+# Copyright (c) 2001-2003 Zope Corporation and Contributors.
+# All Rights Reserved.
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """ PortalContent: Base class for all CMF content.
 
 $Id$
 """
-
-import string, urllib
 
 from DateTime import DateTime
 from Globals import InitializeClass
@@ -27,7 +26,7 @@ from CMFCorePermissions import AccessContentsInformation, View, FTPAccess
 
 from interfaces.Contentish import Contentish
 from DynamicType import DynamicType
-from utils import _checkPermission, _getViewFor
+from utils import _getViewFor
 
 from CMFCatalogAware import CMFCatalogAware
 

@@ -1,14 +1,15 @@
 ##############################################################################
 #
-# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+# Copyright (c) 2001-2003 Zope Corporation and Contributors.
+# All Rights Reserved.
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """ Type registration tool.
 
@@ -17,9 +18,11 @@ $Id$
 
 import OFS
 from Globals import InitializeClass, DTMLFile
-from utils import UniqueObject, SimpleItemWithProperties, tuplize
-from utils import _dtmldir, _checkPermission, cookString, getToolByName
-import string
+from utils import _checkPermission
+from utils import _dtmldir
+from utils import cookString
+from utils import SimpleItemWithProperties
+from utils import UniqueObject
 from AccessControl import getSecurityManager, ClassSecurityInfo, Unauthorized
 from Acquisition import aq_base
 import Products
@@ -224,7 +227,7 @@ class TypeInformation (SimpleItemWithProperties):
                     return action['action']
             else:
                 # Temporary backward compatibility.
-                if string.lower(action['name']) == id:
+                if action['name'].lower() == id:
                     return action['action']
 
         if default is _marker:

@@ -1,14 +1,15 @@
 ##############################################################################
 #
-# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+# Copyright (c) 2001-2003 Zope Corporation and Contributors.
+# All Rights Reserved.
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """ DynamicType: Mixin for dynamic properties.
 
@@ -16,8 +17,8 @@ $Id$
 """
 
 from AccessControl import ClassSecurityInfo
+from Globals import InitializeClass
 from utils import getToolByName
-import Globals
 from urllib import quote
 
 from interfaces.Dynamic import DynamicType as IDynamicType
@@ -93,4 +94,4 @@ class DynamicType:
     security.declarePublic('icon')
     icon = getIcon  # For the ZMI
 
-Globals.InitializeClass (DynamicType)
+InitializeClass(DynamicType)
