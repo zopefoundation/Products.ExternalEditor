@@ -24,8 +24,11 @@ class CachingPolicyManager( Base ):
     """
     id = Attribute( 'id', 'Must be set to "caching_policy_manager"' )
 
-    def getHTTPCachingHeaders( content, view_method, keywords ):
+    def getHTTPCachingHeaders( content, view_method, keywords, time=None ):
         """
             Update HTTP caching headers in REQUEST based on 'content',
             'view_method', and 'keywords'.
+
+            If 'time' is supplied, use it instead of the current time
+            (for reliable testing).
         """

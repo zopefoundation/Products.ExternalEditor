@@ -2,7 +2,7 @@ import unittest
 import Zope
 
 class DummyCachingManager:
-    def getHTTPCachingHeaders( self, content, view_name, keywords ):
+    def getHTTPCachingHeaders( self, content, view_name, keywords, time=None ):
         return ( ( 'foo', 'Foo' ), ( 'bar', 'Bar' ) )
 
 from Products.CMFCore.tests.base.testcase import RequestTest, SecurityTest

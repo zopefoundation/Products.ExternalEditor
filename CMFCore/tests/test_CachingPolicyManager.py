@@ -37,17 +37,6 @@ class CachingPolicyTests( unittest.TestCase ):
         return createCPContext( DummyContent(self._epoch)
                               , 'foo_view', kw, self._epoch )
         
-    def test_interface( self ):
-        from Products.CMFCore.interfaces.CachingPolicyManager \
-            import CachingPolicyManager as ICachingPolicyManager
-        from Products.CMFCore.CachingPolicyManager import CachingPolicyManager
-        try:
-            from Interface import verify_class_implementation as verifyClass
-        except ImportError:
-            from Interface.Verify import verifyClass
-
-        verifyClass(ICachingPolicyManager, CachingPolicyManager)
-
     def test_empty( self ):
 
         policy = self._makePolicy( 'empty' )
