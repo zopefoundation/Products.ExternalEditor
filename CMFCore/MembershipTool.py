@@ -357,7 +357,7 @@ class MembershipTool (UniqueObject, SimpleItem, ActionProviderBase):
         return tuple( member_roles )
 
     security.declareProtected(CMFCorePermissions.View, 'setLocalRoles')
-    def setLocalRoles( self, obj, member_ids, member_role, reindex=0 ):
+    def setLocalRoles( self, obj, member_ids, member_role, reindex=1 ):
         """ Set local roles on an item """
         member = self.getAuthenticatedMember()
         my_roles = member.getRolesInContext( obj )
@@ -374,7 +374,7 @@ class MembershipTool (UniqueObject, SimpleItem, ActionProviderBase):
             self.reindexSecurity(obj)
 
     security.declareProtected(CMFCorePermissions.View, 'deleteLocalRoles')
-    def deleteLocalRoles( self, obj, member_ids, reindex=0 ):
+    def deleteLocalRoles( self, obj, member_ids, reindex=1 ):
         """ Delete local roles for members member_ids """
         member = self.getAuthenticatedMember()
         my_roles = member.getRolesInContext( obj )
