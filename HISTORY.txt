@@ -1,4 +1,27 @@
-1.0 beta (2001/02/16)
+1.0 beta (2001/03/05)
+
+ * Migrated from old PTK repository on cvs.zope.org.
+
+ * Changed package and module names:  'PTKBase' has become
+   (mostly) 'CMFCore';  'PTKDemo', 'CMFDefault'.
+
+ * Added package 'CMFTopic', which provides a new content type,
+   'Topic';  topics are "logical" folders, which aggregate
+   content based on catalog searches against metadata.
+ 
+ * Revised discussion mechanism to store discussion with its
+   underlying content (rather than in members' "Correspondence"
+   folders).
+
+ * Mad the membership system agnostic to the kind of user
+   folder, including whether it is found in the portal or not.
+
+ * "Skinned" the portal UI and all the content objects,
+   enabling portal managers to replace it "piecemeal", safely.
+
+ * Implemented local type registration, allowing portal
+   managers to configure and extend the types addable in the
+   portal.
 
  * Add 'PortalFolder.allowedContentTypes' and supporting machinery
    in type info objects, to permit configuration of the content

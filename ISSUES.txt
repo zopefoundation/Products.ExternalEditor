@@ -1,0 +1,62 @@
+CMF 1.0beta:  Known Issues
+
+  Overview
+
+    This document describes known issues with the beta release of
+    the Content Management Framework (CMF), version 1.0.
+    For more information on the CMF, please see the "website",
+       http://cmf.zope.org.
+
+  Package and Module Name Changes
+
+    In order to improve the future maintainability of the CMF,
+    and as part of the "rebranding" of the product from "Portal
+    Toolkit" to "Content Management Framework", we have moved the
+    code base to a new set of packages:
+
+      'CMF' -- the "top-level" package, replaces 'ZopePTK'.
+
+      'CMFCore' -- provides essential interfaces and services of
+        the framework.  All CMF sites will use this package;
+        most will not replace the services it provides.  Most
+        modules in this package came from the old 'PTKBase'
+        package.
+
+      'CMFDefault' -- provides a set of content objects and
+        services which allow construction of a useful CMF site
+        "out of the box";  while many sites will use these
+        objects directly, many will extend or replace them.  Most
+        modules in this package came from the old 'PTKDemo'
+        package.
+
+      'CMFTopic' -- provides a new, "add-in" content object, the
+        Topic.  Topics represent "canned" catalog queries, and
+        are useful for presenting "logical collections" of
+        content, based on common metadata.
+
+  CVS Changes
+
+    Until this release, the "canonical" CVS repository for the
+    PTK/CMF has been on the public CVS mirror, cvs.zope.org.
+    This placement has been somewhat problematic:  because all
+    the *other* CVS code is replicated from Digital Creations'
+    internal CVS repository, tags and branches created on PTK/CMF
+    files tended to get "forgotten" during the synchronization.
+    Going forward, we will keep the CMF repository alongside the
+    main Zope repository, and replicate it to the public mirror.
+
+  Migrating Existing PTK Sites
+
+    The changes to package and module names (mentioned above)
+    have significant impacts for existing PTK sites:  instances
+    created from classes defined in 'PTKBase' or 'PTKDemo' will
+    need to be "re-seated" as instances of their cognates in
+    'CMFCore' or 'CMFDefault'.  In the past, we have arranged to
+    do such reseating "in place";  for this change, however, we
+    plan not to require a "copying" migration, in order to remove
+    the need to maintain the backward-compatibility cruft
+    required by the in-place strategy.
+    
+    We will provide a script shortly to aid this migration (in
+    fact, it will be the script which we use to migrate the
+    "dogbowl" site this week.
