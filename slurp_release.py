@@ -41,8 +41,15 @@ class ReleasePackage:
         zip_command = ( '/usr/bin/zip -r %s.zip %s'
                       % ( self._version_id, self._version_id ) )
 
-        os.remove( '%s.tar.gz' % self._version_id )
-        os.remove( '%s.zip' % self._version_id )
+        try:
+            os.remove( '%s.tar.gz' % self._version_id )
+        except OSError:
+            pass
+
+        try:
+            os.remove( '%s.zip' % self._version_id )
+        except OSError:
+            pass
 
         os.system( tar_command )
         os.system( zip_command )
@@ -92,7 +99,7 @@ class ReleasePackage:
         """ How are we used?
         """
         USAGE = """\
-slurp_release [options] release_tag version_id userid password
+slurp_release [options] release_tag version_id
 
 options:
 
@@ -168,7 +175,7 @@ options:
         print 'PUTting file, %s, to URL, %s' % ( filename, URL )
         conn.request( 'PUT', URL, body, self._getAuthHeaders() )
         response = conn.getresponse()
-        if int( response.status ) not in ( 200, 204, 302 ):
+        if int( response.status ) not in ( 200, 201, 204, 302 ):
             raise ValueError, 'Failed: %s (%s)' % ( response.status
                                                   , response.reason )
 
