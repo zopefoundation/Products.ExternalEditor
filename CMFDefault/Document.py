@@ -87,31 +87,26 @@
 
 ADD_CONTENT_PERMISSION = 'Add portal content'
 
-import Globals, string
-from Globals import DTMLFile, HTML, InitializeClass
-from Discussions import Discussable
+import Globals, StructuredText, string
+from Globals import DTMLFile, InitializeClass
 from AccessControl import ClassSecurityInfo
 from Products.CMFCore.PortalContent import PortalContent
 from DublinCore import DefaultDublinCoreImpl
-from utils import parseHeadersBody, SimpleHTMLParser, bodyfinder, _dtmldir
 
 from Products.CMFCore import CMFCorePermissions
 from Products.CMFCore.WorkflowCore import WorkflowAction, afterCreate
+from utils import parseHeadersBody, SimpleHTMLParser, bodyfinder, _dtmldir
 
 def addDocument(self, id, title='', description='', text_format='',
                 text=''):
-    """
-        Add a Document
-    """
-    o=Document(id, title, description, text_format, text)
+    """ Add a Document """
+    o = Document(id, title, description, text_format, text)
     self._setObject(id,o)
     afterCreate(self.this()._getOb(id))
     
 
 class Document(PortalContent, DefaultDublinCoreImpl):
-    """
-    A Document
-    """
+    """ A Document - Handles both StructuredText and HTML """
 
     meta_type = 'Document'
     effective_date = expiration_date = None
@@ -122,33 +117,31 @@ class Document(PortalContent, DefaultDublinCoreImpl):
 
     def __init__(self, id, title='', description='', text_format='', text=''):
         DefaultDublinCoreImpl.__init__(self)
-        self.id=id
-        self.title=title
-        self.description=description
-        self.text=text
-        self.text_format=text_format
+        self.id = id
+        self.title = title
+        self.description = description
+        self.text = text
+        self.text_format = text_format
         self.edit(text_format, text)
 
-    security.declareProtected( CMFCorePermissions.ModifyPortalContent
-                             , 'manage_edit' )
-    manage_edit = DTMLFile( 'zmi_editDocument', _dtmldir )
+    security.declareProtected(CMFCorePermissions.ModifyPortalContent,
+                              'manage_edit')
+    manage_edit = DTMLFile('zmi_editDocument', _dtmldir)
 
-    security.declareProtected( CMFCorePermissions.ModifyPortalContent
-                             , 'manage_editDocument' )
-    def manage_editDocument( self, text_format, text, file='', REQUEST=None ):
-        """
-        """
-        self._edit( text_format, text, file )
+    security.declareProtected(CMFCorePermissions.ModifyPortalContent,
+                              'manage_editDocument' )
+    def manage_editDocument(self, text_format, text, file='', REQUEST=None):
+        """ A ZMI (Zope Management Interface) level editing method """
+        self._edit(text_format, text, file)
         if REQUEST is not None:
-            REQUEST[ 'RESPONSE' ].redirect( self.absolute_url()
-                                     + '/manage_edit'
-                                     + '?manage_tabs_message=Document+updated'
-                                          )
+            REQUEST['RESPONSE'].redirect(
+                self.absolute_url()
+                + '/manage_edit'
+                + '?manage_tabs_message=Document+updated'
+                )
 
     def _edit(self, text_format, text, file=''):
-        """
-        Edit the Document
-        """
+        """ Edit the Document - Parses headers and cooks the body"""
         self.text = text
         headers = {}
         if file and (type(file) is not type('')):
@@ -200,37 +193,44 @@ class Document(PortalContent, DefaultDublinCoreImpl):
         into HTML for 'cooked_text', used by the default skins for Document.
         """
         if self.text_format=='structured-text':
-            ct = self._format_text(text=self.text)
+            ct = self._format_stx(text=self.text)
             if type(ct) is not type(''):
                 ct = ct.read()
             self.cooked_text=ct
         else:
             self.cooked_text=self.text
             
-    _format_text=HTML('''<dtml-var text fmt="structured-text">''')
+    def _format_stx(self, text, level=1):
+        """ Renders structured text """
+        st = StructuredText.Basic(text) # Creates the basic DOM
+        if not st:                      # If it's an empty object
+            return ""                   # return now or have errors!
 
+        doc = StructuredText.DocumentWithImages(st)
+        html = StructuredText.HTMLWithImages(doc)
+        return html
 
-    security.declareProtected( CMFCorePermissions.View, 'SearchableText' )
+    security.declareProtected(CMFCorePermissions.View, 'SearchableText')
     def SearchableText(self):
-        "text for indexing"
+        """ Used by the catalog for basic full text indexing """
         return "%s %s %s" % (self.title, self.description, self.text)
 
-    security.declareProtected( CMFCorePermissions.View, 'Description' )
+    security.declareProtected(CMFCorePermissions.View, 'Description')
     def Description(self):
-        "description for indexing"
+        """ Dublin core description, also important for indexing """
         return self.description
     
-    security.declareProtected( CMFCorePermissions.View, 'Format' )
+    security.declareProtected(CMFCorePermissions.View, 'Format')
     def Format(self):
-        """ """
+        """ Returns a content-type style format of the underlying source """
         if self.text_format == 'html':
             return 'text/html'
         else:
             return 'text/plain'
     
 
-    security.declareProtected( CMFCorePermissions.ModifyPortalContent
-                             , 'setFormat' )
+    security.declareProtected(CMFCorePermissions.ModifyPortalContent,
+                             'setFormat' )
     def setFormat(self, value):
         value = str(value)
         if value == 'text/html':
@@ -240,17 +240,13 @@ class Document(PortalContent, DefaultDublinCoreImpl):
     setFormat = WorkflowAction(setFormat)
 
     ## FTP handlers
-    security.declareProtected( CMFCorePermissions.ModifyPortalContent
-                             , 'PUT' )
+    security.declareProtected(CMFCorePermissions.ModifyPortalContent, 'PUT')
     def PUT(self, REQUEST, RESPONSE):
-        """Handle HTTP (and presumably FTP?) PUT requests"""
+        """ Handle HTTP (and presumably FTP?) PUT requests """
         self.dav__init(REQUEST, RESPONSE)
         body = REQUEST.get('BODY', '')
-        ishtml = 0
-            
-        if (REQUEST.get_header('Content-Type', '') == 'text/html') or \
-           (string.find(body, '</body>') > -1):
-            ishtml = 1
+        bodyfound = bodyfinder.search(body)
+        ishtml = (text_format == 'html') or (bodyfound is not None)
 
         if ishtml: self.setFormat('text/html')
         else: self.setFormat('text/plain')
@@ -291,7 +287,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
 
     security.declareProtected( CMFCorePermissions.View, 'get_size' )
     def get_size( self ):
-        " "
+        """ Used for FTP and apparently the ZMI now too """
         return len(self.manage_FTPget())
 
-InitializeClass( Document )
+InitializeClass(Document)
