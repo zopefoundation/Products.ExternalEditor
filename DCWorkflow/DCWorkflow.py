@@ -453,12 +453,7 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
         '''
         Notifies this workflow that an action has taken place.
         '''
-        # Take the opportunity to execute automatic transitions.
-        sdef = self._getWorkflowStateOf(ob)
-        if sdef is not None:
-            tdef = self._findAutomaticTransition(ob, sdef)
-            if tdef is not None:
-                self._changeStateOf(self, ob, tdef)
+        pass
 
     security.declarePrivate('notifyException')
     def notifyException(self, ob, action, exc):
