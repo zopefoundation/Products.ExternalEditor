@@ -119,7 +119,7 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
         return res
 
 
-    def _getObjectVersionIds(self, object):
+    def _getObjectVersionIds(self, object, include_status=0):
         repo = self._getVersionRepository()
         stages = self._getObjectStages(object)
         res = {}
@@ -127,7 +127,11 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
             if object is None or not repo.isUnderVersionControl(object):
                 res[stage_name] = None
             else:
-                res[stage_name] = repo.getVersionInfo(object).version_id
+                info = repo.getVersionInfo(object)
+                v = info.version_id
+                if include_status and info.status == info.CHECKED_OUT:
+                    v = str(v) + '+'
+                res[stage_name] = v
         return res
 
 
@@ -169,6 +173,14 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
             if stage is not None and object.aq_inContextOf(stage, 1):
                 return stage_name
         return None
+
+
+    security.declareProtected(StageObjects, 'getObjectInStage')
+    def getObjectInStage(self, object, stage):
+        """Returns the version of the object in the given stage.
+        """
+        stages = self._getObjectStages(object)
+        return stages[stage]
 
 
     security.declareProtected(StageObjects, 'updateStages')
@@ -248,9 +260,9 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
 
 
     security.declareProtected(StageObjects, 'getVersionIds')
-    def getVersionIds(self, object):
+    def getVersionIds(self, object, include_status=0):
         """Retrieves object version identifiers in the different stages."""
-        return self._getObjectVersionIds(object)
+        return self._getObjectVersionIds(object, include_status)
 
 
     def _checkContainers(self, object, stages, containers):
