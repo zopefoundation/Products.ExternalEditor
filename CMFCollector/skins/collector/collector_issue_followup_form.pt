@@ -74,42 +74,21 @@
         </td>
       </tr>
 
-      <span tal:replace="nothing">
-         (Comment: 'artifacts' is global in issue_header macro)
-      </span>
-
-      <tr tal:condition="artifacts">
-        <td colspan="2">
-          Check the artifacts whose URLs you want included in the change
-          notice:
-        </td>
-      </tr>
-
     </table>
 
-    <table>
+    <div metal:use-macro="here/collector_macros/macros/add_artifacts_table">
+       add_artifacts_excerpt
+    </div>
 
-      <tr>
-        <th align="left" valign="top"> Add </th>
-        <td align="left" NOWRAP>
-          <input type=radio name="filetype" value="File" checked> File or
-          <br>
-          <input type=radio name="filetype" value="Image"> Image
-        </td>
-        <td> <input type=file name="file" size="35"> </td>
-        <th align="right"> Id: </th>
-        <td> <input type=text name="fileid" size="15"> </td>
-      </tr>
       <tr>
         <td colspan="5">
             <input type="submit" name="submit" value="Submit">
         </td>
       </tr>
 
-    </table>
-
   </form>
 
 </div>
+
 </body>
 </html>
