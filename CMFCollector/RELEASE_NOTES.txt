@@ -11,6 +11,23 @@ CMF Collector Update Notes
 
   See KNOWN_PROBLEMS.txt for pending bugs and problems to beware.
 
+  Version 0.9b, Feb 21, 2002
+
+    Enabled alternate collector policies about who can followup with
+    comments on existing issues.  Now the collector configurer can
+    enable comments by only staff and issue participants (the prior
+    and default situation), by any authenticated user, or by anyone
+    including authenticated users.
+
+    To get this new functionality, you'll have to do two things
+
+    - Remove the old collector_issue_workflow from the site's workflow
+      contents and import the new collector_issue_workflow.zexp
+
+    - Run the configuration "Reinstate catalog" action - the
+      "Internal only" option will be sufficient - so preexisting
+      issues will be properly adjusted.
+
   Version 0.9b, Nov 7, 2001
 
     - Packaged transcript webtext in a Document derivative
