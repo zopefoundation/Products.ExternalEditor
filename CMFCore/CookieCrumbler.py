@@ -226,6 +226,7 @@ class CookieCrumbler (SimpleItemWithProperties):
         ac = encodestring('%s:%s' % (name, pw))
         method = self.getCookieMethod( 'setAuthCookie'
                                        , self.defaultSetAuthCookie )
+        resp = self.REQUEST['RESPONSE']
         method( resp, self.auth_cookie, quote( ac ) )
 
     def _cleanupResponse(self):
