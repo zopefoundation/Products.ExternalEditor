@@ -2,6 +2,8 @@ External Editor Change Log
 
   4/1/03 - 0.7 Release
 
+    - Added working distutils setup for Unix.
+
     - You can now specify from the server that the helper app should
       borrow a lock by passing borrow_lock=1 via the request, thus
       suppressing the dialog box which appears by default. Thanks
