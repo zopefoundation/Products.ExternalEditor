@@ -82,7 +82,7 @@
 # attributions are listed in the accompanying credits file.
 # 
 ##############################################################################
-import os
+import os, urllib
 from Globals import HTMLFile, package_home, InitializeClass
 from Products.CMFCore.PortalFolder import PortalFolder
 from Products.CMFCore import utils
@@ -98,22 +98,27 @@ import TopicPermissions
 # with the Types Tool (portal_types)
 factory_type_information = (
     {'id': 'Topic',
+     'content_icon': 'topic_icon.gif',
      'meta_type': 'Portal Topic',
      'description': ('Topics are canned queries for organizing content '
                      'with up to date queries into the catalog.'),
      'product': 'CMFTopic',
      'factory': 'addTopic',
      'immediate_view': 'topic_edit',
-     'actions': ({'name': 'View',
+     'actions': ({'id': 'view',
+                  'name': 'View',
                   'action': 'topic_view',
                   'permissions': (CMFCorePermissions.View,)},
-                 {'name': 'Edit',
+                 {'id': 'edit',
+                  'name': 'Edit',
                   'action': 'topic_edit',
                   'permissions': (TopicPermissions.ChangeTopics,)},
-                 {'name': 'Criteria',
+                 {'id': 'criteria',
+                  'name': 'Criteria',
                   'action': 'topic_criteria',
                   'permissions': (TopicPermissions.ChangeTopics,)},
-                 {'name': 'Subtopics',
+                 {'id': 'subtopics',
+                  'name': 'Subtopics',
                   'action': 'topic_subtopics',
                   'permissions': (TopicPermissions.ChangeTopics,)},
                  ),                     # End Actions
@@ -133,7 +138,7 @@ def addTopic(self, id, title='', REQUEST=None):
         REQUEST['RESPONSE'].redirect( 'manage_main' )
 
 
-class Topic( PortalFolder ):
+class Topic(PortalFolder):
     """
     Topics are a 'canned query'.  You construct catalog queries out
     of Criteria objects.
@@ -147,15 +152,14 @@ class Topic( PortalFolder ):
     acquireCriteria = 1
     _criteriaTypes = []
 
-##    topicMetatype = ({ 'name'         : meta_type,
-##                       'action'       : TOPIC_ACTION,
-##                       'permission'   : TopicPermissions.AddTopics,
-##                       },
-##                     )
-
     # Contentish interface methods
     # ----------------------------
 
+    security.declareProtected(CMFCorePermissions.View, 'icon')
+    def icon(self):
+        """ For the ZMI and Catalog """
+        return self.getIcon()
+    
     def _index_html(self):
         '''
         Invokes the action identified by the id "view" or the first action.
@@ -279,7 +283,7 @@ class Topic( PortalFolder ):
         self._setObject(newid, crit)
 
         if REQUEST is not None:
-            message = 'New+criteria+added.'
+            message = urllib.quote_plus('New criteria added.')
             REQUEST['RESPONSE'].redirect(
                 '%s/topic_criteria?portal_status_message=%s' % (
                 self.absolute_url(), message)
@@ -292,7 +296,7 @@ class Topic( PortalFolder ):
             self._delObject(cid)
 
         if REQUEST is not None:
-            message = 'Criteria+deleted.'
+            message = urllib.quote_plus('Criteria deleted.')
             REQUEST['RESPONSE'].redirect(
                 '%s/topic_criteria?portal_status_message=%s' % (
                 self.absolute_url(), message)
@@ -321,7 +325,7 @@ class Topic( PortalFolder ):
             apply(crit.edit, (), command)
 
         if REQUEST is not None:
-            message = 'Changes+saved.'
+            message = urllib.quote_plus('Changes saved.')
             REQUEST['RESPONSE'].redirect(
                 '%s/topic_criteria?portal_status_message=%s' % (
                 self.absolute_url(), message)
@@ -339,7 +343,7 @@ class Topic( PortalFolder ):
             action = topictype.getActionById('subtopics')
             url = '%s/%s?portal_status_message=%s' % (
                 self.absolute_url(), action,
-                "Subtopic+'%s'+added" % id )
+                urllib.quote_plus("Subtopic '%s' added" % id ))
             REQUEST['RESPONSE'].redirect(url)
         else:
             return self._getOb(id)
@@ -349,11 +353,11 @@ class Topic( PortalFolder ):
 InitializeClass(Topic)
 
 # Waah.  This seems to be the only way to get the icon in correctly
-from Products.CMFCore.register import registerPortalContent
-registerPortalContent(
-    Topic,
-    meta_type='Portal Topic',
-    icon = 'images/topic.gif',
-    permission = TopicPermissions.AddTopics,
-    productGlobals = globals(),
-    )
+##from Products.CMFCore.register import registerPortalContent
+##registerPortalContent(
+##    Topic,
+##    meta_type='Portal Topic',
+##    icon = 'images/topic.gif',
+##    permission = TopicPermissions.AddTopics,
+##    productGlobals = globals(),
+##    )
