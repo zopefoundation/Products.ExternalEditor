@@ -1193,8 +1193,10 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
                  , 'url' : "javascript:window.open("
                          "'WikiHelp',"
                          "'WikiHelp',"
-                         "'menubar=no,toolbar=yes,scrollbars=yes,resizable=yes'"
-                           ").focus();"
+                         "'menubar=no,toolbar=yes,"
+                         "scrollbars=yes,resizable=yes,"
+                         "height=300,width=500"
+                           "').focus();"
                  , 'permissions' : []
                  , 'category' : 'object'
                  } ]

@@ -60,15 +60,19 @@ def install(self):
     for skin in skins:
         path = skinstool.getSkinPath(skin)
         path = map(string.strip, string.split(path,','))
-        if 'wiki' not in path:
-            path.append('wiki')
-            path = string.join(path, ', ')
-            # addSkinSelection will replace existing skins as well.
-            skinstool.addSkinSelection(skin, path)
-            out.write("Added 'wiki' to %s skin\n" % skin)
-        else:
-            out.write("Skipping %s skin, 'wiki' is already set up\n" % (
-                skin))
+        for dir in ( 'wiki', 'zpt_wiki' ):
+
+            if not dir in path:
+                try:
+                    idx = path.index( 'custom' )
+                except ValueError:
+                    idx = 999
+                path.insert( idx+1, dir )
+
+        path = string.join(path, ', ')
+        # addSkinSelection will replace existing skins as well.
+        skinstool.addSkinSelection(skin, path)
+        out.write("Added 'wiki' and 'zpt_wiki' to %s skin\n" % skin)
 
     # remove workflow for Wiki pages
     cbt = workflowtool._chains_by_type
