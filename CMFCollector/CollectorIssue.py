@@ -600,7 +600,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         it._setPortalTypeName('Collector Issue Transcript')
         it.title = self.title
 
-    def _entry_header(self, type, user, prefix="= ", suffix=""):
+    def _entry_header(self, type, user, date=None, prefix="= ", suffix=""):
         """Return text for the header of a new transcript entry."""
         # Ideally this would be a skin method (probly python script), but i
         # don't know how to call it from the product, sigh.
@@ -609,9 +609,13 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
             lead = t + " - Entry #" + str(self.action_number)
         else:
             lead = t
+        if date is None:
+            date = DateTime()
+        if not isinstance(date, DateTime):
+            date = DateTime(date)
 
         return ("%s%s by %s on %s%s" %
-                (prefix, lead, str(user), DateTime().aCommon(), suffix))
+                (prefix, lead, str(user), date.aCommon(), suffix))
 
     security.declareProtected(View, 'cited_text')
     def cited_text(self):
@@ -734,8 +738,10 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         # which i don't know how to set, if can should be done - so trying to
         # set an initial collector issue mod time is a noop when using with
         # pre-1.3 CMF.
+        if not isinstance(date, DateTime):
+            date = DateTime(date)
         if hasattr(self, 'setModificationDate'):
-            self.setModificationDate(DateTime(date))
+            self.setModificationDate(date)
         else:
             pass                        # XXX Sigh - not with
 
