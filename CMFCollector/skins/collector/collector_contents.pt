@@ -151,15 +151,18 @@
 
         </tr>
 
-        <tr tal:define="crdate python: item.created.aCommon();
-                        moddate python: item.modified.aCommon()">
+        <tr tal:define="crdate item/created;
+                        moddate item/modified;
+                        datesdiff python: ((moddate - crdate) * 86400) > 30">
           <td> </td>
           <td> </td>
           <td colspan="3">
             Submitted
-            <span tal:replace="crdate">CREATEDATE
-              </span><span tal:condition="python: crdate != moddate">,
-              Last Mod: <span tal:replace="moddate">MODDATE</span>
+            <span tal:replace="python: crdate.aCommon()">CREATEDATE
+              </span><span tal:condition="python: datesdiff">,
+              Last Mod:
+                <span tal:replace="python: moddate.aCommon()">
+                  MODDATE</span>
             </span>
           </td>
         </tr>

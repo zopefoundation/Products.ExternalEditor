@@ -57,12 +57,9 @@
     <div metal:define-macro="issue_header"
          tal:define="global collector_issue_header_present python: 1;
                      TITLELEN python: 45;
-                     crdate python: here.creation_date.aCommon();
+                     crdate python: here.creation_date;
                      DateTime nocall: modules/DateTime/DateTime;
                      split nocall: modules/string/split;
-                     moddate python:
-                                DateTime(here.ModificationDate()).aCommon();
-                     datesdiff python: crdate != moddate;
                      TRUNCDESCR python: 150;
                      global artifacts
                             python: [i for i in here.objectValues()
@@ -101,14 +98,12 @@
            <td align="right">Status:</td>
            <td tal:define="base python: split(here.status(), '_')[0];
                            paren here/confidential">
-              <code>
                 <span tal:replace="python: '%s%s%s'
                                            % ((paren and '(') or '',
                                               base,
                                               (paren and ')') or '')">
                   STATUS
                 </span>
-              </code>
            </td>
 
            <td align="right"> Security related: </td>
@@ -168,7 +163,13 @@
            </td>
 
            <td align="right"> on: </td>
-           <td tal:content="crdate">CREATIONDATE</td>
+           <td>
+             <code>
+               <span tal:replace="python: crdate.aCommon()">
+                 CREATIONDATE
+               </span>
+             </code>
+           </td>
          </tr>
 
          <tr>
@@ -180,22 +181,27 @@
            </td>
 
            <td align="right">Last update:</td>
-           <td tal:content="moddate">MODDATE</td>
+           <td tal:define="actions here/action_number">
+             <code>
+               <span tal:condition="python: actions <= 1">~</span>
+               <span tal:condition="python: actions > 1"
+                     tal:replace="python: 
+                                  DateTime(here.ModificationDate()).aCommon()">
+                 MODDATE
+               </span>
+             </code>
+           </td>
          </tr>
 
          <tr>
            <td align="right">Version:</td>
            <td metal:define-slot="issue_version_slot">
-             <code>
                <span tal:content="here/reported_version">VERSION
                </span>
-             </code>
            </td>
 
-           <td align="right">
-             Related versions:
-           </td>
            <td metal:define-slot="issue_other_versions_slot"
+               colspan="2"
                tal:content="here/other_version_info">
              OTHER_VERSION_INFO
            </td>
