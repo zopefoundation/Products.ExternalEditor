@@ -281,7 +281,7 @@ class MembershipTool( BaseTool ):
                     # Don't return the folder if the user can't get to it.
                     return None
                 return folder
-            except AttributeError:
+            except (AttributeError, TypeError):
                 pass
         return None
 
