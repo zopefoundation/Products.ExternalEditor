@@ -70,7 +70,7 @@ ModifyPortalContent = 'Modify portal content'
 setDefaultRoles(ModifyPortalContent, ('Manager',))
 
 ManageProperties = 'Manage properties'
-setDefaultRoles(ModifyPortalContent, ('Owner','Manager',))
+setDefaultRoles(ManageProperties, ('Owner','Manager',))
 
 ListPortalMembers = 'List portal members'
 setDefaultRoles(ListPortalMembers, ('Manager', 'Member'))
