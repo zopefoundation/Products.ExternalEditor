@@ -26,7 +26,6 @@ Snapshots capture site configuration at a particular point in time.
 
  <thead tal:condition="snapshot_info">
   <tr class="list-header">
-   <td class="list-item">Sel.</td>
    <td class="list-item">Title</td>
   </tr>
  </thead>
@@ -37,10 +36,6 @@ Snapshots capture site configuration at a particular point in time.
       tal:attributes="class python:
                        ( repeat[ 'info' ].odd and 'row-normal'
                                                or 'row-hilite' )" >
-   <td class="list-item" width="16">
-    <input type="checkbox" name="ids:list" value="STEP_ID"
-           tal:attributes="value info/id" />
-   </td>
    <td class="list-item">
     <a href="."
        tal:attributes="href string:${info/url}/manage_main"
@@ -50,21 +45,14 @@ Snapshots capture site configuration at a particular point in time.
   </tal:loop>
 
   <tr valign="top" class="list-header">
-   <td colspan="2">&nbsp;</td>
+   <td>&nbsp;</td>
   </tr>
 
   <tr valign="top">
-   <td />
    <td>
-
     <input class="form-element" type="submit"
            name="manage_createSnapshot:method"
            value=" Create a Snapshot " />
-      
-    <input class="form-element" type="submit"
-           name="manage_compareSnapshots:method"
-           value=" Compare Snapshots " />
-      
    </td>
   </tr>
  </tbody>
