@@ -134,32 +134,6 @@ class WorkflowToolConfigurator( Implicit ):
         o See '_extractDCWorkflowInfo' below for keys present only for
           DCWorkflow definitions.
 
-        o Within the workflow mapping, each 'worklist_info' mapping has keys:
-
-          'id' -- the ID of the worklist
-
-          'description' -- a textual description of the worklist
-
-          'actbox_name' -- the name of the "action" corresponding to the
-            worklist
-
-          'actbox_url' -- the URL of the "action" corresponding to the
-            worklist
-
-          'actbox_category' -- the category of the "action" corresponding
-            to the worklist
-
-          'guard_permissions' -- a list of permissions guarding access
-            to the worklist
-
-          'guard_roles' -- a list of roles guarding access
-            to the worklist
-
-          'guard_expr' -- an expression guarding access to the worklist
-
-          'var_match' -- a list of ( key, value ) tuples defining
-            the variables used to "activate" the worklist.
-
         """
         workflow_tool = getToolByName( self._site, 'portal_workflow' )
         workflow = workflow_tool.getWorkflowById( workflow_id )
@@ -205,20 +179,20 @@ class WorkflowToolConfigurator( Implicit ):
           'state_variable' -- the name of the workflow's "main"
             state variable 
 
-          'variable_info' -- a list of mappings describing the
-            variables tracked by the workflow (see '_extractVariables').
-
-          'worklist_info' -- a list of mappings describing the
-            worklists tracked by the workflow (see '_extractWorklists').
-
           'initial_state' -- the name of the state in the workflow
             in which objects start their lifecycle.
+
+          'variable_info' -- a list of mappings describing the
+            variables tracked by the workflow (see '_extractVariables').
 
           'state_info' -- a list of mappings describing the
             states tracked by the workflow (see '_extractStates').
 
           'transition_info' -- a list of mappings describing the
             transitions tracked by the workflow (see '_extractTransitions').
+
+          'worklist_info' -- a list of mappings describing the
+            worklists tracked by the workflow (see '_extractWorklists').
         """
         workflow_info[ 'state_variable' ] = workflow.state_var
         workflow_info[ 'initial_state' ] = workflow.initial_state
@@ -226,7 +200,8 @@ class WorkflowToolConfigurator( Implicit ):
         workflow_info[ 'variable_info' ] = self._extractVariables( workflow )
         workflow_info[ 'state_info' ] = self._extractStates( workflow )
         workflow_info[ 'transition_info' ] = self._extractTransitions(
-                                                                    workflow )
+                                                                   workflow )
+        workflow_info[ 'worklist_info' ] = self._extractWorklists( workflow )
 
     security.declarePrivate( '_extractVariables' )
     def _extractVariables( self, workflow ):
@@ -427,6 +402,66 @@ class WorkflowToolConfigurator( Implicit ):
                    , 'actbox_url'           : v.actbox_url
                    , 'actbox_category'      : v.actbox_category
                    , 'variables'            : v.getVariableExprs()
+                   , 'guard_permissions'    : guard.getPermissionsText()
+                   , 'guard_roles'          : guard.getRolesText()
+                   , 'guard_groups'         : guard.getGroupsText()
+                   , 'guard_expr'           : guard.getExprText()
+                   }
+
+            result.append( info )
+
+        return result
+
+    security.declarePrivate( '_extractWorklists' )
+    def _extractWorklists( self, workflow ):
+
+        """ Return a sequence of mappings describing DCWorkflow transitions.
+
+        o Each mapping has the keys:
+
+          'id' -- the ID of the worklist
+
+          'title' -- the title of the worklist
+
+          'description' -- a textual description of the worklist
+
+          'var_match' -- a list of ( key, value ) tuples defining
+            the variables used to "activate" the worklist.
+
+          'actbox_name' -- the name of the "action" corresponding to the
+            worklist
+
+          'actbox_url' -- the URL of the "action" corresponding to the
+            worklist
+
+          'actbox_category' -- the category of the "action" corresponding
+            to the worklist
+
+          'guard_permissions' -- a list of permissions guarding access
+            to the worklist
+
+          'guard_roles' -- a list of roles guarding access
+            to the worklist
+
+          'guard_expr' -- an expression guarding access to the worklist
+
+        """
+        result = []
+
+        for k, v in workflow.worklists.objectItems():
+
+            guard = v.getGuard()
+
+            var_match = [ ( id, v.getVarMatchText( id ) )
+                            for id in v.getVarMatchKeys() ]
+
+            info = { 'id'                   : k
+                   , 'title'                : v.title
+                   , 'description'          : v.description
+                   , 'var_match'            : var_match
+                   , 'actbox_name'          : v.actbox_name
+                   , 'actbox_url'           : v.actbox_url
+                   , 'actbox_category'      : v.actbox_category
                    , 'guard_permissions'    : guard.getPermissionsText()
                    , 'guard_roles'          : guard.getRolesText()
                    , 'guard_groups'         : guard.getGroupsText()

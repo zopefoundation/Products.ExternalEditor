@@ -133,9 +133,30 @@ class _WorkflowSetup( BaseRegistryTests ):
                                     , actbox_category=v[ 8 ]
                                     , props=self._genGuardProps( *v[ -4: ] )
                                     )
+
             for k, v in v[ 9 ].items():
                 transition.addVariable( k, v )
 
+    def _initWorklists( self, dcworkflow ):
+
+        for k, v in _WF_WORKLISTS.items():
+
+            dcworkflow.worklists.addWorklist( k )
+            worklist = dcworkflow.worklists._getOb( k )
+
+            worklist.title = v[ 0 ]
+
+            props=self._genGuardProps( *v[ -4: ] )
+
+            for var_id, matches in v[ 2 ].items():
+                props[ 'var_match_%s' % var_id ] = ';'.join( matches )
+
+            worklist.setProperties( description=v[ 1 ]
+                                  , actbox_name=v[ 3 ]
+                                  , actbox_url=v[ 4 ]
+                                  , actbox_category=v[ 5 ]
+                                  , props=props
+                                  )
 
 class WorkflowToolConfiguratorTests( _WorkflowSetup
                                    , _GuardChecker
@@ -189,19 +210,18 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
     def test_getWorkflowInfo_dcworkflow_permissions( self ):
 
         WF_ID = 'dcworkflow_permissions'
-        WF_PERMISSIONS = ( 'Frob content', 'Bruggle content' )
 
         site = self._initSite()
         dcworkflow = self._initDCWorkflow( WF_ID )
-        dcworkflow.permissions = WF_PERMISSIONS
+        dcworkflow.permissions = _WF_PERMISSIONS
 
         configurator = self._makeOne( site ).__of__( site )
         info = configurator.getWorkflowInfo( WF_ID )
 
         permissions = info[ 'permissions' ]
-        self.assertEqual( len( permissions ), len( WF_PERMISSIONS ) )
+        self.assertEqual( len( permissions ), len( _WF_PERMISSIONS ) )
 
-        for permission in WF_PERMISSIONS:
+        for permission in _WF_PERMISSIONS:
             self.failUnless( permission in permissions )
 
     def test_getWorkflowInfo_dcworkflow_variables( self ):
@@ -328,6 +348,49 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
 
             self._assertGuard( info, *expected[ -4: ] )
 
+    def test_getWorkflowInfo_dcworkflow_worklists( self ):
+
+        WF_ID = 'dcworkflow_worklists'
+
+        site = self._initSite()
+        dcworkflow = self._initDCWorkflow( WF_ID )
+        self._initWorklists( dcworkflow )
+
+        configurator = self._makeOne( site ).__of__( site )
+        info = configurator.getWorkflowInfo( WF_ID )
+
+        worklist_info = info[ 'worklist_info' ]
+        self.assertEqual( len( worklist_info ), len( _WF_WORKLISTS ) )
+
+        ids = [ x[ 'id' ] for x in worklist_info ]
+
+        for k in _WF_WORKLISTS.keys():
+            self.failUnless( k in ids )
+
+        for info in worklist_info:
+
+            expected = _WF_WORKLISTS[ info[ 'id' ] ]
+
+            self.assertEqual( info[ 'title' ], expected[ 0 ] )
+            self.assertEqual( info[ 'description' ], expected[ 1 ] )
+            self.assertEqual( info[ 'actbox_name' ], expected[ 3 ] )
+            self.assertEqual( info[ 'actbox_url' ], expected[ 4 ] )
+            self.assertEqual( info[ 'actbox_category' ], expected[ 5 ] )
+
+            var_match = info[ 'var_match' ]
+            self.assertEqual( len( var_match ), len( expected[ 2 ] ) )
+
+            for var_id, values_txt in var_match:
+
+                values = [ x.strip() for x in values_txt.split( ';' ) ]
+                e_values = expected[ 2 ][ var_id ]
+                self.assertEqual( len( values ), len( e_values ) )
+
+                for e_value in e_values:
+                    self.failUnless( e_value in values )
+
+            self._assertGuard( info, *expected[ -4: ] )
+
     def test_listWorkflowInfo_empty( self ):
 
         site = self._initSite()
@@ -337,6 +400,12 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
         self.assertEqual( len( configurator.listWorkflowInfo() ), 0 )
 
 
+_WF_PERMISSIONS = \
+( 'Open content for modifications'
+, 'Modify content'
+, 'Query history'
+, 'Restore expired content'
+)
 
 _WF_VARIABLES = \
 { 'when_opened':  ( 'Opened when'
@@ -469,7 +538,28 @@ _WF_TRANSITIONS = \
 }
 
 _WF_WORKLISTS = \
-{
+{ 'expired_list':   ( 'Expired'
+                    , 'Worklist for expired content'
+                    , { 'state' : ( 'expired', ) }
+                    , 'Expired items'
+                    , 'string:${portal_url}/expired_items'
+                    , 'workflow'
+                    , ( 'Restore expired content', )
+                    , ()
+                    , ()
+                    , ""
+                    )
+, 'alive_list':     ( 'Alive'
+                    , 'Worklist for content not yet expired / killed'
+                    , { 'state' : ( 'open',  'closed' ) }
+                    , 'Expired items'
+                    , 'string:${portal_url}/expired_items'
+                    , 'workflow'
+                    , ( 'Restore expired content', )
+                    , ()
+                    , ()
+                    , ""
+                    )
 }
 
 
