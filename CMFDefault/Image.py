@@ -171,6 +171,12 @@ class Image( OFS.Image.Image
         PortalContent.manage_beforeDelete(self, item, container)
         OFS.Image.Image.manage_beforeDelete(self, item, container)
 
+    security.declarePrivate('manage_afterClone')
+    def manage_afterClone(self, item):
+        """Both of my parents have an afterClone method"""
+        PortalContent.manage_afterClone(self, item)
+        OFS.Image.Image.manage_afterClone(self, item)
+
     security.declarePrivate('_isNotEmpty')
     def _isNotEmpty(self, file):
         """ Do various checks on 'file' to try to determine non emptiness. """
