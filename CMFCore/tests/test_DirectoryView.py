@@ -113,6 +113,10 @@ class DirectoryViewTests( FSDVTest ):
         """Make sure the directory view is reading properties"""
         self.assertEqual(self.ob.fake_skin.testPT.title, 'Zope Pope')
 
+    def test_ignored(self):
+        """ Test that the .test1.py is ignored """
+        assert('#test1' not in self.ob.fake_skin.objectIds())
+
 if DevelopmentMode:
 
   class DebugModeTests( FSDVTest ):
