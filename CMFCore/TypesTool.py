@@ -21,7 +21,6 @@ import OFS
 from Globals import InitializeClass, DTMLFile
 from utils import UniqueObject, SimpleItemWithProperties, tuplize
 from utils import _dtmldir, _checkPermission, cookString
-import urllib
 from utils import _dtmldir, _checkPermission, cookString, getToolByName
 import string
 from AccessControl import getSecurityManager, ClassSecurityInfo
@@ -552,14 +551,25 @@ class TypesTool( UniqueObject, OFS.Folder.Folder, ActionProviderBase ):
         """
         return self._actions
 
+    def __bobo_traverse__(self, TraversalRequest, name):
+        # Nasty hack to get around main.dtml's quoting of
+        # all_meta_types' actions
+        
+        if name=='manage_addTypeInfoForm':
+            stack = TraversalRequest['TraversalRequestNameStack']
+            if stack:
+                TraversalRequest['type_type']=stack[0]
+                stack[:]=[]
+            
+        return getattr(self,name)
+
     def all_meta_types(self):
         all = TypesTool.inheritedAttribute('all_meta_types')(self)
         factypes = []
         for name, fac in _type_factories.items():
-            query = urllib.urlencode({'type_type': name})
             factypes.append({
                 'name': fac.meta_type,
-                'action': 'manage_addTypeInfoForm?%s' % query,
+                'action': 'manage_addTypeInfoForm/%s' % name,
                 'permission': CMFCorePermissions.ManagePortal,
                 })
         factypes.extend(all)

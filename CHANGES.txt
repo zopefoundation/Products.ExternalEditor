@@ -30,6 +30,9 @@ New Features
 
 Bugs Fixed
 
+  - Reworked functionality added in Tracker #409 which broke the 
+    Types Tool. (Tracker #458)
+
   - Fixed bug whereby DirectoryView instances were not noticing
     some of the changes they should when Zope was running in debug mode
     on Windows (Tracker #305)

@@ -12,6 +12,9 @@ from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
 from Products.CMFCore.PortalFolder import *
 from Products.CMFCore import utils
 import ZPublisher.HTTPRequest
+from Products.PythonScripts.standard import url_quote
+from webdav.NullResource import NullResource
+from Acquisition import aq_base
 
 class PermissiveSecurityPolicy:
     """
@@ -217,8 +220,27 @@ class TypesToolTests( TestCase ):
         tool.manage_addTypeInformation(id='foo_sub', type_type=type_type)
         fs = tool.foo_sub
         self.failUnless(isinstance(fs, DummyTypeInfo), fs.__class__)
-        
 
+    def test_allMetaTypes(self):
+        """
+        Test that everything returned by allMetaTypes can be
+        traversed to.
+        """
+        tool = self.root.portal_types
+        meta_types={}
+        # Seems we get NullResource if the method couldn't be traverse to
+        # so we check for that. If we've got it, something is b0rked.
+        for factype in tool.all_meta_types():
+            meta_types[factype['name']]=1
+            # The url_quote below is necessary 'cos of the one in
+            # main.dtml. Could be removed once that is gone.
+            self.failIf(type(aq_base(tool.unrestrictedTraverse(url_quote(factype['action'])))) is NullResource)
+
+        # Check the ones we're expecting are there
+        self.failUnless(meta_types.has_key('Scriptable Type Information'))
+        self.failUnless(meta_types.has_key('Dummy Test Type Info'))
+        self.failUnless(meta_types.has_key('Factory-based Type Information'))
+        
 class TypeInfoTests( TestCase ):
     
     def test_construction( self ):
