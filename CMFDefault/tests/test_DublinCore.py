@@ -104,6 +104,26 @@ class DublinCoreTests(SecurityTest):
         item.setCreators( ('user_baz',) )
         self.assertEqual( item.listCreators(), ('user_baz',) )
 
+    def test_creators_upgrade(self):
+        site = DummySite('site').__of__(self.root)
+        acl_users = site._setObject( 'acl_users', DummyUserFolder() )
+        site._setObject( 'portal_membership', MembershipTool() )
+        newSecurityManager(None, acl_users.user_foo)
+        item = self._makeDummyContent('item').__of__(site)
+        item.manage_fixupOwnershipAfterAdd()
+        # fake an old object < CMF 1.5 without creators
+        delattr(item, 'creators')
+        self.assertEqual(item.Creator(), 'user_foo')
+        newSecurityManager(None, acl_users.user_bar)
+        item.addCreator()
+        self.assertEqual(item.Creator(), 'user_foo')
+        self.assertEqual(item.listCreators(), ('user_foo', 'user_bar'))
+        # or if added directly
+        delattr(item, 'creators')
+        item.addCreator()
+        self.assertEqual(item.Creator(), 'user_foo')
+        self.assertEqual(item.listCreators(), ('user_foo', 'user_bar'))
+
     def test_ceiling_parsable(self):
         # Test that a None ceiling date will be parsable by a DateIndex
         site = DummySite('site').__of__(self.root)

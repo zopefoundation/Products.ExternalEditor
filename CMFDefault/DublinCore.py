@@ -124,9 +124,9 @@ class DefaultDublinCoreImpl( PropertyManager ):
         """
         if not hasattr(aq_base(self), 'creators'):
             # for content created with CMF versions before 1.5
-            owner = self.getOwner()
-            if hasattr(owner, 'getId'):
-                self.creators = ( owner.getId(), )
+            owner_tuple = self.getOwnerTuple()
+            if owner_tuple:
+                self.creators = (owner_tuple[1],)
             else:
                 self.creators = ()
         return self.creators
