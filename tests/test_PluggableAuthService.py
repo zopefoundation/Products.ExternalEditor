@@ -97,7 +97,7 @@ class DummyGroupPlugin(DummyPlugin):
         return self._groups
 
 class DummyChallenger( DummyPlugin ):
-        
+
     def challenge(self, request, response):
         # Mark on the faux response that we have seen it:
         response.challenger = self
@@ -137,14 +137,14 @@ class FauxResponse:
 
     def notFoundError( self, message ):
         raise FauxNotFoundError, message
-    
+
     def _unauthorized(self):
         pass
 
     def unauthorized(self):
         self._unauthorized()
         raise Unauthorized, 'You can not do this!'
-    
+
 class FauxObject( Implicit ):
 
     def __init__( self, id=None ):
@@ -346,7 +346,7 @@ class PluggableAuthServiceTests( unittest.TestCase ):
         cp = DummyChallenger(id)
         directlyProvides( cp, (IChallengePlugin,) )
         return cp
-    
+
     def test_conformance_IUserFolder( self ):
 
         from Products.PluggableAuthService.interfaces.authservice \
@@ -524,7 +524,7 @@ class PluggableAuthServiceTests( unittest.TestCase ):
 
         from Products.PluggableAuthService.interfaces.plugins \
             import IExtractionPlugin, IAuthenticationPlugin
-        
+
         from AccessControl.User import UnrestrictedUser
 
         from Products.PluggableAuthService import PluggableAuthService
@@ -933,7 +933,7 @@ class PluggableAuthServiceTests( unittest.TestCase ):
 
         foosheet = user[ 'foo' ]
         self.assertEqual( len( foosheet.propertyMap() ), 1 )
- 
+
     def test__findUser_with_groups( self ):
 
         from Products.PluggableAuthService.interfaces.plugins \
@@ -958,7 +958,7 @@ class PluggableAuthServiceTests( unittest.TestCase ):
         self.assertEqual( len( groups ), 2 )
         self.failUnless( 'foo__group1' in groups )
         self.failUnless( 'foo__group2' in groups )
- 
+
     def test__findUser_with_groups_ignoring_one( self ):
 
         from Products.PluggableAuthService.interfaces.plugins \
@@ -1032,7 +1032,7 @@ class PluggableAuthServiceTests( unittest.TestCase ):
 
         self._oldSecurityPolicy = setSecurityPolicy( PermissiveSP() )
 
-        self.failUnless( zcuf._authorizeUser( faux 
+        self.failUnless( zcuf._authorizeUser( faux
                                             , accessed=FauxObject('a')
                                             , container=FauxObject('c')
                                             , name='name'
@@ -1059,7 +1059,7 @@ class PluggableAuthServiceTests( unittest.TestCase ):
 
         self._oldSecurityPolicy = setSecurityPolicy( ParanoidSP() )
 
-        self.failIf( zcuf._authorizeUser( faux 
+        self.failIf( zcuf._authorizeUser( faux
                                         , accessed=FauxObject('a')
                                         , container=FauxObject('c')
                                         , name='name'
@@ -1115,7 +1115,7 @@ class PluggableAuthServiceTests( unittest.TestCase ):
         faux = FauxUser( 'faux' )
         object = FauxObject( 'object' )
 
-        self.failUnless( zcuf._authorizeUser( faux 
+        self.failUnless( zcuf._authorizeUser( faux
                                             , accessed=FauxObject('a')
                                             , container=FauxObject('c')
                                             , name='name'
@@ -1129,7 +1129,7 @@ class PluggableAuthServiceTests( unittest.TestCase ):
         faux = FauxUser( 'faux' )
         object = FauxObject( 'object' )
 
-        self.failIf( zcuf._authorizeUser( faux 
+        self.failIf( zcuf._authorizeUser( faux
                                         , accessed=FauxObject('a')
                                         , container=FauxObject('c')
                                         , name='name'
@@ -1143,7 +1143,7 @@ class PluggableAuthServiceTests( unittest.TestCase ):
         mgr = FauxUser( 'mgr', roles=( 'Manager', ) )
         object = FauxObject( 'object' )
 
-        self.failUnless( zcuf._authorizeUser( mgr 
+        self.failUnless( zcuf._authorizeUser( mgr
                                             , accessed=FauxObject('a')
                                             , container=FauxObject('c')
                                             , name='name'
@@ -1197,7 +1197,7 @@ class PluggableAuthServiceTests( unittest.TestCase ):
         zcuf = self._makeOne(plugins)
         faux = FauxUser('faux')
 
-        foo = self._makeGroupPlugin('foo', groups=default_groups) 
+        foo = self._makeGroupPlugin('foo', groups=default_groups)
         zcuf._setObject('foo', foo)
 
         plugins = zcuf._getOb('plugins')
@@ -1255,7 +1255,7 @@ class PluggableAuthServiceTests( unittest.TestCase ):
 
 
         wrapped = zcuf.__of__( root )
-        validated = wrapped.validate( request ) 
+        validated = wrapped.validate( request )
         self.assertEqual( validated, None )
 
     def test_validate_simple_anonymous( self ):
@@ -1302,7 +1302,7 @@ class PluggableAuthServiceTests( unittest.TestCase ):
 
 
         wrapped = zcuf.__of__( root )
-        validated = wrapped.validate( request ) 
+        validated = wrapped.validate( request )
         self.assertEqual( validated.getUserName(), nobody.getUserName() )
 
     def test_validate_simple_authenticated( self ):
@@ -1397,7 +1397,7 @@ class PluggableAuthServiceTests( unittest.TestCase ):
         root._setObject( 'acl_users', zcuf )
         root_users = root.acl_users
 
-        root_validated = root_users.validate( request ) 
+        root_validated = root_users.validate( request )
         self.assertEqual( root_validated.getUserName(), 'New Anonymous User' )
         self.assertEqual( root_validated.getGroups()
                         , [ 'All People Everywhere Ever' ] )
@@ -1554,7 +1554,7 @@ class PluggableAuthServiceTests( unittest.TestCase ):
         response = FauxResponse()
         request = FauxRequest(RESPONSE=response)
         zcuf.REQUEST = request
-        
+
         # First call the userfolders before_traverse hook, to set things up:
         zcuf(self, request)
         # Call unauthorized to make sure Unauthorized is raised.
@@ -1562,15 +1562,15 @@ class PluggableAuthServiceTests( unittest.TestCase ):
         # Enable the plugin
         plugins = zcuf._getOb( 'plugins' )
         plugins.activatePlugin( IChallengePlugin, 'challenger' )
-        
+
         # Fake Zopes exception trap.
         try:
             response.unauthorized()
         except Unauthorized:
             response.exception()
             self.failUnless(isinstance(response.challenger, DummyChallenger))
-        
-                                                                            
+
+
 if __name__ == "__main__":
     unittest.main()
 
