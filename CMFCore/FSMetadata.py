@@ -46,6 +46,14 @@ class FSMetadata:
             self._properties = self._old_readProperties()
             self._security = self._old_readSecurity()
 
+    def getProxyRoles(self):
+        """ Returns the proxy roles """
+        if self.getProperties():
+            pxy = self.getProperties().get('proxy')
+            if pxy:
+                return [r.strip() for r in pxy.split(',') if r.strip()]
+        return []
+
     def getSecurity(self):
         """ Gets the security settings """
         return self._security

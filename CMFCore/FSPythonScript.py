@@ -46,7 +46,8 @@ class FSPythonScript (FSObject, Script):
     meta_type = 'Filesystem Script (Python)'
     _params = _body = ''
     _v_f = None
-
+    _proxy_roles = ()
+    
     manage_options=(
         (
             {'label':'Customize', 'action':'manage_main'},
@@ -197,6 +198,9 @@ class FSPythonScript (FSObject, Script):
 
     security.declareProtected(ViewManagementScreens, 'params')
     def params(self): return self._params
+
+    security.declareProtected(ViewManagementScreens, 'manage_haveProxy')
+    manage_haveProxy = PythonScript.manage_haveProxy
 
     security.declareProtected(ViewManagementScreens, 'body')
     def body(self): return self._body

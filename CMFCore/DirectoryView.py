@@ -240,9 +240,19 @@ class DirectoryInformation:
                     except:
                         LOG('DirectoryView',
                             ERROR,
-                            'Error setting permission from .security file information',
+                            'Error setting permissions',
                             error=exc_info())
 
+                    # only DTML Methods can have proxy roles
+                    if hasattr(ob, '_proxy_roles'):
+                        try:
+                            ob._proxy_roles = tuple(metadata.getProxyRoles())
+                        except:
+                            LOG('DirectoryView',
+                                ERROR,
+                                'Error setting proxy role',
+                                error=exc_info())
+                    
                     ob_id = ob.getId()
                     data[ob_id] = ob
                     objects.append({'id': ob_id, 'meta_type': ob.meta_type})

@@ -21,6 +21,7 @@ from os import path, stat
 import Globals
 from AccessControl import ClassSecurityInfo, getSecurityManager, Permissions
 from OFS.DTMLMethod import DTMLMethod, decapitate, guess_content_type
+from AccessControl.Role import RoleManager
 
 from utils import _dtmldir
 from CMFCorePermissions import View
@@ -39,7 +40,7 @@ from OFS.Cache import Cacheable
 
 _marker = []  # Create a new marker object.
 
-class FSDTMLMethod(RestrictedDTML, FSObject, Globals.HTML):
+class FSDTMLMethod(RestrictedDTML, RoleManager, FSObject, Globals.HTML):
     """FSDTMLMethods act like DTML methods but are not directly
     modifiable from the management interface."""
 
@@ -50,10 +51,13 @@ class FSDTMLMethod(RestrictedDTML, FSObject, Globals.HTML):
             {'label':'Customize', 'action':'manage_main'},
             {'label':'View', 'action':'',
              'help':('OFSP','DTML-DocumentOrMethod_View.stx')},
+            {'label':'Proxy', 'action':'manage_proxyForm',
+             'help':('OFSP','DTML-DocumentOrMethod_Proxy.stx')},
             )
             +Cacheable.manage_options
         )
 
+    _proxy_roles=()
     _cache_namespace_keys=()
 
     # Use declarative security
@@ -186,6 +190,9 @@ class FSDTMLMethod(RestrictedDTML, FSObject, Globals.HTML):
 
     security.declareProtected(ViewManagementScreens, 'document_src')
     document_src = DTMLMethod.document_src
+
+    security.declareProtected(ViewManagementScreens, 'manage_haveProxy')
+    manage_haveProxy = DTMLMethod.manage_haveProxy
 
 Globals.InitializeClass(FSDTMLMethod)
 
