@@ -203,7 +203,12 @@ class DiscussionItemContainer(Persistent, Implicit):
     __allow_access_to_unprotected_subobjects__ = 1   # legacy code
 
 
-    __ac_permissions__ = ( ( 'View'
+    __ac_permissions__ = ( ( 'Access contents information'
+                           , ( 'objectIds'
+                             , 'objectValues'
+                             )
+                           )
+                         , ( 'View'
                            , ( 'hasReplies'
                              , 'getReplies'
                              , '__bobo_traverse__'
@@ -234,6 +239,19 @@ class DiscussionItemContainer(Persistent, Implicit):
             except:
                 REQUEST.RESPONSE.notFoundError("%s\n%s" % (name, ''))
 
+    def objectIds(self):
+        """
+        return a list of ids of DiscussionItems in
+        this DiscussionItemContainer
+        """
+        return self._container.keys()
+
+    def objectValues(self):
+        """
+        return the list of objects stored in this
+        DiscussionItemContainer
+        """
+        return self._container.values()
 
     def createReply(self, title, text, REQUEST, RESPONSE):
         """
