@@ -104,14 +104,6 @@ class WorkflowUIMixin:
         # possible_permissions is in AccessControl.Role.RoleManager.
         return list(self.possible_permissions())
 
-
-    def _getGroupFolder(self):
-        try:
-            return aq_get(self, "acl_groups", None, 1)
-        except AttributeError:
-            pass
-        return None
-
     security.declareProtected(ManagePortal, 'getGroups')
     def getGroups(self):
         """Returns the names of groups managed by this workflow.
@@ -122,21 +114,21 @@ class WorkflowUIMixin:
     def getAvailableGroups(self):
         """Returns a list of available group names.
         """
-        gf = self._getGroupFolder()
+        gf = aq_get( self, '__allow_groups__', None, 1 )
         if gf is None:
             return ()
-        r = []
-        r.extend(gf.getDynamicGroups())
-        r.extend(gf.getStaticGroups())
-        return [g.getId() for g in r]
+        try:
+            groups = gf.searchGroups()
+        except AttributeError:
+            return ()
+        else:
+            return [g['id'] for g in groups]
 
     security.declareProtected(ManagePortal, 'addGroup')
     def addGroup(self, group, RESPONSE=None):
         """Adds a group by name.
         """
-        gf = self._getGroupFolder()
-        g = gf.getGroupById(group)
-        if g is None:
+        if group not in self.getAvailableGroups():
             raise ValueError(group)
         self.groups = self.groups + (group,)
         if RESPONSE is not None:
