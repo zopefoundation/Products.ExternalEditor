@@ -36,7 +36,6 @@ target = '%s/members_manage_form' % portal_url
 members = mtool.listMembers()
 batch_obj = Batch(members, 25, b_start, orphan=0)
 items = []
-addButtons = 0
 for member in batch_obj:
     member_id = member.getId()
     login_time = member.getProperty('login_time')
