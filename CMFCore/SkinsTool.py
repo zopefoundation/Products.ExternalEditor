@@ -101,10 +101,6 @@ from AccessControl import ClassSecurityInfo
 from CMFCorePermissions import ManagePortal, AccessContentsInformation
 import CMFCorePermissions
 
-# Permission names:
-manage_portal = 'Manage portal'
-access_contents_information = 'Access contents information'
-
 
 def modifiedOptions():
     # Remove the existing "Properties" option and add our own.
@@ -249,8 +245,8 @@ class SkinsTool(UniqueObject, SkinsContainer, PortalFolder):
         '''
         If needed, updates the skin cookie based on the member preference.
         '''
-        member = (getToolByName(self, 'portal_membership')
-                  .getAuthenticatedMember())
+        pm = getToolByName(self, 'portal_membership')
+        member = pm.getAuthenticatedMember()
         if hasattr(aq_base(member), 'portal_skin'):
             mskin = member.portal_skin
             if mskin:
