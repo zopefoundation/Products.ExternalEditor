@@ -19,20 +19,28 @@ import string, urllib
 
 from DateTime import DateTime
 from Globals import InitializeClass
+from Acquisition import aq_base
 from OFS.SimpleItem import SimpleItem
 from AccessControl import ClassSecurityInfo
-from CMFCorePermissions import AccessContentsInformation, View, \
-     ReviewPortalContent, ModifyPortalContent
-import CMFCorePermissions
+
+from CMFCorePermissions import AccessContentsInformation, View, FTPAccess
+from CMFCorePermissions import ReviewPortalContent, ModifyPortalContent
+
 from interfaces.Contentish import Contentish
 from DynamicType import DynamicType
 from utils import getToolByName, _checkPermission, _getViewFor
-from webdav.Lockable import ResourceLockedError
+
+try:
+    from webdav.Lockable import ResourceLockedError
+except ImportError:
+    class ResourceLockedError( Exception ):
+        pass
+
 try: 
     from webdav.WriteLockInterface import WriteLockInterface
     NoWL = 0
-except ImportError: NoWL = 1
-from Acquisition import aq_base
+except ImportError:
+    NoWL = 1
 
 
 class PortalContent(DynamicType, SimpleItem):
@@ -67,11 +75,11 @@ class PortalContent(DynamicType, SimpleItem):
 
     security = ClassSecurityInfo()
 
-    security.declareObjectProtected(CMFCorePermissions.View)
+    security.declareObjectProtected(View)
 
     # The security for FTP methods aren't set up by default in our
     # superclasses...  :(
-    security.declareProtected(CMFCorePermissions.FTPAccess,
+    security.declareProtected(FTPAccess,
                               'manage_FTPstat',
                               'manage_FTPget',
                               'manage_FTPlist',)
@@ -160,7 +168,7 @@ class PortalContent(DynamicType, SimpleItem):
 
     index_html = None  # This special value informs ZPublisher to use __call__
 
-    security.declareProtected(CMFCorePermissions.View, 'view')
+    security.declareProtected(View, 'view')
     def view(self):
         '''
         Returns the default view even if index_html is overridden.
