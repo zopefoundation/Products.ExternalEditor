@@ -19,6 +19,8 @@ import sys
 
 from Products.CMFCore import utils
 from Products.CMFCore.DirectoryView import registerDirectory
+from Products.CMFSetup import EXTENSION
+from Products.CMFSetup import profile_registry
 
 import Event
 import CalendarTool
@@ -55,3 +57,10 @@ def initialize( context ):
                      , extra_constructors = contentConstructors
                      , fti = Event.factory_type_information
                      ).initialize( context )
+
+    profile_registry.registerProfile('default-calendar',
+                                     'CMFCalendar',
+                                     'Adds calendar support.',
+                                     'profiles/default',
+                                     'CMFCalendar',
+                                     EXTENSION)

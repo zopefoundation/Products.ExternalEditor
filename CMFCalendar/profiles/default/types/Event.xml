@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<type-info id="Event" kind="Factory-based Type Information"
+           title="Event" meta_type="CMF Event"
+           icon="event_icon.gif"
+           immediate_view="event_edit_form"
+           filter_content_types="True"
+           allow_discussion="False" global_allow="True"
+           product="CMFCalendar" factory="addEvent">
+  <description>Events are objects for use in Calendar topical queries on the catalog.</description>
+  <aliases>
+   <alias from="(Default)" to="event_view"/>
+   <alias from="view" to="event_view"/>
+  </aliases>
+  <action action_id="view" title="View" condition_expr=""
+          url_expr="string:${object_url}/event_view"
+          category="object" visible="True">
+   <permission>View</permission>
+  </action>
+  <action action_id="edit" title="Edit" condition_expr=""
+          url_expr="string:${object_url}/event_edit_form"
+          category="object" visible="True">
+   <permission>Change portal events</permission>
+  </action>
+</type-info>

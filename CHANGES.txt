@@ -2,6 +2,10 @@ HEAD only (unreleased)
 
   New Features
 
+    - CMFCalendar: Added extension profile.
+      You can now set up CMFCalendar in one step together with a new site or
+      add calendar support to an existing site using the portal_setup tool.
+
     - CMFSetup: Added support for extension profiles.
       Extension profiles are profile fragments used to modify base profiles.
       They can be shipped with add-on products or used for customization

@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<import-steps>
+ <import-step id="various-calendar" version="20050316-01"
+              handler="Products.CMFCalendar.setuphandlers.importVarious"
+              title="Various Calendar Settings">
+  <dependency step="toolset"/>
+  Import various settings for CMF Calendar.
+ </import-step>
+</import-steps>
