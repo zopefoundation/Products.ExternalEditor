@@ -35,8 +35,8 @@
                  split nocall: strmod/split;
                  DateTime nocall: modules/DateTime/DateTime;
                  BATCHSIZE python: 10;
-                 TITLELEN python: 35;
-                 DESCRLEN python: 150;
+                 TITLELEN python: 110;
+                 DESCRLEN python: 200;
                  b_start python: request.get('b_start', 0);
                  searching
                     python: (request.get('searching') != 'yep'
@@ -74,37 +74,30 @@
 
           <td>
             <a href="ITEMURL" tal:attributes="href itemurl">
-              <span tal:replace="item/id">ID</span> </a>
+              <span tal:replace="item/id">ID</span>
+            </a>
           </td>
 
-          <td NOWRAP>
+          <td>
             <a href="ITEMURL" tal:attributes="href itemurl">
-              <b><span tal:condition="item/Title"
-                       tal:replace="python:
-                                     item.Title[:TITLELEN]
-                                    + (item.Title[TITLELEN:] and '...')">
-              TITLE</span></b></a>
-          </td>
-
-          <td NOWRAP>
-            <span tal:replace="python: '%s/%s'
-                                       % (item.topic, item.classification)">
-              TOPIC/CLASSIFICATION
-            </span>
-            <span tal:replace="item/importance">
-              Importance
-            </span>
+              <b>
+                <span tal:condition="item/Title"
+                      tal:replace="python:
+                                   item.Title[:TITLELEN]
+                                   + (item.Title[TITLELEN:] and '...')">
+                  TITLE
+                </span>
+              </b>
+            </a>
           </td>
 
         </tr>
+        <tr>
 
-        <tr tal:define="numcmts python: int(item.action_number)-1;
-                        plrlcmts python: (numcmts != 1) and 's' or '';
-                        numuploads python: int(item.upload_number);
-                        plrluploads python: (numuploads != 1) and 's' or '';
-                        security python: item.security_related;
-                        confidential python: split(item.status, '_')[-1]
-                                             == 'confidential'">
+        <tr tal:define="crdate item/created;
+                        moddate item/modified;
+                        global numcmts python: int(item.action_number)-1;
+                        datesdiff python: ((moddate - crdate) * 86400) > 30">
           <td> <font color="gray"> # </font> </td>
           <td>
             <font color="gray">
@@ -112,7 +105,30 @@
             </font>
           </td>
 
-          <td NOWRAP colspan="2">
+          <td>
+
+            From
+            <span tal:replace="item/submitter_id|nothing">SUBMITTER ID</span
+              ><span tal:condition="numcmts">.</span>
+            <span tal:condition="not: item/submitter_id|nothing">
+              <em>???</em></span>
+
+            <span tal:replace="python: here.aCompact(crdate)">CREATEDATE
+              </span><span tal:condition="python: datesdiff"> ...
+                <span tal:replace="python: here.aCompact(moddate)">
+                  MODDATE</span>
+            </span>
+          </td>
+
+       </tr>
+
+       <tr tal:define="security python: item.security_related;
+                       confidential python: split(item.status, '_')[-1]
+                                             == 'confidential';
+                       plrlcmts python: (numcmts != 1) and 's' or ''">
+          <td> </td>
+          <td> </td>
+          <td NOWRAP>
 
             <!-- The color indicates whether the item is security-related, and
                   parenthesizing indicates that a security-related item has not
@@ -129,11 +145,13 @@
               </em>
             </font>
 
-            From
-            <span tal:replace="item/Creator|nothing">SUBMITTER ID</span
-              ><span tal:condition="numcmts">.</span>
-            <span tal:condition="not: item/Creator|nothing">
-              <em>???</em></span>
+            <span tal:replace="python: '%s/%s'
+                                       % (item.topic, item.classification)">
+              TOPIC/CLASSIFICATION
+            </span>
+            <span tal:replace="item/importance">
+              Importance
+            </span>
 
             <span tal:condition="numcmts">
               <span tal:replace="numcmts">NUM COMMENTS</span>
@@ -141,11 +159,8 @@
             </span>
 
             <span tal:condition="not: numcmts"
-                  tal:replace="nothing"></span>
-            <span tal:condition="numuploads">
-              <span tal:replace="numuploads">NUM ARTIFACTS</span>
-              upload<span tal:replace="plrluploads">S?
-            </span></span><span tal:condition="item/assigned_to|nothing">,
+                  tal:replace="nothing">
+            </span><span tal:condition="item/assigned_to|nothing">,
               Assigned: 
               <span tal:content="python: ', '.join(item.assigned_to)">
                 SUPPORTERS
@@ -153,20 +168,6 @@
             </span>
           </td>
 
-        </tr>
-
-        <tr tal:define="crdate item/created;
-                        moddate item/modified;
-                        datesdiff python: ((moddate - crdate) * 86400) > 30">
-          <td> </td>
-          <td> </td>
-          <td colspan="3">
-            <span tal:replace="python: here.aCompact(crdate)">CREATEDATE
-              </span><span tal:condition="python: datesdiff"> ...
-                <span tal:replace="python: here.aCompact(moddate)">
-                  MODDATE</span>
-            </span>
-          </td>
         </tr>
 
         <tr tal:condition="item/Description">
