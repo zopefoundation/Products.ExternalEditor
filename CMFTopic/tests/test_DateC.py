@@ -27,6 +27,8 @@ except AttributeError:
 
 from DateTime.DateTime import DateTime
 
+from Products.CMFTopic.DateCriteria import FriendlyDateCriterion
+
 
 class FriendlyDateCriterionTests(TestCase):
 
@@ -46,13 +48,10 @@ class FriendlyDateCriterionTests(TestCase):
 
     def test_Interface( self ):
         from Products.CMFTopic.interfaces import Criterion
-        from Products.CMFTopic.DateCriteria import FriendlyDateCriterion
         self.failUnless(
             Criterion.isImplementedByInstancesOf( FriendlyDateCriterion ) )
 
     def test_Empty( self ):
-
-        from Products.CMFTopic.DateCriteria import FriendlyDateCriterion
         friendly = FriendlyDateCriterion( 'foo', 'foofield' )
 
         self.assertEqual( friendly.getId(), 'foo' )
@@ -63,8 +62,6 @@ class FriendlyDateCriterionTests(TestCase):
         self.assertEqual( len( friendly.getCriteriaItems() ), 0 )
 
     def test_ListOfDefaultDates( self ):
-
-        from Products.CMFTopic.DateCriteria import FriendlyDateCriterion
         friendly = FriendlyDateCriterion( 'foo', 'foofield' )
 
         d = friendly.defaultDateOptions()
@@ -73,8 +70,6 @@ class FriendlyDateCriterionTests(TestCase):
         self.assertEqual( d[2][0], 2 )
 
     def test_Clear( self ):
-
-        from Products.CMFTopic.DateCriteria import FriendlyDateCriterion
         friendly = FriendlyDateCriterion( 'foo', 'foofield' )
 
         friendly.edit( value=None )
@@ -83,8 +78,6 @@ class FriendlyDateCriterionTests(TestCase):
         self.assertEqual( friendly.daterange, 'old' )
 
     def test_Basic( self ):
-
-        from Products.CMFTopic.DateCriteria import FriendlyDateCriterion
         friendly = FriendlyDateCriterion( 'foo', 'foofield' )
 
         friendly.apply( self.lessThanFiveDaysOld )
@@ -93,8 +86,6 @@ class FriendlyDateCriterionTests(TestCase):
         self.assertEqual( friendly.daterange, 'old' )
 
     def test_BadInput( self ):
-
-        from Products.CMFTopic.DateCriteria import FriendlyDateCriterion
         friendly = FriendlyDateCriterion( 'foo', 'foofield' )
 
         # Bogus value
@@ -107,8 +98,6 @@ class FriendlyDateCriterionTests(TestCase):
         self.assertRaises( ValueError, friendly.edit, 4, 'max', 'new' )
 
     def test_StringAsValue( self ):
-
-        from Products.CMFTopic.DateCriteria import FriendlyDateCriterion
         friendly = FriendlyDateCriterion( 'foo', 'foofield' )
 
         friendly.edit( '4' )
@@ -121,8 +110,6 @@ class FriendlyDateCriterionTests(TestCase):
         self.assertEqual( friendly.value, None )
 
     def test_Today( self ):
-
-        from Products.CMFTopic.DateCriteria import FriendlyDateCriterion
         friendly = FriendlyDateCriterion( 'foo', 'foofield' )
 
         friendly.apply( self.today )
@@ -131,39 +118,35 @@ class FriendlyDateCriterionTests(TestCase):
         now = DateTime()
 
         result = friendly.getCriteriaItems()
-        self.assertEqual( len( result ), 2 )
+        self.assertEqual( len(result), 1 )
         self.assertEqual( result[0][0], 'foofield' )
-        self.assertEqual( result[0][1], ( now.earliestTime()
-                                        , now.latestTime() ) )
-        self.assertEqual( result[1][0], 'foofield_usage' )
-        self.assertEqual( result[1][1], 'range:min:max' )
+        self.assertEqual( result[0][1]['query'],
+                          ( now.earliestTime(), now.latestTime() ) )
+        self.assertEqual( result[0][1]['range'], 'min:max' )
 
     def test_FiveDaysOld( self ):
-
-        from Products.CMFTopic.DateCriteria import FriendlyDateCriterion
         friendly = FriendlyDateCriterion( 'foo', 'foofield' )
 
         friendly.apply( self.lessThanFiveDaysOld )
         self.assertEqual( friendly.daterange, 'old' )
 
         result = friendly.getCriteriaItems()
-        self.assertEqual( len( result ), 2 )
+        self.assertEqual( len(result), 1 )
         self.assertEqual( result[0][0], 'foofield' )
-        self.assertEqual( result[0][1].Date(), ( DateTime() - 4 ).Date() )
-        self.assertEqual( result[1][0], 'foofield_usage' )
-        self.assertEqual( result[1][1], 'range:min' )
+        self.assertEqual( result[0][1]['query'].Date(),
+                          ( DateTime() - 4 ).Date() )
+        self.assertEqual( result[0][1]['range'], 'min' )
 
     def test_OneMonthAhead( self ):
-
-        from Products.CMFTopic.DateCriteria import FriendlyDateCriterion
         friendly = FriendlyDateCriterion( 'foo', 'foofield' )
 
         friendly.apply( self.lessThanOneMonthAhead )
         self.assertEqual( friendly.daterange, 'ahead' )
 
         result = friendly.getCriteriaItems()
-        self.assertEqual( result[0][1].Date(), ( DateTime() + 30 ).Date() )
-        self.assertEqual( result[1][1], 'range:max' )
+        self.assertEqual( result[0][1]['query'].Date(),
+                          ( DateTime() + 30 ).Date() )
+        self.assertEqual( result[0][1]['range'], 'max' )
 
 
 def test_suite():

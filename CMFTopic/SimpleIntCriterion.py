@@ -15,15 +15,15 @@
 $Id$
 """
 
-from Products.CMFTopic import TopicPermissions
-from Products.CMFTopic.AbstractCriterion import AbstractCriterion
-from Products.CMFTopic.Topic import Topic
-from Products.CMFTopic.interfaces import Criterion
+from AccessControl import ClassSecurityInfo
+from Globals import InitializeClass
 
 from Products.CMFCore.CMFCorePermissions import View
 
-from Globals import InitializeClass
-from AccessControl import ClassSecurityInfo
+from Products.CMFTopic import TopicPermissions
+from Products.CMFTopic.AbstractCriterion import AbstractCriterion
+from Products.CMFTopic.interfaces import Criterion
+from Products.CMFTopic.Topic import Topic
 
 
 class SimpleIntCriterion( AbstractCriterion ):
@@ -116,15 +116,11 @@ class SimpleIntCriterion( AbstractCriterion ):
         """
         if self.value is None:
             return ()
-
-        result = [ ( self.Field(), self.value ) ]
-
-        if self.direction is not None:
-            result.append( ( '%s_usage' % self.Field()
-                           , 'range:%s' % self.direction
-                           ) )
-
-        return tuple( result )
+        elif self.direction is None:
+            return ( ( self.Field(), self.value ), )
+        else:
+            return ( ( self.Field(), {'query': self.value,
+                                      'range': self.direction} ), )
 
 InitializeClass( SimpleIntCriterion )
 

@@ -25,19 +25,17 @@ except AttributeError:
     # for Zope versions before 2.6.1
     pass
 
+from Products.CMFTopic.SimpleIntCriterion import SimpleIntCriterion
+
 
 class SimpleIntCriterionTests(TestCase):
 
     def test_Interface( self ):
         from Products.CMFTopic.interfaces import Criterion
-        from Products.CMFTopic.SimpleIntCriterion import SimpleIntCriterion
         self.failUnless(
             Criterion.isImplementedByInstancesOf( SimpleIntCriterion ) )
 
     def test_Empty( self ):
-
-        from Products.CMFTopic.SimpleIntCriterion import SimpleIntCriterion
-
         sic = SimpleIntCriterion( 'foo', 'foofield' )
         self.assertEqual( sic.getId(), 'foo' )
         self.assertEqual( sic.field, 'foofield' )
@@ -46,9 +44,6 @@ class SimpleIntCriterionTests(TestCase):
         self.assertEqual( len(sic.getCriteriaItems() ), 0 )
 
     def test_EditWithString( self ):
-
-        from Products.CMFTopic.SimpleIntCriterion import SimpleIntCriterion
-
         sic = SimpleIntCriterion('foo', 'foofield')
         sic.edit('0')
         self.assertEqual( sic.value, 0 )
@@ -61,9 +56,6 @@ class SimpleIntCriterionTests(TestCase):
         self.assertEqual( items[0][1], 0 )
 
     def test_EditWithInt( self ):
-
-        from Products.CMFTopic.SimpleIntCriterion import SimpleIntCriterion
-
         sic = SimpleIntCriterion( 'foo', 'foofield' )
         sic.edit( 32 )
         self.assertEqual( sic.value, 32 )
@@ -75,9 +67,6 @@ class SimpleIntCriterionTests(TestCase):
         self.assertEqual( items[0][1], 32 )
 
     def test_RangeMin( self ):
-
-        from Products.CMFTopic.SimpleIntCriterion import SimpleIntCriterion
-
         sic = SimpleIntCriterion( 'foo', 'foofield' )
         sic.edit( '32', SimpleIntCriterion.MINIMUM )
 
@@ -85,18 +74,13 @@ class SimpleIntCriterionTests(TestCase):
         self.assertEqual( sic.getValueString(), '32' )
 
         items = sic.getCriteriaItems()
-        self.assertEqual( len( items ), 2 )
+        self.assertEqual( len(items), 1 )
         self.assertEqual( len( items[0] ), 2 )
-        self.assertEqual( len( items[1] ), 2 )
         self.assertEqual( items[0][0], 'foofield' )
-        self.assertEqual( items[0][1], 32 )
-        self.assertEqual( items[1][0], 'foofield_usage' )
-        self.assertEqual( items[1][1], 'range:min' )
+        self.assertEqual( items[0][1]['query'], 32 )
+        self.assertEqual( items[0][1]['range'], 'min' )
 
     def test_RangeMin_withInt( self ):
-
-        from Products.CMFTopic.SimpleIntCriterion import SimpleIntCriterion
-
         sic = SimpleIntCriterion( 'foo', 'foofield' )
         sic.edit( 32, SimpleIntCriterion.MINIMUM )
 
@@ -104,18 +88,13 @@ class SimpleIntCriterionTests(TestCase):
         self.assertEqual( sic.getValueString(), '32' )
 
         items = sic.getCriteriaItems()
-        self.assertEqual( len( items ), 2 )
+        self.assertEqual( len(items), 1 )
         self.assertEqual( len( items[0] ), 2 )
-        self.assertEqual( len( items[1] ), 2 )
         self.assertEqual( items[0][0], 'foofield' )
-        self.assertEqual( items[0][1], 32 )
-        self.assertEqual( items[1][0], 'foofield_usage' )
-        self.assertEqual( items[1][1], 'range:min' )
+        self.assertEqual( items[0][1]['query'], 32 )
+        self.assertEqual( items[0][1]['range'], 'min' )
 
     def test_RangeMax( self ):
-
-        from Products.CMFTopic.SimpleIntCriterion import SimpleIntCriterion
-
         sic = SimpleIntCriterion( 'foo', 'foofield' )
         sic.edit( '32', SimpleIntCriterion.MAXIMUM )
 
@@ -123,18 +102,13 @@ class SimpleIntCriterionTests(TestCase):
         self.assertEqual( sic.getValueString(), '32' )
 
         items = sic.getCriteriaItems()
-        self.assertEqual( len( items ), 2 )
+        self.assertEqual( len(items), 1 )
         self.assertEqual( len( items[0] ), 2 )
-        self.assertEqual( len( items[1] ), 2 )
         self.assertEqual( items[0][0], 'foofield' )
-        self.assertEqual( items[0][1], 32 )
-        self.assertEqual( items[1][0], 'foofield_usage' )
-        self.assertEqual( items[1][1], 'range:max' )
+        self.assertEqual( items[0][1]['query'], 32 )
+        self.assertEqual( items[0][1]['range'], 'max' )
 
     def test_RangeMax_withInt( self ):
-
-        from Products.CMFTopic.SimpleIntCriterion import SimpleIntCriterion
-
         sic = SimpleIntCriterion( 'foo', 'foofield' )
         sic.edit( 32, SimpleIntCriterion.MAXIMUM )
 
@@ -142,18 +116,13 @@ class SimpleIntCriterionTests(TestCase):
         self.assertEqual( sic.getValueString(), '32' )
 
         items = sic.getCriteriaItems()
-        self.assertEqual( len( items ), 2 )
+        self.assertEqual( len(items), 1 )
         self.assertEqual( len( items[0] ), 2 )
-        self.assertEqual( len( items[1] ), 2 )
         self.assertEqual( items[0][0], 'foofield' )
-        self.assertEqual( items[0][1], 32 )
-        self.assertEqual( items[1][0], 'foofield_usage' )
-        self.assertEqual( items[1][1], 'range:max' )
+        self.assertEqual( items[0][1]['query'], 32 )
+        self.assertEqual( items[0][1]['range'], 'max' )
 
     def test_RangeMinMax( self ):
-
-        from Products.CMFTopic.SimpleIntCriterion import SimpleIntCriterion
-
         sic = SimpleIntCriterion( 'foo', 'foofield' )
         sic.edit( '32 34', SimpleIntCriterion.MINMAX )
 
@@ -161,18 +130,13 @@ class SimpleIntCriterionTests(TestCase):
         self.assertEqual( sic.getValueString(), '32 34' )
 
         items = sic.getCriteriaItems()
-        self.assertEqual( len( items ), 2 )
+        self.assertEqual( len(items), 1 )
         self.assertEqual( len( items[0] ), 2 )
-        self.assertEqual( len( items[1] ), 2 )
         self.assertEqual( items[0][0], 'foofield' )
-        self.assertEqual( items[0][1], ( 32, 34 ) )
-        self.assertEqual( items[1][0], 'foofield_usage' )
-        self.assertEqual( items[1][1], 'range:min:max' )
+        self.assertEqual( items[0][1]['query'], ( 32, 34 ) )
+        self.assertEqual( items[0][1]['range'], 'min:max' )
 
     def test_RangeMinMax_withTuple( self ):
-
-        from Products.CMFTopic.SimpleIntCriterion import SimpleIntCriterion
-
         sic = SimpleIntCriterion( 'foo', 'foofield' )
         sic.edit( ( 32, 34 ), SimpleIntCriterion.MINMAX )
 
@@ -180,13 +144,11 @@ class SimpleIntCriterionTests(TestCase):
         self.assertEqual( sic.getValueString(), '32 34' )
 
         items = sic.getCriteriaItems()
-        self.assertEqual( len( items ), 2 )
+        self.assertEqual( len(items), 1 )
         self.assertEqual( len( items[0] ), 2 )
-        self.assertEqual( len( items[1] ), 2 )
         self.assertEqual( items[0][0], 'foofield' )
-        self.assertEqual( items[0][1], ( 32, 34 ) )
-        self.assertEqual( items[1][0], 'foofield_usage' )
-        self.assertEqual( items[1][1], 'range:min:max' )
+        self.assertEqual( items[0][1]['query'], ( 32, 34 ) )
+        self.assertEqual( items[0][1]['range'], 'min:max' )
 
 
 def test_suite():

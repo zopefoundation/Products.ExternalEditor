@@ -15,16 +15,16 @@
 $Id$
 """
 
-from Products.CMFTopic.AbstractCriterion import AbstractCriterion
-from Products.CMFTopic.interfaces import Criterion
-from Products.CMFTopic.Topic import Topic
-from Products.CMFTopic import TopicPermissions
+from AccessControl import ClassSecurityInfo
+from DateTime.DateTime import DateTime
+from Globals import InitializeClass
 
 from Products.CMFCore.CMFCorePermissions import View
 
-from AccessControl import ClassSecurityInfo
-from DateTime.DateTime import DateTime
-import Globals
+from Products.CMFTopic import TopicPermissions
+from Products.CMFTopic.AbstractCriterion import AbstractCriterion
+from Products.CMFTopic.interfaces import Criterion
+from Products.CMFTopic.Topic import Topic
 
 
 class FriendlyDateCriterion( AbstractCriterion ):
@@ -108,10 +108,7 @@ class FriendlyDateCriterion( AbstractCriterion ):
         """
             Return a sequence of items to be used to build the catalog query.
         """
-        result = []
-
         if self.value is not None:
-
             field = self.Field()
             value = self.value
 
@@ -123,25 +120,15 @@ class FriendlyDateCriterion( AbstractCriterion ):
 
             operation = self.operation
             if operation == 'within_day':
-
                 range = ( date.earliestTime(), date.latestTime() )
-                result.append( ( field, range ) )
-
-
-                result.append( ( '%s_usage' % field
-                               , 'range:min:max'
-                               ) )
+                return ( ( field, {'query': range, 'range': 'min:max'} ), )
             else:
-                result.append( ( field, date ) )
+                return ( ( field, {'query': date, 'range': operation} ), )
+        else:
+            return ()
 
+InitializeClass(FriendlyDateCriterion)
 
-                result.append( ( '%s_usage' % field
-                            , 'range:%s' % self.operation
-                            ) )
-
-        return result
-
-Globals.InitializeClass( FriendlyDateCriterion )
 
 # Register as a criteria type with the Topic class
 Topic._criteriaTypes.append( FriendlyDateCriterion )
