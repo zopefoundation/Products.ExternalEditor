@@ -119,6 +119,7 @@ factory_type_information = (
      },
     )
 
+_dtmldir = os.path.join( package_home( globals() ), 'dtml' )
 addTopicForm = HTMLFile( 'topicAdd', _dtmldir, title='Add Topic' )
 def addTopic(self, id, title='', REQUEST=None):
     """
