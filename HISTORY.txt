@@ -39,6 +39,9 @@
  - Synch up interface definition of 'Contentish.getIcon' with
    reality.
 
+ - DirectoryView objects now reload when the directory they represent has
+   changed, if Zope is running in debug mode.
+
 1.0 final (2001/03/29)
 
  - Removed embedded spaces in 'portal_status_message' strings
