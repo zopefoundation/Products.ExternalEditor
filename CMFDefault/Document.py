@@ -87,7 +87,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
 
     meta_type = 'Document'
     effective_date = expiration_date = None
-    text_format = ''
+    cooked_text = text = text_format = ''
     _isDiscussable = 1
 
     _stx_level = 1                      # Structured text level

@@ -1,36 +1,4 @@
-1.2 beta (2001/12/07)
-
- New features
-
-  - reindexObject moved out of _edit and _editMetadata to the
-    presentation level methods (edit, PUT, and editMetadata)
-
-  - _edit method removed from NewsItem, renamed to edit to work nicely with
-    the changes to Document edit and _edit
-
-  - added setMetadata method to remove the editing of metadata from the edit
-    methods
-
-  - CMFDecor megreged into CMF.  FSPageTemplate put into CMFCore, skins
-    put into CMFDefault, and basic skin setup to include ZPT skins.
-
-  - Added cookString method to CMFCore.utils for taking a string and making it id
-    friendly, it also does a string.lower on the resultant regex.
-    
-  - Change in TypesTool to utilize cookString to ensure the id is 
-    properly formated if the name is being used as the id.
-
-  - Added failIfLocked method to PortalContent which handles the necessary
-    checks to make sure a Document isn't locked via webDAV.
-
-  - Added edit method to Document and editMetadata method to fix problems
-    with working nicely with webDAV.  The PUT method calls _edit method if
-    it passes lock checks, while through the web code calls the edit variant
-    and it in turn calls the _ method if the lock check passes.  Similar
-    cases for handling the editMetadata method calls and checks for webDAV
-    locks.
-
-  - (__future__) Added docs from the crack ZC docs guys.
+Somewhere over the rainbow
 
   - (__future__) Exposed role management for manager users on
     the default roster:  managers can now "promote" members
@@ -44,24 +12,28 @@
   - (__future__) Added simple link extraction / checking for
     textual content.  Link checking also works for Link objects.
 
-  - (__future__) Added "compound content" types (see the
+  - (__future__) Added "composite content" types (see the
     "dogbowl proposal",
     (http://cmf.zope.org/rqmts/proposals/compounds/compoundproposal.txt).
 
-  - (__future__) Made global actions emitted by ActionsTool
-    configurable through-the-web.
+  - (__future__) Added DCWorkflow (through-the-web configurable
+    workflows) to the core set of CMF products.
 
-  - (__future__) Fleshed out CMFDecor product, which adds Zope
-    Page Templates skins to the CMFSite and content objects of
-    CMFDefault; added CMFDecor to the core set of CMF products.
+1.2 beta (2001/12/07)
+
+ New features
+
+  - Added docs from the crack ZC docs guys; these docs live in
+    the top-level 'docs' directory.
+
+  - Merged CMFDecor product's artifacts into CMFCore /
+    CMFDefault;  theses aretifacts allow use of filesystem-based
+    Zope Page Templates as skins.
 
     Note that the CMFDecor skin is the one which will be
     receiving all our development focus:  we will fix bugs in the
     DTML skins, but are not likely to invest significant effort
     in upgrading it.
-
-  - (__future__) Added DCWorkflow (through-the-web configurable
-    workflows) to the core set of CMF products.
 
   - Hooked 'manage_addFolder' to allow creation of PortalFolders
     from both WebDAV, FTP, and ZMI.
@@ -138,8 +110,24 @@
 
  Bug fixes
 
+  - Refactored content and metadata editing methods of
+    DefaultDublinCoreImpl, Document, and NewsItem to disentangle
+    the excessive coupling.  Each "path" for editing now has a
+    "presentation"-level method, which directs traffic and
+    reindexes the object;  the underlying methods are much
+    simplified.
+
   - Fixed inner / named links in Document / News Item (thanks to 
     Kenichi Sato for the patch!)
+
+  - Ensured that editing methods handle WebDAV locks correctly,
+    using a new 'failIfLocked' assertion.
+
+  - Added cookString method to CMFCore.utils for taking a string
+    and making it id friendly, it also does a string.lower on the
+    resultant regex.  Changed TypesTool to utilize cookString to
+    ensure that action ids are properly formated if the name is
+    being used as the id.
 
   - Added 'getReply' to CMFDefault.DiscussionItem.DiscussionItemContainer,
     to permit access to an individual reply without needing to
@@ -153,19 +141,6 @@
     making it id friendly, it also does a string.lower on the resultant
     regex.
     
-  - Change in TypesTool to utilize cookString to ensure the id is 
-    properly formated if the name is being used as the id.
-
-  - Added failIfLocked method to PortalContent which handles the necessary
-    checks to make sure a Document isn't locked via webDAV.
-
-  - Added edit method to Document and editMetadata method to fix problems
-    with working nicely with webDAV.  The PUT method calls _edit method if
-    it passes lock checks, while through the web code calls the edit variant
-    and it in turn calls the _ method if the lock check passes.  Similar
-    cases for handling the editMetadata method calls and checks for webDAV
-    locks.
-
   - Made examples in INSTALL.txt less terse, and added notes on
     Windows-specific issues (thanks to Johan Mukhsein for the
     suggestions).
