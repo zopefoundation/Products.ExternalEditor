@@ -2,12 +2,12 @@
 <setup-steps xmlns:tal="http://xml.zope.org/namespaces/tal">
  <setup-step id="STEP_ID"
              version="STEP_VERSION"
-             callable="DOTTED.NAME"
+             handler="DOTTED.NAME"
              title="TITLE"
              tal:repeat="step here/listStepMetadata"
              tal:attributes="id step/id;
                              version step/version;
-                             callable step/callable;
+                             handler step/handler;
                              title step/title
                             ">
   <dependency step="DEPENDENCY"

@@ -8,7 +8,7 @@ import os
 from Products.CMFCore.tests.base.testcase import SecurityRequestTest
 
 #==============================================================================
-#   Dummy callables
+#   Dummy handlers
 #==============================================================================
 def ONE_FUNC( context ): pass
 def TWO_FUNC( context ): pass
@@ -88,13 +88,13 @@ class SetupStepRegistryTests( BaseRegistryTests ):
 
         registry.registerStep( id='docstring'
                              , version='1'
-                             , callable=func_with_doc
+                             , handler=func_with_doc
                              , dependencies=()
                              )
 
         info = registry.getStepMetadata( 'docstring' )
         self.assertEqual( info[ 'id' ], 'docstring' )
-        self.assertEqual( info[ 'callable' ], FUNC_NAME )
+        self.assertEqual( info[ 'handler' ], FUNC_NAME )
         self.assertEqual( info[ 'dependencies' ], () )
         self.assertEqual( info[ 'title' ], 'This is the first line.' )
         self.assertEqual( info[ 'description' ] , 'This is the second line.' )
@@ -112,14 +112,14 @@ class SetupStepRegistryTests( BaseRegistryTests ):
 
         registry.registerStep( id='docstring'
                              , version='1'
-                             , callable=func_with_doc
+                             , handler=func_with_doc
                              , dependencies=()
                              , title='Title'
                              )
 
         info = registry.getStepMetadata( 'docstring' )
         self.assertEqual( info[ 'id' ], 'docstring' )
-        self.assertEqual( info[ 'callable' ], FUNC_NAME )
+        self.assertEqual( info[ 'handler' ], FUNC_NAME )
         self.assertEqual( info[ 'dependencies' ], () )
         self.assertEqual( info[ 'title' ], 'Title' )
         self.assertEqual( info[ 'description' ] , 'This is the second line.' )
@@ -130,7 +130,7 @@ class SetupStepRegistryTests( BaseRegistryTests ):
 
         registry.registerStep( id='one'
                              , version='1'
-                             , callable=ONE_FUNC
+                             , handler=ONE_FUNC
                              , dependencies=( 'two', 'three' )
                              , title='One Step'
                              , description='One small step'
@@ -149,7 +149,7 @@ class SetupStepRegistryTests( BaseRegistryTests ):
         info = registry.getStepMetadata( 'one' )
         self.assertEqual( info[ 'id' ], 'one' )
         self.assertEqual( info[ 'version' ], '1' )
-        self.assertEqual( info[ 'callable' ], ONE_FUNC_NAME )
+        self.assertEqual( info[ 'handler' ], ONE_FUNC_NAME )
         self.assertEqual( info[ 'dependencies' ], ( 'two', 'three' ) )
         self.assertEqual( info[ 'title' ], 'One Step' )
         self.assertEqual( info[ 'description' ], 'One small step' )
@@ -162,20 +162,20 @@ class SetupStepRegistryTests( BaseRegistryTests ):
 
         registry = self._makeOne()
 
-        registry.registerStep( id='one', version='1', callable=ONE_FUNC )
+        registry.registerStep( id='one', version='1', handler=ONE_FUNC )
 
         self.assertRaises( KeyError
                          , registry.registerStep
                          , id='one'
                          , version='0'
-                         , callable=ONE_FUNC
+                         , handler=ONE_FUNC
                          )
 
         self.assertRaises( KeyError
                          , registry.registerStep
                          , id='one'
                          , version='1'
-                         , callable=ONE_FUNC
+                         , handler=ONE_FUNC
                          )
 
     def test_registerStep_replacement( self ):
@@ -184,7 +184,7 @@ class SetupStepRegistryTests( BaseRegistryTests ):
 
         registry.registerStep( id='one'
                              , version='1'
-                             , callable=ONE_FUNC
+                             , handler=ONE_FUNC
                              , dependencies=( 'two', 'three' )
                              , title='One Step'
                              , description='One small step'
@@ -192,7 +192,7 @@ class SetupStepRegistryTests( BaseRegistryTests ):
 
         registry.registerStep( id='one'
                              , version='1.1'
-                             , callable=ONE_FUNC
+                             , handler=ONE_FUNC
                              , dependencies=()
                              , title='Leads to Another'
                              , description='Another small step'
@@ -211,19 +211,19 @@ class SetupStepRegistryTests( BaseRegistryTests ):
 
         registry.registerStep( id='one'
                              , version='1'
-                             , callable=ONE_FUNC
+                             , handler=ONE_FUNC
                              , dependencies=()
                              )
 
         registry.registerStep( id='two'
                              , version='2'
-                             , callable=TWO_FUNC
+                             , handler=TWO_FUNC
                              , dependencies=()
                              )
 
         registry.registerStep( id='three'
                              , version='3'
-                             , callable=THREE_FUNC
+                             , handler=THREE_FUNC
                              , dependencies=()
                              )
 
@@ -239,13 +239,13 @@ class SetupStepRegistryTests( BaseRegistryTests ):
 
         registry.registerStep( id='one'
                              , version='1'
-                             , callable=ONE_FUNC
+                             , handler=ONE_FUNC
                              , dependencies=( 'two', )
                              )
 
         registry.registerStep( id='two'
                              , version='2'
-                             , callable=TWO_FUNC
+                             , handler=TWO_FUNC
                              , dependencies=()
                              )
 
@@ -262,21 +262,21 @@ class SetupStepRegistryTests( BaseRegistryTests ):
 
         registry.registerStep( id='one'
                              , version='1'
-                             , callable=ONE_FUNC
+                             , handler=ONE_FUNC
                              , dependencies=( 'two', )
                              , title='One small step'
                              )
 
         registry.registerStep( id='two'
                              , version='2'
-                             , callable=TWO_FUNC
+                             , handler=TWO_FUNC
                              , dependencies=( 'three', )
                              , title='Texas two step'
                              )
 
         registry.registerStep( id='three'
                              , version='3'
-                             , callable=THREE_FUNC
+                             , handler=THREE_FUNC
                              , dependencies=()
                              , title='Gimme three steps'
                              )
@@ -295,28 +295,28 @@ class SetupStepRegistryTests( BaseRegistryTests ):
 
         registry.registerStep( id='one'
                              , version='1'
-                             , callable=ONE_FUNC
+                             , handler=ONE_FUNC
                              , dependencies=( 'two', )
                              , title='One small step'
                              )
 
         registry.registerStep( id='two'
                              , version='2'
-                             , callable=TWO_FUNC
+                             , handler=TWO_FUNC
                              , dependencies=( 'four', )
                              , title='Texas two step'
                              )
 
         registry.registerStep( id='three'
                              , version='3'
-                             , callable=THREE_FUNC
+                             , handler=THREE_FUNC
                              , dependencies=( 'four', )
                              , title='Gimme three steps'
                              )
 
         registry.registerStep( id='four'
                              , version='4'
-                             , callable=FOUR_FUNC
+                             , handler=FOUR_FUNC
                              , dependencies=()
                              , title='Four step program'
                              )
@@ -337,28 +337,28 @@ class SetupStepRegistryTests( BaseRegistryTests ):
 
         registry.registerStep( id='one'
                              , version='1'
-                             , callable=ONE_FUNC
+                             , handler=ONE_FUNC
                              , dependencies=( 'two', 'three' )
                              , title='One small step'
                              )
 
         registry.registerStep( id='two'
                              , version='2'
-                             , callable=TWO_FUNC
+                             , handler=TWO_FUNC
                              , dependencies=( 'four', )
                              , title='Texas two step'
                              )
 
         registry.registerStep( id='three'
                              , version='3'
-                             , callable=THREE_FUNC
+                             , handler=THREE_FUNC
                              , dependencies=( 'four', )
                              , title='Gimme three steps'
                              )
 
         registry.registerStep( id='four'
                              , version='4'
-                             , callable=FOUR_FUNC
+                             , handler=FOUR_FUNC
                              , dependencies=()
                              , title='Four step program'
                              )
@@ -379,7 +379,7 @@ class SetupStepRegistryTests( BaseRegistryTests ):
 
         registry.registerStep( id='one'
                              , version='1'
-                             , callable=ONE_FUNC
+                             , handler=ONE_FUNC
                              , dependencies=( 'two', )
                              )
 
@@ -389,7 +389,7 @@ class SetupStepRegistryTests( BaseRegistryTests ):
 
         registry.registerStep( id='two'
                              , version='2'
-                             , callable=TWO_FUNC
+                             , handler=TWO_FUNC
                              , dependencies=()
                              )
 
@@ -401,7 +401,7 @@ class SetupStepRegistryTests( BaseRegistryTests ):
 
         registry.registerStep( id='one'
                              , version='1'
-                             , callable=ONE_FUNC
+                             , handler=ONE_FUNC
                              , dependencies=( 'two', 'three' )
                              )
 
@@ -412,7 +412,7 @@ class SetupStepRegistryTests( BaseRegistryTests ):
 
         registry.registerStep( id='two'
                              , version='2'
-                             , callable=TWO_FUNC
+                             , handler=TWO_FUNC
                              , dependencies=()
                              )
 
@@ -422,7 +422,7 @@ class SetupStepRegistryTests( BaseRegistryTests ):
 
         registry.registerStep( id='three'
                              , version='3'
-                             , callable=THREE_FUNC
+                             , handler=THREE_FUNC
                              , dependencies=()
                              )
 
@@ -430,7 +430,7 @@ class SetupStepRegistryTests( BaseRegistryTests ):
 
         registry.registerStep( id='two'
                              , version='2.1'
-                             , callable=TWO_FUNC
+                             , handler=TWO_FUNC
                              , dependencies=( 'four', )
                              )
 
@@ -452,7 +452,7 @@ class SetupStepRegistryTests( BaseRegistryTests ):
 
         registry.registerStep( id='one'
                              , version='1'
-                             , callable=ONE_FUNC
+                             , handler=ONE_FUNC
                              , dependencies=()
                              , title='One Step'
                              , description='One small step'
@@ -466,7 +466,7 @@ class SetupStepRegistryTests( BaseRegistryTests ):
 
         registry.registerStep( id='one'
                              , version='1'
-                             , callable=ONE_FUNC
+                             , handler=ONE_FUNC
                              , dependencies=( 'two', )
                              , title='One Step'
                              , description='One small step'
@@ -474,7 +474,7 @@ class SetupStepRegistryTests( BaseRegistryTests ):
 
         registry.registerStep( id='two'
                              , version='2'
-                             , callable=TWO_FUNC
+                             , handler=TWO_FUNC
                              , dependencies=( 'three', )
                              , title='Two Steps'
                              , description='Texas two step'
@@ -482,7 +482,7 @@ class SetupStepRegistryTests( BaseRegistryTests ):
 
         registry.registerStep( id='three'
                              , version='3'
-                             , callable=THREE_FUNC
+                             , handler=THREE_FUNC
                              , dependencies=()
                              , title='Three Steps'
                              , description='Gimme three steps'
@@ -496,7 +496,7 @@ class SetupStepRegistryTests( BaseRegistryTests ):
 
         registry.registerStep( id='one'
                              , version='1'
-                             , callable=ONE_FUNC
+                             , handler=ONE_FUNC
                              , dependencies=()
                              , description='One small step'
                              )
@@ -513,7 +513,7 @@ class SetupStepRegistryTests( BaseRegistryTests ):
 
         registry.registerStep( id='two'
                              , version='2'
-                             , callable=TWO_FUNC
+                             , handler=TWO_FUNC
                              , dependencies=()
                              , title='Two Steps'
                              , description='Texas two step'
@@ -527,7 +527,7 @@ class SetupStepRegistryTests( BaseRegistryTests ):
         info = registry.getStepMetadata( 'one' )
         self.assertEqual( info[ 'id' ], 'one' )
         self.assertEqual( info[ 'version' ], '1' )
-        self.assertEqual( info[ 'callable' ], ONE_FUNC_NAME )
+        self.assertEqual( info[ 'handler' ], ONE_FUNC_NAME )
         self.assertEqual( info[ 'dependencies' ], () )
         self.assertEqual( info[ 'title' ], 'One Step' )
         self.failUnless( 'One small step' in info[ 'description' ] )
@@ -563,7 +563,7 @@ _SINGLE_STEP_EXPORT = """\
 <setup-steps>
  <setup-step id="one"
              version="1"
-             callable="%s"
+             handler="%s"
              title="One Step">
   One small step
  </setup-step>
@@ -575,20 +575,20 @@ _ORDERED_STEPS_EXPORT = """\
 <setup-steps>
  <setup-step id="one"
              version="1"
-             callable="%s"
+             handler="%s"
              title="One Step">
   <dependency step="two" />
   One small step
  </setup-step>
  <setup-step id="three"
              version="3"
-             callable="%s"
+             handler="%s"
              title="Three Steps">
   Gimme three steps
  </setup-step>
  <setup-step id="two"
              version="2"
-             callable="%s"
+             handler="%s"
              title="Two Steps">
   <dependency step="three" />
   Texas two step
@@ -645,7 +645,7 @@ class ExportScriptRegistryTests( BaseRegistryTests ):
         info = registry.getScriptMetadata( 'one', {} )
 
         self.assertEqual( info[ 'id' ], 'one' )
-        self.assertEqual( info[ 'callable' ], ONE_FUNC_NAME )
+        self.assertEqual( info[ 'handler' ], ONE_FUNC_NAME )
         self.assertEqual( info[ 'title' ], 'one' )
         self.assertEqual( info[ 'description' ], '' )
 
@@ -663,7 +663,7 @@ class ExportScriptRegistryTests( BaseRegistryTests ):
         info = registry.getScriptMetadata( 'one', {} )
 
         self.assertEqual( info[ 'id' ], 'one' )
-        self.assertEqual( info[ 'callable' ], FUNC_NAME )
+        self.assertEqual( info[ 'handler' ], FUNC_NAME )
         self.assertEqual( info[ 'title' ], 'This is the first line.' )
         self.assertEqual( info[ 'description' ] , 'This is the second line.' )
 
@@ -682,7 +682,7 @@ class ExportScriptRegistryTests( BaseRegistryTests ):
         info = registry.getScriptMetadata( 'one', {} )
 
         self.assertEqual( info[ 'id' ], 'one' )
-        self.assertEqual( info[ 'callable' ], FUNC_NAME )
+        self.assertEqual( info[ 'handler' ], FUNC_NAME )
         self.assertEqual( info[ 'title' ], 'This is the first line.' )
         self.assertEqual( info[ 'description' ], 'Description' )
 
@@ -705,7 +705,7 @@ class ExportScriptRegistryTests( BaseRegistryTests ):
         registry = self._makeOne().__of__( self.root )
 
         registry.registerScript( id='one'
-                               , callable=ONE_FUNC
+                               , handler=ONE_FUNC
                                , title='One Step'
                                , description='One small step'
                                )
@@ -717,19 +717,19 @@ class ExportScriptRegistryTests( BaseRegistryTests ):
         registry = self._makeOne().__of__( self.root )
 
         registry.registerScript( id='one'
-                               , callable=ONE_FUNC
+                               , handler=ONE_FUNC
                                , title='One Step'
                                , description='One small step'
                                )
 
         registry.registerScript( id='two'
-                               , callable=TWO_FUNC
+                               , handler=TWO_FUNC
                                , title='Two Steps'
                                , description='Texas two step'
                                )
 
         registry.registerScript( id='three'
-                               , callable=THREE_FUNC
+                               , handler=THREE_FUNC
                                , title='Three Steps'
                                , description='Gimme three steps'
                                )
@@ -741,7 +741,7 @@ class ExportScriptRegistryTests( BaseRegistryTests ):
         registry = self._makeOne().__of__( self.root )
 
         registry.registerScript( id='one'
-                               , callable=ONE_FUNC
+                               , handler=ONE_FUNC
                                , description='One small step'
                                )
 
@@ -755,7 +755,7 @@ class ExportScriptRegistryTests( BaseRegistryTests ):
         registry = self._makeOne().__of__( self.root )
 
         registry.registerScript( id='two'
-                               , callable=TWO_FUNC
+                               , handler=TWO_FUNC
                                , title='Two Steps'
                                , description='Texas two step'
                                )
@@ -767,7 +767,7 @@ class ExportScriptRegistryTests( BaseRegistryTests ):
 
         info = registry.getScriptMetadata( 'one' )
         self.assertEqual( info[ 'id' ], 'one' )
-        self.assertEqual( info[ 'callable' ], ONE_FUNC_NAME )
+        self.assertEqual( info[ 'handler' ], ONE_FUNC_NAME )
         self.assertEqual( info[ 'title' ], 'One Step' )
         self.failUnless( 'One small step' in info[ 'description' ] )
 
@@ -793,7 +793,7 @@ _SINGLE_SCRIPT_EXPORT = """\
 <?xml version="1.0"?>
 <export-scripts>
  <export-script id="one"
-                callable="%s"
+                handler="%s"
                 title="One Step">
   One small step
  </export-script>
@@ -804,17 +804,17 @@ _ORDERED_SCRIPTS_EXPORT = """\
 <?xml version="1.0"?>
 <export-scripts>
  <export-script id="one"
-                callable="%s"
+                handler="%s"
                 title="One Step">
   One small step
  </export-script>
  <export-script id="three"
-                callable="%s"
+                handler="%s"
                 title="Three Steps">
   Gimme three steps
  </export-script>
  <export-script id="two"
-                callable="%s"
+                handler="%s"
                 title="Two Steps">
   Texas two step
  </export-script>

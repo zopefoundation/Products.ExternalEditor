@@ -93,7 +93,7 @@ class SetupStepRegistry( Implicit ):
 
         o Return 'default' if no such step is registered.
 
-        o The 'callable' metadata is available via 'getStep'.
+        o The 'handler' metadata is available via 'getStep'.
         """
         result = {}
 
@@ -104,7 +104,7 @@ class SetupStepRegistry( Implicit ):
 
         for key, value in info.items():
 
-            if key == 'callable':
+            if key == 'handler':
                 result[ key ] = _getDottedName( value )
             else:
                 result[ key ] = value
@@ -127,7 +127,7 @@ class SetupStepRegistry( Implicit ):
 
         """ Return a round-trippable XML representation of the registry.
 
-        o 'callable' values are serialized using their dotted names.
+        o 'handler' values are serialized using their dotted names.
         """
         return self._exportTemplate()
 
@@ -144,13 +144,13 @@ class SetupStepRegistry( Implicit ):
         if info is marker:
             return default
 
-        return info[ 'callable' ]
+        return info[ 'handler' ]
     
     security.declarePrivate( 'registerStep' )
     def registerStep( self
                     , id
                     , version
-                    , callable
+                    , handler
                     , dependencies=()
                     , title=None
                     , description=None
@@ -169,7 +169,7 @@ class SetupStepRegistry( Implicit ):
           - Attempting to register an older one after a newer one results
             in a KeyError.
 
-        o 'callable' should implement ISetupStep.
+        o 'handler' should implement ISetupStep.
 
         o 'dependencies' is a tuple of step ids which have to run before
           this step in order to be able to run at all. Registration of
@@ -177,12 +177,12 @@ class SetupStepRegistry( Implicit ):
           dependencies have been registered.
 
         o 'title' is a one-line UI description for this step.
-          If None, the first line of the documentation string of the callable
+          If None, the first line of the documentation string of the handler
           is used, or the id if no docstring can be found.
 
         o 'description' is a one-line UI description for this step.
           If None, the remaining line of the documentation string of
-          the callable is used, or default to ''.
+          the handler is used, or default to ''.
         """
         already = self.getStepMetadata( id )
 
@@ -192,14 +192,14 @@ class SetupStepRegistry( Implicit ):
 
         if title is None or description is None:
 
-            t, d = _extractDocstring( callable, id, '' )
+            t, d = _extractDocstring( handler, id, '' )
 
             title = title or t
             description = description or d
 
         info = { 'id'           : id
                , 'version'      : version
-               , 'callable'     : callable
+               , 'handler'     : handler
                , 'dependencies' : dependencies
                , 'title'        : title
                , 'description'  : description
@@ -314,7 +314,7 @@ class _SetupStepRegistryParser( ContentHandler ):
 
             id = self._pending[ 'id' ]
             version = self._pending[ 'version' ]
-            callable = _resolveDottedName( self._pending[ 'callable' ] )
+            handler = _resolveDottedName( self._pending[ 'handler' ] )
 
             dependencies = tuple( self._pending.get( 'dependencies', () ) )
             title = self._pending.get( 'title', id )
@@ -322,7 +322,7 @@ class _SetupStepRegistryParser( ContentHandler ):
 
             self._registry.registerStep( id=id
                                        , version=version
-                                       , callable=callable
+                                       , handler=handler
                                        , dependencies=dependencies
                                        , title=title
                                        , description=description
@@ -388,7 +388,7 @@ class ExportScriptRegistry( Implicit ):
 
         o Return 'default' if no such script is registered.
 
-        o The 'callable' metadata is available via 'getScript'.
+        o The 'handler' metadata is available via 'getScript'.
         """
         result = {}
 
@@ -399,7 +399,7 @@ class ExportScriptRegistry( Implicit ):
 
         for key, value in info.items():
 
-            if key == 'callable':
+            if key == 'handler':
                 result[ key ] = _getDottedName( value )
             else:
                 result[ key ] = value
@@ -422,7 +422,7 @@ class ExportScriptRegistry( Implicit ):
 
         """ Return a round-trippable XML representation of the registry.
 
-        o 'callable' values are serialized using their dotted names.
+        o 'handler' values are serialized using their dotted names.
         """
         return self._exportTemplate()
 
@@ -439,10 +439,10 @@ class ExportScriptRegistry( Implicit ):
         if info is marker:
             return default
 
-        return info[ 'callable' ]
+        return info[ 'handler' ]
 
     security.declarePrivate( 'registerScript' )
-    def registerScript( self, id, callable, title=None, description=None ):
+    def registerScript( self, id, handler, title=None, description=None ):
 
         """ Register an export script.
 
@@ -465,13 +465,13 @@ class ExportScriptRegistry( Implicit ):
 
         if title is None or description is None:
 
-            t, d = _extractDocstring( callable, id, '' )
+            t, d = _extractDocstring( handler, id, '' )
 
             title = title or t
             description = description or d
 
         info = { 'id'           : id
-               , 'callable'     : callable
+               , 'handler'     : handler
                , 'title'        : title
                , 'description'  : description
                }
@@ -555,13 +555,13 @@ class _ExportScriptRegistryParser( ContentHandler ):
                 raise ValueError, 'No pending script!'
 
             id = self._pending[ 'id' ]
-            callable = _resolveDottedName( self._pending[ 'callable' ] )
+            handler = _resolveDottedName( self._pending[ 'handler' ] )
 
             title = self._pending.get( 'title', id )
             description = ''.join( self._pending.get( 'description', [] ) )
 
             self._registry.registerScript( id=id
-                                         , callable=callable
+                                         , handler=handler
                                          , title=title
                                          , description=description
                                          )
