@@ -9,3 +9,4 @@ def importAll():
     import word, winword
     import excel
     import powerpoint, powerpnt
+    import msohtmed
