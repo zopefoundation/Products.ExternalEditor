@@ -76,11 +76,16 @@ def parseHeadersBody( body, headers=None ):
     return headers, join( lines[ i+1: ], '\n' )
 
 
-    
-def tuplize( valueName, value ):
+def semi_split(s):
+    return map(strip, split(s, ';'))
+
+def comma_split(s):
+    return map(strip, split(s, ','))
+
+def tuplize( valueName, value, splitter=split ):
     if type(value) == type(()): return value
     if type(value) == type([]): return tuple( value )
-    if type(value) == type(''): return tuple( split( value ) )
+    if type(value) == type(''): return tuple( splitter( value ) )
     raise ValueError, "%s of unsupported type" % valueName
 
 
