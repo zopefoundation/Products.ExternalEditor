@@ -21,6 +21,7 @@ from Globals import InitializeClass, Persistent
 from AccessControl import ClassSecurityInfo
 from Acquisition import Implicit, aq_base
 
+from OFS.PropertyManager import PropertyManager
 from OFS.SimpleItem import SimpleItem
 
 from Products.CMFCore.utils import getToolByName, UniqueObject
@@ -104,12 +105,19 @@ class UniqueIdAnnotation(Persistent, Implicit):
 InitializeClass(UniqueIdAnnotation)
 
 
-class UniqueIdAnnotationTool(UniqueObject, SimpleItem, ActionProviderBase):
+class UniqueIdAnnotationTool(UniqueObject, SimpleItem, PropertyManager, ActionProviderBase):
     __doc__ = __doc__ # copy from module
 
     __implements__ = (
-        SimpleItem.__implements__,
         IUniqueIdAnnotationManagement,
+        ActionProviderBase.__implements__,
+        SimpleItem.__implements__,
+    )
+
+    manage_options = (
+        PropertyManager.manage_options +
+        ActionProviderBase.manage_options +
+        SimpleItem.manage_options
     )
 
     id = 'portal_uidannotation'
@@ -118,9 +126,14 @@ class UniqueIdAnnotationTool(UniqueObject, SimpleItem, ActionProviderBase):
     
     security = ClassSecurityInfo()
     
-    # XXX make Zope properties out of those:
     remove_on_add = True
-    remove_on_clone = True # caution when setting this to False!!!
+    remove_on_clone = True
+    _properties = (
+    {'id': 'remove_on_add', 'type': 'boolean', 'mode': 'w',
+     'label': "Remove the objects unique id on add (and import)"},
+    {'id': 'remove_on_clone', 'type': 'boolean', 'mode': 'w',
+     'label': 'Remove the objects unique id on clone (CAUTION !!!)'},
+    )
     
     security.declareProtected(ManagePortal, '__call__')
     def __call__(self, obj, id):
