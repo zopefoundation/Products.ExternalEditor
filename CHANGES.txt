@@ -1,5 +1,9 @@
 External Editor Change Log
 
+    - Fixed bug editing large (chunked) files and images. External editor now
+      streams their data properly to the client. Thanks to all the users who
+      reported various symptoms of this bug.
+
     - Fixed bug editing objects inside a Squishdot site. Thanks to Kevin Salt.
 
     - Added the capability to borrow exising DAV locks. This allows external

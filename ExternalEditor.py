@@ -21,6 +21,7 @@ import Acquisition
 from AccessControl.SecurityManagement import getSecurityManager
 from webdav.common import rfc1123_date
 from webdav import Lockable
+from OFS import Image
 
 class ExternalEditor(Acquisition.Implicit):
     """Create a response that encapsulates the data needed by the
@@ -84,6 +85,22 @@ class ExternalEditor(Acquisition.Implicit):
               
         r.append('')
         
+        RESPONSE.setHeader('Pragma', 'no-cache')
+        
+        if hasattr(Acquisition.aq_base(ob), 'data') \
+           and hasattr(ob.data, '__class__') \
+           and ob.data.__class__ is Image.Pdata:
+            # We have a File instance with chunked data, lets stream it
+            metadata = join(r, '\n')
+            RESPONSE.setHeader('Content-Type', 'application/x-zope-edit')
+            RESPONSE.setHeader('Content-Length', len(metadata) + ob.get_size())
+            RESPONSE.write(metadata)
+            RESPONSE.write('\n')
+            data = ob.data
+            while data is not None:
+                RESPONSE.write(data.data)
+                data = data.next         
+            return ''
         if hasattr(ob, 'manage_FTPget'):
             try:
                 r.append(ob.manage_FTPget())
@@ -99,7 +116,5 @@ class ExternalEditor(Acquisition.Implicit):
             # can't read it!
             raise 'BadRequest', 'Object does not support external editing'
         
-        RESPONSE.setHeader('Content-Type', 'application/x-zope-edit')
-        RESPONSE.setHeader('Pragma', 'no-cache')
-            
+        RESPONSE.setHeader('Content-Type', 'application/x-zope-edit')    
         return join(r, '\n')
