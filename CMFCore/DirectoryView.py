@@ -101,7 +101,8 @@ import CMFCorePermissions
 
 __reload_module__ = 0
 
-normalize = path.normcase
+def normalize(p):
+    return path.abspath(path.normcase(p))
 
 normINSTANCE_HOME = normalize(INSTANCE_HOME)
 normSOFTWARE_HOME = normalize(SOFTWARE_HOME)
@@ -112,10 +113,10 @@ def expandpath(p):
     # Converts a minimal path to an absolute path.
     if path.isabs(p):
         return p
-    abs = path.join(INSTANCE_HOME, p)
+    abs = path.join(normINSTANCE_HOME, p)
     if path.exists(abs):
         return abs
-    return path.join(SOFTWARE_HOME, p)
+    return path.join(normSOFTWARE_HOME, p)
 
 def minimalpath(p):
     # Trims INSTANCE_HOME or SOFTWARE_HOME from a path.
@@ -240,7 +241,7 @@ class DirectoryInformation:
                 pos = rfind(entry, '.')
                 if pos >= 0:
                     name = entry[:pos]
-                    ext = normalize(entry[pos + 1:])
+                    ext = path.normcase(entry[pos + 1:])
                 else:
                     name = entry
                     ext = ''
