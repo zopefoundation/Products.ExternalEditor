@@ -8,8 +8,7 @@
 <form method="POST" action="" 
       tal:attributes="action python: here.absolute_url() + '/talkback'">
 <input type="hidden" name="Creator" value=""
-       tal:define="member python: here.portal_membership.getAuthenticatedMember()"
-	   tal:attributes="value member">
+	   tal:attributes="value python: here.portal_membership.getAuthenticatedMember()">
 
 <table class="FormLayout">
  <tr>
