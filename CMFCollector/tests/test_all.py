@@ -10,7 +10,7 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-""" CMFSetup tests.
+""" CMFCollector tests.
 
 $Id$
 """
