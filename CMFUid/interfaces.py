@@ -27,6 +27,7 @@ from Products.CMFCore.interfaces.IOpaqueItems \
 
 class UniqueIdError(Exception): pass
 
+
 class IUniqueIdQuery(Interface):
     """Querying unique ids.
     """
@@ -105,6 +106,7 @@ class IUniqueIdSet(Interface):
         UniqueIdError is raised if object was not registered previously.
         """
 
+
 class IUniqueIdHandler(IUniqueIdSet, IUniqueIdQuery, IUniqueIdBrainQuery):
     """Handle registering, querying unique ids and objects.
     """
@@ -117,6 +119,7 @@ class IUniqueIdGenerator(Interface):
     def __call__():
         """Return a unique id object implementing 'IAnnotatedUid'.
         """
+
 
 class IAnnotatedUniqueId(ICallableOpaqueItem, ICallableOpaqueItemEvents):
     """Unique id handling adding, copying, and deletion events.

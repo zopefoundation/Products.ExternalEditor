@@ -20,14 +20,15 @@ __version__ = "$Revision$"
 
 import Missing
 
-from OFS.SimpleItem import SimpleItem
-from Products.CMFCore.utils import UniqueObject
-from Products.CMFCore.ActionProviderBase import ActionProviderBase
-
 from Globals import InitializeClass, Persistent
 from AccessControl import ClassSecurityInfo
 from Acquisition import Implicit, aq_base
-from Products.CMFCore.utils import getToolByName
+
+from OFS.SimpleItem import SimpleItem
+
+from Products.CMFCore.utils import getToolByName, UniqueObject
+from Products.CMFCore.ActionProviderBase import ActionProviderBase
+from Products.CMFCore.permissions import ManagePortal
 
 from Products.CMFUid.interfaces import IUniqueIdHandler
 from Products.CMFUid.interfaces import UniqueIdError
@@ -55,7 +56,7 @@ class UniqueIdHandlerTool(UniqueObject, SimpleItem, ActionProviderBase):
     
     security = ClassSecurityInfo()
     
-    security.declarePublic('quersUid')
+    security.declarePublic('queryUid')
     def queryUid(self, obj, default=None):
         """See IUniqueIdQuery.
         """
@@ -79,7 +80,7 @@ class UniqueIdHandlerTool(UniqueObject, SimpleItem, ActionProviderBase):
         return uid
     
     
-    security.declarePrivate('register')
+    security.declareProtected(ManagePortal, 'register')
     def register(self, obj):
         """See IUniqueIdSet.
         """
@@ -99,7 +100,7 @@ class UniqueIdHandlerTool(UniqueObject, SimpleItem, ActionProviderBase):
             uid = uid()
         return uid
     
-    security.declarePrivate('unregister')
+    security.declareProtected(ManagePortal, 'unregister')
     def unregister(self, obj):
         """See IUniqueIdSet.
         """

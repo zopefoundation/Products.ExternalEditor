@@ -23,14 +23,15 @@ import time, random, md5, socket
 
 from BTrees.Length import Length
 
-from OFS.SimpleItem import SimpleItem
-from Products.CMFCore.utils import UniqueObject
-from Products.CMFCore.ActionProviderBase import ActionProviderBase
-
 from Globals import InitializeClass, Persistent
 from AccessControl import ClassSecurityInfo
 from Acquisition import Implicit, aq_base, aq_parent
-from Products.CMFCore.utils import getToolByName
+
+from OFS.SimpleItem import SimpleItem
+
+from Products.CMFCore.utils import getToolByName, UniqueObject
+from Products.CMFCore.ActionProviderBase import ActionProviderBase
+from Products.CMFCore.permissions import ManagePortal
 
 from Products.CMFUid.interfaces \
     import IUniqueIdGenerator, IAnnotatedUniqueId
@@ -148,7 +149,7 @@ class UniqueIdGeneratorTool(UniqueObject, SimpleItem, ActionProviderBase):
         # XXX to be implemented by searching the max value in the catalog
         raise NotImplementedError
     
-    security.declarePrivate('__call__')
+    security.declareProtected(ManagePortal, '__call__')
     def __call__(self):
         """See IUniqueIdGenerator.
         """
