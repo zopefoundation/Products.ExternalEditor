@@ -1,0 +1,32 @@
+Installing CMF 1.1beta
+
+  Requirements
+
+    - Zope v. 2.3.2 or later
+
+  Assumptions
+
+    - New installation
+
+    - Zope configured using INSTANCE_HOME, /var/zope, and
+      SOFTWARE_HOME, /usr/local/zope/Zope-2.3.2
+
+  Procedure
+
+    1. Unpack the CMF-1.1beta.tar.gz tarball into a working
+       directory. For instance::
+
+        $ cd /usr/local/zope
+        $ tar xzf /tmp/CMF-1.1beta.tar.gz
+
+    2. Link (or copy/move) the CMF packages into
+       $INSTANCE_HOME/Products.  For instance::
+
+        $ cd /var/zope/Products
+        $ ln -s /usr/local/zope/CMF-1.1beta/CMF* .
+
+    3. Restart Zope; verify that the CMF products loaded
+       property, by examining them in Control_Panel/Product.
+
+    4. Create a CMF Site object. join, and begin adding content.
+       Enjoy!

@@ -2,6 +2,10 @@
 
  New features
 
+  - Added CMFCore.utils.keywordsplitter to construct 'Subject'
+    dublin core header from both 'Keywords' and 'Subject' headers
+    passed in (meta tags/rfc822).
+
   - CMF Document now uses StructuredTextNG for structured text
     handling.  Nicely enough, it uses the "with images" features, and
     also enables named and inner links.
@@ -81,10 +85,23 @@
 
  Bug Fixes
 
+  - Only display the "join" action if the user has the "Add
+    portal member" permission.
+
+  - Check for appropriate REQUEST variables before invoking
+    CopySupport machinery, return a nice 'portal_status_message'
+    instead of allowing the traceback to kick in (Tracker #247).
+
+  - Initialize default DublinCore metadata for the site, so that
+    *some* value is available everywhere (Tracker #285).
+
+  - Add module-level globals aliases, to permit other products
+    to use elements of skins (Tracker #273).
+
   - Replaced 'metadata_edit' DTMLMethod with PythonScript.
 
   - Updated 'metadata_edit' to avoid clearing values not passed
-    in REQUEST (Tracker issue #268).
+    in REQUEST (Tracker #268).
 
   - Removed spurious whitespace being added to Subject.
 
@@ -127,7 +144,7 @@
     parent is deleted / moved (Tracker #261).
 
   - Fixed lossage to File objects when no upload supplied
-    (Tracker issue #271).
+    (Tracker #271).
 
   - Fixed "Add to Favorites" when applied to Folders.
 
@@ -158,7 +175,7 @@
     need 'modified', too);  also, added selection list for 'Subject',
     and fixed the "Last Month" option value.
 
-  - Fixed non-import in CMFCore/WorkflowCore.py (Tracker issue #239,
+  - Fixed non-import in CMFCore/WorkflowCore.py (Tracker #239,
     thanks to 'snej' for the patch).
 
   - Updated CatalogTool to handle searchable vs. displayable DublinCore
@@ -169,7 +186,7 @@
     <jq@jquade.de> for pointing this out. (Issue PTK(241)[]).
 
   - Extended 'index_html' to render portal description using STX
-    (Tracker issue #246).
+    (Tracker #246).
 
   - Updated CMFDefault skins to use Contentish.getIcon, including
     the portal catalog. This greatly simplifies using ZClasses as
@@ -181,18 +198,18 @@
 
   - Extended 'folder_factories' to filter type objects using
     'isConstructionAllowed' in 'PortalFolder.allowedContentTypes'
-    (Tracker issue #249).
+    (Tracker #249).
 
   - Fixed display of replies on discussion items.
 
   - Made appropriate use of 'portal_url', instead of BASEPATH
-    ad hockery, in skin methods.
+    ad hockery, in skin methods (Tracker #259).
 
   - Synched interface definition of 'Contentish.getIcon' with
     reality (documented 'relative' parameter).
 
   - Fixed "Ever" entry in 'search_form' to use a value safe in
-    timezones east of GMT (Tracker issue #236).
+    timezones east of GMT (Tracker #236).
 
   - Deprecated the CMFDefault.File.download method; it is still
     available, but is no longer called by the current CMF skin,
