@@ -21,7 +21,6 @@ from Acquisition import aq_base
 import util                             # Collector utilities.
 
 from Products.CMFDefault.DublinCore import DefaultDublinCoreImpl
-from Products.CMFCore.PortalContent import PortalContent
 from Products.CMFCore.WorkflowCore import WorkflowAction
 from Products.CMFCore.utils import getToolByName
 
@@ -32,12 +31,14 @@ from Products.CMFDefault.Document import addDocument
 from Products.CMFCore import CMFCorePermissions
 from CollectorPermissions import *
 
+RULE = '_' * 50
 
-DEFAULT_TRANSCRIPT_FORMAT = 'stx'
+UPLOAD_PREFIX = "Uploaded: "
+uploadexp = re.compile('(%s)([^<,\n]*)([<,\n])' % UPLOAD_PREFIX, re.MULTILINE)
 
 factory_type_information = (
     {'id': 'Collector Issue',
-     'content_icon': 'collector_issue_icon.gif',
+     'icon': 'collector_issue_icon.gif',
      'meta_type': 'CMF Collector Issue',
      'description': ('A Collector Issue represents a bug report or'
                      ' other support request.'),
@@ -76,10 +77,9 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
 
     meta_type = 'CMF Collector Issue'
     effective_date = expiration_date = None
+    TRANSCRIPT_FORMAT = 'html'
     
     security = ClassSecurityInfo()
-
-    comment_delimiter = "<hr solid id=comment_delim>"
 
     action_number = 0
 
@@ -208,38 +208,14 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
 
     security.declareProtected(CMFCorePermissions.View, 'CookedBody')
     def CookedBody(self):
-        """Massage the transcript's cooked body to linkify obvious things."""
-        return self._cook_links(self.get_transcript().CookedBody(stx_level=3))
+        """Rendered content."""
+        body = self.get_transcript().CookedBody()
+        body = util.format_webtext(body)
+        body = uploadexp.sub(r'\1 <a href="%s/\2/view">\2</a>\3'
+                             % self.aq_parent.absolute_url(),
+                             body)
+        return body
 
-    def _cook_links(self, text, email=0):
-        """Cook text so URLs and upload references are hrefs.
-
-        If optional arg 'email' is true, then we just provide urls for uploads
-        (assuming the email client will take care of linkifying URLs)."""
-        if not email:
-            candidates = util.link_candidates(text)
-            if candidates:
-                got = []
-                cursor = 0
-                for c in candidates:
-                    start, end = c.start(), c.end()
-                    got.append(text[cursor:start])
-                    url = text[start:end]
-                    got.append('<a href="%s">%s</a>' % (url, url))
-                    cursor = end
-                if cursor < len(text):
-                    got.append(text[cursor:])
-                text = "".join(got)
-            text = util.uploadexp.sub(r'\1<a href="%s/\2/view">\2</a>\3'
-                                      % self.absolute_url(),
-                                      text)
-        else:
-            text = util.uploadexp.sub(r'\1 "\2" - %s/\2/view'
-                                      % self.absolute_url(),
-                                      text)
-            text = string.replace(text, "<hr>", "-" * 62)
-        return text
-        
 
     security.declareProtected(EditCollectorIssue, 'edit')
     def edit(self,
@@ -263,9 +239,8 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         changes += self._set_submitter_specs(submitter_id,
                                              submitter_name, submitter_email)
         if text is not None and text != transcript.text:
-            changes.append('revised transcript')
-            transcript._edit(text_format=DEFAULT_TRANSCRIPT_FORMAT,
-                             text=text)
+            changes.append('edited transcript')
+            transcript._edit(text_format=self.TRANSCRIPT_FORMAT, text=text)
         if changed('title', title):
             changes.append('revised title')
             self.title = title
@@ -303,16 +278,16 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         username = str(getSecurityManager().getUser())
 
         if comment:
-            comment = "\n\n" + util.process_comment(comment)
+            comment = "\n\n" + comment
         else:
             comment = ''
 
-        transcript._edit('stx',
+        transcript._edit(self.TRANSCRIPT_FORMAT,
                          self._entry_header('Edit', username)
                          + "\n\n"
                          + " Changes: " + ", ".join(changes)
                          + comment
-                         + ((self.action_number > 1) and "\n<hr>\n")
+                         + ((self.action_number > 1) and "\n" + RULE + "\n")
                          + transcript.EditableBody())
         self.reindexObject()
         self._send_update_notice('Edit', username)
@@ -377,14 +352,14 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         (uploadmsg, fileid) = self._process_file(file, fileid,
                                                   filetype, comment)
         if uploadmsg:
-            comment_header.append(" " + uploadmsg)
+            comment_header.append("\n" + uploadmsg)
 
         comment_header_str = "\n\n".join(comment_header) + "\n\n"
 
-        transcript._edit('stx',
+        transcript._edit(self.TRANSCRIPT_FORMAT,
                          comment_header_str
-                         + util.process_comment(comment)
-                         + ((action_number > 1) and "\n\n<hr>\n" or '')
+                         + comment
+                         + ((action_number > 1) and ("\n" + RULE + "\n") or '')
                          + transcript.EditableBody())
         self.reindexObject()
         self._send_update_notice(action, username,
@@ -487,8 +462,10 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
                        % (subject, self.id, self.action_number,
                           string.capitalize(action), self.title))
 
-            body = util.unprocess_comments(self.get_transcript().text)
-            body = self._cook_links(body, email=1)
+            body = self.get_transcript().text
+            body = uploadexp.sub(r'\1 "\2"\n - %s/\2/view'
+                                 % self.absolute_url(),
+                                 body)
             cin = self.collector_issue_notice
             message = cin(sender=sender,
                           recipients=to,
@@ -570,12 +547,12 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         wftool = getToolByName(self, 'portal_workflow')
         return wftool.getInfoFor(self, 'confidential', 0)
 
-    def _create_transcript(self, description,
-                           text_format=DEFAULT_TRANSCRIPT_FORMAT):
+    def _create_transcript(self, description):
         """Create events and comments transcript, with initial entry."""
 
         user = getSecurityManager().getUser()
-        addDocument(self, TRANSCRIPT_NAME, description=description)
+        addDocument(self, TRANSCRIPT_NAME, description=description,
+                    text_format=self.TRANSCRIPT_FORMAT)
         it = self.get_transcript()
         it._setPortalTypeName('Collector Issue Transcript')
         it.title = self.title
