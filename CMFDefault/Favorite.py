@@ -128,7 +128,8 @@ class Favorite( Link ):
         """
         # strip off scheme and machine from URL if present
         tokens = urlparse.urlparse( remote_url, 'http' )
-        if tokens[0] or tokens[1]:
+        if tokens[1]:
+            # There is a nethost, remove it
             t=('', '') + tokens[2:]
             remote_url=urlparse.urlunparse(t)
         # if URL begins with site URL, remove site URL
