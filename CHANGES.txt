@@ -96,6 +96,10 @@ CMF 1.4 alpha
 
   Bug Fixes
 
+    - Skinnable: Changed docstring for setupCurrentSkin and added 
+      docstring to changeSkin: the latter is now used to set skin
+      manually mid-request. (Collector #27)
+
     - Document: Ensured that setFormat('text/plain') does not overwrite
       text_format if text_format is 'plain'. (Collector #140)
 

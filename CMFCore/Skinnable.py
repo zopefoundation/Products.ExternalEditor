@@ -102,7 +102,9 @@ class SkinnableObjectManager (ObjectManager):
 
     security.declarePublic('changeSkin')
     def changeSkin(self, skinname):
-        '''Can be called manually, allowing the user to change
+        '''Change the current skin.
+        
+        Can be called manually, allowing the user to change
         skins in the middle of a request.
         '''
         self._v_skindata = None
@@ -114,6 +116,7 @@ class SkinnableObjectManager (ObjectManager):
     def setupCurrentSkin(self, REQUEST=None):
         '''
         Sets up _v_skindata so that __getattr__ can find it.
+
         Can NOT be called manually to change skins in the middle of a 
         request! Use changeSkin for that.
         '''
