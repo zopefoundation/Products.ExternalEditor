@@ -25,6 +25,10 @@ CMF 1.3 beta2 (2002/06/30)
 
   New Features
 
+    - Modified the 'standard_error_message' page template to show the
+      'error_log_url', if passed in (Zope 2.6 will pass this argument
+      if an error log is installed).
+
     - Extended the metadata tool to permit passing the type name
       directly (e.g., when building a new object, one might need to know
       the allowed subjects before construction).
