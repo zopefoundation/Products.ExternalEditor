@@ -21,8 +21,6 @@ from dummy import DummyFolder
 class TransactionalTest( TestCase ):
 
     def setUp( self ):
-        if hasattr(Zope, 'startup'):
-            Zope.startup()
         get_transaction().begin()
         self.connection = Zope.DB.open()
         self.root =  self.connection.root()[ 'Application' ]
