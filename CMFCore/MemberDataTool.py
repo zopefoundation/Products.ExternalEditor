@@ -261,6 +261,8 @@ class MemberData (SimpleItem):
         # Hopefully we can later make notifyModified() implicit.
         self.notifyModified()
 
+    # XXX: s.b., getPropertyForMember(member, id, default)?
+
     security.declarePublic('getProperty')
     def getProperty(self, id, default=_marker):
 
@@ -268,27 +270,29 @@ class MemberData (SimpleItem):
         base = aq_base( self )
 
         # First, check the wrapper (w/o acquisition).
-        # XXX: s.b., tool.getPropertyForMember( self, id, default )?
         value = getattr( base, id, _marker )
         if value is not _marker:
             return value
 
-        # Then, check the tool for a value other than ''
+        # Then, check the tool and the user object for a value.
         tool_value = tool.getProperty( id, _marker )
-        user_value = getattr( self.getUser(), id, default )
-        
-        if tool_value is not _marker:
-            if not tool_value and not user_value:
-                value = tool_value
-            elif not tool_value and user_value:
-                value = user_value
-        else:
-            if user_value:
-                value = user_value
-            else:
-                raise 'Property not found', id
+        user_value = getattr( self.getUser(), id, _marker )
 
-        return value
+        # If the tool doesn't have the property, use user_value or default
+        if tool_value is _marker:
+            if user_value is not _marker:
+                return user_value
+            elif default is not _marker:
+                return default
+            else:
+                raise ValueError, 'The property %s does not exist' % id
+
+        # If the tool has an empty property and we have a user_value, use it
+        if not tool_value and user_value is not _marker:
+            return user_value
+
+        # Otherwise return the tool value
+        return tool_value
 
     security.declarePrivate('getPassword')
     def getPassword(self):
