@@ -104,7 +104,7 @@ class StateDefinition (SimpleItem):
                                      manage_tabs_message=manage_tabs_message,
                                      )
 
-    def setProperties(self, title='', description='', transitions=(), REQUEST=None):
+    def setProperties(self, title='', transitions=(), REQUEST=None, description=''):
         '''
         '''
         self.title = str(title)

@@ -108,12 +108,12 @@ class TransitionDefinition (SimpleItem):
                                      manage_tabs_message=manage_tabs_message,
                                      )
 
-    def setProperties(self, title, description, new_state_id,
+    def setProperties(self, title, new_state_id,
                       trigger_type=TRIGGER_USER_ACTION, script_name='',
                       after_script_name='',
                       actbox_name='', actbox_url='',
                       actbox_category='workflow',
-                      props=None, REQUEST=None):
+                      props=None, REQUEST=None, description=''):
         '''
         '''
         self.title = str(title)
