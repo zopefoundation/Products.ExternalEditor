@@ -341,7 +341,7 @@ class ExternalEditor:
                 h.putheader("Authorization", self.metadata['auth'])
 
             if self.metadata.get('cookie'):
-                h.putheader("Cookie", self.metadata['cookie']+'\n')
+                h.putheader("Cookie", self.metadata['cookie'])
 
             h.endheaders()
             h.send(body)
