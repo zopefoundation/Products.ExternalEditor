@@ -202,7 +202,16 @@ class PortalGenerator:
         addCMFDefaultTool('Default Properties Tool', None)
         addCMFDefaultTool('Default Metadata Tool', None)
         addCMFDefaultTool('Default Syndication Tool', None)
-
+        
+        # try to install CMFUid without raising exceptions if not available
+        try:
+            addCMFUidTool = p.manage_addProduct['CMFUid'].manage_addTool
+        except AttributeError:
+            pass
+        else:
+            addCMFUidTool('Unique Id Generator Tool', None)
+            addCMFUidTool('Unique Id Handler Tool', None)
+        
     def setupMailHost(self, p):
         p.manage_addProduct['MailHost'].manage_addMailHost(
             'MailHost', smtp_host='localhost')
