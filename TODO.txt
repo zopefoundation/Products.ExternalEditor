@@ -46,6 +46,8 @@ CMF TODO's
 
       - Tracker #513:  deleteReply is genocidal
 
+      - Tracker #514:  Document STX messing up anchors
+
       - Tracker #515:  Improper default button for discussion reply
 
       - Tracker #516:  Preview, then edit broken for ZPT discussion replies.
