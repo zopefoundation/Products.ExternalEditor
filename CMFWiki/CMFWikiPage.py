@@ -2,7 +2,7 @@
 The code in this module is available under the GPL.
 All rights reserved, all disclaimers apply, etc.
 
-(c) 1999,2000 Simon Michael <simon@joyful.com>
+\(c) 1999,2000 Simon Michael <simon@joyful.com>
 Parenting code and regulations by Ken Manheimer (klm@digicool.com)
 Integrated into Zope CMF by Chris McDonough (chrism@digicool.com)
 """
@@ -14,7 +14,8 @@ from Globals import HTMLFile, default__class_init__, package_home
 from OFS.DTMLDocument import DTMLDocument
 from OFS.Image import cookId
 from urllib import quote, unquote     # url quoting
-from StructuredText import html_with_references, html_quote
+from StructuredText import html_with_references #, html_quote
+from DocumentTemplate.DT_Util import html_quote
 from wwml import translate_WMML
 from string import split,join,find,lstrip,lower
 import Acquisition
@@ -101,6 +102,10 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
     set(CMFWikiPermissions.Move, ('Owner', 'Manager'))
     set(CMFWikiPermissions.Comment, ('Owner', 'Manager', 'Authenticated'))
     set = None
+
+    def __init__(self, file, __name__):
+        DTMLDocument.__init__(self, file, mapping=None, __name__=__name__)
+        DefaultDublinCoreImpl.__init__(self)
 
     security.declarePublic('getId')
     def getId(self):
@@ -1123,7 +1128,6 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
 
         See the WikiNesting docstring for nestings structure description."""
         container = self._my_folder()
-        print container
         allpages = container.objectIds(spec=self.meta_type)
         ancestors = {}
         offspring = {}
@@ -1742,6 +1746,14 @@ factory_type_information = (
                  {'id': 'wikihelp',
                   'name': 'WikiHelp',
                   'action': 'view_wiki_help',
+                  'permissions': (CMFWikiPermissions.View,)},
+                 {'id': 'toc',
+                  'name': 'Wiki Contents',
+                  'action':'page_get_wiki_toc',
+                  'permissions': (CMFWikiPermissions.View,)},
+                 {'id': 'recent_changes',
+                  'name': 'Recent Changes',
+                  'action':'page_recent_wiki_changes',
                   'permissions': (CMFWikiPermissions.View,)},
                  ),
      },
