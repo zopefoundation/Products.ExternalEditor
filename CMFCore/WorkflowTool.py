@@ -264,7 +264,7 @@ class WorkflowTool (UniqueObject, Folder):
                                                'Changed.')
 
     security.declareProtected(CMFCorePermissions.ManagePortal,
-                              'setChainForPortalType')
+                              'setChainForPortalTypes')
     def setChainForPortalTypes(self, pt_names, chain):
         """ Set a chain for a specific portal type """
         cbt = self._chains_by_type
