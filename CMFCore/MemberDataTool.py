@@ -146,13 +146,16 @@ class MemberDataTool (UniqueObject, SimpleItem, PropertyManager, ActionProviderB
             search_param = 'id'
 
         for user_wrapper in self._members.values():
-            searched = getattr( user_wrapper, search_param, None )
+
+            memberProperty = user_wrapper.getProperty
+            searched = memberProperty( search_param, None )
+
             if searched is not None and searched.find(search_term) != -1:
-                res.append( { 'username' : getattr( user_wrapper, 'id' )
-                            , 'email' : getattr( user_wrapper, 'email', '' )
+
+                res.append( { 'username': memberProperty( 'id' )
+                            , 'email' : memberProperty( 'email', '' )
                             }
                           )
-
         return res
 
     security.declarePrivate('pruneMemberDataContents')
