@@ -105,7 +105,9 @@ class ActionProviderBase:
 
         a_expr = action and Expression(text=str(action)) or ''
         c_expr = condition and Expression(text=str(condition)) or ''
-        perm = permission and (str(permission),) or ()
+
+        if type( permission ) != type( () ):
+            permission = permission and (str(permission),) or ()
 
         new_actions = self._cloneActions()
 
@@ -113,7 +115,7 @@ class ActionProviderBase:
                                       , title=str(name)
                                       , action=a_expr
                                       , condition=c_expr
-                                      , permissions=perm
+                                      , permissions=permission
                                       , category=str(category)
                                       , visible=int(visible)
                                       )
