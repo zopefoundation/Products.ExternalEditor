@@ -382,7 +382,7 @@ class FactoryTypeInformation (TypeInformation):
                 if getSecurityManager().validate(p, p, self.factory, m):
                     return m
             return None
-        except:
+        except: # only raise if allowed
             if raise_exc:
                 raise
             return None
@@ -613,7 +613,7 @@ class TypesTool( UniqueObject, OFS.Folder.Folder ):
         if type( contentType ) is not type( '' ):
             try:
                 contentType = contentType._getPortalTypeName()
-            except:
+            except: # if we can't get or call it for any reason, fall back...
                 contentType = contentType.meta_type
         ob = getattr( self, contentType, None )
         if getattr(aq_base(ob), '_isTypeInformation', 0):

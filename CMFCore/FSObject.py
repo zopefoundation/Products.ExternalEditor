@@ -185,7 +185,7 @@ class BadFile( FSObject ):
                 data = self.file_contents = file.read()
             finally:
                 file.close()
-        except:
+        except:  # No errors of any sort may propagate
             data = self.file_contents = None #give up
         return data
     

@@ -76,6 +76,8 @@ class CookieCrumbler (SimpleItemWithProperties):
 
     security.declarePrivate('delRequestVar')
     def delRequestVar(self, req, name):
+        # No errors of any sort may propagate, and we don't care *what*
+        # they are, even to log them.
         try: del req.other[name]
         except: pass
         try: del req.form[name]
@@ -180,6 +182,8 @@ class CookieCrumbler (SimpleItemWithProperties):
 
     def _cleanupResponse(self):
         resp = self.REQUEST['RESPONSE']
+        # No errors of any sort may propagate, and we don't care *what*
+        # they are, even to log them.
         try: del resp.unauthorized
         except: pass
         try: del resp._unauthorized
@@ -279,6 +283,9 @@ class ResponseCleanup:
 
     def __del__(self):
         # Free the references.
+        #
+        # No errors of any sort may propagate, and we don't care *what*
+        # they are, even to log them.
         try: del self.resp.unauthorized
         except: pass
         try: del self.resp._unauthorized

@@ -11,6 +11,11 @@
 #
 ##############################################################################
 
+"""Declare named permissions used throughout the CMF.
+$Id$
+"""
+__version__='$Revision$'[11:-2]
+
 import Globals, AccessControl, Products
 from AccessControl import Permissions
 
