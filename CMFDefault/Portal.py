@@ -101,7 +101,6 @@ factory_type_information = ( Document.factory_type_information
                            + Favorite.factory_type_information
                            )
 
-members_roster = '''<dtml-return roster>'''
 
 class CMFSite ( PortalObjectBase
               , DefaultDublinCoreImpl

@@ -88,7 +88,7 @@
 ADD_CONTENT_PERMISSION = 'Add portal content'
  
 import Portal
-import Document, Link, NewsItem, File, Image, Favorite
+import Document, Link, NewsItem, File, Image, Favorite, SkinnedFolder
 import Discussions, DiscussionItem
 import PropertiesTool, MembershipTool, MetadataTool
 import RegistrationTool, URLTool, DublinCore, DiscussionTool
@@ -129,12 +129,13 @@ if SUPPLY_DEPRECATED_PTK_BASE_ALIASES:
     Products.PTKBase.NewsItem = NewsItem
 
 contentClasses = ( Document.Document
-                   , File.File
-                   , Image.Image
-                   , Link.Link
-                   , Favorite.Favorite
-                   , NewsItem.NewsItem
-                   )
+                 , File.File
+                 , Image.Image
+                 , Link.Link
+                 , Favorite.Favorite
+                 , NewsItem.NewsItem
+                 , SkinnedFolder.SkinnedFolder
+                 )
 
 contentConstructors = ( Document.addDocument
                         , File.addFile
