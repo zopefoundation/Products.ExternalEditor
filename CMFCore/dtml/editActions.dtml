@@ -104,6 +104,24 @@
 </td>
 </tr>
 
+<tr>
+<td></td>
+<td>
+  <div class="form-label">
+  Visible?
+  </div>
+</td>
+<td>
+  <div class="form-element">
+  <input type="hidden" name="visible_&dtml-index;:int:default"
+         value="0" />
+  <dtml-let chk="visible and 'checked' or ''">
+  <input type="checkbox" name="visible_&dtml-index;:boolean" &dtml-chk; />
+  </dtml-let>
+  </div>
+</td>
+</tr>
+
 </dtml-let>
 
 <tr><td colspan="3">
@@ -202,6 +220,22 @@ Add an action
 <td>
   <div class="form-element">
   <input type="text" name="category" value="" />
+  </div>
+</td>
+</tr>
+<tr>
+
+<td></td>
+<td>
+  <div class="form-label">
+  Visible?
+  </div>
+</td>
+<td>
+  <div class="form-element">
+  <input type="hidden" name="visible:int:default"
+         value="0" />
+  <input type="checkbox" name="visible:boolean" checked />
   </div>
 </td>
 </tr>

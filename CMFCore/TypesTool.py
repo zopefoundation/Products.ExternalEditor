@@ -292,6 +292,8 @@ class TypeInformation (SimpleItemWithProperties):
                 a['category'] = 'object'
             if not a.has_key('id'):
                 a['id'] = string.lower(a['name'])
+            if not a.has_key( 'visible' ):
+                a['visible'] = 1
             actions.append(a)
         # possible_permissions is in AccessControl.Role.RoleManager.
         pp = self.possible_permissions()
@@ -302,7 +304,15 @@ class TypeInformation (SimpleItemWithProperties):
                                   manage_tabs_message=manage_tabs_message)
 
     security.declareProtected(ManagePortal, 'addAction')
-    def addAction(self, id, name, action, permission, category, REQUEST=None):
+    def addAction( self
+                 , id
+                 , name
+                 , action
+                 , permission
+                 , category
+                 , visible=1
+                 , REQUEST=None
+                 ):
         """
         Adds an action to the list.
         """
@@ -314,6 +324,7 @@ class TypeInformation (SimpleItemWithProperties):
              'action': str(action),
              'permissions': (str(permission),),
              'category': str(category),
+             'visible': int(visible),
              },)
         if REQUEST is not None:
             return self.manage_editActionsForm(
@@ -336,6 +347,7 @@ class TypeInformation (SimpleItemWithProperties):
                 'permissions':
                 (properties.get('permission_' + s_idx, ()),),
                 'category': str(properties.get('category_' + s_idx, '')),
+                'visible': not not properties.get('visible_' + s_idx, 0),
                 }
             if not action['name']:
                 raise ValueError('A name is required.')

@@ -212,6 +212,7 @@ class ActionsTool (UniqueObject, SimpleItem):
                             'url': url,
                             'permissions': d['permissions'],
                             'category': d.get('category', 'object'),
+                            'visible': d.get('visible', 1),
                             })
             if hasattr(base, 'listActions'):
                 a = object.listActions(info)
@@ -229,6 +230,9 @@ class ActionsTool (UniqueObject, SimpleItem):
         for action in actions:
             category = action['category']
             permissions = action.get('permissions', None)
+            visible = action.get('visible', 1)
+            if not visible:
+                continue
             verified = 0
             if not permissions:
                 # This action requires no extra permissions.
