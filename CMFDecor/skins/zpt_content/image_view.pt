@@ -8,7 +8,7 @@
 
 <div class="Image">
 
-<span tal:replace="here/tag">Tag</span>
+<span tal:replace="structure here/tag">Tag</span>
 
 <div class="Discussion">
 <span tal:replace="structure here/viewThreadsAtBottom"
