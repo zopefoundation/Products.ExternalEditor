@@ -61,6 +61,12 @@ CMF 1.3 beta2 (2002/06/30)
 
   Bugs Fixed
 
+    - Provided all default skins (content_hide_form, content_show_form)
+      for the DCWorkflow default workflow [rev 2]. Note that, when using
+      this workflow, the descriptions in the retract and reject forms
+      are slightly incorrect as they mention the "private" state but in
+      fact go to the "visible" state.
+
     - Fixed verification of portal types in the TypesTool to work in the
       presence of portal types with a non-empty title (Tracker #497).
 
