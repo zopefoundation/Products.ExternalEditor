@@ -61,13 +61,28 @@ def _replaceUserFolder(self, RESPONSE=None):
                   , 'replaceUserFolder'
                   , 'Already replaced this user folder\n' )
             return
+
+        # Capture all the user info from the previous user folder,
+        # then delete it.
         old_acl = self.__allow_groups__
-        new_acl = PluggableAuthService()
-        preg = PluginRegistry( _PLUGIN_TYPE_INFO )
-        preg._setId( 'plugins' )
-        new_acl._setObject( 'plugins', preg )
-        self._setObject( 'new_acl_users', new_acl )
-        new_acl = getattr( self, 'new_acl_users' )
+        user_map = []
+        for user_name in old_acl.getUserNames():
+            old_user = old_acl.getUser( user_name )
+            _write( RESPONSE
+                  , 'replaceRootUserFolder'
+                  , 'Capturing user info for %s\n' % user_name )
+            user_map.append(
+                { 'login' : user_name,
+                  'password' : old_user._getPassword(),
+                  'roles' : old_user.getRoles() }
+                )
+        self._delObject( 'acl_users' )
+
+        # Create the new PluggableAuthService, and re-populate from
+        # the captured data
+        _pas = self.manage_addProduct['PluggableAuthService']
+        new_pas = _pas.addPluggableAuthService()
+        new_acl = self.acl_users
 
         user_folder = ZODBUserManager( 'users' )
         new_acl._setObject( 'users', user_folder )
@@ -80,37 +95,37 @@ def _replaceUserFolder(self, RESPONSE=None):
         plugins.activatePlugin( IRolesPlugin, 'roles' )
         plugins.activatePlugin( IRoleEnumerationPlugin, 'roles' )
         plugins.activatePlugin( IRoleAssignerPlugin, 'roles' )
-        for user_name in old_acl.getUserNames():
-            old_user = old_acl.getUser( user_name )
+        for user_dict in user_map:
             _write( RESPONSE
                   , 'replaceRootUserFolder'
                   , 'Translating user %s\n' % user_name )
-            _migrate_user( new_acl.users, user_name, old_user._getPassword() )
-            new_user = new_acl.getUser( user_name )
-            for role_id in old_user.getRoles():
-                if role_id not in ['Authenticated', 'Anonymous']:
-                    new_acl.roles.assignRoleToPrincipal( role_id,
-                                                         new_user.getId() )
-        self._delObject( 'acl_users' )
-        self._setObject( 'acl_users', aq_base( new_acl ) )
-        self._delObject( 'new_acl_users' )
-        self.__allow_groups__ = aq_base( new_acl )
+            login = user_dict['login']
+            password = user_dict['password']
+            roles = user_dict['roles']
+
+            _migrate_user( new_acl, login, password, roles )
         _write( RESPONSE
               , 'replaceRootUserFolder'
               , 'Replaced root acl_users with PluggableAuthService\n' )
 
     get_transaction().commit()
 
-def _migrate_user( new_user_folder, login, password ):
+def _migrate_user( pas, login, password, roles ):
 
     from AccessControl import AuthEncoding
 
     if AuthEncoding.is_encrypted( password ):
-        new_user_folder._user_passwords[ login ] = password
-        new_user_folder._login_to_userid[ login ] = login
-        new_user_folder._userid_to_login[ login ] = login
+        pas.users._user_passwords[ login ] = password
+        pas.users._login_to_userid[ login ] = login
+        pas.users._userid_to_login[ login ] = login
     else:
-        new_user_folder.addUser( login, login, password )
+        pas.users.addUser( login, login, password )
+
+    new_user = pas.getUser( login )
+    for role_id in roles:
+        if role_id not in ['Authenticated', 'Anonymous']:
+            pas.roles.assignRoleToPrincipal( role_id,
+                                             new_user.getId() )
 
 def _upgradeLocalRoleAssignments(self, RESPONSE=None):
     """ upgrades the __ac_local_roles__ attributes on objects to account
