@@ -108,7 +108,7 @@ factory_type_information = (
      'immediate_view':'metadata_edit_form', 'actions_for':'document',
      },
 
-    {'id': 'File', 'meta_type': 'File', 'description':
+    {'id': 'File', 'meta_type': 'Portal File', 'description':
      'File objects can contain arbitrary downloadable files.',
      'icon': 'file_icon.gif',
      'product':'CMFDefault', 'factory':'addFile',
@@ -128,7 +128,7 @@ factory_type_information = (
       ),
      },
 
-    {'id': 'Image', 'meta_type': 'Image', 'description':
+    {'id': 'Image', 'meta_type': 'Portal Image', 'description':
      'Image objects can be embedded in Portal documents.',
      'icon': 'image_icon.gif',
      'product':'CMFDefault', 'factory':'addImage',
