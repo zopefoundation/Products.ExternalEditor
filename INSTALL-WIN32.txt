@@ -1,0 +1,102 @@
+Zope External Editor Installation
+
+  Installation is two-fold: 
+
+  - Install the ExternalEditor product in Zope.
+
+  - Install the helper application on the client(s) and configure the browser(s)
+
+  Product Installation
+
+    Download the archive and extract it into your Zope products directory. Then
+    restart Zope. If you succeeded, you'll notice pencil icons next to the
+    external editable objects in the Zope management screens.
+
+  Helper Application Installation
+
+    Dependancies: Python 2.2, Pythonwin extensions
+    
+    Download the helper app archive and extract into the directory where you 
+    want to install it (it contains one executable Python module file).
+    C:\Program Files\ZopeEdit might be a good choice. 
+
+    Once you have the help application installed, you need to configure your
+    browser to fire it off appropriately. To do so, create an entry in the
+    helper applications list for your browser(s) that associates the mime type
+    "application/x-zope-edit" with the helper application.
+
+    To do this for Internet Explorer and other recent browsers, you must
+    register the external editor file type with Windows:
+
+    - From the "My Computer" window, choose "Folder Options" from the "View"
+      menu.
+
+    - In the "File Types" tab, click on the "New Type" button.
+
+    - Enter a description such as "Zope External Editor"
+
+    - Enter an extension not otherwise used on your system (.zope is usually a
+      good choice, the exact value is not important)
+
+    - For content type (MIME) enter: application/x-zope-edit
+
+    - Under "Actions", click on the "New" button.
+
+    - For Action enter: Open
+
+    - For application used, enter or browse to the path to pythonw.exe
+      (wherever you installed python2.2, such as C:\Program Files\Python22).
+      Use quotes around the path if it includes spaces. Following the path to
+      Python, enter the path to the helper application file, in quotes if
+      needed.  Follow it with: "%1" (in quotes). On my system it looks like:
+
+      '"C:\Program Files\Python22\pythonw.exe" C:\Casey\ExternalEditor\zopeedit.py "%1"
+
+    - Click OK.
+
+    - Uncheck "Confirm open after download"
+      
+    - Click OK, you should now see your new file type.
+    
+  Tips
+  
+    The helper application can run any editor program that does not detach
+    itself from the controlling process.
+    
+    As for editors that insist on detaching from the controlling process
+    (EditPad does this by default), you need to configure them so that they do
+    not detach. For EditPad you could use::
+
+      editor = C:\Program Files\EditPadClassic\EditPad.exe /newinstance
+
+    Check the command line options of your favorite editor to see if it
+    supports this.
+    
+ Troubleshooting
+
+    If the helper app won't launch try the following suggestions:
+    
+    - Make sure you have Pythonwin installed properly. To test this, bring up 
+      the Python console and type in 'import win32api'. If it throws an
+      exception, you need to install Pythonwin.
+
+    - Netscape 4 users, add a "%s" at the end of the application command line. 
+      It appears the Netscape  likes to alert you with spurious things coming
+      from stderr. I'll see if I can come up with a solution to that.
+
+    - Make sure the file type is properly configured to launch the helper app
+      when it receives files of type "application/x-zope-edit".
+
+    - Try downloading and saving the external editor data to a file manually
+      (right click on the pencil icon). Then try running the helper app from 
+      the command line, passing it the path to this file. If it runs, then
+      there is something wrong with the browser/system configuration. If not,
+      then it should output a traceback to your terminal. Email me a copy of
+      this traceback, and the data file and I will try to fix it.
+
+    - If the editor launches, but the helper app complains that it lost its 
+      connection to the editor process, this is because your editor detached 
+      from the parent process (the helper app). Configure the editor such that 
+      it does not do this. Unfortunately, many MDI applications do this and
+      cannot be configured otherwise. Look for a solution to this in a later
+      version of external editor.

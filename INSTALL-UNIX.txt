@@ -12,20 +12,18 @@ Zope External Editor Installation
     restart Zope. If you succeeded, you'll notice pencil icons next to the
     external editable objects in the Zope management screens.
 
-  Helper Application Installation (Unix)
+  Helper Application Installation
 
-    Download the helper app archive and extract into the directory where you want
-    to install it (it contains one executable Python module file). ~/bin or
-    /usr/local/bin might be good choices, the latter if you want to share it
-    between multiple users.
+    Dependancies: Python 2.2, Tk
 
-    In order to use the helper app, you must have Python and Tkinter installed.
-    It has been tested using Python 2.2.1, but it should work with Python 2.0 or
-    better.
+    Download the helper app archive and extract into the directory where you
+    want to install it (it contains one executable Python module file). ~/bin
+    or /usr/local/bin might be good choices, the latter if you want to share
+    it between multiple users.
 
     Once you have the help application installed, you need to configure your
-    browser to fire it off appropriately. To do so, create an entry in the helper
-    applications list for your browser(s) that associates the mime type
+    browser to fire it off appropriately. To do so, create an entry in the
+    helper applications list for your browser(s) that associates the mime type
     "application/x-zope-edit" with the helper application.
     
     Here are the step-by-step configuration instructions for Mozilla:
@@ -36,7 +34,7 @@ Zope External Editor Installation
     
     - Click on the New Type button
     
-    - Enter a descripition, like "Zope Editor"
+    - Enter a description, like "Zope Editor"
     
     - For MIME type, enter application/x-zope-edit
     
@@ -44,26 +42,23 @@ Zope External Editor Installation
 
   Tips
   
-    The helper application can run any graphical editor that does not detach
+    The helper application can run any editor program that does not detach
     itself from the controlling process.
     
-    To get terminal editors to work, you need to create a small shell script to
-    spawn them inside an xterm. For example, the following short shell script
-    fires up vi in an xterm and passes it the file to edit::
-    
-      #!/bin/sh
-      xterm -e vi "$@"
+    To get terminal based editors to work, you need to spawn them inside an 
+    xterm. to do this, use something like the following for the editor option::
+
+      editor = xterm -e vi
       
-    You can of course modify the above to fire up your favorite editor or add
-    any command line arguments you want.
-    
-    Specify the shell script as the editor (in ~/.zope-external-edit) and you
-    should be good to go.
+    You can of course modify the above to fire up your favorite terminal and 
+    editor or add any command line arguments you want.
     
     As for editors that insist on detaching from the controlling process (gvim
-    does this by default), you need to configure them so that they do not do
-    this. (The -f option turns this off for gvim).
-    
+    does this by default), you need to configure them so that they do not
+    detach. For gvim you could use::
+
+      editor = gvim -f
+
  Troubleshooting
 
     If the helper app won't launch try the following suggestions:
@@ -76,17 +71,14 @@ Zope External Editor Installation
       It appears the Netscape  likes to alert you with spurious things coming
       from stderr. I'll see if I can come up with a solution to that.
 
-    - Make sure the file is marked as executable for your user ('chmod +x zopeedit.py' should do it)
-
-    - Make sure the first line of the helper app file points to the correct 
-      path to your Python binary (the default is '/usr/local/bin/python' which 
-      may not be correct on all systems)
+    - Make sure the file is marked as executable for your user 
+      ('chmod +x zopeedit.py' should do it)
 
     - Make sure the browser is properly configured. Use a full path to the 
       helper app.
 
     - Make sure you are using a graphical editor (that uses X windows). To use
-      a terminal based editor (like vi), create a shell script that spawns it 
+      a terminal based editor (like vi), setup the editor option to spawn it 
       inside an xterm. See tips above.
 
     - Try downloading and saving the external editor data to a file manually
@@ -96,11 +88,9 @@ Zope External Editor Installation
       should output a traceback to your terminal. Email me a copy of this
       traceback, and the data file and I will try to fix it.
 
-    - If the editor launches, but the helper app complains that it didn't, its
-      probably because your editor detached from the parent process (the helper
-      app). Configure the editor such that it does not do this. Unfortunately
-      this prevents you from using a multi-headed text edit server (like nedit
-      and emacs can provide). This is a limitation I have not found a way
-      around yet (any ideas??)
-
-    
+    - If the editor launches, but the helper app complains that it lost its 
+      connection to the editor process, this is because your editor detached 
+      from the parent process (the helper app). Configure the editor such that 
+      it does not do this. Unfortunately this prevents you from using a 
+      multi-headed text edit server (like nedit and emacs can provide). 
+      This is a limitation I have not found a way around yet (any ideas??)

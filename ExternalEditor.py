@@ -16,6 +16,7 @@
 
 # Zope External Editor Product by Casey Duncan
 
+from string import join
 import Acquisition
 from AccessControl.SecurityManagement import getSecurityManager
 from webdav.common import rfc1123_date
@@ -23,7 +24,7 @@ import base64
 
 class ExternalEditor(Acquisition.Implicit):
     """Create a response that encapsulates the data needed by the
-       ZopeEdit help application
+       ZopeEdit helper application
     """
     
     def __before_publishing_traverse__(self, self2, request):
@@ -77,4 +78,4 @@ class ExternalEditor(Acquisition.Implicit):
         RESPONSE.setHeader('Content-Type', 'application/x-zope-edit')
         RESPONSE.setHeader('Pragma', 'no-cache')
             
-        return '\n'.join(r)
+        return join(r, '\n')

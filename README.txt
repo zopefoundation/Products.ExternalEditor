@@ -115,7 +115,7 @@ Zope External Editor
     can be triggered in any combination of object meta-type and content-type.
     This allows you to create appropriate behavior for different types of Zope
     objects and content. The configuration file is stored in the file 
-    "~/.zope-external-edit"
+    "~/.zope-external-edit" (Unix) or "~\ZopeEdit.ini" (Windows).
     
     The configuration file follows the standard Python ConfigParser format,
     which is pretty much like the old .ini file format from windows. The file
@@ -132,12 +132,16 @@ Zope External Editor
     
       The available options for all sections of the config file are:
 
-      editor -- (file path) The fully qualified path of the editor application
+      editor -- Command line used to launch the editor application. On
+      Windows, if no editor setting is found for an object you edit, the
+      helper app will search the file type registry for an appropriate editor
+      based on the content-type or file extension of the object (which can be 
+      specified using the extension option below).
 
-      save_interval -- (float) The interval in seconds that the helper application
-      checks the edited file for changes.
+      save_interval -- (float) The interval in seconds that the helper 
+      application checks the edited file for changes.
 
-      use_locks -- (1 or 0) Whether to use WebDAV locking
+      use_locks -- (1 or 0) Whether to use WebDAV locking.
 
       cleanup_files -- (1 or 0) Whether to delete the temp files created.
       WARNING the temp file coming from the browser contains authentication
@@ -148,6 +152,9 @@ Zope External Editor
 
       extension -- (text) The file extension to add to the content file. Allows
       better handling of images and can improve syntax highlighting.
+
+      temp_dir -- (path) Path to store local copies of object data being
+      edited. Defaults to operating system temp directory (new in 0.3).
 
     Sections
     
@@ -167,12 +174,15 @@ Zope External Editor
       - '[content-type:text/*]' -- Options by major content-type come second.
       
       - '[meta-type:File]' -- Options by Zope meta-type are third.
+
+      - '[domain:www.mydomain.com]' -- Options by domain follow. Several
+        sections can be added for each domain level if desired (new in 0.3).
       
       - '[general]' -- General options are last.
       
       This scheme allows you to specify an extension by content-type, the
-      editor by meta-type and the remaining options under general for a given
-      object. This is how images are handled, for example.
+      editor by meta-type, the locking setting by domain and the remaining 
+      options under general for a given object.
       
   Integrating with External Editor
   

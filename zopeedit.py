@@ -71,13 +71,13 @@ class Configuration:
         for i in range(len(host_domain)):
             domains.append('domain:%s' % '.'.join(host_domain[i:]))
         domains.reverse()
+
+        sections = ['general']
+        sections.extend(domains)
+        sections.append('meta-type:%s' % meta_type)
+        sections.append('content-type:%s' % general_type)
+        sections.append('content-type:%s' % content_type)
         
-        sections = ('general', 
-                    'meta-type:%s' % meta_type,
-                    'content-type:%s' % general_type,
-                    'content-type:%s' % content_type,
-                   ) + tuple(domains)
-                   
         for section in sections:
             if self.config.has_section(section):
                 for option in self.config.options(section):
@@ -182,20 +182,23 @@ class ExternalEditor:
         editor = self.options.get('editor')
         
         if win32 and editor is None:
-            from win32api import FindExecutable, RegOpenKeyEx, RegQueryValueEx
+            from _winreg import HKEY_CLASSES_ROOT, OpenKeyEx, \
+                                QueryValueEx, EnumKey
+            from win32api import FindExecutable, RegOpenKeyEx, \
+                                 RegQueryValueEx, RegEnumKey
             from win32con import HKEY_CLASSES_ROOT
+            import pywintypes
             # Find editor application based on mime type and extension
             content_type = self.metadata.get('content_type')
-            extension = self.metadata.get('extension')
+            extension = self.options.get('extension')
             
             if content_type:
                 # Search registry for the extension by MIME type
                 try:
-                    reg_key = 'MIME\\Database\\Content Type\\%s' % content_type
-                    hk = RegOpenKeyEx(HKEY_CLASSES_ROOT, reg_key)
-                    extension, nil = RegQueryValueEx(hk, 'Extension')
-                except:
-                    traceback.print_exc(file=sys.stderr)
+                    key = 'MIME\\Database\\Content Type\\%s' % content_type
+                    key = OpenKeyEx(HKEY_CLASSES_ROOT, key)
+                    extension, nil = QueryValueEx(key, 'Extension')
+                except EnvironmentError:
                     pass
             
             if extension is None:
@@ -206,34 +209,59 @@ class ExternalEditor:
                     extension = url[dot:]
 
             if extension is not None:
-                hk = RegOpenKeyEx(HKEY_CLASSES_ROOT, extension)
-                classname, nil = RegQueryValueEx(hk, None)
                 try:
-                    hk = RegOpenKeyEx(HKEY_CLASSES_ROOT, 
-                                      classname+'\\Shell\\Edit\\Command')
-                    editor, nil = RegQueryValueEx(hk, None)
-                except:
-                    traceback.print_exc(file=sys.stderr)
-                    pass
+                    key = OpenKeyEx(HKEY_CLASSES_ROOT, extension)
+                    classname, nil = QueryValueEx(key, None)
+                except EnvironmentError:
+                    classname = None
+
+                if classname is not None:
+                    try:
+                        # Look for Edit action in registry
+                        key = OpenKeyEx(HKEY_CLASSES_ROOT, 
+                                        classname+'\\Shell\\Edit\\Command')
+                        editor, nil = QueryValueEx(key, None)
+                    except EnvironmentError:
+                        pass
+
+                if classname is not None and editor is None:
+                    # Enumerate the actions looking for one
+                    # starting with 'Edit'
+                    try:
+                        key = OpenKeyEx(HKEY_CLASSES_ROOT, classname+'\\Shell')
+                        index = 0
+                        while 1:
+                            try:
+                                subkey = EnumKey(key, index)
+                                index += 1
+                                if str(subkey).lower().startswith('edit'):
+                                    subkey = OpenKeyEx(key, 
+                                                       subkey + '\\Command')
+                                    editor, nil = QueryValueEx(subkey, None)
+                                else:
+                                    continue
+                            except EnvironmentError:
+                                break
+                    except EnvironmentError:
+                        pass
 
                 if editor is None:
                     try:
-                        hk = RegOpenKeyEx(HKEY_CLASSES_ROOT, 
-                                          classname+'\\Shell\\Open\\Command')
-                        editor, nil = RegQueryValueEx(hk, None)
-                    except: 
-                        traceback.print_exc(file=sys.stderr)
+                        # Look for Open action in registry
+                        key = OpenKeyEx(HKEY_CLASSES_ROOT, 
+                                        classname+'\\Shell\\Open\\Command')
+                        editor, nil = QueryValueEx(key, None)
+                    except EnvironmentError:
                         pass
 
                 if editor is None:
                     try:
                         nil, editor = FindExecutable(self.body_file, '')
-                    except:
-                        traceback.print_exc(file=sys.stderr)
+                    except pywintypes.error:
                         pass
             
             # Don't use IE as an "editor"
-            if editor.find('\\iexplore.exe') != -1:
+            if editor is not None and editor.find('\\iexplore.exe') != -1:
                 editor = None
 
         if not editor and not win32 and has_tk():
@@ -248,7 +276,8 @@ class ExternalEditor:
         if editor is not None:            
             return editor
         else:
-            fatalError('Editor not specified in configuration file.')
+            fatalError('No editor was found for that object.\n'
+                       'Specify an editor in the configuration file.')
         
     def launch(self):
         """Launch external editor"""
@@ -256,7 +285,11 @@ class ExternalEditor:
         use_locks = int(self.options.get('use_locks', 0))
         launch_success = 0
         last_mtime = path.getmtime(self.content_file)
-        command = '%s %s' % (self.getEditorCommand(), self.content_file)
+        command = self.getEditorCommand()
+        if command.find('%1') > -1:
+            command = command.replace('%1', self.content_file)
+        else:
+            command = '%s %s' % (command, self.content_file)
         editor = EditorProcess(command)
         
         if use_locks:
@@ -280,7 +313,8 @@ class ExternalEditor:
         if not launch_success:
             fatalError('Editor did not launch properly.\n'
                        'External editor lost connection '
-                       'to editor process.')
+                       'to editor process.\n'
+                       '(%s)' % command)
         
         if use_locks:
             self.unlock()
@@ -456,25 +490,32 @@ if win32:
     from win32ui import MessageBox
     from win32process import CreateProcess, GetExitCodeProcess, STARTUPINFO
     from win32event import WaitForSingleObject
+    from win32con import MB_OK, MB_OKCANCEL, MB_YESNO, MB_RETRYCANCEL, \
+                         MB_SYSTEMMODAL, MB_ICONERROR, MB_ICONQUESTION, \
+                         MB_ICONEXCLAMATION
     import pywintypes
 
     def errorDialog(message):
-        MessageBox(message, title, 16)
+        MessageBox(message, title, MB_OK + MB_ICONERROR + MB_SYSTEMMODAL)
         sys.stderr.write(message + '\n')
 
     def askRetryCancel(message):
-        return MessageBox(message, title, 53) == 4
+        return MessageBox(message, title, 
+                          MB_OK + MB_RETRYCANCEL + MB_ICONEXCLAMATION 
+                          + MB_SYSTEMMODAL) == 4
 
     def askYesNo(message):
-        return MessageBox(message, title, 52) == 6
+        return MessageBox(message, title, 
+                          MB_OK + MB_YESNO + MB_ICONQUESTION +
+                          MB_SYSTEMMODAL) == 6
 
     class EditorProcess:
         def __init__(self, command):
             """Launch editor process"""
             try:
-                self.handle, ht, pid, tid = CreateProcess(None, command, None, 
-                                                          None, 1, 0, None, 
-                                                          None, STARTUPINFO())
+                self.handle, nil, nil, nil = CreateProcess(None, command, None, 
+                                                           None, 1, 0, None, 
+                                                           None, STARTUPINFO())
             except pywintypes.error, e:
                 fatalError('Error launching editor process\n'
                            '(%s):\n%s' % (command, e[2]))
