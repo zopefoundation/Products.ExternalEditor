@@ -2,6 +2,8 @@
 
  New features
 
+  - (__future__) Added docs from the crack ZC docs guys.
+
   - (__future__) Exposed role management for manager users on
     the default roster:  managers can now "promote" members
     without going to the ZMI.
@@ -34,6 +36,8 @@
     workflows) to the core set of CMF products.
 
   - (__future__) Merged Chris Withers' FSSQLMethod into CMFCore.
+
+  - Added initial CMF use cases as FSSTXMethods in CMFDefault/help.
 
   - Made validation methods of 'portal_metadata' available to
     scripts.
@@ -80,11 +84,24 @@
     permit indirection (via 'getActionById') without exposing the
     action in the CMF UI.
 
-  - Extendd MetadataTool to allow adding / removing element specs
+  - Extended MetadataTool to allow adding / removing element specs
     (i.e., it can now manage policies for "custom" schemas, as
     well as Dublin Core).
 
  Bug fixes
+
+  - Removed an infinite loop condition that arises when
+    MembershipTool.createMemberArea gets called inside wrapUser
+    (this could only happen if "Create Member Area" was checked
+    in the Membership tool.)
+
+  - Added new 'TitleOrId' skin method, and updated skins to
+    depend on it rather than SimpleItem.title_or_id.
+
+  - Made unit tests runnable without reliance on 'zctl test'.
+
+  - Corrected initial column set in catalog to include
+    "ModificationDate" instead of "ModifiedDate".
 
   - Ensure that object is recatalogued (e.g., after setting 'portal_type'
       (thanks to Florent Guillaume)
