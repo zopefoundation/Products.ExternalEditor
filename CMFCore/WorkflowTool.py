@@ -264,6 +264,24 @@ class WorkflowTool (UniqueObject, Folder):
                                                'Changed.')
 
     security.declareProtected(CMFCorePermissions.ManagePortal,
+                              'setChainForPortalType')
+    def setChainForPortalTypes(self, pt_names, chain):
+        """ Set a chain for a specific portal type """
+        cbt = self._chains_by_type
+        if cbt is None:
+            self._chains_by_type = cbt = PersistentMapping()
+
+        if type(chain) is type(''):
+            chain = map(strip, split(chain,','))
+
+        ti = self._listTypeInfo()
+        for t in ti:
+            id = t.getId()
+            if id in pt_names:
+                cbt[id] = tuple(chain)
+                
+
+    security.declareProtected(CMFCorePermissions.ManagePortal,
                               'updateRoleMappings')
     def updateRoleMappings(self, REQUEST=None):
         '''
