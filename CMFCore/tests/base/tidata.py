@@ -52,6 +52,64 @@ FTIDATA_DUMMY = (
     ,
     )
 
+FTIDATA_CMF13 = (
+      { 'id' : 'Dummy Content 13'
+      , 'meta_type' : 'Dummy'
+      , 'description' : (
+           'Dummy Content.')
+      , 'icon' : 'dummy_icon.gif'
+      , 'product' : 'FooProduct'
+      , 'factory' : 'addFoo'
+      , 'immediate_view' : 'metadata_edit_form'
+      , 'actions' : (
+            { 'id':'view',
+              'name':'View',
+              'action':'dummy_view',
+              'permissions':(View,) }
+          , { 'id':'edit',
+              'name':'Edit',
+              'action':'dummy_edit_form',
+              'permissions':(ModifyPortalContent,) }
+          , { 'id':'metadata',
+              'name':'Metadata',
+              'action':'metadata_edit_form',
+              'permissions':(ModifyPortalContent,) }
+          )
+      }
+    ,
+    )
+
+FTIDATA_CMF13_FOLDER = (
+      { 'id' : 'Dummy Folder 13'
+      , 'meta_type' : 'Dummy Folder'
+      , 'description' : (
+           'Dummy Folder.')
+      , 'icon' : 'dummy_icon.gif'
+      , 'product' : 'FooProduct'
+      , 'factory' : 'addFoo'
+      , 'filter_content_types' : 0
+      , 'immediate_view' : 'dummy_edit_form'
+      , 'actions' : (
+            { 'id':'view',
+              'name':'View',
+              'action':'',
+              'permissions':(View,),
+              'category':'folder' }
+          , { 'id':'edit',
+              'name':'Edit',
+              'action':'dummy_edit_form',
+              'permissions':(ManageProperties,),
+              'category':'folder' }
+          , { 'id':'localroles',
+              'name':'Local Roles',
+              'action':'folder_localrole_form',
+              'permissions':(ManageProperties,),
+              'category':'folder' }
+          )
+      }
+    ,
+    )
+
 FTIDATA_CMF14 = (
       { 'id' : 'Dummy Content 14'
       , 'meta_type' : 'Dummy'

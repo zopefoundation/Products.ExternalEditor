@@ -12,6 +12,8 @@ except ImportError:
     # for Zope versions before 2.6.0
     from Interface import verify_class_implementation as verifyClass
 
+from types import DictType
+
 from AccessControl import Unauthorized
 from AccessControl.SecurityManagement import newSecurityManager
 from AccessControl.SecurityManagement import noSecurityManager
@@ -21,6 +23,7 @@ from webdav.NullResource import NullResource
 from Products.PythonScripts.PythonScript import PythonScript
 from Products.PythonScripts.standard import url_quote
 
+from Products.CMFCore.ActionInformation import ActionInformation
 from Products.CMFCore.TypesTool import FactoryTypeInformation as FTI
 from Products.CMFCore.TypesTool import ScriptableTypeInformation as STI
 from Products.CMFCore.TypesTool import TypesTool
@@ -35,6 +38,8 @@ from Products.CMFCore.tests.base.dummy import DummyObject
 from Products.CMFCore.tests.base.dummy import DummySite
 from Products.CMFCore.tests.base.dummy import DummyUserFolder
 from Products.CMFCore.tests.base.tidata import FTIDATA_ACTIONS
+from Products.CMFCore.tests.base.tidata import FTIDATA_CMF13
+from Products.CMFCore.tests.base.tidata import FTIDATA_CMF13_FOLDER
 from Products.CMFCore.tests.base.tidata import FTIDATA_CMF14
 from Products.CMFCore.tests.base.tidata import FTIDATA_CMF14_FOLDER
 from Products.CMFCore.tests.base.tidata import FTIDATA_CMF14_SPECIAL
@@ -260,38 +265,6 @@ class TypeInfoTests(TestCase):
         action = ti.getActionById( 'slot' )
         self.assertEqual( action, 'foo_slot' )
 
-    def test__convertActions_from_dict( self ):
-
-        from Products.CMFCore.ActionInformation import ActionInformation
-
-        ti = self._makeInstance( 'Foo' )
-        ti._actions = ( { 'id' : 'bar'
-                        , 'name' : 'Bar'
-                        , 'action' : 'bar_action'
-                        , 'permissions' : ( 'Bar permission', )
-                        , 'category' : 'baz'
-                        , 'visible' : 0
-                        }
-                      ,
-                      )
-
-        actions = ti.listActions()
-        self.assertEqual( len( actions ), 1 )
-
-        action = actions[0]
-
-        self.failUnless( isinstance( action, ActionInformation ) )
-        self.assertEqual( action.getId(), 'bar' )
-        self.assertEqual( action.Title(), 'Bar' )
-        self.assertEqual( action.getActionExpression(),
-                          'string:${object_url}/bar_action' )
-        self.assertEqual( action.getCondition(), '' )
-        self.assertEqual( action.getPermissions(), ( 'Bar permission', ) )
-        self.assertEqual( action.getCategory(), 'baz' )
-        self.assertEqual( action.getVisibility(), 0 )
-
-        self.failUnless( isinstance( ti._actions[0], ActionInformation ) )
-
     def test_MethodAliases_methods(self):
         ti = self._makeInstanceByFTIData(FTIDATA_CMF15)
         self.assertEqual( ti.getMethodAliases(), FTIDATA_CMF15[0]['aliases'] )
@@ -303,13 +276,79 @@ class TypeInfoTests(TestCase):
         ti.setMethodAliases( ti.getMethodAliases() )
         self.assertEqual( ti.getMethodAliases(), FTIDATA_CMF15[0]['aliases'] )
 
-    def test_MethodAliases_content_migration(self):
-        wanted = { 'view':('dummy_view',),
-                   '(Default)':('dummy_view',) }
+    def _checkContentTI(self, ti):
+        wanted_aliases = { 'view':('dummy_view',),
+                           '(Default)':('dummy_view',) }
+        wanted_actions_text0 = 'string:${object_url}/dummy_view'
+        wanted_actions_text1 = 'string:${object_url}/dummy_edit_form'
+        wanted_actions_text2 = 'string:${object_url}/metadata_edit_form'
+
+        self.failUnless( isinstance( ti._actions[0], ActionInformation ) )
+        self.assertEqual( len( ti._actions ), 3 )
+        self.assertEqual(ti._aliases, wanted_aliases)
+        self.assertEqual(ti._actions[0].action.text, wanted_actions_text0)
+        self.assertEqual(ti._actions[1].action.text, wanted_actions_text1)
+        self.assertEqual(ti._actions[2].action.text, wanted_actions_text2)
+
+        action0 = ti._actions[0]
+        self.assertEqual( action0.getId(), 'view' )
+        self.assertEqual( action0.Title(), 'View' )
+        self.assertEqual( action0.getActionExpression(), wanted_actions_text0 )
+        self.assertEqual( action0.getCondition(), '' )
+        self.assertEqual( action0.getPermissions(), ( 'View', ) )
+        self.assertEqual( action0.getCategory(), 'object' )
+        self.assertEqual( action0.getVisibility(), 1 )
+
+    def _checkFolderTI(self, ti):
+        wanted_aliases = { 'view':('(Default)',), }
+        wanted_actions_text0 = 'string:${object_url}'
+        wanted_actions_text1 = 'string:${object_url}/dummy_edit_form'
+        wanted_actions_text2 = 'string:${object_url}/folder_localrole_form'
+
+        self.failUnless( isinstance( ti._actions[0], ActionInformation ) )
+        self.assertEqual( len( ti._actions ), 3 )
+        self.assertEqual(ti._aliases, wanted_aliases)
+        self.assertEqual(ti._actions[0].action.text, wanted_actions_text0)
+        self.assertEqual(ti._actions[1].action.text, wanted_actions_text1)
+        self.assertEqual(ti._actions[2].action.text, wanted_actions_text2)
+
+    def test_CMF13_content_migration(self):
+
+        # use old FTI Data
+        ti = self._makeInstanceByFTIData(FTIDATA_CMF13)
+        self._checkContentTI(ti)
+
+        # simulate old FTI
+        del ti._aliases
+        self.failIf( hasattr(ti, '_aliases') )
+        ti._actions = FTIDATA_CMF13[0]['actions']
+        self.failUnless( isinstance( ti._actions[0], DictType ) )
+
+        # migrate FTI
+        ti.getMethodPath('view')
+        self._checkContentTI(ti)
+
+    def test_CMF13_folder_migration(self):
+
+        # use old FTI Data
+        ti = self._makeInstanceByFTIData(FTIDATA_CMF13_FOLDER)
+        self._checkFolderTI(ti)
+
+        # simulate old FTI
+        del ti._aliases
+        self.failIf( hasattr(ti, '_aliases') )
+        ti._actions = FTIDATA_CMF13_FOLDER[0]['actions']
+        self.failUnless( isinstance( ti._actions[0], DictType ) )
+
+        # migrate FTI
+        ti.getMethodPath('view')
+        self._checkFolderTI(ti)
+
+    def test_CMF14_content_migration(self):
 
         # use old FTI Data
         ti = self._makeInstanceByFTIData(FTIDATA_CMF14)
-        self.assertEqual(ti._aliases, wanted)
+        self._checkContentTI(ti)
 
         # simulate old FTI
         del ti._aliases
@@ -317,14 +356,13 @@ class TypeInfoTests(TestCase):
 
         # migrate FTI
         ti.getMethodPath('view')
-        self.assertEqual(ti._aliases, wanted)
+        self._checkContentTI(ti)
 
-    def test_MethodAliases_folder_migration(self):
-        wanted = { 'view':('(Default)',), }
+    def test_CMF14_folder_migration(self):
 
         # use old FTI Data
         ti = self._makeInstanceByFTIData(FTIDATA_CMF14_FOLDER)
-        self.assertEqual(ti._aliases, wanted)
+        self._checkFolderTI(ti)
 
         # simulate old FTI
         del ti._aliases
@@ -332,9 +370,9 @@ class TypeInfoTests(TestCase):
 
         # migrate FTI
         ti.getMethodPath('view')
-        self.assertEqual(ti._aliases, wanted)
+        self._checkFolderTI(ti)
 
-    def test_MethodAliases_special_migration(self):
+    def test_CMF14_special_migration(self):
         wanted = { 'view':('dummy_view',), 'mkdir':('dummy_mkdir',) }
 
         # use old FTI Data

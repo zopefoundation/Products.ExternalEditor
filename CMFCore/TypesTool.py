@@ -124,29 +124,16 @@ class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
 
             apply(self.manage_changeProperties, (), kw)
 
-        aa = kw.get( 'actions', () )
-
-        for action in aa:
-
-            action = action.copy()
-
-            # Some backward compatibility stuff.
-            if not action.has_key('id'):
-                action['id'] = cookString(action['name'])
-
-            if not action.has_key('name'):
-                action['name'] = action['id'].capitalize()
-
-            # XXX:  historically, action['action'] is simple string
-
-            self.addAction( id=action['id']
-                          , name=action['name']
-                          , action=action.get( 'action' )
-                          , condition=action.get( 'condition' )
-                          , permission=action.get('permissions', () )
-                          , category=action.get( 'category', 'object' )
-                          , visible=action.get( 'visible', 1 )
-                          )
+        actions = kw.get( 'actions', () )
+        # make sure we have a copy
+        _actions = []
+        for action in actions:
+            _actions.append( action.copy() )
+        actions = tuple(_actions)
+        # We don't know if actions need conversion, so we always add oldstyle
+        # _actions and convert them.
+        self._actions = actions
+        self._convertActions()
 
         aliases = kw.get( 'aliases', _marker )
         if aliases is _marker:
@@ -306,22 +293,28 @@ class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
 
     security.declarePrivate( '_convertActions' )
     def _convertActions( self ):
-        """
-            Upgrade dictionary-based actions.
+        """ Upgrade dictionary-based actions.
         """
         aa, self._actions = self._actions, ()
 
         for action in aa:
 
-            # XXX:  historically, action['action'] is simple string
-            actiontext = action.get('action')
-            if actiontext:
-                actiontext = '/' + actiontext
+            # Some backward compatibility stuff.
+            if not action.has_key('id'):
+                action['id'] = cookString(action['name'])
+
+            if not action.has_key('name'):
+                action['name'] = action['id'].capitalize()
+
+            # historically, action['action'] is simple string
+            actiontext = action.get('action').strip() or 'string:${object_url}'
+            if actiontext[:7] not in ('python:', 'string:'):
+                actiontext = 'string:${object_url}/%s' % actiontext
 
             self.addAction(
                   id=action['id']
                 , name=action['name']
-                , action='string:${object_url}%s' % actiontext
+                , action=actiontext
                 , condition=action.get('condition')
                 , permission=action.get( 'permissions', () )
                 , category=action.get('category', 'object')
