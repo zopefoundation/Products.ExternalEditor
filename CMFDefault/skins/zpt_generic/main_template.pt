@@ -301,11 +301,11 @@
  <!-- end main slot -->
  </div>
 
- <p tal:define="isFolderish here/isPrincipiaFolderish | nothing"
-    tal:condition="python: uidtool and not isFolderish">Permalink: 
+ <div tal:condition="not:here/isPrincipiaFolderish | nothing">
+ <p tal:define="uid python:uidtool.register(here);"
+    tal:on-error="nothing">Permalink: 
   <a href=""
-     tal:define="uid python:uidtool.register(here);
-                 url string:${portal_url}/permalink/${uid};"
+     tal:define="url string:${portal_url}/permalink/${uid};"
      tal:content="url"
      tal:attributes="href url">
   the unique id</a>
