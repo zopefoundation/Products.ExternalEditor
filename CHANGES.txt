@@ -16,9 +16,9 @@ CMF 1.5alpha (unreleased)
       'ResourceLockedError' are now also available for TTW code.
       'EditingConflict' is a new CMF class replacing the old string exception.
 
-    - Callable Opaque Items, CMFCatalogAware: Added a marker interface 
+    - Callable Opaque Items, CMFCatalogAware: Added a marker interface
       'ICallableOpaqueItemWithHooks'. CMF now calls the manage_after*
-      and manage_before* hooks of a marked opaque item on copying, 
+      and manage_before* hooks of a marked opaque item on copying,
       moving or deleting the containing content object (gregweb).
 
     - DublinCore: Creator element no longer depends on Ownership.
@@ -163,6 +163,9 @@ CMF 1.5alpha (unreleased)
       tool overrides default member content creation.
 
   Bug Fixes
+
+
+    - CMFCore.PortalFolder: Explicitly declare base interfaces.
 
     - Tests: CachingPolicyManager tests don't fail on Windows anymore.
       (Collector #107)

@@ -22,6 +22,8 @@ from Products.CMFCore.tests.base.testcase import SecurityTest
 from Products.CMFCore.tests.base.utils import has_path
 from Products.CMFCore.TypesTool import FactoryTypeInformation as FTI
 from Products.CMFCore.TypesTool import TypesTool
+from Products.CMFCore.interfaces.Dynamic import DynamicType as IDynamicType
+from webdav.WriteLockInterface import WriteLockInterface
 
 def extra_meta_types():
     return [  { 'name' : 'Dummy', 'action' : 'manage_addFolder' } ]
@@ -183,6 +185,10 @@ class PortalFolderTests( SecurityTest ):
         assert not foo.after_add_called
         assert foo.before_delete_called
         assert len( catalog ) == 0
+
+    def test_tracker215( self ):
+        self.failUnless(IDynamicType.isImplementedBy(self.root.test))
+        self.failUnless(WriteLockInterface.isImplementedBy(self.root.test))
 
     def test_folderMove( self ):
         #
