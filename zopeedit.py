@@ -349,22 +349,34 @@ class ExternalEditor:
         
         if use_locks:
             self.lock()
+
+        final_loop = 0
 	    
         while 1:
-            editor.wait(save_interval or 2)
-            mtime = os.path.getmtime(self.content_file)
-            
-            if (save_interval or not editor.isAlive()) and mtime != last_mtime:
-                # File was modified
-                launch_success = 1 # handle very short editing sessions
-                self.saved = self.putChanges()
-                last_mtime = mtime
+            if not final_loop:
+                editor.wait(save_interval or 2)
 
-            if editor.isAlive():
-                launch_success = 1
-            else:
-                break
-                
+            mtime = os.path.getmtime(self.content_file)
+
+            if mtime != last_mtime:
+                if save_interval or final_loop:
+                    launch_success = 1 # handle very short editing sessions
+                    self.saved = self.putChanges()
+                    last_mtime = mtime
+
+            if not editor.isAlive():
+                if final_loop:
+                    break
+                else:
+                    # Go through the loop one final time for good measure.
+                    # Our editor's isAlive method may itself *block* during a
+                    # save operation (seen in COM calls, which seem to
+                    # respond asynchronously until they don't) and subsequently
+                    # return false, but the editor may have actually saved the
+                    # file to disk while the call blocked.  We want to catch
+                    # any changes that happened during a blocking isAlive call.
+                    final_loop = 1
+
         if not launch_success:
             fatalError('Editor did not launch properly.\n'
                        'External editor lost connection '
