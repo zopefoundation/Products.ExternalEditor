@@ -113,3 +113,20 @@ table.dayView td.heading {
     border: 1px solid Black;
     text-align: center;
 }
+
+table.Event {
+    background-color: #DDDDDD;
+}
+
+table.Event th {
+    text-align: left;
+    white-space: nowrap;
+    font-size: 80%;
+    font-weight: bold;
+    font-family: Verdana, Helvetica, sans-serif;
+}
+
+table.Event td {
+    font-size: 80%;
+    font-family: Verdana, Helvetica, sans-serif;
+}
