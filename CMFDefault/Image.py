@@ -270,8 +270,8 @@ class Image( OFS.Image.Image
 
     def index_html(self, REQUEST, RESPONSE):
         """
-        Display the image, with our without standard_html_[header|footer],
-        as appropreate.
+        Display the image, with or without standard_html_[header|footer],
+        as appropriate.
         """
         #if REQUEST['PATH_INFO'][-10:] == 'index_html':
         #    return self.view(self, REQUEST)
