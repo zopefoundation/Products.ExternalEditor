@@ -130,10 +130,18 @@ def install(self):
     else:
         # Zope 2.3 and below
         addColumn = catalog._catalog.addColumn
-    addIndex('start', 'FieldIndex')
-    addIndex('end', 'FieldIndex')
-    addColumn('start')
-    addColumn('end')
+    try:
+        addIndex('start', 'FieldIndex')
+    except: pass
+    try:
+        addIndex('end', 'FieldIndex')
+    except: pass
+    try:
+        addColumn('start')
+    except: pass
+    try:
+        addColumn('end')
+    except: pass
     out.write('Added "start" and "end" field indexes and columns to '\
               'the portal_catalog\n')
 
@@ -150,17 +158,19 @@ def install(self):
                 t['id']))
 
     # Setup a MetadataTool Element Policy for Events
-    metadatatool.addElementPolicy(
-        element='Subject',
-        content_type='Event',
-        is_required=0,
-        supply_default=0,
-        default_value='',
-        enforce_vocabulary=0,
-        allowed_vocabulary=('Appointment', 'Convention', 'Meeting',
-                            'Social Event', 'Work'),
-        REQUEST=None,
-        )
+    try:
+        metadatatool.addElementPolicy(
+            element='Subject',
+            content_type='Event',
+            is_required=0,
+            supply_default=0,
+            default_value='',
+            enforce_vocabulary=0,
+            allowed_vocabulary=('Appointment', 'Convention', 'Meeting',
+                                'Social Event', 'Work'),
+            REQUEST=None,
+            )
+    except: pass
     out.write('Event added to Metdata element Policies\n')
     
     
