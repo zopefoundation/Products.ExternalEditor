@@ -362,7 +362,7 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
         '''
         try:
             self._changeStateOf(ob, None)
-        except ObjectDeleted, ObjectMoved:
+        except ( ObjectDeleted, ObjectMoved ):
             # Swallow.
             pass
 
