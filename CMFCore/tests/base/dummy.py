@@ -320,7 +320,10 @@ class DummyTool(Implicit,ActionProviderBase):
 class DummyCachingManager:
 
     def getHTTPCachingHeaders( self, content, view_name, keywords, time=None ):
-        return ( ( 'foo', 'Foo' ), ( 'bar', 'Bar' ) )
+         return (
+             ('foo', 'Foo'), ('bar', 'Bar'),
+             ('test_path', '/'.join(content.getPhysicalPath())),
+             )
 
     def getPhysicalPath(self):
         return ('baz',)

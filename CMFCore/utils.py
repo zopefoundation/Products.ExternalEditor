@@ -25,6 +25,7 @@ from AccessControl import ModuleSecurityInfo
 from AccessControl.Permission import Permission
 from AccessControl.PermissionRole import rolesForPermissionOn
 from AccessControl.Role import gather_permissions
+from Acquisition import Implicit
 from Acquisition import aq_base
 from Acquisition import aq_get
 from Acquisition import aq_inner
@@ -285,6 +286,17 @@ def _setCacheHeaders(obj, extra_context):
                 RESPONSE.setHeader('X-Cache-Headers-Set-By',
                                    'CachingPolicyManager: %s' %
                                    '/'.join(manager.getPhysicalPath()))
+
+class _ViewEmulator(Implicit):
+    """Auxiliary class used to adapt FSFile and FSImage
+    for caching_policy_manager
+    """
+    def __init__(self, view_name=''):
+        self._view_name = view_name
+
+    def getId(self):
+        return self._view_name
+
 
 #
 #   Base classes for tools

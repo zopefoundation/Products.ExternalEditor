@@ -29,7 +29,7 @@ from DirectoryView import registerFileExtension
 from DirectoryView import registerMetaType
 from FSObject import FSObject
 from utils import _dtmldir
-from utils import _setCacheHeaders
+from utils import _setCacheHeaders, _ViewEmulator
 from utils import expandpath
 
 
@@ -129,7 +129,7 @@ class FSImage(FSObject):
         if self.ZCacheable_getManager() is not None:
             self.ZCacheable_set(None)
         else:
-            _setCacheHeaders(self, extra_context={})
+            _setCacheHeaders(_ViewEmulator().__of__(self), extra_context={})
         return data
 
     security.declareProtected(View, 'getContentType')

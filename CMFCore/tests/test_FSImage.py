@@ -111,6 +111,18 @@ class FSImageTests( RequestTest, FSDVTest):
         self.failUnless( data, '' )
         self.assertEqual( self.RESPONSE.getStatus(), 200 )
 
+    def test_caching( self ):
+        self.root.caching_policy_manager = DummyCachingManager()
+        original_len = len(self.RESPONSE.headers)
+        image = self._makeOne('test_image', 'test_image.gif')
+        image = image.__of__(self.root)
+        image.index_html(self.REQUEST, self.RESPONSE)
+        headers = self.RESPONSE.headers
+        self.failUnless(len(headers) >= original_len + 3)
+        self.failUnless('foo' in headers.keys())
+        self.failUnless('bar' in headers.keys())
+        self.assertEqual(headers['test_path'], '/test_image')
+
 
 def test_suite():
     return unittest.TestSuite((
