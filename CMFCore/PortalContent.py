@@ -181,7 +181,7 @@ class PortalContent(DynamicType, SimpleItem):
                                 % ti.id)
         else:
             raise 'Not Found', ('Cannot find default view for "%s"'
-                                % self.getPhysicalPath())
+                                % string.join( self.getPhysicalPath() ) )
 
     security.declareProtected(CMFCorePermissions.View, 'index_html')
     index_html = ComputedAttribute(_index_html, 1)
