@@ -280,6 +280,17 @@ _FRAGMENT_IMPORT = """\
 </skins-tool>
 """
 
+_FRAGMENT_IMPORT2 = """\
+<?xml version="1.0"?>
+<skins-tool>
+ <skin-directory id="four" directory="CMFSetup/tests/four" />
+ <skin-path id="*">
+  <layer name="four" insert-after="three"/>
+ </skin-path>
+</skins-tool>
+"""
+
+
 class Test_exportSkinsTool( _SkinsSetup ):
 
     def test_empty( self ):
@@ -503,6 +514,21 @@ class Test_importSkinsTool( _SkinsSetup ):
         self.assertEqual( skin_paths[ 1 ], ( 'fancy', 'three,two,one' ) )
         self.assertEqual( len( skins_tool.objectItems() ), 3 )
 
+        self._registerDirectoryView( os.path.join( _TESTS_PATH, 'four' ) )
+        context._files[ 'skins.xml' ] = _FRAGMENT_IMPORT2
+        importSkinsTool( context )
+
+        self.assertEqual( skins_tool.default_skin, "default_skin" )
+        self.assertEqual( skins_tool.request_varname, "request_varname" )
+        self.failIf( skins_tool.allow_any )
+        self.failIf( skins_tool.cookie_persistence )
+
+        self.failUnless( skins_tool._setup_called )
+        skin_paths = skins_tool.getSkinPaths()
+        self.assertEqual( len( skin_paths ), 2 )
+        self.assertEqual( skin_paths[ 0 ], ( 'basic', 'one,three,four' ) )
+        self.assertEqual( skin_paths[ 1 ], ( 'fancy', 'three,four,two,one' ) )
+        self.assertEqual( len( skins_tool.objectItems() ), 4 )
 
 def test_suite():
     return unittest.TestSuite((

@@ -142,6 +142,13 @@ def _updatePath(path, layer_infos):
                 continue
             except ValueError:
                 pass
+        if 'insert-after' in layer:
+            try:
+                index = path.index(layer['insert-after'])
+                path.insert(index+1, layer['name'])
+                continue
+            except ValueError:
+                pass
         path.append(layer['name'])
 
     return str( ','.join(path) )
@@ -266,6 +273,7 @@ class SkinsToolConfigurator(ConfiguratorBase):
               'layer':              {KEY: 'layers', DEFAULT: ()} },
           'layer':
             { 'name':               {},
+              'insert-after' :      {},
               'insert-before':      {} } }
 
 InitializeClass(SkinsToolConfigurator)
