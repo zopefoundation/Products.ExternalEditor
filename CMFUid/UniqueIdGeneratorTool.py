@@ -44,9 +44,6 @@ class AnnotatedUniqueId(Persistent, Implicit):
         IAnnotatedUniqueId,
     )
     
-    remove_on_add = True
-    remove_on_clone = True
-    
     def __init__(self, uid):
         """See IAnnotatedUniqueId.
         """
@@ -74,10 +71,11 @@ class AnnotatedUniqueId(Persistent, Implicit):
         # the uid object may already be removed by the 'manage_afterAdd'.
         # To be independent of the implementation of 'manage_afterAdd'
         # the unique id object probably gets removed another time.
-        if self.remove_on_clone:
+        generator = getToolByName(item, 'portal_uidgenerator')
+        if generator.remove_on_clone:
             try:
                 delattr(item, self.id)
-            except AttributeError:
+            except KeyError, AttributeError:
                 pass
     
     def manage_beforeDelete(self, item, container):
@@ -85,7 +83,8 @@ class AnnotatedUniqueId(Persistent, Implicit):
         """
         # This helps in distinguishing renaming from copying/adding and
         # importing in 'manage_afterAdd' (see below)
-        if self.remove_on_add:
+        generator = getToolByName(item, 'portal_uidgenerator')
+        if generator.remove_on_add:
             self._cmf_uid_is_rename = True
     
     def manage_afterAdd(self, item, container):
@@ -96,10 +95,12 @@ class AnnotatedUniqueId(Persistent, Implicit):
         # a rename operation.
         # This way I the unique id gets deleted on imports.
         _is_rename = getattr(aq_base(self), '_cmf_uid_is_rename', None)
-        if self.remove_on_add and self.remove_on_clone and not _is_rename:
+        generator = getToolByName(item, 'portal_uidgenerator')
+        if generator.remove_on_add and generator.remove_on_clone \
+           and not _is_rename:
             try:
                 delattr(item, self.id)
-            except AttributeError:
+            except KeyError, AttributeError:
                 pass
         if _is_rename is not None:
             del self._cmf_uid_is_rename
@@ -119,13 +120,17 @@ class UniqueIdGeneratorTool(UniqueObject, SimpleItem, ActionProviderBase):
     id = 'portal_uidgenerator'
     alternative_id = 'portal_standard_uidgenerator'
     meta_type = 'Unique Id Generator Tool'
-
+    
     # make AnnotatedUniqueId class available through the tool
     # not meant to be altered on runtime !!!
     _uid_implementation = AnnotatedUniqueId
-
+    
     security = ClassSecurityInfo()
-
+    
+    # XXX properties
+    remove_on_add = True
+    remove_on_clone = True
+    
     security.declarePrivate('__init__')
     def __init__(self):
         """Initialize the generator

@@ -25,6 +25,8 @@ from Interface import Interface, Attribute
 from Products.CMFCore.interfaces.IOpaqueItems \
     import ICallableOpaqueItem, ICallableOpaqueItemEvents
 
+class UniqueIdError(Exception): pass
+
 class IUniqueIdQuery(Interface):
     """Querying unique ids.
     """
@@ -37,7 +39,7 @@ class IUniqueIdQuery(Interface):
     def getUid(obj):
         """Return the unique id of the object.
         
-        If the object doesn't have a unique, a KeyError is raised.
+        If the object doesn't have a unique, a UniqueIdError is raised.
         """
         
     def queryObject(uid, default=None):
@@ -50,7 +52,7 @@ class IUniqueIdQuery(Interface):
     def getObject(uid):
         """Return the object with the given uid.
         
-        If no object exist with the given unique id, a KeyError is raised.
+        If no object exist with the given unique id, a UniqueIdError is raised.
         """
 
 
@@ -75,7 +77,7 @@ class IUniqueIdBrainQuery(Interface):
     def getBrain(uid):
         """Return a brain of the object with the given uid.
         
-        If no object exist with the given unique id, a KeyError is raised.
+        If no object exist with the given unique id, a UniqueIdError is raised.
         
         Returning a brain is more efficient than returning the object.
         A brain usually exposes only parts of the object and should only 
@@ -100,7 +102,7 @@ class IUniqueIdSet(Interface):
     def unregister(obj):
         """Remove the object from the indexes.
         
-        KeyError is raised if object was not registered previously.
+        UniqueIdError is raised if object was not registered previously.
         """
 
 class IUniqueIdHandler(IUniqueIdSet, IUniqueIdQuery, IUniqueIdBrainQuery):

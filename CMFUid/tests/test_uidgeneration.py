@@ -17,9 +17,13 @@ $Id$
 __version__ = "$Revision$"
 
 from unittest import TestCase, TestSuite, makeSuite, main
-#import Testing
-#import Zope
-#Zope.startup()
+import Testing
+import Zope
+Zope.startup()
+
+from Products.CMFCore.tests.base.dummy import DummyContent
+
+from Products.CMFCore.tests.base.testcase import SecurityTest
 
 from Products.CMFUid.interfaces \
     import IUniqueIdGenerator, IAnnotatedUniqueId
@@ -34,27 +38,33 @@ class DummyItem:
     def setUid(self, uid):
         setattr(self, UID_ATTRNAME, uid)
 
-def addDummyItemWithUid(remove_on_add=None, remove_on_clone=None):
-    generator = UniqueIdGeneratorTool()
-    item = DummyItem()
-    setattr(item, UID_ATTRNAME, generator())
-    uid = getattr(item, UID_ATTRNAME)
-    if remove_on_add is not None:
-        uid.remove_on_add = remove_on_add
-    if remove_on_clone is not None:
-        uid.remove_on_clone = remove_on_clone
-    uid.setId(UID_ATTRNAME)
-    return item, uid
+class UniqueIdGeneratorTests(SecurityTest):
 
-class UniqueIdGeneratorTests(TestCase):
-
+    def setUp(self):
+        SecurityTest.setUp(self)
+        self.root._setObject('portal_uidgenerator', UniqueIdGeneratorTool())
+        self.root._setObject('dummy', DummyContent(id='dummy'))
+    
+    def addDummyContent(self, remove_on_add=None, remove_on_clone=None):
+        # attach a unique id to dummy content
+        dummy = self.root.dummy
+        generator = self.root.portal_uidgenerator
+        setattr(dummy, UID_ATTRNAME, generator())
+        uid = getattr(dummy, UID_ATTRNAME)
+        uid.setId(UID_ATTRNAME)
+        if remove_on_add is not None:
+            generator.remove_on_add = remove_on_add
+        if remove_on_clone is not None:
+            generator.remove_on_clone = remove_on_clone
+        return dummy, uid
+        
     def test_interface(self):
-        generator = UniqueIdGeneratorTool()
+        generator = self.root.portal_uidgenerator
         IUniqueIdGenerator.isImplementedBy(generator)
         IAnnotatedUniqueId.isImplementedBy(generator())
         
     def test_returnedUidsAreDifferent(self):
-        generator = UniqueIdGeneratorTool()
+        generator = self.root.portal_uidgenerator
         uid1 = generator()
         uid2 = generator()
         self.failIfEqual(uid1, uid2)
@@ -62,7 +72,7 @@ class UniqueIdGeneratorTests(TestCase):
         self.failIfEqual(uid1(), None)
         
     def test_getIdOfUidObject(self):
-        generator = UniqueIdGeneratorTool()
+        generator = self.root.portal_uidgenerator
         uid1 = generator()
         uid1.setId('blah')
         self.assertEqual(uid1.getId(), 'blah')
@@ -81,38 +91,39 @@ class UniqueIdGeneratorTests(TestCase):
     #   obj.manage_afterClone(obj_at_target, obj_at_target)
         
     def test_simulateItemAddRemovingUid(self):
-        item, uid = addDummyItemWithUid()
+        item, uid = self.addDummyContent()
         uid.manage_afterAdd(item, None)
         self.assertRaises(AttributeError, getattr, item, UID_ATTRNAME)
         
     def test_simulateItemAddDoesNotTouchUid(self):
-        item, uid = addDummyItemWithUid(remove_on_add=False)
+        item, uid = self.addDummyContent(remove_on_add=False)
         uid.manage_afterAdd(item, None)
         self.assertEqual(getattr(item, UID_ATTRNAME)(), 1)
         
     def test_simulateItemRename(self):
-        item, uid = addDummyItemWithUid()
+        item, uid = self.addDummyContent()
         uid.manage_beforeDelete(item, None)
         uid.manage_afterAdd(item, None)
         self.assertEqual(getattr(item, UID_ATTRNAME)(), 1)
         
     def test_simulateItemCloneRemovingUid1(self):
-        item, uid = addDummyItemWithUid()
+        item, uid = self.addDummyContent()
         uid.manage_afterAdd(item, None)
         uid.manage_afterClone(item)
         self.assertRaises(AttributeError, getattr, item, UID_ATTRNAME)
         
     def test_simulateItemCloneRemovingUid2(self):
-        item, uid = addDummyItemWithUid(remove_on_add=False)
+        item, uid = self.addDummyContent(remove_on_add=False)
         uid.manage_afterAdd(item, None)
         uid.manage_afterClone(item)
         self.assertRaises(AttributeError, getattr, item, UID_ATTRNAME)
         
     def test_simulateItemCloneDoesNotTouchUid(self):
-        item, uid = addDummyItemWithUid(remove_on_clone=False)
+        item, uid = self.addDummyContent(remove_on_clone=False)
         uid.manage_afterAdd(item, None)
         uid.manage_afterClone(item)
         self.assertEqual(getattr(item, UID_ATTRNAME)(), 1)
+
 
 def test_suite():
     return TestSuite((

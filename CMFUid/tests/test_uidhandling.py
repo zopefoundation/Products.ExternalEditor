@@ -55,26 +55,28 @@ class UniqueIdHandlerTests(SecurityTest):
         setupIndexes(self.root.portal_catalog, self.uid_attr_name)
     
     def test_interface(self):
-        handler = UniqueIdHandlerTool()
+        handler = self.root.portal_uidhandler
         IUniqueIdHandler.isImplementedBy(handler)
     
     def test_getUidOfNotYetRegisteredObject(self):
         handler = self.root.portal_uidhandler
         dummy = self.root.dummy
+        UniqueIdError = handler.UniqueIdError
         
         self.assertEqual(handler.queryUid(dummy, None), None)
-        self.assertRaises(KeyError, handler.getUid, dummy)
+        self.assertRaises(UniqueIdError, handler.getUid, dummy)
     
     def test_getInvalidUid(self):
         handler = self.root.portal_uidhandler
         dummy = self.root.dummy
+        UniqueIdError = handler.UniqueIdError
         
         self.assertEqual(handler.queryObject(100, None), None)
-        self.assertRaises(KeyError, handler.getObject, 100)
+        self.assertRaises(UniqueIdError, handler.getObject, 100)
     
         uid = handler.register(dummy)
         self.assertEqual(handler.queryObject(uid+1, None), None)
-        self.assertRaises(KeyError, handler.getObject, uid+1)
+        self.assertRaises(UniqueIdError, handler.getObject, uid+1)
     
     def test_getUidOfRegisteredObject(self):
         handler = self.root.portal_uidhandler
@@ -93,20 +95,42 @@ class UniqueIdHandlerTests(SecurityTest):
     def test_getUnregisteredObject(self):
         handler = self.root.portal_uidhandler
         dummy = self.root.dummy
+        UniqueIdError = handler.UniqueIdError
         
         uid = handler.register(dummy)
         handler.unregister(dummy)
         self.assertEqual(handler.queryObject(uid, None), None)
-        self.assertRaises(KeyError, handler.getObject, uid)
+        self.assertRaises(UniqueIdError, handler.getObject, uid)
 
     def test_getUidOfUnregisteredObject(self):
         handler = self.root.portal_uidhandler
         dummy = self.root.dummy
+        UniqueIdError = handler.UniqueIdError
         
         uid = handler.register(dummy)
         handler.unregister(dummy)
         self.assertEqual(handler.queryUid(dummy, None), None)
-        self.assertRaises(KeyError, handler.getUid, dummy)
+        self.assertRaises(UniqueIdError, handler.getUid, dummy)
+
+    def test_reregisterObject(self):
+        handler = self.root.portal_uidhandler
+        dummy = self.root.dummy
+        
+        uid1_reg = handler.register(dummy)
+        uid1_get = handler.getUid(dummy)
+        uid2_reg = handler.register(dummy)
+        uid2_get = handler.getUid(dummy)
+        self.assertEqual(uid1_reg, uid2_reg)
+        self.assertEqual(uid1_get, uid2_get)
+        self.assertEqual(uid1_reg, uid1_get)
+    
+    def test_unregisterObjectWithoutUid(self):
+        handler = self.root.portal_uidhandler
+        dummy = self.root.dummy
+        UniqueIdError = handler.UniqueIdError
+        
+        self.assertRaises(UniqueIdError, handler.unregister, dummy)
+
 
 def test_suite():
     return TestSuite((

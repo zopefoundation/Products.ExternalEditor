@@ -30,6 +30,7 @@ from Acquisition import Implicit, aq_base
 from Products.CMFCore.utils import getToolByName
 
 from Products.CMFUid.interfaces import IUniqueIdHandler
+from Products.CMFUid.interfaces import UniqueIdError
 
 UID_ATTRIBUTE_NAME = 'cmf_uid'
 
@@ -48,6 +49,9 @@ class UniqueIdHandlerTool(UniqueObject, SimpleItem, ActionProviderBase):
     # make the uid attribute name available for the unit tests
     # not meant to be altered!!!
     _UID_ATTRIBUTE_NAME = UID_ATTRIBUTE_NAME
+    
+    # make the exception class available through the tool
+    UniqueIdError = UniqueIdError
     
     security = ClassSecurityInfo()
     
@@ -71,7 +75,7 @@ class UniqueIdHandlerTool(UniqueObject, SimpleItem, ActionProviderBase):
         """
         uid = self.queryUid(obj, None)
         if uid is None:
-            raise KeyError, "Missing unique id on '%s'" % obj
+            raise UniqueIdError, "No unique id available on '%s'" % obj
         return uid
     
     
@@ -101,7 +105,8 @@ class UniqueIdHandlerTool(UniqueObject, SimpleItem, ActionProviderBase):
         """
         UID_ATTRIBUTE_NAME = self._UID_ATTRIBUTE_NAME
         if getattr(aq_base(obj), UID_ATTRIBUTE_NAME, None) is None:
-            return
+            raise UniqueIdError, \
+                  "No unique id available to be unregistered on '%s'" % obj
             
         # delete the uid
         delattr(obj, UID_ATTRIBUTE_NAME)
@@ -142,7 +147,7 @@ class UniqueIdHandlerTool(UniqueObject, SimpleItem, ActionProviderBase):
         """
         brain = self.queryBrain(obj, default=None)
         if brain is None:
-            raise KeyError, "No object found with '%s' as uid." % uid
+            raise UniqueIdError, "No object found with '%s' as uid." % uid
         return brain
         
     security.declarePublic('queryObject')
@@ -160,7 +165,7 @@ class UniqueIdHandlerTool(UniqueObject, SimpleItem, ActionProviderBase):
         """
         brain = self.queryBrain(uid, default=None)
         if brain is None:
-            raise KeyError, "No object found with '%s' as uid." % uid
+            raise UniqueIdError, "No object found with '%s' as uid." % uid
         return brain.getObject()
         
 InitializeClass(UniqueIdHandlerTool)
