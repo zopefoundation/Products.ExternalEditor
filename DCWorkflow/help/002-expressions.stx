@@ -24,25 +24,30 @@ Expressions
   'workflow' -- The workflow definition object
   'scripts' -- The scripts in the workflow definition object
 
- 'state_change' objects provide the following 
- attributes:
+ 'state_change' objects provide the following attributes, some of which
+ are duplicates of the above information:
 
    - 'status' is a mapping containing the workflow status. This
    includes all the variables defined in the variable tab with "store
    in state" checked.
 
-   - 'object' is the object being modified by workflow. Same as 'here'?
+   - 'object' is the object being modified by workflow.
+     (Same as the 'here' variable above.)
 
-   - 'workflow' is the workflow definition object. Same as the
-   workflow context, above?
+   - 'workflow' is the workflow definition object.  (Same as the
+   'workflow' variable above.)
   
-   - 'transition' is the transition object being executed. Same
-   as above?
+   - 'transition' is the transition object being executed.  (Same
+   as the 'transition' variable above.)
 
-   - 'old_state' is the former state object. Former status? Is this
-   the same value in the contexts of pre and post scripts?
+   - 'old_state' is the former state object.  The name of the former state,
+   for example "published", is available as 'old_state.getId()'.  (Note
+   that DCWorkflow defines 'state' and 'status' as different entities;
+   the name of the current 'state' is stored in the 'status'.  The word
+   clash is unfortunate; patches welcome.)
 
-   - 'new_state' is the destination state object. Ditto?
+   - 'new_state' is the destination state object.  Use 'new_state.getId()'
+   to access the new state name.
 
    - 'kwargs' is the keyword arguments passed to the doActionFor() method.
 

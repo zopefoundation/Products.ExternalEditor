@@ -32,7 +32,13 @@ Worklists Tab
   that urlquotes that query so it can be passed straight to the search
   page. This way, the work list count and the number of items on the 
   search page will be the same as they are derived from the same
-  query string, defined in one place.]
+  query string, defined in one place.
+
+  Reply from Shane: work lists already exercise the catalog too heavily,
+  and most people don't understand their purpose.  Expanding their
+  capabilities further could impact performance.  I think perhaps
+  the UI should instead display work lists on a user's home page rather
+  than the actions box, which would open up new possibilities.]
  
  The guard fields are described in detail in the "Guards"
  section. It's probably better to avoid using permission and role
@@ -57,8 +63,7 @@ Worklists Tab
   - Whether the user can view content which is in that
   state
 
- This has some unexpected 
- consequences:
+ This has some unexpected consequences:
 
   - If you have several workflow that use the same state variable,
   and similar state names, and each has a work list on, say, the 

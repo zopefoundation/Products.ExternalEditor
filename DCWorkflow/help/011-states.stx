@@ -8,10 +8,6 @@ States Tab
  the possible transitions from that state (and their titles). You can go
  straight to the details of each state and transition from here.
 
- [**Note:** Display bug - you can still see possible transitions that 
- have been deleted, though the don't show up in the action box or on a
- state's properties tab] 
-
  Within a state's properties tab you can set the title, and the
  transitions that are possible from this state from a list of
  all the available transitions created in the workflow's 

@@ -33,5 +33,7 @@ Action Boxes
 
   - isAnonymous
 
- [**Note:** How are these actually used without a TALES expression to use
- them in?]
+  Note that this formatting is done using standard Python string formatting
+  rather than TALES.  It might be more appropriate to use TALES instead.
+  As always, patches welcome.
+

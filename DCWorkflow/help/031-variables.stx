@@ -29,13 +29,13 @@ Variables Tab
  
   Variable update mode -- Select whether the variable is updated on
   every transition (in which case, you should set a default
-  expression), or whether it should only update if a transitions or
+  expression), or whether it should only update if a transition or
   state sets a value.
 
   Default value -- Set the default value to some string.
 
   Default expression -- This is a TALES expression (as described in
-  Expressions) and overrides the default value
+  Expressions) and overrides the default value.
 
   Guards -- See the "Guards" section. 
 

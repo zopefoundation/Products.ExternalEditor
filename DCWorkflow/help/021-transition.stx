@@ -17,8 +17,7 @@ Transitions Tab
   reviewer adding comments to the review history, but not taking any
   action, updating some variable, or invoking scripts.
 
-  Trigger type - There are three 
-  types:
+  Trigger type - There are three types:
 
     - User actions are the familiar user initiated transitions activated
     by actions in the action box.
@@ -26,13 +25,14 @@ Transitions Tab
     - Automatic transitions are executed any time other workflow
     events occur; so if a user action results in the content moving
     to a state that has automatic transitions, they will be executed.
-    [*Note:* In what order? Mutually exclusive guards seem necessary.]
+    (You should use mutually exclusive guards to prevent indeterminate
+    behavior.)
 
     - WorkflowMethod initiate actions occur as a side effect when
     a method of the content object with the same name as the
     transtion, and that has been wrapped in the WorkflowMethod class
-    is called.[*Note:* is the core method executed before or after the
-    transition is attempted?]
+    is called.  DCWorkflow executes the body of the method just before
+    the workflow transition.
 
 
   Scripts - Perform complicated behaviours either before or after the
