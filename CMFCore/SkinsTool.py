@@ -90,7 +90,7 @@ __version__='$Revision$'[11:-2]
 
 
 from string import split
-from utils import UniqueObject
+from utils import UniqueObject, getToolByName
 from PortalFolder import PortalFolder
 import Globals
 from Globals import HTMLFile, PersistentMapping
