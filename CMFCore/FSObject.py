@@ -119,6 +119,7 @@ class FSObject(Acquisition.Implicit, Item):
             self.__dict__.update(properties)
 
         self.id = id
+        self.__name__ = id # __name__ is used in traceback reporting
         self._filepath = filepath
         fp = expandpath(self._filepath)
         
