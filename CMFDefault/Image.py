@@ -215,6 +215,12 @@ class Image( OFS.Image.Image
         #    return self.view(self, REQUEST)
         return OFS.Image.Image.index_html(self, REQUEST, RESPONSE)
 
+    security.declareProtected(CMFCorePermissions.ModifyPortalContent, 'PUT')
+    def PUT(self, REQUEST, RESPONSE):
+        """ Handle HTTP (and presumably FTP?) PUT requests """
+        OFS.Image.Image.PUT( self, REQUEST, RESPONSE )
+        self.reindexObject()
+
 InitializeClass(Image)
 
 
