@@ -1,0 +1,5 @@
+CMFDecor Changes
+
+  1.1beta
+
+    o Initial release.
