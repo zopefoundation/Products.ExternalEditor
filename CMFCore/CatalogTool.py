@@ -151,6 +151,50 @@ class CatalogTool (UniqueObject, ZCatalog):
         ZCatalog.__init__(self, self.getId())
         self._initIndexes()
 
+    #
+    #   Subclass extension interface
+    #
+    security.declarePublic( 'enumerateIndexes' ) # Subclass can call
+    def enumerateIndexes( self ):
+        #   Return a list of ( index_name, type ) pairs for the initial
+        #   index set.
+        return ( ('Title', 'TextIndex')
+               , ('Subject', 'KeywordIndex')
+               , ('Description', 'TextIndex')
+               , ('Creator', 'FieldIndex')
+               , ('SearchableText', 'TextIndex')
+               , ('Date', 'FieldIndex')
+               , ('Type', 'FieldIndex')
+               , ('created', 'FieldIndex')
+               , ('effective', 'FieldIndex')
+               , ('expires', 'FieldIndex')
+               , ('modified', 'FieldIndex')
+               , ('allowedRolesAndUsers', 'KeywordIndex')
+               , ('review_state', 'FieldIndex')
+               , ('in_reply_to', 'FieldIndex')
+               )
+    
+    security.declarePublic( 'enumerateColumns' )
+    def enumerateColumns( self ):
+        #   Return a sequence of schema names to be cached.
+        return ( 'Subject'
+               , 'Title'
+               , 'Description'
+               , 'Type'
+               , 'review_state'
+               , 'Creator'
+               , 'Date'
+               , 'getIcon'
+               , 'created'
+               , 'effective'
+               , 'expires'
+               , 'modified'
+               , 'CreationDate'
+               , 'EffectiveDate'
+               , 'ExpiresDate'
+               , 'ModifiedDate'
+               )
+
     def _initIndexes(self):
         base = aq_base(self)
         if hasattr(base, 'addIndex'):
@@ -165,38 +209,14 @@ class CatalogTool (UniqueObject, ZCatalog):
         else:
             # Zope 2.3 and below
             addColumn = self._catalog.addColumn
+
         # Content indexes
-        addIndex('Title', 'TextIndex')
-        addIndex('Subject', 'KeywordIndex')
-        addIndex('Description', 'TextIndex')
-        addIndex('Creator', 'FieldIndex')
-        addIndex('SearchableText', 'TextIndex')
-        addIndex('Date', 'FieldIndex')
-        addIndex('Type', 'FieldIndex')
-        addIndex('created', 'FieldIndex')
-        addIndex('effective', 'FieldIndex')
-        addIndex('expires', 'FieldIndex')
-        addIndex('modified', 'FieldIndex')
-        addIndex('allowedRolesAndUsers', 'KeywordIndex')
-        addIndex('review_state', 'FieldIndex')
-        addIndex('in_reply_to', 'FieldIndex')
-        # Catalog meta-data
-        addColumn('Subject')
-        addColumn('Title')
-        addColumn('Description')
-        addColumn('Type')
-        addColumn('review_state')
-        addColumn('Creator')
-        addColumn('Date')
-        addColumn('getIcon')
-        addColumn('created')
-        addColumn('effective')
-        addColumn('expires')
-        addColumn('modified')
-        addColumn('CreationDate')
-        addColumn('EffectiveDate')
-        addColumn('ExpiresDate')
-        addColumn('ModifiedDate')
+        for index_name, index_type in self.enumerateIndexes():
+            addIndex( index_name, index_type )
+
+        # Cached metadata
+        for column_name in self.enumerateColumns():
+            addColumn( column_name )
 
     #
     #   ZMI methods
