@@ -148,7 +148,7 @@ class MemberDataTool (UniqueObject, SimpleItem, PropertyManager, ActionProviderB
         If possible, returns the Member object that corresponds
         to the given User object.
         '''
-        id = u.getUserName()
+        id = u.getId()
         members = self._members
         if not members.has_key(id):
             # Get a temporary member that might be
@@ -217,7 +217,7 @@ class MemberData (SimpleItem):
 
     security.declarePublic('getMemberId')
     def getMemberId(self):
-        return self.getUser().getUserName()
+        return self.getUser().getId()
 
     security.declareProtected(SetOwnProperties, 'setProperties')
     def setProperties(self, properties=None, **kw):

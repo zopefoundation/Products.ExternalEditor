@@ -84,10 +84,10 @@ class UndoTool (UniqueObject, SimpleItem, ActionProviderBase):
             t['id'] = t['id'].replace('\n', '')
         if not _checkPermission('Manage portal', portal):
             # Filter out transactions done by other members of the portal.
-            user_name = _getAuthenticatedUser(self).getUserName()
+            user_id = _getAuthenticatedUser(self).getId()
             transactions = filter(
-                lambda record, user_name=user_name:
-                split(record['user_name'])[-1] == user_name,
+                lambda record, user_id=user_id:
+                split(record['user_name'])[-1] == user_id,
                 transactions
                 )
         return transactions

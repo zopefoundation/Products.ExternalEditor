@@ -29,6 +29,13 @@ Future
 
   Bug Fixes
 
+    - Multimodule checkin to convert calls from user.getUserName() to
+      user.getId() where appropriate.  User names should not be used
+      as immutable references, while user ids should.  The distinction
+      is not clearly enforcd in the stock user folder or any current user
+      folder implementations, but newer user folder implementations
+      will rely upon it.
+
     - Remove redundant VERSION.txt files;  the canonical spelling is
       'version.txt' (Collector #13).
 

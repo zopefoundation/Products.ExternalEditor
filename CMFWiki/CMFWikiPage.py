@@ -467,11 +467,11 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
         get_transaction().note(log)
         self.last_log = log
         user = getSecurityManager().getUser()
-        username = user.getUserName()
-        if username == 'Anonymous User':
+        if user.getUserName() == 'Anonymous User':
             username = ''
-        self.last_editor = username
-        self.username = username
+        uid = user.getId()
+        self.last_editor = uid
+        self.username = uid
         t = text + self._process_comment(comment, text, ack_requested)
         self._set_text(t)
         self.reindexObject()
@@ -489,11 +489,11 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
         # appended.
         self.checkEditTimeStamp(timeStamp) 
         user = getSecurityManager().getUser()
-        username = user.getUserName()
-        if username == 'Anonymous User': username = ''
-        self.last_editor = username
+        if user.getUserName() == 'Anonymous User': username = ''
+        uid = user.getId()
+        self.last_editor = uid
         if type is not None:
-            self.username = username
+            self.username = uid
             self.page_type = type
         if log and string.strip(log):
             log = string.strip(log)
@@ -503,7 +503,7 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
             self.last_log = None
         self.title=title
         if text is not None:
-            self.username = username
+            self.username = uid
             t = text
             self._set_text(t)
         self.reindexObject()
@@ -674,7 +674,7 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
         # owner from the parent folder.
         ob._deleteOwnershipAfterAdd()
 
-        username = getSecurityManager().getUser().getUserName()
+        userid   = getSecurityManager().getUser().getId()
         subowner = self.subOwner()
 
         owners = {}
@@ -689,12 +689,12 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
                 ob.manage_addLocalRoles(user, ['Owner'])
 
         elif subowner == 'both':
-            ob.manage_addLocalRoles(username, ['Owner'])
+            ob.manage_addLocalRoles(userid, ['Owner'])
             for user in owners:
                 ob.manage_addLocalRoles(user, ['Owner'])
                 
         else: # creator or unspecified
-            ob.manage_addLocalRoles(username, ['Owner'])
+            ob.manage_addLocalRoles(userid, ['Owner'])
                                     
         ob.setSubOwner(subowner)
 
@@ -722,9 +722,9 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
         ob._set_text(text)
         if log:
             get_transaction().note(log)
-        if username == 'Anonymous User':
+        if user.getUserName() == 'Anonymous User':
             username = ''
-        ob.last_editor = username
+        ob.last_editor = userid
         ob.indexObject()
         
     # we want a Wiki page's manage_upload method to be
@@ -804,7 +804,7 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
         """
         iseditor = self.isAllowed('edit')
         timestamp = DateTime().aCommon()
-        userid = getSecurityManager().getUser().getUserName()
+        username = getSecurityManager().getUser().getUserName()
 
         if string.find(text, commentsdelim) == -1:
             # No commentsdelim there yet, prepend one to the current comment.
@@ -816,7 +816,7 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
         else:
             ack = ''
         got.append('\n%s (%s; Comment #%s) %s --'
-                   % (userid, timestamp, self.comment_number, ack))
+                   % (username, timestamp, self.comment_number, ack))
 
         # Process the comment:
         # - Strip leading whitespace,
@@ -1078,7 +1078,7 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
                edit is the same as the last editor."""
 
         this_belt = timeStamp
-        this_user = getSecurityManager().getUser().getUserName()
+        this_user = getSecurityManager().getUser().getId()
 
         if (# we have a safety belt value:
             this_belt
@@ -1908,8 +1908,8 @@ def makeCMFWikiPage(id, title, file):
     ob = CMFWikiPage(source_string=file, __name__=id)
     ob.title = title
     ob.parents = []
-    username = getSecurityManager().getUser().getUserName()
-    ob.manage_addLocalRoles(username, ['Owner'])
+    userid = getSecurityManager().getUser().getId()
+    ob.manage_addLocalRoles(userid, ['Owner'])
     ob.setSubOwner('both')
     initPageMetadata(ob)
     for name, perm in ob._perms.items():

@@ -89,7 +89,7 @@
 
  <p class="Desktop">Welcome. You are currently logged in.
 <!--Don't forget to take a look at your
-<a href="<!--#var SCRIPT_NAME-->/Members/<!--#var "member.getUserName()" url_quote-->/update_html">personalization
+<a href="<!--#var SCRIPT_NAME-->/Members/<!--#var "member.getId()" url_quote-->/update_html">personalization
 page</a>.-->
 </p>
 

@@ -237,7 +237,13 @@ class MembershipTool (UniqueObject, SimpleItem, ActionProviderBase):
         """
         parent = self.aq_inner.aq_parent
         members =  getattr(parent, 'Members', None)
-        user = self.acl_users.getUser( member_id ).__of__( self.acl_users )
+        
+        user = self.acl_users.getUserById( member_id, None )
+        if user is None:
+            raise ValueError, 'Member %s does not exist' % member_id
+
+        if user is not None:
+            user = user.__of__( self.acl_users )
         
         if members is not None and user is not None:
             f_title = "%s's Home" % member_id
@@ -286,24 +292,26 @@ class MembershipTool (UniqueObject, SimpleItem, ActionProviderBase):
         if not self.isAnonymousUser():
             acl_users = self.acl_users
             user = _getAuthenticatedUser(self)
-            id = user.getUserName()
+            name = user.getUserName()
+            # this really does need to be the user name, and not the user id,
+            # because we're dealing with authentication credentials
             if hasattr(acl_users.aq_base, 'credentialsChanged'):
                 # Use an interface provided by LoginManager.
-                acl_users.credentialsChanged(user, id, password)
+                acl_users.credentialsChanged(user, name, password)
             else:
                 req = self.REQUEST
                 p = getattr(req, '_credentials_changed_path', None)
                 if p is not None:
                     # Use an interface provided by CookieCrumbler.
                     change = self.restrictedTraverse(p)
-                    change(user, id, password)
+                    change(user, name, password)
 
     security.declareProtected(ManagePortal, 'getMemberById')
     def getMemberById(self, id):
         '''
         Returns the given member.
         '''
-        u = self.acl_users.getUser(id)
+        u = self.acl_users.getUserById(id, None)
         if u is not None:
             u = self.wrapUser(u)
         return u
@@ -326,7 +334,8 @@ class MembershipTool (UniqueObject, SimpleItem, ActionProviderBase):
         replaced with a set of methods for querying pieces of the
         list rather than the entire list at once.
         '''
-        return self.__getPUS().getUserNames()
+        user_folder = self.__getPUS()
+        return [ x.getId() for x in user_folder.getUsers() ]
     
     security.declareProtected(ManagePortal, 'listMembers')
     def listMembers(self):

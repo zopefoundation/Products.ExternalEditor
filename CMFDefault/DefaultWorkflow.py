@@ -83,7 +83,7 @@ class DefaultWorkflowDefinition (SimpleItemWithProperties):
         content_url = info.content_url
         content_creator = content.Creator()
         pm = getToolByName(self, 'portal_membership')
-        current_user = pm.getAuthenticatedMember().getUserName()
+        current_user = pm.getAuthenticatedMember().getId()
         review_state = self.getReviewStateOf(content)
         actions = []
 
@@ -185,7 +185,7 @@ class DefaultWorkflowDefinition (SimpleItemWithProperties):
                 raise 'Unauthorized', 'Already private'
             content_creator = ob.Creator()
             pm = getToolByName(self, 'portal_membership')
-            current_user = pm.getAuthenticatedMember().getUserName()
+            current_user = pm.getAuthenticatedMember().getId()
             if (content_creator != current_user) and not allow_review:
                 raise 'Unauthorized', 'Not creator or reviewer'
             self.setReviewStateOf(ob, 'private', action, comment)
@@ -232,7 +232,7 @@ class DefaultWorkflowDefinition (SimpleItemWithProperties):
     def setReviewStateOf(self, ob, review_state, action, comment):
         tool = aq_parent(aq_inner(self))
         pm = getToolByName(self, 'portal_membership')
-        current_user = pm.getAuthenticatedMember().getUserName()
+        current_user = pm.getAuthenticatedMember().getId()
         status = {
             'actor': current_user,
             'action': action,

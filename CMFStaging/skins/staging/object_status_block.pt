@@ -1,5 +1,5 @@
 <form action="." method="POST"
-      tal:define="username python: user.getUserName();
+      tal:define="uid python: user.getId();
                   versions python: here.portal_staging.getVersionIds(here, 1);
                   stage python: here.portal_staging.getStageOf(here);
                   dev_object python:
@@ -8,7 +8,7 @@
                   locker python: lt and lt.locker(dev_object);"
       tal:attributes="action here/absolute_url">
 <!--
-  allow_submit python: (locker == username) or (
+  allow_submit python: (locker == uid) or (
       not locker and versions['dev'] != versions['prod']);
   allow_publish allow_submit
 -->

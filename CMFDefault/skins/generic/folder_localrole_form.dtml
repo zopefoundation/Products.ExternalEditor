@@ -111,7 +111,7 @@ value="&dtml-username;"></td>
       <tr>
         <td width="16">
           <dtml-if expr="_['sequence-key'] != 
-portal_membership.getAuthenticatedMember().getUserName()">
+portal_membership.getAuthenticatedMember().getId()">
             <input type="checkbox" name="member_ids:list" value="&dtml-sequence-key;">
           <dtml-else>
             &nbsp;

@@ -102,8 +102,8 @@ class DefaultDublinCoreImpl( PropertyManager ):
         #       *all* owners
         "Dublin Core element - resource creator"
         owner = self.getOwner()
-        if hasattr( owner, 'getUserName' ):
-            return owner.getUserName()
+        if hasattr( owner, 'getId' ):
+            return owner.getId()
         return 'No owner'
 
     security.declarePublic( 'Subject' )

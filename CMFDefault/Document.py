@@ -246,7 +246,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
            edit is the same as the last editor."""
 
         this_belt = safety_belt
-        this_user = getSecurityManager().getUser().getUserName()
+        this_user = getSecurityManager().getUser().getId()
 
         if (# we have a safety belt value:
             this_belt

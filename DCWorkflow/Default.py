@@ -147,7 +147,7 @@ def setupDefaultWorkflowRev2(wf):
     vdef = wf.variables['actor']
     vdef.setProperties(description='The ID of the user who performed '
                        'the last transition',
-                       default_expr='user/getUserName',
+                       default_expr='user/getId',
                        for_status=1, update_always=1)
 
     vdef = wf.variables['comments']
@@ -279,7 +279,7 @@ def setupDefaultWorkflowClassic(wf):
     vdef = wf.variables['actor']
     vdef.setProperties(description='The ID of the user who performed '
                        'the last transition',
-                       default_expr='user/getUserName',
+                       default_expr='user/getId',
                        for_status=1, update_always=1)
 
     vdef = wf.variables['comments']

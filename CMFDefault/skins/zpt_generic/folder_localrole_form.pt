@@ -153,7 +153,7 @@
  <tr tal:define="user_name python: role_tuple[0];
                  roles python: role_tuple[1];
                  auth mtool/getAuthenticatedMember;
-                 auth_name auth/getUserName;
+                 auth_name auth/getId;
                 "
  >
   <td width="16">

@@ -138,7 +138,7 @@ class MembershipTool( BaseTool ):
         roster = []
         for member in self.listMembers():
             if isManager or member.listed:
-                roster.append({'id':member.getUserName(),
+                roster.append({'id':member.getId(),
                                'listed':member.listed})
         return roster
 
@@ -165,7 +165,7 @@ class MembershipTool( BaseTool ):
                 from AccessControl import getSecurityManager
                 user= getSecurityManager().getUser()
                 # check that we do not do something wrong
-                if user.getUserName() != member_id:
+                if user.getId() != member_id:
                     raise NotImplementedError, \
                         'cannot get user for member area creation'
 

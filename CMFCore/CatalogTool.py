@@ -194,7 +194,7 @@ class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
     def _listAllowedRolesAndUsers( self, user ):
         result = list( user.getRoles() )
         result.append( 'Anonymous' )
-        result.append( 'user:%s' % user.getUserName() )
+        result.append( 'user:%s' % user.getId() )
         return result
 
     # searchResults has inherited security assertions.

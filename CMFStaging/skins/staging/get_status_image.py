@@ -10,9 +10,9 @@ if stage == 'dev':
 
     if locker:
         from AccessControl import getSecurityManager
-        username = getSecurityManager().getUser().getUserName()
+        uid = getSecurityManager().getUser().getId()
 
-        if locker == username:
+        if locker == uid:
             return getattr(context, "status_locked.gif")
         else:
             return getattr(context, "status_locked_out.gif")
