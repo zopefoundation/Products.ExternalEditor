@@ -2,13 +2,7 @@ HEAD only (unreleased)
 
   New Features
 
-    - profiles: Moved 'default' profile to CMFDefault.
-      Using the new 'importVarious' handler this profile now allows to create
-      CMF sites identical to those created with manage_addCMFSite.
-
-    - CMFDefault: Added 'importVarious' setup handler.
-      This provisional handler will be removed again as soon as full handlers
-      are implemented for these steps.
+    - 
 
   Bug Fixes
 
