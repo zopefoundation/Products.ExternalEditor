@@ -52,22 +52,23 @@ class DiscussionTool( UniqueObject, SimpleItem ):
     #   'portal_discussion' interface methods
     #
 
-    security.declareProtected(CMFCorePermissions.ModifyPortalContent
-                            , 'overrideDiscussionFor')
+    security.declarePublic( 'overrideDiscussionFor' )
     def overrideDiscussionFor(self, content, allowDiscussion):
         """
-        Override discussability for a per object basis or clear and let the site default
-        override.
+            Override discussability for a per object basis or clear and let
+            the site default override.
         """
+        mtool = getToolByName( self, 'portal_membership' )
+        if not mtool.checkPermission( CMFCorePermissions.ModifyPortalContent
+                                    , content
+                                    ):
+            raise "Unauthorized"
+
         if allowDiscussion is None or allowDiscussion == 'None':
             if hasattr(content, 'allow_discussion'):
                 del content.allow_discussion
         else:
-            allowDiscussion = int(allowDiscussion)
-            if hasattr(content, 'allow_discussion'):
-                content.allow_discussion = allowDiscussion
-            else:
-                content.manage_addProperty('allow_discussion', allowDiscussion, 'boolean')
+            content.allow_discussion = int(allowDiscussion)
 
     security.declarePublic( 'getDiscussionFor' )
     def getDiscussionFor(self, content):
