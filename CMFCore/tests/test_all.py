@@ -12,6 +12,7 @@ from Products.CMFCore.tests.base.utils import build_test_suite
 
 def test_suite():
     return build_test_suite('Products.CMFCore.tests',[
+        'testCookieCrumbler',
         'test_ActionInformation',
         'test_ActionProviderBase',
         'test_ActionsTool',

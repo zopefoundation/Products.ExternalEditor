@@ -1,14 +1,14 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-#
+# 
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-#
+# 
 ##############################################################################
 """ Cookie Crumbler: Enable cookies for non-cookie user folders.
 
@@ -17,19 +17,17 @@ $Id$
 
 from base64 import encodestring, decodestring
 from urllib import quote, unquote
+import sys
+
 from Acquisition import aq_inner, aq_parent
 from DateTime import DateTime
-from AccessControl import ClassSecurityInfo
+from AccessControl import getSecurityManager, ClassSecurityInfo, Permissions
 from ZPublisher import BeforeTraverse
 import Globals
 from Globals import HTMLFile
 from zLOG import LOG, ERROR
-import sys
 from ZPublisher.HTTPRequest import HTTPRequest
-
-from CMFCorePermissions import ModifyCookieCrumblers
-from CMFCorePermissions import ViewManagementScreens
-from utils import SimpleItemWithProperties
+from OFS.Folder import Folder
 
 try:
     from zExceptions import Redirect
@@ -43,12 +41,15 @@ ATTEMPT_NONE = 0       # No attempt at authentication
 ATTEMPT_LOGIN = 1      # Attempt to log in
 ATTEMPT_RESUME = 2     # Attempt to resume session
 
+ModifyCookieCrumblers = 'Modify Cookie Crumblers'
+ViewManagementScreens = Permissions.view_management_screens
+
 
 class CookieCrumblerDisabled (Exception):
     """Cookie crumbler should not be used for a certain request"""
 
 
-class CookieCrumbler (SimpleItemWithProperties):
+class CookieCrumbler (Folder):
     '''
     Reads cookies during traversal and simulates the HTTP
     authentication headers.
@@ -59,6 +60,9 @@ class CookieCrumbler (SimpleItemWithProperties):
     security.declareProtected(ModifyCookieCrumblers, 'manage_editProperties')
     security.declareProtected(ModifyCookieCrumblers, 'manage_changeProperties')
     security.declareProtected(ViewManagementScreens, 'manage_propertiesForm')
+
+    # By default, anonymous users can view login/logout pages.
+    _View_Permission = ('Anonymous',)
 
 
     _properties = ({'id':'auth_cookie', 'type': 'string', 'mode':'w',
@@ -77,6 +81,8 @@ class CookieCrumbler (SimpleItemWithProperties):
                     'label':'Failed authorization page ID'},
                    {'id':'local_cookie_path', 'type': 'boolean', 'mode':'w',
                     'label':'Use cookie paths to limit scope'},
+                   {'id':'cache_header_value', 'type': 'string', 'mode':'w',
+                    'label':'Cache-Control header value'},
                    )
 
     auth_cookie = '__ac'
@@ -87,6 +93,7 @@ class CookieCrumbler (SimpleItemWithProperties):
     unauth_page = ''
     logout_page = 'logged_out'
     local_cookie_path = 0
+    cache_header_value = 'no-cache'
 
     security.declarePrivate('delRequestVar')
     def delRequestVar(self, req, name):
@@ -113,8 +120,8 @@ class CookieCrumbler (SimpleItemWithProperties):
 
     # Allow overridable cookie set/expiration methods.
     security.declarePrivate('getCookieMethod')
-    def getCookieMethod( self, name='setAuthCookie', default=None ):
-        return getattr( self.aq_inner.aq_parent, name, default )
+    def getCookieMethod(self, name, default=None):
+        return getattr(self, name, default)
 
     security.declarePrivate('defaultSetAuthCookie')
     def defaultSetAuthCookie( self, resp, cookie_name, cookie_value ):
@@ -134,8 +141,7 @@ class CookieCrumbler (SimpleItemWithProperties):
         CookieCrumblerDisabled.
         """
         if (req.__class__ is not HTTPRequest
-            or (not req['REQUEST_METHOD'] in ('HEAD', 'GET', 'PUT', 'POST')
-            and not req.has_key(self.auth_cookie))
+            or not req['REQUEST_METHOD'] in ('HEAD', 'GET', 'PUT', 'POST')
             or req.environ.has_key('WEBDAV_SOURCE_PORT')):
             raise CookieCrumblerDisabled
 
@@ -216,10 +222,12 @@ class CookieCrumbler (SimpleItemWithProperties):
             resp._unauthorized = self._unauthorized
         if attempt != ATTEMPT_NONE:
             # Trying to log in or resume a session
-            # we don't want caches to cache the resulting page
-            resp.setHeader('Cache-Control', 'no-cache')
-            # demystify this in the response.
-            resp.setHeader('X-Cache-Control-Hdr-Modified-By', 'CookieCrumbler')
+            if self.cache_header_value:
+                # we don't want caches to cache the resulting page
+                resp.setHeader('Cache-Control', self.cache_header_value)
+                # demystify this in the response.
+                resp.setHeader('X-Cache-Control-Hdr-Modified-By',
+                               'CookieCrumbler')
             phys_path = self.getPhysicalPath()
             if self.logout_page:
                 # Cookies are in use.
@@ -232,7 +240,7 @@ class CookieCrumbler (SimpleItemWithProperties):
 
     security.declarePublic('credentialsChanged')
     def credentialsChanged(self, user, name, pw):
-        ac = encodestring('%s:%s' % (name, pw))
+        ac = encodestring('%s:%s' % (name, pw)).rstrip()
         method = self.getCookieMethod( 'setAuthCookie'
                                        , self.defaultSetAuthCookie )
         resp = self.REQUEST['RESPONSE']
@@ -296,8 +304,7 @@ class CookieCrumbler (SimpleItemWithProperties):
             page_id = self.unauth_page
             retry = ''
         if page_id:
-            parent = aq_parent(aq_inner(self))
-            page = getattr(parent, page_id, None)
+            page = self.restrictedTraverse(page_id, None)
             if page is not None:
                 came_from = req.get('came_from', None)
                 if came_from is None:
@@ -327,8 +334,7 @@ class CookieCrumbler (SimpleItemWithProperties):
                                      , self.defaultExpireAuthCookie )
         method( resp, cookie_name=self.auth_cookie )
         if self.logout_page:
-            parent = aq_parent(aq_inner(self))
-            page = getattr(parent, self.logout_page, None)
+            page = self.restrictedTraverse(self.logout_page, None)
             if page is not None:
                 resp.redirect('%s?disable_cookie_login__=1'
                               % page.absolute_url())
@@ -349,6 +355,15 @@ class CookieCrumbler (SimpleItemWithProperties):
             container = container.this()
             nc = BeforeTraverse.NameCaller(self.getId())
             BeforeTraverse.registerBeforeTraverse(container, nc, handle)
+
+    security.declarePublic('propertyLabel')
+    def propertyLabel(self, id):
+        """Return a label for the given property id
+        """
+        for p in self._properties:
+            if p['id'] == id:
+                return p.get('label', id)
+        return id
 
 Globals.InitializeClass(CookieCrumbler)
 
@@ -373,21 +388,22 @@ class ResponseCleanup:
 manage_addCCForm = HTMLFile('dtml/addCC', globals())
 manage_addCCForm.__name__ = 'addCC'
 
-def manage_addCC(self, id, create_forms=0, REQUEST=None):
+def manage_addCC(dispatcher, id, create_forms=0, REQUEST=None):
     ' '
     ob = CookieCrumbler()
     ob.id = id
-    self._setObject(id, ob)
+    dispatcher._setObject(ob.getId(), ob)
+    ob = getattr(dispatcher.this(), ob.getId())
     if create_forms:
         import os
         from OFS.DTMLMethod import addDTMLMethod
         dtmldir = os.path.join(os.path.dirname(__file__), 'dtml')
-        for fn in ('login_form', 'logged_in', 'logged_out'):
+        for fn in ('index_html', 'logged_in', 'logged_out', 'login_form',
+                   'standard_login_footer', 'standard_login_header'):
             filename = os.path.join(dtmldir, fn + '.dtml')
             f = open(filename, 'rt')
             try: data = f.read()
             finally: f.close()
-            addDTMLMethod(self, fn, file=data)
+            addDTMLMethod(ob, fn, file=data)
     if REQUEST is not None:
-        return self.manage_main(self, REQUEST)
-
+        return dispatcher.manage_main(dispatcher, REQUEST)
