@@ -140,7 +140,7 @@ class FSPythonScript (FSObject, Script):
         data if necessary.
         """
         fp = expandpath(self._filepath)
-        file = open(fp, 'rb')
+        file = open(fp, 'r')
         try: data = file.read()
         finally: file.close()
         self._write(data)
