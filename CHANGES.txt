@@ -1,6 +1,12 @@
 External Editor Change Log
 
-  Next release
+  0.8 release
+
+    - Compiled windows helper app binary using Python 2.3.4, Pythonwin build
+      163 and py2exe 0.5.
+
+    - Add Dreamweaver plugin contributed by Manuel Aristaránn. Thanks also
+      to Anton Stonor.
   
     - Add ZMI support for Zope 2.7's ordered folder objects.      
   

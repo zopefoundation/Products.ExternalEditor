@@ -228,6 +228,7 @@ Zope External Editor
       Application       Platform    Plugin Module Name(s)
       ===================================================
       HomeSite          Windows     homesite5, homesite
+      Dreamweaver       Windows     dreamweaver	
       Photoshop         Windows     photoshp, photoshop
       MS Word           Windows     winword, word
       MS Excel          Windows     excel
@@ -256,7 +257,12 @@ Zope External Editor
       cannot detect that you have closed a file until you exit the entire
       application (it can still detect saves). Therefore you may want to turn 
       off DAV locking (use_locks=0) or borrow locks (always_borrow_locks=1)
-      when using it.      
+      when using it.
+
+      Dreamweaver -- External editor cannot detect when you have finished 
+      editing a single file. Objects edited with Dreamweaver will remain
+      locked on the server until you exit the application. As with Photoshop
+      above, you may want to turn off locking for Dreamweaver.
 
       If your favorite editor needs a plugin because the general support is
       not good enough, please let me know. Keep in mind that I must be able to
