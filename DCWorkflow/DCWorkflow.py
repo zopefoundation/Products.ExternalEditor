@@ -453,7 +453,12 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
         '''
         Notifies this workflow that an action has taken place.
         '''
-        pass
+        # Take the opportunity to execute automatic transitions.
+        sdef = self._getWorkflowStateOf(ob)
+        if sdef is not None:
+            tdef = self._findAutomaticTransition(ob, sdef)
+            if tdef is not None:
+                self._changeStateOf(self, ob, tdef)
 
     security.declarePrivate('notifyException')
     def notifyException(self, ob, action, exc):
@@ -486,6 +491,16 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
         if guard.check(getSecurityManager(), self, ob):
             return 1
         return 0
+
+    def _findAutomaticTransition(self, ob, sdef):
+        tdef = None
+        for tid in sdef.transitions:
+            t = self.transitions.get(tid, None)
+            if t is not None and t.trigger_type == TRIGGER_AUTOMATIC:
+                if self._checkTransitionGuard(t, ob):
+                    tdef = t
+                    break
+        return tdef
         
     def _changeStateOf(self, ob, tdef=None, kwargs=None):
         '''
@@ -503,13 +518,7 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
                 sdef = self._getWorkflowStateOf(ob)
             if sdef is None:
                 break
-            tdef = None
-            for tid in sdef.transitions:
-                t = self.transitions.get(tid, None)
-                if t is not None and t.trigger_type == TRIGGER_AUTOMATIC:
-                    if self._checkTransitionGuard(t, ob):
-                        tdef = t
-                        break
+            tdef = self._findAutomaticTransition(ob, sdef)
             if tdef is None:
                 # No more automatic transitions.
                 break
