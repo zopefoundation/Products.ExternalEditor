@@ -110,7 +110,7 @@ class FSMetadata:
 
         acquire, roles = data.split(':')
         roles = [r.strip() for r in roles.split(',') if r.strip()]
-        return (acquire, roles)
+        return (int(acquire), roles)
 
     def _getSectionDict(self, cfg, section, parser=None):
         """
