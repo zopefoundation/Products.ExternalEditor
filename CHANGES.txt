@@ -19,6 +19,10 @@ New Features
   - (__future__) Added DCWorkflow (through-the-web configurable
       workflows) to the core set of CMF products.
 
+  - CMFDefault Documents, News Items and Discussion Items now support
+    a 'plain' text format, which simply HTML-quote's the text before
+    displaying it.
+
   - Added CachingPolicyManager tool, which manages caching policies
     for skin methods, and updated FSPageTemplate to use a CPM if
     found.

@@ -38,10 +38,13 @@
    <input type="radio" name="text_format"
                      value="structured-text"
                      tal:attributes="checked python: path('here/text_format') == 'structured-text'" />
-	      <label for="cb_structuredtext">structured-text</label>
-	      <input type="radio" name="text_format" value="html"
-              tal:attributes="checked python: path('here/text_format') == 'html'" />
-	      <label for="cb_html">html</label>
+   <label for="cb_structuredtext">structured-text</label>
+   <input type="radio" name="text_format" value="plain"
+          tal:attributes="checked python: path('here/text_format') == 'plain'" />
+   <label for="cb_html">plain text</label>
+   <input type="radio" name="text_format" value="html"
+          tal:attributes="checked python: path('here/text_format') == 'html'" />
+   <label for="cb_html">html</label>
   </td>
  </tr>
 

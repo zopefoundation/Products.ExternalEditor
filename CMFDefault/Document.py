@@ -27,6 +27,7 @@ from Products.CMFCore.utils import _format_stx, keywordsplitter
 from DublinCore import DefaultDublinCoreImpl
 from utils import parseHeadersBody, formatRFC822Headers
 from utils import SimpleHTMLParser, bodyfinder, _dtmldir
+from DocumentTemplate.DT_Util import html_quote
 
 factory_type_information = ( { 'id'             : 'Document'
                              , 'meta_type'      : 'Document'
@@ -142,9 +143,11 @@ class Document(PortalContent, DefaultDublinCoreImpl):
             raise 'EditingConflict', msg
         if text_format == 'html':
             self.text = self.cooked_text = text
+        elif text_format == 'plain':
+            self.text = text
+            self.cooked_text = html_quote(text).replace('\n','<br>')
         else:
-            cooked = _format_stx(text=text, level=level)
-            self.cooked_text = cooked
+            self.cooked_text = _format_stx(text=text, level=level)
             self.text = text
 
     security.declareProtected( CMFCorePermissions.ModifyPortalContent, 'edit' )
@@ -294,7 +297,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
         text.  Otherwise, recook.  If we recook and 'setlevel' is true,
         then set the recooked text and stx_level on the object.
         """
-        if (self.text_format == 'html'
+        if (self.text_format == 'html' or self.text_format == 'plain'
             or (stx_level is None)
             or (stx_level == self._stx_level)):
             return self.cooked_text
@@ -333,6 +336,8 @@ class Document(PortalContent, DefaultDublinCoreImpl):
         value = str(value)
         if value == 'text/html' or value == 'html':
             self.text_format = 'html'
+        elif value == 'plain':
+            self.text_format = 'plain'
         else:
             self.text_format = 'structured-text'
     setFormat = WorkflowAction(setFormat)

@@ -43,6 +43,10 @@
           <dtml-if "text_format=='structured-text'">checked</dtml-if>
           id="cb_structuredtext" />
           <label for="cb_structuredtext">structured-text</label>
+   <input type="radio" name="text_format" value="plain"
+          <dtml-if "text_format=='plain'">checked</dtml-if>
+	  id="cb_html" />
+	  <label for="cb_html">plain text</label>
    <input type="radio" name="text_format" value="html"
           <dtml-if "text_format=='html'">checked</dtml-if>
 	  id="cb_html" />
