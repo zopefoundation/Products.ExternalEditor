@@ -497,7 +497,7 @@ class ExternalEditor:
 
             h.putheader("Content-Length", str(len(body)))
 
-            if self.metadata.get('auth','').startswith('Basic'):
+            if self.metadata.get('auth','').lower().startswith('basic'):
                 h.putheader("Authorization", self.metadata['auth'])
 
             if self.metadata.get('cookie'):
