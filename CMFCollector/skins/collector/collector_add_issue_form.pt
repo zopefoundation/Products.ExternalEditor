@@ -20,8 +20,8 @@
 
   <h2> Submit New Issue </h2>
  
-  <div tal:define="member python:
-                          here.portal_membership.getAuthenticatedMember();
+  <div tal:define="pm python: here.portal_membership;
+                   member python: pm.getAuthenticatedMember();
                    authenticated python: member.has_role('Authenticated')">
 
   <form method="POST" enctype="multipart/form-data"
@@ -138,12 +138,30 @@
             the causes.
           </font>
         </td>
+       </tr>
 
-       <tr valign="top">
-          <th align="right"> Description </th>
-          <td colspan="3">
-            <textarea name="description:text" rows="8" cols="60"></textarea>
-          </td>
+       <tr valign="top"
+           tal:define="assigner python: pm.checkPermission(
+                                        'Support collector issue', here);
+                       supporters here/supporters">
+         <th align="right"> Description </th>
+         <td colspan="3">
+           <textarea name="description:text" rows="10" cols="55"></textarea>
+         </td>
+         <td valign="top"
+             tal:condition="assigner">
+            Assign to:
+           <select name="assignees:list" MULTIPLE size="5"
+                   tal:attributes="size python:
+                                        min(max(len(supporters), 3), 8)">
+             <span tal:repeat="supporter supporters">
+               <option tal:content="supporter">
+                 SUPPORTER
+               </option>
+             </span>
+           </select>
+         </td>
+              
        </tr>
 
        <tr>
