@@ -103,6 +103,6 @@ class PortalContent(DynamicType, CMFCatalogAware, SimpleItem):
                 return method()
         else:
             raise NotFound( 'Cannot find default view for "%s"' %
-                            '/'.join( obj.getPhysicalPath() ) )
+                            '/'.join( self.getPhysicalPath() ) )
 
 InitializeClass(PortalContent)
