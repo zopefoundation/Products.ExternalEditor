@@ -108,6 +108,7 @@ class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
     def enumerateIndexes( self ):
         #   Return a list of ( index_name, type ) pairs for the initial
         #   index set.
+        #   id is depricated and may go away, use getId!
         return ( ('Title', 'TextIndex')
                , ('Subject', 'KeywordIndex')
                , ('Description', 'TextIndex')
@@ -124,6 +125,7 @@ class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
                , ('in_reply_to', 'FieldIndex')
                , ('meta_type', 'FieldIndex')
                , ('id', 'FieldIndex')
+               , ('getId', 'FieldIndex')
                , ('path', 'PathIndex')
                , ('portal_type', 'FieldIndex')
                )
@@ -131,6 +133,7 @@ class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
     security.declarePublic( 'enumerateColumns' )
     def enumerateColumns( self ):
         #   Return a sequence of schema names to be cached.
+        #   id is depricated and may go away, use getId!
         return ( 'Subject'
                , 'Title'
                , 'Description'
@@ -147,6 +150,8 @@ class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
                , 'EffectiveDate'
                , 'ExpiresDate'
                , 'ModificationDate'
+               , 'id'
+               , 'getId'
                , 'portal_type'
                )
 
