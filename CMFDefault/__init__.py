@@ -95,6 +95,7 @@ import RegistrationTool, URLTool, DublinCore, DiscussionTool
 from Products.CMFCore import utils
 import Products.CMFCore
 from Products.CMFCore.DirectoryView import registerDirectory
+import DefaultWorkflow
 
 
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -186,6 +187,8 @@ def initialize( context ):
                                         Portal.manage_addCMFSite,
                                         ),
                           icon='portal.gif')
+    utils.registerIcon(DefaultWorkflow.DefaultWorkflowDefinition,
+                       'images/workflow.gif', globals())
 
     reg = Products.CMFCore.PortalFolder.addPortalTypeHandler
     reg( 'text/html', Document.Document )

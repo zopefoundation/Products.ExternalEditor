@@ -395,6 +395,14 @@ class PortalGenerator:
             cfm = apply(ContentFactoryMetadata, (), t)
             tool._setObject(t['id'], cfm)
 
+    def setupWorkflow(self, p):
+        tool = getToolByName(p, 'portal_workflow', None)
+        if tool is None:
+            return
+        from DefaultWorkflow import DefaultWorkflowDefinition
+        id = 'default_workflow'
+        tool._setObject(id, DefaultWorkflowDefinition(id))
+
     def setup(self, p, create_userfolder):
         self.setupTools(p)
         self.setupMailHost(p)
@@ -406,6 +414,7 @@ class PortalGenerator:
         self.setupPermissions(p)
         self.setupDefaultSkins(p)
         self.setupTypes(p)
+        self.setupWorkflow(p)
 
     def create(self, parent, id, create_userfolder):
         id = str(id)
