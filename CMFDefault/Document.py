@@ -24,7 +24,8 @@ from webdav.Lockable import ResourceLockedError
 from Products.CMFCore import CMFCorePermissions
 from Products.CMFCore.WorkflowCore import WorkflowAction
 from Products.CMFCore.utils import _format_stx, keywordsplitter
-from utils import parseHeadersBody, SimpleHTMLParser, bodyfinder, _dtmldir
+from utils import parseHeadersBody, formatRFC822Headers
+from utils import SimpleHTMLParser, bodyfinder, _dtmldir
 
 factory_type_information = ( { 'id'             : 'Document'
                              , 'meta_type'      : 'Document'
@@ -400,9 +401,8 @@ class Document(PortalContent, DefaultDublinCoreImpl):
                 'body': self.EditableBody(),
                 }
         else:
-            hdrtext = join(map(lambda x: '%s: %s' % (
-                x[0], x[1]), hdrlist), '\n')
-            bodytext = '%s\n\n%s' % ( hdrtext, self.text )
+            hdrtext = formatRFC822Headers( hdrlist )
+            bodytext = '%s\r\n\r\n%s' % ( hdrtext, self.text )
 
         return bodytext
 

@@ -361,8 +361,9 @@ class TestFTPGet( unittest.TestCase ):
         d = Document( 'foo' )
         d.PUT(REQUEST, RESPONSE=fakeResponse())
 
-        simple_lines = string.split( SIMPLE_HTML, '\n' )
-        get_lines = string.split( d.manage_FTPget(), '\n' )
+        rnlinesplit = re.compile( r'\r?\n?' )
+        simple_lines = rnlinesplit.split( SIMPLE_HTML )
+        get_lines = rnlinesplit.split( d.manage_FTPget() )
 
         # strip off headers
         meta_pattern = re.compile( r'meta name="([a-z]*)" '
@@ -408,8 +409,11 @@ class TestFTPGet( unittest.TestCase ):
         d = Document( 'foo' )
         d.PUT(REQUEST, RESPONSE=fakeResponse())
 
-        simple_lines = string.split( SIMPLE_STRUCTUREDTEXT, '\n' )
-        get_lines = string.split( d.manage_FTPget(), '\n' )
+        rnlinesplit = re.compile( r'\r?\n?' )
+
+        get_text = d.manage_FTPget()
+        simple_lines = rnlinesplit.split( SIMPLE_STRUCTUREDTEXT )
+        get_lines = rnlinesplit.split( get_text )
 
         # strip off headers
         simple_headers = []

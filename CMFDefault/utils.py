@@ -8,6 +8,23 @@ import os
 from Globals import package_home
 _dtmldir = os.path.join( package_home( globals() ), 'dtml' )
 
+def formatRFC822Headers( headers ):
+    """
+        Convert the key-value pairs in 'headers' to valid RFC822-style
+        headers, including adding leading whitespace to elements which
+        contain newlines in order to preserve continuation-line semantics.
+    """
+    munged = []
+    linesplit = re.compile( r'[\n\r]+?' )
+
+    for key, value in headers:
+
+        vallines = linesplit.split( value )
+        munged.append( '%s: %s' % ( key, join( vallines, '\r\n  ' ) ) )
+
+    return join( munged, '\r\n' )
+
+
 def parseHeadersBody( body, headers=None ):
     """
         Parse any leading 'RFC-822'-ish headers from an uploaded

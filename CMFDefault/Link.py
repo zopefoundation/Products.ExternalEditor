@@ -28,7 +28,7 @@ from Products.CMFCore.WorkflowCore import WorkflowAction
 from Products.CMFCore.utils import keywordsplitter
 
 from DublinCore import DefaultDublinCoreImpl
-from utils import parseHeadersBody, _dtmldir
+from utils import formatRFC822Headers, parseHeadersBody, _dtmldir
 
 factory_type_information = ( { 'id'             : 'Link'
                              , 'meta_type'      : 'Link'
@@ -88,6 +88,7 @@ class Link( PortalContent
                      )
 
     meta_type = 'Link'
+    URL_FORMAT = format = 'text/url'
     effective_date = expiration_date = None
     _isDiscussable = 1
 
@@ -158,7 +159,7 @@ class Link( PortalContent
         lines = string.split( body, '\n' )
         self.edit( lines[0] )
 
-        headers['Format'] = 'text/url'
+        headers['Format'] = self.URL_FORMAT
         new_subject = keywordsplitter(headers)
         headers['Subject'] = new_subject or self.Subject()
         haveheader = headers.has_key
@@ -197,8 +198,7 @@ class Link( PortalContent
         join = string.join
         lower = string.lower
         hdrlist = self.getMetadataHeaders()
-        hdrtext = join( map( lambda x: '%s: %s' % ( x[0], x[1] )
-                           , hdrlist), '\n' )
+        hdrtext = formatRFC822Headers( hdrlist )
         bodytext = '%s\n\n%s' % ( hdrtext, self.getRemoteUrl() )
 
         return bodytext
