@@ -1088,17 +1088,22 @@ class PluggableAuthService( Folder ):
 
     def __call__(self, container, req):
         """ The __before_publishing_traverse__ hook. """
-        # resp = self.REQUEST['RESPONSE']
-
-        # plugins = self._getOb('plugins')
-
-        # challengers = plugins.listPlugins( IChallengePlugin )
-
-        # for challenger_id, challenger in challengers:
-        #     challenger.challenge(req, resp)
-
+        resp = req['RESPONSE']
+        resp.old_unauthorized = resp._unauthorized
+        resp._unauthorized = self.challenge
         return
 
+    def challenge(self):
+        req = self.REQUEST
+        resp = req['RESPONSE']
+        resp.old_unauthorized()
+        
+        # Go through all challenge plugins
+        plugins = self._getOb('plugins')
+        challengers = plugins.listPlugins( IChallengePlugin )
+        for challenger_id, challenger in challengers:
+            challenger.challenge(req, resp)
+        
     security.declarePublic( 'hasUsers' )
     def hasUsers(self):
         """Zope quick start sacrifice.

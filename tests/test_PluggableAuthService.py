@@ -20,6 +20,7 @@ from AccessControl.SecurityManagement import noSecurityManager
 from AccessControl.SecurityManager import setSecurityPolicy
 from OFS.ObjectManager import ObjectManager
 from OFS.Folder import Folder
+from zExceptions import Unauthorized, Redirect
 
 from Products.PluggableAuthService.utils import directlyProvides
 
@@ -95,6 +96,11 @@ class DummyGroupPlugin(DummyPlugin):
 
         return self._groups
 
+class DummyChallenger( DummyPlugin ):
+        
+    def challenge(self, request, response):
+        raise Redirect, 'http://redirect.to/me'
+
 class FauxRequest:
 
     def __init__( self, steps=(), **kw ):
@@ -130,7 +136,14 @@ class FauxResponse:
 
     def notFoundError( self, message ):
         raise FauxNotFoundError, message
+    
+    def _unauthorized(self):
+        pass
 
+    def unauthorized(self):
+        self._unauthorized()
+        raise Unauthorized, 'You can not do this!'
+    
 class FauxObject( Implicit ):
 
     def __init__( self, id=None ):
@@ -325,6 +338,14 @@ class PluggableAuthServiceTests( unittest.TestCase ):
         directlyProvides( gp, (IGroupsPlugin,) )
         return gp
 
+    def _makeChallengePlugin(self, id, groups=()):
+        from Products.PluggableAuthService.interfaces.plugins \
+             import IChallengePlugin
+
+        cp = DummyChallenger(id)
+        directlyProvides( cp, (IChallengePlugin,) )
+        return cp
+    
     def test_conformance_IUserFolder( self ):
 
         from Products.PluggableAuthService.interfaces.authservice \
@@ -1521,6 +1542,29 @@ class PluggableAuthServiceTests( unittest.TestCase ):
             len( zcuf.searchPrincipals( id='s00per__group'
                                       , exact_match=True ) ) == 1 )
 
+
+    def test_challenge( self ):
+        from Products.PluggableAuthService.interfaces.plugins \
+             import IChallengePlugin
+        plugins = self._makePlugins()
+        zcuf = self._makeOne( plugins )
+        challenger = self._makeChallengePlugin('challenger')
+        zcuf._setObject( 'challenger', challenger )
+        response = FauxResponse()
+        request = FauxRequest(RESPONSE=response)
+        zcuf.REQUEST = request
+        
+        # First call the userfolders before_traverse hook, to set things up:
+        zcuf(self, request)
+        # Call unauthorized to make sure Unauthorized is raised.
+        self.failUnlessRaises( Unauthorized, response.unauthorized)
+        # Enable the plugin
+        plugins = zcuf._getOb( 'plugins' )
+        plugins.activatePlugin( IChallengePlugin, 'challenger' )
+        # And now redirect should be called.
+        self.failUnlessRaises( Redirect, response.unauthorized)
+        
+                                                                            
 if __name__ == "__main__":
     unittest.main()
 
