@@ -45,13 +45,18 @@ class CatalogToolTests( TestCase ):
     def test_interface(self):
         from Products.CMFCore.interfaces.portal_catalog \
                 import portal_catalog as ICatalogTool
-        from Products.ZCatalog.IZCatalog import IZCatalog
         from Products.CMFCore.interfaces.portal_actions \
                 import ActionProvider as IActionProvider
 
         verifyClass(ICatalogTool, CatalogTool)
-        verifyClass(IZCatalog, CatalogTool)
         verifyClass(IActionProvider, CatalogTool)
+
+        try:
+            from Products.ZCatalog.IZCatalog import IZCatalog
+            verifyClass(IZCatalog, CatalogTool)
+        except ImportError:
+            # for Zope versions before 2.6.0
+            pass
 
 
 def test_suite():
