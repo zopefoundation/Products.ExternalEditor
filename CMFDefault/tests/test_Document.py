@@ -1,15 +1,23 @@
 from unittest import TestSuite, makeSuite, main
 
+import Zope
+try:
+    Zope.startup()
+except AttributeError:
+    # for Zope versions before 2.6.1
+    pass
 try:
     from Interface.Verify import verifyClass
 except ImportError:
     # for Zope versions before 2.6.0
     from Interface import verify_class_implementation as verifyClass
 
-from StringIO import StringIO
+from Globals import package_home
+from os.path import join
 from re import compile
+from StringIO import StringIO
 
-from Products.CMFCore.tests.base.testcase import RequestTest
+from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
 
 from Products.CMFCore.tests.base.content import DOCTYPE
 from Products.CMFCore.tests.base.content import HTML_TEMPLATE
@@ -23,8 +31,13 @@ from Products.CMFCore.tests.base.content import STX_NO_HEADERS_BUT_COLON
 from Products.CMFCore.tests.base.content import SIMPLE_STRUCTUREDTEXT
 from Products.CMFCore.tests.base.content import SIMPLE_HTML
 from Products.CMFCore.tests.base.content import SIMPLE_XHTML
-
+from Products.CMFCore.tests.base.dummy import DummySite
+from Products.CMFCore.tests.base.testcase import RequestTest
+from Products.CMFCore.tests.base.tidata import FTIDATA_CMF15
+from Products.CMFCore.TypesTool import FactoryTypeInformation as FTI
+from Products.CMFCore.TypesTool import TypesTool
 from Products.CMFDefault.Document import Document
+
 
 class DocumentTests(RequestTest):
 
@@ -116,8 +129,8 @@ class DocumentTests(RequestTest):
         body = '<ul>\n%s\n</ul>' % '\n'.join(s)
         html = HTML_TEMPLATE % {'title': 'big document',
                                 'body': body}
-        file = StringIO( html )
-        d.edit(text_format='html', text='', file=file)
+        _file = StringIO( html )
+        d.edit(text_format='html', text='', file=_file)
         self.assertEqual( d.CookedBody(), body )
         
     def test_plain_text(self):
@@ -302,7 +315,26 @@ class DocumentFTPGetTests(RequestTest):
 
     def testHTML( self ):
         self.REQUEST['BODY']=BASIC_HTML
-        d = Document( 'foo' )
+
+        site = DummySite('site').__of__(self.root)
+        ttool = site._setObject( 'portal_types', TypesTool() )
+        fti = FTIDATA_CMF15[0].copy()
+        del fti['id']
+        ttool._setObject( 'Document', FTI('Document', **fti) )
+
+        zpt = site._setObject( 'source_html',
+                               ZopePageTemplate('source_html') )
+        dir = package_home( globals() )
+        if dir.endswith('__main__'):
+            dir = dir[:-15]
+        else:
+            dir = dir[:-6]
+        _file = join(dir, 'skins', 'zpt_content', 'source_html.pt')
+        data = open(_file, 'r').read()
+        zpt.write(data)
+
+        d = site._setObject( 'foo', Document('foo') )
+        d._setPortalTypeName('Document')
         d.PUT(self.REQUEST, self.RESPONSE)
 
         rnlinesplit = compile( r'\r?\n?' )
@@ -346,6 +378,11 @@ class DocumentFTPGetTests(RequestTest):
 
         for header in simple_headers:
             self.failUnless( header in get_headers )
+
+        body1 = d.EditableBody()
+        self.REQUEST['BODY'] = d.manage_FTPget()
+        d.PUT(self.REQUEST, self.RESPONSE)
+        self.assertEqual( d.EditableBody(), body1 )
 
     def testSTX( self ):
         self.REQUEST['BODY']=SIMPLE_STRUCTUREDTEXT

@@ -2,6 +2,10 @@ CMF 1.5alpha (unreleased)
 
   New Features
 
+    - Document and NewsItem: Un-hardwired 'manage_FTPget()' for 'text/html'.
+      Added 'source_html.dtml' and 'source_html.pt'. 'manage_FTPget()' now has
+      a 'gethtml' hook and uses 'source_html' by default. (Collector #168)
+
     - TypeInformation: Added Method Aliases.
 
       o TypesTool and TypeInformation now have an 'Aliases' tab to configure

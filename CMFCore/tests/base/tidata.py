@@ -218,7 +218,8 @@ FTIDATA_CMF15 = (
            'view':'dummy_view',
            'view.html':'dummy_view',
            'edit.html':'dummy_edit_form',
-           'metadata.html':'metadata_edit_form'}
+           'metadata.html':'metadata_edit_form',
+           'gethtml':'source_html'}
       , 'actions' : (
             { 'id':'view',
               'name':'View',

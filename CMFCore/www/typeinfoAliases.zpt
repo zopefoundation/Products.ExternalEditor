@@ -50,7 +50,11 @@
  <dt>'<tt>(Default)</tt>' alias:</dt>
  <dd><tt>path/to/object</tt> or <tt>path/to/object/</tt></dd>
  <dt>'<tt>mkdir</tt>' alias:</dt>
- <dd>customization hook for manage_addFolder (WebDAV/FTP)</dd>
+ <dd>customization hook for manage_addFolder, used by some folderish types
+  (WebDAV/FTP)</dd>
+ <dt>'<tt>gethtml</tt>' alias:</dt>
+ <dd>customization hook for manage_FTPget, used by some contentish types
+  (WebDAV/FTP)</dd>
  <dt>For backwards compatibility there is also a '<tt>(Default)</tt>'
   method:</dt>
  <dd>Calls <tt>index_html</tt> or <tt>__call__</tt>, depending on the class.

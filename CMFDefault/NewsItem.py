@@ -36,7 +36,8 @@ an optional description.
   , 'factory'        : 'addNewsItem'
   , 'immediate_view' : 'metadata_edit_form'
   , 'aliases'        : {'(Default)':'newsitem_view',
-                        'view':'newsitem_view'}
+                        'view':'newsitem_view',
+                        'gethtml':'source_html'}
   , 'actions'        : ( { 'id'            : 'view'
                          , 'name'          : 'View'
                          , 'action': 'string:${object_url}/newsitem_view'

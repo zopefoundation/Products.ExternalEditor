@@ -1,0 +1,9 @@
+<html>
+ <head>
+ <title><dtml-var Title></title>
+ <dtml-in getMetadataHeaders><dtml-unless expr="
+                                          _['sequence-key'].lower()=='title'">
+<meta name="<dtml-var sequence-key>" content="<dtml-var sequence-item>" />
+ </dtml-unless></dtml-in></head>
+ <body><dtml-var EditableBody></body>
+</html>

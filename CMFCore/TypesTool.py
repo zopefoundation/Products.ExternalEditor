@@ -122,7 +122,7 @@ class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
                 and kw.has_key('icon')):
                 kw['content_icon'] = kw['icon']
 
-            apply(self.manage_changeProperties, (), kw)
+            self.manage_changeProperties(**kw)
 
         actions = kw.get( 'actions', () )
         # make sure we have a copy
@@ -158,11 +158,11 @@ class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
             if v:
                 aliases[k] = v
         
-        dict = {}
+        _dict = {}
         for k, v in form['methods'].items():
             if aliases.has_key(k):
-                dict[ aliases[k] ] = v
-        self.setMethodAliases(dict)
+                _dict[ aliases[k] ] = v
+        self.setMethodAliases(_dict)
         REQUEST.RESPONSE.redirect('%s/manage_aliases' % self.absolute_url())
 
     #
@@ -342,27 +342,27 @@ class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
         """
         if not hasattr(self, '_aliases'):
             self._guessMethodAliases()
-        dict = {}
+        _dict = {}
         aliases = self._aliases
         for k, v in aliases.items():
             path = list(v)
             path.reverse()
-            dict[k] = '/'.join(path)
-        return dict
+            _dict[k] = '/'.join(path)
+        return _dict
 
     security.declareProtected(ManagePortal, 'setMethodAliases')
     def setMethodAliases(self, aliases):
         """ Set method aliases dict.
         """
-        dict = {}
+        _dict = {}
         for k, v in aliases.items():
             v = v.strip()
             if v:
                 path = v.split('/')
                 path.reverse()
-                dict[ k.strip() ] = tuple(path)
-        if not getattr(self, '_aliases', None) == dict:
-            self._aliases = dict
+                _dict[ k.strip() ] = tuple(path)
+        if not getattr(self, '_aliases', None) == _dict:
+            self._aliases = _dict
             return 1
         else:
             return 0
@@ -391,7 +391,7 @@ class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
         context = getActionContext(self)
         actions = self.listActions()
         ordered = []
-        dict = {}
+        _dict = {}
 
         # order actions and search 'mkdir' action 
         for action in actions:
@@ -401,7 +401,7 @@ class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
                 mkdirmethod = action.action(context).strip()
                 if mkdirmethod.startswith('/'):
                     mkdirmethod = mkdirmethod[1:]
-                dict['mkdir'] = mkdirmethod
+                _dict['mkdir'] = mkdirmethod
             else:
                 ordered.append(action)
 
@@ -417,7 +417,7 @@ class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
                 break
         else:
             viewmethod = '(Default)'
-        dict['view'] = viewmethod
+        _dict['view'] = viewmethod
 
         # search default action
         for action in ordered:
@@ -427,16 +427,18 @@ class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
             if not defmethod:
                 break
         else:
-            dict['(Default)'] = viewmethod
+            _dict['(Default)'] = viewmethod
 
         # correct guessed values if we know better
         if self.content_meta_type in ('Portal File', 'Portal Folder',
                                       'Portal Image'):
-            dict['(Default)'] = 'index_html'
+            _dict['(Default)'] = 'index_html'
             if viewmethod == '(Default)':
-                dict['view'] = 'index_html'
+                _dict['view'] = 'index_html'
+        if self.content_meta_type in ('Document', 'News Item'):
+            _dict['gethtml'] = 'source_html'
 
-        self.setMethodAliases(dict)
+        self.setMethodAliases(_dict)
         return 1
 
 InitializeClass( TypeInformation )
@@ -531,7 +533,7 @@ class FactoryTypeInformation (TypeInformation):
         else:
             args = ( id, ) + args
 
-        id = apply( m, args, kw ) or id  # allow factory to munge ID
+        id = m(*args, **kw) or id  # allow factory to munge ID
         ob = container._getOb( id )
 
         return self._finishConstruction(ob)
@@ -591,7 +593,7 @@ class ScriptableTypeInformation( TypeInformation ):
         constructor = aq_base(constructor).__of__( container )
 
         id = str(id)
-        ob = apply(constructor, (container, id) + args, kw)
+        ob = constructor(container, id, *args, **kw)
 
         return self._finishConstruction(ob)
 
@@ -744,9 +746,9 @@ class TypesTool(UniqueObject, Folder, ActionProviderBase):
             fti = fti.copy()
             if fti.has_key('id'):
                 del fti['id']
-            ob = apply(klass, (id,), fti)
+            ob = klass(id, **fti)
         else:
-            ob = apply(klass, (id,))
+            ob = klass(id)
         self._setObject(id, ob)
         if RESPONSE is not None:
             RESPONSE.redirect('%s/manage_main' % self.absolute_url())
@@ -763,11 +765,11 @@ class TypesTool(UniqueObject, Folder, ActionProviderBase):
                 aliases[k] = v
         
         for ti in self.listTypeInfo():
-            dict = {}
+            _dict = {}
             for k, v in form[ ti.getId() ].items():
                 if aliases.has_key(k):
-                    dict[ aliases[k] ] = v
-            ti.setMethodAliases(dict)
+                    _dict[ aliases[k] ] = v
+            ti.setMethodAliases(_dict)
         REQUEST.RESPONSE.redirect('%s/manage_aliases' % self.absolute_url())
 
     security.declareProtected(AccessContentsInformation, 'getTypeInfo')
@@ -867,7 +869,7 @@ class TypesTool(UniqueObject, Folder, ActionProviderBase):
         if not self._checkViewType(info):
             raise Unauthorized,info
 
-        ob = apply(info.constructInstance, (container, id) + args, kw)
+        ob = info.constructInstance(container, id, *args, **kw)
 
         if RESPONSE is not None:
             immediate_url = '%s/%s' % ( ob.absolute_url()
@@ -894,12 +896,12 @@ class TypesTool(UniqueObject, Folder, ActionProviderBase):
     def listMethodAliasKeys(self):
         """ List all defined method alias names.
         """
-        dict = {}
+        _dict = {}
         for ti in self.listTypeInfo():
             aliases = ti.getMethodAliases()
             for k, v in aliases.items():
-                dict[k] = 1
-        rval = dict.keys()
+                _dict[k] = 1
+        rval = _dict.keys()
         rval.sort()
         return rval
 

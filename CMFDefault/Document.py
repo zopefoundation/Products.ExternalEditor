@@ -18,6 +18,7 @@ $Id$
 from StructuredText.HTMLWithImages import HTMLWithImages
 from Globals import DTMLFile, InitializeClass
 from AccessControl import ClassSecurityInfo, getSecurityManager
+from Acquisition import aq_base
 
 from Products.CMFCore.PortalContent import PortalContent
 from Products.CMFCore.PortalContent import NoWL, ResourceLockedError
@@ -43,7 +44,8 @@ They may also contain HTML, or "plain" text.
   , 'factory'        : 'addDocument'
   , 'immediate_view' : 'metadata_edit_form'
   , 'aliases'        : {'(Default)':'document_view',
-                        'view':'document_view'}
+                        'view':'document_view',
+                        'gethtml':'source_html'}
   , 'actions'        : ( { 'id'            : 'view' 
                          , 'name'          : 'View'
                          , 'action': 'string:${object_url}/document_view'
@@ -384,29 +386,40 @@ class Document(PortalContent, DefaultDublinCoreImpl):
         ' <title>%(title)s</title>\n'
        '%(metatags)s\n'
         ' </head>\n'
-        ' <body>\n%(body)s\n </body>\n'
+        ' <body>%(body)s</body>\n'
         '</html>\n'
         )
 
     security.declareProtected(View, 'manage_FTPget')
     def manage_FTPget(self):
         "Get the document body for FTP download (also used for the WebDAV SRC)"
-        hdrlist = self.getMetadataHeaders()
         if self.Format() == 'text/html':
-            hdrtext = ''
-            for name, content in hdrlist:
-                if name.lower() == 'title':
-                    continue
+            ti = self.getTypeInfo()
+            method_id = ti and ti.getMethodURL('gethtml') or None
+            if method_id:
+                method = getattr(self, method_id)
+                if getattr(aq_base(method), 'isDocTemp', 0):
+                    bodytext = method(self, self.REQUEST)
                 else:
-                    hdrtext = '%s\n <meta name="%s" content="%s" />' % (
-                        hdrtext, name, content)
+                    bodytext = method()
+            else:
+                # Use the old code as fallback. May be removed some day.
+                hdrlist = self.getMetadataHeaders()
+                hdrtext = ''
+                for name, content in hdrlist:
+                    if name.lower() == 'title':
+                        continue
+                    else:
+                        hdrtext = '%s\n <meta name="%s" content="%s" />' % (
+                            hdrtext, name, content)
 
-            bodytext = self._htmlsrc % {
-                'title': self.Title(),
-                'metatags': hdrtext,
-                'body': self.EditableBody(),
-                }
+                bodytext = self._htmlsrc % {
+                    'title': self.Title(),
+                    'metatags': hdrtext,
+                    'body': self.EditableBody(),
+                    }
         else:
+            hdrlist = self.getMetadataHeaders()
             hdrtext = formatRFC822Headers( hdrlist )
             bodytext = '%s\r\n\r\n%s' % ( hdrtext, self.text )
 
