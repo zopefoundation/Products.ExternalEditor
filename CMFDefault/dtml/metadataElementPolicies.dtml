@@ -25,7 +25,8 @@
  </tr>
 
  <dtml-let spec="getElementSpec( element=REQUEST[ 'element' ] )"
-           tokenz="spec.isMultiValued() and ':tokens' or ''"
+           multi="spec.isMultiValued()"
+           tokenz="multi and ':tokens' or ''"
  >
 
  <dtml-in expr="spec.listPolicies()" sort>
@@ -36,7 +37,8 @@
            rqd="policy.isRequired() and 'checked' or ''"
            canRemove="key is not _.None"
            supply="policy.supplyDefault() and 'checked' or ''"
-           defval="policy.defaultValue()"
+           rawdef="policy.defaultValue()"
+           defval="(multi and ( _.string.join( rawdef ), ) or ( rawdef, ))[0]"
            enforce="policy.enforceVocabulary() and 'checked' or ''"
            vocab="_.string.join( policy.allowedVocabulary(), '\n' )"
  >
