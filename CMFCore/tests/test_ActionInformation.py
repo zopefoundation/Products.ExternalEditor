@@ -35,6 +35,20 @@ class ActionInformationTests(TransactionalTest):
         self.assertEqual(ai.getVisibility(), 1)
         self.assertEqual(ai.getCategory(), 'object')
         self.assertEqual(ai.getPermissions(), ())
+        
+    def test_editing(self):
+        ai = ActionInformation(id='view',
+                               category='folder',
+                              )
+        ai.edit(id='new_id', title='blah')
+        self.assertEqual(ai.getId(), 'new_id')
+        self.assertEqual(ai.Title(), 'blah')
+        self.assertEqual(ai.Description(), '')
+        self.assertEqual(ai.getCondition(), '')
+        self.assertEqual(ai.getActionExpression(), '')
+        self.assertEqual(ai.getVisibility(), 1)
+        self.assertEqual(ai.getCategory(), 'folder')
+        self.assertEqual(ai.getPermissions(), ())
 
     def test_construction_with_Expressions(self):
         ai = ActionInformation(id='view'

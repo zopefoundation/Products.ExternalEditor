@@ -96,6 +96,18 @@ class ActionProvider(Interface):
         Returns -- Tuple of ActionInformation objects
         """
 
+    def getActionObject(action):
+        """Return the actions object or None if action doesn't exist.
+        
+        'action' is an action 'path' (e.g. 'object/view').
+        
+        Raises an ValueError exception if the action is of the wrong format.
+        
+        Permission -- Private
+        
+        Returns -- The actions object reference.
+        """
+
     def listActionInfos(action_chain=None, object=None, check_visibility=1,
                         check_permissions=1, check_condition=1, max=-1):
         """ List Action info mappings.

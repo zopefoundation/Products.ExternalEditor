@@ -59,6 +59,24 @@ class ActionProviderBase:
         """
         return self._actions or ()
 
+    security.declarePrivate('getActionObject')
+    def getActionObject(self, action):
+        """Return the actions object or None if action doesn't exist.
+        """
+        # separate cataegory and id from action
+        sep = action.rfind('/')
+        if sep == -1:
+            raise ValueError('Actions must have the format <category>/<id>.')
+        category, id = action[:sep], action[sep+1:]
+
+        # search for action and return first one found
+        for ai in self.listActions():
+            if id == ai.getId() and category == ai.getCategory():
+                return ai
+        
+        # no action found
+        return None
+
     security.declarePublic('listActionInfos')
     def listActionInfos(self, action_chain=None, object=None,
                         check_visibility=1, check_permissions=1,
@@ -368,6 +386,9 @@ class OldstyleActionProviderBase:
         """ List all the actions defined by a provider.
         """
         return self._actions or ()
+
+    security.declarePrivate('getActionObject')
+    getActionObject = ActionProviderBase.getActionObject
 
     security.declarePublic('listActionInfos')
     def listActionInfos(self, action_chain=None, object=None,

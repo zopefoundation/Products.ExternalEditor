@@ -15,8 +15,6 @@
 $Id$
 """
 
-from types import StringType
-
 from AccessControl import ClassSecurityInfo
 from Globals import InitializeClass
 from Acquisition import aq_base, aq_inner, aq_parent
@@ -26,6 +24,8 @@ from Expression import Expression
 from permissions import View
 from utils import getToolByName
 
+
+_unchanged = [] # marker
 
 class ActionInformation( SimpleItem ):
 
@@ -52,21 +52,54 @@ class ActionInformation( SimpleItem ):
                 ):
         """ Set up an instance.
         """
-        if condition and type( condition ) == type( '' ):
-            condition = Expression( condition )
-
-        if action and type( action ) == type( '' ):
-            action = Expression( action )
-
-        self.id = id
-        self.title = title
-        self.description = description
-        self.category = category
-        self.condition = condition
-        self.permissions = permissions
-        self.priority = priority
-        self.visible = visible
-        self.setActionExpression(action)
+        self.edit( id
+                 , title
+                 , description
+                 , category
+                 , condition
+                 , permissions
+                 , priority
+                 , visible
+                 , action
+                 )
+        
+    security.declarePrivate('edit')
+    def edit( self
+            , id=_unchanged
+            , title=_unchanged
+            , description=_unchanged
+            , category=_unchanged
+            , condition=_unchanged
+            , permissions=_unchanged
+            , priority=_unchanged
+            , visible=_unchanged
+            , action=_unchanged
+            ):
+        """Edit the specified properties.
+        """
+        
+        if id is not _unchanged:
+            self.id = id
+        if title is not _unchanged:
+            self.title = title
+        if description is not _unchanged:
+            self.description = description
+        if category is not _unchanged:
+            self.category = category
+        if condition is not _unchanged:
+            if condition and isinstance(condition, basestring):
+                condition = Expression(condition)
+            self.condition = condition
+        if permissions is not _unchanged:
+            self.permissions = permissions
+        if priority is not _unchanged:
+            self.priority = priority
+        if visible is not _unchanged:
+            self.visible = visible
+        if action is not _unchanged:
+            if action and isinstance(action, basestring):
+                action = Expression(action)
+            self.setActionExpression(action)
 
     security.declareProtected( View, 'Title' )
     def Title(self):
@@ -132,7 +165,7 @@ class ActionInformation( SimpleItem ):
         """
         action = self._getActionObject()
         expr = action and action.text or ''
-        if expr and type( expr ) is StringType:
+        if expr and isinstance(expr, basestring):
             if not expr.startswith('python:') and not expr.startswith('string:'):
                 expr = 'string:${object_url}/%s' % expr
                 self.action = Expression( expr )
@@ -140,7 +173,7 @@ class ActionInformation( SimpleItem ):
 
     security.declarePrivate( 'setActionExpression' )
     def setActionExpression(self, action):
-        if action and type( action ) is StringType:
+        if action and isinstance(action, basestring):
             if not action.startswith('python:')  and not action.startswith('string:'):
                 action = 'string:${object_url}/%s' % action
                 action = Expression( action )

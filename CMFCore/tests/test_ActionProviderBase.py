@@ -167,6 +167,14 @@ class ActionProviderBaseTests(SecurityRequestTest):
         rval = apb.listActionInfos('foo/another_id', check_visibility=0)
         self.assertEqual( rval, [] )
 
+    def test_getActionObject(self):
+        apb = self.site._setObject( 'portal_apb', self._makeProvider(1) )
+        rval = apb.getActionObject('object/an_id')
+        self.assertEqual(rval, apb._actions[0])
+        rval = apb.getActionObject('object/not_existing_id')
+        self.assertEqual(rval, None)
+        self.assertRaises(ValueError, apb.getActionObject, 'wrong_format')
+
     def test_getActionInfo(self):
         wanted = {'permissions': '', 'id': 'an_id', 'url': '',
                   'name': 'A Title', 'visible': 0, 'category': 'object'}
