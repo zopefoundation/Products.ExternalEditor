@@ -254,6 +254,41 @@ class ISetupTool( Interface ):
     """ API for SetupTool.
     """
 
+    def getProfileProduct():
+
+        """ Return the name of the product defining our current profile.
+
+        o Return None if the current profile is not relative to a product.
+        """
+
+    def getProfileDirectory( relative_to_product=False ):
+
+        """ Return the path to the directory containing profile information.
+
+        o If 'relative_to_product', return it relative to the root directory
+          of our profile product.
+        """
+
+    def setProfileDirectory( path, product_name=None ):
+
+        """ Set the path to the directory containing profile information.
+
+        o If 'product_name' is not None, compute the fully-qualified path
+          relative to the product's root directory.
+
+        o Update the import and export step registries from that directory.
+        """
+
+    def getImportStepRegistry():
+
+        """ Return the IImportStepRegistry for the tool.
+        """
+
+    def getExportStepRegistry():
+
+        """ Return the IExportStepRegistry for the tool.
+        """
+
     def runSetupStep( step_id, purge_old=True, run_dependencies=True ):
 
         """ Execute a given setup step

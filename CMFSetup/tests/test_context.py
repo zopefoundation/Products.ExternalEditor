@@ -5,56 +5,20 @@ $Id$
 
 import unittest
 import os
-import shutil
 
 from OFS.Folder import Folder
 
 from Products.CMFCore.tests.base.testcase import SecurityRequestTest
 
+from common import TestBase
 from conformance import ConformsToISetupContext
 from conformance import ConformsToIImportContext
 from conformance import ConformsToIExportContext
 
+
 class DummySite( Folder ):
 
     pass
-
-class TestBase( SecurityRequestTest ):
-
-    def _makeOne( self, *args, **kw ):
-
-        return self._getTargetClass()( *args, **kw )
-
-    def setUp( self ):
-
-        SecurityRequestTest.setUp( self )
-        self._clearTempDir()
-
-    def tearDown( self ):
-
-        self._clearTempDir()
-        SecurityRequestTest.tearDown( self )
-
-    def _clearTempDir( self ):
-
-        if os.path.exists( self._PROFILE_PATH ):
-            shutil.rmtree( self._PROFILE_PATH )
-
-    def _makeFile( self, filename, contents ):
-
-        path, filename = os.path.split( filename )
-
-        subdir = os.path.join( self._PROFILE_PATH, path )
-
-        if not os.path.exists( subdir ):
-            os.makedirs( subdir )
-
-        fqpath = os.path.join( subdir, filename )
-
-        file = open( fqpath, 'w' )
-        file.write( contents )
-        file.close()
-        return fqpath
 
 class ImportContextTests( TestBase
                         , ConformsToISetupContext
