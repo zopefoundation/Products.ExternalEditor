@@ -1,5 +1,8 @@
 External Editor Change Log
 
+    - Made manage_FTPget the default source for the editable content, instead
+      of document_src which was broken for CMF Wiki Pages.
+
     - Fixed Windows "body_file" bug.
 
     - Added binary build support for Windows using py2exe and Inno setup.

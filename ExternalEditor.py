@@ -63,12 +63,12 @@ class ExternalEditor(Acquisition.Implicit):
         r.append('cookie:%s' % REQUEST.environ.get('HTTP_COOKIE',''))            
         r.append('')
         
-        if hasattr(ob, 'document_src'):
-            r.append(ob.document_src(REQUEST, RESPONSE))
-        elif hasattr(ob, 'manage_FTPget'):
-            r.append(ob.manage_FTPget(REQUEST, RESPONSE))
+        if hasattr(ob, 'manage_FTPget'):
+            r.append(ob.manage_FTPget())
         elif hasattr(ob, 'EditableBody'):
             r.append(ob.EditableBody())
+        elif hasattr(ob, 'document_src'):
+            r.append(ob.document_src(REQUEST, RESPONSE))
         elif hasattr(ob, 'read'):
             r.append(ob.read())
         else:
