@@ -999,7 +999,7 @@ class PortalFolderCopySupportTests( TestCase ):
         #
         #   This test can't succeed on Zope's earlier than 2.7.3 because
         #   of the DWIM'y behavior of 'guarded_getattr', which tries to
-        #   filter #   acquired-but-inaccessible objects, rather than raising
+        #   filter acquired-but-inaccessible objects, rather than raising
         #   Unauthorized.
         #
         #   If you are running with such a Zope, this test will error out
@@ -1067,6 +1067,141 @@ class PortalFolderCopySupportTests( TestCase ):
                                    , ce_regex='Insufficient Privileges'
                                              + '.*%s' % DeleteObjects
                                    )
+
+    def test_paste_with_restricted_item_content_type_not_allowed(self):
+        
+        #   Test from CMF Collector #216 (Plone #2186), for the case
+        #   in which the item being pasted does not allow adding such
+        #   objects to containers which do not explicitly grant access.
+        from Products.CMFCore.PortalFolder import PortalFolder
+
+        RESTRICTED_TYPE = 'Restricted Item'
+        UNRESTRICTED_TYPE = 'Unrestricted Container'
+
+        folder1, folder2 = self._initFolders()
+        folder1.portal_type = UNRESTRICTED_TYPE
+        folder2.portal_type = RESTRICTED_TYPE
+
+        self._initPolicyAndUser() # ensure that sec. machinery allows paste
+
+        self.app._setObject( 'portal_types', TypesTool() )
+        types_tool = self.app.portal_types
+        types_tool._setObject( RESTRICTED_TYPE
+                             , FTI( id=RESTRICTED_TYPE
+                                  , title=RESTRICTED_TYPE
+                                  , meta_type=PortalFolder.meta_type
+                                  , product='CMFCore'
+                                  , factory='manage_addPortalFolder'
+                                  , global_allow=0
+                                  )
+                             )
+        types_tool._setObject( UNRESTRICTED_TYPE
+                             , FTI( id=UNRESTRICTED_TYPE
+                                  , title=UNRESTRICTED_TYPE
+                                  , meta_type=PortalFolder.meta_type
+                                  , product='CMFCore'
+                                  , factory='manage_addPortalFolder'
+                                  , filter_content_types=0
+                                  )
+                             )
+
+        # copy and pasting the object into the folder should raise
+        # an exception
+        copy_cookie = self.app.manage_copyObjects( ids=[ 'folder2' ] )
+        self.assertRaises( ValueError
+                         , folder1.manage_pasteObjects
+                         , copy_cookie
+                         )
+
+    def test_paste_with_restricted_item_content_type_allowed(self):
+        
+        #   Test from CMF Collector #216 (Plone #2186), for the case
+        #   in which the item being pasted *does8 allow adding such
+        #   objects to containers which *do* explicitly grant access.
+        from Products.CMFCore.PortalFolder import PortalFolder
+
+        RESTRICTED_TYPE = 'Restricted Item'
+        UNRESTRICTED_TYPE = 'Unrestricted Container'
+
+        folder1, folder2 = self._initFolders()
+        folder1.portal_type = UNRESTRICTED_TYPE
+        folder2.portal_type = RESTRICTED_TYPE
+
+        self._initPolicyAndUser() # ensure that sec. machinery allows paste
+
+        self.app._setObject( 'portal_types', TypesTool() )
+        types_tool = self.app.portal_types
+        types_tool._setObject( RESTRICTED_TYPE
+                             , FTI( id=RESTRICTED_TYPE
+                                  , title=RESTRICTED_TYPE
+                                  , meta_type=PortalFolder.meta_type
+                                  , product='CMFCore'
+                                  , factory='manage_addPortalFolder'
+                                  , global_allow=0
+                                  )
+                             )
+        types_tool._setObject( UNRESTRICTED_TYPE
+                             , FTI( id=UNRESTRICTED_TYPE
+                                  , title=UNRESTRICTED_TYPE
+                                  , meta_type=PortalFolder.meta_type
+                                  , product='CMFCore'
+                                  , factory='manage_addPortalFolder'
+                                  , filter_content_types=1
+                                  , allowed_content_types=[ RESTRICTED_TYPE ]
+                                  )
+                             )
+
+        # copy and pasting the object into the folder should *not* raise
+        # an exception, because the folder's type allows it.
+        copy_cookie = self.app.manage_copyObjects( ids=[ 'folder2' ] )
+        folder1.manage_pasteObjects( copy_cookie )
+        self.failUnless( 'folder2' in folder1.objectIds() )
+
+    def test_paste_with_restricted_container_content_type(self):
+        
+        #   Test from CMF Collector #216 (Plone #2186), for the case
+        #   in which the container does not allow adding items of the
+        #   type being pasted.
+        from Products.CMFCore.PortalFolder import PortalFolder
+        
+        RESTRICTED_TYPE = 'Restricted Container'
+        UNRESTRICTED_TYPE = 'Unrestricted Item'
+
+        folder1, folder2 = self._initFolders()
+        folder1.portal_type = RESTRICTED_TYPE
+        folder2.portal_type = UNRESTRICTED_TYPE
+
+        self._initPolicyAndUser() # ensure that sec. machinery allows paste
+
+        self.app._setObject( 'portal_types', TypesTool() )
+        types_tool = self.app.portal_types
+        types_tool._setObject( RESTRICTED_TYPE
+                             , FTI( id=RESTRICTED_TYPE
+                                  , title=RESTRICTED_TYPE
+                                  , meta_type=PortalFolder.meta_type
+                                  , product='CMFCore'
+                                  , factory='manage_addPortalFolder'
+                                  , filter_content_types=1
+                                  , allowed_content_types=()
+                                  )
+                             )
+        types_tool._setObject( UNRESTRICTED_TYPE
+                             , FTI( id=UNRESTRICTED_TYPE
+                                  , title=UNRESTRICTED_TYPE
+                                  , meta_type=PortalFolder.meta_type
+                                  , product='CMFCore'
+                                  , factory='manage_addPortalFolder'
+                                  , global_allow=1
+                                  )
+                             )
+
+        # copy and pasting the object into the folder should raise
+        # an exception
+        copy_cookie = self.app.manage_copyObjects( ids=[ 'folder2' ] )
+        self.assertRaises( ValueError
+                         , folder1.manage_pasteObjects
+                         , copy_cookie
+                         )
 
 class DummyTypeInfo:
 
