@@ -25,7 +25,8 @@ from Globals import InitializeClass, DTMLFile
 from AccessControl import ClassSecurityInfo, getSecurityManager
 from Products.CMFCore.utils import UniqueObject, getToolByName, \
      SimpleItemWithProperties, _checkPermission
-from Products.CMFCore.CMFCorePermissions import ManagePortal
+from Products.CMFCore.CMFCorePermissions import ManagePortal, \
+     ModifyPortalContent
 
 from webdav.WriteLockInterface import WriteLockInterface
 from webdav.LockItem import LockItem
@@ -178,7 +179,22 @@ class LockTool(UniqueObject, SimpleItemWithProperties):
         if _checkPermission(UnlockObjects, object):
             return 1
         return 0
-        
+
+
+    security.declarePublic('canChange')
+    def canChange(self, object):
+        """Returns true if the current user can change the given object."""
+        if not WriteLockInterface.isImplementedBy(object):
+            if self.isLockedOut(object):
+                return 0
+        if not _checkPermission(ModifyPortalContent, object):
+            return 0
+        vt = getToolByName(self, 'portal_versions', None)
+        if vt is not None:
+            if (vt.isUnderVersionControl(object)
+                and not vt.isCheckedOut(object)):
+                return 0
+        return 1
 
 InitializeClass(LockTool)
 
