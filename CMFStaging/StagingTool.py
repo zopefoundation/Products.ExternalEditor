@@ -146,8 +146,17 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
     def isStageable(self, object):
         """Returns a true value if the object can be staged."""
         repo = self._getVersionRepository()
-        return (repo.isAVersionableResource(object) and
-                getattr(object, '_stageable', 1))
+        if not repo.isAVersionableResource(object):
+            return 0
+        if not getattr(object, '_stageable', 1):
+            return 0
+        # An object is stageable only if it is located in one of the stages.
+        root = aq_parent(aq_inner(self))
+        for stage_name, path in self._stages.items():
+            stage = root.restrictedTraverse(path, None)
+            if stage is not None and object.aq_inContextOf(stage, 1):
+                return 1
+        return 0      
 
 
     security.declareProtected(StageObjects, 'updateStages')
