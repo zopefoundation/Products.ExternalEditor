@@ -288,6 +288,7 @@ class SyndicationTool (UniqueObject, SimpleItem):
         particular obj is enabled, allowing for turning on only
         specific folders for syndication.
         """
+        #import pdb; pdb.set_trace()
         syInfo = getattr(obj, 'syndication_information',
                          None)
         if syInfo is None:
