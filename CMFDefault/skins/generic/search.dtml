@@ -10,7 +10,7 @@
 items<dtml-if name="SearchableText"> matching "&dtml-SearchableText;"</dtml-if>.</p>
 
 <dtml-in results size="25" start="batch_start">
- <dtml-let objURL="portal_catalog.getpath(data_record_id_) + '/view'"
+ <dtml-let objURL="getURL() + '/view'"
            objIcon="'%s/%s' % ( portal_url(), icon )"
  >
 

@@ -16,7 +16,7 @@
                                         )" size="10">
   <tr class="NewsItemRow">
    <td valign="top">
-    <a href="<dtml-var "portal_catalog.getpath( data_record_id_ )"
+    <a href="<dtml-var "getURL()"
     >"> &dtml-Title; </a><br>
     <dtml-var Date>
    </td>
