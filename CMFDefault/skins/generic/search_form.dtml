@@ -113,7 +113,7 @@
   <th> Item type
   </th>
   <td>
-   <select name="meta_type:list" multiple size="5">
+   <select name="Type:list" multiple size="5">
     <dtml-in expr="portal_types.listTypeInfo()" reverse>
      <option><dtml-var expr="_['sequence-item'].getId()"></option>
     </dtml-in>
