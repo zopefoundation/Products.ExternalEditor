@@ -34,7 +34,7 @@ class EditorProcess:
             except:
                 i += 1
                 if i >= timeout:
-                    raise RuntimeError('Could not launch Homesite.')
+                    raise RuntimeError('Could not launch Word.')
                 sleep(1)
             else:
                 break
@@ -47,8 +47,8 @@ class EditorProcess:
             
     def isAlive(self):
         """Returns true if the editor process is still alive"""
-	head, tail = os.path.split(self.file)
-	head, tail = head.lower(), tail.lower()
+        head, tail = os.path.split(self.file)
+        head, tail = head.lower(), tail.lower()
         for doc in self.wordapp.Documents:
             if head == doc.Path.lower() and tail == doc.Name.lower():
                 return 1
