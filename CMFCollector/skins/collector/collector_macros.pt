@@ -253,7 +253,7 @@
           - last_batch
       </span>
 
-      <table bgcolor="#eeeeee" width="100%"
+      <table width="100%"
              tal:define="url_query nocall: modules/ZTUtils/url_query;
                          make_query nocall: modules/ZTUtils/make_query;
                          base python: url_query(request, omit='b_start')">

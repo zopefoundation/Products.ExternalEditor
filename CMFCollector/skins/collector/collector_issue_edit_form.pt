@@ -31,14 +31,29 @@
     </div>
   </div>
 
-  <h3> Edit Collector Issue <span tal:replace="here/id"></span> </h3>
+  <table width="100%">
 
-  <p>
-    Adjust various issue data - the current settings are indicated above.  Use
-    the regular issue followup, instead, to change the issue workflow state or
-    assigned supporters, and use the folder contents view to change the
-    uploads.
-  </p>
+    <tr bgcolor="ccffcc">
+      <td>
+        <font size="+1">
+          <strong>
+            Edit Collector Issue <span tal:replace="here/id"></span>
+          </strong>
+        </font>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <p>
+          Adjust various issue data - the current settings are indicated
+          above.  Use the regular issue followup, instead, to change the issue
+          workflow state or assigned supporters, and use the folder contents
+          view to change the uploads.
+        </p>
+      </td>
+    </tr>
+  </table>
 
   <form method="POST" enctype="multipart/form-data"
         action="collector_issue_edit">
@@ -51,6 +66,7 @@
       </span>
 
       <table>
+
         <tr>
           <td> ISSUE TITLE </td>
           <td metal:fill-slot="issue_title_slot" colspan="3">

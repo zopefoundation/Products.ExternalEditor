@@ -34,12 +34,16 @@
 
     <table tal:define="actions_pairs here/valid_actions_pairs">
 
-      <tr>
-        <th align="left" NOWRAP>
+      <tr bgcolor="#ccffcc">
+        <td NOWRAP colspan="DEPENDS"
+            tal:attributes="colspan python: (here.no_submitter_email() and 2)
+                                            or 3">
           <font size="+1">
-            Issue <span tal:replace="here/id">ID</span>
+            <strong>
+              Issue <span tal:replace="here/id">ID</span>
+            </strong>
           </font>
-        </th>
+        </td>
         <td tal:condition="here/no_submitter_email" align="right">
           <em>
             Note: We have no submitter address, so they won't get followups.

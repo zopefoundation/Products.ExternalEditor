@@ -24,8 +24,6 @@
 
 <div metal:fill-slot="main">	  
 
-  <h2> Submit New Issue </h2>
- 
   <div tal:define="pm python: here.portal_membership;
                    member python: pm.getAuthenticatedMember();
                    authenticated python: member.has_role('Authenticated')
@@ -35,6 +33,16 @@
         action="collector_add_issue">
 
       <table class="FormLayout">
+
+        <tr bgcolor="#ccffcc">
+          <td colspan="5" align="center">
+            <font size="+1"> <strong> Submit A New Issue </strong> </font>
+          </td>
+        </tr>
+
+        <tr>
+          <td> &nbsp; </td>
+        </tr>
 
        <tr valign="top">
         <th align="right"> Issue Title </th>

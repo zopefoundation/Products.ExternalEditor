@@ -28,12 +28,14 @@
     <table tal:define="entries here/action_number;
                        ending python: (entries == 1 and 'y') or 'ies'">
 
-      <tr>
-        <th colspan="2" align="left">
+      <tr bgcolor="#ccffcc">
+        <td colspan="2" align="center">
           <font size="+1">
-            Issue <span tal:replace="here/id">ID</span> Transcript
+            <strong>
+              Issue <span tal:replace="here/id">ID</span> Transcript
+            </strong>
           </font>
-        </th>
+        </td>
       </tr>
       <tr>
         <th colspan="2" align="left">

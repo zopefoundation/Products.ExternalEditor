@@ -24,10 +24,18 @@
 
 <div metal:fill-slot="main">	  
 
-<h2> Configure Collector </h2>
- 
 <form action="collector_edit" method="post">
 <table class="FormLayout" width="100%">
+ 
+ <tr bgcolor="#ccffcc">
+  <td align="center" colspan="4">
+    <font size="+1"> <strong> Configure Collector </strong> </font>
+  </td>
+ </tr>
+
+ <tr>
+  <td> &nbsp; </td>
+ </tr>
  
  <tr valign="top">
   <th align="right"> Title

@@ -46,18 +46,26 @@
                  next batch/next|nothing;
                  last_batch python: max(int(here.length()) - BATCHSIZE, 1)">
 
-    <div metal:use-macro="here/collector_macros/macros/issue_batch_nav">
-      ISSUE-BATCH NAVIGATION
-    </div>
-
-    <table class="FormLayout">
+    <table class="FormLayout" cellspacing="0">
+      <tr bgcolor="#ccffcc">
+        <td colspan="3">
+          <div metal:use-macro="here/collector_macros/macros/issue_batch_nav">
+            ISSUE-BATCH NAVIGATION
+          </div>
+        </td>
+      </tr>
 
       <tbody tal:repeat="itemnum python: range(len(batch))">
 
-        <tr tal:define="global item python: batch[itemnum];
+        <tr bgcolor="ALTERNATING"
+            tal:attributes="bgcolor alternatingcolor"
+            tal:define="global item python: batch[itemnum];
                         itemurl item/getURL;
                         itemtype item/Type|nothing;
-                        icon item/getIcon|item/icon|nothing">
+                        icon item/getIcon|item/icon|nothing;
+                        odd repeat/itemnum/odd;
+                        global alternatingcolor python:
+                                                ['#ffffff', '#eeeeee'][odd]">
 
           <td>
              <a href=""
@@ -90,18 +98,14 @@
           </td>
 
         </tr>
-        <tr>
 
-        <tr tal:define="crdate item/created;
+        <tr tal:attributes="bgcolor alternatingcolor"
+            tal:define="crdate item/created;
                         moddate item/modified;
                         global numcmts python: int(item.action_number)-1;
                         datesdiff python: ((moddate - crdate) * 86400) > 30">
-          <td> <font color="gray"> # </font> </td>
-          <td>
-            <font color="gray">
-              <span tal:replace="python: itemnum + b_start + 1">#</span>
-            </font>
-          </td>
+          <td> </td>
+          <td> </td>
 
           <td>
 
@@ -118,12 +122,13 @@
             </span>
           </td>
 
-       </tr>
+        </tr>
 
-       <tr tal:define="security python: item.security_related;
-                       confidential python: split(item.status, '_')[-1]
-                                             == 'confidential';
-                       plrlcmts python: (numcmts != 1) and 's' or ''">
+        <tr tal:attributes="bgcolor alternatingcolor"
+            tal:define="security python: item.security_related;
+                        confidential python: split(item.status, '_')[-1]
+                                              == 'confidential';
+                        plrlcmts python: (numcmts != 1) and 's' or ''">
           <td> </td>
           <td> </td>
           <td NOWRAP>
@@ -168,7 +173,8 @@
 
         </tr>
 
-        <tr tal:condition="item/Description">
+        <tr tal:attributes="bgcolor alternatingcolor"
+            tal:condition="item/Description">
           <td> </td>
           <td> </td>
           <td colspan="7">
@@ -181,11 +187,14 @@
 
       </tbody>
 
+      <tr bgcolor="#ccffcc">
+        <td colspan="3">
+          <div metal:use-macro="here/collector_macros/macros/issue_batch_nav">
+            ISSUE-BATCH NAVIGATION
+          </div>
+        </td>
+      </tr>
     </table>
-
-    <div metal:use-macro="here/collector_macros/macros/issue_batch_nav">
-      ISSUE-BATCH NAVIGATION
-    </div>
 
     <form action="RETURNHERE" method="get"
           tal:attributes="action python: here.absolute_url()
