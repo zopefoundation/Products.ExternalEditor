@@ -129,7 +129,7 @@
 <!-- end user_menu_bar div-->
 </div>
 
-<div metal:define-macro="main_body">
+<div id="main_body">
 
 
  <table class="Forematter"
