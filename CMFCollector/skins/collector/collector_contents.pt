@@ -46,7 +46,7 @@
                  next batch/next|nothing;
                  last_batch python: max(int(here.length()) - BATCHSIZE, 1)">
 
-    <table class="FormLayout" cellspacing="0">
+    <table class="FormLayout" cellspacing="0" border="0">
       <tr bgcolor="#ccffcc">
         <td colspan="3">
           <div metal:use-macro="here/collector_macros/macros/issue_batch_nav">
@@ -104,8 +104,8 @@
                         moddate item/modified;
                         global numcmts python: int(item.action_number)-1;
                         datesdiff python: ((moddate - crdate) * 86400) > 30">
-          <td> </td>
-          <td> </td>
+          <td> &nbsp; </td>
+          <td> &nbsp; </td>
 
           <td>
 
@@ -129,8 +129,8 @@
                         confidential python: split(item.status, '_')[-1]
                                               == 'confidential';
                         plrlcmts python: (numcmts != 1) and 's' or ''">
-          <td> </td>
-          <td> </td>
+          <td> &nbsp; </td>
+          <td> &nbsp; </td>
           <td NOWRAP>
 
             <!-- The color indicates whether the item is security-related, and
@@ -175,9 +175,9 @@
 
         <tr tal:attributes="bgcolor alternatingcolor"
             tal:condition="item/Description">
-          <td> </td>
-          <td> </td>
-          <td colspan="7">
+          <td> &nbsp; </td>
+          <td> &nbsp; </td>
+          <td>
             <font color="gray"
                   tal:content="python: item.Description[:DESCRLEN]
                                + (item.Description[DESCRLEN:] and '...')">
@@ -206,8 +206,11 @@
 
         <table>
           <tr>
-            <td colspan="6" align="center">
+            <td align="center">
               <input type="Submit" value="Search">
+            </td>
+            <td>
+              <input type="reset" value="Reset">
             </td>
           </tr>
           <tr>
@@ -221,7 +224,7 @@
           <tr>
             <th align="center"> Status </th>
             <th align="center"> Requester</th>
-            <th align="center"> Supporter </th>
+            <th align="center"> Assigned </th>
             <th align="center"> Security Related </th>
           </tr>
           <tr>

@@ -32,11 +32,12 @@
   <form method="POST" enctype="multipart/form-data"
         action="collector_issue_followup">
 
-    <table tal:define="actions_pairs here/valid_actions_pairs">
+    <table tal:define="actions_pairs here/valid_actions_pairs"
+      border="0" cellspacing="0">
 
       <tr bgcolor="#ccffcc">
         <td NOWRAP colspan="DEPENDS"
-            tal:attributes="colspan python: (here.no_submitter_email() and 2)
+            tal:attributes="colspan python: (here.no_submitter_email() and 1)
                                             or 3">
           <font size="+1">
             <strong>
