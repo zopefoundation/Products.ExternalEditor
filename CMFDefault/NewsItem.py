@@ -91,134 +91,55 @@ ADD_CONTENT_PERMISSION = 'Add portal content'
 import Globals
 from Globals import HTMLFile, HTML
 from Discussions import Discussable
-from Products.CMFCore.PortalContent import PortalContent
-from DublinCore import DefaultDublinCoreImpl
+from Document import Document
 from utils import parseHeadersBody
 
 from Products.CMFCore import CMFCorePermissions
+from AccessControl import ClassSecurityInfo
 from Products.CMFCore.WorkflowCore import WorkflowAction, afterCreate
 
 def addNewsItem( self
                , id
                , title=''
-               , text=''
                , description=''
+               , text=''
+               , text_format='html'
                ):
     """
         Add a NewsItem
     """
-    o=NewsItem( id, title, text, description )
+    o=NewsItem( id=id
+              , title=title
+              , description=description
+              , text=text
+              , text_format=text_format
+              )
     self._setObject(id, o)
     afterCreate(self.this()._getOb(id))
 
 
-class NewsItem( PortalContent
-              , DefaultDublinCoreImpl
-              ):
+class NewsItem( Document ):
     """
         A News Item
     """
 
     meta_type='News Item'
-    effective_date = expiration_date = None
-    _isDiscussable = 1
 
-    __ac_permissions__=(
-        (CMFCorePermissions.View, ('')),
-        (CMFCorePermissions.ModifyPortalContent, ('edit',)),
-        )
+    security = ClassSecurityInfo()
 
-    def __init__( self
-                , id
-                , title=''
-                , text=''
-                , description=''
-                ):
-        DefaultDublinCoreImpl.__init__(self)
-        self.id=id
-        self.title=title
-        self.text=text
-        self.description = description
-        self._parse()
-
-    def edit( self, text, description ):
+    def _edit( self, text, description=None, text_format=None ):
         """
             Edit the News Item
         """
-        self.text=text
-        self.description=description
-        self._parse()
-    edit = WorkflowAction(edit)
+        if text_format is None:
+            text_format = self.text_format
+        if description is not None:
+            self.setDescription( description )
+        Document._edit( self, text_format, text )
 
-    def _parse(self):
-        self.cooked_text=self._format_text(self)     
-        
-    _format_text=HTML('''<dtml-var text fmt="structured-text">''')
+    security.declareProtected( CMFCorePermissions.ModifyPortalContent, 'edit' )
+    edit = WorkflowAction( _edit )
 
-    def SearchableText(self):
-        """
-            text for indexing
-        """
-        return "%s %s %s" % (self.title, self.description, self.text)
 
-    def Description(self):
-        """
-            description for indexing
-        """
-        return self.description
-
-    ## FTP handlers
-
-    def PUT(self, REQUEST, RESPONSE):
-        """Handle HTTP (and presumably FTP?) PUT requests"""
-        try:
-            self.dav__init(REQUEST, RESPONSE)
-
-            headers = {}
-            for k, v in self.getMetadataHeaders():
-                if k != 'Format':
-                    headers[k] = v
-
-            body = REQUEST.get( 'BODY', '')
-            headers, body = parseHeadersBody( body, headers )
-
-            if not headers.has_key( 'Format' ): # not supplied in headers
-                from NullPortalResource import sniffContentType
-                sniffFmt = sniffContentType( self.getId(), body )
-                fmt = REQUEST.get_header( 'content-type', sniffFmt )
-                headers[ 'Format' ] = fmt
-
-            self.editMetadata( title=headers['Title']
-                             , subject=headers['Subject']
-                             , description=headers['Description']
-                             , contributors=headers['Contributors']
-                             , effective_date=headers['Effective_date']
-                             , expiration_date=headers['Expiration_date']
-                             , format=headers['Format']
-                             , language=headers['Language']
-                             , rights=headers['Rights']
-                             )
-            self.edit( title=self.Title()
-                     , description=self.Description()
-                     , text=body
-                     )
-            RESPONSE.setStatus(204)
-            return RESPONSE
-        except:
-            import traceback
-            traceback.print_exc()
-            raise
-
-    def manage_FTPget(self):
-        "Get the document body for FTP download"
-        from string import join
-        hdrlist = self.getMetadataHeaders()
-        hdrtext = join( map( lambda x: '%s: %s' % ( x[0], x[1] )
-                           , hdrlist
-                           )
-                      , '\n'
-                      )
-        return '%s\n\n%s' % ( hdrtext, self.text )
-
-Globals.default__class_init__(NewsItem)
+Globals.InitializeClass( NewsItem )
 

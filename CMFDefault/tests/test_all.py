@@ -1,5 +1,6 @@
 import unittest
 from Products.CMFDefault.tests import test_Document
+from Products.CMFDefault.tests import test_NewsItem
 from Products.CMFDefault.tests import test_Image
 from Products.CMFDefault.tests import test_MetadataTool
 from Products.CMFDefault.tests import test_utils
@@ -11,6 +12,7 @@ def main():
     """
     suite = unittest.TestSuite((
         test_Document.test_suite(),
+        test_NewsItem.test_suite(),
         test_Image.test_suite(),
         test_MetadataTool.test_suite(),
         test_utils.test_suite(),

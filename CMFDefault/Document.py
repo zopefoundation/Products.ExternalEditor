@@ -135,7 +135,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
         self.description = description
         self.text = text
         self.text_format = text_format
-        self.edit(text_format, text)
+        self.edit( text_format=text_format, text=text )
 
     security.declareProtected(CMFCorePermissions.ModifyPortalContent,
                               'manage_edit')
