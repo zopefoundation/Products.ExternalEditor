@@ -13,8 +13,6 @@
 """Customizable properties that come from the filesystem."""
 __version__='$Revision$'[11:-2]
 
-from string import split, strip
-
 import Globals
 import Acquisition
 from OFS.Folder import Folder
@@ -59,7 +57,7 @@ class FSPropertiesObject (FSObject, PropertyManager):
         FSObject.manage_doCustomize(self, folder_path, RESPONSE)
 
         if RESPONSE is not None:
-            fpath = tuple(split(folder_path, '/'))
+            fpath = tuple(folder_path.split('/'))
             folder = self.restrictedTraverse(fpath)
             RESPONSE.redirect('%s/%s/manage_propertiesForm' % (
                 folder.absolute_url(), self.getId()))
@@ -102,20 +100,20 @@ class FSPropertiesObject (FSObject, PropertyManager):
         for line in lines:
 
             lino = lino + 1
-            line = strip( line )
+            line = line.strip()
 
             if not line or line[0] == '#':
                 continue
 
             try:
-                propname, proptv = split( line, ':' )
+                propname, proptv = line.split(':')
                 #XXX multi-line properties?
-		proptype, propvstr = proptv.split( '=', 1 ) # split( proptv, '=' )
-                propname = strip(propname)
-                proptv = strip(proptv)
-                propvstr = strip(propvstr)
+        	    proptype, propvstr = proptv.split( '=', 1 ) 
+                propname = propname.strip()
+                proptv = proptv.strip()
+                propvstr = propvstr.strip()
                 converter = get_converter( proptype, lambda x: x )
-                propvalue = converter( strip( propvstr ) )
+                propvalue = converter( propvstr )
                 # Should be safe since we're loading from
                 # the filesystem.
                 setattr(self, propname, propvalue)
