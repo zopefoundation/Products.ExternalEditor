@@ -2,6 +2,21 @@ HEAD only (unreleased)
 
   New Features
 
+    - DirectoryView and derived classes: It is now possible to customize what 
+      gets created to represent directories inside the directory view.
+      Previously, the code had a fixed assumption that all directories on the 
+      file system must turn into instances of 
+      CMFCore.DirectoryView.DirectoryView(Surrogate). It is now possible to 
+      register a class deriving from DirectoryView and have that be 
+      instantiated instead.
+
+    - CMFSetup: Sometimes it is not necessary or desirable to create a 
+      snapshot upon initial site creation. Matter of fact when run in a unit 
+      test situation, addConfiguredSite can throw permission errors during the
+      snapshot-taking because no specific SecurityManager has been set up.
+      Add new flag "snapshot" to factory.addConfiguredSite to turn off
+      snapshotting if desired
+
     - ActionsTool: Added new way to define Actions.
       'CMF Action Category' objects can now be added to the portal_actions
       tool and 'CMF Action' objects to categories or subcategories. To
@@ -19,7 +34,10 @@ HEAD only (unreleased)
 
   Bug Fixes
 
-    - 
+    - CMFSetup.skins made the assumption that the CMF site can always
+      acquire REQUEST and would set up the current skin with it. Added a test
+      to see if REQUEST is available and if it is not, skip the step that
+      sets up the current skin.
 
   Others
 
