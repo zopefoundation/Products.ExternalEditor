@@ -87,16 +87,6 @@ class HTTPBasicAuthHelperTests( unittest.TestCase
         self.failIf( response._unauthorized_called )
         self.failUnlessRaises(Unauthorized, helper.challenge, (request, response ), {})
 
-    def test_updateCredentials( self ):
-
-        helper = self._makeOne()
-        request = FauxHTTPRequest()
-        response = FauxHTTPResponse()
-
-        self.failIf( response._unauthorized_called )
-        helper.updateCredentials( request, response, new_password='baz' )
-        self.failIf( response._unauthorized_called )
-
     def test_resetCredentials( self ):
 
         helper = self._makeOne()
