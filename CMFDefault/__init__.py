@@ -13,8 +13,6 @@
 """
 """
 
-ADD_CONTENT_PERMISSION = 'Add portal content'
-
 from AccessControl import ModuleSecurityInfo
 
 prod_security = ModuleSecurityInfo( 'Products' )
@@ -31,9 +29,13 @@ import PropertiesTool, MembershipTool, MetadataTool
 import RegistrationTool, URLTool, DublinCore, DiscussionTool
 import SyndicationTool
 from Products.CMFCore import utils
+from Products.CMFCore.CMFCorePermissions import AddPortalContent
 import Products.CMFCore
 from Products.CMFCore.DirectoryView import registerDirectory
 import DefaultWorkflow
+
+# Old name that some third-party packages may need.
+ADD_CONTENT_PERMISSION = AddPortalContent
 
 
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -121,7 +123,7 @@ def initialize( context ):
 
     utils.ContentInit( 'CMFDefault Content'
                      , content_types=contentClasses
-                     , permission=ADD_CONTENT_PERMISSION
+                     , permission=AddPortalContent
                      , extra_constructors=contentConstructors
                      , fti=Portal.factory_type_information
                      ).initialize( context )

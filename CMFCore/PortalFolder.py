@@ -15,9 +15,6 @@
 $Id$
 """
 
-ADD_FOLDERS_PERMISSION = 'Add portal folders'
-ADD_CONTENT_PERMISSION = 'Add portal content'
-
 import sys
 import Globals, re, base64, marshal, string
 

@@ -15,7 +15,7 @@
 $Id$
 """
 
-from Globals import default__class_init__
+from Globals import InitializeClass
 from PortalFolder import PortalFolder
 from Skinnable import SkinnableObjectManager
 from CMFCorePermissions import *
@@ -48,4 +48,4 @@ class PortalObjectBase(PortalFolder, SkinnableObjectManager):
     def getSkinsFolderName(self):
         return PORTAL_SKINS_TOOL_ID
 
-default__class_init__(PortalObjectBase)
+InitializeClass(PortalObjectBase)

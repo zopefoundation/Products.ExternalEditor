@@ -17,12 +17,10 @@ Zope's built-in File object, but modifies the behaviour slightly to
 make it more Portal-friendly.
 """
 
-ADD_CONTENT_PERMISSION = 'Add portal content'
+from Globals import InitializeClass
+from AccessControl import ClassSecurityInfo
 
-
-from Globals import HTMLFile, HTML
 from Products.CMFCore.PortalContent import PortalContent
-import Globals
 from DublinCore import DefaultDublinCoreImpl
 
 from Products.CMFCore.CMFCorePermissions import View
@@ -135,11 +133,8 @@ class File( OFS.Image.File
     _isDiscussable = 1
     icon = PortalContent.icon
 
-    __ac_permissions__ = (
-        (View, ('download',)),
-        (ModifyPortalContent, ('edit',)),
-        )
-    
+    security = ClassSecurityInfo()
+
     def __init__( self
                 , id
                 , title=''
@@ -160,7 +155,8 @@ class File( OFS.Image.File
         DefaultDublinCoreImpl.__init__( self, title, subject, description
                                , contributors, effective_date, expiration_date
                                , format, language, rights )
-    
+
+    security.declareProtected(View, 'SearchableText')
     def SearchableText(self):
         """
         SeachableText is used for full text seraches of a portal.  It
@@ -168,16 +164,19 @@ class File( OFS.Image.File
         """
         return "%s %s" % (self.title, self.description)
 
+    security.declarePrivate('manage_beforeDelete')
     def manage_afterAdd(self, item, container):
         """Both of my parents have an afterAdd method"""
         OFS.Image.File.manage_afterAdd(self, item, container)
         PortalContent.manage_afterAdd(self, item, container)
 
+    security.declarePrivate('manage_beforeDelete')
     def manage_beforeDelete(self, item, container):
         """Both of my parents have a beforeDelete method"""
         PortalContent.manage_beforeDelete(self, item, container)
         OFS.Image.File.manage_beforeDelete(self, item, container)
 
+    security.declarePrivate('_isNotEmpty')
     def _isNotEmpty(self, file):
         """ Do various checks on 'file' to try to determine non emptiness. """
         if not file:
@@ -195,6 +194,7 @@ class File( OFS.Image.File
             if t: return 1
             else: return 0
 
+    security.declarePrivate('_edit')
     def _edit(self, precondition='', file=''):
         """ Perform changes for user """
         if precondition: self.precondition = precondition
@@ -205,6 +205,7 @@ class File( OFS.Image.File
 
         self.setFormat(self.content_type)
 
+    security.declareProtected(ModifyPortalContent, 'edit')
     def edit(self, precondition='', file=''):
         """ Update and reindex. """
         self._edit( precondition, file )
@@ -212,6 +213,7 @@ class File( OFS.Image.File
 
     edit = WorkflowAction(edit)
 
+    security.declareProtected(View, 'download')
     def download(self, REQUEST, RESPONSE):
         """Download this item.
         
@@ -229,5 +231,6 @@ class File( OFS.Image.File
                            'attachment; filename=%s' % self.getId())
         return OFS.Image.File.index_html(self, REQUEST, RESPONSE)
 
-Globals.default__class_init__(File)
+
+InitializeClass(File)
 

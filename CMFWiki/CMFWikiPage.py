@@ -10,7 +10,7 @@ __version__="$Revision$"[11:-2]
 
 from types import *
 import string, re, os
-from Globals import HTMLFile, default__class_init__, package_home
+from Globals import InitializeClass, package_home
 from OFS.DTMLDocument import DTMLDocument
 from OFS.Image import cookId
 from urllib import quote, unquote     # url quoting
@@ -1413,7 +1413,7 @@ def within_literal(upto, after, state, text,
     state['lastend'] = after
     return newinpre or newincode or newintag
 
-default__class_init__(CMFWikiPage)
+InitializeClass(CMFWikiPage)
 
 
 class WikiNesting(Acquisition.Implicit):

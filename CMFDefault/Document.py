@@ -15,8 +15,6 @@
 $Id$
 """
 
-ADD_CONTENT_PERMISSION = 'Add portal content'
-
 import Globals, StructuredText, string, utils, re
 from StructuredText.HTMLWithImages import HTMLWithImages
 from Globals import DTMLFile, InitializeClass
@@ -100,7 +98,6 @@ class Document(PortalContent, DefaultDublinCoreImpl):
     _last_safety_belt = ''
     _safety_belt = ''
 
-    # Declarative security (replaces __ac_permissions__)
     security = ClassSecurityInfo()
 
     def __init__(self, id, title='', description='', text_format='', text=''):
