@@ -1,5 +1,7 @@
 External Editor Change Log
 
+    - Added Photoshop plugin (win32)
+
     - Added HomeSite plugin (win32)
 
     - Added win32 editor plugin support for the helper application.

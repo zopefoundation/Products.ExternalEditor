@@ -322,12 +322,13 @@ class ExternalEditor:
                 if bin is not None:
                     bin = bin.group(1)
             else:
-                bin = command.strip()
+                bin = command.lower().strip()
         else:
             bin = None # TODO Add Unix command extraction
 
         if bin is not None:
             # Try to load the plugin for this editor
+            import Plugins # Just to assert dependancy
             try:
                 module = 'Plugins.%s' % bin
                 Plugin = __import__(module, globals(), locals(), 

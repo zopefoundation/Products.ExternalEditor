@@ -11,10 +11,15 @@
 # FOR A PARTICULAR PURPOSE.
 # 
 ##############################################################################
-"""External Editor HomeSite Plugin
+"""External Editor Photoshop Plugin
 
 $Id$
 """
+
+# Note that Photoshop's com API is not terribly rich and external editor
+# cannot discern from it when a Photoshop file has been closed.
+# Therefore Photoshop should probably be used without DAV locks or
+# with always_borrow_locks enabled
 
 from time import sleep
 import win32com
@@ -23,21 +28,22 @@ from win32com import client # Initialize Client module
 class EditorProcess:
     def __init__(self, file):
         """Launch editor process"""
-        hs = win32com.client.Dispatch('AllaireClientApp.TAllaireClientApp')
+        ps = win32com.client.Dispatch('Photoshop.Application')
         # Try to open the file, keep retrying until we succeed or timeout
         i = 0
         timeout = 45
         while i < timeout:
             try:
-                hs.OpenFile(file)
+                fileconn = ps.Open(file)
             except:
+                print 'open failure: ', i
                 i += 1
                 if i >= timeout:
-                    raise RuntimeError('Could not launch Homesite.')
+                    raise RuntimeError('Could not launch Photoshop.')
                 sleep(1)
             else:
                 break
-        self.hs = hs
+        self.fileconn = fileconn
         self.file = file
         
     def wait(self, timeout):
@@ -46,20 +52,19 @@ class EditorProcess:
             
     def isAlive(self):
         """Returns true if the editor process is still alive"""
-        return self.hs.IsFileOpen(self.file)
+        # Photoshop has no API for checking if a file is still open
+        # This workaround just checks if the file connection is
+        # still accessible. It will be until Photoshop itself is closed 8^/
+        try:
+            self.fileconn.Title # See if the file is still accessible
+        except:
+            return 0
+        return 1
 
 def test():
-    import os
-    from time import sleep
-    from tempfile import mktemp
-    fn = mktemp('.html')
-    f = open(fn, 'w')
-    f.write('<html>\n  <head></head>\n  <body>\n  </body>\n</html>')
-    f.close()
-    print 'Connecting to HomeSite...'
-    f = EditorProcess(fn)
-    print 'Attached to %s %s' % (`f.hs`, f.hs.VersionText)
-    print ('%s is open...' % fn),
+    print 'Connecting to Photoshop...'
+    f = EditorProcess('C:\\Windows\\Cloud.gif')
+    print ('%s is open...' % f.fileconn.Title),
     if f.isAlive():
         print 'yes'
         print 'Test Passed.'

@@ -135,14 +135,14 @@ Zope External Editor
     
       The available options for all sections of the config file are:
 
-      editor -- Command line used to launch the editor application. On Windows,
-      if no editor setting is found for an object you edit, the helper app will
-      search the file type registry for an appropriate editor based on the
-      content-type or file extension of the object (which can be  specified
-      using the extension option below). By default, the file path of the local
-      file being edited is appended to this command line. To insert the file
-      path in the middle of your command, use "$1" for Unix and "%1" for
-      Windows respectively.
+      editor -- Command line or plugin name used to invoke the editor
+      application. On Windows, if no editor setting is found for an object you
+      edit, the helper app will search the file type registry for an
+      appropriate editor based on the content-type or file extension of the
+      object (which can be specified using the extension option below). By
+      default, the file path of the local file being edited is appended to
+      this command line. To insert the file path in the middle of your
+      command, use "$1" for Unix and "%1" for Windows respectively.
 
       save_interval -- (float) The interval in seconds that the helper 
       application checks the edited file for changes.
@@ -154,7 +154,7 @@ Zope External Editor
       suppresses warnings when trying to edit an object you have already locked.
       When enabled, external editor will always "borrow" the existing lock token
       instead of doing the locking itself. This is useful when using CMFStaging
-      for instance. If omitted, this option defaults to 0. (new in 0.5)
+      for instance. If omitted, this option defaults to 0.
 
       cleanup_files -- (1 or 0) Whether to delete the temp files created.
       WARNING the temp file coming from the browser contains authentication
@@ -198,12 +198,66 @@ Zope External Editor
       editor by meta-type, the locking settings by domain and the remaining 
       options under general for a given object.
       
+  Editor Plugins (New in 0.6)
+
+    For tighter client-side integration, external editor has a plugin system
+    that allows it to interact directly with supported applications.
+
+    On Windows this generally means using COM to invoke the application, open
+    the content file and wait for the user to save and close the file. Because
+    each application has different remote scripting capabilities and APIs,
+    editor specific plugins must be written tailored to each supported
+    application and platform.
+
+    This system allows external editor to efficiently connect to running
+    applications without relaunching them and therefore fully support MDI 
+    environments. The following applications currently have plugin support::
+
+      Application       Platform    Plugin Module(s)
+      ===============================================
+      HomeSite          Windows     homesite5, homesite
+      Photoshop         Windows     photoshp, photoshop
+
+    External editor will attempt to load a plugin for any application before
+    using the general editor control method. It does this by matching the
+    name of the application executable file (sans extension) in the editor
+    command line with the available plugins. 
+
+    Because plugins do not require the path of the editor application to work,
+    you can simply specify the plugin module name for your editor in the
+    configuration file if desired. For example, to specify Photoshop for all
+    image files, use add the following section to your config file
+    (ZopeEdit.ini on Windows)::
+
+      [content-type:image/*]
+      editor=photoshop
+
+    This is only a shortcut and specifying the full application path will
+    still use the plugin where possible.
+
+    Plugin Notes
+
+      Photoshop -- Photoshop's COM API is quite limited, and external editor
+      cannot detect that you have closed a file until you exit the entire
+      application (it can still detect saves). Therefore you may want to turn 
+      off DAV locking (use_locks=0) or borrow locks (always_borrow_locks=1)
+      when using it.      
+
+      If your favorite editor needs a plugin because the general support is
+      not good enough, please let me know. Keep in mind that I must be able to
+      run a copy of the application in order to develop a plugin for it. So, 
+      unless the application is free, or a full demo is available for download
+      I won't be able to help much. Plugins are not difficult to write, and I
+      encourage you to write one for your favorite editor, start by reading
+      one of the existing ones. I am happy to include third-party plugins with
+      the distribution.
+    
   Permissions
   
-    External editing is governed by the permission "Use external editor". Users
-    with this permission can launch external editor from editable objects. In
-    order to save changes, users will need additional permissions appropriate
-    for the objects they are editing.
+    External editing is governed by the permission "Use external editor".
+    Users with this permission can launch external editor from editable
+    objects. In order to save changes, users will need additional permissions
+    appropriate for the objects they are editing.
     
     If users wish to use the built-in locking support, they must have the
     "WebDAV access", "WebDAV Lock items" and "WebDAV Unlock items" permissions
@@ -216,8 +270,8 @@ Zope External Editor
   
     The external editor product in zope installs a globally available object
     that can format objects accessible through FTP/DAV for use by the helper
-    application. You can take advantage of this functionality easily in your own
-    content management applications.
+    application. You can take advantage of this functionality easily in your
+    own content management applications.
     
     Say you have an FTP editable object, "document", in a Zope folder named
     "my_stuff". The URL to view the object would be::
