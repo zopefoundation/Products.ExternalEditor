@@ -161,6 +161,9 @@ def _verifyActionPermissions(obj, action):
 
 security.declarePublic( 'getActionContext' )
 def getActionContext( self ):
+    # getActionContext is deprecated and might be removed some day.
+    # This is only used by the deprecated _getViewFor function and the
+    # getActionById method which might also become deprecated.
     data = { 'object_url'   : ''
            , 'folder_url'   : ''
            , 'portal_url'   : ''
