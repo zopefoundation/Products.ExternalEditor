@@ -65,10 +65,10 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
         }
     # mapping of mnemonic pseudorole name (used by forms) to actual role name
     _roles_map = {
-        'everyone':'Anonymous',
-        'anyone':'Anonymous',
-        'nonanon':'Authenticated',
-        'owners':'Owner',
+        'everyone': ('Anonymous', 'Authenticated'),
+        'anyone': ('Anonymous', 'Authenticated'),
+        'nonanon': ('Authenticated',),
+        'owners':('Owner',),
         }
     # _roles_map backwards
     _reverse_roles_map = {
@@ -103,8 +103,11 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
     set(CMFWikiPermissions.Comment, ('Owner', 'Manager', 'Authenticated'))
     set = None
 
-    def __init__(self, file, __name__):
-        DTMLDocument.__init__(self, file, mapping=None, __name__=__name__)
+    def __init__(self, file=None, __name__='', source_string='', mapping=None):
+        DTMLDocument.__init__(self, file=file,
+                              mapping=mapping,
+                              __name__=__name__,
+                              source_string=source_string)
         DefaultDublinCoreImpl.__init__(self)
 
     security.declarePublic('getId')
@@ -584,11 +587,11 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
     def setOp(self, op, usernames, category):
         """Set who can do a particular operation."""
         if category is None:
-            raise "Programmer error, emasculate programmer"
+            raise "Programmer error, eviscerate programmer"
         this_perm = self._perms[op]
-        this_role = self._roles_map[category]
+        these_roles = self._roles_map[category]
         this_local_role = self._local_roles_map[op]
-        self.manage_permission(this_perm, [this_role])
+        self.manage_permission(this_perm, these_roles)
         for username in usernames:
             username and \
                      self.manage_addLocalRoles(username,[this_local_role])
@@ -716,9 +719,9 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
         # also carry over permissions from parent page.
         for op, permission in ob._perms.items():
             pseudoperm = self.opCategory(op)
-            this_role = self._roles_map[pseudoperm]
+            these_roles = self._roles_map[pseudoperm]
             this_local_role = self._local_roles_map[op]
-            roles = [this_local_role, this_role]
+            roles = (this_local_role,) + these_roles
             ob.manage_permission(permission, roles=roles)
 
         # propagate parent local Wiki roles settings
@@ -1821,7 +1824,7 @@ def makeCMFWikiPage(id, title, file):
         pseudoperm = default_perms[name]
         local_roles_map = ob._local_roles_map
         roles_map = ob._roles_map
-        roles = [local_roles_map[name], roles_map[pseudoperm]]
+        roles = (local_roles_map[name],) + roles_map[pseudoperm]
         ob.manage_permission(perm, roles=roles)
     return ob
 
