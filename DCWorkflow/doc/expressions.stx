@@ -16,8 +16,8 @@ following names are also available.
 
 - 'kwargs' is the keyword arguments passed to the doActionFor() method.
 
-- 'getHistory', a function that returns a copy of the object's workflow
-   history.
+- 'getHistory()', a function that returns a copy of the object's workflow
+   history.  'getPortal()' returns the root of the portal.
 
 - All status variables, including the current state.
 

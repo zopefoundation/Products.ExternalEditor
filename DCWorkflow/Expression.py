@@ -148,11 +148,16 @@ class Expression (Persistent):
 Globals.InitializeClass(Expression)
 
 
-def exprNamespace(object, workflow, status,
+def exprNamespace(object, workflow, status=None,
                   transition=None, new_state=None, kwargs=None):
     md = TemplateDict()
     if kwargs is None:
         kwargs = {}
+    if status is None:
+        tool = aq_parent(aq_inner(workflow))
+        status = tool.getStatusOf(workflow.id, object)
+        if status is None:
+            status = {}
     md._push(status)
     md._push(ExprVars(object, workflow))
     d = {'object': object,
@@ -168,7 +173,7 @@ def exprNamespace(object, workflow, status,
 
 class ExprVars:
     '''
-    Provides names that depend on both the workflow and the object.
+    Provides names that are more expensive to compute.
     '''
 
     def __init__(self, ob, wf):
@@ -190,3 +195,8 @@ class ExprVars:
         else:
             return ()
 
+    def getPortal(self):
+        ob = self._ob
+        while ob is not None and not getattr(ob, '_isPortalRoot', 0):
+            ob = aq_parent(aq_inner(ob))
+        return ob
