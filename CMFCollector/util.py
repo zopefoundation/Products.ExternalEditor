@@ -120,8 +120,6 @@ def format_webtext(text,
     in_pre = at_literal = 0
     got = []
 
-    text = html_quote_nonURLs(text)
-
     for l in text.split('\n'):
 
         if not l:
@@ -131,42 +129,61 @@ def format_webtext(text,
         at_literal = (l.startswith(" ") or l.startswith("&gt;"))
 
         if at_literal:
-            # Can't open or close <pre> in literal - since it's cited/escaped.
-            got.append(l.replace(" ", "&nbsp;"))
+            # In a cited or leading-whitespace literal.
+            got.append(_webtext_format_line(l, do_whitespace=1))
                        
         elif in_pre:
-            got.append(l.replace(" ", "&nbsp;"))
-            # Check for closing pre:
+            # In a pre.
             x = unpresplit(l)
             if len(x) > 1 and not presearch(x[-1]):
                 in_pre = 0
+            got.append(_webtext_format_line(l, do_whitespace=1))
 
         else:
-            # Non-literal:
-            got.append(urlexpsub(r'<a href="\1">\1</a>', l))
-            # Check for opening pre:
+            # Non-literal case.
             x = presplit(l)
             if len(x) > 1 and not unpresearch(x[-1]):
                 # The line has a prevailing <pre>.
                 in_pre = 1
+            got.append(_webtext_format_line(l))
             
     return "<br>\n".join(got)
 
-def html_quote_nonURLs(text):
-    """html_quote everything in text except for URLs."""
-    urlmatches = list_search_hits(text, urlexp)
-    if not urlmatches:
-        return html_quote(text)
+def _webtext_format_line(line,
+                         do_html_quote=1, do_links=1, do_whitespace=0):
+    """
+    Turn URLs into links, and html_quote everything else."""
+
+    if do_links:
+        urlmatches = list_search_hits(line, urlexp)
     else:
-        got = []
-        cursor = 0
-        for m in urlmatches:
-            curstart, curend = m.start(), m.end()
-            got.append(html_quote(text[cursor:curstart]))
-            got.append(text[curstart:curend])
-            cursor = curend
-        if cursor < len(text):
-            got.append(html_quote(text[cursor:]))
+        urlmatches = []
+
+    got = []
+    cursor = 0
+    lenline = len(line)
+    while cursor < lenline:
+
+        if urlmatches:
+            urlmatch = urlmatches.pop(0)
+            curstart, curend = urlmatch.start(), urlmatch.end()
+        else:
+            urlmatch = None
+            curstart = curend = lenline
+
+        nonurl = line[cursor:curstart]
+        if do_html_quote:
+            nonurl = html_quote(nonurl)
+        if do_whitespace:
+            nonurl = nonurl.replace(" ", "&nbsp;")
+        got.append(nonurl)
+
+        if urlmatch:
+            url = line[curstart:curend]
+            got.append('<a href="%s">%s</a>' % (url, url))
+
+        cursor = curend
+
     return "".join(got)
 
 def list_search_hits(text, exprobj):
@@ -181,6 +198,28 @@ def list_search_hits(text, exprobj):
         else:
             break
     return got
+
+def test_webtext_format_line():
+    wfl = _webtext_format_line
+    assert wfl("") == ""
+    assert wfl("x") == "x"
+    assert wfl(" ") == " "
+    assert wfl("& < >") == "&amp; &lt; &gt;"
+    assert wfl(" ", do_whitespace=1) == "&nbsp;"
+    subj = "http://www.zope.org and so on"
+    assert wfl(subj) == ('<a href="http://www.zope.org">'
+                         'http://www.zope.org</a>'
+                         ' and so on')
+    assert wfl(subj, do_whitespace=1) == ('<a href="http://www.zope.org">'
+                                          'http://www.zope.org</a>'
+                                          '&nbsp;and&nbsp;so&nbsp;on')
+    subj = "<http://www.zope.org&value=1> and so on"
+    assert wfl(subj) == ('&lt;<a href="http://www.zope.org&value=1">'
+                         'http://www.zope.org&value=1</a>&gt;'
+                         ' and so on')
+    subj = "... http://www.zope.org&value=1"
+    assert wfl(subj) == ('... <a href="http://www.zope.org&value=1">'
+                         'http://www.zope.org&value=1</a>')
 
 
 # Match group 1 is citation prefix, group 2 is leading whitespace:
