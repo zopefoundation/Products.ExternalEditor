@@ -45,9 +45,9 @@ Installing CMFCollector
 
       o title (optional): Install Collector Content Types
 
-      o module name: CMFCollector.InstallCollector
+      o module name: CMFCollector.Install
 
-      o function name: install_collector
+      o function name: install
 
     Go to the management screen for the newly added external method and
     click the 'Try it' tab.
