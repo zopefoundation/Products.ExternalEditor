@@ -1,4 +1,4 @@
-The Zope Content Managment Framework
+The Zope Content Management Framework
 
   Introduction
 
@@ -88,7 +88,7 @@ Creating a CMF site
               data. You may also select "I have an existing user folder and want
               to use it instead". In this case, the CMF Site will draw its member
               information from a User Folder that already exists in the Zope 
-              object heirarchy above the new CMF Site.
+              object hierarchy above the new CMF Site.
         
             - **Description** -- A short description of the site. This description
               may be made available with syndicated content and may be used by 
@@ -191,7 +191,7 @@ Creating CMF Folders
           Folders may used in CMF to help organize content. Folders may contain 
           any kind of content object, including subfolders.
         
-          To create a new Folder at a given place in the site heirarchy, navigate
+          To create a new Folder at a given place in the site hierarchy, navigate
           to the place where you want to add the new Folder, then click the 
           "Folder Contents" link in the actions box. This will bring up the 
           "desktop" view of the current Folder, listing the content objects 
@@ -254,7 +254,7 @@ Creating a CMF Topic
         
         
           One of the ways you can manage the structure of a CMF site is by using
-          CMF Topics.  Often a site is comprised of a large amount
+          CMF Topics.  Often a site is composed of a large amount
           of content through which visitors are able to navigate.  A Topic
           allows you to create a dynamic view onto the available content
           enabling visitors to "drill down" into that content.
@@ -313,7 +313,7 @@ Creating a CMF Topic
               criteria of containing Topic objects when constructing the virtual
               contents list. Selecting this option (the default) allows you to 
               provide progressively narrower drill-down views of your content by 
-              building a heirarchy of Topics that refine the searches of higher 
+              building a hierarchy of Topics that refine the searches of higher 
               level Topics.
         
           Click the "Change" button to save the changes to the Topic object.
@@ -356,7 +356,7 @@ Configuring CMF Topics
         
               - **String Criterion** -- The value to search for is a string.
         
-              - **Integer Criteron** -- The value to search for is an integer. This
+              - **Integer Criterion** -- The value to search for is an integer. This
                 may be used to match against integer content attributes.
         
               - **List Criterion** -- Match against the selected attribute using a 
@@ -508,7 +508,7 @@ Configuring metadata policies
         
         
           Content objects in the CMF support rich metadata. The CMF supports 
-          the Dublic Core metadata standard, and instances of all of the builtin 
+          the Dublin Core metadata standard, and instances of all of the builtin 
           CMF content types are associated with Dublin Core metadata. Content 
           objects provide Web forms that allow content creators to enter and 
           maintain metadata for their content.
@@ -818,7 +818,7 @@ Modifying existing workflows
 Viewing personal content
 
         
-        Many times content creators will be required to revist content
+        Many times content creators will be required to revisit content
         items for updating the content or performing some other series
         of editing tasks.  The following steps walk you through
         searching for all of the content in the CMF you have created.
@@ -828,7 +828,7 @@ Viewing personal content
         you will perform your query to obtain a list of content you
         have created.
         
-        Second, enter your login name in the form field labled
+        Second, enter your login name in the form field labeled
         *Creator*.  Make sure you spell it exactly as you type it when
         you login to the CMF.
         
@@ -840,7 +840,7 @@ Viewing personal content
 Creating content objects
 
         
-          CMF Sites are comprised of content; to add content to your
+          CMF Sites are composed of content; to add content to your
           CMF site you will need to create content objects.  There are
           several stock content objects which come with the CMF.  The
           stock content types are Document, Image, File, Link, and
@@ -848,7 +848,7 @@ Creating content objects
         
           To add a content object in the CMF, you will need to
           navigate to a location with the site you have the
-          appropriate privelages to create content.  This could range
+          appropriate privileges to create content.  This could range
           from a specific folder in your CMF which has been configured
           by your CMF administrator or by selecting the 'My Stuff'
           link from your navigation bar.
@@ -862,7 +862,7 @@ Creating content objects
           you have permission to add at this location within the CMF.
           For this example, we are going to use a Document as our
           sample content type to add.  Select Document from the list,
-          and enter an ID for the document in the form field labled
+          and enter an ID for the document in the form field labeled
           **ID** at the bottom of the content add form.  Click the Add
           button to complete the first stage of creating your document
           object.
@@ -896,7 +896,8 @@ Creating content objects
             form is not shared across the different content types and
             will be discussed in more detail below.
         
-            - Change and View - Commit your changes and proceed to viewing your new piece of content.
+            - Change and View - Commit your changes and proceed to
+              viewing your new piece of content.
         
           **Note** although there are 3 options to proceed, to
           complete adding your content, the logical processions is
@@ -904,7 +905,7 @@ Creating content objects
           Metadata' form.
         
         After selecting 'Change and Edit', you proceed onto the edit
-        form for your document.  The docuemtn edit form consists of 2
+        form for your document.  The document edit form consists of 2
         options.  The first option, 'File Upload', allows you to
         author your content offline and upload it to the CMF through
         your web browser.  The second option consists of a 'Body'
@@ -920,9 +921,9 @@ Creating content objects
         
             - 'Simple' edit form (Link, Favorite, Event)
         
-          After you fillout the edit form, select change the change
+          After you fill out the edit form, select change the change
           button.  This concludes creating a content object in the
-          CMF.  Depending on your site's buisness rules, you could be
+          CMF.  Depending on your site's business rules, you could be
           required to submit your new content through a workflow or
           series of workflows.
 
@@ -973,12 +974,12 @@ Managing content metadata
             Creator who have contributed to the content.
         
             - Effective Date -- The date when the content is effective
-            to be publically displayed on the CMF site.  It this is
+            to be publicly displayed on the CMF site.  It this is
             left None, the content is considered to be always
             effective.
         
             - Expiration Date -- The date when the content is to
-            expire from being publically displayed on the CMF site.
+            expire from being publicly displayed on the CMF site.
             It defaults to an extreme date in the future to ensure it
             is by default, never expired.
         
@@ -986,7 +987,7 @@ Managing content metadata
             content item, for example, 'text/html'.
         
             - Language -- An abbreviation of the language the content
-            item is wirtten in, for example, 'en', 'de, etc...
+            item is written in, for example, 'en', 'de, etc...
           
             - Rights -- A copyright and other IP information related
             to the content item.
@@ -995,7 +996,7 @@ Managing content metadata
         item, you next click the Change button.  After clicking the
         Change button, you proceed to the 'Standard Resource Metadata'
         form with a notification message your changes have been
-        sucessfull(1).
+        successful(1).
         
         **Notes:** 1. This seems like a strange procession, we should
         most likely redirect to the full_metadata_editform rather then
@@ -1067,7 +1068,7 @@ Undoing changes
         undoable, but for this example we are going to assume no
         transactions have made the change you wish to undo undoable.
         We will assume you immediately realized you updated some
-        content accidentally and wish to return it to it's premodified
+        content accidentally and wish to return it to it's pre-modified
         state.
         
         
@@ -1079,7 +1080,7 @@ Undoing changes
         To complete the undo, click the undo button.  You will
         redirect to the undo list with a notification your change has
         been undone.  In the case your transaction is undoable, you
-        will recieve a notification message indicating so.  As
+        will receive a notification message indicating so.  As
         mentioned above, it's possible that a transaction is undoable.
         This results from other transactions effecting the object you
         are trying to undo; in which case you must also undo the
@@ -1174,7 +1175,7 @@ Controlling access to content
         choose to search for a user with their email, make sure you
         select 'Email Address' from the **Search by** drop down).
         
-        By clikcing the Search button, you will be returned a list of
+        By clicking the Search button, you will be returned a list of
         user's matching your query.  Select the checkbox corresponding
         to the user(s) from the list returned by your search.  Next,
         Select the role you'd like to give them from the drop down
@@ -1210,7 +1211,7 @@ Browsing content submitted for review
         If items are in the pending state, you will see a link in your
         actions box, indicating items are pending review.  To browse
         the content which has been submitted for review, select the
-        link which is displayed in your actions box similiarly to the
+        link which is displayed in your actions box similarly to the
         following example: 'Pending review (10)'.  In this example, it
         indicates there are 10 item awaiting review in the pending
         queue.
@@ -1375,7 +1376,7 @@ Personalization options
         adjustments to your e-mail, listing status, and/or skin
         preferences and select the change button.  You will return to
         the personalization form with a notification indicating your
-        preferences have been changed sucessfully.
+        preferences have been changed successfully.
         
 
 
@@ -1396,13 +1397,13 @@ Searching site content
         enter the keyword (s) in the search text box in your top
         navigation bar and select the go button.  This allows you to
         search the content cataloged on the site only via the keywords
-        you've choosen to enter into the quick search field.  After
+        you've chosen to enter into the quick search field.  After
         selecting the go button, you proceed to the search results
         list which displays the results of your query.  The advanced
         search form is discussed in more detail next.
         
         If you would like to further parameterize your search or
-        strictly limit your search to only content of a spefic type,
+        strictly limit your search to only content of a specific type,
         you will want to use the advanced search capabilities of the
         CMF.  To access the advanced search form, click the 'search'
         link in the top navigation bar.  This will take you to the
@@ -1431,7 +1432,7 @@ Searching site content
             new since a specific period; for example only search for
             items which have been created in the past month.
         
-            - Type of content you are interestded in -- Searching by
+            - Type of content you are interested in -- Searching by
             content type allows you to only search for content which
             you are interested in.  For example, you might only wish
             to view News Items which have the word 'convention'
@@ -1475,9 +1476,9 @@ Providing feedback on content
         it, select the 'Reply' link from the actions box.
         
         After selecting the 'Reply' link, you will proceed to the
-        feedback form for the content you have choosen to provide
+        feedback form for the content you have chosen to provide
         feedback upon.  Next, you need to enter your comment into the
-        textarea labled **Reply body**.
+        textarea labeled **Reply body**.
         
         After entering your comment or reply, you can either select
         the 'preview' or 'reply' button to proceed.  If you click the
