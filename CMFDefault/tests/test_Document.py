@@ -28,6 +28,7 @@ from re import compile
 from StringIO import StringIO
 
 from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
+from DocumentTemplate.DT_Util import html_quote
 
 from Products.CMFCore.tests.base.content import BASIC_HTML
 from Products.CMFCore.tests.base.content import BASIC_STRUCTUREDTEXT
@@ -160,6 +161,25 @@ class DocumentTests(RequestTestBase):
         _file = StringIO( html )
         d.edit(text_format='html', text='', file=_file)
         self.assertEqual( d.CookedBody(), body )
+
+    def test_Htmltag_removal_and_formatchange(self):
+        """ Test for http://www.zope.org/Collectors/CMF/214 """
+        d = self._makeOne('foo')
+        quoted_html = html_quote(BASIC_HTML)
+
+        # Put HTML into a plain text document
+        d.edit(text_format='plain', text=BASIC_HTML)
+        new_body = d.CookedBody()
+        self.failIf(new_body==BASIC_HTML)
+        self.failUnless(new_body.startswith(quoted_html[:5]))
+
+        # Now we change the format. The body *must* change because
+        # the format change will trigger re-cooking
+        old_body = d.CookedBody()
+        d.setFormat('html')
+        new_body = d.CookedBody()
+        self.failIf(old_body==new_body)
+        self.failIf(new_body==BASIC_HTML)
 
     def test_Html_Fragment(self):
         """test that edits with HTML fragments behave nicely"""

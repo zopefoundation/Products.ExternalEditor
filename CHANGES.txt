@@ -9,7 +9,14 @@ HEAD only (unreleased)
 
   Bug Fixes
 
-    -
+    - Document/NewsItem: If the "plain text" format is selected the 
+      content will no longer be tested for HTML and reduced to text
+      between opening and closing "body" tags
+      (http://www.zope.org/Collectors/CMF/214)
+
+    - Document/NewsItem: A call to setFormat will now re-cook the
+      document content if the format has been changed (arising from
+      discussion about http://www.zope.org/Collectors/CMF/214)
 
   Removed Features
 

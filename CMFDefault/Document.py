@@ -165,7 +165,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
             contents=file.read()
             if contents:
                 text = contents
-        if html_headcheck(text):
+        if html_headcheck(text) and text_format.lower() != 'plain':
             text = bodyfinder(text)
         self.setFormat(text_format)
         self._edit(text=text, text_format=text_format, safety_belt=safety_belt)
@@ -325,6 +325,8 @@ class Document(PortalContent, DefaultDublinCoreImpl):
         """ Set text format and Dublin Core resource format.
         """
         value = str(format)
+        old_value = self.text_format
+
         if value == 'text/html' or value == 'html':
             self.text_format = 'html'
         elif value == 'text/plain':
@@ -334,6 +336,16 @@ class Document(PortalContent, DefaultDublinCoreImpl):
             self.text_format = 'plain'
         else:
             self.text_format = 'structured-text'
+
+        # Did the format change? We might need to re-cook the content.
+        if value != old_value:
+            if html_headcheck(self.text) and value != 'plain':
+                self.text = bodyfinder(self.text)
+
+            self._edit( self.text
+                      , text_format=self.text_format
+                      , safety_belt=self._safety_belt
+                      )
 
     ## FTP handlers
     security.declareProtected(ModifyPortalContent, 'PUT')
