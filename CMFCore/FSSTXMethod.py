@@ -176,7 +176,7 @@ class FSSTXMethod( FSObject ):
             self._v_cooked = _format_stx( text=self.raw )
         return self._v_cooked
 
-    _rendering_template = Globals.HTML( """\
+    _default_template = Globals.HTML( """\
 <dtml-var standard_html_header>
 <div class="Desktop">
 <dtml-var cooked>
@@ -191,11 +191,22 @@ class FSSTXMethod( FSObject ):
 
         if RESPONSE is not None:
             RESPONSE.setHeader( 'Content-Type', 'text/html' )
-        return self._rendering_template( client=self
-                                       , mapping=REQUEST
-                                       , RESPONSE=RESPONSE
-                                       , cooked=self.cook()
-                                       )
+        return apply( self._render, ( REQUEST, RESPONSE ), kw )
+
+    security.declarePrivate( '_render' )
+    def _render( self, REQUEST={}, RESPONSE=None, **kw ):
+        """
+            Find the appropriate rendering template and use it to
+            render us.
+        """
+        template = getattr( self, 'stxmethod_view', self._default_template )
+
+        if getattr( template, 'isDocTemp', 0 ):
+            posargs = ( self, REQUEST )
+        else:
+            posargs = ()
+        
+        return apply( template, posargs, { 'cooked' : self.cook() } )
 
     security.declareProtected( CMFCorePermissions.FTPAccess, 'manage_FTPget' )
     def manage_FTPget( self ):
