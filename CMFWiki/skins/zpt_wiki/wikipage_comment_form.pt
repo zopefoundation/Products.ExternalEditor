@@ -19,15 +19,14 @@
 
 <div
   tal:define="commentator python:here.isAllowed('comment', REQUEST=request);
-              editor python:here.isAllowed('edit', REQUEST=request);
-              commentcat python:here.opCategory('comment')">
+              editor python:here.isAllowed('edit', REQUEST=request)">
 
  <h3> Submit a Comment for <em tal:content="here/getId">page</em> </h3>
 
  <p tal:condition="python:not commentator">
    <strong> You are not allowed to comment on <span tal:replace="here/getId">
     this page</span>. </strong>
-   (<span tal:replace="python:here.whichWho( commentcat )" /> may add
+   (<span tal:replace="python:here.whichWho('comment')" /> may add
    a comment to this page.)
  </p>
 

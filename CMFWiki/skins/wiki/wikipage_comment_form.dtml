@@ -10,7 +10,7 @@
  <dtml-if nocomment> </font> </dtml-if>
  <dtml-if nocomment>
    <strong> You are not allowed to comment on &dtml-getId;. </strong>
-   (<dtml-var "whichWho(opCategory('comment'))"> may add a comment to this page.)
+   (<dtml-var "whichWho('comment')"> may add a comment to this page.)
  <dtml-else>
 
   <p>
