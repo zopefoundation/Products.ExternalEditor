@@ -94,7 +94,7 @@ import CMFCorePermissions
 from interfaces.Contentish import Contentish
 from DynamicType import DynamicType
 from utils import getToolByName, _checkPermission
-
+from webdav.WriteLockInterface import WriteLockInterface
 from Acquisition import aq_base
 
 
@@ -108,7 +108,7 @@ class PortalContent(DynamicType, SimpleItem):
         interfaces/DublinCore.py.
     """
 
-    __implements__ = Contentish
+    __implements__ = (WriteLockInterface, Contentish,)
     isPortalContent = 1
     _isPortalContent = 1  # More reliable than 'isPortalContent'.
 
