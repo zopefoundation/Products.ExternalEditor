@@ -63,8 +63,9 @@ CMF 1.5.0beta (2004/08/06)
     - CMFDefault.DiscussionItem: Replies were not sorted chronologically
       (http://www.zope.org/Collectors/CMF/211)
 
-    - CMFDefault.Image: When pasting an Image object the review state did not
-      revert to "private" (http://www.zope.org/Collectors/CMF/176)
+    - CMFDefault.Image and CMFDefault.File: When copy/pasting Image and File
+      objects the review state did not revert to "private".
+      (http://www.zope.org/Collectors/CMF/176)
 
     - CMFSetup: Refactored rolemap.
       Converted the roles attribute to role sub-elements. Fixed an acquisition
