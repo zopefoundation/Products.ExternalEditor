@@ -7,4 +7,4 @@ depends entirely on people's needs, so speak up!
 
 Shane Hathaway
 Digital Creations
-shane@digicool.com
+shane@zope.com
