@@ -22,7 +22,7 @@ from Globals import InitializeClass
 
 from Products.CMFCore.PortalObject import PortalObjectBase
 from Products.CMFCore import PortalFolder
-from Products.CMFCore.TypesTool import ContentFactoryMetadata
+from Products.CMFCore.TypesTool import FactoryTypeInformation
 from Products.CMFCore.utils import getToolByName
 from Products.CMFTopic import Topic
 from Products.CMFTopic import topic_globals
@@ -201,8 +201,8 @@ class PortalGenerator:
         if tool is None:
             return
         for t in initial_types:
-            cfm = ContentFactoryMetadata(**t)
-            tool._setObject(t['id'], cfm)
+            fti = FactoryTypeInformation(**t)
+            tool._setObject(t['id'], fti)
 
     def setupMimetypes(self, p):
         p.manage_addProduct[ 'CMFCore' ].manage_addRegistry()
