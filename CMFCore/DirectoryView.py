@@ -46,6 +46,7 @@ def _filtered_listdir(path):
                listdir(path))
     return n
 
+# This walker is only used on the Win32 version of _changed
 def _walker (listdir, dirname, names):
     names[:]=filter(_filter,names)
     listdir.extend(names)
@@ -124,7 +125,7 @@ class DirectoryInformation:
                 fp = expandpath(self.filepath)
                 mtime = stat(fp)[8]
                 # some Windows directories don't change mtime 
-                # when a file in them changes :-(
+                # when a file is added to or deleted from them :-(
                 # So keep a list of files as well, and see if that
                 # changes
                 path.walk(fp,_walker,filelist)
@@ -136,7 +137,7 @@ class DirectoryInformation:
                     ERROR,
                     'Error checking for directory modification',
                     error=sys.exc_info())
-                
+
             if mtime != self._v_last_read or filelist != self._v_last_filelist:
                 self._v_last_read = mtime
                 self._v_last_filelist = filelist

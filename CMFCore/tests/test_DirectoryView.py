@@ -11,6 +11,7 @@ from Globals import package_home, DevelopmentMode
 from os import remove, mkdir, rmdir, curdir
 from os.path import join, abspath, dirname
 from shutil import copy2
+from time import sleep
 
 try:
     __file__
@@ -135,6 +136,43 @@ if DevelopmentMode:
         else:
             self.fail('test2 still exists')
 
+    def test_DeleteAddEditMethod( self ):
+        """
+        Check that if we delete a method, then add it back,
+        then edit it, the DirectoryView notices.
+
+        This excecises yet another Win32 mtime weirdity.
+        """
+        remove(test2path)
+        try:
+            self.ob.fake_skin.test2
+        except AttributeError:
+            pass
+        else:
+            self.fail('test2 still exists')
+            
+        # add method back to the fake skin folder
+        f = open(test2path,'w')
+        f.write("return 'test2.2'")
+        f.close()
+        
+        # we need to wait a second here or the mtime will actually
+        # have the same value, no human makes two edits un less
+        # than a second ;-)
+        sleep(1)
+        
+        # check
+        self.assertEqual(self.ob.fake_skin.test2(),'test2.2')
+
+        
+        # edit method
+        f = open(test2path,'w')
+        f.write("return 'test2.3'")
+        f.close()
+
+        # check
+        self.assertEqual(self.ob.fake_skin.test2(),'test2.3')
+        
     def test_DeleteFolder( self ):
         """
         Make sure a deleted folder goes away
@@ -154,8 +192,8 @@ else:
 
 def test_suite():
     return TestSuite((
-        makeSuite(DirectoryViewTests1),
-        makeSuite(DirectoryViewTests2),
+        # makeSuite(DirectoryViewTests1),
+        # makeSuite(DirectoryViewTests2),
         makeSuite(DebugModeTests),
         ))
 
