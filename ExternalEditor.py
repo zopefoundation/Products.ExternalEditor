@@ -21,9 +21,13 @@ import Acquisition
 from Globals import InitializeClass
 from AccessControl.SecurityManagement import getSecurityManager
 from AccessControl.SecurityInfo import ClassSecurityInfo
-from webdav.common import rfc1123_date
-from webdav import Lockable
 from OFS import Image
+try:
+    from webdav.Lockable import wl_isLocked
+except ImportError:
+    # webdav module not available
+    def wl_isLocked(ob):
+        return 0
 
 class ExternalEditor(Acquisition.Implicit):
     """Create a response that encapsulates the data needed by the
@@ -72,7 +76,7 @@ class ExternalEditor(Acquisition.Implicit):
             
         r.append('cookie:%s' % REQUEST.environ.get('HTTP_COOKIE',''))
         
-        if Lockable.wl_isLocked(ob):
+        if wl_isLocked(ob):
             # Object is locked, send down the lock token 
             # owned by this user (if any)
             user_id = security.getUser().getId()

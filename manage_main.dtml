@@ -134,9 +134,12 @@ function toggleSelect() {
   &dtml-sequence-key; <dtml-if title>(&dtml-title;)</dtml-if>
   </a>
   <dtml-let explicit="_.getitem('sequence-item').aq_explicit">
-    <dtml-if expr="_.hasattr(explicit, 'manage_FTPget')
+    <dtml-if expr="(_.hasattr(explicit, 'manage_FTPget')
                    or _.hasattr(explicit, 'read')
-                   or _.hasattr(explicit, 'document_src')">
+                   or _.hasattr(explicit, 'EditableBody')
+                   or _.hasattr(explicit, 'document_src'))
+                   and AUTHENTICATED_USER.has_permission(
+                        'Use external editor', explicit)">
       <a href="&dtml-parent_url;/externalEdit_/&dtml.url_quote-sequence-key;"
          title="Edit using external editor"
       ><img src="&dtml-BASEPATH1;/misc_/ExternalEditor/edit_icon"
