@@ -195,6 +195,10 @@ class Event(PortalContent, DefaultDublinCoreImpl):
         self.effective_date = effective_date
         self.expiration_date = expiration_date
         self.setStartDate(start_date)
+        
+        if end_date < start_date:
+            end_date = start_date
+
         self.setEndDate(end_date)
         self.location=location
         self.contact_name=contact_name
@@ -258,6 +262,7 @@ class Event(PortalContent, DefaultDublinCoreImpl):
                                  , start_time
                                  , startAMPM
                                  )
+        start_date = DateTime( efdate )
 
         exdate = '%s/%s/%s %s %s' % (expirationDay
                                  , expirationMo
@@ -265,9 +270,14 @@ class Event(PortalContent, DefaultDublinCoreImpl):
                                  , stop_time
                                  , stopAMPM
                                  )
+        end_date = DateTime( exdate )
+
+        if end_date < start_date:
+            end_date = start_date
  
-        self.setStartDate(DateTime(efdate))
-        self.setEndDate(DateTime(exdate))
+        self.setStartDate( start_date )
+        self.setEndDate( end_date )
+
         if location is not None:
             self.location = location
         if contact_name is not None:
