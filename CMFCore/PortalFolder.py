@@ -83,13 +83,29 @@ class PortalFolder( Folder, DynamicType ):
         self.id = id
         self.title = title
 
+    security.declareProtected( CMFCorePermissions.ManageProperties
+                             , 'setTitle')
+    def setTitle( self, title ):
+        """
+            Edit the folder title.
+        """
+        self.title = title
+
+    security.declareProtected( CMFCorePermissions.ManageProperties
+                             , 'setDescription')
+    def setDescription( self, description ):
+        """
+            Edit the folder description.
+        """
+        self.description = description
+
     security.declareProtected(CMFCorePermissions.ManageProperties, 'edit')
     def edit(self, title='', description=''):
         """
         Edit the folder title (and possibly other attributes later)
         """
-        self.title = title
-        self.description = description
+        self.setTitle( title )
+        self.setDescription( description )
 
     security.declarePublic('allowedContentTypes')
     def allowedContentTypes( self ):
@@ -319,11 +335,7 @@ class PortalFolder( Folder, DynamicType ):
         """
             Handle WebDAV MKCOL.
         """
-        type_name = self._getPortalTypeName()
-        self.invokeFactory( type_name=type_name
-                          , id=id
-                          , RESPONSE=RESPONSE
-                          )
+        self.manage_addFolder( id=id, title='' )
 
     def _checkId(self, id, allow_dup=0):
         PortalFolder.inheritedAttribute('_checkId')(self, id, allow_dup)
@@ -405,6 +417,38 @@ class PortalFolder( Folder, DynamicType ):
 
     security.setPermissionDefault(AddPortalContent, ('Owner','Manager'))
     security.setPermissionDefault(AddPortalFolders, ('Owner','Manager'))
+
+    def manage_addFolder( self
+                        , id
+                        , title=''
+                        , REQUEST=None
+                        ):
+        """
+            Add a new folder-like object with id *id*.  IF present,
+            use the parent object's 'mkdir' action;  otherwise, just
+            add a PortalFolder.
+            to take control of the process by checking for a 'mkdir'
+            action.
+        """
+        try:
+            action = self.getTypeInfo().getActionById( 'mkdir' )
+        except TypeError:
+            self.invokeFactory( type_name='Folder', id=id )
+        else:
+            # call it
+            getattr( self, action )( id=id )
+
+        ob = self._getOb( id )
+        ob.setTitle( title )
+        try:
+            ob.reindexObject()
+        except AttributeError:
+            pass
+
+        if REQUEST is not None:
+            return self.manage_main(self, REQUEST, update_menu=1)
+
+Globals.InitializeClass(PortalFolder)
     
 
 
@@ -506,8 +550,6 @@ class ContentFilter:
             Return a stringified description of the filter.
         """
         return string.join( self.description, '; ' )
-
-Globals.InitializeClass(PortalFolder)
 
 manage_addPortalFolder = PortalFolder.manage_addPortalFolder
 manage_addPortalFolderForm = DTMLFile( 'folderAdd', globals() )

@@ -243,6 +243,67 @@ class PortalFolderTests( unittest.TestCase ):
         assert len( catalog ) == 2
         assert has_path( catalog._catalog, '/test/folder/sub2/bar' )
 
+    def test_manageAddFolder( self ):
+        #
+        #   Does MKDIR/MKCOL intercept work?
+        #
+        test = PortalFolder( 'test', '' )
+        test._setPortalTypeName( 'Folder' )
+        self.root._setObject( 'test', test )
+        self.root.reindexObject = lambda: 0
+        test = self.root.test
+
+        self.root._setObject( 'portal_types', TypesTool() )
+        types_tool = self.root.portal_types
+        FTI = FactoryTypeInformation
+        types_tool._setObject( 'Folder'
+                             , FTI( id='Folder'
+                                  , meta_type=PortalFolder.meta_type
+                                  , product='CMFCore'
+                                  , factory='manage_addPortalFolder'
+                                  )
+                             )
+        types_tool._setObject( 'Grabbed'
+                             , FTI( 'Grabbed'
+                                  , meta_type=PortalFolder.meta_type
+                                  , product='CMFCore'
+                                  , factory='manage_addPortalFolder'
+                                  )
+                             )
+
+        # First, test default behavior
+        test.manage_addFolder( id='simple', title='Simple' )
+        self.assertEqual( test.simple.Type(), 'Folder' )
+        self.assertEqual( test.simple.getId(), 'simple' )
+        self.assertEqual( test.simple.Title(), 'Simple' )
+
+        # Now, test overridden behavior
+        types_tool.Folder.addAction( id = 'mkdir'
+                                   , name = 'MKDIR handler'
+                                   , action = 'grabbed'
+                                   , permission = ''
+                                   , category = 'folder'
+                                   , visible = 0
+                                   )
+        class Grabbed:
+
+            _grabbed_with = None
+
+            def __init__( self, context ):
+                self._context = context
+
+            def __call__( self, id ):
+                self._grabbed_with = id
+                self._context._setOb( id, PortalFolder( id ) )
+                self._context._getOb( id )._setPortalTypeName( 'Grabbed' )
+
+        self.root.grabbed = Grabbed( test )
+
+        test.manage_addFolder( id='indirect', title='Indirect' )
+        self.assertEqual( test.indirect.Type(), 'Grabbed' )
+        self.assertEqual( test.indirect.getId(), 'indirect' )
+        self.assertEqual( test.indirect.Title(), 'Indirect' )
+
     def test_contentPaste( self ):
         #
         #   Does copy / paste work?

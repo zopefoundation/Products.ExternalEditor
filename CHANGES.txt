@@ -35,6 +35,9 @@
   - (__future__) Added DCWorkflow (through-the-web configurable
     workflows) to the core set of CMF products.
 
+  - Hooked 'manage_addFolder' to allow creation of PortalFolders
+    from both WebDAV, FTP, and ZMI.
+
   - Improved tracebacks from broken FSDTMLMethods, which no longer
     indicate that every problem is in RestrictedDTML.
 
@@ -106,6 +109,10 @@
     well as Dublin Core).
 
  Bug fixes
+
+  - Added 'getReply' to CMFDefault.DiscussionItem.DiscussionItemContainer,
+    to permit access to an individual reply without needing to
+    do traversal.
 
   - Corrected pass-through of 'file' and 'seatbelt' arguments in
     new 'CMFDefault.Document.edit' method;  also sync'ed ZMI edit
