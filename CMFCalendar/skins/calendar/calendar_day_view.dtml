@@ -1,0 +1,331 @@
+<dtml-var standard_html_header>
+
+<SCRIPT language=javascript>
+function NewWindow(url) { 
+   var hWnd = window.open(url,'HelpWindow','menubar=no,toolbar=yes,scrollbars=yes,status=no,width=570,resizable=yes,resize=no,height=395,screenX=120,screenY=120');
+} 
+</SCRIPT>
+
+<STYLE>BODY {
+	FONT-SIZE: 10pt; FONT-FAMILY: arial,helvetica
+}
+TD {
+	FONT-SIZE: 10pt; FONT-FAMILY: arial,helvetica
+}
+TH {
+	FONT-SIZE: 10pt; FONT-FAMILY: arial,helvetica
+}
+BIG {
+	FONT-WEIGHT: bold; FONT-SIZE: 17px; FONT-FAMILY: Arial,Helvetica
+}
+A {
+	FONT-SIZE: 13px; FONT-FAMILY: Arial,Helvetica
+}
+SMALL {
+	FONT-SIZE: 2.75mm; FONT-FAMILY: Arial,Helvetica
+}
+.bttn {
+	BORDER-RIGHT: #9999cc 2px outset; BORDER-TOP: #9999cc 2px outset; BORDER-LEFT: #9999cc 2px outset; BORDER-BOTTOM: #9999cc 2px outset; BACKGROUND-COLOR: #cccccc
+}
+</STYLE>
+
+<STYLE type=text/css>A.calendarlight:link {
+	COLOR: #ffffff; TEXT-DECORATION: none
+}
+A.calendarlight:visited {
+	COLOR: #ffffff; TEXT-DECORATION: none
+}
+A.calendarlight:active {
+	COLOR: #ffffff; TEXT-DECORATION: none
+}
+A.calendarlight:hover {
+	COLOR: #dddddd; TEXT-DECORATION: none
+}
+A.calendardark:link {
+	COLOR: #ffffff; TEXT-DECORATION: none
+}
+A.calendardark:visited {
+	COLOR: #ffffff; TEXT-DECORATION: none
+}
+A.calendardark:active {
+	COLOR: #ffffff; TEXT-DECORATION: none
+}
+A.calendardark:hover {
+	COLOR: #dddddd; TEXT-DECORATION: none
+}
+#nav A:link {
+	COLOR: blue; TEXT-DECORATION: none
+}
+#nav A:visited {
+	COLOR: blue; TEXT-DECORATION: none
+}
+#nav A:active {
+	COLOR: blue; TEXT-DECORATION: none
+}
+#nav A:hover {
+	COLOR: #000000; TEXT-DECORATION: none
+}
+#nav TD {
+	PADDING-LEFT: 2px
+}
+</STYLE>
+
+<FORM action="" method=post>
+			<TABLE cellSpacing=0 cellPadding=3 width="100%" border=0>
+  <TBODY>
+  <TR>
+    <TD width=20><IMG height=15 hspace=3 src="event_icon.gif" 
+      width=16 border=0></TD>
+    <TD align=left width="91%">
+	<B><FONT style="FONT-SIZE: 9pt">Today</FONT>:&nbsp;<dtml-var ZopeTime></FONT> 
+     </B></TD>
+    <TD noWrap align=right width="5%"><NOBR>
+    <FONT style="FONT-SIZE: 3.2mm">
+	<SELECT style="FONT-SIZE: 8pt" name=M>
+	<OPTION value=1>Jan
+	<OPTION value=2>Feb
+     <OPTION value=3>Mar<OPTION 
+        value=4>Apr<OPTION value=5 selected>May<OPTION value=6>Jun<OPTION 
+        value=7>Jul<OPTION value=8>Aug<OPTION value=9>Sep<OPTION 
+        value=10>Oct<OPTION value=11>Nov<OPTION 
+      value=12>Dec</OPTION></SELECT>
+     <SELECT style="FONT-SIZE: 8pt" name=D> 
+        <OPTION value=1>1<OPTION value=2>2<OPTION value=3>3<OPTION 
+        value=4>4<OPTION value=5>5<OPTION value=6>6<OPTION value=7>7<OPTION 
+        value=8>8<OPTION value=9>9<OPTION value=10>10<OPTION value=11>11<OPTION 
+        value=12>12<OPTION value=13>13<OPTION value=14>14<OPTION 
+        value=15>15<OPTION value=16>16<OPTION value=17>17<OPTION 
+        value=18>18<OPTION value=19>19<OPTION value=20>20<OPTION 
+        value=21>21<OPTION value=22>22<OPTION value=23>23<OPTION 
+        value=24>24<OPTION value=25 selected>25<OPTION value=26>26<OPTION 
+        value=27>27<OPTION value=28>28<OPTION value=29>29<OPTION 
+        value=30>30<OPTION value=31>31</OPTION></SELECT>
+    <SELECT style="FONT-SIZE: 8pt" name=Y> 
+     <OPTION value=1996>1996<OPTION 
+        value=1997>1997<OPTION value=1998>1998<OPTION value=1999>1999<OPTION 
+        value=2000>2000<OPTION value=2001 selected>2001<OPTION 
+        value=2002>2002<OPTION value=2003>2003<OPTION value=2004>2004<OPTION 
+        value=2005>2005<OPTION value=2006>2006<OPTION value=2007>2007<OPTION 
+        value=2008>2008<OPTION value=2009>2009<OPTION value=2010>2010<OPTION 
+        value=2011>2011</OPTION>
+      </SELECT>
+    <INPUT style="FONT-SIZE: 3mm; FONT-FAMILY: arial,helvetica" type=submit value=">" name=jumptodate.x> 
+      </FONT></NOBR>
+</TD>
+    <TD width="2%">&nbsp;</TD></TR>
+  <TR>
+    <TD colSpan=4>
+
+</TD>
+  </TR>
+</TBODY></TABLE>
+			<TABLE cellSpacing=0 cellPadding=1 width="100%" border=0>
+        <TBODY>
+        <TR>
+				<TD bgColor=#000000>
+            <TABLE cellSpacing=1 cellPadding=2 width="100%" border=0>
+              <TBODY>
+              <TR>
+                <TD vAlign=top noWrap align=right width="2%" 
+                  bgColor=#9bb1bf>&nbsp;<A class=calendarlight 
+                  href="&dtml-absolute_url;"><B>6:00</B></A>&nbsp;</TD>
+                <TD bgColor=#eeeeee>&nbsp;</TD></TR>
+			</TR>
+              <TR>
+                <TD vAlign=top noWrap align=right width="2%" 
+                  bgColor=#9bb1bf>&nbsp;<A class=calendarlight 
+                  href="&dtml-absolute_url;"><SMALL>6:30</SMALL></A>&nbsp;</TD>
+                <TD bgColor=#dddddd>&nbsp;</TD></TR></TR>
+              <TR>
+                <TD vAlign=top noWrap align=right width="2%" 
+                  bgColor=#9bb1bf>&nbsp;<A class=calendarlight 
+                  href="&dtml-absolute_url;"><B>7:00</B></A>&nbsp;</TD>
+                <TD bgColor=#eeeeee>&nbsp;</TD></TR></TR>
+              <TR>
+                <TD vAlign=top noWrap align=right width="2%" 
+                  bgColor=#9bb1bf>&nbsp;<A class=calendarlight 
+                  href="&dtml-absolute_url;"><SMALL>7:30</SMALL></A>&nbsp;</TD>
+                <TD bgColor=#dddddd>&nbsp;</TD></TR></TR>
+              <TR>
+                <TD vAlign=top noWrap align=right width="2%" 
+                  bgColor=#9bb1bf>&nbsp;<A class=calendarlight 
+                  href="&dtml-absolute_url;"><B>8:00</B></A>&nbsp;</TD>
+                <TD bgColor=#eeeeee>&nbsp;</TD></TR></TR>
+              <TR>
+                <TD vAlign=top noWrap align=right width="2%" 
+                  bgColor=#9bb1bf>&nbsp;<A class=calendarlight 
+                  href="&dtml-absolute_url;"><SMALL>8:30</SMALL></A>&nbsp;</TD>
+                <TD bgColor=#dddddd>&nbsp;</TD></TR></TR>
+              <TR>
+                <TD vAlign=top noWrap align=right width="2%" 
+                  bgColor=#9bb1bf>&nbsp;<A class=calendarlight 
+                  href="&dtml-absolute_url;"><B>9:00</B></A>&nbsp;</TD>
+                <TD bgColor=#eeeeee>&nbsp;</TD></TR></TR>
+              <TR>
+                <TD vAlign=top noWrap align=right width="2%" 
+                  bgColor=#9bb1bf>&nbsp;<A class=calendarlight 
+                  href="&dtml-absolute_url;"><SMALL>9:30</SMALL></A>&nbsp;</TD>
+                <TD bgColor=#dddddd>&nbsp;</TD></TR></TR>
+              <TR>
+                <TD vAlign=top noWrap align=right width="2%" 
+                  bgColor=#9bb1bf>&nbsp;<A class=calendarlight 
+                  href="&dtml-absolute_url;"><B>10:00</B></A>&nbsp;</TD>
+                <TD bgColor=#eeeeee>&nbsp;</TD></TR></TR>
+              <TR>
+                <TD vAlign=top noWrap align=right width="2%" 
+                  bgColor=#9bb1bf>&nbsp;<A class=calendarlight 
+                  href="&dtml-absolute_url;"><SMALL>10:30</SMALL></A>&nbsp;</TD>
+                <TD bgColor=#dddddd>&nbsp;</TD></TR></TR>
+              <TR>
+                <TD vAlign=top noWrap align=right width="2%" 
+                  bgColor=#9bb1bf>&nbsp;<A class=calendarlight 
+                  href="&dtml-absolute_url;"><B>11:00</B></A>&nbsp;</TD>
+                <TD bgColor=#eeeeee>&nbsp;</TD></TR></TR>
+              <TR>
+                <TD vAlign=top noWrap align=right width="2%" 
+                  bgColor=#9bb1bf>&nbsp;<A class=calendarlight 
+                  href="&dtml-absolute_url;"><SMALL>11:30</SMALL></A>&nbsp;</TD>
+                <TD bgColor=#dddddd>&nbsp;</TD></TR></TR>
+              <TR>
+                <TD vAlign=top noWrap align=right width="2%" 
+                  bgColor=#6699CC>&nbsp;<A class=calendardark 
+                  href="&dtml-absolute_url;"><B>12:00</B></A>&nbsp;</TD>
+                <TD bgColor=#eeeeee>&nbsp;</TD></TR></TR>
+              <TR>
+                <TD vAlign=top noWrap align=right width="2%" 
+                  bgColor=#6699CC>&nbsp;<A class=calendardark 
+                  href="&dtml-absolute_url;"><SMALL>12:30</SMALL></A>&nbsp;</TD>
+                <TD bgColor=#dddddd>&nbsp;</TD></TR></TR>
+              <TR>
+                <TD vAlign=top noWrap align=right width="2%" 
+                  bgColor=#6699CC>&nbsp;<A class=calendardark 
+                  href="&dtml-absolute_url;"><B>1:00</B></A>&nbsp;</TD>
+                <TD bgColor=#eeeeee>&nbsp;</TD></TR></TR>
+              <TR>
+                <TD vAlign=top noWrap align=right width="2%" 
+                  bgColor=#6699CC>&nbsp;<A class=calendardark 
+                  href="&dtml-absolute_url;"><SMALL>1:30</SMALL></A>&nbsp;</TD>
+                <TD bgColor=#dddddd>&nbsp;</TD></TR></TR>
+              <TR>
+                <TD vAlign=top noWrap align=right width="2%" 
+                  bgColor=#6699CC>&nbsp;<A class=calendardark 
+                  href="&dtml-absolute_url;"><B>2:00</B></A>&nbsp;</TD>
+                <TD bgColor=#eeeeee>&nbsp;</TD></TR></TR>
+              <TR>
+                <TD vAlign=top noWrap align=right width="2%" 
+                  bgColor=#6699CC>&nbsp;<A class=calendardark 
+                  href="&dtml-absolute_url;"><SMALL>2:30</SMALL></A>&nbsp;</TD>
+                <TD bgColor=#dddddd>&nbsp;</TD></TR></TR>
+              <TR>
+                <TD vAlign=top noWrap align=right width="2%" 
+                  bgColor=#6699CC>&nbsp;<A class=calendardark 
+                  href="&dtml-absolute_url;"><B>3:00</B></A>&nbsp;</TD>
+                <TD bgColor=#eeeeee>&nbsp;</TD></TR></TR>
+              <TR>
+                <TD vAlign=top noWrap align=right width="2%" 
+                  bgColor=#6699CC>&nbsp;<A class=calendardark 
+                  href="&dtml-absolute_url;"><SMALL>3:30</SMALL></A>&nbsp;</TD>
+                <TD bgColor=#dddddd>&nbsp;</TD></TR></TR>
+              <TR>
+                <TD vAlign=top noWrap align=right width="2%" 
+                  bgColor=#6699CC>&nbsp;<A class=calendardark 
+                  href="&dtml-absolute_url;"><B>4:00</B></A>&nbsp;</TD>
+                <TD bgColor=#eeeeee>&nbsp;</TD></TR></TR>
+              <TR>
+                <TD vAlign=top noWrap align=right width="2%" 
+                  bgColor=#6699CC>&nbsp;<A class=calendardark 
+                  href="&dtml-absolute_url;"><SMALL>4:30</SMALL></A>&nbsp;</TD>
+                <TD bgColor=#dddddd>&nbsp;</TD></TR></TR>
+              <TR>
+                <TD vAlign=top noWrap align=right width="2%" 
+                  bgColor=#6699CC>&nbsp;<A class=calendardark 
+                  href="&dtml-absolute_url;"><B>5:00</B></A>&nbsp;</TD>
+                <TD bgColor=#eeeeee>&nbsp;</TD></TR></TR>
+              <TR>
+                <TD vAlign=top noWrap align=right width="2%" 
+                  bgColor=#6699CC>&nbsp;<A class=calendardark 
+                  href="&dtml-absolute_url;"><SMALL>5:30</SMALL></A>&nbsp;</TD>
+                <TD bgColor=#dddddd>&nbsp;</TD></TR></TR>
+              <TR>
+                <TD vAlign=top noWrap align=right width="2%" 
+                  bgColor=#6699CC>&nbsp;<A class=calendardark 
+                  href="&dtml-absolute_url;"><B>6:00</B></A>&nbsp;</TD>
+                <TD bgColor=#eeeeee>&nbsp;</TD></TR></TR>
+              <TR>
+                <TD vAlign=top noWrap align=right width="2%" 
+                  bgColor=#6699CC>&nbsp;<A class=calendardark 
+                  href="&dtml-absolute_url;"><SMALL>6:30</SMALL></A>&nbsp;</TD>
+                <TD bgColor=#dddddd>&nbsp;</TD></TR></TR>
+              <TR>
+                <TD vAlign=top noWrap align=right width="2%" 
+                  bgColor=#6699CC>&nbsp;<A class=calendardark 
+                  href="&dtml-absolute_url;"><B>7:00</B></A>&nbsp;</TD>
+                <TD bgColor=#eeeeee>&nbsp;</TD></TR></TR>
+              <TR>
+                <TD vAlign=top noWrap align=right width="2%" 
+                  bgColor=#6699CC>&nbsp;<A class=calendardark 
+                  href="&dtml-absolute_url;"><SMALL>7:30</SMALL></A>&nbsp;</TD>
+                <TD bgColor=#dddddd>&nbsp;</TD></TR></TR>
+              <TR>
+                <TD vAlign=top noWrap align=right width="2%" 
+                  bgColor=#6699CC>&nbsp;<A class=calendardark 
+                  href="&dtml-absolute_url;"><B>8:00</B></A>&nbsp;</TD>
+                <TD bgColor=#eeeeee>&nbsp;</TD></TR></TR>
+              <TR>
+                <TD vAlign=top noWrap align=right width="2%" 
+                  bgColor=#6699CC>&nbsp;<A class=calendardark 
+                  href="&dtml-absolute_url;"><SMALL>8:30</SMALL></A>&nbsp;</TD>
+                <TD bgColor=#dddddd>&nbsp;</TD>
+		</TR>
+		<TR>
+                <TD vAlign=top noWrap align=right width="2%" 
+                  bgColor=#6699AA>&nbsp;<A class=calendardark 
+                  href="&dtml-absolute_url;"><B>9:00</B></A>&nbsp;</TD>
+                <TD bgColor=#eeeeee>&nbsp;</TD>
+		</TR>
+              <TR>
+                <TD vAlign=top noWrap align=right width="2%" 
+                  bgColor=#6699AA>&nbsp;<A class=calendardark 
+                  href="&dtml-absolute_url;"><SMALL>9:30</SMALL></A>&nbsp;</TD>
+                <TD bgColor=#dddddd>&nbsp;</TD>
+		</TR>
+		<TR>
+                <TD vAlign=top noWrap align=right width="2%" 
+                  bgColor=#6699AA>&nbsp;<A class=calendardark 
+                  href="&dtml-absolute_url;"><B>10:00</B></A>&nbsp;</TD>
+                <TD bgColor=#eeeeee>&nbsp;</TD>
+		</TR>
+              <TR>
+                <TD vAlign=top noWrap align=right width="2%" 
+                  bgColor=#6699AA>&nbsp;<A class=calendardark 
+                  href="&dtml-absolute_url;"><SMALL>10:30</SMALL></A>&nbsp;</TD>
+                <TD bgColor=#dddddd>&nbsp;</TD>
+		</TR>
+		<TR>
+                <TD vAlign=top noWrap align=right width="2%" 
+                  bgColor=#6699AA>&nbsp;<A class=calendardark 
+                  href="&dtml-absolute_url;"><B>11:00</B></A>&nbsp;</TD>
+                <TD bgColor=#eeeeee>&nbsp;</TD>
+		</TR>
+              <TR>
+                <TD vAlign=top noWrap align=right width="2%" 
+                  bgColor=#6699AA>&nbsp;<A class=calendardark 
+                  href="&dtml-absolute_url;"><SMALL>11:30</SMALL></A>&nbsp;</TD>
+                <TD bgColor=#dddddd>&nbsp;</TD>
+		</TR>
+		<TR>
+                <TD vAlign=top noWrap align=right width="2%" 
+                  bgColor=#6699AA>&nbsp;<A class=calendardark 
+                  href="&dtml-absolute_url;"><B>12:00</B></A>&nbsp;</TD>
+                <TD bgColor=#eeeeee>&nbsp;</TD>
+		</TR>
+              <TR>
+                <TD vAlign=top noWrap align=right width="2%" 
+                  bgColor=#6699AA>&nbsp;<A class=calendardark 
+                  href="&dtml-absolute_url;"><SMALL>12:30</SMALL></A>&nbsp;</TD>
+                <TD bgColor=#dddddd>&nbsp;</TD>
+		</TR>
+</TR></TBODY></TABLE>
+			</TD></TR></TBODY></TABLE></TD></TR></TBODY>
+</TABLE></FORM>
+<dtml-var standard_html_footer>

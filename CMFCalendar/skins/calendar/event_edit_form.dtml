@@ -1,0 +1,278 @@
+<dtml-var standard_html_header>
+
+<STYLE>
+
+<!--
+
+body,td,th { font-family:arial,helvetica; font-size:10pt } 
+
+BIG {FONT-FAMILY: Arial,Helvetica; font-size: 17px;font-weight:bold}
+
+A {FONT-FAMILY: Arial,Helvetica; font-size: 13.5px;}
+
+SMALL {FONT-FAMILY: Arial,Helvetica; font-size: 2.75mm;}
+
+ .bttn 
+
+ { 
+
+   BACKGROUND-COLOR: #cccccc; 
+
+   BORDER-BOTTOM: #9999cc 2px outset; 
+
+   BORDER-LEFT: #9999cc 2px outset; 
+
+   BORDER-RIGHT: #9999cc 2px outset; 
+
+   BORDER-TOP: #9999cc 2px outset 
+
+ } 
+
+   -->
+
+</STYLE>
+
+<style type="text/css" >
+
+<!--
+   td.EventBackground  { background: #DDDDDD }
+   
+   td.EventHorizon  { background: #818384 }
+
+   a.calendarlight:link { color: #FFFFFF; text-decoration: none }
+
+   a.calendarlight:visited { color: #FFFFFF; text-decoration: none }
+
+   a.calendarlight:active { color: #FFFFFF; text-decoration: none }
+
+   a.calendarlight:hover { color: #dddddd; text-decoration: none }
+
+   a.calendardark:link { color: #FFFFFF; text-decoration: none }
+
+   a.calendardark:visited { color: #FFFFFF; text-decoration: none }
+
+   a.calendardark:active { color: #FFFFFF; text-decoration: none }
+
+   a.calendardark:hover { color: #dddddd; text-decoration: none }
+
+   #nav a:link { color: blue; text-decoration: none } 
+
+   #nav a:visited { color: blue; text-decoration: none } 
+
+   #nav a:active { color: blue; text-decoration: none } 
+
+   #nav a:hover { color: #000000; text-decoration: none } 
+
+   #nav TD {PADDING-LEFT: 2px;} 
+
+-->
+
+</style>
+
+<FORM METHOD=POST ACTION="&dtml-absolute_url;/event_edit">
+<center>
+<table border=0 bordercolor=bronze width=100% height=100% >
+<tr><td align=center valign=top >
+
+<table border=0 bordercolor=grey width=100% height=100% cellspacing=0 cellpadding=0 >
+
+<tr height=2% ><td colspan=5 >
+<table border=0 cellpadding=0 cellspacing=0 >
+<tr><td><image src="event_info_tab.gif" height=26 width=90 border=0></td><td>
+<img src="space.gif" width=5 height=1></td>
+<td></td>
+<td><img src="space.gif" width=5 height=1></td>
+<td></td>
+<td><img src="space.gif" width=5 height=1></td>
+<td></td>
+<td><img src="space.gif" width=5 height=1></td>
+</tr>
+</table>
+</td></tr>
+
+<tr height=2% ><td Class="EventHorizon" width=15% colspan=4 >&nbsp;</td>
+<td width=85% Class="EventHorizon" align=right nowrap >
+<table border=0 cellpadding=6 cellspacing=0>
+<tr><td align="Right" nowrap>
+<nobr>
+<INPUT TYPE="submit" VALUE="Save" style="font-size:9pt" >&nbsp;
+<INPUT TYPE="reset" VALUE="Reset" style="font-size:9pt" >&nbsp;
+</nobr>
+</td></tr>
+</table>
+</td></tr>
+
+<tr height=1>
+<td colspan=5 bgcolor=#FFFFFF ><img src="space.gif" width=10 height=1 border=0></td>
+</tr>
+<tr height=96% ><td colspan=5 Class="EventBackground" valign=top>
+<table border=0 cellpadding=5 width=100% cellspacing=3>
+<tr><td Class="EventBackground">
+
+<table border=0 width=100% >
+<TR>
+<th align=right NOWRAP>Event Name</th>
+<TD NOWRAP><INPUT TYPE=text NAME="title" MAXLENGTH=100 size=35 VALUE="&dtml-Title;"></TD>
+<th align=right NOWRAP>Contact Name</th>
+<TD NOWRAP><INPUT TYPE=text NAME="contact_name" MAXLENGTH=100 size=35 VALUE="&dtml-contact_name;"></TD>
+</TR>
+<TR>
+<th align=right>Location</th>
+<TD NOWRAP><INPUT TYPE=text NAME="location" MAXLENGTH=100 size=35 VALUE="&dtml-location;" ></TD>
+<th align=right NOWRAP>Contact Email</th>
+<TD NOWRAP><INPUT TYPE=text NAME="contact_email" MAXLENGTH=100 size=35 VALUE="&dtml-contact_email;"></TD>
+</TR>
+<TR>
+<th align=right>Event type</th>
+<TD VALIGN=top>
+<dtml-let contentSubject=Subject
+             allowedSubjects="portal_metadata.listAllowedSubjects( this() )">
+   <select name="event_type:list" multiple>
+     <dtml-in allowedSubjects>
+     <dtml-let item=sequence-item
+               sel="item in contentSubject and 'selected' or ''"
+     >
+      <option value="&dtml-sequence-item;"
+              &dtml-sel;> &dtml-sequence-item; </option>
+     </dtml-let>
+     </dtml-in>
+    </select>
+   </dtml-let>  
+</TD>
+<th align=right NOWRAP>Contact Phone</th>
+<TD NOWRAP><INPUT TYPE=text NAME="contact_phone" MAXLENGTH=100 size=35 VALUE="&dtml-contact_phone;"></TD>
+</TR>
+<tr>
+<th align="right">Event URL</th>
+<td colspan="3"><input type="text" name="event_url" size="55" MAXLENGTH="100" value="&dtml-event_url;"></td>
+</tr>
+
+<tr><td colspan=4 >
+<table border=0 width=100% cellpadding=2 cellspacing=3 >
+<tr>
+<td colspan="4" >
+<hr></font></td>
+</tr>
+<tr><th valign="middle" align=right>Start Date</th>
+<dtml-with getEffectiveStrings mapping>
+   <td> 
+		<select name="effectiveYear">
+		<dtml-in buildYears>
+                        <option value="&dtml-sequence-item;"
+                         <dtml-if expr="_['sequence-item'] == year">Selected</dtml-if>>
+                        <dtml-var sequence-item></option>
+                    </dtml-in>
+		</select>
+
+		<select name="effectiveMo">
+		<dtml-in buildMonths>
+                        <option value="&dtml-sequence-item;"
+                         <dtml-if expr="_['sequence-item'] == month">Selected</dtml-if>>
+                        <dtml-var sequence-item></option>
+                    </dtml-in>
+		</select>
+        
+		<select name="effectiveDay">
+                    <dtml-in buildDays>
+                        <option value="&dtml-sequence-item;"
+                         <dtml-if expr="_['sequence-item'] == day">Selected</dtml-if>>
+                        <dtml-var sequence-item></option>
+                    </dtml-in>
+               </select>
+              </td>
+   </dtml-with>
+
+   <th valign="middle" align="right"> Stop Date </th>
+   <dtml-with getExpirationStrings mapping>
+   <td> 
+        <select name="expirationYear">
+		<dtml-in buildYears>
+                        <option value="&dtml-sequence-item;"
+                         <dtml-if expr="_['sequence-item'] == year">Selected</dtml-if>>
+                        <dtml-var sequence-item></option>
+                    </dtml-in>
+		</select>
+
+		<select name="expirationMo">
+		<dtml-in buildMonths>
+                        <option value="&dtml-sequence-item;"
+                         <dtml-if expr="_['sequence-item'] == month">Selected</dtml-if>>
+                        <dtml-var sequence-item></option>
+                    </dtml-in>
+		</select>
+        
+		<select name="expirationDay">
+                    <dtml-in buildDays>
+                        <option value="&dtml-sequence-item;"
+                         <dtml-if expr="_['sequence-item'] == day">Selected</dtml-if>>
+                        <dtml-var sequence-item></option>
+                    </dtml-in>
+               </select>
+              </td>
+
+   </td>
+   </dtml-with>
+</td>
+</tr>
+
+<TR>
+<th valign="middle" align="right">Start Time</th>
+<TD><select name="start_time" >
+<dtml-let stTimeString="_.string.split(getStartTimeString())"
+            amSel="(_.len(stTimeString) == 2 and stTimeString[1] == 'am') and 'CHECKED' or ''"
+            pmSel="(_.len(stTimeString) == 2 and stTimeString[1] == 'pm') and 'CHECKED' or ''"
+        >
+        <dtml-in buildTimes>
+        <option value="&dtml-sequence-item;"
+          <dtml-if expr="_['sequence-item'] == stTimeString[0]">
+             selected="selected"
+          </dtml-if>> <dtml-var sequence-item> </option>
+        </dtml-in>
+       </select>
+       <input type="radio" name="startAMPM" value="am" &dtml-amSel;> am
+       <input type="radio" name="startAMPM" value="pm" &dtml-pmSel;> pm
+       <input type="hidden" name="startAMPM:default" value="pm">
+      </dtml-let>
+</TD>
+<th valign="middle" align="right">Stop Time</th>
+   <td> <select name="stop_time">
+        <dtml-let stTimeString="_.string.split(getStopTimeString())"
+            amSel="(_.len(stTimeString) == 2 and stTimeString[1] == 'am') and 'CHECKED' or ''"
+            pmSel="(_.len(stTimeString) == 2 and stTimeString[1] == 'pm') and 'CHECKED' or ''"
+        >
+        <dtml-in buildTimes>
+        <option value="&dtml-sequence-item;"
+          <dtml-if expr="_['sequence-item'] == stTimeString[0]">
+             selected="selected"
+          </dtml-if>> <dtml-var sequence-item> </option>
+
+        </dtml-in>
+
+       </select>
+       <input type="radio" name="stopAMPM" value="am" &dtml-amSel;> am
+       <input type="radio" name="stopAMPM" value="pm" &dtml-pmSel;> pm
+       <input type="hidden" name="stopAMPM:default" value="pm">
+   </dtml-let>
+   </td>
+</tr>
+</table>
+</td></tr>
+
+<tr><td colspan=4 ><hr></td></tr>
+<tr>
+<th align=right valign=top >Description</th>
+<TD colspan="3" VALIGN=top NOWRAP>
+<TEXTAREA NAME="description" WRAP=virtual ROWS=6 COLS=55>&dtml-Description;</TEXTAREA>
+</td></tr>
+
+</table>
+</td></tr>
+
+</table>
+</td></tr>
+</table>
+</td></tr>
+</table>
+	</center>
+</FORM>
+<dtml-var standard_html_footer>
