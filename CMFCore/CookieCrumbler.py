@@ -128,7 +128,8 @@ class CookieCrumbler (SimpleItemWithProperties):
         CookieCrumblerDisabled.
         """
         if (req.__class__ is not HTTPRequest
-            or not req['REQUEST_METHOD'] in ('HEAD', 'GET', 'PUT', 'POST')
+            or (not req['REQUEST_METHOD'] in ('HEAD', 'GET', 'PUT', 'POST')
+            and not req.has_key(self.auth_cookie))
             or req.environ.has_key('WEBDAV_SOURCE_PORT')):
             raise CookieCrumblerDisabled
 
