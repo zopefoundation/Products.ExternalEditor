@@ -98,6 +98,18 @@ class SkinsTool(UniqueObject, SkinsContainer, Folder, ActionProviderBase):
     security.declareProtected(ManagePortal, 'manage_propertiesForm')
     manage_propertiesForm = DTMLFile('dtml/skinProps', globals())
 
+    # the following two methods override those in FindSupport, to
+    # support marking of objects used in specific skins
+    security.declareProtected(ManagePortal, 'manage_findResult')
+    manage_findResult = DTMLFile('findResult', _dtmldir,
+                                 management_view='Find')
+
+    security.declareProtected(ManagePortal, 'manage_findForm')
+    manage_findForm = DTMLFile('findForm', _dtmldir,
+                               management_view='Find')
+
+
+
     security.declareProtected(ManagePortal, 'manage_skinLayers')
     def manage_skinLayers(self, chosen=(), add_skin=0, del_skin=0,
                           skinname='', skinpath='', REQUEST=None):
@@ -131,6 +143,37 @@ class SkinsTool(UniqueObject, SkinsContainer, Folder, ActionProviderBase):
         if REQUEST is not None:
             return self.manage_propertiesForm(
                 self, REQUEST, management_view='Properties', manage_tabs_message='Skins changed.')
+
+
+    security.declareProtected(ManagePortal, 'isFirstInSkin')
+    def isFirstInSkin(self, template_path, skin=None):
+        """
+        Is the specified template the one that would get returned from the current
+        skin?
+        """
+        if skin is None or skin == 'None':
+            skin = self.getDefaultSkin()            
+        template = self.restrictedTraverse(template_path)
+        name = template.getId()
+        skin_path = self.getSkinPath(skin)
+        if not skin_path:
+            return 0
+        parts = list(skin_path.split(","))
+        found = ""
+        for part in parts:
+            part = part.strip()
+            if part[0] == "_":
+                continue
+            partob = getattr(self, part, None)
+            if partob:
+                skin_template = getattr(partob.aq_base, name, None)
+                if skin_template:
+                    found = skin_template
+                    break
+        if found == template:
+            return 1
+        else:
+            return 0
 
     security.declareProtected(ManagePortal, 'manage_properties')
     def manage_properties(self, default_skin='', request_varname='',

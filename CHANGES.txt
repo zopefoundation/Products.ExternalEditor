@@ -29,6 +29,9 @@ CMF 1.5.0-beta (unreleased)
 
     - 'portal_setup' tool can now disply / download diffs between profiles
       and / or snapshots.
+
+    - The 'find' tab on the 'portal_skins' tool will now mark the object that
+      would be returned when using the specified skin
       
   Bug Fixes
 
