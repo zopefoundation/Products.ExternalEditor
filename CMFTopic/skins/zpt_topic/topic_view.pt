@@ -26,7 +26,7 @@
             b_start string:0;b_start request/b_start | b_start;
             results here/queryCatalog;
             Batch python:modules['ZTUtils'].Batch;
-            global batch python:Batch(results, 5, int(b_start), orphan=1)">
+            global batch python:Batch(results, 20, int(b_start), orphan=1)">
     <h4>Topic Matches: </h4>
     <div tal:repeat="match batch" tal:condition="batch">
         <a href=""
