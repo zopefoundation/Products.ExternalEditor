@@ -490,8 +490,7 @@ class WorkflowTool (UniqueObject, Folder):
             if hasattr(aq_base(wf), 'updateRoleMappingsFor'):
                 wfs[id] = wf
         portal = aq_parent(aq_inner(self))
-        catalog = getToolByName(self, 'portal_catalog', None)
-        count = self._recursiveUpdateRoleMappings(portal, wfs, catalog)
+        count = self._recursiveUpdateRoleMappings(portal, wfs)
         if REQUEST is not None:
             return self.manage_selectWorkflows(REQUEST, manage_tabs_message=
                                                '%d object(s) updated.' % count)
@@ -642,7 +641,7 @@ class WorkflowTool (UniqueObject, Folder):
         return res
 
     security.declarePrivate( '_recursiveUpdateRoleMappings' )
-    def _recursiveUpdateRoleMappings(self, ob, wfs, catalog):
+    def _recursiveUpdateRoleMappings(self, ob, wfs):
 
         """ Update roles-permission mappings recursively, and
             reindex special index.
@@ -660,16 +659,15 @@ class WorkflowTool (UniqueObject, Folder):
                         changed = 1
             if changed:
                 count = count + 1
-                if catalog is not None:
+                if hasattr(aq_base(ob), 'reindexObject'):
                     # Reindex security-related indexes
-                    catalog.reindexObject(ob, idxs=['allowedRolesAndUsers'])
+                    ob.reindexObject(idxs=['allowedRolesAndUsers'])
         if hasattr(aq_base(ob), 'objectItems'):
             obs = ob.objectItems()
             if obs:
                 for k, v in obs:
                     changed = getattr(v, '_p_changed', 0)
-                    count = count + self._recursiveUpdateRoleMappings(v, wfs,
-                                                                      catalog)
+                    count = count + self._recursiveUpdateRoleMappings(v, wfs)
                     if changed is None:
                         # Re-ghostify.
                         v._p_deactivate()
@@ -692,13 +690,12 @@ class WorkflowTool (UniqueObject, Folder):
         if not self._default_cataloging:
             return
 
-        catalog = getToolByName(self, 'portal_catalog', None)
-        if catalog is not None:
+        if hasattr(aq_base(ob), 'reindexObject'):
             # XXX We only need the keys here, no need to compute values.
             mapping = self.getCatalogVariablesFor(ob) or {}
             mapping['allowedRolesAndUsers'] = None
             vars = mapping.keys()
-            catalog.reindexObject(ob, idxs=vars)
+            ob.reindexObject(idxs=vars)
 
 InitializeClass(WorkflowTool)
 

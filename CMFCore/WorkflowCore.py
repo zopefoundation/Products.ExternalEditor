@@ -80,9 +80,8 @@ class WorkflowMethod (Method):
             except ObjectDeleted, ex:
                 res = ex.getResult()
             else:
-                catalog = getToolByName(instance, 'portal_catalog', None)
-                if catalog is not None:
-                    catalog.reindexObject(ob)
+                if hasattr(aq_base(instance), 'reindexObject'):
+                    instance.reindexObject()
         else:
             res = wf.wrapWorkflowMethod(instance, self._id, self._m,
                                         (instance,) + args, kw)
