@@ -48,13 +48,6 @@ Skinned folders can define custom 'view' actions."""
                                      (CMFCorePermissions.ManageProperties,)
                                   , 'category'      : 'folder'
                                   }
-                                , { 'id'            : 'syndication'
-                                  , 'name'          : 'Syndication'
-                                  , 'action'        : 'synPropertiesForm'
-                                  , 'permissions'   :
-                                     (CMFCorePermissions.ManageProperties,)
-                                  , 'category'      : 'folder'
-                                  }
                                 , { 'id'            : 'foldercontents'
                                   , 'name'          : 'Folder contents'
                                   , 'action'        : 'folder_contents'

@@ -71,7 +71,7 @@ CMF TODO's
 
       - ( ) Actions fixes
 
-        ( ) Tracker #481:  Reduntant syndication action on Skinned
+        (x) Tracker #481:  Reduntant syndication action on Skinned
                            Folder
 
         ( ) Tracker #495:  Make logged-in userid available to actions
@@ -127,6 +127,6 @@ CMF TODO's
         ( ) Tracker #516:  Preview, then edit broken for ZPT discussion
                            replies.
 
-      - (/) Documentation fixes (Tres Seaver)
+      - (x) Documentation fixes (Tres Seaver)
 
-        (/) Tracker #489:  Dependency on TAL breaks Zope 2.4.x
+        (x) Tracker #489:  Dependency on TAL breaks Zope 2.4.x

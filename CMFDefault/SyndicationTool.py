@@ -11,44 +11,56 @@
 # 
 ##############################################################################
 
-"""CMFDefault portal_syndication tool.
+""" CMFDefault portal_syndication tool.
+
+Manage outbound RSS syndication of folder content.
 """
 
-
 import os
-from Products.CMFCore.utils import UniqueObject, _checkPermission
-from OFS.SimpleItem import SimpleItem
-from Globals import HTMLFile, package_home, InitializeClass 
 import string
+
+from Globals import HTMLFile, package_home, InitializeClass 
+from AccessControl import ClassSecurityInfo, SecurityManagement
 from Acquisition import aq_base, aq_inner, aq_parent
 from DateTime import DateTime
-from AccessControl import ClassSecurityInfo, SecurityManagement
+from OFS.SimpleItem import SimpleItem
+
+from Products.CMFCore.utils import UniqueObject
+from Products.CMFCore.utils import _checkPermission
 from Products.CMFCore.CMFCorePermissions import ManagePortal
 from Products.CMFCore.CMFCorePermissions import ManageProperties
 from Products.CMFCore.CMFCorePermissions import AccessContentsInformation
 from Products.CMFCore.ActionProviderBase import ActionProviderBase
 from Products.CMFCore.ActionInformation import ActionInformation
 from Products.CMFCore.Expression import Expression
-import Products.CMFCore.CMFCorePermissions
 from Products.CMFCore.PortalFolder import PortalFolder
+
 from SyndicationInfo import SyndicationInformation
 
 _dtmldir = os.path.join( package_home( globals() ), 'dtml' )
 
 class SyndicationTool (UniqueObject, SimpleItem, ActionProviderBase):
+    """
+        The syndication tool manages the site-wide policy for
+        syndication of folder content as RSS.
+    """
+
     id = 'portal_syndication'
+
     meta_type = 'Default Syndication Tool'
 
-    _actions = [ActionInformation(id='syndication'
-                                , title='Syndication'
-                                , action=Expression(
-               text='string: ${folder_url}/synPropertiesForm')
-                                , condition=Expression(
-               text='python: folder is object') 
-                                , permissions=(ManageProperties,)
-                                , category='folder'
-                                , visible=1
-                                 )]
+    _actions = [ ActionInformation(
+                    id='syndication'
+                  , title='Syndication'
+                  , action=Expression(
+                        text='string: ${folder_url}/synPropertiesForm')
+                  , condition=Expression(
+                        text='python: folder is object') 
+                  , permissions=(ManageProperties,)
+                  , category='folder'
+                  , visible=1
+                  )
+               ]
 
     security = ClassSecurityInfo()
     
@@ -60,27 +72,40 @@ class SyndicationTool (UniqueObject, SimpleItem, ActionProviderBase):
     max_items = 15
 
     #ZMI Methods
-    manage_options = (ActionProviderBase.manage_options + 
-                        ({'label'     :  'Overview'
-                        ,'action'   :  'overview'
-                        , 'help'    :  ('CMFDefault', 'Syndication-Tool_Overview.stx') }
-                        ,{'label'   :  'Properties'
-                        ,'action'   :  'propertiesForm'
-                        , 'help'    :   ('CMFDefault', 'Syndication-Tool_Properties.stx')}
-                        ,{'label'   :  'Policies'
-                        ,'action'   :  'policiesForm'
-                        , 'help'    :   ('CMFDefault', 'Syndication-Tool_Policies.stx')}
-                        ,{'label'   :  'Reports'
-                        ,'action'   :  'reportForm'
-                        , 'help'    :   ('CMFDefault', 'Syndication-Tool_Reporting.stx')}
-                     ))
+    manage_options = ( ActionProviderBase.manage_options
+                     + ( { 'label'  : 'Overview'
+                         , 'action' : 'overview'
+                         , 'help'   : ( 'CMFDefault'
+                                      , 'Syndication-Tool_Overview.stx' )
+                         }
+                        ,{ 'label'  : 'Properties'
+                         , 'action' : 'propertiesForm'
+                         , 'help'   : ( 'CMFDefault'
+                                      , 'Syndication-Tool_Properties.stx' )
+                         }
+                        ,{ 'label'  : 'Policies'
+                         , 'action' : 'policiesForm'
+                         , 'help'   : ( 'CMFDefault'
+                                      , 'Syndication-Tool_Policies.stx' )
+                         }
+                        ,{ 'label'  : 'Reports'
+                         , 'action' : 'reportForm'
+                         , 'help'   : ( 'CMFDefault'
+                                      , 'Syndication-Tool_Reporting.stx' )
+                         }
+                        )
+                     )
+
     security.declareProtected(ManagePortal, 'overview')
     overview = HTMLFile('synOverview', _dtmldir)
+
     security.declareProtected(ManagePortal, \
                               'propertiesForm')
     propertiesForm = HTMLFile('synProps', _dtmldir)
+
     security.declareProtected(ManagePortal, 'policiesForm')
     policiesForm = HTMLFile('synPolicies', _dtmldir)
+
     security.declareProtected(ManagePortal, 'reportForm')
     reportForm = HTMLFile('synReports', _dtmldir)
    
@@ -92,50 +117,64 @@ class SyndicationTool (UniqueObject, SimpleItem, ActionProviderBase):
         return self._actions
 
     security.declareProtected(ManagePortal, 'editProperties')
-    def editProperties(self
-                       , updatePeriod=None
-                       , updateFrequency=None
-                       , updateBase=None
-                       , isAllowed=None
-                       , max_items=None
-                       , REQUEST=None
+    def editProperties( self
+                      , updatePeriod=None
+                      , updateFrequency=None
+                      , updateBase=None
+                      , isAllowed=None
+                      , max_items=None
+                      , REQUEST=None
                       ):
         """
-        Edit the properties for the SystemWide defaults on the SyndicationTool.
+        Edit the properties for the SystemWide defaults on the
+        SyndicationTool.
         """
         if isAllowed is not None:
             self.isAllowed = isAllowed
+
         if updatePeriod:
             self.syUpdatePeriod = updatePeriod
         else:
-            try: del self.syUpdatePeriod
-            except KeyError: pass
+            try:
+                del self.syUpdatePeriod
+            except KeyError:
+                pass
+
         if updateFrequency:
             self.syUpdateFrequency = updateFrequency
         else:
-            try: del self.syUpdateFrequency
-            except KeyError: pass
+            try:
+                del self.syUpdateFrequency
+            except KeyError:
+                pass
+
         if updateBase:
             if type( updateBase ) is type( '' ):
                 updateBase = DateTime( updateBase )
             self.syUpdateBase = updateBase
         else:
-            try: del self.syUpdateBase
-            except KeyError: pass
+            try:
+                del self.syUpdateBase
+            except KeyError:
+                pass
+
         if max_items:
             self.max_items = max_items
         else:
-            try: del self.max_items
-            except KeyError: pass
+            try:
+                del self.max_items
+            except KeyError:
+                pass
+
         if REQUEST is not None:
-            REQUEST['RESPONSE'].redirect(self.absolute_url()
-                                + '/propertiesForm'
-                                +
-                                '?manage_tabs_message=Tool+Updated.'
-                                )
+            REQUEST['RESPONSE'].redirect( self.absolute_url()
+                                        + '/propertiesForm'
+                                        + '?manage_tabs_message=Tool+Updated.'
+                                        )
 
     security.declarePublic( 'editSyInformationProperties' )
-    def editSyInformationProperties(self, obj
+    def editSyInformationProperties( self
+                                   , obj
                                    , updatePeriod=None
                                    , updateFrequency=None
                                    , updateBase=None
@@ -149,21 +188,27 @@ class SyndicationTool (UniqueObject, SimpleItem, ActionProviderBase):
         """
         if not _checkPermission( ManageProperties, obj ):
             raise Unauthorized
+
         syInfo = getattr(obj, 'syndication_information', None)
+
         if syInfo is None:
             raise 'Syndication is Disabled'
+
         if updatePeriod:
             syInfo.syUpdatePeriod = updatePeriod
         else:
             syInfo.syUpdatePeriod = self.syUpdatePeriod
+
         if updateFrequency:
             syInfo.syUpdateFrequency = updateFrequency
         else:
             syInfo.syUpdateFrequency = self.syUpdateFrequency
+
         if updateBase:
             syInfo.syUpdateBase = updateBase
         else:
             syInfo.syUpdateBase = self.syUpdateBase
+
         if max_items:
             syInfo.max_items = max_items
         else:
@@ -176,48 +221,54 @@ class SyndicationTool (UniqueObject, SimpleItem, ActionProviderBase):
         """
         if not self.isSiteSyndicationAllowed():
             raise 'Syndication is Disabled'
-        else:
-            if hasattr(aq_base(obj), 'syndication_information'):
-             raise 'Syndication Information Exists'
-            syInfo = SyndicationInformation()
-            obj._setObject('syndication_information', syInfo)
-            syInfo=obj._getOb('syndication_information')
-            syInfo.syUpdatePeriod = self.syUpdatePeriod
-            syInfo.syUpdateFrequency = self.syUpdateFrequency
-            syInfo.syUpdateBase = self.syUpdateBase
-            syInfo.max_items = self.max_items
-            syInfo.description = "Channel Description"
+
+        if hasattr(aq_base(obj), 'syndication_information'):
+            raise 'Syndication Information Exists'
+
+        syInfo = SyndicationInformation()
+        obj._setObject('syndication_information', syInfo)
+        syInfo = obj._getOb('syndication_information')
+        syInfo.syUpdatePeriod = self.syUpdatePeriod
+        syInfo.syUpdateFrequency = self.syUpdateFrequency
+        syInfo.syUpdateBase = self.syUpdateBase
+        syInfo.max_items = self.max_items
+        syInfo.description = "Channel Description"
 
     security.declarePublic('disableSyndication')
     def disableSyndication(self, obj):
         """
         Disable syndication for the obj; and remove it.
         """
-        syInfo = getattr(obj, 'syndication_information',
-                         None)
-        if syInfo is not None:
-            obj._delObject('syndication_information')
-        else:
+        syInfo = getattr(obj, 'syndication_information', None)
+
+        if syInfo is None:
             raise 'This object does not have Syndication Information'
+
+        obj._delObject('syndication_information')
 
     security.declarePublic('getSyndicatableContent')
     def getSyndicatableContent(self, obj):
         """
-        An interface for allowing folderish items to implement an equivalent of PortalFolder.contentValues()
+        An interface for allowing folderish items to implement an
+        equivalent of PortalFolder.contentValues()
         """
         if hasattr(obj, 'synContentValues'):
             values = obj.synContentValues()
         else:
             values = PortalFolder.contentValues(obj)
         return values
+
     security.declarePublic('buildUpdatePeriods')
     def buildUpdatePeriods(self):
         """
         Return a list of possible update periods for the xmlns: sy
         """
-        updatePeriods = (('hourly', 'Hourly'), ('daily', 'Daily'),
-                        ('weekly', 'Weekly'), ('monthly',
-                        'Monthly'), ('yearly', 'Yearly'))
+        updatePeriods = ( ('hourly',  'Hourly')
+                        , ('daily',   'Daily')
+                        , ('weekly',  'Weekly')
+                        , ('monthly', 'Monthly')
+                        , ('yearly',  'Yearly')
+                        )
         return updatePeriods
 
     security.declarePublic('isSiteSyndicationAllowed')
@@ -247,22 +298,24 @@ class SyndicationTool (UniqueObject, SimpleItem, ActionProviderBase):
         """
         Return the update period for the RSS syn namespace.
         This is either on the object being passed or the
-        portal_syndication tool (if a sitewide value or default is set)
+        portal_syndication tool (if a sitewide value or default
+        is set)
 
         NOTE:  Need to add checks for sitewide policies!!!
         """
         if not self.isSiteSyndicationAllowed():
             raise 'Syndication is Not Allowed'
+
         if obj is None:
             return self.syUpdatePeriod
+
+        syInfo = getattr(obj, 'syndication_information', None)
+
+        if syInfo is not None:
+            return syInfo.syUpdatePeriod
         else:
-            syInfo = getattr(obj, 'syndication_information',
-                             None)
-            if syInfo is not None:
-                return syInfo.syUpdatePeriod
-            else:
-                return 'Syndication is Not Allowed'
-    
+            return 'Syndication is Not Allowed'
+
     security.declarePublic('getUpdateFrequency')
     def getUpdateFrequency(self, obj=None):
         """
@@ -275,15 +328,16 @@ class SyndicationTool (UniqueObject, SimpleItem, ActionProviderBase):
         """
         if not self.isSiteSyndicationAllowed():
             raise 'Syndication is not Allowed'
+
         if obj is None:
             return self.syUpdateFrequency
+
+        syInfo = getattr(obj, 'syndication_information',
+                            None)
+        if syInfo is not None:
+            return syInfo.syUpdateFrequency
         else:
-            syInfo = getattr(obj, 'syndication_information',
-                             None)
-            if syInfo is not None:
-                return syInfo.syUpdateFrequency
-            else:
-                return 'Syndication is not Allowed'
+            return 'Syndication is not Allowed'
      
     security.declarePublic('getUpdateBase')
     def getUpdateBase(self, obj=None):
@@ -301,17 +355,18 @@ class SyndicationTool (UniqueObject, SimpleItem, ActionProviderBase):
         #import pdb; pdb.set_trace()
         if not self.isSiteSyndicationAllowed():
             raise 'Syndication is not Allowed'
+
         if obj is None:
             when = self.syUpdateBase
             return when.ISO()
+
+        syInfo = getattr(obj, 'syndication_information',
+                            None)
+        if syInfo is not None:
+                when = syInfo.syUpdateBase
+                return when.ISO()
         else:
-            syInfo = getattr(obj, 'syndication_information',
-                               None)
-            if syInfo is not None:
-                 when = syInfo.syUpdateBase
-                 return when.ISO()
-            else:
-                return 'Syndication is not Allowed'
+            return 'Syndication is not Allowed'
 
     security.declarePublic('getHTML4UpdateBase')
     def getHTML4UpdateBase(self, obj):
@@ -320,17 +375,18 @@ class SyndicationTool (UniqueObject, SimpleItem, ActionProviderBase):
         """
         if not self.isSiteSyndicationAllowed():
             raise 'Syndication is not Allowed'
+
         if obj is None:
             when = syUpdateBase
             return when.HTML4()
+
+        syInfo = getattr(obj, 'syndication_information',
+                            None)
+        if syInfo is not None:
+            when = syInfo.syUpdateBase
+            return when.HTML4()
         else:
-            syInfo = getattr(obj, 'syndication_information',
-                                None)
-            if syInfo is not None:
-                when = syInfo.syUpdateBase
-                return when.HTML4()
-            else:
-                return 'Syndication is not Allowed'
+            return 'Syndication is not Allowed'
 
     def getMaxItems(self, obj=None):
         """
@@ -338,14 +394,15 @@ class SyndicationTool (UniqueObject, SimpleItem, ActionProviderBase):
         """
         if not self.isSiteSyndicationAllowed():
             raise 'Syndication is not Allowed'
+
         if obj is None:
             return self.max_items
+
+        syInfo = getattr(obj, 'syndication_information',
+                            None)
+        if syInfo is not None:
+            return syInfo.max_items
         else:
-            syInfo = getattr(obj, 'syndication_information',
-                                None)
-            if syInfo is not None:
-                return syInfo.max_items
-            else:
-                return 'Syndication is not Allowed'
+            return 'Syndication is not Allowed'
 
 InitializeClass(SyndicationTool)
