@@ -84,8 +84,9 @@
 
          <tr>
            <td align="right">Status:</td>
-           <td tal:define="base python: split(here.status(), '_')[0];
-                           paren here/confidential">
+           <td tal:define="statpair python: split(here.status(), '_');
+                           base python: statpair[0];
+                           paren python: len(statpair) > 1">
                 <span tal:replace="python: '%s%s%s'
                                            % ((paren and '(') or '',
                                               base,
