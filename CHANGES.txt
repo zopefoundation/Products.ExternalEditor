@@ -1,40 +1,17 @@
 HEAD only (unreleased)
 
-  Others
+  New Features
 
-    - CMFWiki: The package as distributed with CMF itself has been
-      deprecated and removed. Please use the better-supported 
-      CMFWiki package that comes as part of Simon Michael's ZWiki
-      package. More information at http://zwiki.org.
-
-    - CMFDefault: Cleaned out some super-ancient code for migrating
-      or fixing PTK content so it would work with CMF.
+    -
 
   Bug Fixes
 
-    - Document/NewsItem: If the "plain text" format is selected the 
-      content will no longer be tested for HTML and reduced to text
-      between opening and closing "body" tags
-      (http://www.zope.org/Collectors/CMF/214)
+    -
 
-    - Document/NewsItem: A call to setFormat will now re-cook the
-      document content if the format has been changed (arising from
-      discussion about http://www.zope.org/Collectors/CMF/214)
+  Others
 
-    - DirectoryViews/FSMetadata: Corrected some erroneous docstrings
-      about proxy role handling using .metadata files 
-      (http://www.zope.org/Collectors/CMF/177)
-
-    - FSDTMLMethod: Small code cleanup to remove duplicate variable
-      definition (http://www.zope.org/Collectors/CMF/291)
-
-  Features:
-
-    - RegistrationTool: The regular expression that limits what people 
-      can put in as a valid member ID is now configurable TTW in the 
-      portal_registration tool (http://www.zope.org/Collectors/CMF/117)
-
-  Removed Features
+    - CMFDefault: Cleaned out some super-ancient code for migrating
+      or fixing PTK content so it would work with CMF.
 
     - CatalogTool: Removed deprecated indexes and metadata.
       'Creator' was replaced by 'listCreators', 'portal_type' should be used
@@ -60,20 +37,42 @@ HEAD only (unreleased)
 
     - Workflow: Removed deprecated WorkflowMethod machinery.
 
-CMF 1.5.0beta2 (unreleased)
+CMF 1.5.1beta (unreleased)
 
   New Features
 
-    - Feature
+    - RegistrationTool: The regular expression that limits what people
+      can put in as a valid member ID is now configurable TTW in the
+      portal_registration tool (http://collector.zope.org/CMF/117)
+
+  Bug Fixes
+
+    - FSDTMLMethod: Small code cleanup to remove duplicate variable
+      definition (http://collector.zope.org/CMF/291)
+
+    - Document/NewsItem: If the "plain text" format is selected the
+      content will no longer be tested for HTML and reduced to text
+      between opening and closing "body" tags
+      (http://collector.zope.org/CMF/214)
+
+    - Document/NewsItem: A call to setFormat will now re-cook the
+      document content if the format has been changed (arising from
+      discussion about http://collector.zope.org/CMF/214)
+
+    - DirectoryViews/FSMetadata: Corrected some erroneous docstrings
+      about proxy role handling using .metadata files
+      (http://collector.zope.org/CMF/177)
+
+CMF 1.5.0beta2 (2004/09/27)
 
   Bug Fixes
 
     - FSFile: Allow setting a content_type value using a .metadata file
-      (http://www.zope.org/Collectors/CMF/281)
+      (http://collector.zope.org/CMF/281)
 
     - FSPageTemplate: Refine the XML content type detection so that
       addtional data such as encoding is preserved
-      (http://www.zope.org/Collectors/CMF/228)
+      (http://collector.zope.org/CMF/228)
 
     - ActionInformation: If a path expression ending in an object that
       gets called using __render_with_namespace__ (such as DTML objects
@@ -82,7 +81,8 @@ CMF 1.5.0beta2 (unreleased)
       expects the namespace to contain "here", which the context coming
       from CMFCore.Expressions.createExprContext did not provide. Added
       "here" as an alias pointing to the provided "object"
-      (http://www.zope.org/Collectors/CMF/171)
+      (http://collector.zope.org/CMF/171)
 
-    - http://www.zope.org/Collectors/CMF/205: When pasting a content item,
-      local roles were not changed to reflect the neew ownership.
+    - CMFCatalogAware: When pasting a content item, local roles were not
+      changed to reflect the new ownership.
+      (http://collector.zope.org/CMF/205)
