@@ -11,11 +11,12 @@
                  ">
 
   <div tal:condition="python: not( mtool.checkPermission( 'Set own properties'
-                                                        , here ) )"
-       tal:define="aurl here/absolute_url;
-                   rurl string:${purl}/login_form?came_from=${aurl};
-                   response request/RESPONSE;
-                   redirect python:response.redirect( rurl )" >
+                                                        , here ) )">
+    <span id="dummy_for_redirect"
+          tal:define="aurl here/absolute_url;
+                      rurl string:${purl}/login_form?came_from=${aurl};
+                      response request/RESPONSE;
+                      redirect python:response.redirect( rurl )" />
 
   </div><!-- not Set own properties -->
 
