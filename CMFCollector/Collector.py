@@ -214,11 +214,18 @@ class Collector(SkinnedFolder):
         if email is not None and self.email != email:
             self.email = email
             changes.append("Email")
-        if managers is not None:
+        if managers is not None or not self.managers:
             # XXX Vette managers - they must exist, etc.
             x = filter(None, managers)
-            if ((userid in self.managers)
-                and (userid not in x)):
+            if not self.managers:
+                changes.append("(Managers set must be non-empty)")
+                owners = self.users_with_local_role('Owner')
+                if owners:
+                    x.extend(owners)
+                else:
+                    x.append(userid)
+            elif ((userid in self.managers)
+                  and (userid not in x)):
                 changes.append("(Managers may not deenlist themselves)")
                 x.append(userid)
             if util.sorted(self.managers) != util.sorted(x):
