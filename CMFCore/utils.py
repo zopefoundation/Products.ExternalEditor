@@ -629,8 +629,8 @@ security.declarePublic('minimalpath')
 def minimalpath(p):
     # Trims INSTANCE_HOME or SOFTWARE_HOME from a path.
     p = os_path.abspath(p)
-    abs = normalize(p)
-    p = abs[abs.index('products'):]
+    #abs = normalize(p)
+    p = p[p.index('Products'):]
     while p[:1] in separators:
         p = p[1:]
     return p
