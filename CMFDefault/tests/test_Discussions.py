@@ -110,13 +110,13 @@ class DiscussionTests( unittest.TestCase ):
         talkback = self.discussion_tool.getDiscussionFor( test )
         assert talkback._getDiscussable() == test
         assert talkback._getDiscussable( outer=1 ) == test
-        assert not talkback.hasReplies()
+        assert not talkback.hasReplies( test )
         assert len( talkback.getReplies() ) == 0
 
         talkback.createReply( title='test'
                             , text='blah'
                             )
-        assert talkback.hasReplies()
+        assert talkback.hasReplies( test )
         assert len( talkback.getReplies() ) == 1
 
         reply1 = talkback.getReplies()[0]
@@ -137,7 +137,7 @@ class DiscussionTests( unittest.TestCase ):
                              , text='blah2'
                              )
         assert len( talkback._container ) == 2
-        assert talkback1.hasReplies()
+        assert talkback1.hasReplies( reply1 )
         assert len( talkback1.getReplies() ) == 1
         assert len( talkback.getReplies() ) == 1
 
