@@ -105,7 +105,7 @@ class IUniqueIdSet(Interface):
         UniqueIdError is raised if object was not registered previously.
         """
 
-# Main API for plaing with unique ids
+# Main API for playing with unique ids
 class IUniqueIdHandler(IUniqueIdSet, IUniqueIdQuery, IUniqueIdBrainQuery):
     """Handle registering, querying unique ids and objects.
     """
