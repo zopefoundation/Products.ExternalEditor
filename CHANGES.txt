@@ -10,6 +10,8 @@ CMF 1.5.0-beta (unreleased)
 
   Bug Fixes
 
+    - DCWorkflow DefaultWorkflowClassic: Fixed 'pending' state permissions.
+
     - CMFSetup: Refactored actions, type-infos and workflow definition.
       Changed some XML attributes. Converted list items and descriptions to
       sub-elements.
