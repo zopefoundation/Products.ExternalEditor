@@ -44,7 +44,9 @@ class TestCalendar(unittest.TestCase):
 
         try: app._delObject('CalendarTest')
         except AttributeError: pass
-        app.manage_addProduct['CMFDefault'].manage_addCMFSite('CalendarTest')
+        app.manage_addProduct['CMFSetup'].addConfiguredSite( 'CalendarTest'
+                                                           , 'default'
+                                                           )
 
         self.Site = app.CalendarTest
 

@@ -7,7 +7,7 @@ from Products.CMFCore.TypesTool import TypesTool
 from Products.CMFCore.WorkflowTool import WorkflowTool
 from Products.CMFDefault.DefaultWorkflow import DefaultWorkflowDefinition
 from Products.CMFDefault.MetadataTool import MetadataTool
-from Products.CMFDefault.Portal import manage_addCMFSite
+from Products.CMFSetup.factory import addConfiguredSite
 
 class BaseTrackerTestCase( unittest.TestCase ):
     """
@@ -19,7 +19,7 @@ class BaseTrackerTestCase( unittest.TestCase ):
 
         # Set up a scratch CMFSite
         app = Zope.app()
-        manage_addCMFSite( app, 'testing' )
+        addConfiguredSite(app, 'testing', 'default', snapshot=False)
         self.root = app.testing
 
         # TODO:  Configure type info for Issue, Tracker

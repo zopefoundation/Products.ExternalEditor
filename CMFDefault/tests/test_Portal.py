@@ -29,9 +29,9 @@ class CMFSiteTests( SecurityRequestTest ):
 
     def _makeSite( self, id='testsite' ):
 
-        from Products.CMFDefault.Portal import manage_addCMFSite
+        from Products.CMFSetup.factory import addConfiguredSite
 
-        manage_addCMFSite( self.root, id )
+        addConfiguredSite(self.root, id, 'default', snapshot=False)
         return getattr( self.root, id )
 
     def _makeContent( self, site, portal_type, id='document', **kw ):
