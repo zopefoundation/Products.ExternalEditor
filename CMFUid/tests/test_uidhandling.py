@@ -44,6 +44,11 @@ def removeUnnecessaryIndexes(catalog):
     catalog.manage_delIndex(indexes)
     catalog.manage_delColumn(columns)
 
+class DummyUid:
+    """A dummy uid that surely is of different type of the generated ones.
+    """
+    pass
+
 class UniqueIdHandlerTests(SecurityTest):
 
     def setUp(self):
@@ -53,6 +58,7 @@ class UniqueIdHandlerTests(SecurityTest):
         self.root._setObject('portal_uidannotation', UniqueIdAnnotationTool())
         self.root._setObject('portal_uidhandler', UniqueIdHandlerTool())
         self.root._setObject('dummy', DummyContent(id='dummy'))
+        self.root._setObject('dummy2', DummyContent(id='dummy2'))
         
         removeUnnecessaryIndexes(self.root.portal_catalog)
     
@@ -142,6 +148,86 @@ class UniqueIdHandlerTests(SecurityTest):
         
         self.assertRaises(UniqueIdError, handler.unregister, dummy)
 
+    def test_setNewUidByHandWithCheck(self):
+        handler = self.root.portal_uidhandler
+        dummy = self.root.dummy
+        
+        # registering and unregisterung a object just to get a free uid
+        unused_uid = handler.register(dummy)
+        handler.unregister(dummy)
+        
+        handler.setUid(dummy, unused_uid)
+        
+        result = handler.getUid(dummy)
+        self.assertEqual(unused_uid, result)
+        
+    def test_setSameUidOnSameObjectWithCheck(self):
+        handler = self.root.portal_uidhandler
+        dummy = self.root.dummy
+        
+        uid = handler.register(dummy)
+        
+        # just setting the same uid another time is allowed
+        handler.setUid(dummy, uid)
+        
+        result = handler.getUid(dummy)
+        self.assertEqual(uid, result)
+        
+    def test_setExistingUidOnDifferentObjectWithCheckRaisesException(self):
+        handler = self.root.portal_uidhandler
+        dummy = self.root.dummy
+        dummy2 = self.root.dummy2
+        UniqueIdError = handler.UniqueIdError
+        
+        # registering and unregisterung a object just to get a free uid
+        uid1_reg = handler.register(dummy)
+        uid2_reg = handler.register(dummy2)
+        
+        self.assertRaises(UniqueIdError, handler.setUid, dummy2, uid1_reg)
+
+    def test_setExistingUidOnDifferentObjectWithoutCheck(self):
+        handler = self.root.portal_uidhandler
+        dummy = self.root.dummy
+        dummy2 = self.root.dummy2
+        UniqueIdError = handler.UniqueIdError
+        
+        # registering and unregisterung a object just to get a free uid
+        uid1_reg = handler.register(dummy)
+        uid2_reg = handler.register(dummy2)
+        
+        # now lets double the unique id
+        handler.setUid(dummy2, uid1_reg, check_uniqueness=False)
+        
+        # calling a getter returns one object and generates a log
+        # we can't capture. So let's ask the catalog directly.
+        catalog = self.root.portal_catalog
+        result = catalog({handler.UID_ATTRIBUTE_NAME: uid1_reg})
+        self.assertEqual(len(result), 2)
+        
+        # dummy2 shall not be reachable anymore by uid2_reg
+        self.assertRaises(UniqueIdError, handler.getBrain, uid2_reg)
+
+    def test_setNoneAsUidRaisesException(self):
+        handler = self.root.portal_uidhandler
+        dummy = self.root.dummy
+        UniqueIdError = handler.UniqueIdError
+        
+        uid = handler.register(dummy)
+        
+        self.assertRaises(UniqueIdError, handler.setUid, dummy, None)
+
+    def test_setArbitraryKindOfUidRaisesException(self):
+        handler = self.root.portal_uidhandler
+        dummy = self.root.dummy
+        UniqueIdError = handler.UniqueIdError
+        
+        uid = handler.register(dummy)
+        
+        # As we don't know what kind of exception the implementation
+        # throws lets check for all exceptions! 
+        # IMHO it makes sense here to catch exceptions in general here!
+        self.assertRaises(Exception, handler.setUid, dummy, DummyUid())
+        
 
 def test_suite():
     return TestSuite((

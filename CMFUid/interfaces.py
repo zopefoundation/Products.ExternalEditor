@@ -81,6 +81,14 @@ class IUniqueIdSet(Interface):
         UniqueIdError is raised if object was not registered previously.
         """
 
+    def setUid(obj, uid, check_uniqueness=True):
+        """Set the unique id of an object.
+        
+        By default a check ensuring uniqueness is enabled. Be aware when
+        disabling this check: You really need to know what you do !!!
+        """
+
+
 class IUniqueIdQuery(Interface):
     """Querying unique ids.
     """

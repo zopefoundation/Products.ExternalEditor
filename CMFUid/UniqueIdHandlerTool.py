@@ -72,23 +72,27 @@ class UniqueIdHandlerTool(UniqueObject, SimpleItem, ActionProviderBase):
         # reindex
         catalog.reindexObject(obj)
 
+    def _setUid(self, obj, uid):
+        """Attaches a unique id to the object and does reindexing.
+        """
+        # attach a unique id annotation to the object
+        anno_tool = getToolByName(self, 'portal_uidannotation')
+        annotation = anno_tool(obj, self.UID_ATTRIBUTE_NAME)
+        annotation.setUid(uid)
+        
+        # reindex the object
+        self._reindexObject(obj)
+
     security.declarePublic('register')
     def register(self, obj):
         """See IUniqueIdSet.
         """
         uid = self.queryUid(obj, default=None)
         if uid is None:
-            # attach a unique id annotation to the object
-            anno_tool = getToolByName(self, 'portal_uidannotation')
-            annotation = anno_tool(obj, self.UID_ATTRIBUTE_NAME)
-            
-            # initialize the annotation with a (new) unique id
+            # generate a new unique id and set it
             generator = getToolByName(self, 'portal_uidgenerator')
             uid = generator()
-            annotation.setUid(uid)
-            
-            # reindex the object
-            self._reindexObject(obj)
+            self._setUid(obj, uid)
             
         return uid
     
@@ -128,6 +132,24 @@ class UniqueIdHandlerTool(UniqueObject, SimpleItem, ActionProviderBase):
         if uid is None:
             raise UniqueIdError, "No unique id available on '%s'" % obj
         return uid
+    
+    security.declarePrivate('setUid')
+    def setUid(self, obj, uid, check_uniqueness=True):
+        """See IUniqueIdSet.
+        """
+        # None is the only value a unique id shall never have!
+        if uid is None:
+            raise UniqueIdError, "It's forbidden to set a unique id to 'None'."
+        
+        # check for uniqueness if enabled
+        result = self.queryObject(uid)
+        if check_uniqueness and result is not None and result != obj:
+            if callable(uid):
+                uid = uid()
+            raise UniqueIdError, "The unique id '%s' is already in use" % uid
+        
+        # everything is ok: set it!
+        self._setUid(obj, uid)
     
     def _queryBrain(self, uid, searchMethodName, default=None):
         """This helper method does the "hard work" of querying the catalog
