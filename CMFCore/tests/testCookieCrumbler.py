@@ -209,14 +209,14 @@ class CookieCrumblerTests (unittest.TestCase):
         self.req.cookies['__ac_name'] = 'abraham'
         self.req.cookies['__ac_password'] = 'pass-w'
         self.req.traverse('/')
-        self.assertEqual(self.req.response['cache-control'], 'no-cache')
+        self.assertEqual(self.req.response['cache-control'], 'private')
 
 
     def testCacheHeaderAuthenticated(self):
         # Should set cache-control
         self.req.cookies['__ac'] = self.credentials
         self.req.traverse('/')
-        self.assertEqual(self.req.response['cache-control'], 'no-cache')
+        self.assertEqual(self.req.response['cache-control'], 'private')
 
 
     def testCacheHeaderDisabled(self):
