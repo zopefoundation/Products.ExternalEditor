@@ -158,7 +158,7 @@ class CookieCrumbler (SimpleItemWithProperties):
         resp.setCookie( cookie_name, cookie_value, path='/')
 
     security.declarePrivate('defaultExpireAuthCookie')
-    def defaultExpireAuthCookie( self, cookie_name ):
+    def defaultExpireAuthCookie( self, resp, cookie_name ):
         resp.expireCookie( cookie_name, path='/')
 
     security.declarePrivate('modifyRequest')
@@ -223,9 +223,10 @@ class CookieCrumbler (SimpleItemWithProperties):
 
     security.declarePublic('credentialsChanged')
     def credentialsChanged(self, user, name, pw):
-        resp = self.REQUEST['RESPONSE']
         ac = encodestring('%s:%s' % (name, pw))
-        self.setAuthCookie(resp, ac)
+        method = self.getCookieMethod( 'setAuthCookie'
+                                       , self.defaultSetAuthCookie )
+        method( resp, self.auth_cookie, quote( ac ) )
 
     def _cleanupResponse(self):
         resp = self.REQUEST['RESPONSE']
@@ -282,7 +283,7 @@ class CookieCrumbler (SimpleItemWithProperties):
         resp = req['RESPONSE']
         method = self.getCookieMethod( 'expireAuthCookie'
                                      , self.defaultExpireAuthCookie )
-        method( cookie_name=self.auth_cookie )
+        method( resp, cookie_name=self.auth_cookie )
         redir = 0
         if self.logout_page:
             iself = getattr(self, 'aq_inner', self)
