@@ -1,0 +1,106 @@
+<dtml-unless do_inline_css>
+<dtml-call "RESPONSE.setHeader('Content-Type','text/css')">
+</dtml-unless>
+
+div.CalendarBox {
+    background-color: white;
+    border: None;
+    }
+
+table.calendar {
+    border: 1px solid Black;
+    text-align: right;
+}
+
+table.calendar th {
+    background-color: #DDDDDD;
+    font-weight: bold;
+    text-align: center;
+}
+
+table.calendar td {
+    white-space: nowrap
+    background-color: white;
+    width: 1.5em;
+}
+
+table.calendar a {
+    text-decoration: none;
+    color: Blue;
+}
+
+table.calendar a:hover {
+    text-decoration: none;
+}
+
+table.calendar td.weekdays {
+    background-color: #AAAAAA;
+    border: Black;
+    border-style: solid none;
+    text-align: center;
+}
+
+table.calendar td.event {
+    background-color: #DDDDDD;
+    font-weight: bold;
+}
+
+table.calendar td.todayevent {
+    background-color: #DDDDDD;
+    border: 2px solid Orange;
+    font-weight: bold;
+}
+
+table.calendar td.todaynoevent {
+    border-collapse: collapse;
+    border: 2px solid Orange;
+}
+
+div.day {
+    background-color: #FFFFBB;
+    border: 1px solid Black;
+    visibility: hidden;
+    width: 12em;
+    z-index: 2;
+}
+
+
+div.dayViewBox {
+    background-color: white;
+    border: None;
+    }
+
+table.dayView {
+    border: 1px solid Black;
+    text-align: right;
+}
+
+table.dayView th {
+    background-color: #DDDDDD;
+    font-weight: bold;
+    font-size: 75%;
+    text-align: center;
+}
+
+table.dayView td {
+    white-space: nowrap
+    background-color: white;
+    font-size: 75%;
+    width: 1.5em;
+    padding: 0.2em;
+    text-align: center;
+}
+
+table.dayView td.startDate {
+    text-align: right;
+}
+
+table.dayView td.endDate {
+    text-align: left;
+}
+
+table.dayView td.heading {
+    background-color: #AAAAAA;
+    border: 1px solid Black;
+    text-align: center;
+}

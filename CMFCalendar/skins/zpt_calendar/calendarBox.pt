@@ -1,0 +1,81 @@
+<html xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="here/main_template/macros/master">
+ 
+<div metal:fill-slot="header">&nbsp;</div>
+      
+<div metal:fill-slot="main">
+ <div metal:define-macro="calendarBox"
+     class="CalendarBox"
+     tal:define="DateTime python:modules['DateTime'].DateTime;
+                 yearmonth python:here.getMonthAndYear();
+                 year python:yearmonth[0];
+                 month python:yearmonth[1];
+                 weeks python:here.portal_calendar.getEventsForCalendar(month=month, year=year);">
+                 
+    <!-- The calendar, rendered as a table -->
+
+    <table cellpadding="2" cellspacing="0" border="0" class="calendar">
+
+        <tr>
+        
+            <!-- The headers.  The month with links either side -->
+            <th>
+                <a href="#" tal:attributes="href python:here.getPreviousMonthLink(request.URL0, month, year)">&laquo;</a>
+            </th>
+
+            <th colspan="5" tal:define="date string:$month/1/$year">
+              <span tal:replace="python:DateTime(date).strftime('%B').capitalize()"/> <span tal:replace="python:DateTime(date).year()"/>
+            </th>
+
+            <th>
+                <a href="#" tal:attributes="href python:here.getNextMonthLink(request.URL0, month, year)">&raquo;</a>
+            </th>
+        </tr>
+
+        <!-- The week days across the top -->
+        <tr tal:define="weekdays here/portal_calendar/getDays">
+          <tal:weekday tal:repeat="weekday weekdays">
+            <td class="weekdays" tal:content="weekday">Su</td>
+          </tal:weekday>
+        </tr>
+
+        <!-- The actual days with in the weeks -->
+        <tr tal:repeat="week weeks">
+          <tal:week tal:define="days week">
+            <tal:day tal:repeat="day days">
+
+              <tal:daynumber tal:define="daynumber day/day;
+                                         datestring python: '%d/%0.2d/%0.2d' % (year, month, daynumber);">
+
+                <tal:event tal:condition="day/event">
+                    <!-- There is an event on this day -->
+                    <td class="event"
+                        tal:attributes="class       python:here.getDaysClass(daynumber, month, year, day['event'])">
+                        <a href tal:attributes="href python:here.portal_url()+'/calendar_day_view?date=%s'%(datestring)"
+                                tal:content="python: daynumber or default">
+                          &nbsp;
+                        </a>
+                    </td>
+                </tal:event>
+                
+                <tal:event tal:condition="not: day/event">
+                    <!-- There is no event on this day -->
+                    <td tal:content="python: daynumber or default"
+                        tal:attributes="class python:here.getDaysClass(daynumber, month, year)">
+                        &nbsp;
+                    </td>
+                </tal:event>
+                
+              </tal:daynumber>
+
+            </tal:day>
+          </tal:week>
+        </tr>
+
+    </table>
+
+ </div>
+</div>
+
+</html>

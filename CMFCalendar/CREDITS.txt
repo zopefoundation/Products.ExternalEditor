@@ -1,0 +1,10 @@
+-- CREDITS.TXT --
+
+Orignal Event meta_type and CMFCalendar by Zope Corporation.
+
+The implementation of the calendar and the calendar_tool was
+completed by Andy Dawkins (New Information Paradigms Ltd)
+
+Andy originally implemented the Calendar design in plone
+(www.plone.org) with help from the plone development team
+(Alexander Limi, Vidar Andersen and Alan Runyan)

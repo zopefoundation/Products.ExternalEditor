@@ -1,0 +1,62 @@
+<html xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="here/main_template/macros/master">
+ 
+<div metal:fill-slot="header">&nbsp;</div>
+
+<div metal:fill-slot="main">
+
+ <div metal:define-macro="dayViewBox"
+      class="dayViewBox"
+      tal:define="DateTime python:modules['DateTime'].DateTime;
+                  thisDay  python:DateTime(request.get('date', DateTime().aCommon()[:12]))">
+
+  <table class="dayView" cellpadding="0" cellspacing="0" border="0">
+  
+   <tr>
+
+     <th>
+       <a href="#" tal:attributes="href python:here.getPreviousDayLink(template.absolute_url(), thisDay)">&laquo;</a>
+     </th>
+
+     <th tal:content="python:thisDay.aCommon()[:12]" colspan="3" nowrap>Date Heading</th>
+   
+     <th>
+       <a href="#" tal:attributes="href python:here.getNextDayLink(template.absolute_url(), thisDay)">&raquo;</a>
+     </th>
+   
+   </tr>
+
+   <tal:events tal:repeat="event python:here.portal_calendar.getEventsForThisDay(thisDay)">
+
+     <tr>
+
+       <td class="heading" colspan="5" nowrap>
+         <a href="#" tal:attributes="href event/getURL" tal:content="event/title">
+           event title
+         </a>
+       </td>     
+              
+     </tr>
+
+     <tr>
+       <td class="startDate" tal:content="python:here.getStartAsString(thisDay, event)" nowrap colspan="2">
+        Event Start
+       </td>
+
+       <td nowrap>
+        --
+       </td>
+
+       <td class="endDate" tal:content="python:here.getEndAsString(thisDay, event)" nowrap colspan="2">
+        Event End
+       </td>
+     </tr>   
+   
+   </tal:events>
+   
+ </div>
+
+</div>
+
+</html>
