@@ -11,8 +11,12 @@ Installing CMFCollector
 
    - Zope Page templates (ZPT, http://www.zope.org/Wikis/DevSite/Projects/ZPT )
 
-   - CMFDecor provisions for ZPT, including use of the ZPT skin as the
+   - CMF/CMFDecor provisions for ZPT, including use of the ZPT skin as the
      default skin (settable from the portal_skins 'Properties' tab).
+
+   - CMF/DCWorkflow (this is probably temporary - we'll probably move
+     to script-based specification of the workflow, once it's further
+     developed, for easier updating)
 
   To install CMFCollector, uncompress the CMFCollector product into
   your zope/Products directory or link it there, e.g.::
@@ -40,3 +44,16 @@ Installing CMFCollector
   The install function will execute and give information about the
   steps it took to register and install the CMF Events into the CMF
   Site instance.
+
+  Finally, install the workflow:
+
+     1. Put collector_issue_workflow.zexp in your site's import/
+        directory.
+
+     2. Within the portal's portal_workflow 'Contents' tab:
+
+        o hit the 'Import/Export' button
+
+        o fill in Import File Name: collector_issue_workflow.zexp
+
+        o hit 'import'
