@@ -300,7 +300,7 @@ class CookieCrumblerTests (unittest.TestCase):
 
     def testCreateForms(self):
         # Verify the factory creates the login forms.
-        if 'CMFCore' in CookieCrumbler.__module__:
+        if CookieCrumbler.__module__.find('CMFCore') >= 0:
             # This test is disabled in CMFCore.
             return
         self.root._delObject('cookie_authentication')
