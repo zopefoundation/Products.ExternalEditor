@@ -105,13 +105,13 @@ class WorkflowUIMixin:
 
     security.declareProtected(ManagePortal, 'getGroups')
     def getGroups(self):
-        """Returns the group security monikers managed by this workflow.
+        """Returns the names of groups managed by this workflow.
         """
         return tuple(self.groups)
 
     security.declareProtected(ManagePortal, 'getAvailableGroups')
     def getAvailableGroups(self):
-        """Returns a list of available group security monikers.
+        """Returns a list of available group names.
         """
         gf = self._getGroupFolder()
         if gf is None:
@@ -119,14 +119,14 @@ class WorkflowUIMixin:
         r = []
         r.extend(gf.getDynamicGroups())
         r.extend(gf.getStaticGroups())
-        return [g.getSecurityMoniker() for g in r]
+        return [g.getId() for g in r]
 
     security.declareProtected(ManagePortal, 'addGroup')
     def addGroup(self, group, RESPONSE=None):
-        """Adds a group by moniker.
+        """Adds a group by name.
         """
         gf = self._getGroupFolder()
-        g = gf.getPrincipalByMoniker(group)
+        g = gf.getGroupById(group)
         if g is None:
             raise ValueError(group)
         self.groups = self.groups + (group,)
@@ -137,7 +137,7 @@ class WorkflowUIMixin:
 
     security.declareProtected(ManagePortal, 'delGroups')
     def delGroups(self, groups, RESPONSE=None):
-        """Removes groups by moniker.
+        """Removes groups by name.
         """
         self.groups = tuple([g for g in self.groups if g not in groups])
         if RESPONSE is not None:

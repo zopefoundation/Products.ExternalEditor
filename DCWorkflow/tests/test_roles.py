@@ -38,19 +38,19 @@ class RoleMapTests(unittest.TestCase):
 
     def testModifyRolesForGroup(self):
         modifyRolesForGroup(
-            self.ob, '(Group) Administrators', ['Owner'], ['Member', 'Owner'])
+            self.ob, 'Administrators', ['Owner'], ['Member', 'Owner'])
         modifyRolesForGroup(
-            self.ob, '(Group) Users', [], ['Member'])
+            self.ob, 'Users', [], ['Member'])
         self.assertEqual(self.ob.__ac_local_roles__, {
-            '(Group) Administrators': ('Manager', 'Owner'),
+            '(Group) Administrators': ['Manager', 'Owner'],
             })
         modifyRolesForGroup(
-            self.ob, '(Group) Administrators', ['Member'], ['Member', 'Owner'])
+            self.ob, 'Administrators', ['Member'], ['Member', 'Owner'])
         modifyRolesForGroup(
-            self.ob, '(Group) Users', ['Member'], ['Member'])
+            self.ob, 'Users', ['Member'], ['Member'])
         self.assertEqual(self.ob.__ac_local_roles__, {
-            '(Group) Administrators': ('Manager', 'Member'),
-            '(Group) Users': ('Member',),
+            '(Group) Administrators': ['Manager', 'Member'],
+            '(Group) Users': ['Member'],
             })
 
     def testModifyRolesForPermission(self):

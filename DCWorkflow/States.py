@@ -49,7 +49,7 @@ class StateDefinition (SimpleItem):
     description = ''
     transitions = ()  # The ids of possible transitions.
     permission_roles = None  # { permission: [role] or (role,) }
-    group_roles = None  # { group moniker : (role,) }
+    group_roles = None  # { group name : (role,) }
     var_values = None  # PersistentMapping if set.  Overrides transition exprs.
 
     security = ClassSecurityInfo()
