@@ -88,6 +88,7 @@ from OFS.PropertyManager import PropertyManager
 from Globals import default__class_init__, HTMLFile
 from DateTime.DateTime import DateTime
 from utils import tuplize
+from Products.CMFCore.WorkflowCore import WorkflowAction
 
 class DefaultDublinCoreImpl( PropertyManager ):
     """
@@ -396,8 +397,7 @@ class DefaultDublinCoreImpl( PropertyManager ):
         self.setLanguage( language )
         self.setRights( rights )
 
-        if hasattr( self, 'reindexObject' ):
-            self.reindexObject()
+    editMetadata = WorkflowAction(editMetadata)
 
 
 default__class_init__(DefaultDublinCoreImpl)

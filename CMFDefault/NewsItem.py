@@ -96,21 +96,20 @@ from DublinCore import DefaultDublinCoreImpl
 from utils import parseHeadersBody
 
 from Products.CMFCore import CMFCorePermissions
+from Products.CMFCore.WorkflowCore import WorkflowAction, afterCreate
 
 def addNewsItem( self
                , id
                , title=''
                , text=''
                , description=''
-               , RESPONSE=None
                ):
     """
         Add a NewsItem
     """
     o=NewsItem( id, title, text, description )
-    self._setObject(id,o)
-    if RESPONSE is not None:
-        RESPONSE.redirect(self.absolute_url()+'/folder_contents')
+    self._setObject(id, o)
+    afterCreate(self.this()._getOb(id))
 
 
 class NewsItem( PortalContent
@@ -142,9 +141,6 @@ class NewsItem( PortalContent
         self.description = description
         self._parse()
 
-##    def __call__(self, REQUEST, **kw):
-##        return apply(self.view, (self, REQUEST), kw)
-
     def edit( self, text, description ):
         """
             Edit the News Item
@@ -152,7 +148,7 @@ class NewsItem( PortalContent
         self.text=text
         self.description=description
         self._parse()
-        self.reindexObject()
+    edit = WorkflowAction(edit)
 
     def _parse(self):
         self.cooked_text=self._format_text(self)     

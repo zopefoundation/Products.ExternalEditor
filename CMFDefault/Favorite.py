@@ -94,9 +94,10 @@ from Products.CMFCore.utils import getToolByName
 from DublinCore import DefaultDublinCoreImpl
 from Link import Link
 
+from Products.CMFCore.WorkflowCore import afterCreate
 
-def addFavorite(self, id, title='', remote_url='', description='',
-                RESPONSE=None):
+
+def addFavorite(self, id, title='', remote_url='', description=''):
     """
     Add a Favorite
     """
@@ -105,9 +106,9 @@ def addFavorite(self, id, title='', remote_url='', description='',
         remote_url))
     o=Favorite( id, title, relUrl, description )
     self._setObject(id,o)
-    if RESPONSE is not None:
-        RESPONSE.redirect(self.absolute_url()+'/folder_contents')
-        
+    afterCreate(self.this()._getOb(id))
+
+
 class Favorite( Link ):
     """
         A Favorite (special kind of Link)

@@ -94,6 +94,7 @@ from Products.CMFCore.PortalContent import PortalContent
 from DublinCore import DefaultDublinCoreImpl
 
 from Products.CMFCore import CMFCorePermissions
+from Products.CMFCore.WorkflowCore import WorkflowAction, afterCreate
 
 
 def addLink( self
@@ -101,16 +102,15 @@ def addLink( self
            , title=''
            , remote_url=''
            , description=''
-           , RESPONSE=None
            ):
     """
     Add a Link
     """
     o=Link( id, title, remote_url, description )
     self._setObject(id,o)
-    if RESPONSE is not None:
-        RESPONSE.redirect(self.absolute_url()+'/folder_contents')
-        
+    afterCreate(self.this()._getOb(id))
+
+
 class Link( PortalContent
           , DefaultDublinCoreImpl
           ):
@@ -139,15 +139,12 @@ class Link( PortalContent
         self.remote_url=remote_url
         self.description=description
 
-##    def __call__(self, REQUEST, **kw):
-##        return apply(self.view, (self, REQUEST), kw)
-
     def edit( self, remote_url ):
         """
             Edit the Link
         """
         self.remote_url=remote_url
-        self.reindexObject()
+    edit = WorkflowAction(edit)
 
     def SearchableText(self):
         """

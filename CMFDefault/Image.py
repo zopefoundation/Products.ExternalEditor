@@ -98,6 +98,7 @@ import Globals
 from DublinCore import DefaultDublinCoreImpl
 
 from Products.CMFCore import CMFCorePermissions
+from Products.CMFCore.WorkflowCore import WorkflowAction, afterCreate
 
 
 import OFS.Image
@@ -116,7 +117,6 @@ def addImage( self
             , format='text/html'
             , language='en-US'
             , rights=''
-            , RESPONSE=None
             ):
     """
         Add an Image
@@ -125,11 +125,9 @@ def addImage( self
     # cookId sets the id and title if they are not explicity specified
     id, title = OFS.Image.cookId(id, title, file)
 
-    self=self.this()  # Why?
+    self=self.this()
 
     # Instantiate the object and set its description.
-    # The description is not set by the constructor because I didn't
-    # want to extend Image's constructor.  Perhaps I should.
     iobj = Image( id, title, '', content_type, precondition, subject
                 , description, contributors, effective_date, expiration_date
                 , format, language, rights
@@ -139,12 +137,12 @@ def addImage( self
     self._setObject(id, iobj)
 
     # 'Upload' the image.  This is done now rather than in the
-    # constructor because it's faster.  Why is it faster?
+    # constructor because it's faster (see File.py.)
     self._getOb(id).manage_upload(file)
 
-    if RESPONSE is not None:
-        RESPONSE.redirect(self.absolute_url()+'/folder_contents')
-    
+    afterCreate(self._getOb(id))
+
+
 class Image( OFS.Image.Image
            , PortalContent
            , DefaultDublinCoreImpl
@@ -220,7 +218,7 @@ class Image( OFS.Image.Image
             self.manage_upload(file)
 
         self.setFormat(self.content_type)
-        self.reindexObject()
+    edit = WorkflowAction(edit)
 
     def index_html(self, REQUEST, RESPONSE):
         """

@@ -96,16 +96,16 @@ from DublinCore import DefaultDublinCoreImpl
 from utils import parseHeadersBody, SimpleHTMLParser, bodyfinder
 
 from Products.CMFCore import CMFCorePermissions
+from Products.CMFCore.WorkflowCore import WorkflowAction, afterCreate
 
 def addDocument(self, id, title='', description='', text_format='',
-                text='', RESPONSE=None):
+                text=''):
     """
         Add a Document
     """
     o=Document(id, title, description, text_format, text)
     self._setObject(id,o)
-    if RESPONSE is not None:
-        RESPONSE.redirect(self.absolute_url() + '/folder_contents')
+    afterCreate(self.this()._getOb(id))
     
 
 class Document(PortalContent, DefaultDublinCoreImpl):
@@ -121,7 +121,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
     security = ClassSecurityInfo()
     security.declareProtected(CMFCorePermissions.View,
                               'manage_FTPget',
-                              'listActions', 'Format', 'Description',)
+                              'Format', 'Description',)
     security.declareProtected(CMFCorePermissions.ModifyPortalContent,
                               'edit', 'setFormat',)
 
@@ -133,9 +133,6 @@ class Document(PortalContent, DefaultDublinCoreImpl):
         self.text=text
         self.text_format=text_format
         self._parse()
-
-##    def __call__(self, REQUEST, **kw):
-##        return apply(self.view, (self, REQUEST), kw)
 
     def edit(self, text_format, text, file=''):
         """
@@ -181,7 +178,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
                           rights=headers['Rights'],
                           )
         self._parse()
-        self.reindexObject()
+    edit = WorkflowAction(edit)
 
     def _parse(self):
         if self.text_format=='structured-text':
@@ -215,6 +212,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
             self.text_format = 'html'
         else:
             self.text_format = 'structured-text'
+    setFormat = WorkflowAction(setFormat)
 
     ## FTP handlers
     def PUT(self, REQUEST, RESPONSE):

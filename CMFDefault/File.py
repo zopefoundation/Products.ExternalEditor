@@ -99,6 +99,7 @@ import Globals
 from DublinCore import DefaultDublinCoreImpl
 
 from Products.CMFCore import CMFCorePermissions
+from Products.CMFCore.WorkflowCore import WorkflowAction, afterCreate
 
 
 import OFS.Image
@@ -117,7 +118,6 @@ def addFile( self
            , format='text/html'
            , language='en-US'
            , rights=''
-           , RESPONSE=None
            ):
     """
     Add a File
@@ -126,11 +126,9 @@ def addFile( self
     # cookId sets the id and title if they are not explicity specified
     id, title = OFS.Image.cookId(id, title, file)
 
-    self=self.this()  # Why?
+    self=self.this()
 
-    # Instantiate the object and set it's description.
-    # The description is not set by the constructor because I didn't
-    # want to extend File's constructor.  Perhaps I should.
+    # Instantiate the object and set its description.
     fobj = File( id, title, '', content_type, precondition, subject
                , description, contributors, effective_date, expiration_date
                , format, language, rights
@@ -140,12 +138,13 @@ def addFile( self
     self._setObject(id, fobj)
 
     # 'Upload' the file.  This is done now rather than in the
-    # constructor because it's faster.  Why is it faster?
+    # constructor because the object is now in the ZODB and
+    # can span ZODB objects.
     self._getOb(id).manage_upload(file)
 
-    if RESPONSE is not None:
-        RESPONSE.redirect(self.absolute_url()+'/folder_contents')
-    
+    afterCreate(self._getOb(id))
+
+
 class File( OFS.Image.File
           , PortalContent
           , DefaultDublinCoreImpl
@@ -221,7 +220,7 @@ class File( OFS.Image.File
             self.manage_upload(file)
 
         self.setFormat(self.content_type)
-        self.reindexObject()
+    edit = WorkflowAction(edit)
 
     def download(self, REQUEST, RESPONSE):
         """
@@ -235,9 +234,6 @@ class File( OFS.Image.File
         return OFS.Image.File.index_html(self, REQUEST, RESPONSE)
 
     index_html = download
-
-##    def __call__(self, REQUEST, **kw):
-##        return apply(self.view, (self, REQUEST), kw)
 
 
 Globals.default__class_init__(File)
