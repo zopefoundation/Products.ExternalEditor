@@ -45,6 +45,12 @@
 
  Bug fixes
 
+  - Hardened DirectoryView against objects which raise exceptions
+    during initial reads (typically due to permission problems);
+    these objects now capture and log the exception, and create
+    a BadFile object which allows browsing the traceback via the
+    ZMI (Tracker #317).
+
   - Stopped polluting the browser with persistent skin cookie;
     clear it as well on logout (Tracker #304).
 

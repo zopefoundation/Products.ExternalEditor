@@ -91,48 +91,17 @@ from Globals import HTMLFile, Persistent
 import os
 from os import path, listdir, stat
 from Acquisition import aq_inner, aq_parent, aq_base
-from string import split, rfind, strip
+from string import split, rfind, strip, join
 from App.Common import package_home
 from OFS.ObjectManager import bad_id
 from OFS.Folder import Folder
 from AccessControl import ClassSecurityInfo
 from CMFCorePermissions import AccessContentsInformation
 import CMFCorePermissions
+from FSObject import BadFile
+from utils import expandpath, minimalpath
 
 __reload_module__ = 0
-
-def normalize(p):
-    return path.abspath(path.normcase(p))
-
-normINSTANCE_HOME = normalize(INSTANCE_HOME)
-normSOFTWARE_HOME = normalize(SOFTWARE_HOME)
-
-separators = (os.sep, os.altsep)
-
-def expandpath(p):
-    # Converts a minimal path to an absolute path.
-    if path.isabs(p):
-        return p
-    abs = path.join(normINSTANCE_HOME, p)
-    if path.exists(abs):
-        return abs
-    return path.join(normSOFTWARE_HOME, p)
-
-def minimalpath(p):
-    # Trims INSTANCE_HOME or SOFTWARE_HOME from a path.
-    p = path.abspath(p)
-    abs = normalize(p)
-    l = len(normINSTANCE_HOME)
-    if abs[:l] != normINSTANCE_HOME:
-        l = len(normSOFTWARE_HOME)
-        if abs[:l] != normSOFTWARE_HOME:
-            # Can't minimize.
-            return p
-    p = p[l:]
-    while p[:1] in separators:
-        p = p[1:]
-    return p
-
 
 class DirectoryInformation:
     data = None
@@ -198,12 +167,13 @@ class DirectoryInformation:
                     register_subdirs=changed)
             except:
                 from zLOG import LOG, ERROR
-                import sys
+                import sys, traceback
                 type,value,tb = sys.exc_info()
-                LOG('DirectoryView',
-                    ERROR,
-                    'Error during prepareContents:',
-                    "\nType:%s\nValue:%s\n" % (type,value))
+                LOG( 'DirectoryView'
+                   , ERROR
+                   , 'Error during prepareContents:'
+                   , traceback.format_exception( type, value, tb )
+                   )
                 self.data = {}
                 self.objects = ()
                     
@@ -265,7 +235,19 @@ class DirectoryInformation:
                 if t is None:
                     t = registry.getTypeByExtension(ext)
                 if t is not None:
-                    ob = t(name, e_filepath, fullname=entry)
+                    try:
+                        ob = t(name, e_filepath, fullname=entry)
+                    except:
+                        from zLOG import LOG, ERROR
+                        import sys, traceback
+                        typ, val, tb = sys.exc_info()
+                        exc_lines = traceback.format_exception( typ, val, tb )
+                        LOG( 'DirectoryView', ERROR, join( exc_lines, '\n' ) )
+                        ob = BadFile( name
+                                    , e_filepath
+                                    , exc_str=join( exc_lines, '\r\n' )
+                                    , fullname=entry
+                                    )
                     ob_id = ob.getId()
                     data[ob_id] = ob
                     objects.append({'id': ob_id, 'meta_type': ob.meta_type})

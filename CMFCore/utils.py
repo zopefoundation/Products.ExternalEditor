@@ -567,7 +567,41 @@ def keywordsplitter(headers,
         keylist = map(string.strip, keylist)
         out.extend(filter(operator.truth, keylist))
     return out
-    
+
+#
+#   Directory-handling utilities
+#
+def normalize(p):
+    return path.abspath(path.normcase(p))
+
+normINSTANCE_HOME = normalize(INSTANCE_HOME)
+normSOFTWARE_HOME = normalize(SOFTWARE_HOME)
+
+separators = (os.sep, os.altsep)
+
+def expandpath(p):
+    # Converts a minimal path to an absolute path.
+    if path.isabs(p):
+        return p
+    abs = path.join(normINSTANCE_HOME, p)
+    if path.exists(abs):
+        return abs
+    return path.join(normSOFTWARE_HOME, p)
+
+def minimalpath(p):
+    # Trims INSTANCE_HOME or SOFTWARE_HOME from a path.
+    p = path.abspath(p)
+    abs = normalize(p)
+    l = len(normINSTANCE_HOME)
+    if abs[:l] != normINSTANCE_HOME:
+        l = len(normSOFTWARE_HOME)
+        if abs[:l] != normSOFTWARE_HOME:
+            # Can't minimize.
+            return p
+    p = p[l:]
+    while p[:1] in separators:
+        p = p[1:]
+    return p
 
 if 0:
     # Hopefully we can use this.

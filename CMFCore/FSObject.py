@@ -93,7 +93,7 @@ from AccessControl import ClassSecurityInfo
 from OFS.SimpleItem import Item
 from DateTime import DateTime
 
-from DirectoryView import expandpath
+from utils import expandpath
 import CMFCorePermissions
 
 class FSObject(Acquisition.Implicit, Item):
@@ -193,3 +193,86 @@ class FSObject(Acquisition.Implicit, Item):
         return self._filepath
 
 Globals.InitializeClass(FSObject)
+
+class BadFile( FSObject ):
+    """
+        Represent a file which was not readable or parseable
+        as its intended type.
+    """
+    meta_type = 'Bad File'
+    icon = 'p_/broken'
+
+    BAD_FILE_VIEW = """\
+<dtml-var manage_page_header>
+<dtml-var manage_tabs>
+<h2> Bad Filesystem Object: &dtml-getId; </h2>
+
+<h3> File Contents </h3>
+<pre>
+<dtml-var getFileContents>
+</pre>
+
+<h3> Exception </h3>
+<pre>
+<dtml-var getExceptionText>
+</pre>
+<dtml-var manage_page_footer>
+"""
+
+    manage_options=(
+        {'label':'Error', 'action':'manage_showError'},
+        )
+
+    def __init__( self, id, filepath, exc_str=''
+                , fullname=None, properties=None):
+        id = fullname or id # Use the whole filename.
+        self.exc_str = exc_str
+        self.file_contents = ''
+        FSObject.__init__(self, id, filepath, fullname, properties)
+
+    security = ClassSecurityInfo()
+
+    showError = Globals.HTML( BAD_FILE_VIEW )
+    security.declareProtected( CMFCorePermissions.ManagePortal
+                             , 'manage_showError' )
+    def manage_showError( self, REQUEST ):
+        """
+        """
+        return self.showError( self, REQUEST )
+
+    security.declarePrivate( '_readFile' )
+    def _readFile( self, reparse ):
+        """Read the data from the filesystem.
+        
+        Read the file indicated by exandpath(self._filepath), and parse the
+        data if necessary.  'reparse' is set when reading the second
+        time and beyond.
+        """
+        try:
+            fp = expandpath(self._filepath)
+            file = open(fp, 'rb')
+            try:
+                data = self.file_contents = file.read()
+            finally:
+                file.close()
+        except:
+            data = self.file_contents = None #give up
+        return data
+    
+    security.declarePublic( 'getFileContents' )
+    def getFileContents( self ):
+        """
+            Return the contents of the file, if we could read it.
+        """
+        return self.file_contents
+    
+    security.declarePublic( 'getExceptionText' )
+    def getExceptionText( self ):
+        """
+            Return the exception thrown while reading or parsing
+            the file.
+        """
+        return self.exc_str
+
+
+Globals.InitializeClass( BadFile )
