@@ -19,6 +19,7 @@ import os
 from os import path as os_path
 import re
 from types import StringType, UnicodeType
+from warnings import warn
 
 from AccessControl import ClassSecurityInfo
 from AccessControl import getSecurityManager
@@ -143,6 +144,8 @@ def _checkPermission(permission, obj):
 
 security.declarePrivate('_verifyActionPermissions')
 def _verifyActionPermissions(obj, action):
+    # _verifyActionPermissions is deprecated and will be removed in CMF 1.6.
+    # This was only used by the deprecated _getViewFor function.
     pp = action.getPermissions()
     if not pp:
         return 1
@@ -168,6 +171,11 @@ def getActionContext( self ):
 
 security.declarePrivate('_getViewFor')
 def _getViewFor(obj, view='view'):
+    warn('__call__() and view() methods using _getViewFor() as well as '
+         '_getViewFor() itself are deprecated and will be removed in CMF 1.6. '
+         'Bypass these methods by defining \'(Default)\' and \'view\' Method '
+         'Aliases.',
+         DeprecationWarning)
     ti = obj.getTypeInfo()
 
     if ti is not None:
