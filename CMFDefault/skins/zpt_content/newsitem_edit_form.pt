@@ -46,7 +46,7 @@
   <th class="TextField"> Lead-in </th>
   <td class="TextField">
    <textarea name="description:text" rows="10" wrap="soft"  
-             cols="65" tal:content="here/description"></textarea>
+             cols="65" tal:content="here/Description"></textarea>
   </td>
  </tr>
  <tr>

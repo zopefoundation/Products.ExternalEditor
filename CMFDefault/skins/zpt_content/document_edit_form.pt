@@ -28,7 +28,7 @@
     Description
   </th>
   <td>
-   <span tal:replace="here/description">Description</span>
+   <span tal:replace="here/Description">Description</span>
   </td>
  </tr>
 

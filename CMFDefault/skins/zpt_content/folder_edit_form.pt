@@ -18,7 +18,7 @@
    <input type="text"
           name="title"
           value=""
-		  tal:attributes="value here/title"
+		  tal:attributes="value here/Title"
           size="65">
   </td>
  </tr>
@@ -29,7 +29,7 @@
   <td colspan="3">
    <textarea name="description:text" rows="5"
              cols="65" wrap="soft"
-			 tal:content="here/description">
+			 tal:content="here/Description">
    </textarea>
   </td>
  </tr>
