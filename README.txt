@@ -14,8 +14,6 @@ Zope Content Management Framework (CMF) README
 
     General
 
-      * The CMF "dogbowl" site, http://cmf.zope.org.
-
       * The mailing list, zope-cmf@zope.org.  List information and
 	online signup are available at:
 	http://lists.zope.org/mailman/listinfo/zope-cmf.  Archives
