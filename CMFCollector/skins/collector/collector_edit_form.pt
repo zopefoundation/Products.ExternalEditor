@@ -20,7 +20,7 @@
 <h2> Configure Collector </h2>
  
 <form action="collector_edit" method="post">
-<table class="FormLayout">
+<table class="FormLayout" width="100%">
  
  <tr valign="top">
   <th align="right"> Title
@@ -55,7 +55,7 @@
  <tr valign="top">
   <th align="right"> Collector Email
   </th>
-  <td colspan="2"
+  <td colspan="3"
       tal:define="member python:
                          here.portal_membership.getAuthenticatedMember();
                   getpropemail python: hasattr(member, 'getProperty')
@@ -63,34 +63,95 @@
                   attremail python: getattr(member, 'email', '');
                   email python: getattr(here, 'email', 
                                         getpropemail or attremail)">
-          <input type="text" name="email" size=30
-                 value="EMAIL"
-                 tal:attributes="value email">
-  </td>
-  <td> <font color="gray"> Administrative email address - Mandatory </font>
+          <table>
+            <tr>
+              <td>
+                <input type="text" name="email" size=30
+                       value="EMAIL"
+                       tal:attributes="value email">
+              </td>
+              <td>
+                <font color="gray"> "From" address for notifications </font>
+              </td>
+            </tr>
+          </table>
   </td>
  </tr>
   
  <tr valign="top">
+  <th> </th>
+  <td colspan="3">
+       <font color="gray"> <em> Note that staff changes cause reindexing of
+              all issues, so catalog local-roles/visibility caching
+              tracks. </em>
+       </font>
+  </td>
+ </tr>
+  
+ <tr valign="top">
+  <th align="right"> Managers
+  </th>
+  <td>
+   <textarea name="managers:lines" rows="5" cols="15">
+<span tal:repeat="it here/managers" tal:replace="it"></span>
+</textarea>
+  </td>
+  <td colspan="2">
+          <font color="gray"> Managers configure, and may handle requests.
+            They receive new requests regardless of the "dispatching" setting.
+            Managers cannot remove <em>themselves</em> from management
+            - another manager must do so.
+          </font>
+  </td>
+ </tr>
+
+ <tr>
   <th align="right"> Supporters
   </th>
-  <td colspan="3">
-<!-- If there's no 'supporters' attribute, we're creating the collector,
-     so include the creator as the default set of supporters -->
+  <td>
    <textarea name="supporters:lines" rows="5" cols="15">
 <span tal:repeat="it here/supporters" tal:replace="it"></span>
 </textarea>
   </td>
+  <td colspan="2">
+          <font color="gray"> Supporters just handle requests.  They may
+            or may not receive initial request notifications, depending on the
+            "dispatching" setting below.
+          </font>
+  </td>
+ </tr>
+
+ <tr valign="top">
+  <th align="right"> Dispatching
+  </th>
+  <td colspan="3">
+    <input type="radio" name="dispatching:int" value="0"
+           tal:attributes="checked not: here/dispatching|nothing">
+          Off
+            <font color="gray">
+              Managers and supporters receive non-consultation notices </font>
+  </td>
+ </tr>
+
+ <tr>
+  <td> </td>
+  <td colspan="3">
+    <input type="radio" name="dispatching:int" value="1"
+           tal:attributes="checked here/dispatching|nothing">
+          On
+            <font color="gray">
+              Only managers recieve non-consultation notices </font>
+  </td>
  </tr>
   
  <tr valign="top">
-  <th align="right"> Issue Topics
+  <th align="right"> Topics
   </th>
   <td>
    <textarea name="topics:lines" rows="5" cols="15">
 <span tal:repeat="it here/topics|nothing" tal:replace="it"></span></textarea>
   </td>
-  <th align="right"> Issue Classifications
+  <th align="right"> Classifications
   </th>
   <td>
    <textarea name="classifications:lines" rows="5" cols="15">
