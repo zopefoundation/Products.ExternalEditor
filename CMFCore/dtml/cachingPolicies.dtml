@@ -1,0 +1,181 @@
+<dtml-var manage_page_header>
+<dtml-var manage_tabs>
+
+<dtml-in listPolicies>
+<dtml-if sequence-start>
+<h2> Edit Caching Policies </h2>
+
+<table>
+</dtml-if>
+ <dtml-let policy_id=sequence-key
+           policy=sequence-item
+ >
+  <tr valign="top">
+   <td align="left">
+
+    <form action="&dtml-absolute_url;">
+
+     <dtml-with policy>
+      <dtml-let nc_checked="getNoCache() and 'checked' or ''"
+                ns_checked="getNoStore() and 'checked' or ''"
+                mr_checked="getMustRevalidate() and 'checked' or ''">
+
+       <input type="hidden" name="policy_id" value="&dtml-getPolicyId;">
+       <input type="hidden" name="no_cache:default:int" value="0">
+       <input type="hidden" name="no_store:default:int" value="0">
+       <input type="hidden" name="must_revalidate:default:int" value="0">
+
+       <table>
+
+       <tr valign="top">
+       <th align="right"> Policy ID </th>
+       <td>
+         &dtml-getPolicyId;
+       </td>
+       </tr>
+
+       <tr valign="top">
+       <th align="right"> Predicate </th>
+       <td>
+         <input type="text"
+                name="predicate"
+                value="&dtml-getPredicate;"
+                size="40">
+       </td>
+
+       <th align="right"> No-cache? </th>
+       <td>
+         <input type="checkbox" name="no_cache:int"
+                                value="1" &dtml-nc_checked;>
+       </td>
+       </tr>
+
+       <tr valign="top">
+       <th align="right"> Mod. Time </th>
+       <td>
+         <input type="text"
+                name="mtime_func"
+                value="&dtml-getMTimeFunc;"
+                size="40">
+       </td>
+
+       <th align="right"> No-store? </th>
+       <td>
+         <input type="checkbox" name="no_store:int"
+                                value="1" &dtml-ns_checked;>
+       </td>
+       </tr>
+
+       <tr valign="top">
+       <th align="right"> Max age (secs) </th>
+       <td>
+         <input type="text"
+                name="max_age_secs:int"
+               value="&dtml-getMaxAgeSecs;">
+       </td>
+
+       <th align="right"> Must-revalidate? </th>
+       <td>
+         <input type="checkbox" name="must_revalidate:int"
+                                value="1" &dtml-mr_checked;>
+       </td>
+       </tr>
+
+       <tr valign="top">
+       <td><br /></td>
+       <td colspan="3">
+         <input type="submit" name="updatePolicy:method" value=" Change ">
+         <input type="submit" name="removePolicy:method" value=" Delete ">
+         <input type="submit" name="movePolicyUp:method" value=" Up ">
+         <input type="submit" name="movePolicyDown:method" value=" Down ">
+       </td>
+
+       </table>
+
+      </dtml-let>
+     </dtml-with>
+
+
+    </form>
+
+   </td>
+   <td> <br> </td>
+  </tr>
+ </dtml-let>
+<dtml-if sequence-end>
+</table>
+</dtml-if>
+</dtml-in>
+
+<h2> Add Caching Policy </h2>
+
+<table>
+ <tr valign="top">
+  <td align="left">
+    <form action="&dtml-absolute_url;">
+
+       <input type="hidden" name="no_cache:default:int" value="0">
+       <input type="hidden" name="no_store:default:int" value="0">
+       <input type="hidden" name="must_revalidate:default:int" value="0">
+
+       <table>
+
+       <tr valign="top">
+       <th align="right"> Policy ID </th>
+       <td>
+         <input type="text" name="policy_id">
+       </td>
+       </tr>
+
+       <tr valign="top">
+       <th align="right"> Predicate </th>
+       <td>
+         <input type="text" name="predicate" size="40">
+       </td>
+
+       <th align="right"> No-cache? </th>
+       <td>
+         <input type="checkbox" name="no_cache:int" value="1">
+       </td>
+       </tr>
+
+       <tr valign="top">
+       <th align="right"> Mod. time </th>
+       <td>
+         <input type="text" name="mtime_func" size="40">
+       </td>
+
+       <th align="right"> No-store? </th>
+       <td>
+         <input type="checkbox" name="no_store:int" value="1">
+       </td>
+       </tr>
+
+       <tr valign="top">
+       <th align="right"> Max age (secs) </th>
+       <td>
+         <input type="text" name="max_age_secs:int" value="0">
+       </td>
+
+       <th align="right"> Most-revalidate? </th>
+       <td>
+         <input type="checkbox" name="must_revalidate:int"
+                              value="1">
+       </td>
+       </tr>
+
+       <tr valign="top">
+       <td><br /></td>
+       <td>
+         <input type="submit" name="addPolicy:method" value=" Add ">
+       </td>
+       </tr>
+       </table>
+
+    </form>
+  </td>
+ </tr>
+</table>
+
+<dtml-var manage_page_footer>
+

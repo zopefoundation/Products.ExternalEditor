@@ -15,7 +15,8 @@ def test_suite():
         'test_CatalogTool',
         'test_DirectoryView',
         'test_FSPythonScript',
-        'test_FSPageTemplate'
+        'test_FSPageTemplate',
+        'test_CachingPolicyManager',
         ])
 
 if __name__ == '__main__':

@@ -22,6 +22,7 @@ import FSDTMLMethod, FSPythonScript, FSSTXMethod
 import FSZSQLMethod
 import CookieCrumbler
 import ContentTypeRegistry
+import CachingPolicyManager
 import utils
 
 try:
@@ -91,6 +92,12 @@ def initialize(context):
     context.registerClass(
         ContentTypeRegistry.ContentTypeRegistry,
         constructors=( ContentTypeRegistry.manage_addRegistry, ),
+        icon = 'images/registry.gif'
+        )
+
+    context.registerClass(
+        CachingPolicyManager.CachingPolicyManager,
+        constructors=( CachingPolicyManager.manage_addCachingPolicyManager, ),
         icon = 'images/registry.gif'
         )
 

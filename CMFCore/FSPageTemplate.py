@@ -19,6 +19,7 @@ from os import stat
 import Globals, Acquisition
 from DateTime import DateTime
 from DocumentTemplate.DT_Util import html_quote
+from Acquisition import aq_parent
 from AccessControl import getSecurityManager, ClassSecurityInfo
 from Shared.DC.Scripts.Script import Script
 from Products.PageTemplates.PageTemplate import PageTemplate
@@ -27,6 +28,7 @@ from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate, Src
 from DirectoryView import registerFileExtension, registerMetaType, expandpath
 from CMFCorePermissions import ViewManagementScreens, View, FTPAccess
 from FSObject import FSObject
+from utils import getToolByName
 
 class FSPageTemplate(FSObject, Script, PageTemplate):
     "Wrapper for Page Template"
@@ -95,6 +97,31 @@ class FSPageTemplate(FSObject, Script, PageTemplate):
     def pt_render(self, source=0, extra_context={}):
         self._updateFromFS()  # Make sure the template has been loaded.
         try:
+            if not source: # Hook up to caching policy.
+
+                REQUEST = getattr( self, 'REQUEST', None )
+
+                if REQUEST:
+
+                    content = aq_parent( self )
+
+                    mgr = getToolByName( content
+                                       , 'caching_policy_manager'
+                                       , None
+                                       )
+
+                    if mgr:
+                        view_name = self.getId()
+                        RESPONSE = REQUEST[ 'RESPONSE' ]
+                        headers = mgr.getHTTPCachingHeaders( content
+                                                           , view_name
+                                                           , extra_context
+                                                           )
+                        for key, value in headers:
+                            RESPONSE.setHeader( key, value )
+
+            return FSPageTemplate.inheritedAttribute('pt_render')( self,
+                    source, extra_context )
             return FSPageTemplate.inheritedAttribute('pt_render')(
                 self, source, extra_context )
         except RuntimeError:
@@ -107,7 +134,6 @@ class FSPageTemplate(FSObject, Script, PageTemplate):
                 raise RuntimeError, msg
             else:
                 raise
-            
             
     # Copy over more mothods
     security.declareProtected(FTPAccess, 'manage_FTPget')

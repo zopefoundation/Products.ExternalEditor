@@ -1,6 +1,10 @@
 import unittest
 import Zope
 
+class DummyCachingManager:
+    def getHTTPCachingHeaders( self, content, view_name, keywords ):
+        return ( ( 'foo', 'Foo' ), ( 'bar', 'Bar' ) )
+
 from Products.CMFCore.tests.base.testcase import RequestTest, SecurityTest
 
 class FSPTMaker:
@@ -27,6 +31,19 @@ class FSPageTemplateTests( RequestTest, FSPTMaker ):
         script = self._makeOne( 'testPTbad', 'testPTbad.pt' )
         script = script.__of__(self.root)
         self.assertRaises(Undefined,script)
+
+    def test_caching( self ):
+        """
+            Test HTTP caching headers.
+        """
+        self.root.caching_policy_manager = DummyCachingManager()
+        original_len = len( self.RESPONSE.headers )
+        script = self._makeOne('testPT', 'testPT.pt')
+        script = script.__of__(self.root)
+        script()
+        self.failUnless( len( self.RESPONSE.headers ) >= original_len + 2 )
+        self.failUnless( 'foo' in self.RESPONSE.headers.keys() )
+        self.failUnless( 'bar' in self.RESPONSE.headers.keys() )
 
 class FSPageTemplateCustomizationTests( SecurityTest, FSPTMaker ):
 
@@ -73,7 +90,4 @@ def test_suite():
 
 if __name__ == '__main__':
     unittest.main(defaultTest='test_suite')
-
-
-
 

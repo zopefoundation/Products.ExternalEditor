@@ -1,19 +1,5 @@
 New Features
 
-  - Added functionality such that only users who have the
-    view permission on the relevent Type object can create
-    content of that type.
-
-  - Added the ability to limit what types of object an
-    object of a given Portal Type can be created in. 
-
-    If 'Implicity Addable' is set (the default), then 
-    objects of that Type can be added anywhere.
-
-    If it is not set, then objects of that Type can only be 
-    added to objects whose Type's allowed_content_types
-    contains the Type.
-
   - (__future__) Exposed role management for manager users on
       the default roster:  managers can now "promote" members
       without going to the ZMI.
@@ -30,6 +16,27 @@ New Features
     "dogbowl proposal",
     (http://cmf.zope.org/rqmts/proposals/compounds/compoundproposal.txt).
 
+  - (__future__) Added DCWorkflow (through-the-web configurable
+      workflows) to the core set of CMF products.
+
+  - Added CachingPolicyManager tool, which manages caching policies
+    for skin methods, and updated FSPageTemplate to use a CPM if
+    found.
+
+  - Added functionality such that only users who have the
+    view permission on the relevent Type object can create
+    content of that type.
+
+  - Added the ability to limit what types of object an
+    object of a given Portal Type can be created in. 
+
+    If 'Implicity Addable' is set (the default), then 
+    objects of that Type can be added anywhere.
+
+    If it is not set, then objects of that Type can only be 
+    added to objects whose Type's allowed_content_types
+    contains the Type.
+
   - Enabled querying actions from workflow tool in absence
     of actions tool (Tracker #401).
 
@@ -38,9 +45,6 @@ New Features
     support it, e.g., KeywordIndex (Tracker #442).
 
   - Added ZMI interface for editing Link URL (Tracker #364).
-
-  - (__future__) Added DCWorkflow (through-the-web configurable
-      workflows) to the core set of CMF products.
 
 Bugs Fixed
 
