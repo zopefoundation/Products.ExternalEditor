@@ -7,7 +7,7 @@ External Editor Change Log
       from httplib. Thanks to Christopher Deckard.
 
     - Removed stderr writes to cure "Invalid File Descriptor" errors on
-      Windows.
+      Windows. Thanks to Martijn Peters.
 
     - Added Photoshop plugin (win32)
 
