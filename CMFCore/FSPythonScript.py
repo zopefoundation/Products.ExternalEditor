@@ -47,6 +47,8 @@ class FSPythonScript (FSObject, Script):
     _params = _body = ''
     _v_f = None
     _proxy_roles = ()
+
+    _owner = None  # Unowned
     
     manage_options=(
         (
