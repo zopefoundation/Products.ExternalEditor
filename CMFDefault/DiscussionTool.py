@@ -46,7 +46,7 @@ class DiscussionTool( UniqueObject, SimpleItem, ActionProviderBase ):
     _actions = (ActionInformation(id='reply'
                                 , title='Reply'
                                 , action=Expression(
-                text='string: ${object_url}/discussion_reply_form')
+                text='string:${object_url}/discussion_reply_form')
                                 , condition=Expression(
                 text='python: object is not None and ' +
                 'portal.portal_discussion.isDiscussionAllowedFor(object)')

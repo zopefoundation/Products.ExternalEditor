@@ -51,7 +51,7 @@ class SyndicationTool (UniqueObject, SimpleItem, ActionProviderBase):
                     id='syndication'
                   , title='Syndication'
                   , action=Expression(
-                        text='string: ${folder_url}/synPropertiesForm')
+                        text='string:${folder_url}/synPropertiesForm')
                   , condition=Expression(
                         text='python: folder is object') 
                   , permissions=(ManageProperties,)

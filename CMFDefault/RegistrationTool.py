@@ -40,7 +40,7 @@ class RegistrationTool(BaseTool):
                                   , title='Join'
                                   , description='Click here to Join'
                                   , action=Expression(
-                                     text='string: ${portal_url}/join_form')
+                                     text='string:${portal_url}/join_form')
                                   , permissions=(AddPortalMember,)
                                   , category='user'
                                   , condition=Expression(text='not: member')

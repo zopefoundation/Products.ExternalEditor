@@ -41,7 +41,7 @@ class PropertiesTool(UniqueObject, SimpleItem, ActionProviderBase):
                             , title='Reconfigure Portal'
                             , description='Reconfigure the portal'
                             , action=Expression(
-            text='string: ${portal_url}/reconfig_form')
+            text='string:${portal_url}/reconfig_form')
                             , permissions=(ManagePortal,)
                             , category='global'
                             , condition=None
