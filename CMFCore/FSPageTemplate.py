@@ -87,7 +87,7 @@ class FSPageTemplate(FSObject, Script, PageTemplate):
         if reparse:
             # If we already have a content_type set it must come from a
             # .metadata file and we should always honor that
-            if getattr(self, 'content_type', None) is not None:
+            if getattr(self, 'content_type', None) is None:
                 xml_info = xml_detect_re.match(data)
                 if xml_info:
                     # Smells like xml
