@@ -231,11 +231,9 @@ class CatalogTool (UniqueObject, ZCatalog):
 
     # searchResults has inherited security assertions.
     def searchResults(self, REQUEST=None, **kw):
-        '''Calls SiteIndex.searchResults() with extra arguments that
+        '''Calls ZCatalog.searchResults with extra arguments that
         limit the results to what the user is allowed to see.
         '''
-        if REQUEST is None:
-            REQUEST = self.REQUEST
         user = _getAuthenticatedUser(self)
         kw['allowedRolesAndUsers'] = list(user.getRoles()) + \
                                      ['Anonymous',
