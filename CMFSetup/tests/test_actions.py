@@ -164,28 +164,28 @@ class ActionProvidersConfiguratorTests( _ActionSetup ):
         self.assertEqual( len( info[ 'actions' ] ), 1 )
 
         action = info[ 'actions' ][ 0 ]
-        self.assertEqual( action[ 'id' ], 'foo' )
-        self.assertEqual( action[ 'title' ], 'Foo' )
-        self.assertEqual( action[ 'expression' ]
+        self.assertEqual( action[ 'action_id' ], 'foo' )
+        self.assertEqual( action[ 'name' ], 'Foo' )
+        self.assertEqual( action[ 'action' ]
                         , 'string:${object_url}/foo' )
         self.assertEqual( action[ 'condition' ], 'python:1' )
-        self.assertEqual( action[ 'permissions' ], () )
+        self.assertEqual( action[ 'permission' ], '' )
         self.assertEqual( action[ 'category' ], 'dummy' )
-        self.failUnless( action[ 'visible' ] )
+        self.assertEqual( action[ 'visible' ], '1' )
 
         info = info_list[ 2 ]
         self.assertEqual( info[ 'id' ], 'portal_bar' )
         self.assertEqual( len( info[ 'actions' ] ), 1 )
 
         action = info[ 'actions' ][ 0 ]
-        self.assertEqual( action[ 'id' ], 'bar' )
-        self.assertEqual( action[ 'title' ], 'Bar' )
-        self.assertEqual( action[ 'expression' ]
+        self.assertEqual( action[ 'action_id' ], 'bar' )
+        self.assertEqual( action[ 'name' ], 'Bar' )
+        self.assertEqual( action[ 'action' ]
                         , 'string:${object_url}/bar' )
         self.assertEqual( action[ 'condition' ], 'python:0' )
-        self.assertEqual( action[ 'permissions' ], ( 'Manage portal', ) )
+        self.assertEqual( action[ 'permission' ], 'Manage portal' )
         self.assertEqual( action[ 'category' ], 'dummy' )
-        self.failIf( action[ 'visible' ] )
+        self.assertEqual( action[ 'visible' ], '0' )
 
 
 

@@ -519,7 +519,7 @@ class ImportStepRegistryTests( BaseRegistryTests
         self.assertEqual( info[ 'handler' ], ONE_FUNC_NAME )
         self.assertEqual( info[ 'dependencies' ], () )
         self.assertEqual( info[ 'title' ], 'One Step' )
-        self.failUnless( 'One small step' in info[ 'description' ], info )
+        self.failUnless( 'One small step' in info[ 'description' ] )
 
 
 _EMPTY_IMPORT_XML = """\
@@ -740,7 +740,7 @@ class ExportStepRegistryTests( BaseRegistryTests
         self.assertEqual( info[ 'id' ], 'one' )
         self.assertEqual( info[ 'handler' ], ONE_FUNC_NAME )
         self.assertEqual( info[ 'title' ], 'One Step' )
-        self.failUnless( 'One small step' in info[ 'description' ], info )
+        self.failUnless( 'One small step' in info[ 'description' ] )
 
     def test_parseXML_single_as_ascii( self ):
 
@@ -760,7 +760,7 @@ class ExportStepRegistryTests( BaseRegistryTests
         self.assertEqual( info[ 'id' ], 'one' )
         self.assertEqual( info[ 'handler' ], ONE_FUNC_NAME )
         self.assertEqual( info[ 'title' ], 'One Step' )
-        self.failUnless( 'One small step' in info[ 'description' ], info )
+        self.failUnless( 'One small step' in info[ 'description' ] )
 
 
 _EMPTY_EXPORT_XML = """\
