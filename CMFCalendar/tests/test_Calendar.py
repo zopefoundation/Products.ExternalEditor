@@ -21,6 +21,7 @@ import Zope
 Zope.startup()
 
 from AccessControl.SecurityManagement import newSecurityManager
+from AccessControl.SecurityManagement import noSecurityManager
 from AccessControl.User import UnrestrictedUser
 from DateTime import DateTime
 from Products.ExternalMethod.ExternalMethod import manage_addExternalMethod
@@ -75,6 +76,7 @@ class TestCalendar(unittest.TestCase):
         obj(*params)
 
     def tearDown(self):
+        noSecurityManager()
         get_transaction().abort()
         self.app._p_jar.close()
 
