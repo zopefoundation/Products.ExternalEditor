@@ -8,7 +8,8 @@ BASIC_HTML = '''\
  <head>
   <title>Title in tag</title>
   <meta name="description" content="Describe me">
-  <meta name="contributors" content="foo@bar.com baz@bam.net">
+  <meta name="contributors" content="foo@bar.com; baz@bam.net;
+    Benotz, Larry J (larry@benotz.stuff)">
   <meta name="title" content="Title in meta">
   <meta name="subject" content="content management">
   <meta name="keywords" content="unit tests, framework; ,zope ">
@@ -33,7 +34,7 @@ ENTITY_IN_TITLE = '''\
 BASIC_STRUCTUREDTEXT = '''\
 Title: My Document
 Description: A document by me
-Contributors: foo@bar.com baz@bam.net no@yes.maybe
+Contributors: foo@bar.com; baz@bam.net; no@yes.maybe
 Subject: content management, zope
 Keywords: unit tests; , framework
 
@@ -86,7 +87,8 @@ class DocumentTests(unittest.TestCase):
         assert d.title == 'Title in tag'
         assert string.find(d.text, '</body>') == -1
         assert d.Description() == 'Describe me'
-        assert len(d.Contributors()) == 2
+        assert len(d.Contributors()) == 3
+        assert d.Contributors()[-1] == 'Benotz, Larry J (larry@benotz.stuff)'
 
         # Since the format is html, the STX level operands should
         # have no effect.
@@ -110,7 +112,7 @@ class DocumentTests(unittest.TestCase):
         assert d.title == 'TITLE IN TAG'
         assert string.find(d.text, '</BODY') == -1
         assert d.Description() == 'DESCRIBE ME'
-        assert len(d.Contributors()) == 2
+        assert len(d.Contributors()) == 3
 
     def test_EntityInTitle(self):
         d = Document('foo')
@@ -192,7 +194,7 @@ class DocumentTests(unittest.TestCase):
         d = Document('foo', text=BASIC_HTML)
         assert d.Format() == 'text/html'
         assert d.Title() == 'Title in tag'
-        assert len(d.Contributors()) == 2
+        assert len(d.Contributors()) == 3
 
         d = Document('foo', title='Foodoc')
         assert d.text == ''
