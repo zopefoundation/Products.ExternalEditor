@@ -87,7 +87,7 @@ from Globals import HTMLFile, package_home, InitializeClass
 from Products.CMFCore.PortalFolder import PortalFolder
 from Products.CMFCore import utils
 from AccessControl import ClassSecurityInfo
-from Acquisition import aq_parent, aq_inner
+from Acquisition import aq_parent, aq_inner, aq_base
 from ComputedAttribute import ComputedAttribute
 
 # Import permission names
@@ -159,31 +159,53 @@ class Topic(PortalFolder):
     def icon(self):
         """ For the ZMI """
         return self.getIcon()
-    
-    def _index_html(self):
-        '''
-        Invokes the action identified by the id "view" or the first action.
-        '''
-        tool = utils.getToolByName( self, 'portal_types' )
-        ti = tool.getTypeInfo( self )
-        if ti is not None:
-            path = ti.getActionById('view', None)
-            if path is not None:
-                view = self.restrictedTraverse(path)
-                return view
-            actions = ti.getActions()
-            if actions:
-                path = actions[0]['action']
-                view = self.restrictedTraverse(path)
-                return view
-            raise 'Not Found', ('No default view defined for type "%s"'
-                                % ti.getId())
-        else:
-            raise 'Not Found', ('Cannot find default view for "%s"'
-                                % self.getPhysicalPath())
 
-    security.declareProtected(CMFCorePermissions.View, 'index_html')
-    index_html = ComputedAttribute(_index_html, 1)
+    def _verifyActionPermissions(self, action):
+        pp = action.get('permissions', ())
+        if not pp:
+            return 1
+        for p in pp:
+            if utils._checkPermission(p, self):
+                return 1
+        return 0
+
+    def _getDefaultView(self):
+        ti = self.getTypeInfo()
+        if ti is not None:
+            actions = ti.getActions()
+            for action in actions:
+                if action.get('id', None) == 'view':
+                    if self._verifyActionPermissions(action):
+                        return self.restrictedTraverse(action['action'])
+            # "view" action is not present or not allowed.
+            # Find something that's allowed.
+            for action in actions:
+                if self._verifyActionPermissions(action):
+                    return self.restrictedTraverse(action['action'])
+            raise 'Unauthorized', ('No accessible views available for %s' %
+                                 string.join(self.getPhysicalPath(), '/'))
+        else:
+            raise 'Not Found', ('Cannot find default view for "%s"' %
+                                string.join(self.getPhysicalPath(), '/'))
+
+    def __call__(self):
+        '''
+        Invokes the default view.
+        '''
+        view = self._getDefaultView()
+        if getattr(aq_base(view), 'isDocTemp', 0):
+            return apply(view, (self, self.REQUEST))
+        else:
+            return view()
+
+    index_html = None  # This special value informs ZPublisher to use __call__
+
+    security.declareProtected(CMFCorePermissions.View, 'view')
+    def view(self):
+        '''
+        Returns the default view even if index_html is overridden.
+        '''
+        return self()
 
     def _criteria_metatype_ids(self):
         result = []
