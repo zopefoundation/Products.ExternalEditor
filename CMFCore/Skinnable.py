@@ -86,10 +86,10 @@ class SkinnableObjectManager (ObjectManager):
             # Don't change the skin right now. (Otherwise
             # [un]restrictedTraverse messes up the skin data.)
             return
-        self._v_skindata = None
         if self._v_skindata is not None and self._v_skindata[0] is REQUEST:
             # Already set up for this request.
             return
+        self._v_skindata = None
         sfn = self.getSkinsFolderName()
         if sfn is not None:
             # Note that our custom __getattr__ won't get confused
