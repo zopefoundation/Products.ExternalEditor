@@ -591,7 +591,7 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
             category = d.get(op + '-category', None)
             self.setOp(op, usernames, category)
             # Propagate to subpages if desired
-            if d.get('propagate-' + op, None) == "ON":
+            if lower(d.get('propagate-' + op, None)) == "on":
                 if offspring is None:
                     page_meta_type = self.meta_type
                     nesting = WikiNesting(self._my_folder(), page_meta_type)
