@@ -1,24 +1,108 @@
 <dtml-var standard_html_header>
 
-<dtml-with portal_properties>
+<dtml-if expr="'local_html' in objectIds()">
+<!-- localattr -->
+<dtml-var local_html>
+<dtml-else>
 
-<table cellpadding="0" cellspacing="0" width="100%">
- <tr>
-  <td valign="top" width="80%">
+<h2><dtml-var title_or_id></h2>
 
-<h1> Welcome to &dtml-title; </h1>
+<dtml-if Description>
+ <blockquote><dtml-var Description fmt="structured-text"></blockquote>
+</dtml-if Description>
 
-<dl>
- <dt> Overview </dt>
- <dd> <dtml-var description fmt="structured-text"> </dd>
-</dl>
+<dtml-let folder_url=absolute_url>
 
-  </td>
-  <td valign="top" width="20%">
-   <dtml-var news_box>
-  </td>
-  </tr>
- </table>
+<dtml-in expr="objectValues( [ 'Document'
+                             , 'News Item'
+                             , 'Portal Image'
+                             , 'Portal File'
+                             , 'FAQ'
+                             ] )"
+         skip_unauthorized sort="Title">
+<dtml-if sequence-start>
+<h3> Documents, Images, and Files </h3>
 
-</dtml-with>
+<ul>
+</dtml-if>
+ <li> 
+  <a href="&dtml-absolute_url;"
+  ><img align="middle" src="&dtml-portal_url;/&dtml-getIcon;"
+        alt="&dtml-Type;" title="&dtml-Type;" border="0"></a>
+  <a href="&dtml-absolute_url;"> <dtml-var Title> </a>
+ <dtml-if name="Description">
+   <blockquote><dtml-var Description fmt="structured-text"></blockquote>
+ </dtml-if>
+ </li>
+<dtml-if sequence-end>
+</ul>
+</dtml-if>
+</dtml-in>
+
+<dtml-in expr="objectValues( [ 'Link','Favorite' ] )"
+         skip_unauthorized sort="Title">
+<dtml-if sequence-start>
+<h3> Links </h3>
+
+<ul>
+</dtml-if>
+ <li> 
+  <a href="&dtml-absolute_url;"
+  ><img align="middle" src="&dtml-portal_url;/&dtml-getIcon;"
+        alt="&dtml-Type;" title="&dtml-Type;" border="0"></a>
+  <a href="&dtml-getRemoteUrl;"> &dtml-Title; </a>
+  <dtml-if name="Description">
+   <blockquote><dtml-var Description fmt="structured-text"></blockquote>
+  </dtml-if>
+ </li>
+<dtml-if sequence-end>
+</ul>
+</dtml-if>
+</dtml-in>
+
+<dtml-in expr="objectValues( [ 'Folder', 'Portal Folder' ] )"
+         skip_unauthorized sort="Title">
+<dtml-if sequence-start>
+<h3> Folders </h3>
+
+<ul>
+</dtml-if>
+ <li>
+  <a href="&dtml-absolute_url;/"
+  ><img align="middle" src="&dtml-portal_url;/&dtml-getIcon;"
+        alt="&dtml-Type;" title="&dtml-Type;" border="0"></a>
+  <a href="&dtml-absolute_url;/"> <dtml-var Title> </a>
+  <dtml-if name="Description">
+   <blockquote><dtml-var Description fmt="structured-text"></blockquote>
+  </dtml-if>
+ </li>
+<dtml-if sequence-end>
+</ul>
+</dtml-if>
+</dtml-in>
+
+<dtml-in expr="objectValues( [ 'Portal Topic' ] )" skip_unauthorized>
+<dtml-if sequence-start>
+<h3> Topics </h3>
+
+<ul>
+</dtml-if>
+<li>
+<a href="&dtml-absolute_url;/"
+><img align="middle" src="&dtml-portal_url;/&dtml-getIcon;"
+      alt="&dtml-Type;" title="&dtml-Type;" border="0"></a>
+<a href="&dtml-absolute_url;/"> <dtml-var Title> </a>
+<dtml-if name="Description">
+<blockquote><dtml-var Description fmt="structured-text"></blockquote>
+</dtml-if>
+</li>
+<dtml-if sequence-end>
+</ul>
+</dtml-if>
+</dtml-in>
+
+</dtml-let>
+
+</dtml-if>
+
 <dtml-var standard_html_footer>
