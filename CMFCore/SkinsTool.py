@@ -264,6 +264,7 @@ class SkinsTool(UniqueObject, SkinsContainer, Folder, ActionProviderBase):
         If needed, updates the skin cookie based on the member preference.
         '''
         pm = getToolByName(self, 'portal_membership')
+        pu = getToolByName(self, 'portal_url')
         member = pm.getAuthenticatedMember()
         if hasattr(aq_base(member), 'portal_skin'):
             mskin = member.portal_skin
@@ -272,14 +273,20 @@ class SkinsTool(UniqueObject, SkinsContainer, Folder, ActionProviderBase):
                 cookie = req.cookies.get(self.request_varname, None)
                 if cookie != mskin:
                     resp = req.RESPONSE
+                    
+                    # you'd think that portal_url would expose this
+                    portalPath = pu()[len(req['BASE0']):]
+                    # ensure it starts with a '/'
+                    if not portalPath or portalPath[0] != '/': portalPath = '/'+portalPath
+                        
                     if not self.cookie_persistence:
                         # *Don't* make the cookie persistent!
-                        resp.setCookie( self.request_varname, mskin, path='/' )
+                        resp.setCookie( self.request_varname, mskin, path=portalPath )
                     else:
                         expires = ( DateTime( 'GMT' ) + 365 ).rfc822()
                         resp.setCookie( self.request_varname
                                       , mskin
-                                      , path='/'
+                                      , path=portalPath
                                       , expires=expires
                                       )
                     # Ensure updateSkinCookie() doesn't try again
