@@ -648,6 +648,9 @@ class TypesTool(UniqueObject, Folder, ActionProviderBase):
     security.declareProtected(ManagePortal, 'manage_aliases')
     manage_aliases = PageTemplateFile( 'typesAliases.zpt', _wwwdir )
 
+    #
+    #   ObjectManager methods
+    #
     def all_meta_types(self):
         """Adds TypesTool-specific meta types."""
         all = TypesTool.inheritedAttribute('all_meta_types')(self)
@@ -662,12 +665,11 @@ class TypesTool(UniqueObject, Folder, ActionProviderBase):
             allowed[name] = 1
 
         all = TypesTool.inheritedAttribute('filtered_meta_types')(self)
-        meta_types = []
-        for meta_type in self.all_meta_types():
-            if allowed.get(meta_type['name']):
-                meta_types.append(meta_type)
-        return meta_types
+        return tuple( [ mt for mt in all if mt['name'] in allowed ] )
 
+    #
+    #   other methods
+    #
     security.declareProtected(ManagePortal, 'listDefaultTypeInformation')
     def listDefaultTypeInformation(self):
         # Scans for factory_type_information attributes
