@@ -345,6 +345,25 @@ class DiscussionItemContainer( Persistent, Implicit, Traversable ):
 
         return id
 
+    security.declareProtected( CMFCorePermissions.ManagePortal, 'deleteReply' )
+    def deleteReply( self, reply_id ):
+        """ Remove a reply from this container """
+        if self._container.has_key( reply_id ):
+            reply = self._container.get( reply_id ).__of__( self )
+            my_replies = reply.getReplies()
+            for my_reply in my_replies:
+                my_reply_id = my_reply.getId()
+                if hasattr( my_reply, 'unindexObject' ):
+                    my_reply.unindexObject()
+
+                del self._container[my_reply_id]
+
+            if hasattr( reply, 'unindexObject' ):
+                reply.unindexObject()
+
+            del self._container[reply_id]
+
+
     security.declareProtected( CMFCorePermissions.View, 'hasReplies' )
     def hasReplies( self, content_obj ):
         """
