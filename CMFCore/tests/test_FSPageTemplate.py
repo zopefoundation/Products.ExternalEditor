@@ -38,11 +38,19 @@ class FSPageTemplateTests( RequestTest, FSPTMaker ):
         script()
         self.assertEqual(script.content_type, 'text/xml')
         self.assertEqual(self.RESPONSE.getHeader('content-type'), 'text/xml')
+        # purge RESPONSE Content-Type header for new test
+        del self.RESPONSE.headers['content-type']
         script = self._makeOne( 'testPT', 'testPT.pt' )
         script = script.__of__(self.root)
         script()
         self.assertEqual(script.content_type, 'text/html')
         self.assertEqual(self.RESPONSE.getHeader('content-type'), 'text/html')
+
+    def test_ContentTypeOverride(self):
+        script = self._makeOne( 'testPT_utf8', 'testPT_utf8.pt' )
+        script = script.__of__(self.root)
+        script()
+        self.assertEqual(self.RESPONSE.getHeader('content-type'), 'text/html; charset=utf-8')
 
     def test_BadCall( self ):
 

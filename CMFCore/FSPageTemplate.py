@@ -161,12 +161,10 @@ class FSPageTemplate(FSObject, Script, PageTemplate):
             response = self.REQUEST.RESPONSE
         except AttributeError:
             response = None
+        # Read file first to get a correct content_type default value.
+        self._updateFromFS()
         # call "inherited"
         result = self._ZPT_exec( bound_names, args, kw )
-        if response is not None:
-            # XXX Why do that again? It's already done by ZopePageTemplate.
-            if not response.headers.has_key('content-type'):
-                 response.setHeader('content-type', self.content_type)
         return result
  
     # Copy over more methods
