@@ -159,6 +159,7 @@ class MemberDataTool (UniqueObject, SimpleItem, PropertyManager, ActionProviderB
                 m = MemberData(base, id)
                 if temps is None:
                     self._v_temps = {id:m}
+                    self.REQUEST._hold(CleanupTemp(self))
                 else:
                     temps[id] = m
         else:
@@ -178,6 +179,14 @@ class MemberDataTool (UniqueObject, SimpleItem, PropertyManager, ActionProviderB
         self._members[id] = m
 
 InitializeClass(MemberDataTool)
+
+
+class CleanupTemp:
+    """Used to cleanup _v_temps at the end of the request."""
+    def __init__(self, tool):
+        self._tool = tool
+    def __del__(self):
+        del self._tool._v_temps
 
 
 class MemberData (SimpleItem):
