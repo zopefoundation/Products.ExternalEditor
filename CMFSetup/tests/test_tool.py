@@ -24,6 +24,17 @@ class SetupToolTests( TestBase
 
         return self._getTargetClass()( *args, **kw )
 
+    def _makeSite( self, title ):
+
+        from OFS.Folder import Folder
+
+        site = Folder()
+        site._setId( 'site' )
+        site.title = title
+
+        self.root._setObject( 'site', site )
+        return self.root._getOb( 'site' )
+
     def test_empty( self ):
 
         tool = self._makeOne()
@@ -176,6 +187,117 @@ class SetupToolTests( TestBase
         self.assertRaises( ValueError           
                          , tool.setProfileDirectory, _PATH, 'NonesuchProduct' )
 
+    def test_runImportStep_nonesuch( self ):
+
+        TITLE = 'original title'
+        site = self._makeSite( TITLE )
+
+        tool = self._makeOne().__of__( site )
+
+        self.assertRaises( ValueError, tool.runImportStep, 'nonesuch' )
+
+    def test_runImportStep_simple( self ):
+
+        TITLE = 'original title'
+        site = self._makeSite( TITLE )
+
+        tool = self._makeOne().__of__( site )
+
+        registry = tool.getImportStepRegistry()
+        registry.registerStep( 'simple', '1', _uppercaseSiteTitle )
+
+        message = tool.runImportStep( 'simple' )
+
+        self.assertEqual( message, 'Updated title' )
+        self.assertEqual( site.title, TITLE.upper() )
+
+    def test_runImportStep_dependencies( self ):
+
+        TITLE = 'original title'
+        site = self._makeSite( TITLE )
+
+        tool = self._makeOne().__of__( site )
+
+        registry = tool.getImportStepRegistry()
+        registry.registerStep( 'dependable', '1', _underscoreSiteTitle )
+        registry.registerStep( 'dependent', '1'
+                             , _uppercaseSiteTitle, ( 'dependable', ) )
+
+        message = tool.runImportStep( 'dependent' )
+
+    def test_runImportStep_skip_dependencies( self ):
+
+        TITLE = 'original title'
+        site = self._makeSite( TITLE )
+
+        tool = self._makeOne().__of__( site )
+
+        registry = tool.getImportStepRegistry()
+        registry.registerStep( 'dependable', '1', _underscoreSiteTitle )
+        registry.registerStep( 'dependent', '1'
+                             , _uppercaseSiteTitle, ( 'dependable', ) )
+
+        message = tool.runImportStep( 'dependent', run_dependencies=False )
+
+        self.assertEqual( message, 'Updated title' )
+        self.assertEqual( site.title, TITLE.upper() )
+
+    def test_runImportStep_default_purge( self ):
+
+        TITLE = 'original title'
+        site = self._makeSite( TITLE )
+
+        tool = self._makeOne().__of__( site )
+        registry = tool.getImportStepRegistry()
+        registry.registerStep( 'purging', '1', _purgeIfRequired )
+
+        message = tool.runImportStep( 'purging' )
+
+        self.assertEqual( message, 'Purged' )
+
+    def test_runImportStep_explicit_purge( self ):
+
+        TITLE = 'original title'
+        site = self._makeSite( TITLE )
+
+        tool = self._makeOne().__of__( site )
+        registry = tool.getImportStepRegistry()
+        registry.registerStep( 'purging', '1', _purgeIfRequired )
+
+        message = tool.runImportStep( 'purging', purge_old=True )
+
+        self.assertEqual( message, 'Purged' )
+
+    def test_runImportStep_skip_purge( self ):
+
+        TITLE = 'original title'
+        site = self._makeSite( TITLE )
+
+        tool = self._makeOne().__of__( site )
+        registry = tool.getImportStepRegistry()
+        registry.registerStep( 'purging', '1', _purgeIfRequired )
+
+        message = tool.runImportStep( 'purging', purge_old=False )
+
+        self.assertEqual( message, 'Unpurged' )
+
+def _underscoreSiteTitle( context ):
+
+    site = context.getSite()
+    site.title = site.title.replace( ' ', '_' )
+    return 'Updated title'
+
+def _uppercaseSiteTitle( context ):
+
+    site = context.getSite()
+    site.title = site.title.upper()
+    return 'Updated title'
+
+def _purgeIfRequired( context ):
+
+    site = context.getSite()
+    purged = site.purged = context.shouldPurge()
+    return purged and 'Purged' or 'Unpurged'
 
 def test_suite():
     return unittest.TestSuite((

@@ -289,7 +289,7 @@ class ISetupTool( Interface ):
         """ Return the IExportStepRegistry for the tool.
         """
 
-    def runSetupStep( step_id, purge_old=True, run_dependencies=True ):
+    def runImportStep( step_id, purge_old=True, run_dependencies=True ):
 
         """ Execute a given setup step
         
@@ -303,7 +303,7 @@ class ISetupTool( Interface ):
           dependency steps first.
         """
 
-    def runAllSetupSteps( purge_old=True ):
+    def runAllImportSteps( purge_old=True ):
 
         """ Run all setup steps in dependency order.
 

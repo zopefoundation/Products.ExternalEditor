@@ -29,7 +29,7 @@ class ImportContext( Implicit ):
         self._should_purge = bool( should_purge )
 
     security.declareProtected( ManagePortal, 'getSite' )
-    def getSite():
+    def getSite( self ):
 
         """ See ISetupContext.
         """
@@ -113,7 +113,7 @@ class ExportContext( Implicit ):
         self._profile_path = profile_path
 
     security.declareProtected( ManagePortal, 'getSite' )
-    def getSite():
+    def getSite( self ):
 
         """ See ISetupContext.
         """

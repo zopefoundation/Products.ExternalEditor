@@ -12,6 +12,8 @@ from Products.CMFCore.utils import UniqueObject
 
 from interfaces import ISetupTool
 from permissions import ManagePortal
+from context import ImportContext
+from context import ExportContext
 from registry import ImportStepRegistry
 from registry import ExportStepRegistry
 
@@ -105,13 +107,34 @@ class SetupTool( UniqueObject, Folder ):
         return self._export_registry
 
     security.declareProtected( ManagePortal, 'executeStep' )
-    def runSetupStep( self, step_id, run_dependencies=True, purge_old=True ):
+    def runImportStep( self, step_id, run_dependencies=True, purge_old=True ):
 
         """ See ISetupTool.
         """
+        info = self._import_registry.getStepMetadata( step_id )
+
+        if info is None:
+            raise ValueError, 'No such import step: %s' % step_id
+
+        dependencies = info.get( 'dependencies', () )
+
+        if run_dependencies:
+            already = {}
+            for dependency in dependencies:
+
+                if already.get( dependency ) is None:
+                    self.runImportStep( dependency )
+                    already[ dependency ] = 1
+
+        handler = self._import_registry.getStep( step_id )
+
+        profile_path = self._getFullyQualifiedProfileDirectory()
+        context = ImportContext( self, profile_path, purge_old )
+
+        return handler( context )
 
     security.declareProtected( ManagePortal, 'runAllSetupSteps')
-    def runAllSetupSteps( self, purge_old=True ):
+    def runAllImportSteps( self, purge_old=True ):
 
         """ See ISetupTool.
         """
