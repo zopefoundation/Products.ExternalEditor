@@ -2,7 +2,8 @@ HEAD only (unreleased)
 
   New Features
 
-    -
+    - CachePolicyManager: You can now set a ETag using a TALES expression
+      (http://www.zope.org/Collectors/CMF/236)
 
   Bug Fixes
 

@@ -100,6 +100,10 @@ class CachingPolicy:
             Cookie headers into account when deciding what cached object to 
             choose and serve in response to a request.
 
+          - The "ETag" HTTP response header will be set if a value is
+            provided. The value is a TALES expression and the result 
+            after evaluation will be used as the ETag header value.
+
           - Other tokens will be added to the "Cache-control" HTTP response
             header as follows:
 
@@ -119,6 +123,7 @@ class CachingPolicy:
                 , no_store=0
                 , must_revalidate=0
                 , vary=''
+                , etag_func=''
                 ):
 
         if not predicate:
@@ -138,6 +143,7 @@ class CachingPolicy:
         self._no_store = int( no_store )
         self._must_revalidate = int( must_revalidate )
         self._vary = vary
+        self._etag_func = Expression( text=etag_func )
 
     def getPolicyId( self ):
         """
@@ -178,6 +184,17 @@ class CachingPolicy:
         """
         """
         return getattr(self, '_vary', '')
+
+    def getETagFunc( self ):
+        """
+        """
+        etag_func_text = ''
+        etag_func = getattr(self, '_etag_func', None)
+
+        if etag_func is not None:
+            etag_func_text = etag_func.text
+
+        return etag_func_text
 
     def getHeaders( self, expr_context ):
         """
@@ -221,6 +238,9 @@ class CachingPolicy:
 
             if self.getVary():
                 headers.append( ( 'Vary', self._vary ) )
+
+            if self.getETagFunc():
+                headers.append( ( 'ETag', self._etag_func( expr_context ) ) )
 
         return headers
 
@@ -278,6 +298,7 @@ class CachingPolicyManager( SimpleItem ):
                  , no_store         # boolean (def. 0)
                  , must_revalidate  # boolean (def. 0)
                  , vary             # string value
+                 , etag_func        # TALES expr (def. '')
                  , REQUEST=None
                  ):
         """
@@ -291,6 +312,7 @@ class CachingPolicyManager( SimpleItem ):
                        , no_store
                        , must_revalidate
                        , vary
+                       , etag_func
                        )
         if REQUEST is not None: 
             REQUEST[ 'RESPONSE' ].redirect( self.absolute_url()
@@ -308,7 +330,8 @@ class CachingPolicyManager( SimpleItem ):
                     , no_cache          # boolean (def. 0)
                     , no_store          # boolean (def. 0)
                     , must_revalidate   # boolean (def. 0)
-                    , vary
+                    , vary              # string value
+                    , etag_func         # TALES expr (def. '')
                     , REQUEST=None
                     ):
         """
@@ -322,6 +345,7 @@ class CachingPolicyManager( SimpleItem ):
                           , no_store
                           , must_revalidate
                           , vary
+                          , etag_func
                           )
         if REQUEST is not None: 
             REQUEST[ 'RESPONSE' ].redirect( self.absolute_url()
@@ -391,6 +415,7 @@ class CachingPolicyManager( SimpleItem ):
                   , no_store
                   , must_revalidate
                   , vary
+                  , etag_func
                   ):
         """
             Add a policy to our registry.
@@ -411,6 +436,7 @@ class CachingPolicyManager( SimpleItem ):
                                                    , no_store
                                                    , must_revalidate
                                                    , vary
+                                                   , etag_func
                                                    )
         idlist = list( self._policy_ids )
         idlist.append( policy_id )
@@ -426,6 +452,7 @@ class CachingPolicyManager( SimpleItem ):
                      , no_store
                      , must_revalidate
                      , vary
+                     , etag_func
                      ):
         """
             Update a policy in our registry.
@@ -441,6 +468,7 @@ class CachingPolicyManager( SimpleItem ):
                                                    , no_store
                                                    , must_revalidate
                                                    , vary
+                                                   , etag_func
                                                    )
 
     security.declarePrivate( '_reorderPolicy' )

@@ -277,7 +277,10 @@ def _setCacheHeaders(obj, extra_context):
                               )
             RESPONSE = REQUEST['RESPONSE']
             for key, value in headers:
-                RESPONSE.setHeader(key, value)
+                if key == 'ETag':
+                    RESPONSE.setHeader(key, value, literal=1)
+                else:
+                    RESPONSE.setHeader(key, value)
             if headers:
                 RESPONSE.setHeader('X-Cache-Headers-Set-By',
                                    'CachingPolicyManager: %s' %

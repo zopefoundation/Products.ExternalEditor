@@ -202,6 +202,29 @@ class CachingPolicyTests(TestCase):
         self.assertEqual( headers[1][0].lower() , 'cache-control' )
         self.assertEqual( headers[1][1] , 'must-revalidate' )
 
+    def test_ETag( self ):
+
+        # With an empty etag_func, no ETag should be produced
+        policy = self._makePolicy( 'ETag', etag_func='' )
+        context = self._makeContext()
+        headers = policy.getHeaders( context )
+
+        self.assertEqual( len( headers ), 1)
+        self.assertEqual( headers[0][0].lower() , 'last-modified' )
+        self.assertEqual( headers[0][1]
+                        , rfc1123_date(self._epoch.timeTime()) )
+
+        policy = self._makePolicy( 'ETag', etag_func='string:foo' )
+        context = self._makeContext()
+        headers = policy.getHeaders( context )
+
+        self.assertEqual( len( headers ), 2)
+        self.assertEqual( headers[0][0].lower() , 'last-modified' )
+        self.assertEqual( headers[0][1]
+                        , rfc1123_date(self._epoch.timeTime()) )
+        self.assertEqual( headers[1][0].lower(), 'etag' )
+        self.assertEqual( headers[1][1], 'foo' )
+
     def test_combined( self ):
 
         policy = self._makePolicy( 'noStore', no_cache=1, no_store=1 )
@@ -241,14 +264,14 @@ class CachingPolicyManagerTests(TestCase):
         self.assertEqual( len( headers ), 0 )
 
         self.assertRaises( KeyError, mgr._updatePolicy
-                         , 'xyzzy', None, None, None, None, None, None, '' )
+                         , 'xyzzy', None, None, None, None, None, None, '', '' )
         self.assertRaises( KeyError, mgr._removePolicy, 'xyzzy' )
         self.assertRaises( KeyError, mgr._reorderPolicy, 'xyzzy', -1 )
 
     def test_addPolicy( self ):
 
         mgr = self._makeOne()
-        mgr._addPolicy( 'first', 'python:1', None, 0, 0, 0, 0, '' )
+        mgr._addPolicy( 'first', 'python:1', None, 0, 0, 0, 0, '', '' )
         headers = mgr.getHTTPCachingHeaders( content=DummyContent(self._epoch)
                                            , view_method='foo_view'
                                            , keywords={}
@@ -273,7 +296,7 @@ class CachingPolicyManagerTests(TestCase):
         for policy_id in policy_ids:
             mgr._addPolicy( policy_id
                           , 'python:"%s" in keywords.keys()' % policy_id
-                          , None, 0, 0, 0, 0, '' )
+                          , None, 0, 0, 0, 0, '', '' )
 
         ids = tuple( map( lambda x: x[0], mgr.listPolicies() ) )
         self.assertEqual( ids, policy_ids )
@@ -296,7 +319,7 @@ class CachingPolicyManagerTests(TestCase):
         for policy_id, max_age_secs in policy_tuples:
             mgr._addPolicy( policy_id
                           , 'python:"%s" in keywords.keys()' % policy_id
-                          , None, max_age_secs, 0, 0, 0, '' )
+                          , None, max_age_secs, 0, 0, 0, '', '' )
 
         return mgr
 
