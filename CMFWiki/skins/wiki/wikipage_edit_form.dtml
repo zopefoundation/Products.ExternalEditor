@@ -8,7 +8,7 @@
     </h3>
     <dtml-if noedit>
       <strong> You can view the page source, below, but not edit it. </strong>
-      (<dtml-var "whichWho(opCategory('edit'))"> edit this page.)
+      (<dtml-var "whichWho('edit')"> edit this page.)
     </dtml-if>
 
   <dtml-if "not noedit">

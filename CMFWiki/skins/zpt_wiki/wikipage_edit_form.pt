@@ -24,7 +24,7 @@
 
     <p tal:condition="python: not editor">
       <strong> You can view the page source, below, but not edit it. </strong>
-      (<span tal:replace="python: here.whichWho( opCategory( 'edit' ) )" />
+      (<span tal:replace="python: here.whichWho('edit')" />
        edit this page.)
     </p>
 
