@@ -38,52 +38,6 @@ HEAD only (unreleased)
 
     - Workflow: Removed deprecated WorkflowMethod machinery.
 
-CMF 1.5.1beta (unreleased)
+CMF 1.5.x
 
-  New Features
-
-    - RegistrationTool: The regular expression that limits what people
-      can put in as a valid member ID is now configurable TTW in the
-      portal_registration tool (http://collector.zope.org/CMF/117)
-
-  Bug Fixes
-
-    - FSDTMLMethod: Small code cleanup to remove duplicate variable
-      definition (http://collector.zope.org/CMF/291)
-
-    - Document/NewsItem: If the "plain text" format is selected the
-      content will no longer be tested for HTML and reduced to text
-      between opening and closing "body" tags
-      (http://collector.zope.org/CMF/214)
-
-    - Document/NewsItem: A call to setFormat will now re-cook the
-      document content if the format has been changed (arising from
-      discussion about http://collector.zope.org/CMF/214)
-
-    - DirectoryViews/FSMetadata: Corrected some erroneous docstrings
-      about proxy role handling using .metadata files
-      (http://collector.zope.org/CMF/177)
-
-CMF 1.5.0beta2 (2004/09/27)
-
-  Bug Fixes
-
-    - FSFile: Allow setting a content_type value using a .metadata file
-      (http://collector.zope.org/CMF/281)
-
-    - FSPageTemplate: Refine the XML content type detection so that
-      addtional data such as encoding is preserved
-      (http://collector.zope.org/CMF/228)
-
-    - ActionInformation: If a path expression ending in an object that
-      gets called using __render_with_namespace__ (such as DTML objects
-      and Scripts (Python)) is used a KeyError for "here" would be thrown
-      inside PageTemplates.ZRPythonExpr.call_with_ns. call_with_ns
-      expects the namespace to contain "here", which the context coming
-      from CMFCore.Expressions.createExprContext did not provide. Added
-      "here" as an alias pointing to the provided "object"
-      (http://collector.zope.org/CMF/171)
-
-    - CMFCatalogAware: When pasting a content item, local roles were not
-      changed to reflect the new ownership.
-      (http://collector.zope.org/CMF/205)
+  For a complete list see CHANGES.txt of CMF-1_5-branch"
