@@ -117,6 +117,8 @@ class PortalContent(SimpleItem, DynamicType):
 
     security = ClassSecurityInfo()
 
+    security.declareObjectProtected(CMFCorePermissions.View)
+
     # indexed methods
     # ---------------
     
@@ -199,6 +201,7 @@ class PortalContent(SimpleItem, DynamicType):
     security.declareProtected(CMFCorePermissions.View, 'view')
     view = index_html  # Necessary for catalog searches.
 
+    security.declareProtected(CMFCorePermissions.View, 'asHTML')
     def asHTML(self):
         '''
         This is for when this object is used as an index_html
@@ -209,6 +212,5 @@ class PortalContent(SimpleItem, DynamicType):
             return apply(view, (self, self.REQUEST))
         else:
             return view()
-
 
 Globals.InitializeClass(PortalContent)
