@@ -85,10 +85,21 @@
 
 from ExtensionClass import Base
 from AccessControl import ClassSecurityInfo
-import Globals
+import Globals, Acquisition
 try: from OFS.ObjectManager import UNIQUE
 except: UNIQUE = 2
 
+# Tool for getting at Tools, meant to be modified as policies or Tool
+# implementations change without having to affect the consumer.
+_marker = 0
+def getToolByName(obj, name, default=_marker):
+    " Get the tool, 'toolname', by acquiring it. "
+    if default == _marker:
+        try: tool = Acquisition.aq_acquire(obj, name)
+        except: raise AttributeError, name
+    else:
+        tool = Acquisition.aq_acquire(obj, name, default=default)
+    return tool
 
 class ImmutableId (Base):
     def _setId(self, id):
@@ -125,7 +136,7 @@ except:
             u = User.nobody
         return u
     def _checkPermission(permission, obj):
-        return getAuthenticatedUser(obj).has_permission(permission, obj)
+        return _getAuthenticatedUser(obj).has_permission(permission, obj)
 
 
 # If Zope ever provides a call to getRolesInContext() through

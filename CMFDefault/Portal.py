@@ -87,6 +87,7 @@ import Globals
 from Products.CMFCore.PortalObject import PortalObjectBase
 from Products.CMFCore.PortalFolder import manage_addPortalFolder
 from Products.CMFCore.TypesTool import ContentFactoryMetadata
+from Products.CMFCore.utils import getToolByName
 from DublinCore import DefaultDublinCoreImpl
 
 members_roster = '''<dtml-return roster>'''
@@ -374,7 +375,7 @@ class PortalGenerator:
 
     def setupDefaultSkins(self, p):
         from Products.CMFCore.DirectoryView import addDirectoryViews
-        ps = p.portal_skins
+        ps = getToolByName(p, 'portal_skins')
         addDirectoryViews(ps, 'skins', globals())
         ps.manage_addProduct['OFSP'].manage_addFolder(id='custom')
         ps.addSkinSelection('Basic',
@@ -387,7 +388,7 @@ class PortalGenerator:
         p.setupCurrentSkin()
 
     def setupTypes(self, p, initial_types=factory_type_information):
-        tool = getattr(p, 'portal_types', None)
+        tool = getToolByName(p, 'portal_types', None)
         if tool is None:
             return
         for t in initial_types:

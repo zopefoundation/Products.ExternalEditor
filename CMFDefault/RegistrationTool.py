@@ -90,7 +90,8 @@ $Id$
 __version__='$Revision$'[11:-2]
 
 
-from Products.CMFCore.utils import UniqueObject, _checkPermission
+from Products.CMFCore.utils import UniqueObject, _checkPermission, \
+     getToolByName
 from Products.CMFCore.RegistrationTool import RegistrationTool
 from Globals import default__class_init__
 
@@ -129,7 +130,7 @@ class RegistrationTool (RegistrationTool):
         '''Email a forgotten password to a member.  Raises an exception
         if user ID is not found.
         '''
-        membership = self.portal_membership
+        membership = getToolByName(self, 'portal_membership')
         member = membership.getMemberById(forgotten_userid)
         if member is None:
             raise 'NotFound', 'The username you entered could not be found.'

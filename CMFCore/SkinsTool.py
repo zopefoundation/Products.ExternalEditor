@@ -249,7 +249,8 @@ class SkinsTool(UniqueObject, SkinsContainer, PortalFolder):
         '''
         If needed, updates the skin cookie based on the member preference.
         '''
-        member = self.portal_membership.getAuthenticatedMember()
+        member = (getToolByName(self, 'portal_membership')
+                  .getAuthenticatedMember())
         if hasattr(aq_base(member), 'portal_skin'):
             mskin = member.portal_skin
             if mskin:

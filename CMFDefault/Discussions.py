@@ -89,6 +89,7 @@ from ExtensionClass import Base
 from Globals import HTMLFile, package_home, default__class_init__
 from DateTime import DateTime
 from Products.CMFCore.PortalContent import PortalContent
+from Products.CMFCore.utils import getToolByName
 
 _dtmldir = os.path.join( package_home( globals() ), 'dtml' )
 
@@ -129,7 +130,7 @@ class Discussable(Base):
         # It is not yet clear to me what the correct location for this hook is
 
         # Find the folder designated for replies, creating if missing
-        home = self.portal_membership.getHomeFolder()
+        home = getToolByName(self, 'portal_membership').getHomeFolder()
         if not hasattr(home, 'Correspondence'):
             home.manage_addPortalFolder('Correspondence')
         location = home.Correspondence
@@ -151,7 +152,7 @@ class Discussable(Base):
             Often, the actual objects are not needed.  This is less expensive
             than fetching the objects.
         """
-        catalog = self.portal_catalog
+        catalog = getToolByName(self, 'portal_catalog')
         return catalog.searchResults(in_reply_to=
                                       urllib.unquote('/'+self.absolute_url(1)))
 
@@ -160,7 +161,7 @@ class Discussable(Base):
             Return a sequence of the DiscussionResponse objects which are
             associated with this Discussable
         """
-        catalog = self.portal_catalog
+        catalog = getToolByName(self, 'portal_catalog')
         results = self.getReplyResults()
         rids    = map(lambda x: x.data_record_id_, results)
         objects = map(catalog.getobject, rids)

@@ -89,7 +89,7 @@ $Id$
 __version__='$Revision$'[11:-2]
 
 
-from utils import UniqueObject
+from utils import UniqueObject, getToolByName
 from OFS.SimpleItem import SimpleItem
 from OFS.PropertyManager import PropertyManager
 from Globals import Acquisition, Persistent, HTMLFile
@@ -143,8 +143,9 @@ class MemberDataTool (UniqueObject, SimpleItem, PropertyManager):
         Return the number of members stored in the _members
         BTree and some other useful info
         '''
+        membertool   = getToolByName(self, 'portal_membership')
         members      = self._members
-        user_list    = self.portal_membership.listMemberIds()
+        user_list    = membertool.listMemberIds()
         member_list  = members.keys()
         member_count = len(members)
         orphan_count = 0
@@ -163,8 +164,9 @@ class MemberDataTool (UniqueObject, SimpleItem, PropertyManager):
         tool with the list in the actual underlying acl_users
         and delete anything not in acl_users
         '''
+        membertool= getToolByName(self, 'portal_membership')
         members   = self._members
-        user_list = self.portal_membership.listMemberIds()
+        user_list = membertool.listMemberIds()
 
         for tuple in members.items():
             member_name = tuple[0]

@@ -89,7 +89,8 @@ $Id$
 __version__='$Revision$'[11:-2]
 
 
-from utils import UniqueObject, _getAuthenticatedUser, _checkPermission
+from utils import UniqueObject, _getAuthenticatedUser, _checkPermission, \
+     getToolByName
 from OFS.SimpleItem import SimpleItem
 from Globals import InitializeClass, HTMLFile, MessageDialog, \
      PersistentMapping
@@ -97,6 +98,7 @@ from AccessControl.User import nobody
 from AccessControl import ClassSecurityInfo
 from CMFCorePermissions import ManagePortal
 import CMFCorePermissions
+import Acquisition
 
 default_member_content = '''Default page for %s
  
@@ -165,7 +167,7 @@ class MembershipTool (UniqueObject, SimpleItem):
                         u.roles.append(portal_role)
 
             # Get portal_memberdata to do the wrapping.
-            md = parent.portal_memberdata
+            md = getToolByName(parent, 'portal_memberdata')
             try:
                 portal_user = md.wrapUser(u)
 

@@ -89,7 +89,7 @@ $Id$
 __version__='$Revision$'[11:-2]
 
 
-from utils import UniqueObject
+from utils import UniqueObject, getToolByName
 from OFS.SimpleItem import SimpleItem
 from Globals import InitializeClass
 import Acquisition
@@ -126,7 +126,8 @@ class OldDiscussable(Acquisition.Implicit):
         # It is not yet clear to me what the correct location for this hook is
 
         # Find the folder designated for replies, creating if missing
-        home = self.content.portal_membership.getHomeFolder()
+        membershiptool = getToolByName(self.content, 'portal_membership')
+        home = membershiptool.getHomeFolder()
         if not hasattr(home, 'Correspondence'):
             home.manage_addPortalFolder('Correspondence')
         location = home.Correspondence
@@ -149,7 +150,7 @@ class OldDiscussable(Acquisition.Implicit):
             Often, the actual objects are not needed.  This is less expensive
             than fetching the objects.
         """
-        catalog = self.content.portal_catalog
+        catalog = getToolByName(self.content, 'portal_catalog')
         return catalog.searchResults(in_reply_to=
                                       urllib.unquote('/'+self.absolute_url(1)))
 
@@ -159,7 +160,7 @@ class OldDiscussable(Acquisition.Implicit):
             Return a sequence of the DiscussionResponse objects which are
             associated with this Discussable
         """
-        catalog = self.content.portal_catalog
+        catalog = getToolByName(self.content, 'portal_catalog')
         results = self.getReplyResults()
         rids    = map(lambda x: x.data_record_id_, results)
         objects = map(catalog.getobject, rids)
@@ -195,7 +196,8 @@ class DiscussionTool (UniqueObject, SimpleItem):
         '''
         if hasattr( content, 'allow_discussion' ):
             return content.allow_discussion
-        typeInfo = self.portal_types.getTypeInfo( content.Type() )
+        typeInfo = getToolByName(self, 'portal_types').getTypeInfo(
+            content.Type())
         if typeInfo:
             return typeInfo.allowDiscussion()
         return 0

@@ -93,6 +93,7 @@ from CMFCorePermissions import AccessContentsInformation, View, \
      ReviewPortalContent, ModifyPortalContent
 import CMFCorePermissions
 from DynamicType import DynamicType
+from utils import getToolByName
 
 from ComputedAttribute import ComputedAttribute
 from Acquisition import aq_base
@@ -164,11 +165,11 @@ class PortalContent(SimpleItem, DynamicType):
     security.declarePrivate('setReviewState')
     def setReviewState(self, review_state, comment):
         self.review_state = review_state
+        membershiptool = getToolByName(self, 'portal_membership')
 
         rh = self.review_history
         rh = rh + ({
-            'actor': self.portal_membership.getAuthenticatedMember() \
-            .getUserName(),
+            'actor': membershiptool.getAuthenticatedMember().getUserName(),
             'action': 'Made ' + review_state,
             'review_state': review_state,
             'time': DateTime(),
@@ -181,19 +182,19 @@ class PortalContent(SimpleItem, DynamicType):
 
     security.declareProtected(ModifyPortalContent, 'indexObject')
     def indexObject(self):
-        catalog = getattr(self, 'portal_catalog', None)
+        catalog = getToolByName(self, 'portal_catalog', None)
         if catalog is not None:
             catalog.indexObject(self)
 
     security.declareProtected(ModifyPortalContent, 'unindexObject')
     def unindexObject(self):
-        catalog = getattr(self, 'portal_catalog', None)
+        catalog = getToolByName(self, 'portal_catalog', None)
         if catalog is not None:
             catalog.unindexObject(self)
 
     security.declarePrivate('reindexObject')
     def reindexObject(self):
-        catalog = getattr(self, 'portal_catalog', None)
+        catalog = getToolByName(self, 'portal_catalog', None)
         if catalog is not None:
             catalog.reindexObject(self)
         

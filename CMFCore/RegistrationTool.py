@@ -90,7 +90,7 @@ __version__='$Revision$'[11:-2]
 
 
 from utils import UniqueObject, _checkPermission, _getAuthenticatedUser, \
-     limitGrantedRoles
+     limitGrantedRoles, getToolByName
 from OFS.SimpleItem import SimpleItem
 from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
@@ -167,7 +167,7 @@ class RegistrationTool (UniqueObject, SimpleItem):
         # Anyone is always allowed to grant the 'Member' role.
         limitGrantedRoles(roles, self, ('Member',))
 
-        membership = self.portal_membership
+        membership = getToolByName(self, 'portal_membership')
         membership.addMember(id, password, roles, domains)
         member = membership.getMemberById(id)
         if properties is not None:
@@ -186,7 +186,7 @@ class RegistrationTool (UniqueObject, SimpleItem):
             return 0
         if not self.__ALLOWED_MEMBER_ID_PATTERN.match( id ):
             return 0
-        membership = self.portal_membership
+        membership = getToolByName(self, 'portal_membership')
         if membership.getMemberById(id) is not None:
             return 0
         return 1
@@ -208,7 +208,7 @@ class RegistrationTool (UniqueObject, SimpleItem):
     def setPassword(self, password, domains=None):
         '''Allows the authenticated member to set his/her own password.
         '''
-        membership = self.portal_membership
+        membership = getToolByName(self, 'portal_membership')
         if not membership.isAnonymousUser():
             member = membership.getAuthenticatedMember()
             failMessage = self.testPasswordValidity(password)
@@ -226,7 +226,7 @@ class RegistrationTool (UniqueObject, SimpleItem):
         '''
         if properties is None:
             properties = kw
-        membership = self.portal_membership
+        membership = getToolByName(self, 'portal_membership')
         if not membership.isAnonymousUser():
             member = membership.getAuthenticatedMember()
             failMessage = self.testPropertiesValidity(properties, member)

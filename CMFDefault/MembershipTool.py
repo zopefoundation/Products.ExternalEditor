@@ -90,7 +90,8 @@ $Id$
 __version__='$Revision$'[11:-2]
 
 
-from Products.CMFCore.utils import _getAuthenticatedUser, _checkPermission
+from Products.CMFCore.utils import _getAuthenticatedUser, _checkPermission, \
+     getToolByName
 import Products.CMFCore.MembershipTool
 from Products.CMFCore.PortalFolder import manage_addPortalFolder
 from Globals import default__class_init__

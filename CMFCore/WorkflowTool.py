@@ -89,7 +89,7 @@ $Id$
 __version__='$Revision$'[11:-2]
 
 
-from utils import UniqueObject, _checkPermission
+from utils import UniqueObject, _checkPermission, getToolByName
 from OFS.SimpleItem import SimpleItem
 from Globals import InitializeClass
 from AccessControl.Permission import Permission
@@ -214,7 +214,8 @@ class WorkflowTool (UniqueObject, SimpleItem):
             content = info.content
             content_url = info.content_url
             content_creator = content.Creator()
-            current_user = self.portal_membership.getAuthenticatedMember().getUserName()
+            membership = getToolByName(self, 'portal_membership')
+            current_user = membership.getAuthenticatedMember().getUserName()
             review_state = getattr(content, 'review_state', None)
             actions = []
 
@@ -247,7 +248,7 @@ class WorkflowTool (UniqueObject, SimpleItem):
                                 'permission': 'Request review',
                                 'category': 'object' })
 
-            catalog = getattr(self, 'portal_catalog', None)
+            catalog = getToolByName(self, 'portal_catalog', None)
             if catalog is not None:
                 pending = len(catalog.searchResults(
                     review_state='pending'))

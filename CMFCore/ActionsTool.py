@@ -90,7 +90,8 @@ $Id$
 __version__='$Revision$'[11:-2]
 
 
-from utils import UniqueObject, _getAuthenticatedUser, _checkPermission
+from utils import UniqueObject, _getAuthenticatedUser, _checkPermission, \
+     getToolByName
 from OFS.SimpleItem import SimpleItem
 from Globals import InitializeClass
 from urllib import quote
@@ -105,7 +106,8 @@ class ActionInformation:
 
     def __init__(self, tool, folder, object=None):
         self.portal = portal = aq_parent(aq_inner(tool))
-        self.isAnonymous = tool.portal_membership.isAnonymousUser()
+        membership = getToolByName(tool, 'portal_membership')
+        self.isAnonymous = membership.isAnonymousUser()
         self.portal_url = portal.absolute_url()
         if folder is not None:
             self.folder_url = folder.absolute_url()
@@ -268,7 +270,7 @@ class ActionsTool (UniqueObject, SimpleItem):
                     'permissions' : ['Access contents information'],
                     'category': 'folder',
                     })
-            pm = self.portal_membership
+            pm = getToolByName(self, 'portal_membership')
             home_folder = pm.getHomeFolder()
             if content_url is not None and home_folder is not None:
                 home_url = pm.getHomeUrl()

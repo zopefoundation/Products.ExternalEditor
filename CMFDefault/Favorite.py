@@ -90,21 +90,18 @@ ADD_CONTENT_PERMISSION = 'Add portal content'
 import Globals
 from Globals import HTMLFile, HTML
 from Products.CMFCore.PortalContent import PortalContent
+from Products.CMFCore.utils import getToolByName
 from DublinCore import DefaultDublinCoreImpl
 from Link import Link
 
 
-def addFavorite( self
-           , id
-           , title=''
-           , remote_url=''
-           , description=''
-           , RESPONSE=None
-           ):
+def addFavorite(self, id, title='', remote_url='', description='',
+                RESPONSE=None):
     """
     Add a Favorite
     """
-    relUrl = self.portal_url.getRelativeUrl(self.restrictedTraverse(
+    portal_url = getToolByName(self, 'portal_url')
+    relUrl = portal_url.getRelativeUrl(self.restrictedTraverse(
         remote_url))
     o=Favorite( id, title, relUrl, description )
     self._setObject(id,o)
@@ -134,10 +131,11 @@ class Favorite( Link ):
         """
             returns the remote URL of the Link
         """
+        portal_url = getToolByName(self, 'portal_url')
         if self.remote_url:
-            return self.portal_url.getPortalPath() + '/' + self.remote_url
+            return portal_url.getPortalPath() + '/' + self.remote_url
         else:
-            return self.portal_url.getPortalPath()
+            return portal_url.getPortalPath()
 
     def getIcon(self):
         """

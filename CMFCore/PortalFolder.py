@@ -98,6 +98,7 @@ from Globals import HTMLFile
 from AccessControl import getSecurityManager, ClassSecurityInfo
 from Acquisition import aq_parent, aq_inner, aq_base
 from DynamicType import DynamicType
+from utils import getToolByName
 
 #
 #   HACK! HACK! HACK! HACK! HACK! HACK! HACK! HACK! HACK!
@@ -174,23 +175,23 @@ class PortalFolder( Folder, DynamicType ):
             this folder.
         """
         result = []
-        myType = self.portal_types.getTypeInfo( self.Type() )
+        portal_types = getToolByName(self, 'portal_types')
+        myType = portal_types.getTypeInfo(self.Type())
 
         if myType is not None:
-            for contentType in self.portal_types.listTypeInfo():
-                if myType.allowType( contentType.Type() ):
-                    result.append( contentType )
+            for contentType in portal_types.listTypeInfo():
+                if myType.allowType(contentType.Type()):
+                    result.append(contentType)
         else:
-            result = self.portal_types.listTypeInfo()
+            result = portal_types.listTypeInfo()
 
         return result
     
     security.declareProtected(AddPortalFolders, 'manage_addPortalFolder')
-    def manage_addPortalFolder(self, id, title='',
-                               REQUEST=None):
+    def manage_addPortalFolder(self, id, title='', REQUEST=None):
         """Add a new PortalFolder object with id *id*.
         """
-        ob=PortalFolder( id, title )
+        ob=PortalFolder(id, title)
         self._setObject(id, ob)
         if REQUEST is not None:
             return self.folder_contents(
@@ -205,26 +206,26 @@ class PortalFolder( Folder, DynamicType ):
         return getattr(self, 'icon', '/misc_/OFSP/Folder_icon.gif')
 
     security.declarePublic('listContentTypes')
-    def listContentTypes( self ):
+    def listContentTypes(self):
         """
            List all registered portal content types.
         """
         mtSet = {}
-        for info in self.portal_types.listTypeInfo():
-            mtSet[ info.Metatype() ] = 1
+        for info in getToolByName(self, 'portal_types').listTypeInfo():
+            mtSet[info.Metatype()] = 1
         return mtSet.keys()
 
-    def _morphSpec( self, spec ):
+    def _morphSpec(self, spec):
         new_spec = []
         types = self.listContentTypes()
         if spec is not None:
             if type(spec) == type(''):
-                spec = [ spec ]
+                spec = [spec]
             for meta_type in spec:
                 if not meta_type in types:
-                    raise 'PortalFolderError', ( '%s is not a content type'
-                                               % meta_type )
-                new_spec.append( meta_type )
+                    raise 'PortalFolderError', ('%s is not a content type'
+                                                 % meta_type )
+                new_spec.append(meta_type)
         return new_spec or types
     
     def _filteredItems( self, ids, kw, REQUEST=None ):
@@ -351,7 +352,7 @@ class PortalFolder( Folder, DynamicType ):
         '''
         Invokes the portal_types tool.
         '''
-        pt = self.portal_types
+        pt = getToolByName(self, 'portal_types')
         pt.constructContent(type_name, self, id, RESPONSE)
 
     def _checkId(self, id, allow_dup=0):

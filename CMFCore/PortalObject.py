@@ -87,6 +87,7 @@ from Globals import default__class_init__
 from PortalFolder import PortalFolder
 from Skinnable import SkinnableObjectManager
 from CMFCorePermissions import *
+from utils import getToolByName
 
 PORTAL_SKINS_TOOL_ID = 'portal_skins'
 

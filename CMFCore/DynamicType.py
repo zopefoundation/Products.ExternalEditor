@@ -84,6 +84,7 @@
 ##############################################################################
 
 from AccessControl import ClassSecurityInfo
+from utils import getToolByName
 import Globals
 
 class DynamicType:
@@ -108,7 +109,7 @@ class DynamicType:
         '''
         Returns an object that supports the ContentTypeInformation interface.
         '''
-        tool = getattr(self, 'portal_types', None)
+        tool = getToolByName(self, 'portal_types', None)
         if tool is None:
             return None
         pt = self.portal_type
