@@ -10,6 +10,8 @@ BASIC_HTML = '''\
   <meta name="description" content="Describe me">
   <meta name="contributors" content="foo@bar.com baz@bam.net">
   <meta name="title" content="Title in meta">
+  <meta name="subject" content="content management">
+  <meta name="keywords" content="unit tests, framework; ,zope ">
  </head>
  <body bgcolor="#ffffff">
   <h1>Not a lot here</h1>
@@ -75,6 +77,16 @@ class DocumentTests(unittest.TestCase):
         assert string.find(d.text, '</body>') == -1
         assert d.Description() == 'Describe me'
         assert len(d.Contributors()) == 2
+
+        subj = list(d.Subject())
+        assert len(subj) == 4
+        subj.sort()
+        assert subj == [
+            'content management',
+            'framework',
+            'unit tests',
+            'zope'
+            ]
 
     def test_UpperedHtml(self):
         d = Document('foo')
