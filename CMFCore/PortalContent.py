@@ -94,6 +94,7 @@ import CMFCorePermissions
 from interfaces.Contentish import Contentish
 from DynamicType import DynamicType
 from utils import getToolByName, _checkPermission, _getViewFor
+from webdav.Lockable import ResourceLockedError
 try: 
     from webdav.WriteLockInterface import WriteLockInterface
     NoWL = 0
@@ -141,6 +142,14 @@ class PortalContent(DynamicType, SimpleItem):
                               'manage_FTPstat',
                               'manage_FTPget',
                               'manage_FTPlist',)
+
+    def failIfLocked(self):
+        """
+        Check if isLocked via webDav
+        """
+        if self.wl_isLocked():
+            raise ResourceLockedError, 'This resource is locked via webDAV'
+        return 0
 
     # indexed methods
     # ---------------

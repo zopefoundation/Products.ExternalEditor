@@ -2,6 +2,16 @@
 
  New features
 
+  - Added failIfLocked method to PortalContent which handles the necessary
+    checks to make sure a Document isn't locked via webDAV.
+
+  - Added edit method to Document and editMetadata method to fix problems
+    with working nicely with webDAV.  The PUT method calls _edit method if
+    it passes lock checks, while through the web code calls the edit variant
+    and it in turn calls the _ method if the lock check passes.  Similar
+    cases for handling the editMetadata method calls and checks for webDAV
+    locks.
+
   - (__future__) Added docs from the crack ZC docs guys.
 
   - (__future__) Exposed role management for manager users on

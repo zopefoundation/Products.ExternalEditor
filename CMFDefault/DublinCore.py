@@ -465,7 +465,30 @@ class DefaultDublinCoreImpl( PropertyManager ):
 
     security.declareProtected( CMFCorePermissions.ModifyPortalContent
                              , 'editMetadata' )
-    editMetadata = WorkflowAction(_editMetadata)
-
-
+    def editMetadata(self
+                   , title=''
+                   , subject=()
+                   , description=''
+                   , contributors=()
+                   , effective_date=None
+                   , expiration_date=None
+                   , format='text/html'
+                   , language='en-US'
+                   , rights=''
+                    ):
+        """
+        used to be:  editMetadata = WorkflowAction(_editMetadata)
+        Need to add check for webDAV locked resource for TTW methods.
+        """
+        self.failIfLocked()
+        self._editMetadata(title=title
+                     , subject=subject
+                     , description=description
+                     , contributors=contributors
+                     , effective_date=effective_date
+                     , expiration_date=expiration_date
+                     , format=format
+                     , language=language
+                     , rights=rights
+                     )
 InitializeClass(DefaultDublinCoreImpl)

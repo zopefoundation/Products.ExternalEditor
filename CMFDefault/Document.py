@@ -92,7 +92,7 @@ from Globals import DTMLFile, InitializeClass
 from AccessControl import ClassSecurityInfo, getSecurityManager
 from Products.CMFCore.PortalContent import PortalContent
 from DublinCore import DefaultDublinCoreImpl
-
+from webdav.Lockable import ResourceLockedError
 from Products.CMFCore import CMFCorePermissions
 from Products.CMFCore.WorkflowCore import WorkflowAction
 from Products.CMFCore.utils import _format_stx, keywordsplitter
@@ -183,7 +183,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
 
     security.declareProtected(CMFCorePermissions.ModifyPortalContent,
                               'manage_editDocument' )
-    def manage_editDocument(self, text_format, text, file='', REQUEST=None):
+    def manage_editDocument(self, text, file='', REQUEST=None):
         """ A ZMI (Zope Management Interface) level editing method """
         self._edit(text_format, text, file)
         if REQUEST is not None:
@@ -226,7 +226,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
             if key != 'Format' and not haveheader(key):
                 headers[key] = value
         
-        self.editMetadata(title=headers['Title'],
+        self._editMetadata(title=headers['Title'],
                           subject=headers['Subject'],
                           description=headers['Description'],
                           contributors=headers['Contributors'],
@@ -238,7 +238,14 @@ class Document(PortalContent, DefaultDublinCoreImpl):
                           )
 
     security.declareProtected( CMFCorePermissions.ModifyPortalContent, 'edit' )
-    edit = WorkflowAction(_edit)
+    def edit(self, text_format, text, file='', safety_belt=''):
+        """
+        *used to be WorkflowAction(_edit)
+        To add webDav support, we need to check if the content is locked, and if
+        so return ResourceLockedError if not, call _edit.
+        """
+        self.failIfLocked()
+        self._edit(text_format, text, file='', safety_belt='')
 
     security.declarePrivate('guessFormat')
     def guessFormat(self, text):
@@ -391,9 +398,11 @@ class Document(PortalContent, DefaultDublinCoreImpl):
 
     ## FTP handlers
     security.declareProtected(CMFCorePermissions.ModifyPortalContent, 'PUT')
+
     def PUT(self, REQUEST, RESPONSE):
         """ Handle HTTP (and presumably FTP?) PUT requests """
         self.dav__init(REQUEST, RESPONSE)
+        self.dav__simpleifhandler(REQUEST, RESPONSE, refresh=1)
         body = REQUEST.get('BODY', '')
         guessedformat = REQUEST.get_header('Content-Type', 'text/plain')
         ishtml = (guessedformat == 'text/html') or utils.html_headcheck(body)
@@ -402,13 +411,17 @@ class Document(PortalContent, DefaultDublinCoreImpl):
         else: self.setFormat('text/plain')
 
         try:
-            self.edit(text_format=self.text_format, text=body)
+            self._edit(text_format=self.text_format, text=body)
         except 'EditingConflict', msg:
             # XXX Can we get an error msg through?  Should we be raising an
             #     exception, to be handled in the FTP mechanism?  Inquiring
             #     minds...
             get_transaction().abort()
             RESPONSE.setStatus(450)
+            return RESPONSE
+        except ResourceLockedError, msg:
+            get_transaction().abort()
+            RESPONSE.setStatus(423)
             return RESPONSE
 
         RESPONSE.setStatus(204)
