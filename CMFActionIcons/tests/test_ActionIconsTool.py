@@ -208,3 +208,13 @@ class ActionIconToolTests( unittest.TestCase ):
 
         sod3 = tool( sod )
         self.assertEqual( sod2, sod3 )
+
+
+def test_suite():
+    return unittest.TestSuite((
+        unittest.makeSuite(ActionIconToolTests),
+        ))
+
+if __name__ == '__main__':
+    unittest.main(defaultTest='test_suite')
+
