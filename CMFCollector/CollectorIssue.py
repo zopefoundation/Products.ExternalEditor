@@ -176,46 +176,82 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         
 
     security.declareProtected(EditCollectorIssue, 'edit')
-    def edit(self, comment=None,
-             text=None,
-             status=None,
-             submitter_name=None,
+    def edit(self,
              title=None,
-             description=None,
              security_related=None,
+             description=None,
              topic=None,
-             importance=None,
              classification=None,
+             importance=None,
              severity=None,
              reported_version=None,
-             other_version_info=None):
+             other_version_info=None,
+             text=None):
         """Update the explicitly passed fields."""
-        if text is not None:
-            transcript = self.get_transcript()
+
+        changes = []
+        changed = self._changed
+
+        transcript = self.get_transcript()
+        text = text.replace('\r', '')
+        if text is not None and text != transcript.text:
+            changes.append('revised transcript')
             transcript._edit(text_format=DEFAULT_TRANSCRIPT_FORMAT,
                              text=text)
-        if comment is not None:
-            self.do_action('edit', comment)
-        if submitter_name is not None:
-            self.submitter_name = submitter_name
-        if title is not None:
+        if changed('title', title):
+            changes.append('revised title')
             self.title = title
-        if description is not None:
-            self.description = description
-        if security_related is not None:
+        if ((security_related is not None)
+            and ((not security_related) != (not self.security_related))):
+            changes.append('security_related %s'
+                           % (security_related and 'set' or 'unset'))
             self.security_related = security_related
-        if topic is not None:
+        if changed('description', description):
+            changes.append('revised description')
+            self.description = description
+        if changed('topic', topic):
+            changes.append('topic (%s => %s)' % (self.topic, topic))
             self.topic = topic
-        if importance is not None:
+        if changed('importance', importance):
+            changes.append('importance (%s => %s)'
+                           % (self.importance, importance))
             self.importance = importance
-        if classification is not None:
+        if changed('classification', classification):
+            changes.append('classification (%s => %s)'
+                           % (self.classification, classification))
             self.classification = classification
-        if severity is not None:
+        if changed('severity', severity):
+            changes.append('severity (%s => %s)'
+                           % (self.severity, severity))
             self.severity = severity
-        if reported_version is not None:
+        if changed('reported_version', reported_version):
+            changes.append('reported_version (%s => %s)'
+                           % (self.reported_version, reported_version))
             self.reported_version = reported_version
-        if other_version_info is not None:
+        if changed('other_version_info', other_version_info):
+            changes.append('revised other_version_info')
             self.other_version_info = other_version_info
+
+        if not changes:
+            return 'No changes.'
+
+        self.action_number += 1
+
+        username = str(getSecurityManager().getUser())
+
+        transcript._edit('stx',
+                         self._entry_header('Edit', username)
+                         + "\n\n"
+                         + " Changes: " + ", ".join(changes)
+                         + ((self.action_number > 1) and "\n\n<hr>\n")
+                         + transcript.EditableBody())
+        self._send_update_notice('Edit', username)
+        return ", ".join(changes)
+
+    def _changed(self, field_name, value):
+        """True if value is not None and different than self.field_name."""
+        return ((value is not None) and
+                (getattr(self, field_name, None) != value))
 
     security.declareProtected(CMFCorePermissions.View, 'get_transcript')
     def get_transcript(self):
@@ -278,7 +314,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
                          + util.process_comment(string.strip(comment))
                          + ((action_number > 1) and "\n<hr>\n" or '')
                          + transcript.EditableBody())
-        self._send_update_notice(action, username, transcript.EditableBody(),
+        self._send_update_notice(action, username,
                                  orig_status, additions, removals,
                                  file=file, fileid=fileid)
 
@@ -292,9 +328,9 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
             else: minus.append(supporter)
         return (plus, minus)
 
-    def _send_update_notice(self, action, actor, comment,
-                            orig_status, additions, removals,
-                            file, fileid):
+    def _send_update_notice(self, action, actor,
+                            orig_status=None, additions=None, removals=None,
+                            file=None, fileid=None):
         """Send email notification about issue event to relevant parties."""
 
         action = string.capitalize(string.split(action, '_')[0])
@@ -316,8 +352,8 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         #   - those supporters assigned to the issue
         #   - any supporters being removed from or added to an issue.
         candidates = [self.submitter_id]
-        if not ('accepted' == string.lower(new_status) == 
-                string.lower(orig_status)):
+        if orig_status and not ('accepted' == string.lower(new_status) == 
+                                string.lower(orig_status)):
             candidates.extend(self.aq_parent.supporters)
         else:
             candidates.extend(self.assigned_to())
