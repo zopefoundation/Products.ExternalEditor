@@ -584,9 +584,6 @@ class WorkflowToolConfigurator( Implicit ):
 
             - "USER" -> fired in response to user request
 
-            - "WORKFLOW_METHOD" -> fired as the result of execting a
-               WorkflowMethod
-
           'script_name' -- the ID of a script to be executed before
              the transition
 
