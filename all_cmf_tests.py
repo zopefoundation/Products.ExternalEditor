@@ -15,6 +15,7 @@ PACKAGES_UNDER_TEST = []
 def test_suite():
 
     import Zope
+    Zope.startup()
     from Products.CMFCore.tests.base.utils import build_test_suite
 
     suite = unittest.TestSuite()
