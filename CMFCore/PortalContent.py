@@ -214,7 +214,7 @@ class PortalContent(DynamicType, SimpleItem):
             for action in actions:
                 if self._verifyActionPermissions(action):
                     return self.restrictedTraverse(action['action'])
-            raise Unauthorized, ('No accessible views available for %s' %
+            raise 'Unauthorized', ('No accessible views available for %s' %
                                  string.join(self.getPhysicalPath(), '/'))
         else:
             raise 'Not Found', ('Cannot find default view for "%s"' %
