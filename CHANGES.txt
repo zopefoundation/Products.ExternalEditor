@@ -91,6 +91,9 @@ CMF 1.4 alpha
     - Protected the Pending review action in DefaultWorkflow by
       ReviewPortalContent (Collector #52).
 
+    - Raise ValueError instead of TypeError in TypesTool.getActionById
+      if the action is not found (Collector #56).
+
   Bug Fixes
 
     - Document: Ensured that setFormat('text/plain') does not overwrite

@@ -231,9 +231,8 @@ class TypeInformation (SimpleItemWithProperties):
                     return action['action']
 
         if default is _marker:
-            raise TypeError, ( 'No action "%s" for type "%s"'
-                             % ( id, self.getId() )
-                             )
+            raise ValueError, ('No action "%s" for type "%s"'
+                               % (id, self.getId()))
         else:
             return default
 
