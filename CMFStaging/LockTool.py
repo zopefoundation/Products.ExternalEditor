@@ -240,5 +240,15 @@ class LockTool(UniqueObject, SimpleItemWithProperties):
                 return 0
         return 1
 
-InitializeClass(LockTool)
 
+    security.declarePublic('hasLock')
+    def hasLock(self, obj):
+        """Returns true if the user has a lock on the specified object.
+        """
+        locker = self.locker(obj)
+        if not locker:
+            return 0
+        user = getSecurityManager().getUser()
+        return (user.getId() == locker)
+
+InitializeClass(LockTool)
