@@ -120,6 +120,7 @@ class CookieAuthHelper(Folder, BasePlugin):
                 request.set('__ac_password', '')
 
                 cookie_val = encodestring('%s:%s' % (login, password))
+                response = request['RESPONSE']
                 response.setCookie(self.cookie_name, cookie_val, path='/')
 
         if creds:
