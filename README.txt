@@ -12,12 +12,29 @@ Zope Content Management Framework (CMF) README
 
   Resources
 
-    * The CMF "dogbowl" site, http://cmf.zope.org.
+    General
 
-    * The mailing list, zope-cmf@zope.org.  List information and
-      online signup are available at:
-      http://lists.zope.org/mailman/listinfo/zope-cmf.  Archives
-      of the list are at: http://lists.zope.org/pipermail/zope-cmf.
+      * The CMF "dogbowl" site, http://cmf.zope.org.
+
+      * The mailing list, zope-cmf@zope.org.  List information and
+	online signup are available at:
+	http://lists.zope.org/mailman/listinfo/zope-cmf.  Archives
+	of the list are at: http://lists.zope.org/pipermail/zope-cmf.
+
+      * The 'docs/' directory contains user-oriented documentation
+
+    Developer
+
+      * The CMFDefault package is an example application, built using
+	the API and services defined in CMFCore.  You will probably want to
+	alter it.  In the first instance, refer to the source of CMFDefault for
+	usage examples, standard idioms, etc.
+
+      * The API is documented in the 'interfaces/' directory of each
+	package.
+
+      * Refer to the unit tests in the 'tests/' directory of each package
+	for usage examples.
 
   Known Issues
 
