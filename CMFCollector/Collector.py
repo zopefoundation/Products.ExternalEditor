@@ -17,7 +17,7 @@ import os, urllib
 from DateTime import DateTime
 from Globals import InitializeClass, DTMLFile, package_home
 
-from AccessControl import ClassSecurityInfo, ModuleSecurityInfo
+from AccessControl import ClassSecurityInfo, ModuleSecurityInfo, Permission
 from AccessControl import getSecurityManager
 
 from Products.CMFDefault.DublinCore import DefaultDublinCoreImpl
@@ -89,6 +89,8 @@ class Collector(SkinnedFolder):
 
     managers = ()
     dispatching = 1
+    # participation modes: 'staff', 'authenticated', 'anyone'
+    participation = 'staff'
 
     # state_email - a dictionary pairing state names with email destinations
     # for all notifications occuring within that state.
@@ -202,6 +204,7 @@ class Collector(SkinnedFolder):
     def edit(self, title=None, description=None,
              abbrev=None, email=None,
              managers=None, supporters=None, dispatching=None,
+             participation=None,
              state_email=None,
              topics=None, classifications=None,
              importances=None,
@@ -214,15 +217,19 @@ class Collector(SkinnedFolder):
         if title is not None and title != self.title:
             self.title = title
             changes.append("Title")
+
         if description is not None and self.description != description:
             self.description = description
             changes.append("Description")
+
         if abbrev is not None and self.abbrev != abbrev:
             self.abbrev = abbrev
             changes.append("Abbrev")
+
         if email is not None and self.email != email:
             self.email = email
             changes.append("Email")
+
         if not self.email:
             raise ValueError, ('<strong>'
                                '<font color="red">'
@@ -230,6 +237,7 @@ class Collector(SkinnedFolder):
                                ' have an email address'
                                '</font>'
                                '</strong>')
+
         if managers is not None or not self.managers:
             # XXX Vette managers - they must exist, etc.
             x = filter(None, managers)
@@ -251,6 +259,7 @@ class Collector(SkinnedFolder):
                 changes.append("Managers")
                 self.managers = x
                 staff_changed = 1
+
         if supporters is not None:
             # XXX Vette supporters - they must exist, etc.
             x = filter(None, supporters)
@@ -258,25 +267,40 @@ class Collector(SkinnedFolder):
                 changes.append("Supporters")
                 self.supporters = x
                 staff_changed = 1
+
         if staff_changed:
             changes.extend(self._adjust_staff_roles())
+
         if dispatching is not None and self.dispatching != dispatching:
             self.dispatching = dispatching
             changes.append("Dispatching %s"
                            % ((dispatching and "on") or "off"))
-        if state_email is not None and self.state_email != state_email:
-            self.state_email = state_email
-            changes.append("State email")
+
+        if participation is not None and self.participation != participation:
+            self._adjust_participation_mode(participation)
+            changes.append("Participation => '%s'" % participation)
+
+        if state_email is not None:
+            changed = 0
+            for k, v in state_email.items():
+                if self.state_email[k] != v:
+                    changed = 1
+                    self.state_email[k] = v
+            if changed:
+                changes.append("State email")
+
         if topics is not None:
             x = filter(None, topics)
             if self.topics != x:
                 self.topics = x
                 changes.append("Topics")
+
         if classifications is not None:
             x = filter(None, classifications)
             if self.classifications != x:
                 self.classifications = x
                 changes.append("Classifications")
+
         if importances is not None:
             x = filter(None, importances)
             if self.importances != x:
@@ -321,6 +345,22 @@ class Collector(SkinnedFolder):
 
         return change_notes
 
+    def _adjust_participation_mode(self, mode):
+        """Set role privileges according to participation mode."""
+
+        target_roles = ['Reviewer', 'Manager', 'Owner']
+
+        if mode == 'authenticated':
+            target_roles = target_roles + ['Authenticated']
+        elif mode == 'anyone':
+            target_roles = target_roles + ['Authenticated', 'Anonymous']
+
+        self.manage_permission(AddCollectorIssueFollowup,
+                               roles=target_roles,
+                               acquire=1)
+
+        self.participation = mode
+
     security.declareProtected(ManageCollector, 'reinstate_catalog')
     def reinstate_catalog(self, internal_only=1):
         """Recreate and reload internal catalog, to accommodate drastic
@@ -333,8 +373,22 @@ class Collector(SkinnedFolder):
         self._reindex_issues(internal_only=internal_only)
 
     def _reindex_issues(self, internal_only=1):
-        """For, eg, allowedRolesAndUsers recompute after local_role changes."""
+        """For, eg, allowedRolesAndUsers recompute after local_role changes.
+
+        We also make sure that the AddCollectorIssueFollowup permission
+        acquires (old workflows controlled this).  This isn't exactly the
+        right place, but it is an expedient one."""
+
         for i in self.objectValues(spec='CMF Collector Issue'):
+
+            # Ensure the issue acquires AddCollectorIssueFollowup permission.
+            for m in i.ac_inherited_permissions(1):
+                if m[0] == AddCollectorIssueFollowup:
+                    perm = Permission.Permission(m[0], m[1], i)
+                    roles = perm.getRoles()
+                    if type(roles) == type(()):
+                        perm.setRoles(list(roles))
+
             i.reindexObject(internal_only=internal_only)
 
     security.declareProtected(ManageCollector, 'issue_states')
