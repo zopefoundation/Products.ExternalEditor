@@ -20,6 +20,14 @@
                             (trigger_type == 1 and 'User action') or
                             (trigger_type == 2 and 'WorkflowMethod')">
    <br />
+   <dtml-if script_name>
+     Script (before): &dtml-script_name;
+     <br />
+   </dtml-if>
+   <dtml-if after_script_name>
+     Script (after): &dtml-after_script_name;
+     <br />
+   </dtml-if>
    <dtml-if getGuardSummary><dtml-var getGuardSummary><br /></dtml-if>
    <dtml-if actbox_name>Adds to actions box: <code>&dtml-actbox_name;</code></dtml-if>
   </td>
