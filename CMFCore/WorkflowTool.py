@@ -176,8 +176,7 @@ class WorkflowTool (UniqueObject, Folder):
                               '/manage_main?management_view=Contents')
 
     def all_meta_types(self):
-        mt = WorkflowTool.inheritedAttribute('all_meta_types')(self)
-        return tuple(mt) + (
+        return (
             {'name': 'Workflow',
              'action': 'manage_addWorkflowForm',
              'permission': CMFCorePermissions.ManagePortal },)
