@@ -42,6 +42,7 @@ from Products.CMFCore.utils import _getAuthenticatedUser
 from Products.CMFCore.utils import _checkPermission
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.utils import _dtmldir
+import time
 
 
 def createCPContext( content, view_method, keywords ):
@@ -184,16 +185,14 @@ class CachingPolicy:
                 mtime = DateTime( mtime )
 
             if mtime is not None:
-                mtime_str = mtime.rfc822()
+                mtime_flt = mtime.timeTime()
+                mtime_str = rfc1123_date(mtime_flt)
                 headers.append( ( 'Last-modified', mtime_str ) )
 
             control = []
 
             if self._max_age_secs is not None:
-                max_age_days = float( self._max_age_secs ) / 86400.0
-                exp_time = mtime + max_age_days
-                exp_time_str = exp_time.rfc822()
-
+                exp_time_str = rfc1123_date(time.time() + self._max_age_secs)
                 headers.append( ( 'Expires', exp_time_str ) )
                 control.append( 'max-age=%d' % self._max_age_secs )
 
