@@ -84,8 +84,10 @@
 ##############################################################################
 
 from AccessControl import ClassSecurityInfo
-from utils import getToolByName
+from utils import getPortal, getToolByName
 import Globals
+from urllib import quote
+
 
 class DynamicType:
     """
@@ -124,5 +126,29 @@ class DynamicType:
             return None
         pt = self._getPortalTypeName()
         return tool.getTypeInfo(pt)  # Can return None.
+
+    # Support for dynamic icons
+
+    security.declarePublic('getIcon')
+    def getIcon(self, relative_to_portal=0):
+        """
+        Using this method allows the content class
+        creator to grab icons on the fly instead of using a fixed
+        attribute on the class.
+        """
+        ti = self.getTypeInfo()
+        if ti is not None:
+            icon = quote(ti.getIcon())
+            if icon:
+                if relative_to_portal:
+                    return icon
+                else:
+                    # Need the full path to the icon.
+                    portal_url = getPortal(self).absolute_url(relative=1)
+                    return portal_url + '/' + icon
+        return 'misc_/OFSP/dtmldoc.gif'
+
+    security.declarePublic('icon')
+    icon = getIcon  # For the ZMI and the catalog.
 
 Globals.InitializeClass (DynamicType)
