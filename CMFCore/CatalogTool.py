@@ -102,6 +102,7 @@ from AccessControl import ClassSecurityInfo
 from utils import mergedLocalRoles
 import os
 import CMFCorePermissions
+from Acquisition import aq_base
 
 
 class IndexableObjectWrapper:
@@ -151,38 +152,51 @@ class CatalogTool (UniqueObject, ZCatalog):
         self._initIndexes()
 
     def _initIndexes(self):
+        base = aq_base(self)
+        if hasattr(base, 'addIndex'):
+            # Zope 2.4
+            addIndex = self.addIndex
+        else:
+            # Zope 2.3 and below
+            addIndex = self._catalog.addIndex
+        if hasattr(base, 'addColumn'):
+            # Zope 2.4
+            addColumn = self.addColumn
+        else:
+            # Zope 2.3 and below
+            addColumn = self._catalog.addColumn
         # Reviewing indexes
-        self._catalog.addIndex('review_state', 'FieldIndex')
+        addIndex('review_state', 'FieldIndex')
         # Content indexes
-        self._catalog.addIndex('Date', 'FieldIndex')
-        self._catalog.addIndex('allowedRolesAndUsers', 'KeywordIndex')
-        self._catalog.addIndex('Creator', 'FieldIndex')
-        self._catalog.addIndex('Title', 'TextIndex')
-        self._catalog.addIndex('Description', 'TextIndex')
-        self._catalog.addIndex('SearchableText', 'TextIndex')
-        self._catalog.addIndex('Subject', 'KeywordIndex')
-        self._catalog.addIndex('in_reply_to', 'FieldIndex')
-        self._catalog.addIndex('created', 'FieldIndex')
-        self._catalog.addIndex('effective', 'FieldIndex')
-        self._catalog.addIndex('expires', 'FieldIndex')
-        self._catalog.addIndex('modified', 'FieldIndex')
+        addIndex('Date', 'FieldIndex')
+        addIndex('allowedRolesAndUsers', 'KeywordIndex')
+        addIndex('Creator', 'FieldIndex')
+        addIndex('Title', 'TextIndex')
+        addIndex('Description', 'TextIndex')
+        addIndex('SearchableText', 'TextIndex')
+        addIndex('Subject', 'KeywordIndex')
+        addIndex('in_reply_to', 'FieldIndex')
+        addIndex('created', 'FieldIndex')
+        addIndex('effective', 'FieldIndex')
+        addIndex('expires', 'FieldIndex')
+        addIndex('modified', 'FieldIndex')
         # Catalog meta-data
-        self._catalog.addColumn('Subject')
-        self._catalog.addColumn('Title')
-        self._catalog.addColumn('Description')
-        self._catalog.addColumn('Type')
-        self._catalog.addColumn('review_state')
-        self._catalog.addColumn('Creator')
-        self._catalog.addColumn('Date')
-        self._catalog.addColumn('getIcon')
-        self._catalog.addColumn('created')
-        self._catalog.addColumn('effective')
-        self._catalog.addColumn('expires')
-        self._catalog.addColumn('modified')
-        self._catalog.addColumn('CreationDate')
-        self._catalog.addColumn('EffectiveDate')
-        self._catalog.addColumn('ExpiresDate')
-        self._catalog.addColumn('ModifiedDate')
+        addColumn('Subject')
+        addColumn('Title')
+        addColumn('Description')
+        addColumn('Type')
+        addColumn('review_state')
+        addColumn('Creator')
+        addColumn('Date')
+        addColumn('getIcon')
+        addColumn('created')
+        addColumn('effective')
+        addColumn('expires')
+        addColumn('modified')
+        addColumn('CreationDate')
+        addColumn('EffectiveDate')
+        addColumn('ExpiresDate')
+        addColumn('ModifiedDate')
 
     #
     #   ZMI methods
