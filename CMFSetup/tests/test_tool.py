@@ -536,6 +536,8 @@ class SetupToolTests( FilesystemTestBase
         site.portal_setup = self._makeOne()
         tool = site.portal_setup
 
+        self.assertEqual( len( tool.listSnapshotInfo() ), 0 )
+
         result = tool.createSnapshot( 'default' )
 
         self.assertEqual( len( result[ 'steps' ] ), 1 )
@@ -556,6 +558,13 @@ class SetupToolTests( FilesystemTestBase
 
         fileobj = snapshot._getOb( 'export_steps.xml' )
         self.assertEqual( fileobj.read() , _DEFAULT_STEP_REGISTRIES_EXPORT_XML )
+
+        self.assertEqual( len( tool.listSnapshotInfo() ), 1 )
+
+        info = tool.listSnapshotInfo()[ 0 ]
+
+        self.assertEqual( info[ 'id' ], 'default' )
+        self.assertEqual( info[ 'title' ], 'default' )
 
 
 _DEFAULT_STEP_REGISTRIES_EXPORT_XML = """\

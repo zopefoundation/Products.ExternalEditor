@@ -3,6 +3,7 @@
 $Id$
 """
 import os
+import time
 
 from AccessControl import ClassSecurityInfo
 from Globals import InitializeClass
@@ -221,9 +222,18 @@ class SetupTool( UniqueObject, Folder ):
     #   ZMI
     #
     manage_options = ( Folder.manage_options[ :1 ]
-                     + ( { 'label' : 'Properties', 'action' : 'manage_tool' }
-                       , { 'label' : 'Import', 'action' : 'manage_importSteps' }
-                       , { 'label' : 'Export', 'action' : 'manage_exportSteps' }
+                     + ( { 'label' : 'Properties'
+                         , 'action' : 'manage_tool'
+                         }
+                       , { 'label' : 'Import'
+                         , 'action' : 'manage_importSteps'
+                         }
+                       , { 'label' : 'Export'
+                         , 'action' : 'manage_exportSteps'
+                         }
+                       , { 'label' : 'Snapshots'
+                         , 'action' : 'manage_snapshots'
+                         }
                        )
                      + Folder.manage_options[ 3: ] # skip "View", "Properties"
                      )
@@ -329,6 +339,54 @@ class SetupTool( UniqueObject, Folder ):
                           , 'attachment; filename=%s' % result[ 'filename' ]
                           )
         return result[ 'tarball' ]
+
+    security.declareProtected( ManagePortal, 'manage_snapshots' )
+    manage_snapshots = PageTemplateFile( 'sutSnapshots', _wwwdir )
+
+    security.declareProtected( ManagePortal, 'listSnapshotInfo' )
+    def listSnapshotInfo( self ):
+
+        """ Return a list of mappings describing available snapshots.
+        
+        o Keys include:
+
+          'id' -- snapshot ID
+
+          'title' -- snapshot title or ID
+
+          'url' -- URL of the snapshot folder
+
+        o ZMI support.
+        """
+        result = []
+        snapshots = self._getOb( 'snapshots', None )
+
+        if snapshots:
+
+            for id, folder in snapshots.objectItems( 'Folder' ):
+
+                result.append( { 'id' : id
+                               , 'title' : folder.title_or_id()
+                               , 'url' : folder.absolute_url()
+                               } )
+        return result
+
+    security.declareProtected( ManagePortal, 'manage_createSnapshot' )
+    def manage_createSnapshot( self, RESPONSE, snapshot_id=None ):
+
+        """ Create a snapshot with the given ID.
+
+        o If no ID is passed, generate one.
+        """
+        if snapshot_id is None:
+            timestamp = time.gmtime()
+            snapshot_id = 'snapshot-%4d%02d%02d%02d%02d%02d' % timestamp[:6]
+
+        self.createSnapshot( snapshot_id )
+
+        RESPONSE.redirect( '%s/manage_snapshots?manage_tabs_message=%s'
+                         % ( self.absolute_url(), 'Snapshot+created.' ) )
+
 
     #
     #   Helper methods

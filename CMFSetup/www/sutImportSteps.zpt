@@ -49,8 +49,7 @@ procedure, in order to pick up changes since the site was created.
   </tal:loop>
 
   <tr valign="top" class="list-header">
-   <td />
-   <td colspan="3">Import Configuration</td>
+   <td colspan="4">&nbsp;</td>
   </tr>
 
   <tr valign="top">

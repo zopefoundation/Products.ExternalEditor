@@ -49,8 +49,7 @@ Download selected export steps as tarball.
   </tal:loop>
 
   <tr valign="top" class="list-header">
-   <td />
-   <td colspan="3">Export Configuration</td>
+   <td colspan="4">&nbsp;</td>
   </tr>
 
   <tr valign="top">
