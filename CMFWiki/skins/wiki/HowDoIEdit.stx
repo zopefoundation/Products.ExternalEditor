@@ -43,10 +43,6 @@
   from the current page, a <strong>?</strong> will be displayed - click it to
   create the new page.  This is how new wiki pages are added.</p>
 
-<p>  At the point of page creation, text at the top of the form offers a
-  link to an alternate form where you can select a file or an
-  image, to upload, instead, as the content of the page.</p>
-
 <p>  To link to a page on another site, just type the url. Or, you can
   use HTML.  Also, "RemoteWikiLinks":RemoteWikiLinks are a convenient
   notation for linking to pages on another site.</p>
