@@ -88,7 +88,7 @@ class ZODBUserManager( BasePlugin ):
         password = credentials.get( 'password' )
 
         if login is None or password is None:
-            return (None, None)
+            return None
 
         userid = self._login_to_userid.get( login, login )
         reference = self._user_passwords[ userid ]
@@ -102,7 +102,7 @@ class ZODBUserManager( BasePlugin ):
         if reference == digested:
             return userid, login
 
-        return (None, None)
+        return None
 
     #
     #   IUserEnumerationPlugin implementation
