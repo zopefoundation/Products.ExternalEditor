@@ -1,28 +1,19 @@
-<html xmlns:tal="http://xml.zope.org/namespaces/tal"
-      xmlns:metal="http://xml.zope.org/namespaces/metal"
-      metal:use-macro="here/main_template/macros/master">
+<tal:page
+   xmlns:tal="http://xml.zope.org/namespaces/tal"
+   xmlns:metal="http://xml.zope.org/namespaces/metal"
+   tal:define="control python: here.search_results_control(**request.form)"
+   tal:condition="control"
+><html metal:use-macro="here/main_template/macros/master">
 <body>
-<div metal:fill-slot="main" i18n:domain="cmf_default">
-<div class="Desktop">
+
+<metal:block metal:fill-slot="main"
+   tal:define="batch control/batch">
+<div class="Desktop" i18n:domain="cmf_default">
 
 <h2 i18n:translate="">Search Results</h2>
 
-<div tal:define="b_start python:0;b_start request/b_start | b_start;
-                 results python:here.doFormSearch( REQUEST=request );
-                 Batch python:modules['ZTUtils'].Batch;
-                 global batch python:Batch(results, 25, b_start, orphan=1);
-                ">
-
-<p i18n:translate="">Found <span
- tal:define="pss modules/Products.PythonScripts.standard"
- tal:replace="python:pss.thousands_commas(len(results))"
- i18n:name="count">100</span> items<span
- tal:condition="exists:request/SearchableText"
-     tal:omit-tag=""> matching '<span
-     tal:replace="request/SearchableText"
-     i18n:name="text">search term</span>'</span>.</p>
-
-<table class="SearchResults" tal:condition="results">
+<metal:block metal:use-macro="here/batch_widgets/macros/summary" />
+<table class="SearchResults" tal:condition="batch/listItemInfos">
  <thead>
   <tr>
    <td width="16">&nbsp;</td>
@@ -31,7 +22,7 @@
    <th i18n:translate="">Date</th>
   </tr>
  </thead>
- <tbody tal:repeat="result batch">
+ <tbody tal:repeat="result batch/listItemInfos">
   <tr tal:define="objURL string:${result/getURL}/view">
    <td><a href=""
      tal:condition="result/getIcon|nothing"
@@ -60,17 +51,10 @@
   </tr>
  </tbody>
 </table>
-<p tal:condition="not:results"
-   i18n:translate="">There are no items matching your specified criteria.</p>
-
-<tal:span tal:define="target string:${here/portal_url}/search;
-                      batch python: {'navigation':
-                    here.getBatchNavigation(batch, target, **request.form) }">
- <metal:block metal:use-macro="here/batch_widgets/macros/navigation" />
-</tal:span>
+<metal:block metal:use-macro="here/batch_widgets/macros/navigation" />
 
 </div>
-</div>
-</div>
+</metal:block>
+
 </body>
-</html>
+</html></tal:page>

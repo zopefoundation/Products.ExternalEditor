@@ -1,6 +1,23 @@
 <html>
 <body>
 
+<tal:test tal:define="summary python: {'length': '9.999', 'type': 'items',
+                                       'match': 'foo'};
+                      global batch python: {'summary': summary}" />
+
+ <metal:block metal:define-macro="summary"
+ ><p class="BatchSummary" tal:condition="batch/summary/length"
+     i18n:translate="">Found <span tal:replace="batch/summary/length"
+      i18n:name="count">n</span> <span i18n:name="type"><span tal:omit-tag=""
+       tal:content="batch/summary/type" i18n:translate="">items</span></span
+  ><tal:case tal:condition="python: path('batch/summary/match') is not None"
+   > matching '<span tal:replace="batch/summary/match" i18n:name="text"
+    >search term</span>'</tal:case>.</p
+ ><p class="BatchSummary" tal:condition="not:batch/summary/length"
+     i18n:translate="">There are no items matching your specified criteria.</p
+></metal:block>
+
+
 <tal:test tal:define="previous python: {'length': '20', 'text': 'Previous',
                                         'type': 'items', 'url':'?'};
                       next python: {'length': '', 'text': 'Next',
@@ -17,7 +34,7 @@
   ><tal:span tal:content="batch/navigation/previous/text"
    >Previous</tal:span
   > <tal:case tal:condition="batch/navigation/previous/length"
-   ><span tal:omit-tag="" tal:content="batch/navigation/previous/length"
+   ><span tal:replace="batch/navigation/previous/length"
       i18n:name="count">n</span></tal:case
   > <tal:span tal:content="batch/navigation/previous/type"
    >items</tal:span></a></tal:case
@@ -28,7 +45,7 @@
   ><tal:span tal:content="batch/navigation/next/text"
    >Next</tal:span
   > <tal:case tal:condition="batch/navigation/next/length"
-   ><span tal:omit-tag="" tal:content="batch/navigation/next/length"
+   ><span tal:replace="batch/navigation/next/length"
       i18n:name="count">n</span></tal:case
   > <tal:span tal:content="batch/navigation/next/type"
    >items</tal:span></a></tal:case

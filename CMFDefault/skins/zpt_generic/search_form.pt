@@ -92,7 +92,7 @@
                   lastWeek python:(today-7).Date();
                   lastMth python:(today-31).Date();
                  ">
-   <select name="created:date">
+   <select name="created.query:record:date">
     <option value="1970/01/01 00:00:01 GMT"
             i18n:translate="">Ever</option>
     <option value=""
@@ -109,7 +109,7 @@
             tal:attributes="value lastMth"
             i18n:translate="">Last month</option>
    </select>
-   <input type="hidden" name="created_usage" value="range:min" />
+   <input type="hidden" name="created.range:record" value="min" />
    <dl class="FieldHelp">
     <dd i18n:translate="">You may find only recent items by selecting a
       time-frame.
