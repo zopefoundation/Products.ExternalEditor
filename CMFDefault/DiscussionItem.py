@@ -93,6 +93,7 @@ class DiscussionItem( Document
     allow_discussion    = 1
     creator             = 'unknown'
     in_reply_to         = None
+    # XXX this is wrong, it precludes the use of a normal workflow.
     review_state        ='published'
 
     security = ClassSecurityInfo()
