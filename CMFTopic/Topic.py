@@ -304,7 +304,8 @@ InitializeClass(Topic)
 from Products.CMFCore.register import registerPortalContent
 registerPortalContent(
     Topic,
-    meta_type='CMFTopic',
+    meta_type='Portal Topic',
     icon = 'images/topic.gif',
     permission = TopicPermissions.AddTopics,
+    productGlobals = globals(),
     )

@@ -85,42 +85,33 @@
 """
     Declare simple int-match criterion class.
 """
-from OFS.SimpleItem import Item
+from AbstractCriterion import AbstractCriterion
 from AccessControl import ClassSecurityInfo
 from Topic import Topic
-import Acquisition, Globals
+import Globals, interfaces
 
 from Products.CMFCore import CMFCorePermissions
 import TopicPermissions
 
-class SimpleIntCriterion( Item, Acquisition.Implicit ):
+class SimpleIntCriterion(AbstractCriterion):
     """\
     Represent a simple field-match for an integer value, including
     catalog range searches.    
     """
-
+    __implements__ = (interfaces.Criterion,)
     meta_type = 'Integer Criterion'
 
     security = ClassSecurityInfo()
-
     _editableAttributes = ('value', 'direction',)
-
-    direction = None
 
     MINIMUM = 'min'
     MAXIMUM = 'max'
     MINMAX = 'min:max'
 
-    def __init__( self, id, field, value=None, direction=None ):
+    def __init__(self, id, field):
         self.id = id
         self.field = field
-
-        if value is not None:
-            self.value = int(value)
-        else:
-            self.value = None
-
-        self.direction = direction
+        self.value = self.direction = None
 
     security.declareProtected(TopicPermissions.ChangeTopics, 'getEditForm')
     def getEditForm(self):
@@ -128,10 +119,14 @@ class SimpleIntCriterion( Item, Acquisition.Implicit ):
         return 'sic_edit'
 
     security.declareProtected(TopicPermissions.ChangeTopics, 'edit')
-    def edit(self, value, direction=None):
+    def edit(self, value, direction=''):
         """ Update the value we match against. """
-        self.value = int(value)
-        self.direction = direction
+        if type(value) == type('') and (not string.strip(value)):
+            # An empty string was passed in, which evals to None
+            self.value = self.direction = None
+        else:
+            self.value = int(value)
+            self.direction = direction
 
     security.declareProtected(CMFCorePermissions.View, 'getCriteriaItems')
     def getCriteriaItems(self):
@@ -139,10 +134,10 @@ class SimpleIntCriterion( Item, Acquisition.Implicit ):
         if self.value is None:
             return ()
 
-        result = ((self.field, self.value),)
+        result = ((self.Field(), self.value),)
 
         if self.direction is not None:
-            result = result + (('%s_usage' % self.id, 
+            result = result + (('%s_usage' % self.Field(), 
                                 'range:%s' % self.direction ),)
         return result
 

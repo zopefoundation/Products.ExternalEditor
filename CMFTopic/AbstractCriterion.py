@@ -83,59 +83,73 @@
 # 
 ##############################################################################
 """\
-Declare interface for search criterion classes, as used by Topic
-instances to build their queries.
+Home of the abstract Criterion base class.
 """
-import Interface
+from OFS.SimpleItem import Item
+from Globals import Persistent, InitializeClass
+from Acquisition import Implicit
+from AccessControl import ClassSecurityInfo
+import string, operator
 
-class Criterion(Interface.Base):
-    """\
-    A Topic is composed of Criterion objects which specify the query
-    used for the Topic.  By supplying some basic information, the
-    Criterion objects can be plugged into Topics without the Topic
-    having to be too aware of the Criteria types.
-    """
+from Products.CMFCore.CMFCorePermissions import AccessContentsInformation
+from TopicPermissions import ChangeTopics
 
-    def Type(self):
-        """\
-        Return the type of criterion object this is (ie - 'List Criterion')
-        """
+class AbstractCriterion(Persistent, Item, Implicit):
+    """ Abstract base class for Criterion objects. """
 
-    def Field(self):
-        """\
-        Return the field this criterion object searches on.
-        """
+    security = ClassSecurityInfo()
 
-    def Description(self):
-        """\
-        Return a brief description of the criteria type.
-        """
-
+    security.declareProtected(ChangeTopics, 'editableAttributes')
     def editableAttributes(self):
         """\
-        Returns a tuble of editable attributes.  The values of this
-        are used by the topic to build commands to send to the
-        'edit' method based on each criterion's setup.
-        """
+        Return a list of editable attributes, used by topics
+        to build commands to send to the 'edit' command of each
+        criterion, which may vary.
 
-    def getEditForm(self):
-        """\
-        Return the name of a DTML component used to edit criterion.
-        Editforms should be specific to their type of criteria.
-        """
+        Requires concrete subclasses to implement the attribute
+        '_editableAttributes' which is a tuple of attributes
+        that can be edited, for example:
 
-    def edit(self, **kw):
-        """\
-        The signature of this method should be specific to the
-        criterion.  Using the values in the attribute
-        '_editableAttributes', the Topic can apply the right
-        commands to each criteria object as its being edited without
-        having to know too much about the structure.
+          _editableAttributes = ('value', 'direction',)
         """
+        return self._editableAttributes
 
-    def criteriaItems(self):
+    security.declareProtected(AccessContentsInformation, 'Type')
+    def Type(self):
         """\
-        Return a sequence of key-value tuples, each representing
-        a value to be injected into the query dictionary (and,
-        therefore, tailored to work with the catalog).
+        Return the Type of Criterion this object is.  This
+        method can be overriden in subclasses, or those
+        concrete subclasses must define the 'meta_type'
+        attribute.
         """
+        return self.meta_type
+    
+    security.declareProtected(AccessContentsInformation, 'Field')
+    def Field(self):
+        """\
+        Return the field that this criterion searches on.  The
+        concrete subclasses can override this method, or have
+        the 'field' attribute.
+        """
+        return self.field
+
+    security.declareProtected(AccessContentsInformation, 'Description')
+    def Description(self):
+        """\
+        Return a brief but helpful description of the Criterion type,
+        preferably based on the classes __doc__ string.
+        """
+        strip = string.strip
+        split = string.split
+        
+        return string.join(             # Sew a string together after we:
+            filter(operator.truth,      # Filter out empty lines
+                   map(strip,           # strip whitespace off each line
+                       split(self.__doc__, '\n') # from the classes doc string
+                       )
+                   )
+            )
+
+InitializeClass(AbstractCriterion)
+
+        

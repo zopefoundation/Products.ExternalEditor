@@ -85,33 +85,30 @@
 """
     Declare simple string-match criterion class.
 """
-from OFS.SimpleItem import Item
+from AbstractCriterion import AbstractCriterion
 from AccessControl import ClassSecurityInfo
 from Topic import Topic
-import Acquisition, Globals
+import Globals, interfaces
 
 from Products.CMFCore import CMFCorePermissions
 import TopicPermissions
 
-class SimpleStringCriterion(Item, Acquisition.Implicit):
+class SimpleStringCriterion(AbstractCriterion):
     """
-        Represent a simple field-match for a string value.
+    Represent a simple field-match for a string value.
     """
+    __implements__ = (interfaces.Criterion,)
 
     meta_type = 'String Criterion'
     security = ClassSecurityInfo()
 
     _editableAttributes = ('value',)
 
-    def __init__(self, id, field, value=None):
+    def __init__(self, id, field):
         self.id = id
         self.field = field
+        self.value = ''
         
-        if value is not None:
-            self.value = str(value)
-        else:
-            self.value = None
-    
     security.declareProtected(TopicPermissions.ChangeTopics, 'getEditForm')
     def getEditForm(self):
         " Return the skinned name of the edit form "

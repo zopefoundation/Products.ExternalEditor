@@ -113,7 +113,7 @@ def initialize( context ):
 
     # CMF Initializers
     utils.ContentInit(
-        'Portal Topic',
+        'CMF Topic Objects',
         content_types = (Topic.Topic,),
         permission = TopicPermissions.AddTopics,
         extra_constructors = (Topic.addTopic,),

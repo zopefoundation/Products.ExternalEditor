@@ -83,21 +83,22 @@
 # 
 ##############################################################################
 """
-    Declare list criterion class.
+Declare list criterion class.
 """
-from OFS.SimpleItem import Item
 from AccessControl import ClassSecurityInfo
 from Topic import Topic
-import Acquisition, Globals, string
+from AbstractCriterion import AbstractCriterion
+import Globals, string, interfaces
 
 from Products.CMFCore import CMFCorePermissions
 import TopicPermissions
 
-class ListCriterion(Item, Acquisition.Implicit):
+class ListCriterion(AbstractCriterion):
     """\
     Represent a criterion which is a list of values (for an
     'OR' search).
     """
+    __implements__ = (interfaces.Criterion,)
 
     meta_type = 'List Criterion'
 
@@ -105,11 +106,11 @@ class ListCriterion(Item, Acquisition.Implicit):
 
     _editableAttributes = ('value',)
 
-    def __init__( self, id, field, value=None):
+    def __init__( self, id, field):
         self.id = id
         self.field = field
         
-        self.edit(value)
+        self.value = ('',)
 
     security.declareProtected(TopicPermissions.ChangeTopics, 'getEditForm')
     def getEditForm(self):
