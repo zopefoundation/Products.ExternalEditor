@@ -124,6 +124,7 @@ class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
                , ('meta_type', 'FieldIndex')
                , ('id', 'FieldIndex')
                , ('path', 'PathIndex')
+               , ('portal_type', 'FieldIndex')
                )
     
     security.declarePublic( 'enumerateColumns' )
@@ -145,6 +146,7 @@ class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
                , 'EffectiveDate'
                , 'ExpiresDate'
                , 'ModificationDate'
+               , 'portal_type'
                )
 
     def _initIndexes(self):
