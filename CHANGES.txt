@@ -22,6 +22,9 @@ HEAD only (unreleased)
       about proxy role handling using .metadata files 
       (http://www.zope.org/Collectors/CMF/177)
 
+    - FSDTMLMethod: Small code cleanup to remove duplicate variable
+      definition (http://www.zope.org/Collectors/CMF/291)
+
   Features:
 
     - RegistrationTool: The regular expression that limits what people 

@@ -124,16 +124,16 @@ class FSDTMLMethod(RestrictedDTML, RoleManager, FSObject, Globals.HTML):
         security=getSecurityManager()
         security.addContext(self)
         try:
+            r = Globals.HTML.__call__(self, client, REQUEST, **kw)
+
             if client is None:
                 # Called as subtemplate, so don't need error propagation!
-                r = Globals.HTML.__call__(self, client, REQUEST, **kw)
                 if RESPONSE is None: result = r
                 else: result = decapitate(r, RESPONSE)
                 if not self._cache_namespace_keys:
                     self.ZCacheable_set(result)
                 return result
 
-            r = Globals.HTML.__call__(self, client, REQUEST, **kw)
             if type(r) is not type('') or RESPONSE is None:
                 if not self._cache_namespace_keys:
                     self.ZCacheable_set(r)
