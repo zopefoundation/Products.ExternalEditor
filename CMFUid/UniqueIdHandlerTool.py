@@ -72,7 +72,7 @@ class UniqueIdHandlerTool(UniqueObject, SimpleItem, ActionProviderBase):
         # reindex
         catalog.reindexObject(obj)
 
-    security.declareProtected(ManagePortal, 'register')
+    security.declarePublic('register')
     def register(self, obj):
         """See IUniqueIdSet.
         """
