@@ -32,6 +32,9 @@ CMF 1.5.0-beta (unreleased)
       
   Bug Fixes
 
+    - CMFCalendar.CalendarTool: Code assumed US datetime format throughout.
+      At least since Zope 2.7 users can change that.
+
     - CMFCalendar.Event: Day, month, and year were processed in the wrong
       order by Event.edit().
       Also see http://collector.zope.org/CMF/202

@@ -116,50 +116,50 @@ class TestCalendar(unittest.TestCase):
                 [
                  {'day': 0, 'event': 0, 'eventslist':[]},
                  {'day': 0, 'event': 0, 'eventslist':[]},
+                 {'day': 0, 'event': 0, 'eventslist':[]},
                  {'day': 1, 'event': 0, 'eventslist':[]},
                  {'day': 2, 'event': 0, 'eventslist':[]},
                  {'day': 3, 'event': 0, 'eventslist':[]},
                  {'day': 4, 'event': 0, 'eventslist':[]},
-                 {'day': 5, 'event': 0, 'eventslist':[]}
                  ],
                 [
+                 {'day': 5, 'event': 0, 'eventslist':[]},
                  {'day': 6, 'event': 0, 'eventslist':[]},
                  {'day': 7, 'event': 0, 'eventslist':[]},
                  {'day': 8, 'event': 0, 'eventslist':[]},
                  {'day': 9, 'event': 0, 'eventslist':[]},
                  {'day':10, 'event': 0, 'eventslist':[]},
                  {'day':11, 'event': 0, 'eventslist':[]},
-                 {'day':12, 'event': 0, 'eventslist':[]}
                  ],
                 [
+                 {'day':12, 'event': 0, 'eventslist':[]},
                  {'day':13, 'event': 0, 'eventslist':[]},
                  {'day':14, 'event': 0, 'eventslist':[]},
                  {'day':15, 'event': 0, 'eventslist':[]},
                  {'day':16, 'event': 0, 'eventslist':[]},
                  {'day':17, 'event': 0, 'eventslist':[]},
                  {'day':18, 'event': 0, 'eventslist':[]},
-                 {'day':19, 'event': 0, 'eventslist':[]}
                  ],
                 [
+                 {'day':19, 'event': 0, 'eventslist':[]},
                  {'day':20, 'event': 0, 'eventslist':[]},
                  {'day':21, 'event': 0, 'eventslist':[]},
                  {'day':22, 'event': 0, 'eventslist':[]},
                  {'day':23, 'event': 0, 'eventslist':[]},
                  {'day':24, 'event': 0, 'eventslist':[]},
                  {'day':25, 'event': 0, 'eventslist':[]},
-                 {'day':26, 'event': 0, 'eventslist':[]}
                  ],
                 [
+                 {'day':26, 'event': 0, 'eventslist':[]},
                  {'day':27, 'event': 0, 'eventslist':[]},
                  {'day':28, 'event': 0, 'eventslist':[]},
                  {'day':29, 'event': 0, 'eventslist':[]},
                  {'day':30, 'event': 0, 'eventslist':[]},
                  {'day':31, 'event': 0, 'eventslist':[]},
                  {'day': 0, 'event': 0, 'eventslist':[]},
-                 {'day': 0, 'event': 0, 'eventslist':[]}
                  ]
                 ]
-        result = self.Tool.getEventsForCalendar(month='1', year='2002')
+        result = self.Tool.getEventsForCalendar(month='5', year='2002')
         self.assertEqual(result, data)
 
     def test_singleEventCalendarRendering(self):
@@ -170,10 +170,10 @@ class TestCalendar(unittest.TestCase):
                     , description='description'
                     , eventType=( 'eventType', )
                     , effectiveDay=1
-                    , effectiveMo=1
+                    , effectiveMo=5
                     , effectiveYear=2002
                     , expirationDay=1
-                    , expirationMo=1
+                    , expirationMo=5
                     , expirationYear=2002
                     , start_time="00:00"
                     , startAMPM="AM"
@@ -189,50 +189,50 @@ class TestCalendar(unittest.TestCase):
                 [
                  {'day': 0, 'event': 0, 'eventslist':[]},
                  {'day': 0, 'event': 0, 'eventslist':[]},
+                 {'day': 0, 'event': 0, 'eventslist':[]},
                  {'day': 1, 'event': 1, 'eventslist':[{'title': 'title', 'end': '23:59:00', 'start': '00:00:00'}]},
                  {'day': 2, 'event': 0, 'eventslist':[]},
                  {'day': 3, 'event': 0, 'eventslist':[]},
                  {'day': 4, 'event': 0, 'eventslist':[]},
-                 {'day': 5, 'event': 0, 'eventslist':[]}
                  ],
                 [
+                 {'day': 5, 'event': 0, 'eventslist':[]},
                  {'day': 6, 'event': 0, 'eventslist':[]},
                  {'day': 7, 'event': 0, 'eventslist':[]},
                  {'day': 8, 'event': 0, 'eventslist':[]},
                  {'day': 9, 'event': 0, 'eventslist':[]},
                  {'day':10, 'event': 0, 'eventslist':[]},
                  {'day':11, 'event': 0, 'eventslist':[]},
-                 {'day':12, 'event': 0, 'eventslist':[]}
                  ],
                 [
+                 {'day':12, 'event': 0, 'eventslist':[]},
                  {'day':13, 'event': 0, 'eventslist':[]},
                  {'day':14, 'event': 0, 'eventslist':[]},
                  {'day':15, 'event': 0, 'eventslist':[]},
                  {'day':16, 'event': 0, 'eventslist':[]},
                  {'day':17, 'event': 0, 'eventslist':[]},
                  {'day':18, 'event': 0, 'eventslist':[]},
-                 {'day':19, 'event': 0, 'eventslist':[]}
                  ],
                 [
+                 {'day':19, 'event': 0, 'eventslist':[]},
                  {'day':20, 'event': 0, 'eventslist':[]},
                  {'day':21, 'event': 0, 'eventslist':[]},
                  {'day':22, 'event': 0, 'eventslist':[]},
                  {'day':23, 'event': 0, 'eventslist':[]},
                  {'day':24, 'event': 0, 'eventslist':[]},
                  {'day':25, 'event': 0, 'eventslist':[]},
-                 {'day':26, 'event': 0, 'eventslist':[]}
                  ],
                 [
+                 {'day':26, 'event': 0, 'eventslist':[]},
                  {'day':27, 'event': 0, 'eventslist':[]},
                  {'day':28, 'event': 0, 'eventslist':[]},
                  {'day':29, 'event': 0, 'eventslist':[]},
                  {'day':30, 'event': 0, 'eventslist':[]},
                  {'day':31, 'event': 0, 'eventslist':[]},
                  {'day': 0, 'event': 0, 'eventslist':[]},
-                 {'day': 0, 'event': 0, 'eventslist':[]}
                  ]
                 ]
-        result = self.Tool.getEventsForCalendar(month='1', year='2002')
+        result = self.Tool.getEventsForCalendar(month='5', year='2002')
         self.assertEqual(result, data)
 
     def test_spanningEventCalendarRendering(self):
@@ -243,10 +243,10 @@ class TestCalendar(unittest.TestCase):
                     , description='description'
                     , eventType=( 'eventType', )
                     , effectiveDay=1
-                    , effectiveMo=1
+                    , effectiveMo=5
                     , effectiveYear=2002
                     , expirationDay=31
-                    , expirationMo=1
+                    , expirationMo=5
                     , expirationYear=2002
                     , start_time="00:00"
                     , startAMPM="AM"
@@ -262,64 +262,64 @@ class TestCalendar(unittest.TestCase):
                 [
                  {'day': 0, 'event': 0, 'eventslist':[]},
                  {'day': 0, 'event': 0, 'eventslist':[]},
+                 {'day': 0, 'event': 0, 'eventslist':[]},
                  {'day': 1, 'event': 1, 'eventslist':[{'title': 'title', 'end': None, 'start': '00:00:00'}]},
                  {'day': 2, 'event': 1, 'eventslist':[{'title': 'title', 'end': None, 'start': None}]},
                  {'day': 3, 'event': 1, 'eventslist':[{'title': 'title', 'end': None, 'start': None}]},
                  {'day': 4, 'event': 1, 'eventslist':[{'title': 'title', 'end': None, 'start': None}]},
-                 {'day': 5, 'event': 1, 'eventslist':[{'title': 'title', 'end': None, 'start': None}]}
                  ],
                 [
+                 {'day': 5, 'event': 1, 'eventslist':[{'title': 'title', 'end': None, 'start': None}]},
                  {'day': 6, 'event': 1, 'eventslist':[{'title': 'title', 'end': None, 'start': None}]},
                  {'day': 7, 'event': 1, 'eventslist':[{'title': 'title', 'end': None, 'start': None}]},
                  {'day': 8, 'event': 1, 'eventslist':[{'title': 'title', 'end': None, 'start': None}]},
                  {'day': 9, 'event': 1, 'eventslist':[{'title': 'title', 'end': None, 'start': None}]},
                  {'day':10, 'event': 1, 'eventslist':[{'title': 'title', 'end': None, 'start': None}]},
                  {'day':11, 'event': 1, 'eventslist':[{'title': 'title', 'end': None, 'start': None}]},
-                 {'day':12, 'event': 1, 'eventslist':[{'title': 'title', 'end': None, 'start': None}]}
                  ],
                 [
+                 {'day':12, 'event': 1, 'eventslist':[{'title': 'title', 'end': None, 'start': None}]},
                  {'day':13, 'event': 1, 'eventslist':[{'title': 'title', 'end': None, 'start': None}]},
                  {'day':14, 'event': 1, 'eventslist':[{'title': 'title', 'end': None, 'start': None}]},
                  {'day':15, 'event': 1, 'eventslist':[{'title': 'title', 'end': None, 'start': None}]},
                  {'day':16, 'event': 1, 'eventslist':[{'title': 'title', 'end': None, 'start': None}]},
                  {'day':17, 'event': 1, 'eventslist':[{'title': 'title', 'end': None, 'start': None}]},
                  {'day':18, 'event': 1, 'eventslist':[{'title': 'title', 'end': None, 'start': None}]},
-                 {'day':19, 'event': 1, 'eventslist':[{'title': 'title', 'end': None, 'start': None}]}
                  ],
                 [
+                 {'day':19, 'event': 1, 'eventslist':[{'title': 'title', 'end': None, 'start': None}]},
                  {'day':20, 'event': 1, 'eventslist':[{'title': 'title', 'end': None, 'start': None}]},
                  {'day':21, 'event': 1, 'eventslist':[{'title': 'title', 'end': None, 'start': None}]},
                  {'day':22, 'event': 1, 'eventslist':[{'title': 'title', 'end': None, 'start': None}]},
                  {'day':23, 'event': 1, 'eventslist':[{'title': 'title', 'end': None, 'start': None}]},
                  {'day':24, 'event': 1, 'eventslist':[{'title': 'title', 'end': None, 'start': None}]},
                  {'day':25, 'event': 1, 'eventslist':[{'title': 'title', 'end': None, 'start': None}]},
-                 {'day':26, 'event': 1, 'eventslist':[{'title': 'title', 'end': None, 'start': None}]}
                  ],
                 [
+                 {'day':26, 'event': 1, 'eventslist':[{'title': 'title', 'end': None, 'start': None}]},
                  {'day':27, 'event': 1, 'eventslist':[{'title': 'title', 'end': None, 'start': None}]},
                  {'day':28, 'event': 1, 'eventslist':[{'title': 'title', 'end': None, 'start': None}]},
                  {'day':29, 'event': 1, 'eventslist':[{'title': 'title', 'end': None, 'start': None}]},
                  {'day':30, 'event': 1, 'eventslist':[{'title': 'title', 'end': None, 'start': None}]},
                  {'day':31, 'event': 1, 'eventslist':[{'title': 'title', 'end': '23:59:00', 'start': None}]},
                  {'day': 0, 'event': 0, 'eventslist':[]},
-                 {'day': 0, 'event': 0, 'eventslist':[]}
                  ]
                 ]
-        result = self.Tool.getEventsForCalendar(month='1', year='2002')
+        result = self.Tool.getEventsForCalendar(month='5', year='2002')
         self.assertEqual(result, data)
 
     def test_getPreviousMonth(self):
-        assert self.Tool.getPreviousMonth(2,2002) == DateTime('1/1/2002')
-        assert self.Tool.getPreviousMonth(1,2002) == DateTime('12/1/2001')
+        assert self.Tool.getPreviousMonth(2,2002) == DateTime('2002/1/1')
+        assert self.Tool.getPreviousMonth(1,2002) == DateTime('2001/12/1')
 
     def test_getNextMonth(self):
-        assert self.Tool.getNextMonth(12,2001) == DateTime('1/1/2002')
-        assert self.Tool.getNextMonth(1,2002) == DateTime('2/1/2002')
+        assert self.Tool.getNextMonth(12,2001) == DateTime('2002/1/1')
+        assert self.Tool.getNextMonth(1,2002) == DateTime('2002/2/1')
 
     def test_getBeginAndEndTimes(self):
         self.assertEqual( self.Tool.getBeginAndEndTimes(1,12,2001),
-                          ( DateTime('12/1/2001 12:00:00AM'),
-                            DateTime('12/1/2001 11:59:59PM') ) )
+                          ( DateTime('2001/12/1 12:00:00AM'),
+                            DateTime('2001/12/1 11:59:59PM') ) )
 
     def test_singleDayRendering(self):
 
@@ -329,10 +329,10 @@ class TestCalendar(unittest.TestCase):
                     , description='description'
                     , eventType=( 'eventType', )
                     , effectiveDay=1
-                    , effectiveMo=1
+                    , effectiveMo=5
                     , effectiveYear=2002
                     , expirationDay=31
-                    , expirationMo=1
+                    , expirationMo=5
                     , expirationYear=2002
                     , start_time="00:00"
                     , startAMPM="AM"
@@ -344,7 +344,7 @@ class TestCalendar(unittest.TestCase):
                                               'publish',
                                               comment='testing')
 
-        assert len(self.Site.portal_calendar.getEventsForThisDay(thisDay=DateTime('1/1/2002'))) == 1
+        assert len(self.Site.portal_calendar.getEventsForThisDay(thisDay=DateTime('2002/5/1'))) == 1
 
         self.Site.Members.folder_factories.invokeFactory(type_name="Event",id='Event2')
         event = self.app.restrictedTraverse('/CalendarTest/Members/Event2')
@@ -352,10 +352,10 @@ class TestCalendar(unittest.TestCase):
                     , description='description'
                     , eventType=( 'eventType', )
                     , effectiveDay=1
-                    , effectiveMo=1
+                    , effectiveMo=5
                     , effectiveYear=2002
                     , expirationDay=1
-                    , expirationMo=1
+                    , expirationMo=5
                     , expirationYear=2002
                     , start_time="00:00"
                     , startAMPM="AM"
@@ -367,7 +367,7 @@ class TestCalendar(unittest.TestCase):
                                               'publish',
                                               comment='testing')
 
-        assert len(self.Site.portal_calendar.getEventsForThisDay(thisDay=DateTime('1/1/2002'))) == 2
+        assert len(self.Site.portal_calendar.getEventsForThisDay(thisDay=DateTime('2002/5/1'))) == 2
 
         self.Site.Members.folder_factories.invokeFactory(type_name="Event",id='Event3')
         event = self.app.restrictedTraverse('/CalendarTest/Members/Event3')
@@ -378,7 +378,7 @@ class TestCalendar(unittest.TestCase):
                     , effectiveMo=12
                     , effectiveYear=2001
                     , expirationDay=1
-                    , expirationMo=1
+                    , expirationMo=5
                     , expirationYear=2002
                     , start_time="00:00"
                     , startAMPM="AM"
@@ -390,7 +390,7 @@ class TestCalendar(unittest.TestCase):
                                               'publish',
                                               comment='testing')
 
-        assert len(self.Site.portal_calendar.getEventsForThisDay(thisDay=DateTime('1/1/2002'))) == 3
+        assert len(self.Site.portal_calendar.getEventsForThisDay(thisDay=DateTime('2002/5/1'))) == 3
 
         self.Site.Members.folder_factories.invokeFactory(type_name="Event",id='Event4')
         event = self.app.restrictedTraverse('/CalendarTest/Members/Event4')
@@ -401,7 +401,7 @@ class TestCalendar(unittest.TestCase):
                     , effectiveMo=12
                     , effectiveYear=2001
                     , expirationDay=31
-                    , expirationMo=1
+                    , expirationMo=5
                     , expirationYear=2002
                     , start_time="00:00"
                     , startAMPM="AM"
@@ -413,7 +413,7 @@ class TestCalendar(unittest.TestCase):
                                               'publish',
                                               comment='testing')
 
-        assert len(self.Site.portal_calendar.getEventsForThisDay(thisDay=DateTime('1/1/2002'))) == 4
+        assert len(self.Site.portal_calendar.getEventsForThisDay(thisDay=DateTime('2002/5/1'))) == 4
 
         self.Site.Members.folder_factories.invokeFactory(type_name="Event",id='Event5')
         event = self.app.restrictedTraverse('/CalendarTest/Members/Event5')
@@ -421,10 +421,10 @@ class TestCalendar(unittest.TestCase):
                     , description='description'
                     , eventType=( 'eventType', )
                     , effectiveDay=31
-                    , effectiveMo=1
+                    , effectiveMo=5
                     , effectiveYear=2002
                     , expirationDay=31
-                    , expirationMo=1
+                    , expirationMo=5
                     , expirationYear=2002
                     , start_time="00:00"
                     , startAMPM="AM"
@@ -436,7 +436,8 @@ class TestCalendar(unittest.TestCase):
                                               'publish',
                                               comment='testing')
 
-        assert len(self.Site.portal_calendar.getEventsForThisDay(thisDay=DateTime('1/1/2002'))) == 4
+        assert len(self.Site.portal_calendar.getEventsForThisDay(thisDay=DateTime('2002/5/1'))) == 4
+        assert len(self.Site.portal_calendar.getEventsForThisDay(thisDay=DateTime('2002/5/31'))) == 3
 
 
 def test_suite():

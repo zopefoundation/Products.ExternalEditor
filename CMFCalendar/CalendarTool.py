@@ -83,6 +83,8 @@ class CalendarTool (UniqueObject, SimpleItem):
         """Creates a series of weeks, each of which contains an integer day number.
            A day number of 0 means that day is in the previous or next month.
         """
+        year=int(year)
+        month=int(month)
         # daysByWeek is a list of days inside a list of weeks, like so:
         # [[0, 1, 2, 3, 4, 5, 6],
         #  [7, 8, 9, 10, 11, 12, 13],
@@ -126,11 +128,13 @@ class CalendarTool (UniqueObject, SimpleItem):
     security.declarePublic('catalog_getevents')
     def catalog_getevents(self, year, month):
         """ given a year and month return a list of days that have events """
-        first_date=DateTime(str(month)+'/1/'+str(year))
+        year=int(year)
+        month=int(month)
+        first_date=DateTime(year, month, 1)
         last_day=calendar.monthrange(year, month)[1]
         ## This line was cropping the last day of the month out of the
         ## calendar when doing the query
-        ## last_date=DateTime(str(month)+'/'+str(last_day)+'/'+str(year))
+        ## last_date=DateTime(year, month, last_day)
         last_date=first_date + last_day
 
         query = self.portal_catalog(
@@ -260,7 +264,7 @@ class CalendarTool (UniqueObject, SimpleItem):
         else:
             month-=1
 
-        return DateTime(str(month) + '/1/' + str(year))
+        return DateTime(year, month, 1)
 
     security.declarePublic('getNextMonth')
     def getNextMonth(self, month, year):
@@ -277,19 +281,19 @@ class CalendarTool (UniqueObject, SimpleItem):
         else:
             month+=1
 
-        return DateTime(str(month) + '/1/' + str(year))
+        return DateTime(year, month, 1)
 
     security.declarePublic('getBeginAndEndTimes')
     def getBeginAndEndTimes(self, day, month, year):
         # Given any day, month and year this method returns 2 DateTime objects
         # That represent the exact start and the exact end of that particular day.
 
-        day=str(day)
-        month=str(month)
-        year=str(year)
+        day=int(day)
+        month=int(month)
+        year=int(year)
 
-        begin=DateTime(month+'/'+day+'/'+year+' 12:00:00AM')
-        end=DateTime(month+'/'+day+'/'+year+' 11:59:59PM')
+        begin=DateTime('%d-%02d-%02d 00:00:00' % (year, month, day))
+        end=DateTime('%d-%02d-%02d 23:59:59' % (year, month, day))
 
         return (begin, end)
 
