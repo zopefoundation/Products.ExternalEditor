@@ -501,7 +501,7 @@ class CMFDocumentClass( StructuredText.DocumentWithImages.__class__ ):
         'doc_inner_link',
         ] + _STXDWI.text_types
     
-    _URL_AND_PUNC = r'([a-zA-Z0-9_\@\.\,\?\!\/\:\;\-\#\~]+)'
+    _URL_AND_PUNC = r'([a-zA-Z0-9_\@\.\,\?\=\&\+\!\/\:\;\-\#\~]+)'
     def doc_href( self
                 , s
                 , expr1 = re.compile( _STXDWI._DQUOTEDTEXT
