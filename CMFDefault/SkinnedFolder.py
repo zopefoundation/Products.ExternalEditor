@@ -164,7 +164,7 @@ class SkinnedFolder( PortalFolder ):
         """
             Return the ID of our owner.
         """
-        return self.getOwner()[1]
+        return self.getOwner( info=1 )[1]
 
 InitializeClass( SkinnedFolder )
 
