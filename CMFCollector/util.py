@@ -125,7 +125,7 @@ def format_webtext(text,
             got.append(l)
             continue
 
-        l = l.expandtabs()
+        l = html_quote(l.expandtabs())
 
         at_literal = (l.startswith(" ") or l.startswith("&gt;"))
 
