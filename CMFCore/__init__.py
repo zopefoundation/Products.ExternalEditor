@@ -132,12 +132,6 @@ def initialize(context):
     utils.initializeBasesPhase2(z_bases, context)
     utils.initializeBasesPhase2(z_tool_bases, context)
 
-##    context.registerClass( PortalFolder.PortalFolder
-##                         , constructors=( FolderConstructorForm
-##                                        , PortalFolder.manage_addPortalFolder
-##                                        )
-##                         )
-
     context.registerClass(
         DirectoryView.DirectoryView,
         constructors=(('manage_addDirectoryViewForm',
