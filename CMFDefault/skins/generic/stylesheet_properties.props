@@ -23,4 +23,4 @@ secondary_accent_vlink_color:string=#FFFFFF
 secondary_font_family:string=Arial, Verdana, Helvetica, sans-serif
 select_stylesheet_id:string=default_stylesheet
 title:string=Classic PTK Style
-vlink_color:string=LightGrey
+vlink_color:string=DarkMagenta
