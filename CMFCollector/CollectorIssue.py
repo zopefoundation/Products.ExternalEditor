@@ -32,6 +32,14 @@ from Products.CMFDefault.Document import addDocument
 from Products.CMFCore import CMFCorePermissions
 from CollectorPermissions import *
 
+urlchars  = (r'[A-Za-z0-9/:@_%~#=&\.\-\?]+')
+nonpuncurlchars  = (r'[A-Za-z0-9/:@_%~#=&\-]')
+url       = (r'["=]?((http|https|ftp|mailto|file|about):%s%s)'
+             % (urlchars, nonpuncurlchars))
+urlexp    = re.compile(url)
+UPLOAD_PREFIX = "Uploaded: "
+uploadexp = re.compile('(%s)([^<,\n]*)([<,\n])' % UPLOAD_PREFIX, re.MULTILINE)
+
 DEFAULT_TRANSCRIPT_FORMAT = 'stx'
 
 factory_type_information = (
@@ -45,7 +53,7 @@ factory_type_information = (
      'allowed_content_types': ('Collector Issue Transcript', 'File', 'Image'), 
      'immediate_view': 'collector_edit_form',
      'actions': ({'id': 'view',
-                  'name': 'Transcript',
+                  'name': 'View Issue',
                   'action': 'collector_issue_contents',
                   'permissions': (ViewCollector,)},
                  {'id': 'followup',
@@ -80,7 +88,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
 
     comment_delimiter = "<hr solid id=comment_delim>"
 
-    comment_number = 1
+    action_number = 0
 
     ACTIONS_ORDER = ['Accept', 'Resign', 'Assign',
                      'Resolve', 'Reject', 'Defer'] 
@@ -88,7 +96,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
     def __init__(self,
                  id, container,
                  title='', description='',
-                 submitter_id=None, submitter_name=None, submitter_email=None,
+                 submitter_id=None, submitter_name=None,
                  kibitzers=None,
                  topic=None, classification=None,
                  security_related=0,
@@ -101,6 +109,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         """ """
 
         SkinnedFolder.__init__(self, id, title)
+
         # Take care of standard metadata:
         DefaultDublinCoreImpl.__init__(self,
                                        title=title, description=description,
@@ -109,12 +118,6 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         if modification_date is None:
             modification_date = self.creation_date
         self.modification_date = modification_date
-
-        # Acquisition-wrapped self so, eg, invokeFactory can find stuff.
-        contained = self.__of__(container)
-        attach_msg = contained._process_file(file, fileid, filetype,
-                                             description)
-        contained._create_transcript(description, attach_msg)
 
         user = getSecurityManager().getUser()
         if submitter_id is None:
@@ -128,9 +131,6 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
             # XXX We're being cavalier about stashing the full_name.
             user.full_name = submitter_name
         self.submitter_name = submitter_name
-        if submitter_email is None and hasattr(user, 'email'):
-            submitter_email = user.email
-        self.submitter_email = submitter_email
 
         if kibitzers is None:
             kibitzers = ()
@@ -145,9 +145,34 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         self.reported_version = reported_version
         self.other_version_info = other_version_info
 
-        self.edited = 0
+        # Following is acquisition-wrapped so, eg, invokeFactory can work.
+        contained = self.__of__(container)
+        contained.do_action('Request', description, None,
+                            file, fileid, filetype)
 
         return self
+
+    security.declareProtected(CMFCorePermissions.View, 'CookedBody')
+    def CookedBody(self):
+        """Massage the transcript's cooked body to linkify obvious things."""
+        return self._cook_links(self.get_transcript().CookedBody(stx_level=3))
+
+    def _cook_links(self, text, email=0):
+        """Cook text so URLs and artifact references are hrefs.
+
+        If optional arg 'email' is true, then we just provide urls for uploads
+        (assuming the email client will take care of linkifying URLs)."""
+        if not email:
+            text = urlexp.sub(r'<a href=\1>\1</a>', text)
+            text = uploadexp.sub(r'\1<a href="%s/\2/view">\2</a>\3'
+                                 % self.absolute_url(),
+                                 text)
+        else:
+            text = uploadexp.sub(r'\1 "\2" (%s/\2/view)' % self.absolute_url(),
+                                 text)
+            text = string.replace(text, "<hr>", "-" * 62)
+        return text
+        
 
     security.declareProtected(EditCollectorIssue, 'edit')
     def edit(self, comment=None,
@@ -190,7 +215,6 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
             self.reported_version = reported_version
         if other_version_info is not None:
             self.other_version_info = other_version_info
-        self.edited = 1
 
     security.declareProtected(CMFCorePermissions.View, 'get_transcript')
     def get_transcript(self):
@@ -201,9 +225,14 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
                   assignees=None, file=None, fileid=None, filetype=None):
         """Execute an action, adding comment to the transcript."""
 
+        action_number = self.action_number = self.action_number + 1
         username = str(getSecurityManager().getUser())
 
-        if string.lower(action) != 'comment':
+        orig_supporters = self.assigned_to()
+        # Strip off '_confidential' from status, if any.
+        orig_status = string.split(self.status(), '_')[0]
+
+        if string.lower(action)  not in ['comment', 'request']:
             # Confirm against portal actions tool:
             if action not in self._valid_actions():
                 raise 'Unauthorized', "Invalid action '%s'" % action
@@ -214,29 +243,154 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
                                              username=username,
                                              assignees=assignees)
 
+        new_status = string.split(self.status(), '_')[0]
+
+        if string.lower(action) == 'request':
+            self._create_transcript(comment)
         transcript = self.get_transcript()
-        attach_msg = self._process_file(file, fileid, filetype, comment)
-        self.comment_number = self.comment_number + 1
+
         entry_leader = self._entry_header(action, username) + "\n\n"
+        (uploadmsg, fileid) = self._process_file(file, fileid,
+                                                  filetype, comment)
+        additions, removals = self._supporters_diff(orig_supporters)
+        changes = []
+        if orig_status and (new_status != orig_status):
+            changes.append(" Status: %s => %s\n"
+                           % (orig_status, new_status))
+        if additions or removals:
+            if additions:
+                changes.append(" Supporters added: %s\n"
+                               % ", ".join(additions))
+            if removals:
+                changes.append(" Supporters removed: %s\n" %
+                               ", ".join(removals))
+        if changes:
+            changesstr = "\n".join(changes) + "\n"
+            if uploadmsg:
+                uploadmsg = " " + uploadmsg + "\n\n"
+            else:
+                changesstr = changesstr + "\n"
+        else:
+            changesstr = ''
         transcript._edit('stx',
                          entry_leader
-                         + attach_msg
+                         + changesstr
+                         + uploadmsg
                          + util.process_comment(string.strip(comment))
-                         + "\n<hr>\n"
+                         + ((action_number > 1) and "<hr>\n" or '')
                          + transcript.EditableBody())
+        self._send_update_notice(action, username, transcript.EditableBody(),
+                                 orig_status, additions, removals,
+                                 file=file, fileid=fileid)
+
+    def _supporters_diff(self, orig_supporters):
+        """Indicate supporter roster changes, relative to orig_supporters.
+
+        Return (list-of-added-supporters, list-of-removed-supporters)."""
+        plus, minus = self.assigned_to(), []
+        for supporter in orig_supporters:
+            if supporter in plus: plus.remove(supporter)
+            else: minus.append(supporter)
+        return (plus, minus)
+
+    def _send_update_notice(self, action, actor, comment,
+                            orig_status, additions, removals,
+                            file, fileid):
+        """Send email notification about issue event to relevant parties."""
+
+        action = string.capitalize(string.split(action, '_')[0])
+        new_status = string.split(self.status(), '_')[0]
+
+        recipients = []
+        didids = []; gotemails = []     # Duplicate prevention.
+
+        # Who to notify:
+        # We want to noodge only assigned supporters while it's being worked
+        # on, ie assigned supporters are corresponding about it, otherwise
+        # everyone gets updates:
+        # - Requester always
+        # - All supporters:
+        #   - When an issue is any state besides accepted
+        #   - When an issue is being accepted
+        #   - When an issue is accepted and moving to another state
+        # - Relevant supporters when an issue is accepted:
+        #   - those supporters assigned to the issue
+        #   - any supporters being removed from or added to an issue.
+        candidates = [self.submitter_id]
+        if not ('accepted' == string.lower(new_status) == 
+                string.lower(orig_status)):
+            candidates.extend(self.aq_parent.supporters)
+        else:
+            candidates.extend(self.assigned_to())
+            if removals:
+                # Notify supporters being removed from the issue (confirms 
+                # their action, if they're resigning, and informs them if
+                # manager is deassigning them).
+                candidates.extend(removals)
+
+        for userid in candidates:
+            if userid in didids:
+                continue
+            didids.append(userid)
+            name, email = util.get_email_fullname(self, userid)
+            if email:
+                if email in gotemails:
+                    continue
+                gotemails.append(email)
+                recipients.append((name, email))
+
+        if recipients:
+            to = ", ".join(["%s <%s>" % (name, email)
+                            for name, email in recipients])
+            title = self.aq_parent.title[:50]
+            if '.' in title or ',' in title:
+                title = '"%s"' % title
+            sender = self.aq_parent.email
+            mgrfrom = ("For %s by Collector Manager <%s>" % (actor, sender))
+            if self.abbrev:
+                subject = "[%s]" % self.abbrev
+            else: subject = "[Collector]"
+            subject = ('%s #%s/%s %s "%s"'
+                       % (subject, self.id, self.action_number,
+                          string.capitalize(action), self.title))
+
+            body = self._cook_links(self.get_transcript().text, email=1)
+            cin = self.collector_issue_notice
+            message = cin(sender=mgrfrom,
+                          recipients=to,
+                          subject=subject,
+                          issue_id=self.id,
+                          action=action,
+                          actor=actor,
+                          number=self.action_number,
+                          security_related=self.security_related,
+                          confidential=self.confidential(),
+                          title=self.title,
+                          submitter_name=self.submitter_name,
+                          status=new_status,
+                          klass=self.classification,
+                          topic=self.topic,
+                          importance=self.importance,
+                          severity=self.severity,
+                          issue_url=self.absolute_url(),
+                          body=body,
+                          candidates=candidates)
+            mh = self.MailHost
+            mh.send(message)
 
     def _process_file(self, file, fileid, filetype, comment):
-        """Attach file to issue if it is substantial (has a name).
+        """Upload file to issue if it is substantial (has a name).
 
         Return a message describing the file, for transcript inclusion."""
         if file and file.filename:
             if not fileid:
                 fileid = string.split(string.split(file.filename, '/')[-1],
                                       '\\')[-1]
-            attachment = self._add_artifact(fileid, filetype, comment, file)
-            return " - Attachment: %s\n\n" % fileid
+            upload = self._add_artifact(fileid, filetype, comment, file)
+            uploadmsg = "%s%s\n\n" % (UPLOAD_PREFIX, fileid)
+            return (uploadmsg, fileid)
         else:
-            return ''
+            return ('', '')
 
     def _add_artifact(self, id, type, description, file):
         """Add new artifact, and return object."""
@@ -262,22 +416,25 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
     def status(self):
         """Return the current status according to workflow."""
         wftool = getToolByName(self, 'portal_workflow')
-        return wftool.getInfoFor(self, 'state', '??')
+        return wftool.getInfoFor(self, 'state', 'Pending')
+
+    security.declareProtected(CMFCorePermissions.View, 'confidential')
+    def confidential(self):
+        """True if workflow has the issue marked confidential.
+
+        (Security_related issues start confidential, and are made
+        unconfidential on any completion.)"""
+        wftool = getToolByName(self, 'portal_workflow')
+        return wftool.getInfoFor(self, 'state', 'confidential')
 
     def _create_transcript(self, description,
-                           text_format=DEFAULT_TRANSCRIPT_FORMAT,
-                           attachment_msg=''):
+                           text_format=DEFAULT_TRANSCRIPT_FORMAT):
         """Create events and comments transcript, with initial entry."""
 
         user = getSecurityManager().getUser()
         addDocument(self, TRANSCRIPT_NAME, description=description)
         it = self.get_transcript()
         it._setPortalTypeName('Collector Issue Transcript')
-        text = ("%s\n\n%s %s " %
-                (self._entry_header('Request', user),
-                 description,
-                 attachment_msg))
-        it._edit(text_format=text_format, text=text)
         it.title = self.title
 
     def _entry_header(self, type, user, prefix="= ", suffix=" ="):
@@ -285,8 +442,8 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         # Ideally this would be a skin method (probly python script), but i
         # don't know how to call it from the product, sigh.
         t = string.capitalize(type)
-        if self.comment_number:
-            lead = t + " - Entry #" + str(self.comment_number)
+        if self.action_number:
+            lead = t + " - Entry #" + str(self.action_number)
         else:
             lead = t
 
@@ -300,6 +457,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
 
     def _valid_actions(self):
         """Return actions valid according to workflow and application logic."""
+
         pa = getToolByName(self, 'portal_actions', None)
         return [entry['name']
                 for entry in pa.listFilteredActionsFor(self)['issue_workflow']]
@@ -413,7 +571,6 @@ def addCollectorIssue(self,
                       description='',
                       submitter_id=None,
                       submitter_name=None,
-                      submitter_email=None,
                       kibitzers=None,
                       topic=None,
                       classification=None,
@@ -434,7 +591,6 @@ def addCollectorIssue(self,
                         description=description,
                         submitter_id=submitter_id,
                         submitter_name=submitter_name,
-                        submitter_email=submitter_email,
                         kibitzers=kibitzers,
                         topic=topic,
                         classification=classification,
