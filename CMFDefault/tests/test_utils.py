@@ -2,9 +2,7 @@ import unittest
 from Products.CMFDefault.utils import parseHeadersBody
 from string import split
 
-class TestCase( unittest.TestCase ):
-    """
-    """
+class DefaultUtilsTests(unittest.TestCase):
     COMMON_HEADERS = '''Author: Tres Seaver
 Title: Test Products.PTKDemo.utils.parseHeadersBody'''
 
@@ -17,8 +15,7 @@ lines.  It can even include "headerish" lines, like:
 Header: value
 '''
     
-    def testNoBody( self ):
-
+    def test_NoBody( self ):
         headers, body = parseHeadersBody( '%s\n\n' % self.COMMON_HEADERS )
         assert( len( headers ) == 2, '%d!' % len( headers ) )
         assert( 'Author' in headers.keys() )
@@ -26,7 +23,7 @@ Header: value
         assert( 'Title' in headers.keys() )
         assert( len( body ) == 0, '%d!' % len( body ) )
 
-    def testContinuation( self ):
+    def test_Continuation( self ):
         headers, body = parseHeadersBody( '%s\n%s\n\n'
                                         % ( self.COMMON_HEADERS
                                           , self.MULTILINE_DESCRIPTION
@@ -38,7 +35,7 @@ Header: value
         assert( desc_len == 2, '%d!' % desc_len )
         assert( len( body ) == 0, '%d!' % len( body ) )
     
-    def testBody( self ):
+    def test_Body( self ):
         headers, body = parseHeadersBody( '%s\n\n%s'
                                         % ( self.COMMON_HEADERS
                                           , self.TEST_BODY
@@ -47,7 +44,7 @@ Header: value
         assert( len( headers ) == 2, '%d!' % len( headers ) )
         assert( body == self.TEST_BODY )
     
-    def testPreload( self ):
+    def test_Preload( self ):
         preloaded = { 'Author' : 'xxx', 'text_format' : 'structured_text' }
         headers, body = parseHeadersBody( '%s\n%s\n\n%s'
                                         % ( self.COMMON_HEADERS
@@ -60,12 +57,9 @@ Header: value
         assert( preloaded[ 'Author' ] != headers[ 'Author' ] )
         assert( preloaded[ 'text_format' ] == headers[ 'text_format' ] )
 
-if __name__ == '__main__':
+def test_suite():
+    return unittest.makeSuite(DefaultUtilsTests)
 
-    import sys
-    suite = unittest.makeSuite( TestCase )
-    result = unittest.TextTestRunner().run( suite )
-    if result.wasSuccessful():
-        sys.exit(0)
-    else:
-        sys.exit(1)
+if __name__ == '__main__':
+    result = unittest.TextTestRunner().run(test_suite())
+
