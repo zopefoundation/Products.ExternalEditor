@@ -1,5 +1,10 @@
 External Editor Change Log
 
+    - Added the capability to borrow exising DAV locks. This allows external
+      editor to play well with other systems using locks, such as CMFStaging. A
+      new configuration flag, always_borrow_locks can be set to suppress the
+      borrow lock warning dialog when editing.
+
     - Fixed auth bug when product was used with mysqlUserFolder. Thanks to
       ViNiL.
 
