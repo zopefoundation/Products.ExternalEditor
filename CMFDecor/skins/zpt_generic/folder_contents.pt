@@ -25,24 +25,112 @@
 		              upID python: here.aq_parent.getId()"
 		  tal:condition="python: here.portal_membership.checkPermission('List folder contents', here, 'aq_parent')"
 	   >
-        <td width="16"><br></td>
-        <td tal:condition="upNav|nothing">
-          <a href="../folder_contents"><img src="" alt="[Link]" border="0"
-		                                    tal:attributes="src python: here.portal_url() + '/UpFolder_icon.gif'"></a>
-        </td>
-        <td tal:condition="upNav">Up to <a href="../folder_contents" tal:content="upID">Up ID</a></td>
-        <td tal:condition="python: not(upNav)"><span class="mild">Root</span></td>
+        <td colspan="3" align="left">
+          <span tal:condition="upNav|nothing"><a href="../folder_contents"><img src="" alt="[Link]" border="0"
+											tal:attributes="src python: here.portal_url() + '/UpFolder_icon.gif'"></a>
+		  </span>&nbsp;&nbsp;
+        <span tal:condition="upNav">Up to <a href="../folder_contents" tal:content="upID">Up ID</a></span>
+        <span tal:condition="python: not(upNav)"><span class="mild">Root</span></span>
+		</td>
       </tr>
-	  <tr tal:replace="structure here/folderContentList"><td>Folder Content Listing Here</td></tr>
+	  <tr><td colspan="1" align="left" width="49%">
+	  <table>
+	  <tbody tal:define="global b_start string:0;b_start request/b_start | b_start;
+	   filterString python: request.get('folderfilter', '');
+	   filter python: here.decodeFolderFilter(filterString);
+       items python: here.listFolderContents(contentFilter=filter);
+	   Batch python:modules['ZTUtils'].Batch;
+	   global batch python:Batch(items, 8, int(b_start), orphan=0);
+	   global batch1 batch/next">
+	   <tr align="top"
+	       tal:repeat="items batch">
+        <td align="left" width="5" NOWRAP
+		     tal:define="folderish exists: items/isPrincipiaFolderish;
+		               portalish items/isPortalContent|nothing;
+					   global methodID python: folderish and 'folder_contents' or (portalish and 'view' or '');
+					   global icon items/getIcon|items/icon|nothing">
+           <input type="checkbox" name="ids:list" value="" id=""
+		          tal:attributes="value items/getId; id python: 'cb_' + items.getId()" />
+        </td>
+      <td>
+         <span tal:condition="icon">
+         <a href=""
+		    tal:attributes="href python: items.getId() + '/' + methodID">
+	     <img src="" alt="" border="0"
+		      tal:attributes="src python: here.portal_url() + '/' + icon;
+			                  alt items/Type"></a>
+		 </span>
+      </td>
+      <td>
+         <a href=""
+		    tal:attributes="href python: items.getId() + '/' + methodID"><span tal:replace="items/getId">ID
+			<span tal:condition="items/title"
+			      tal:replace="python: '(' + items.title() + ')'">(Title)</span></span></a>
+      </td>	  
+     </tr>
+	 </tbody>
+  </table>
+  </td>
+  <td width="2%">&nbsp;</td>
+  <td colspan="1" width="49%">
+    	  <table>
+	   <tr align="top"
+	       tal:repeat="items batch1">
+        <td align="left" width="5" NOWRAP
+		    tal:define="folderish items/isPrincipiaFolderish;
+		               portalish items/isPortalContent|nothing;
+					   global methodID python: folderish and 'folder_contents' or (portalish and 'view' or '');
+					   global icon items/getIcon|items/icon|nothing">
+           <input type="checkbox" name="ids:list" value="" id=""
+		          tal:attributes="value items/getId; id python: 'cb_' + items.getId()" />
+        </td>
+      <td>
+         <span tal:condition="icon">
+         <a href=""
+		    tal:attributes="href python: items.getId() + '/' + methodID">
+	     <img src="" alt="" border="0"
+		      tal:attributes="src python: here.portal_url() + '/' + icon;
+			                  alt items/Type"></a>
+		 </span>
+      </td>
+      <td>
+         <a href=""
+		    tal:attributes="href python: items.getId() + '/' + methodID"><span tal:replace="items/getId">ID
+			<span tal:condition="items/title"
+			      tal:replace="python: '(' + items.title() + ')'">(Title)</span></span></a>
+      </td>	  
+     </tr>
+  </table>
+	    
+  </tr>
+
+  
+ 
+ <tr>
+  <td align="left">
+     <span tal:define="p batch/previous" tal:condition="p">
+       <a href=""
+          tal:attributes="href string:?b_start=${p/previous/first}">Previous Items</a>
+     </span>
+  </td>
+<td>&nbsp;</td>
+  <td align="left">
+   <span tal:define="n batch1/next|nothing" tal:condition="n">
+     <a href=""
+        tal:attributes="href string:?b_start=${batch1/end}">Next Items</a>
+   </span>
+  </td>
+ </tr>
+<!-- end cotentList -->
 </table>
 
 <TABLE BORDER="0" CELLSPACING="0" CELLPADDING=2>
 <TR>
   <TD ALIGN="LEFT" VALIGN="TOP" WIDTH="16"></TD>
   <TD ALIGN="LEFT" VALIGN="TOP">
-  <dtml-if expr="portal_membership.checkPermission('Add portal content', this())">
+  <span tal:condition="python: here.portal_membership.checkPermission('Add portal content', here)">
     <INPUT TYPE="SUBMIT" NAME="folder_factories:method" VALUE="New...">
-  </dtml-if>
+  </span>
   <span tal:condition="python: here.portal_membership.checkPermission('View management screens', here)">
     <INPUT TYPE="SUBMIT" NAME="folder_rename_form:method" VALUE="Rename">
     <INPUT TYPE="SUBMIT" NAME="folder_cut:method" VALUE="Cut"> 
@@ -51,9 +139,9 @@
     <INPUT TYPE="SUBMIT" NAME="folder_paste:method" VALUE="Paste">
     </span>
   </span>
-  <dtml-if expr="portal_membership.checkPermission('Delete objects', this())">
+  <span tal:condition="python: here.portal_membership.checkPermission('Delete objects', here)">
     <INPUT TYPE="SUBMIT" NAME="folder_delete:method" VALUE="Delete">
-  </dtml-if>
+  </span>
   </TD>
 </TR>
 </TABLE>
