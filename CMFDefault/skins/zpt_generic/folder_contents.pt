@@ -46,7 +46,7 @@
    <tr class="" tal:define="even repeat/item_info/even"
       tal:attributes="class python: (even and 'row-hilite') or 'row-normal'">
       <td width="5"
-      ><input type="checkbox" name="ids:tuple" value="" id=""
+      ><input type="checkbox" name="ids:list" value="" id=""
           tal:attributes="value item_info/id; id item_info/checkbox"
           tal:condition="item_info/checkbox" /></td>
       <td
