@@ -11,27 +11,30 @@
 # 
 ##############################################################################
 
-"""Common pieces of the workflow architecture.
+""" Common pieces of the workflow architecture.
+
 $Id$
 """
-__version__='$Revision$'[11:-2]
+import sys
+
+from Acquisition import aq_base
 
 from MethodObject import Method
 from utils import getToolByName
-import sys
 
 
-class WorkflowException (Exception):
-    '''
-    Exception while invoking workflow.
-    '''
+class WorkflowException( Exception ):
+
+    """ Exception while invoking workflow.
+    """
 
 
-class ObjectDeleted (Exception):
-    '''
-    Raised to tell the workflow tool that the object has been deleted.
+class ObjectDeleted( Exception ):
+
+    """ Raise to tell the workflow tool that the object has been deleted.
+
     Swallowed by the workflow tool.
-    '''
+    """
     def __init__(self, result=None):
         self._r = result
 
@@ -39,11 +42,12 @@ class ObjectDeleted (Exception):
         return self._r
 
 
-class ObjectMoved (Exception):
-    '''
-    Raised to tell the workflow tool that the object has moved.
+class ObjectMoved( Exception ):
+
+    """ Raise to tell the workflow tool that the object has moved.
+
     Swallowed by the workflow tool.
-    '''
+    """
     def __init__(self, new_ob, result=None):
         self._ob = new_ob  # Includes acquisition wrappers.
         self._r = result
@@ -55,10 +59,10 @@ class ObjectMoved (Exception):
         return self._ob
 
 
-class WorkflowMethod (Method):
-    '''
-    Wraps a method to workflow-enable it.
-    '''
+class WorkflowMethod( Method ):
+
+    """ Wrap a method to workflow-enable it.
+    """
     _need__name__=1
 
     def __init__(self, method, id=None, reindex=1):
@@ -69,9 +73,9 @@ class WorkflowMethod (Method):
         # reindex ignored since workflows now perform the reindexing.
 
     def __call__(self, instance, *args, **kw):
-        '''
-        Invokes the method.
-        '''
+
+        """ Invoke the wrapped method, and deal with the results.
+        """
         wf = getToolByName(instance, 'portal_workflow', None)
         if wf is None or not hasattr(wf, 'wrapWorkflowMethod'):
             # No workflow tool found.
