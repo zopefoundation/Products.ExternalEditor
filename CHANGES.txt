@@ -1,10 +1,12 @@
 External Editor Change Log
 
     - Now works on Windows (applause) using Pythonwin. Much overall
-      refactoring to abstract process control.
+      refactoring to abstract process control. Thanks to Oliver Deckmyn and 
+      Gabriel Genellina for testing, patches and suggestions.
 
     - Added "temp_dir" configuration option for specifying a different
-      temp file directory then the OS default.
+      temp file directory then the OS default. Also further improved 
+      temp file name generation.
 
     - Added support for domain specific configuration options.
 

@@ -19,10 +19,13 @@
 
 __version__ = '0.3'
 
-import sys, os, stat
+import sys, os
+from os import path
+from tempfile import mktemp
 from ConfigParser import ConfigParser
 from httplib import HTTPConnection, HTTPSConnection
 from urlparse import urlparse
+import urllib
 
 win32 = sys.platform == 'win32'
 
@@ -87,7 +90,11 @@ class ExternalEditor:
     def __init__(self, input_file):
         try:
             # Read the configuration file
-            config_path = os.path.expanduser('~/.zope-external-edit')
+            if win32:
+                config_path = path.expanduser('~\ZopeExternalEdit.ini')
+            else:
+                config_path = path.expanduser('~/.zope-external-edit')
+                
             self.config = Configuration(config_path)
 
             # Open the input file and read the metadata headers
@@ -114,20 +121,23 @@ class ExternalEditor:
                                             self.host)
 
             # Write the body of the input file to a separate file
-            content_file = (self.host + self.path)\
-                           .replace('/', ',').replace(':',',')
-            
-            if self.options.has_key('temp_dir'):
-                temp = os.tempnam(self.options['temp_dir'])
-            elif win32:
-                temp = os.tempnam()
-            else:
-                temp = os.tmpnam()
-                
-            content_file = '%s-%s' % (temp, content_file)
+            content_file = urllib.unquote('-%s%s' % (self.host, self.path))\
+                           .replace('/', ',').replace(':',',').replace(' ','_')
             ext = self.options.get('extension')
+            
             if ext and not content_file.endswith(ext):
                 content_file = content_file + ext
+            
+            if self.options.has_key('temp_dir'):
+                while 1:
+                    temp = path.expanduser(self.options['temp_dir'])
+                    temp = os.tempnam(temp)
+                    content_file = '%s%s' % (temp, content_file)
+                    if not path.exists(content_file):
+                        break
+            else:
+                content_file = mktemp(content_file)
+                
             body_f = open(content_file, 'wb')
             body_f.write(in_f.read())
             self.content_file = content_file
@@ -175,7 +185,7 @@ class ExternalEditor:
         save_interval = float(self.options.get('save_interval'))
         use_locks = int(self.options.get('use_locks'))
         launch_success = 0
-        last_fstat = os.stat(self.content_file)
+        last_mtime = path.getmtime(self.content_file)
         command = '%s %s' % (self.getEditorCommand(), self.content_file)
         editor = EditorProcess(command)
         
@@ -184,14 +194,13 @@ class ExternalEditor:
             
         while 1:
             editor.wait(save_interval or 2)
-            fstat = os.stat(self.content_file)
+            mtime = path.getmtime(self.content_file)
             
-            if (save_interval or not editor.isAlive()) \
-               and fstat[stat.ST_MTIME] != last_fstat[stat.ST_MTIME]:
+            if (save_interval or not editor.isAlive()) and mtime != last_mtime:
                 # File was modified
                 launch_success = 1 # handle very short editing sessions
                 self.saved = self.putChanges()
-                last_fstat = fstat
+                last_mtime = mtime
 
             if editor.isAlive():
                 launch_success = 1
