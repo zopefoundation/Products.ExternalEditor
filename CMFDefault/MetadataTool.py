@@ -21,13 +21,12 @@ from Globals import PersistentMapping
 
 
 from Globals import InitializeClass, DTMLFile
-from Persistence import Persistent
 from AccessControl import ClassSecurityInfo, getSecurityManager
 from Products.CMFCore import CMFCorePermissions
 from Products.CMFCore.ActionProviderBase import ActionProviderBase
 from utils import _dtmldir
 
-class MetadataElementPolicy( Persistent ):
+class MetadataElementPolicy( SimpleItem ):
     """
         Represent a type-specific policy about a particular DCMI element.
     """
@@ -116,7 +115,7 @@ DEFAULT_ELEMENT_SPECS = ( ( 'Title', 0 )
                         , ( 'Rights', 0 )
                         )
 
-class ElementSpec( Persistent ):
+class ElementSpec( SimpleItem ):
     """
         Represent all the tool knows about a single metadata element.
     """
@@ -397,7 +396,7 @@ class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
             Return an ElementSpec representing the tool's knowledge
             of 'element'.
         """
-        return self.element_specs[ element ]
+        return self.element_specs[ element ].__of__( self )
 
     security.declareProtected( CMFCorePermissions.ManagePortal
                              , 'addElementSpec' )
@@ -465,46 +464,47 @@ class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
         return self.publisher
 
     security.declarePublic( 'listAllowedVocabulary' )
-    def listAllowedVocabulary( self, element, content=None ):
+    def listAllowedVocabulary( self, element, content=None, content_type=None ):
         """
             List allowed keywords for a given meta_type, or all
             possible keywords if none supplied.
         """
         spec = self.getElementSpec( element )
-        typ  = content and content.Type() or None
-        return spec.getPolicy( typ ).allowedVocabulary()
+        if content_type is None:
+            content_type  = content and content.Type() or None
+        return spec.getPolicy( content_type ).allowedVocabulary()
 
     security.declarePublic( 'listAllowedSubjects' )
-    def listAllowedSubjects( self, content=None ):
+    def listAllowedSubjects( self, content=None, content_type=None ):
         """
             List allowed keywords for a given meta_type, or all
             possible keywords if none supplied.
         """
-        return self.listAllowedVocabulary( 'Subject', content )
+        return self.listAllowedVocabulary( 'Subject', content, content_type )
 
     security.declarePublic( 'listAllowedFormats' )
-    def listAllowedFormats( self, content=None ):
+    def listAllowedFormats( self, content=None, content_type=None ):
         """
             List the allowed 'Content-type' values for a particular
             meta_type, or all possible formats if none supplied.
         """
-        return self.listAllowedVocabulary( 'Format', content )
+        return self.listAllowedVocabulary( 'Format', content, content_type )
 
     security.declarePublic( 'listAllowedLanguages' )
-    def listAllowedLanguages( self, content=None ):
+    def listAllowedLanguages( self, content=None, content_type=None ):
         """
             List the allowed language values.
         """
-        return self.listAllowedVocabulary( 'Language', content )
+        return self.listAllowedVocabulary( 'Language', content, content_type )
 
     security.declarePublic( 'listAllowedRights' )
-    def listAllowedRights( self, content=None ):
+    def listAllowedRights( self, content=None, content_type=None ):
         """
             List the allowed values for a "Rights"
             selection list;  this gets especially important where
             syndication is involved.
         """
-        return self.listAllowedVocabulary( 'Rights', content )
+        return self.listAllowedVocabulary( 'Rights', content, content_type )
 
     security.declareProtected( CMFCorePermissions.ModifyPortalContent
                              , 'setInitialMetadata' )

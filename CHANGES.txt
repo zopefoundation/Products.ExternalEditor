@@ -21,6 +21,10 @@
    - (__future__) Added DCWorkflow (through-the-web configurable
        workflows) to the core set of CMF products.
 
+   - Extended the metadata tool to permit passing the type name
+     directly (e.g., when building a new object, one might need to
+     know the allowed subjects before construction).
+
    - Added a working implementation behind the CMFCalendar product.
      Thanks to Andy Dawkins for the work.
 
