@@ -21,6 +21,8 @@ import Testing
 import Zope
 Zope.startup()
 
+from Interface.Verify import verifyObject
+
 from Products.CMFCore.tests.base.testcase import SecurityTest
 
 from Products.CMFCore.tests.base.dummy import DummyContent
@@ -54,7 +56,7 @@ class UniqueIdHandlerTests(SecurityTest):
     
     def test_interface(self):
         handler = self.root.portal_uidhandler
-        IUniqueIdHandler.isImplementedBy(handler)
+        verifyObject(IUniqueIdHandler, handler)
     
     def test_getUidOfNotYetRegisteredObject(self):
         handler = self.root.portal_uidhandler

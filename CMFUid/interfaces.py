@@ -117,7 +117,7 @@ class IUniqueIdGenerator(Interface):
     """
     
     def __call__():
-        """Return a unique id object implementing 'IAnnotatedUid'.
+        """Return a unique id value.
         """
 
 
@@ -125,13 +125,17 @@ class IUniqueIdAnnotation(ICallableOpaqueItem, ICallableOpaqueItemEvents):
     """Opaque unique id item handling adding, copying, and deletion events.
     """
     
-    def __init__(uid):
-        """Generate the unique id object returning 'uid' on '__call__'.
+    def setUid(uid):
+        """Set the uid value the unique id annotation shall return.
         """
 
-    def setId(id):
-        """Set the id of the annotated object.
+
+class IUniqueIdAnnotationManagement(Interface):
+    """Manage unique id annotations.
+    """
+    
+    def __call__(obj, id):
+        """Attach an unique id attribute of 'id' to the passed object.
         
-        (Unfortunately) the id of the attribute has to be passed for CMF 
-        internal reasons.
+        Return a unique id object implementing 'IUniqueIdAnnotation'.
         """

@@ -29,6 +29,7 @@ from Products.CMFCore.ActionProviderBase import ActionProviderBase
 from Products.CMFCore.permissions import ManagePortal
 
 from Products.CMFUid.interfaces import IUniqueIdAnnotation
+from Products.CMFUid.interfaces import IUniqueIdAnnotationManagement
 
 class UniqueIdAnnotation(Persistent, Implicit):
     """Unique id object used as annotation on (content) objects.
@@ -109,17 +110,21 @@ class UniqueIdAnnotationTool(UniqueObject, SimpleItem, ActionProviderBase):
 
     __implements__ = (
         SimpleItem.__implements__,
+        IUniqueIdAnnotationManagement,
     )
 
     id = 'portal_uidannotation'
     alternative_id = "portal_standard_uidannotation"
     meta_type = 'Unique Id Annotation Tool'
     
+    security = ClassSecurityInfo()
+    
     # XXX make Zope properties out of those:
     remove_on_add = True
     remove_on_clone = True # caution when setting this to False!!!
     
+    security.declareProtected(ManagePortal, '__call__')
     def __call__(self, obj, id):
-        """return an empty unique id annotation
+        """See IUniqueIdAnnotationManagement.
         """
         return UniqueIdAnnotation(obj, id)

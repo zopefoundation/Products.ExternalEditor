@@ -21,6 +21,8 @@ import Testing
 import Zope
 Zope.startup()
 
+from Interface.Verify import verifyObject
+
 from Products.CMFCore.tests.base.dummy import DummyContent
 
 from Products.CMFCore.tests.base.testcase import SecurityTest
@@ -37,7 +39,7 @@ class UniqueIdGeneratorTests(SecurityTest):
     
     def test_interface(self):
         generator = self.root.portal_uidgenerator
-        IUniqueIdGenerator.isImplementedBy(generator)
+        verifyObject(IUniqueIdGenerator, generator)
         
     def test_returnedUidsAreValidAndDifferent(self):
         generator = self.root.portal_uidgenerator

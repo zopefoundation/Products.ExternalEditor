@@ -21,17 +21,20 @@ import Testing
 import Zope
 Zope.startup()
 
+from Interface.Verify import verifyObject
+
 from Products.CMFCore.tests.base.dummy import DummyContent
 
 from Products.CMFCore.tests.base.testcase import SecurityTest
 
 from Products.CMFUid.interfaces import IUniqueIdAnnotation
+from Products.CMFUid.interfaces import IUniqueIdAnnotationManagement
 from Products.CMFUid.UniqueIdAnnotationTool import UniqueIdAnnotationTool
 
 
 UID_ATTRNAME = 'cmf_uid'
 
-class UniqueIdGeneratorTests(SecurityTest):
+class UniqueIdAnnotationTests(SecurityTest):
 
     def setUp(self):
         SecurityTest.setUp(self)
@@ -40,9 +43,11 @@ class UniqueIdGeneratorTests(SecurityTest):
     
     def test_interface(self):
         dummy = self.root.dummy
-        annotation = self.root.portal_uidannotation(dummy, UID_ATTRNAME)
+        anno_tool = self.root.portal_uidannotation
+        annotation = anno_tool(dummy, UID_ATTRNAME)
         
-        IUniqueIdAnnotation.isImplementedBy(annotation)
+        verifyObject(IUniqueIdAnnotationManagement, anno_tool)
+        verifyObject(IUniqueIdAnnotation, annotation)
         
     def test_setAndGetUid(self):
         dummy = self.root.dummy
@@ -117,7 +122,7 @@ class UniqueIdGeneratorTests(SecurityTest):
 
 def test_suite():
     return TestSuite((
-        makeSuite(UniqueIdGeneratorTests),
+        makeSuite(UniqueIdAnnotationTests),
         ))
 
 if __name__ == '__main__':
