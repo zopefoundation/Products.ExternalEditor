@@ -251,7 +251,7 @@ class Topic( PortalFolder ):
         self._setObject(newid, crit)
 
         if REQUEST is not None:
-            message = 'New criteria added.'
+            message = 'New+criteria+added.'
             REQUEST['RESPONSE'].redirect(
                 '%s/topic_criteria?portal_status_message=%s' % (
                 self.absolute_url(), message)
@@ -264,7 +264,7 @@ class Topic( PortalFolder ):
             self._delObject(cid)
 
         if REQUEST is not None:
-            message = 'Criteria deleted.'
+            message = 'Criteria+deleted.'
             REQUEST['RESPONSE'].redirect(
                 '%s/topic_criteria?portal_status_message=%s' % (
                 self.absolute_url(), message)
@@ -293,7 +293,7 @@ class Topic( PortalFolder ):
             apply(crit.edit, (), command)
 
         if REQUEST is not None:
-            message = 'Changes saved.'
+            message = 'Changes+saved.'
             REQUEST['RESPONSE'].redirect(
                 '%s/topic_criteria?portal_status_message=%s' % (
                 self.absolute_url(), message)
@@ -311,7 +311,7 @@ class Topic( PortalFolder ):
             action = topictype.getActionById('subtopics')
             url = '%s/%s?portal_status_message=%s' % (
                 self.absolute_url(), action,
-                "Subtopic '%s' added" % id )
+                "Subtopic+'%s'+added" % id )
             REQUEST['RESPONSE'].redirect(url)
         else:
             return self._getOb(id)
