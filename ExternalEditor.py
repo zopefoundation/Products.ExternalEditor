@@ -18,6 +18,7 @@
 
 import Acquisition
 from AccessControl.SecurityManagement import getSecurityManager
+from webdav.common import rfc1123_date
 import base64
 
 class ExternalEditor(Acquisition.Implicit):
@@ -74,9 +75,6 @@ class ExternalEditor(Acquisition.Implicit):
             raise 'BadRequest', 'Object does not support external editing'
         
         RESPONSE.setHeader('Content-Type', 'application/x-zope-edit')
-        RESPONSE.setHeader('Cache-Control', 'no-cache')
         RESPONSE.setHeader('Pragma', 'no-cache')
             
         return '\n'.join(r)
-        
-        

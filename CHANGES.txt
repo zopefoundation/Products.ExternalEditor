@@ -1,5 +1,11 @@
 External Editor Change Log
 
+    - Now works on Windows (applause) using Pythonwin. Much overall
+      refactoring to abstract process control.
+
+    - Added "temp_dir" configuration option for specifying a different
+      temp file directory then the OS default.
+
     - Added support for domain specific configuration options.
 
     - Fixed trailing newline bug in encoded auth data coming from

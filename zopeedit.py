@@ -20,10 +20,11 @@
 __version__ = '0.3'
 
 import sys, os, stat
-from time import sleep
 from ConfigParser import ConfigParser
 from httplib import HTTPConnection, HTTPSConnection
 from urlparse import urlparse
+
+win32 = sys.platform == 'win32'
 
 class Configuration:
     
@@ -75,11 +76,9 @@ class Configuration:
                    
         for section in sections:
             if self.config.has_section(section):
-                print 'found section:', section
                 for option in self.config.options(section):
                     opt[option] = self.config.get(section, option)
         return opt
-                     
         
 class ExternalEditor:
     
@@ -92,7 +91,7 @@ class ExternalEditor:
             self.config = Configuration(config_path)
 
             # Open the input file and read the metadata headers
-            in_f = open(input_file, 'rb')
+            in_f = open(input_file)
             metadata = {}
 
             while 1:
@@ -115,14 +114,23 @@ class ExternalEditor:
                                             self.host)
 
             # Write the body of the input file to a separate file
-            body_file = (self.host + self.path).replace('/', ',')
-            body_file = '%s-%s' % (os.tmpnam(), body_file)
+            content_file = (self.host + self.path)\
+                           .replace('/', ',').replace(':',',')
+            
+            if self.options.has_key('temp_dir'):
+                temp = os.tempnam(self.options['temp_dir'])
+            elif win32:
+                temp = os.tempnam()
+            else:
+                temp = os.tmpnam()
+                
+            content_file = '%s-%s' % (temp, content_file)
             ext = self.options.get('extension')
-            if ext and not body_file.endswith(ext):
-                body_file = body_file + ext
-            body_f = open(body_file, 'wb')
+            if ext and not content_file.endswith(ext):
+                content_file = content_file + ext
+            body_f = open(content_file, 'wb')
             body_f.write(in_f.read())
-            self.body_file = body_file
+            self.content_file = content_file
             in_f.close()
             body_f.close()
             self.clean_up = int(self.options.get('cleanup_files', 1))
@@ -132,18 +140,23 @@ class ExternalEditor:
             # a fatal error occurs, unless explicitly stated otherwise
             # in the config file
             if getattr(self, 'clean_up', 1):
-                os.remove(input_file)
+                try:
+                    exc, exc_data = sys.exc_info()[:2]
+                    os.remove(input_file)
+                except OSError:
+                    # Sometimes we aren't allowed to delete it
+                    raise exc, exc_data
             raise
         
     def __del__(self):
         # for security we always delete the files by default
-        if getattr(self, 'clean_up', 1) and hasattr(self, 'body_file'):
-            os.remove(self.body_file)
+        if getattr(self, 'clean_up', 1) and hasattr(self, 'content_file'):
+            os.remove(self.content_file)
             
-    def getEditor(self):
+    def getEditorCommand(self):
         """Return the editor command"""
         editor = self.options.get('editor')
-        
+        """
         if not editor and has_tk():
             from tkSimpleDialog import askstring
             editor = askstring('Zope External Editor', 
@@ -151,7 +164,7 @@ class ExternalEditor:
             if not editor: sys.exit(0)
             self.config.set('general', 'editor', path)
             self.config.save()
-                
+        """ 
         if editor is not None:            
             return editor
         else:
@@ -159,66 +172,54 @@ class ExternalEditor:
         
     def launch(self):
         """Launch external editor"""
-        editor = self.getEditor().split()
-        file = self.body_file
-        editor.append(file)
-        last_fstat = os.stat(file)
-        pid = os.spawnvp(os.P_NOWAIT, editor[0], editor) # Note: Unix only
+        save_interval = float(self.options.get('save_interval'))
         use_locks = int(self.options.get('use_locks'))
+        launch_success = 0
+        last_fstat = os.stat(self.content_file)
+        command = '%s %s' % (self.getEditorCommand(), self.content_file)
+        editor = EditorProcess(command)
         
         if use_locks:
             self.lock()
             
-        exit_pid = 0
-        save_interval = self.config.getfloat('general', 'save_interval')
-        success = 0
-        
-        while exit_pid != pid:
-            sleep(save_interval or 2)
+        while 1:
+            editor.wait(save_interval or 2)
+            fstat = os.stat(self.content_file)
             
-            try:
-                exit_pid, exit_status = os.waitpid(pid, os.WNOHANG)
-                if exit_pid != pid: success = 1
-            except OSError:
-                exit_pid = pid
-            
-            fstat = os.stat(file)
-            if (exit_pid == pid or save_interval) \
+            if (save_interval or not editor.isAlive()) \
                and fstat[stat.ST_MTIME] != last_fstat[stat.ST_MTIME]:
                 # File was modified
-                success = 1 # handle very short editing sessions
+                launch_success = 1 # handle very short editing sessions
                 self.saved = self.putChanges()
                 last_fstat = fstat
+
+            if editor.isAlive():
+                launch_success = 1
+            else:
+                break
                 
-        if not success:
-            fatalError(('Editor "%s" did not launch properly.\n'
-                        'External editor lost connection '
-                        'to editor process.') % editor[0])
-         
+        if not launch_success:
+            fatalError('Editor did not launch properly.\n'
+                       'External editor lost connection '
+                       'to editor process.')
+        
         if use_locks:
             self.unlock()
         
-        if not self.saved and has_tk():
-            from tkMessageBox import askyesno
-            if askyesno('Zope External Editor',
-                        'File not saved to Zope.\nReopen local copy?'):
-                has_tk() # ugh, keeps tk happy
-                self.launch()
-            else:
-                self.clean_up = 0 # Keep temp file
-                has_tk() # ugh
+        if not self.saved \
+           and askYesNo('File not saved to Zope.\nReopen local copy?'):
+            self.launch()
         
     def putChanges(self):
         """Save changes to the file back to Zope"""
-        f = open(self.body_file, 'rb')
+        f = open(self.content_file, 'rb')
         body = f.read()
         f.close()
         headers = {'Content-Type': 
                    self.metadata.get('content_type', 'text/plain')}
         
         if hasattr(self, 'lock_token'):
-            headers['If'] = '<%s> (<%s>)' % (self.path,
-                                             self.lock_token)
+            headers['If'] = '<%s> (<%s>)' % (self.path, self.lock_token)
         
         response = self.zope_request('PUT', headers, body)
         del body # Don't keep the body around longer then we need to
@@ -228,20 +229,14 @@ class ExternalEditor:
             sys.stderr.write('Error occurred during HTTP put:\n%d %s\n' \
                              % (response.status, response.reason))
             sys.stderr.write('\n----\n%s\n----\n' % response.read())
-            
             message = response.getheader('Bobo-Exception-Type')
-            if has_tk():
-                from tkMessageBox import askretrycancel
-                if askretrycancel('Zope External Editor',
-                                  ('Could not save to Zope.\nError '
-                                   'occurred during HTTP put:\n%d %s\n%s') \
-                                  % (response.status, response.reason,
-                                     message)):
-                    has_tk() # ugh, keeps tk happy
-                    self.putChanges()
-                else:
-                    has_tk() # ugh
-                    return 0
+            
+            if askRetryCancel('Could not save to Zope.\nError '
+                              'occurred during HTTP put:\n%d %s\n%s' \
+                              % (response.status, response.reason, message)):
+                return self.putChanges()
+            else:
+                return 0
         return 1
     
     def lock(self):
@@ -281,16 +276,12 @@ class ExternalEditor:
             sys.stderr.write('Error occurred during lock request:\n%d %s\n' \
                              % (response.status, response.reason))
             sys.stderr.write('\n----\n%s\n----\n' % response.read())
-            if has_tk():
-                from tkMessageBox import askretrycancel
-                if askretrycancel('Zope External Editor',
-                                  ('Lock request failed:\n%d %s\n%s') \
-                                  % (response.status, response.reason, message)):
-                    has_tk() # ugh, keeps tk happy
-                    return self.lock()
-                else:
-                    has_tk() # ugh
-                    return 0
+
+            if askRetryCancel('Lock request failed:\n%d %s\n%s' \
+                              % (response.status, response.reason, message)):
+                return self.lock()
+            else:
+                return 0
         return 1
                     
     def unlock(self):
@@ -299,25 +290,20 @@ class ExternalEditor:
             return 0
             
         headers = {'Lock-Token':self.lock_token}
-        
         response = self.zope_request('UNLOCK', headers)
         
         if response.status / 100 != 2:
             # Captain, she's still locked!
             message = response.getheader('Bobo-Exception-Type')
-            sys.stderr.write('Error occurred during unlock request:\n%d %s\n%s\n' \
+            sys.stderr.write('Error occurred during unlock request:'
+                             '\n%d %s\n%s\n' \
                              % (response.status, response.reason, message))
             sys.stderr.write('\n----\n%s\n----\n' % response.read())
-            if has_tk():
-                from tkMessageBox import askretrycancel
-                if askretrycancel('Zope External Editor',
-                                  ('Unlock request failed:\n%d %s') \
-                                  % (response.status, response.reason)):
-                    has_tk() # ugh, keeps tk happy
-                    return self.unlock(token)
-                else:
-                    has_tk() # ugh
-                    return 0
+            if askRetryCancel('Unlock request failed:\n%d %s'
+                              % (response.status, response.reason)):
+                return self.unlock(token)
+            else:
+                return 0
         return 1
         
     def zope_request(self, method, headers={}, body=''):
@@ -361,33 +347,110 @@ class ExternalEditor:
                 response.status = 0
             return response
 
-def has_tk():
-    """Sets up a suitable tk root window if one has not
-       already been setup. Returns true if tk is happy,
-       false if tk throws an error (like its not available)"""
-    if not hasattr(globals(), 'tk_root'):
-        # create a hidden root window to make Tk happy
+title = 'Zope External Editor'
+
+## Platform specific declarations ##
+
+if win32:
+    from win32ui import MessageBox
+    from win32process import CreateProcess, GetExitCodeProcess, STARTUPINFO
+    from win32event import WaitForSingleObject
+    import pywintypes
+
+    def errorDialog(message):
+        MessageBox(message, title, 16)
+
+    def askRetryCancel(message):
+        return MessageBox(message, title, 53) == 4
+
+    def askYesNo(message):
+        return MessageBox(message, title, 52) == 6
+
+    class EditorProcess:
+        def __init__(self, command):
+            """Launch editor process"""
+            try:
+                self.handle, ht, pid, tid = CreateProcess(None, command, None, 
+                                                          None, 1, 0, None, 
+                                                          None, STARTUPINFO())
+            except pywintypes.error, e:
+                fatalError('Error launching editor process\n'
+                           '(%s):\n%s' % (command, e[2]))
+        def wait(self, timeout):
+            """Wait for editor to exit or until timeout"""
+            WaitForSingleObject(self.handle, int(timeout * 1000.0))
+                
+        def isAlive(self):
+            """Returns true if the editor process is still alive"""
+            return GetExitCodeProcess(self.handle) == 259
+
+else: # Posix platform
+    from time import sleep
+
+    def has_tk():
+        """Sets up a suitable tk root window if one has not
+           already been setup. Returns true if tk is happy,
+           false if tk throws an error (like its not available)"""
+        if not hasattr(globals(), 'tk_root'):
+            # create a hidden root window to make Tk happy
+            try:
+                global tk_root
+                from Tkinter import Tk
+                tk_root = Tk()
+                tk_root.withdraw()
+                return 1
+            except:
+                return 0
+        return 1
+
+    def errorDialog(message):
+        """Error dialog box"""
         try:
-            global tk_root
-            from Tkinter import Tk
-            tk_root = Tk()
-            tk_root.withdraw()
-            return 1
-        except:
-            return 0
-    return 1
+            if has_tk():
+                from tkMessageBox import showerror
+                showerror(title, message)
+                has_tk()
+        finally:
+            sys.stderr.write(message)
+
+    def askRetryCancel(message):
+        if has_tk():
+            from tkMessageBox import askretrycancel
+            r = askretrycancel(title, message)
+            has_tk() # ugh, keeps tk happy
+            return r
+
+    def askYesNo(message):
+        if has_tk:
+            from tkMessageBox import askyesno
+            r = askyesno(title, message)
+            has_tk() # must...make...tk...happy
+            return r
+
+    class EditorProcess:
+        def __init__(self, command):
+            """Launch editor process"""
+            command = command.split()
+            self.pid = os.spawnvp(os.P_NOWAIT, command[0], command)
         
+        def wait(self, timeout):
+            """Wait for editor to exit or until timeout"""
+            sleep(timeout)
+                
+        def isAlive(self):
+            """Returns true if the editor process is still alive"""
+            try:
+                exit_pid, exit_status = os.waitpid(self.pid, os.WNOHANG)
+            except OSError:
+                return 0
+            else:
+                return exit_pid != self.pid
+
 def fatalError(message, exit=1):
     """Show error message and exit"""
-    message = 'FATAL ERROR:\n%s\n' % message
-    try:
-        if has_tk():
-            from tkMessageBox import showerror
-            showerror('Zope External Editor', message)
-            has_tk()
-    finally:
-        sys.stderr.write(message)
-        if exit: sys.exit(0)
+    errorDialog('FATAL ERROR: %s' % message)
+    if exit: 
+        sys.exit(0)
 
 def whereIs(filename): 
     """Given a filename, returns the full path to it based
@@ -426,7 +489,7 @@ save_interval = 1
 cleanup_files = 1
 
 # Use WebDAV locking to prevent concurrent editing by
-# different users. Disable for single user use for
+# different users. Disable for single user use or for
 # better performance
 use_locks = 1
 
