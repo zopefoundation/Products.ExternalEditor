@@ -488,6 +488,32 @@ class SnapshotExportContextTests( SecurityRequestTest
         self.assertEqual( template.read(), _XML )
         self.failIf( template.html() )
 
+    def test_writeDataFile_unicode_xml( self ):
+
+        from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
+        _FILENAME = 'simple.xml'
+        _CONTENT_TYPE = 'text/xml'
+        _XML = u"""<?xml version="1.0"?><simple />"""
+
+        site = DummySite( 'site' ).__of__( self.root )
+        site.portal_setup = DummyTool( 'portal_setup' )
+        tool = site.portal_setup
+        ctx = self._makeOne( tool, 'simple' )
+
+        ctx.writeDataFile( _FILENAME, _XML, _CONTENT_TYPE )
+
+        snapshot = tool.snapshots._getOb( 'simple' )
+
+        self.assertEqual( len( snapshot.objectIds() ), 1 )
+        self.failUnless( _FILENAME in snapshot.objectIds() )
+
+        template = snapshot._getOb( _FILENAME )
+
+        self.assertEqual( template.getId(), _FILENAME )
+        self.assertEqual( template.meta_type, ZopePageTemplate.meta_type )
+        self.assertEqual( template.read(), _XML )
+        self.failIf( template.html() )
+
     def test_writeDataFile_subdir_dtml( self ):
 
         from OFS.DTMLDocument import DTMLDocument

@@ -522,6 +522,41 @@ class SetupToolTests( FilesystemTestBase
         self._verifyTarballEntry( fileish, 'properties.ini'
                                 , _PROPERTIES_INI % site.title  )
 
+    def test_createSnapshot_default( self ):
+
+        from test_registry import _EMPTY_IMPORT_XML
+
+        _EXPECTED = [ ( 'import_steps.xml', _EMPTY_IMPORT_XML )
+                    , ( 'export_steps.xml'
+                      , _DEFAULT_STEP_REGISTRIES_EXPORT_XML
+                      )
+                    ]
+
+        site = self._makeSite()
+        site.portal_setup = self._makeOne()
+        tool = site.portal_setup
+
+        result = tool.createSnapshot( 'default' )
+
+        self.assertEqual( len( result[ 'steps' ] ), 1 )
+        self.assertEqual( result[ 'steps' ][ 0 ], 'step_registries' )
+        self.assertEqual( result[ 'messages' ][ 'step_registries' ]
+                        , 'Step registries exported'
+                        )
+
+        snapshot = result[ 'snapshot' ]
+
+        self.assertEqual( len( snapshot.objectIds() ), len( _EXPECTED ) )
+
+        for id in [ x[0] for x in _EXPECTED ]:
+            self.failUnless( id in snapshot.objectIds() )
+
+        fileobj = snapshot._getOb( 'import_steps.xml' )
+        self.assertEqual( fileobj.read() , _EMPTY_IMPORT_XML )
+
+        fileobj = snapshot._getOb( 'export_steps.xml' )
+        self.assertEqual( fileobj.read() , _DEFAULT_STEP_REGISTRIES_EXPORT_XML )
+
 
 _DEFAULT_STEP_REGISTRIES_EXPORT_XML = """\
 <?xml version="1.0"?>

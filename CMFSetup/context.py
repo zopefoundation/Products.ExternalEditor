@@ -215,8 +215,8 @@ class SnapshotExportContext( Implicit ):
 
     def __init__( self, tool, snapshot_id ):
 
-        self._tool = aq_inner( tool )
-        self._site = aq_parent( self._tool )
+        self._tool = tool = aq_inner( tool )
+        self._site = aq_parent( tool )
         self._snapshot_id = snapshot_id
 
     security.declareProtected( ManagePortal, 'getSite' )
@@ -237,6 +237,20 @@ class SnapshotExportContext( Implicit ):
         ob = self._createObjectByType( filename, text, content_type )
         folder._setObject( filename, ob )
 
+    security.declareProtected( ManagePortal, 'getSnapshotURL' )
+    def getSnapshotURL( self ):
+
+        """ See IExportContext.
+        """
+        return '%s/%s' % ( self._tool.absolute_url(), self._snapshot_id )
+
+    security.declareProtected( ManagePortal, 'getSnapshotFolder' )
+    def getSnapshotFolder( self ):
+
+        """ See IExportContext.
+        """
+        return self._ensureSnapshotsFolder()
+
     #
     #   Helper methods
     #
@@ -255,7 +269,8 @@ class SnapshotExportContext( Implicit ):
 
         elif content_type in ('text/html', 'text/xml' ):
 
-            ob = ZopePageTemplate( name, body, content_type=content_type )
+            ob = ZopePageTemplate( name, str( body )
+                                 , content_type=content_type )
 
         elif content_type[:6]=='image/':
 
@@ -281,7 +296,7 @@ class SnapshotExportContext( Implicit ):
         for element in path:
 
             if element not in current.objectIds():
-                current._setObject( element, Folder( 'element' ) )
+                current._setObject( element, Folder( element ) )
 
             current = current._getOb( element )
 

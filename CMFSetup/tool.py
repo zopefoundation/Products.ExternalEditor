@@ -16,6 +16,7 @@ from interfaces import ISetupTool
 from permissions import ManagePortal
 from context import ImportContext
 from context import TarballExportContext
+from context import SnapshotExportContext
 from registry import ImportStepRegistry
 from registry import ExportStepRegistry
 
@@ -178,7 +179,25 @@ class SetupTool( UniqueObject, Folder ):
 
         """ See ISetupTool.
         """
-        raise NotImplementedError
+        context = SnapshotExportContext( self, snapshot_id )
+        messages = {}
+        steps = self._export_registry.listSteps()
+
+        for step_id in steps:
+
+            handler = self._export_registry.getStep( step_id )
+
+            if handler is None:
+                raise ValueError( 'Invalid export step: %s' % step_id )
+
+            messages[ step_id ] = handler( context )
+
+
+        return { 'steps' : steps
+               , 'messages' : messages
+               , 'url' : context.getSnapshotURL()
+               , 'snapshot' : context.getSnapshotFolder()
+               }
 
     security.declareProtected(ManagePortal, 'compareConfigurations')
     def compareConfigurations( self   
