@@ -40,6 +40,11 @@ New Features
 
 Bugs Fixed
 
+  - Fixed long standing bug in FSPythonScript where get_size returned
+    the incorrect length. This broke editing using EMACS via FTP or
+    WebDAV. Thanks to John Glavin at South River Technologies for
+    help finding the bug.
+
   - Reworked functionality added in Tracker #409 which broke the 
     Types Tool. (Tracker #458)
 

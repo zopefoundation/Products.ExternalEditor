@@ -13,6 +13,7 @@ def test_suite():
         'test_Expression',
         'test_CatalogTool',
         'test_DirectoryView',
+        'test_FSPythonScript'
         ]:
         suite.addTest(
             __import__(name,globals(),locals()).test_suite()
