@@ -161,9 +161,9 @@
           <td> </td>
           <td> </td>
           <td colspan="3">
-            <span tal:replace="python: crdate.aCommon()">CREATEDATE
+            <span tal:replace="python: here.aCompact(crdate)">CREATEDATE
               </span><span tal:condition="python: datesdiff"> ...
-                <span tal:replace="python: moddate.aCommon()">
+                <span tal:replace="python: here.aCompact(moddate)">
                   MODDATE</span>
             </span>
           </td>
