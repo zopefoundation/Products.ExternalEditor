@@ -43,8 +43,6 @@ def importTypesTool( context ):
     encoding = context.getEncoding()
 
     types_tool = getToolByName( site, 'portal_types' )
-    #if config_file is None:
-    #    config_file = context.getDataFile('types.xml')
 
     if context.shouldPurge():
 
