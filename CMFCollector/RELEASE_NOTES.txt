@@ -12,6 +12,14 @@ CMF Collector Update Notes
   See KNOWN_PROBLEMS.txt for currently obtaining bugs and problems to
   be aware of.
 
+  Version 0.9b, Oct 28, 2001
+
+    I believe we're now feature-complete for v 0.9, hence the beta
+    designation and only bug fixes 'til 0.9 full release.
+
+    - Minor changes to the workflow - may help with issues preexisting
+      0.9a, if you encounter problems.
+
   Version 0.9a, Oct 25, 2001
 
     - This version requires two installation changes.
