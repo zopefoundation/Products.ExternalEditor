@@ -31,6 +31,7 @@ from Products.CMFCore.ActionsTool import ActionInformation as AI
 from Products.CMFCore.Expression import Expression
 from Products.CMFCore.CMFCorePermissions import ListPortalMembers
 from Products.CMFCore.CMFCorePermissions import ManagePortal
+from Products.CMFCore.CMFCorePermissions import ManageUsers
 from Products.CMFCore.CMFCorePermissions import View
 
 from Document import addDocument
@@ -154,10 +155,10 @@ class MembershipTool( BaseTool ):
         If Manager, return a list of all usernames.  The mapping
         contains the id and listed variables.
         """
-        isManager = _checkPermission(ManagePortal, self)
+        isUserManager = _checkPermission(ManageUsers, self)
         roster = []
         for member in self.listMembers():
-            if isManager or member.listed:
+            if isUserManager or member.listed:
                 roster.append({'id':member.getId(),
                                'listed':member.listed})
         return roster
@@ -195,7 +196,7 @@ class MembershipTool( BaseTool ):
             member = user
             member_id = user_id
         else:
-            if _checkPermission(ManagePortal, self):
+            if _checkPermission(ManageUsers, self):
                 member = self.acl_users.getUserById(member_id, None)
                 if member:
                     member = member.__of__(self.acl_users)

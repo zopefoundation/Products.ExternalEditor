@@ -27,6 +27,7 @@ ChangePermissions = Permissions.change_permissions
 DeleteObjects = Permissions.delete_objects
 FTPAccess = Permissions.ftp_access
 ManageProperties = Permissions.manage_properties
+ManageUsers = Permissions.manage_users
 UndoChanges = Permissions.undo_changes
 View = Permissions.view
 ViewManagementScreens = Permissions.view_management_screens

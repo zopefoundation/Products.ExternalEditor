@@ -23,10 +23,11 @@ from Globals import InitializeClass, DTMLFile, MessageDialog, \
 from Acquisition import aq_base
 from AccessControl.User import nobody
 from AccessControl import ClassSecurityInfo
-from CMFCorePermissions import View
 from CMFCorePermissions import AccessContentsInformation
 from CMFCorePermissions import ManagePortal
+from CMFCorePermissions import ManageUsers
 from CMFCorePermissions import SetOwnPassword
+from CMFCorePermissions import View
 from ActionProviderBase import ActionProviderBase
 
 from interfaces.portal_membership \
@@ -239,7 +240,7 @@ class MembershipTool(UniqueObject, Folder, ActionProviderBase):
             member = user
             member_id = user_id
         else:
-            if _checkPermission(ManagePortal, self):
+            if _checkPermission(ManageUsers, self):
                 member = self.acl_users.getUserById(member_id, None)
                 if member:
                     member = member.__of__(self.acl_users)
