@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<import-steps>
+ <import-step id="rolemap" version="20040523-01"
+              handler="Products.CMFSetup.rolemap.importRolemap"
+              title="Role / Permission Map">
+  
+  Import custom roles and non-default role-permission mappings.
+ 
+ </import-step>
+</import-steps>

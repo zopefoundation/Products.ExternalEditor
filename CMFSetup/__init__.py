@@ -12,14 +12,25 @@ $Id$
 
 def initialize(context):
 
+    from Products.CMFCore.utils import ToolInit, registerIcon
+    from tool import SetupTool
+
+    TOOLS_AND_ICONS = ( ( SetupTool, 'www/tool.png' ),)
+
+    ToolInit( 'CMFSetup Tools'
+            , tools=[ x[ 0 ] for x in TOOLS_AND_ICONS ]
+            , product_name='Setup'
+            , icon=None
+            ).initialize( context )
+
+    for tool, icon in TOOLS_AND_ICONS:
+        registerIcon( tool, icon, globals() )
+
     return # XXX comment out the rest
 
-    from SiteConfiguration import SiteConfigurationTool
     from SiteConfiguration import addConfiguredSiteForm
     from SiteConfiguration import addConfiguredSite
     from SiteConfiguration import listPaths
-
-    TOOLS_AND_ICONS = ( (SiteConfigurationTool, 'www/tool.png'),)
 
     # Add SiteConfiguration constructor.
     # We specify meta_type and interfaces because we don't actually register a
@@ -37,18 +48,6 @@ def initialize(context):
                                         )
                          , interfaces=None
                          )
-
-    from Products.CMFCore.utils import ToolInit, registerIcon
-    from Products.CMFCore.utils import ContentInit
-
-    ToolInit( 'CMFSetup Tools'
-            , tools=[ x[ 0 ] for x in TOOLS_AND_ICONS ]
-            , product_name='Setup'
-            , icon=None
-            ).initialize( context )
-
-    for tool, icon in TOOLS_AND_ICONS:
-        registerIcon( tool, icon, globals() )
 
 
     # XXX:  This is *all* policy, and belongs in an XML file!

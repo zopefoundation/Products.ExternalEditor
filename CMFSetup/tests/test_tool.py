@@ -73,7 +73,7 @@ class SetupToolTests( FilesystemTestBase
 
         tool.setProfileDirectory( self._PROFILE_PATH )
 
-        self.assertRaises( ValueError, tool.getProfileDirectory, True )
+        self.assertEqual( tool.getProfileDirectory( True ), self._PROFILE_PATH )
 
     def test_setProfileDirectory_absolute_invalid( self ):
 

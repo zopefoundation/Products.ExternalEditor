@@ -161,6 +161,7 @@ class TarballExportContext( ExportContext ):
                        % timestamp[:6] )
 
         self._archive_stream = StringIO()
+        self._archive_filename = archive_name
         self._archive = TarFile.open( archive_name, 'w:gz'
                                     , self._archive_stream )
 
@@ -184,3 +185,10 @@ class TarballExportContext( ExportContext ):
         """
         self._archive.close()
         return self._archive_stream.getvalue()
+
+    security.declareProtected( ManagePortal, 'getArchiveFilename' )
+    def getArchiveFilename( self ):
+
+        """ Close the archive, and return it as a big string.
+        """
+        return self._archive_filename

@@ -7,6 +7,7 @@ import os
 from AccessControl import ClassSecurityInfo
 from Globals import InitializeClass
 from OFS.Folder import Folder
+from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
 from Products.CMFCore.utils import UniqueObject
 from Products.CMFCore.utils import getToolByName
@@ -18,6 +19,7 @@ from context import TarballExportContext
 from registry import ImportStepRegistry
 from registry import ExportStepRegistry
 
+from utils import _wwwdir
 
 class SetupTool( UniqueObject, Folder ):
 
@@ -28,8 +30,8 @@ class SetupTool( UniqueObject, Folder ):
     id = 'portal_setup'
     meta_type = 'Portal Setup Tool'
 
-    IMPORT_STEPS_XML = 'import-steps.xml'
-    EXPORT_STEPS_XML = 'export-steps.xml'
+    IMPORT_STEPS_XML = 'import_steps.xml'
+    EXPORT_STEPS_XML = 'export_steps.xml'
 
     _product_name = None
     _profile_directory = None
@@ -46,6 +48,9 @@ class SetupTool( UniqueObject, Folder ):
                                           , 'Export import / export steps.'
                                           )
 
+    #
+    #   ISetupTool API
+    #
     security.declareProtected( ManagePortal, 'getProfileProduct' )
     def getProfileProduct( self ):
 
@@ -58,15 +63,10 @@ class SetupTool( UniqueObject, Folder ):
 
         """ See ISetupTool.
         """
-        if relative_to_product:
-            if not self._product_name:
-                raise ValueError(
-                        'Profile directory is not relative to any product.' )
-        else:
-            if self._product_name:
-                return self._getFullyQualifiedProfileDirectory()
-
-        return self._profile_directory
+        return ( relative_to_product
+             and self._profile_directory
+              or self._getFullyQualifiedProfileDirectory()
+               )
 
     security.declareProtected( ManagePortal, 'setProfileDirectory' )
     def setProfileDirectory( self, path, product_name=None ):
@@ -164,44 +164,21 @@ class SetupTool( UniqueObject, Folder ):
 
         """ See ISetupTool.
         """
-        context = TarballExportContext( self )
-        handler = self._export_registry.getStep( step_id )
-
-        if handler is None:
-            raise ValueError( 'Invalid export step: %s' % step_id )
-
-        message = handler( context )
-
-        return { 'steps' : [ step_id ]
-               , 'messages' : { step_id : message }
-               , 'tarball' : context.getArchive()
-               }
+        return self._doRunExportSteps( [ step_id ] )
 
     security.declareProtected(ManagePortal, 'runAllExportSteps')
     def runAllExportSteps( self ):
 
         """ See ISetupTool.
         """
-        context = TarballExportContext( self )
-
-        steps = self._export_registry.listSteps()
-        messages = {}
-        for step_id in steps:
-
-            handler = self._export_registry.getStep( step_id )
-            messages[ step_id ] = handler( context )
-
-
-        return { 'steps' : steps
-               , 'messages' : messages
-               , 'tarball' : context.getArchive()
-               }
+        return self._doRunExportSteps( self._export_registry.listSteps() )
 
     security.declareProtected( ManagePortal, 'createSnapshot')
     def createSnapshot( self, snapshot_id ):
 
         """ See ISetupTool.
         """
+        raise NotImplementedError
 
     security.declareProtected(ManagePortal, 'compareConfigurations')
     def compareConfigurations( self   
@@ -212,12 +189,102 @@ class SetupTool( UniqueObject, Folder ):
                              ):
         """ See ISetupTool.
         """
+        raise NotImplementedError
 
     security.declareProtected( ManagePortal, 'markupComparison')
     def markupComparison(self, lines):
 
         """ See ISetupTool.
         """
+        raise NotImplementedError
+
+    #
+    #   ZMI
+    #
+    manage_options = ( Folder.manage_options[ :1 ]
+                     + ( { 'label' : 'Properties', 'action' : 'manage_tool' }
+                       , { 'label' : 'Import', 'action' : 'manage_importSteps' }
+                       , { 'label' : 'Export', 'action' : 'manage_exportSteps' }
+                       )
+                     + Folder.manage_options[ 3: ] # skip "View", "Properties"
+                     )
+
+    security.declareProtected( ManagePortal, 'manage_tool' )
+    manage_tool = PageTemplateFile( 'sutProperties', _wwwdir )
+
+    security.declareProtected( ManagePortal, 'manage_updateToolProperties' )
+    def manage_updateToolProperties( self
+                                   , profile_directory
+                                   , profile_product
+                                   , RESPONSE
+                                   ):
+        """ Update the tool's settings.
+        """
+        profile_directory = profile_directory.strip()
+        profile_product = profile_product.strip()
+
+        if profile_directory.startswith( '.' ):
+            raise ValueError(
+                    "Directories begining with '.' are not allowed." )
+
+        if profile_product and profile_directory.startswith( '/' ):
+            raise ValueError(
+                    "Product may not be specified with absolute directories" )
+
+        self.setProfileDirectory( profile_directory, profile_product )
+
+        RESPONSE.redirect( '%s/manage_tool?manage_tabs_message=%s'
+                         % ( self.absolute_url(), 'Properties+updated.' )
+                         )
+
+    security.declareProtected( ManagePortal, 'manage_importSteps' )
+    manage_importSteps = PageTemplateFile( 'sutImportSteps', _wwwdir )
+
+    security.declareProtected( ManagePortal, 'manage_importSelectedSteps' )
+    def manage_importSelectedSteps( self
+                                  , ids
+                                  , run_dependencies
+                                  , purge_old
+                                  , RESPONSE
+                                  ):
+        """ Import the steps selected by the user.
+        """
+        if not ids:
+            RESPONSE.redirect( '%s/manage_importSteps?manage_tabs_message=%s'
+                             % ( self.absolute_url(), 'No+steps+selected.' )
+                             )
+
+    security.declareProtected( ManagePortal, 'manage_exportSteps' )
+    manage_exportSteps = PageTemplateFile( 'sutExportSteps', _wwwdir )
+
+    security.declareProtected( ManagePortal, 'manage_exportSelectedSteps' )
+    def manage_exportSelectedSteps( self, ids, RESPONSE ):
+
+        """ Export the steps selected by the user.
+        """
+        if not ids:
+            RESPONSE.redirect( '%s/manage_exportSteps?manage_tabs_message=%s'
+                             % ( self.absolute_url(), 'No+steps+selected.' )
+                             )
+
+        result = self._doRunExportSteps( ids )
+        RESPONSE.setHeader( 'Content-type', 'application/x-gzip')
+        RESPONSE.setHeader( 'Content-disposition'
+                          , 'attachment; filename=%s' % result[ 'filename' ]
+                          )
+        return result[ 'tarball' ]
+
+    security.declareProtected( ManagePortal, 'manage_exportAllSteps' )
+    def manage_exportAllSteps( self, RESPONSE ):
+
+        """ Export all steps.
+        """
+        result = self.runAllExportSteps()
+        RESPONSE.setHeader( 'Content-type', 'application/x-gzip')
+        RESPONSE.setHeader( 'Content-disposition'
+                          , 'attachment; filename=%s' % result[ 'filename' ]
+                          )
+        return result[ 'tarball' ]
 
     #
     #   Helper methods
@@ -270,6 +337,30 @@ class SetupTool( UniqueObject, Folder ):
             raise ValueError( 'Invalid import step: %s' % step_id )
 
         return handler( context )
+
+    security.declarePrivate( '_doRunExportSteps')
+    def _doRunExportSteps( self, steps ):
+
+        """ See ISetupTool.
+        """
+        context = TarballExportContext( self )
+        messages = {}
+
+        for step_id in steps:
+
+            handler = self._export_registry.getStep( step_id )
+
+            if handler is None:
+                raise ValueError( 'Invalid export step: %s' % step_id )
+
+            messages[ step_id ] = handler( context )
+
+
+        return { 'steps' : steps
+               , 'messages' : messages
+               , 'tarball' : context.getArchive()
+               , 'filename' : context.getArchiveFilename()
+               }
 
 InitializeClass( SetupTool )
 
