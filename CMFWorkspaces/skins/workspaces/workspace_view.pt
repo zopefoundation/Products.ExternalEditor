@@ -1,0 +1,60 @@
+<html metal:use-macro="here/main_template/macros/master">
+  <head>
+    <title tal:content="template/title">The title</title>
+  </head>
+<body>
+    
+<div metal:fill-slot="main">
+
+  <form name="addform" action="" method="POST" tal:attributes="action
+        string:${here/absolute_url}/workspace_add">
+    <p>
+    <select name="type_name" size="1" onChange="
+        if (document.addform.type_name.selectedIndex > 0)
+          document.addform.Add.click();">
+      <option value="">Select type to add...</option>
+      <option tal:repeat="type_name
+        here/portal_organization/listAddableTypes | nothing"
+        tal:attributes="value type_name" tal:content="type_name">File</option>
+    </select>
+
+    <input type="submit" name="Add" value="Add" />
+    </p>
+
+  </form>
+
+  <form action="" method="POST"
+        tal:attributes="action here/absolute_url">
+
+    <table>
+
+      <div metal:use-macro="here/workspace_content_rows/macros/tbody" />
+
+      <tr>
+
+        <td colspan="5">
+          <input type="submit" name="workspace_remove:method"
+                 value="Remove from workspace" />
+          <input type="submit" name="workspace_copy_to_other_form:method"
+                 value="Copy to other workspace..." />
+        </td>
+
+      </tr>
+
+    </table>
+
+  </form>
+
+<!--
+  <div tal:define="
+       title string:Find additions to workspace...;
+       action string:${here/absolute_url}/workspace_search_results;">
+  <div metal:use-macro="here/search_box_simple/macros/search_box">
+    SEARCH FORM
+  </div>
+  </div>
+-->
+
+</div>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<tbody metal:define-macro="tbody"
+       tal:define="sort_attr python: request.get('sort_attr', 'Title');
+           sort_direction python: request.get('sort_direction', 'up')">
+
+<span tal:condition="nothing">
+  Page fragment presenting the contents as rows in a table, including the
+  table header.
+</span>
+
+      <tr tal:define="sort_fmt python: here.absolute_url() +
+                                           '?sort_attr=%s&sort_direction=%s'">
+        <th width="1%"> </th>
+        <th nowrap width="5%"></th>
+        <th tal:repeat="column python: ['Title', 'Type', 'CreationDate']"
+            tal:attributes="width python:
+                            column == 'Title' and '50%' or default">
+          <a href="" tal:omit-tag="python: sort_attr == column"
+             tal:attributes="href python: sort_fmt % (column, 'up')"
+             tal:content="column">Title</a>
+          <a href="" tal:condition="python: sort_attr == column"
+             tal:attributes="href python: sort_fmt % (
+             column, ascending and 'down' or 'up')"><img border="0"
+             src="sorted_down.gif" tal:attributes="src python:
+             '%s/%s' % (here.portal_url(), ascending
+             and 'sorted_down.gif' or 'sorted_up.gif')" /></a>
+        </th>
+      </tr>
+
+      <tr tal:repeat="it python:
+          here.listReferencedItems(sort_attr, sort_direction)">
+<tal:block define="item python:it[1]">
+        <td><img tal:define="status_image item/get_status_image | nothing"
+               tal:condition="status_image"
+               tal:replace="structure status_image"
+               tal:on-error="string:broken" /></td>
+
+        <td> <input type="checkbox" name="selected_items:list"
+                    tal:attributes="value python: it[0]"/>
+        </td>
+
+        <td> <img src="document_icon.gif"
+                  tal:attributes="src item/getIcon"
+                  tal:on-error="string:" />
+            <a href="#"
+               tal:attributes="href string:${item/absolute_url}/view"
+               tal:content="item/Title"
+               tal:on-error="string:(broken)">
+              TITLE or ID </a>
+        </td>
+
+        <td tal:content="item/Type"
+            tal:on-error="string:(unknown)">
+          Type
+        </td>
+
+        <td tal:content="item/CreationDate"
+            tal:on-error="string:(unknown)">
+          CreationDate
+        </td>
+
+</tal:block>
+      </tr>
+
+</tbody>

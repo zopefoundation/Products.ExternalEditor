@@ -1,0 +1,19 @@
+<html metal:use-macro="here/main_template/macros/master">
+<head>
+  <title tal:content="template/title">The title</title>
+</head>
+<body>
+
+<div metal:fill-slot="main"
+     tal:define="action string:workspace_add;
+                 cancel_action string:view;
+                 got here/get_collection_paths">
+
+<div metal:use-macro="here/search_box_results/macros/form">
+Search results
+</div>
+
+</div>
+
+</body>
+</html>
