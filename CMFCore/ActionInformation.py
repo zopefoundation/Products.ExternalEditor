@@ -138,15 +138,6 @@ class ActionInformation( SimpleItem ):
         """
         return self.visible
 
-    security.declarePublic( 'getPriority' )
-    def getPriority(self):
-
-        """ Return integer priority for sorting.
-        
-        """
-        # XXX: Not used....keep and implement or toss?
-        return getattr( self, 'priority', 10 )
-
 InitializeClass( ActionInformation )
 
 class oai:
