@@ -90,12 +90,13 @@ class Collector(SkinnedFolder):
 
         self.description = description
 
+        username = str(getSecurityManager().getUser())
+        self._add_local_role(username, 'Manager')
+        self._add_local_role(username, 'Owner')
         if supporters is None:
-            username = str(getSecurityManager().getUser())
             if username: supporters = [username]
             else: supporters = []
-        else:
-            self._adjust_supporters_roster(supporters)
+        self._adjust_supporters_roster(supporters)
         self.supporters = supporters
 
         if topics is None:
@@ -143,7 +144,6 @@ class Collector(SkinnedFolder):
                   importance=None,
                   classification=None,
                   severity=None,
-                  assigned_to=None,
                   reported_version=None,
                   other_version_info=None):
         """Instigate a new collector issue."""
@@ -163,7 +163,6 @@ class Collector(SkinnedFolder):
                           security_related=security_related,
                           importance=importance,
                           severity=severity,
-                          assigned_to=assigned_to,
                           reported_version=reported_version,
                           other_version_info=other_version_info)
         return id
@@ -243,10 +242,14 @@ class Collector(SkinnedFolder):
         # Add 'Reviewer' local role to anyone on new_roster that lacks it:
         for u in new_roster:
             if u not in already:
-                roles = list(self.get_local_roles_for_userid(u))
-                roles.append('Reviewer')
-                self.manage_setLocalRoles(u, roles)
-        
+                self._add_local_role(u, 'Reviewer')
+                
+    def _add_local_role(self, userid, roleid):
+        """Add roleid for userid if not already there."""
+        roles = list(self.get_local_roles_for_userid(userid))
+        roles.append(roleid)
+        self.manage_setLocalRoles(userid, roles)
+
     security.declareProtected(CMFCorePermissions.View, 'length')
     def length(self):
         """Use length protocol."""
