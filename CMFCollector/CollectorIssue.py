@@ -482,7 +482,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
                     recipients.append(se)
 
         if recipients:
-            to = ", ".join(["%s <%s>" % (name, email)
+            to = ", ".join(['"%s" <%s>' % (name, email)
                             for name, email in recipients])
             title = self.aq_parent.title[:50]
             short_title = " ".join(title[:40].split(" ")[:-1]) or title
