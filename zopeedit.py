@@ -365,7 +365,7 @@ class ExternalEditor:
             
             try:
                 response.status, response.reason = response.reason
-            except:
+            except ValueError:
                 response.status = 0
             
             return response
