@@ -17,7 +17,7 @@
 $Id$
 """
 
-import sys
+import sys, re, types
 
 from ZPublisher import BeforeTraverse
 
@@ -1089,25 +1089,43 @@ class PluggableAuthService( Folder ):
     def __call__(self, container, req):
         """ The __before_publishing_traverse__ hook. """
         resp = req['RESPONSE']
-        resp.old_unauthorized = resp.unauthorized
-        resp.unauthorized = self.challenge
+        resp.exception = self.exception
         return
 
-    def challenge(self):
-        
+    #
+    # Response overrides
+    #
+    def exception(self, fatal=0, info=None,
+                  absuri_match=re.compile(r'\w+://[\w\.]+').match,
+                  tag_search=re.compile('[a-zA-Z]>').search,
+                  abort=1
+                  ):
         req = self.REQUEST
         resp = req['RESPONSE']
-        resp._unauthorized()
+        try: del resp.exception
+        except: pass
         
+        if type(info) is type(()) and len(info) == 3:
+            t, v, tb = info
+        else:
+            t, v, tb = sys.exc_info()
+        
+        if t == 'Unauthorized' or t == Unauthorized or (
+            isinstance(t, types.ClassType) and issubclass(t, Unauthorized)):
+            t = 'Unauthorized'
+            self.challenge(req, resp)
+            return resp
+        
+        return resp.exception(fatal, info, absuri_match, tag_search, abort)
+    
+    def challenge(self, request, response):
         # Go through all challenge plugins
         plugins = self._getOb('plugins')
         challengers = plugins.listPlugins( IChallengePlugin )
         for challenger_id, challenger in challengers:
-            challenger.challenge(req, resp)
-            
-        # No plugin challenged, fallback to default challenge
-        resp.old_unauthorized()
-        
+            if challenger.challenge(request, response):
+                break
+                                
     security.declarePublic( 'hasUsers' )
     def hasUsers(self):
         """Zope quick start sacrifice.

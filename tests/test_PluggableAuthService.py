@@ -99,7 +99,8 @@ class DummyGroupPlugin(DummyPlugin):
 class DummyChallenger( DummyPlugin ):
         
     def challenge(self, request, response):
-        raise Redirect, 'http://redirect.to/me'
+        # Mark on the faux response that we have seen it:
+        response.challenger = self
 
 class FauxRequest:
 
@@ -1561,8 +1562,13 @@ class PluggableAuthServiceTests( unittest.TestCase ):
         # Enable the plugin
         plugins = zcuf._getOb( 'plugins' )
         plugins.activatePlugin( IChallengePlugin, 'challenger' )
-        # And now redirect should be called.
-        self.failUnlessRaises( Redirect, response.unauthorized)
+        
+        # Fake Zopes exception trap.
+        try:
+            response.unauthorized()
+        except Unauthorized:
+            response.exception()
+            self.failUnless(isinstance(response.challenger, DummyChallenger))
         
                                                                             
 if __name__ == "__main__":

@@ -1,3 +1,10 @@
+24 September 2004
+
+  PluggableAuthService.py:
+      
+    - Challenge support has been implemented.
+    - Some unit tests were not run or did not work with cAccessControl.
+
 22 August 2004
 
   PluggableAuthService.py:

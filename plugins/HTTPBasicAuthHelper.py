@@ -92,9 +92,20 @@ class HTTPBasicAuthHelper( BasePlugin ):
 
         """ Challenge the user for credentials.
         """
+        realm = response.realm
+        if realm:
+            response.setHeader('WWW-Authenticate', 'basic realm="%s"' % realm, 1)
         m = "<strong>You are not authorized to access this resource.</strong>"
-        raise Unauthorized, m
-
+        if response.debug_mode:
+            if response._auth:
+                m = m + '<p>\nUsername and password are not correct.'
+            else:
+                m = m + '<p>\nNo Authorization header found.'
+            
+        response.setBody(m, is_error=1)
+        response.setStatus(401)
+        return 1
+ 
     security.declarePrivate( 'resetCredentials' )
     def resetCredentials( self, request, response ):
 

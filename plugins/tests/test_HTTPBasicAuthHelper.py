@@ -42,10 +42,25 @@ class FauxHTTPRequest:
 class FauxHTTPResponse:
 
     _unauthorized_called = 0
-
+    realm = 'unit test'
+    debug_mode = 0
+    headers = {}
+    
     def unauthorized( self ):
 
         self._unauthorized_called = 1
+        
+    def setStatus(self, status, reason=None):
+        
+        self.status = status
+
+    def setHeader(self, name, value, literal=0):
+        
+        self.headers[name] = value
+
+    def setBody(self, body, is_error=0):
+        self.body = body
+        
 
 class HTTPBasicAuthHelperTests( unittest.TestCase
                               , ILoginPasswordHostExtractionPlugin_conformance
@@ -88,7 +103,11 @@ class HTTPBasicAuthHelperTests( unittest.TestCase
         response = FauxHTTPResponse()
 
         self.failIf( response._unauthorized_called )
-        self.failUnlessRaises(Unauthorized, helper.challenge, (request, response ), {})
+        helper.challenge(request, response)
+        self.failUnless(response.status, 401)
+        self.failUnless(response.headers['WWW-Authenticate'], 
+            'basic realm="unit test"')
+            
 
     def test_resetCredentials( self ):
 
