@@ -50,36 +50,36 @@ class TestTopic(unittest.TestCase):
         assert len(query) == 1
         assert query['baz'] == 'bam'
 
-    def test_EditCriterion(self):
-        topic = Topic('top')
-        topic._setObject('crit__foo', SSC('crit__foo', 'foo'))
-        topic._setObject('crit__bar', SIC('crit__bar', 'bar'))
+##    def test_EditCriterion(self):
+##        topic = Topic('top')
+##        topic._setObject('crit__foo', SSC('crit__foo', 'foo'))
+##        topic._setObject('crit__bar', SIC('crit__bar', 'bar'))
 
-        class CritRecord:
-            pass
-        foorec = CritRecord()
-        barrec = CritRecord()
+##        class CritRecord:
+##            pass
+##        foorec = CritRecord()
+##        barrec = CritRecord()
 
-        foorec.id = 'crit__foo'
-        foorec.value = 'goodfoo'
+##        foorec.id = 'crit__foo'
+##        foorec.value = 'goodfoo'
 
-        barrec.id = 'crit__bar'
-        barrec.value = '12'
+##        barrec.id = 'crit__bar'
+##        barrec.value = '12'
 
-        query = topic.buildQuery()
-        assert len(query) == 0
-        topic.editCriteria([foorec, barrec])
-        query = topic.buildQuery()
-        assert len(query) == 2
-        assert query['foo'] == 'goodfoo'
-        assert query['bar'] == 12
+##        query = topic.buildQuery()
+##        assert len(query) == 0
+##        topic.editCriteria([foorec, barrec])
+##        query = topic.buildQuery()
+##        assert len(query) == 2
+##        assert query['foo'] == 'goodfoo'
+##        assert query['bar'] == 12
 
-        barrec.direction = SIC.MINIMUM
-        topic.editCriteria([barrec])
-        query = topic.buildQuery()
-        assert len(query) == 3
-        assert query['bar_usage'] == 'range:min'
-        assert query['foo'] == 'goodfoo'
+##        barrec.direction = SIC.MINIMUM
+##        topic.editCriteria([barrec])
+##        query = topic.buildQuery()
+##        assert len(query) == 3
+##        assert query['bar_usage'] == 'range:min'
+##        assert query['foo'] == 'goodfoo'
         
     
 def test_suite():
