@@ -562,7 +562,7 @@ class WorkflowTool (UniqueObject, Folder):
 
         return tuple(wf_ids)
 
-    security.declarePrivate('getWorkflowsFor')
+    security.declareProtected( ManagePortal, 'getWorkflowsFor')
     def getWorkflowsFor(self, ob):
 
         """ Find the workflows for the type of the given object.
