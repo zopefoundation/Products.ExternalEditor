@@ -22,7 +22,7 @@ from webdav.common import rfc1123_date
 from OFS.Image import Image, getImageInfo
 
 from utils import _dtmldir
-from CMFCorePermissions import ViewManagementScreens, View
+from CMFCorePermissions import ViewManagementScreens, View, FTPAccess
 from FSObject import FSObject
 from DirectoryView import registerFileExtension, registerMetaType, expandpath
 
@@ -121,6 +121,9 @@ class FSImage(FSObject):
         """
         self._updateFromFS()
         return self.content_type
+
+    security.declareProtected(FTPAccess, 'manage_FTPget')
+    manage_FTPget = index_html
 
 Globals.InitializeClass(FSImage)
 
