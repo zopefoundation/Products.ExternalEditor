@@ -71,13 +71,13 @@ class ActionsToolTests( SecurityRequestTest ):
         self.assertEqual(tool.listFilteredActionsFor(root.portal_registration),
                          {'workflow': [],
                           'user': [],
-                          'object': [{'permissions': ('List folder contents',),
+                          'object': [],
+                          'folder': [{'permissions': ('List folder contents',),
                                       'id': 'folderContents',
                                       'url': 'http://foo/folder_contents',
                                       'name': 'Folder contents',
                                       'visible': 1,
-                                      'category': 'object'}],
-                          'folder': [],
+                                      'category': 'folder'}],
                           'global': []})
 
     def test_DuplicateActions(self):

@@ -9,7 +9,6 @@
 ##
 from ZTUtils import make_query
 from Products.CMFCore.utils import getToolByName
-atool = getToolByName(script, 'portal_actions')
 utool = getToolByName(script, 'portal_url')
 portal_url = utool()
 message = ''
@@ -17,14 +16,14 @@ message = ''
 
 if rename:
     context.manage_renameObjects(ids, new_ids)
-    target = atool.getActionInfo('folder/folderContents', context)['url']
+    target = context.getActionInfo('object/folderContents')['url']
     message = 'Item%s renamed.' % ( len(ids) != 1 and 's' or '' )
     query = make_query(portal_status_message=message)
     context.REQUEST.RESPONSE.redirect( '%s?%s' % (target, query) )
     return None
 
 elif cancel:
-    target = atool.getActionInfo('folder/folderContents', context)['url']
+    target = context.getActionInfo('object/folderContents')['url']
     context.REQUEST.RESPONSE.redirect(target)
     return None
 
@@ -48,7 +47,7 @@ for item in raw_items:
 control['batch'] = { 'listItemInfos': tuple(items) }
 
 buttons = []
-target = context.getActionInfo('folder/rename_items')['url']
+target = context.getActionInfo('object/rename_items')['url']
 buttons.append( {'name': 'rename', 'value': 'Rename'} )
 buttons.append( {'name': 'cancel', 'value': 'Cancel'} )
 control['form'] = { 'action': target,

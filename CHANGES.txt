@@ -169,9 +169,20 @@ CMF 1.5alpha (unreleased)
 
   Bug Fixes
 
-    - SkinnedFolder: Removed 'foldercontents' Action.
-      As long as we have 'foldercontents' in ActionsTool we don't need this
-      Action in SkinnedFolder.
+    - Actions of folderish types: Fixed some inconsistencies.
+      Whatever the old CMFDefault policy was - this is the current policy:
+      "object" is used for Actions related to the object itself, "folder" is
+      used for Actions related to the container of the object.
+
+      o Changed the category of PortalFolder and SkinnedFolder Actions to
+        'object'.
+
+      o Moved 'folderContents' of folderish types from ActionsTool to
+        PortalFolder's type info. Other folderish types now have to declare
+        their own 'folderContents' Action if they need one.
+
+      o Renamed Topic's 'subtopics' and SkinnedFolder's 'foldercontents'
+        Action to 'folderContents' to get them in sync.
 
     - StrippingParser: Added 'big', 'small', 'sub' and 'sup' to valid tags.
 

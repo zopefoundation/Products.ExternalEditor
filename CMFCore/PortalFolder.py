@@ -49,40 +49,40 @@ factory_type_information = (
   , 'factory'        : 'manage_addPortalFolder'
   , 'filter_content_types' : 0
   , 'immediate_view' : 'folder_edit_form'
-  , 'aliases'        : {'(Default)':'index_html',
-                        'view':'index_html',
+  , 'aliases'        : {'(Default)': 'index_html',
+                        'view': 'index_html',
                         'index.html':'index_html'}
   , 'actions'        : ( { 'id'            : 'view'
                          , 'name'          : 'View'
                          , 'action': 'string:${object_url}'
                          , 'permissions'   : (View,)
-                         , 'category'      : 'folder'
                          }
                        , { 'id'            : 'edit'
                          , 'name'          : 'Edit'
                          , 'action': 'string:${object_url}/folder_edit_form'
                          , 'permissions'   : (ManageProperties,)
-                         , 'category'      : 'folder'
                          }
                        , { 'id'            : 'localroles'
                          , 'name'          : 'Local Roles'
                          , 'action':
                                   'string:${object_url}/folder_localrole_form'
                          , 'permissions'   : (ChangeLocalRoles,)
-                         , 'category'      : 'folder'
+                         }
+                       , { 'id'            : 'folderContents'
+                         , 'name'          : 'Folder contents'
+                         , 'action': 'string:${object_url}/folder_contents'
+                         , 'permissions'   : (ListFolderContents,)
                          }
                        , { 'id'            : 'new'
                          , 'name'          : 'New...'
                          , 'action': 'string:${object_url}/folder_factories'
                          , 'permissions'   : (AddPortalContent,)
-                         , 'category'      : 'folder'
                          , 'visible'       : 0
                          }
                        , { 'id'            : 'rename_items'
                          , 'name'          : 'Rename items'
                          , 'action': 'string:${object_url}/folder_rename_form'
                          , 'permissions'   : (AddPortalContent,)
-                         , 'category'      : 'folder'
                          , 'visible'       : 0
                          }
                        )

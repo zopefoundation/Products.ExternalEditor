@@ -21,6 +21,7 @@ from Globals import InitializeClass
 
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
 from Products.CMFCore.CMFCorePermissions import AddPortalContent
+from Products.CMFCore.CMFCorePermissions import ListFolderContents
 from Products.CMFCore.CMFCorePermissions import ManageProperties
 from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
 from Products.CMFCore.CMFCorePermissions import View
@@ -40,32 +41,33 @@ Skinned folders can define custom 'view' actions.
   , 'factory'        : 'addSkinnedFolder'
   , 'filter_content_types' : 0
   , 'immediate_view' : 'folder_edit_form'
-  , 'aliases'        : {'(Default)':'folder_view',
-                        'view':'folder_view'}
+  , 'aliases'        : {'(Default)': 'folder_view',
+                        'view': 'folder_view'}
   , 'actions'        : ( { 'id'            : 'view'
                          , 'name'          : 'View'
                          , 'action': 'string:${object_url}/folder_view'
                          , 'permissions'   : (View,)
-                         , 'category'      : 'folder'
                          }
                        , { 'id'            : 'edit'
                          , 'name'          : 'Edit'
                          , 'action': 'string:${object_url}/folder_edit_form'
                          , 'permissions'   : (ManageProperties,)
-                         , 'category'      : 'folder'
+                         }
+                       , { 'id'            : 'folderContents'
+                         , 'name'          : 'Folder contents'
+                         , 'action': 'string:${object_url}/folder_contents'
+                         , 'permissions'   : (ListFolderContents,)
                          }
                        , { 'id'            : 'new'
                          , 'name'          : 'New...'
                          , 'action': 'string:${object_url}/folder_factories'
                          , 'permissions'   : (AddPortalContent,)
-                         , 'category'      : 'folder'
                          , 'visible'       : 0
                          }
                        , { 'id'            : 'rename_items'
                          , 'name'          : 'Rename items'
                          , 'action': 'string:${object_url}/folder_rename_form'
                          , 'permissions'   : (AddPortalContent,)
-                         , 'category'      : 'folder'
                          , 'visible'       : 0
                          }
                        )

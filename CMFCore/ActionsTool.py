@@ -57,19 +57,10 @@ class ActionsTool(UniqueObject, Folder, ActionProviderBase):
                                 , condition=Expression(
                text='python: folder is not object')
                                 , permissions=(ListFolderContents,)
-                                , category='object'
-                                , visible=1
-                                 )
-              , ActionInformation(id='folderContents'
-                                , title='Folder contents'
-                                , action=Expression(
-               text='string:${folder_url}/folder_contents')
-                                , condition=Expression(
-               text='python: folder is object')
-                                , permissions=(ListFolderContents,)
                                 , category='folder'
                                 , visible=1
                                  )
+               ,
                )
 
     action_providers = ( 'portal_membership'

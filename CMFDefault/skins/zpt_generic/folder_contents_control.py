@@ -16,7 +16,6 @@ from Products.CMFCore.CMFCorePermissions import DeleteObjects
 from Products.CMFCore.CMFCorePermissions import ListFolderContents
 from Products.CMFCore.CMFCorePermissions import ViewManagementScreens
 from Products.CMFCore.utils import getToolByName
-atool = getToolByName(script, 'portal_actions')
 mtool = getToolByName(script, 'portal_membership')
 utool = getToolByName(script, 'portal_url')
 portal_url = utool()
@@ -24,7 +23,7 @@ message = ''
 
 
 if not mtool.checkPermission(ListFolderContents, context):
-    target = context.getActionInfo('folder/view')['url']
+    target = context.getActionInfo('object/view')['url']
     context.REQUEST.RESPONSE.redirect(target)
     return None
 
@@ -51,7 +50,7 @@ elif items_delete:
         message = 'Please select one or more items to delete first.'
 
 elif items_new:
-    target = context.getActionInfo('folder/new')['url']
+    target = context.getActionInfo('object/new')['url']
     context.REQUEST.RESPONSE.redirect(target)
     return None
 
@@ -69,7 +68,7 @@ elif items_paste:
 
 elif items_rename:
     if ids:
-        target = context.getActionInfo('folder/rename_items')['url']
+        target = context.getActionInfo('object/rename_items')['url']
         query = make_query( ids=list(ids) )
         context.REQUEST.RESPONSE.redirect( '%s?%s' % (target, query) )
         return None
@@ -92,7 +91,7 @@ up_info = {}
 if upitems_list_allowed:
     up_obj = context.aq_parent
     if hasattr(up_obj, 'portal_url'):
-        up_url = atool.getActionInfo('folder/folderContents', up_obj)['url']
+        up_url = up_obj.getActionInfo('object/folderContents')['url']
         up_info = { 'icon': '%s/UpFolder_icon.gif' % portal_url,
                     'id': up_obj.getId(),
                     'url': up_url }
@@ -102,7 +101,7 @@ if upitems_list_allowed:
                     'url': '' }
 control['up_info'] = up_info
 
-target = atool.getActionInfo('folder/folderContents', context)['url']
+target = context.getActionInfo('object/folderContents')['url']
 context.filterCookie()
 folderfilter = context.REQUEST.get('folderfilter', '')
 filter = context.decodeFolderFilter(folderfilter)
@@ -112,13 +111,8 @@ items = []
 for item in batch_obj:
     item_icon = item.getIcon(1)
     item_id = item.getId()
-    if item.isPrincipiaFolderish:
-        try:
-            item_url = atool.getActionInfo('folder/folderContents', item)['url']
-        except ValueError:
-            item_url = item.getActionInfo('folder/view')['url']
-    else:
-        item_url = item.getActionInfo('object/view')['url']
+    item_url = item.getActionInfo( ('object/folderContents',
+                                    'object/view') )['url']
     items.append( { 'checkbox': items_manage_allowed and
                                 ('cb_%s' % item_id) or '',
                     'icon': item_icon and

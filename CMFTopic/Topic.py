@@ -15,16 +15,18 @@
 $Id$
 """
 
-from Products.CMFTopic.TopicPermissions import ChangeTopics
-from Products.CMFTopic.TopicPermissions import AddTopics
+from AccessControl import ClassSecurityInfo
+from Acquisition import aq_parent, aq_inner, aq_base
+from Globals import InitializeClass
+
+from Products.CMFCore.CMFCorePermissions import ListFolderContents
 from Products.CMFCore.CMFCorePermissions import View
 from Products.CMFCore.PortalFolder import PortalFolder
 from Products.CMFCore.utils import _getViewFor
 from Products.CMFCore.utils import getToolByName
 
-from Globals import InitializeClass
-from AccessControl import ClassSecurityInfo
-from Acquisition import aq_parent, aq_inner, aq_base
+from Products.CMFTopic.TopicPermissions import AddTopics
+from Products.CMFTopic.TopicPermissions import ChangeTopics
 
 
 # Factory type information -- makes Topic objects play nicely
@@ -38,8 +40,9 @@ factory_type_information = (
   , 'product'        : 'CMFTopic'
   , 'factory'        : 'addTopic'
   , 'immediate_view' : 'topic_edit_form'
-  , 'aliases'        : {'(Default)':'topic_view',
-                        'view':'topic_view'}
+  , 'allowed_content_types': ('Topic',)
+  , 'aliases'        : {'(Default)': 'topic_view',
+                        'view': 'topic_view'}
   , 'actions'        : ( { 'id'            : 'view'
                          , 'name'          : 'View'
                          , 'action': 'string:${object_url}/topic_view'
@@ -55,11 +58,22 @@ factory_type_information = (
                          , 'action': 'string:${object_url}/topic_criteria_form'
                          , 'permissions'   : (ChangeTopics,)
                          }
-                       , { 'id'            : 'subtopics'
+                       , { 'id'            : 'folderContents'
                          , 'name'          : 'Subtopics'
-                         , 'action':
-                                   'string:${object_url}/topic_subtopics_form'
-                         , 'permissions'   : (ChangeTopics,)
+                         , 'action': 'string:${object_url}/folder_contents'
+                         , 'permissions'   : (ListFolderContents,)
+                         }
+                       , { 'id'            : 'new'
+                         , 'name'          : 'New...'
+                         , 'action': 'string:${object_url}/folder_factories'
+                         , 'permissions'   : (AddTopics,)
+                         , 'visible'       : 0
+                         }
+                       , { 'id'            : 'rename_items'
+                         , 'name'          : 'Rename items'
+                         , 'action': 'string:${object_url}/folder_rename_form'
+                         , 'permissions'   : (AddTopics,)
+                         , 'visible'       : 0
                          }
                        )
   }
