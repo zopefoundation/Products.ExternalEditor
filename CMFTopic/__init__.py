@@ -11,26 +11,26 @@
 # 
 ##############################################################################
 """Topic: Canned catalog queries
+
 $Id$
 """
 __version__='$Revision$'[11:-2]
 
  
+import TopicPermissions
 import Topic
 import SimpleStringCriterion
 import SimpleIntCriterion
 import ListCriterion
 import DateCriteria
 import SortCriterion
-import Products.CMFCore
+
+from Products.CMFCore.utils import ContentInit
+from Products.CMFCore.DirectoryView import registerDirectory
 
 from ZClasses import createZClassForBase
-from Products.CMFCore import utils
-from Products.CMFCore.DirectoryView import registerDirectory
-import TopicPermissions
 
-bases = (Topic.Topic,)
-
+bases = ( Topic.Topic, )
 
 import sys
 this_module = sys.modules[ __name__ ]
@@ -40,21 +40,21 @@ for base in bases:
 
 # This is used by a script (external method) that can be run
 # to set up Topics in an existing CMF Site instance.
-topic_globals=globals()
+topic_globals  =globals()
 
 # Make the skins available as DirectoryViews
-registerDirectory('skins', globals())
-registerDirectory('skins/topic', globals())
+registerDirectory( 'skins', globals() )
+registerDirectory( 'skins/topic', globals() )
 
 def initialize( context ):
-    context.registerHelpTitle('CMF Topic Help')
-    context.registerHelp(directory='help')
+
+    context.registerHelpTitle( 'CMF Topic Help' )
+    context.registerHelp( directory='help' )
 
     # CMF Initializers
-    utils.ContentInit(
-        'CMF Topic Objects',
-        content_types = (Topic.Topic,),
-        permission = TopicPermissions.AddTopics,
-        extra_constructors = (Topic.addTopic,),
-        fti = Topic.factory_type_information,
-        ).initialize(context)
+    ContentInit( 'CMF Topic Objects'
+               , content_types = (Topic.Topic,)
+               , permission = TopicPermissions.AddTopics
+               , extra_constructors = (Topic.addTopic,)
+               , fti = Topic.factory_type_information
+               ).initialize( context )

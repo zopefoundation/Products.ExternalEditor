@@ -11,31 +11,37 @@
 # 
 ##############################################################################
 """ Allow topic to specify sorting.
+
 $Id$
 """
-__version__='$Revision$'[11:-2]
-from AbstractCriterion import AbstractCriterion
-from AccessControl import ClassSecurityInfo
-from Topic import Topic
-import Globals, interfaces
+__version__ = '$Revision$'[11:-2]
+
+from Products.CMFTopic.AbstractCriterion import AbstractCriterion
+from Products.CMFTopic.Topic import Topic
+from Products.CMFTopic.interfaces import Criterion
+from Products.CMFTopic import TopicPermissions
 
 from Products.CMFCore import CMFCorePermissions
-import TopicPermissions
 
-class SortCriterion(AbstractCriterion):
+from Globals import InitializeClass
+from AccessControl import ClassSecurityInfo
+
+class SortCriterion( AbstractCriterion ):
     """
         Represent a mock criterion, to allow spelling the sort order
         and reversal items in a catalog query.
     """
-    __implements__ = (interfaces.Criterion,)
+    __implements__ = ( Criterion, )
 
     meta_type = 'Sort Criterion'
+
     security = ClassSecurityInfo()
+
     field = None # Don't prevent use of field in other criteria
 
-    _editableAttributes = ('reversed',)
+    _editableAttributes = ( 'reversed', )
 
-    def __init__(self, id, index):
+    def __init__( self, id, index ):
         self.id = id
         self.index = index
         self.reversed = 0
@@ -47,26 +53,35 @@ class SortCriterion(AbstractCriterion):
         """
         return self.index
 
-    security.declareProtected(TopicPermissions.ChangeTopics, 'getEditForm')
-    def getEditForm(self):
-        " Return the skinned name of the edit form "
+    security.declareProtected( TopicPermissions.ChangeTopics, 'getEditForm' )
+    def getEditForm( self ):
+        """
+            Return the name of skin method which renders the form
+            used to edit this kind of criterion.
+        """
         return 'sort_edit'
     
-    security.declareProtected(TopicPermissions.ChangeTopics, 'edit')
-    def edit(self, reversed):
-        """ Update the value we are to match up against """
+    security.declareProtected( TopicPermissions.ChangeTopics, 'edit' )
+    def edit( self, reversed ):
+        """
+            Update the value we are to match up against.
+        """
         self.reversed = not not reversed
     
-    security.declareProtected(CMFCorePermissions.View, 'getCriteriaItems')
+    security.declareProtected( CMFCorePermissions.View, 'getCriteriaItems' )
     def getCriteriaItems( self ):
-        """ Return a sequence of criteria items, used by Topic.buildQuery """
+        """
+            Return a tuple of query elements to be passed to the catalog
+            (used by 'Topic.buildQuery()').
+        """
         result = [ ( 'sort_on', self.index ) ]
+
         if self.reversed:
             result.append( ( 'sort_order', 'reverse' ) )
+
         return tuple( result )
 
-
-Globals.InitializeClass(SortCriterion)
+InitializeClass( SortCriterion )
 
 # Register as a criteria type with the Topic class
-Topic._criteriaTypes.append(SortCriterion)
+Topic._criteriaTypes.append( SortCriterion )

@@ -1,42 +1,68 @@
+##############################################################################
+#
+# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
+# 
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE
+# 
+##############################################################################
+"""Unit tests for SimpleStringCriterion module.
+
+$Id$
+"""
+__version__ = '$Revision$'[11:-2]
+
 import unittest
-import Products.CMFTopic.SimpleStringCriterion
 
-SSC = Products.CMFTopic.SimpleStringCriterion.SimpleStringCriterion
+class SimpleStringCriterionTests( unittest.TestCase ):
 
-
-class TestSimpleString(unittest.TestCase):
-
-    def setUp( self ):
-        get_transaction().begin()
-
-    def tearDown( self ):
-        get_transaction().abort()
+    def test_Interface( self ):
+        from Products.CMFTopic.interfaces import Criterion
+        from Products.CMFTopic.SimpleStringCriterion \
+            import SimpleStringCriterion
+        self.failUnless(
+            Criterion.isImplementedByInstancesOf( SimpleStringCriterion ) )
     
     def test_Empty( self ):
-        ssc = SSC('foo', 'foofield')
-        assert ssc.getId() == 'foo'
-        assert ssc.field == 'foofield'
-        assert ssc.value == ''
-        assert len( ssc.getCriteriaItems() ) == 0
+
+        from Products.CMFTopic.SimpleStringCriterion \
+            import SimpleStringCriterion
+
+        ssc = SimpleStringCriterion( 'foo', 'foofield' )
+
+        self.assertEqual( ssc.getId(), 'foo' )
+        self.assertEqual( ssc.field, 'foofield' )
+        self.assertEqual( ssc.value, '' )
+        self.assertEqual( len( ssc.getCriteriaItems() ), 0 )
     
     def test_Nonempty( self ):
-        ssc = SSC('foo', 'foofield')
-        ssc.edit('bar')
-        assert ssc.getId() == 'foo'
-        assert ssc.field == 'foofield'
-        assert ssc.value == 'bar'
 
-        items =ssc.getCriteriaItems()
-        assert len(items) == 1
-        assert len(items[0]) == 2
-        assert items[0][0] == 'foofield'
-        assert items[0][1] == 'bar'
+        from Products.CMFTopic.SimpleStringCriterion \
+            import SimpleStringCriterion
+
+        ssc = SimpleStringCriterion( 'foo', 'foofield' )
+        ssc.edit( 'bar' )
+
+        self.assertEqual( ssc.getId(), 'foo' )
+        self.assertEqual( ssc.field, 'foofield' )
+        self.assertEqual( ssc.value, 'bar' )
+
+        items = ssc.getCriteriaItems()
+
+        self.assertEqual( len( items ), 1 )
+        self.assertEqual( len( items[0] ), 2 )
+        self.assertEqual( items[0][0], 'foofield' )
+        self.assertEqual( items[0][1], 'bar' )
 
 def test_suite():
-    return unittest.makeSuite(TestSimpleString)
+    return unittest.makeSuite( SimpleStringCriterionTests )
 
 def main():
-    unittest.TextTestRunner().run(test_suite())
+    unittest.TextTestRunner().run( test_suite() )
 
 if __name__ == '__main__':
     main()

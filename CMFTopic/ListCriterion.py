@@ -11,61 +11,81 @@
 # 
 ##############################################################################
 """List Criterion: A criterion that is a list
+
 $Id$
 """
-__version__='$Revision$'[11:-2]
+__version__ = '$Revision$'[11:-2]
 
-from AccessControl import ClassSecurityInfo
-from Topic import Topic
-from AbstractCriterion import AbstractCriterion
-import Globals, string, interfaces, operator
+from Products.CMFTopic.AbstractCriterion import AbstractCriterion
+from Products.CMFTopic.interfaces import Criterion
+from Products.CMFTopic.Topic import Topic
+from Products.CMFTopic import TopicPermissions
 
 from Products.CMFCore import CMFCorePermissions
-import TopicPermissions
 
-class ListCriterion(AbstractCriterion):
-    """\
-    Represent a criterion which is a list of values (for an
-    'OR' search).
+from Globals import InitializeClass
+from AccessControl import ClassSecurityInfo
+
+import string, operator
+
+class ListCriterion( AbstractCriterion ):
     """
-    __implements__ = (interfaces.Criterion,)
+        Represent a criterion which is a list of values (for an
+        'OR' search).
+    """
+    __implements__ = ( Criterion, )
 
     meta_type = 'List Criterion'
 
     security = ClassSecurityInfo()
 
-    _editableAttributes = ('value',)
+    _editableAttributes = ( 'value', )
 
-    def __init__( self, id, field):
+    def __init__( self, id, field ):
         self.id = id
         self.field = field
-        
-        self.value = ('',)
+        self._clear()
 
-    security.declareProtected(TopicPermissions.ChangeTopics, 'getEditForm')
-    def getEditForm(self):
+    security.declarePrivate( '_clear' )
+    def _clear( self ):
+        """
+            Restore to original value.
+        """
+        self.value = ( '', )    # *Not* '()', which won't do at all!
+
+    security.declareProtected( TopicPermissions.ChangeTopics, 'getEditForm' )
+    def getEditForm( self ):
+        """
+            Return the name of skin method which renders the form
+            used to edit this kind of criterion.
+        """
         return "listc_edit"
 
-    security.declareProtected(TopicPermissions.ChangeTopics, 'edit')
-    def edit(self, value=None, REQUEST=None):
-        """ Update the value we match against. """
-        if value is not None:
-            if type(value) == type(''):
-                value = string.split(value, '\n')
-            self.value = tuple(value)
+    security.declareProtected( TopicPermissions.ChangeTopics, 'edit' )
+    def edit( self, value=None ):
+        """
+            Update the value we match against.
+        """
+        if value is None:
+            self._clear()
         else:
-            self.value = ('',)
+            if type( value ) == type( '' ):
+                value = string.split( value, '\n' )
+            self.value = tuple( value )
 
-    security.declareProtected(CMFCorePermissions.View, 'getCriteriaItems')
-    def getCriteriaItems(self):
-        """ Used by Topic.buildQuery to construct catalog queries """
+    security.declareProtected( CMFCorePermissions.View, 'getCriteriaItems' )
+    def getCriteriaItems( self ):
+        """
+            Return a tuple of query elements to be passed to the catalog
+            (used by 'Topic.buildQuery()').
+        """
         # filter out empty strings
-        value = tuple(filter(operator.truth, self.value)) 
-        return operator.truth(value) and ((self.field, self.value),) or ()
+        value = tuple( filter( operator.truth, self.value ) ) 
+        return operator.truth( value ) and ( ( self.field, self.value ), ) or ()
 
 
 
-Globals.InitializeClass(ListCriterion)
+InitializeClass( ListCriterion )
 
 # Register as a criteria type with the Topic class
-Topic._criteriaTypes.append(ListCriterion)
+Topic._criteriaTypes.append( ListCriterion )

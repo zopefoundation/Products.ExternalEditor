@@ -16,8 +16,8 @@
   <td width="20">&nbsp;</td>
   <td>
    <strong>Value:</strong> 
-   <input type="text" name="criteria.value:records" value="&dtml-value;" 
-    size="40">
+   <input type="text" name="criteria.value:records"
+          value="&dtml-getValueString;" size="40">
   </td>
  </tr>
  <tr>
