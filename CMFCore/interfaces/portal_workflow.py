@@ -100,30 +100,187 @@ class portal_workflow (Base):
     '''
     id = Attribute('id', 'Must be set to "portal_workflow"')
 
-    #getStateFor__roles__ = None
-    def getStateFor(self, content):
-        '''Returns the current workflow state of content.  State
-        is implemented as a mapping object.
+    # security.declarePrivate('getCatalogVariablesFor')
+    def getCatalogVariablesFor(self, ob):
+        '''
+        Invoked by portal_catalog.  Allows workflows
+        to add variables to the catalog based on workflow status,
+        making it possible to implement queues.
+        Returns a mapping containing the catalog variables
+        that apply to ob.
         '''
 
-    #listAllowableTransitionsFor__roles__ = None
-    def listAllowableTransitionsFor(self, content):
-        '''Returns the list of transition names which are available
-        to the current user from the state of content.
+    # security.declarePrivate('listActions')
+    def listActions(self, info):
+        '''
+        Invoked by the portal_actions tool.  Allows workflows to
+        include actions to be displayed in the actions box.
+        Object actions are supplied by workflows that apply
+        to the object.  Global actions are supplied by all
+        workflows.
+        Returns the actions to be displayed to the user.
         '''
 
-    #changeStateFor__roles__ = None
-    def changeStateFor(self, content, transition, comment, **kw):
-        '''Executes the given transition name on content with the
-        keyword arguments as modifiers and the comment as a history
-        attribute. Returns content, which may be in a new location.
-        Remember there are no implicit security assertions;
-        implementations will need to add code that calls checkPermission.
+    # security.declarePublic('doActionFor')
+    def doActionFor(self, ob, action, wf_id=None, *args, **kw):
         '''
-    
-    #listAddableTypesFor__roles__ = None
-    def listAddableTypesFor(self, container):
-        '''Lists the meta types that are allowed to be added by
-        the user to the given container.
+        Invoked by user interface code.
+        Allows the user to request a workflow action.  The workflow object
+        must perform its own security checks.
         '''
 
+    # security.declarePublic('getInfoFor')
+    def getInfoFor(self, ob, name, default, wf_id=None, *args, **kw):
+        '''
+        Invoked by user interface code.  Allows the user to request
+        information provided by the workflow.  The workflow object
+        must perform its own security checks.
+        '''
+
+    # security.declarePrivate('notifyCreated')
+    def notifyCreated(self, ob):
+        '''
+        Notifies all applicable workflows after an object has been created
+        and put in its new place.
+        '''
+
+    # security.declarePrivate('notifyBefore')
+    def notifyBefore(self, ob, action):
+        '''
+        Notifies all applicable workflows of an action before it happens,
+        allowing veto by exception.  Unless an exception is thrown, either
+        a notifySuccess() or notifyException() can be expected later on.
+        The action usually corresponds to a method name.
+        '''
+
+    # security.declarePrivate('notifySuccess')
+    def notifySuccess(self, ob, action, result=None):
+        '''
+        Notifies all applicable workflows that an action has taken place.
+        '''
+
+    # security.declarePrivate('notifyException')
+    def notifyException(self, ob, action, exc):
+        '''
+        Notifies all applicable workflows that an action failed.
+        '''
+
+    # security.declarePrivate('getHistoryOf')
+    def getHistoryOf(self, wf_id, ob):
+        '''
+        Invoked by workflow definitions.  Returns the history
+        of an object.
+        '''
+
+    # security.declarePrivate('getStatusOf')
+    def getStatusOf(self, wf_id, ob):
+        '''
+        Invoked by workflow definitions.  Returns the last element of a
+        history.
+        '''
+
+    # security.declarePrivate('setStatusOf')
+    def setStatusOf(self, wf_id, ob, status):
+        '''
+        Invoked by workflow definitions.  Appends to the workflow history.
+        '''
+
+
+class WorkflowDefinition (Base):
+    '''The interface expected of workflow definitions objects.
+    Accesses and changes the workflow state of objects.
+    '''
+
+    # security.declarePrivate('getCatalogVariablesFor')
+    def getCatalogVariablesFor(self, ob):
+        '''
+        Invoked by the portal_workflow tool.
+        Allows this workflow to make workflow-specific variables
+        available to the catalog, making it possible to implement
+        queues in a simple way.
+        Returns a mapping containing the catalog variables
+        that apply to ob.
+        '''
+
+    # security.declarePrivate('listObjectActions')
+    def listObjectActions(self, info):
+        '''
+        Invoked by the portal_workflow tool.
+        Allows this workflow to
+        include actions to be displayed in the actions box.
+        Called only when this workflow is applicable to
+        info.content.
+        Returns the actions to be displayed to the user.
+        '''
+
+    # security.declarePrivate('listGlobalActions')
+    def listGlobalActions(self, info):
+        '''
+        Invoked by the portal_workflow tool.
+        Allows this workflow to
+        include actions to be displayed in the actions box.
+        Generally called on every request!
+        Returns the actions to be displayed to the user.
+        '''
+
+    # security.declarePrivate('isActionSupported')
+    def isActionSupported(self, ob, action):
+        '''
+        Invoked by the portal_workflow tool.
+        Returns a true value if the given action name is supported.
+        '''
+
+    # security.declarePrivate('doActionFor')
+    def doActionFor(self, ob, action, *args, **kw):
+        '''
+        Invoked by the portal_workflow tool.
+        Allows the user to request a workflow action.  This method
+        must perform its own security checks.
+        '''
+
+    # security.declarePrivate('isInfoSupported')
+    def isInfoSupported(self, ob, name):
+        '''
+        Invoked by the portal_workflow tool.
+        Returns a true value if the given info name is supported.
+        '''
+
+    # security.declarePrivate('getInfoFor')
+    def getInfoFor(self, ob, name, default, *args, **kw):
+        '''
+        Invoked by the portal_workflow tool.
+        Allows the user to request information provided by the
+        workflow.  This method must perform its own security checks.
+        '''
+
+    # security.declarePrivate('notifyCreated')
+    def notifyCreated(self, ob):
+        '''
+        Invoked by the portal_workflow tool.
+        Notifies this workflow after an object has been created
+        and put in its new place.
+        '''
+
+    # security.declarePrivate('notifyBefore')
+    def notifyBefore(self, ob, action):
+        '''
+        Invoked by the portal_workflow tool.
+        Notifies this workflow of an action before it happens,
+        allowing veto by exception.  Unless an exception is thrown, either
+        a notifySuccess() or notifyException() can be expected later on.
+        The action usually corresponds to a method name.
+        '''
+
+    # security.declarePrivate('notifySuccess')
+    def notifySuccess(self, ob, action, result):
+        '''
+        Invoked by the portal_workflow tool.
+        Notifies this workflow that an action has taken place.
+        '''
+
+    # security.declarePrivate('notifyException')
+    def notifyException(self, ob, action, exc):
+        '''
+        Invoked by the portal_workflow tool.
+        Notifies this workflow that an action failed.
+        '''

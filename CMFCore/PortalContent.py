@@ -110,15 +110,10 @@ class PortalContent(SimpleItem, DynamicType):
     """
 
     isPortalContent = 1
+    _isPortalContent = 1  # More secure than 'isPortalContent'.
 
-    review_history=()
-    review_state='private'  # or 'pending' or 'published'
-    
-    manage_options=(
-        {'label':'View', 'action':'view'},
-        {'label':'Security', 'action':'manage_access'},
-        )
-    
+    manage_options = (({'label':'View', 'action':'view'},) +
+                      SimpleItem.manage_options)
 
     security = ClassSecurityInfo()
 
@@ -142,40 +137,6 @@ class PortalContent(SimpleItem, DynamicType):
         attribute on the class. used for the Favorites content class.
         """
         return getattr(self, 'icon', '/misc_/OFSP/dtmldoc.gif')
-
-            
-    # Reviewing methods
-    # -----------------
-    
-    # Attributes:
-    #   'review_state'   indicates state of object,
-    #                    'published'|'private'|'pending'
-    #   'review_history' is a list of dicts which describes a
-    #                    history of reviewing actions
-    #                    
-    # Permissions:
-    #
-    # 'Review portal content'   permission to review an object for publishing
-    # 'Request review'          permission to request an object be published
-    
-    security.declarePrivate('getReviewState')
-    def getReviewState(self):
-        return self.review_state
-
-    security.declarePrivate('setReviewState')
-    def setReviewState(self, review_state, comment):
-        self.review_state = review_state
-        membershiptool = getToolByName(self, 'portal_membership')
-
-        rh = self.review_history
-        rh = rh + ({
-            'actor': membershiptool.getAuthenticatedMember().getUserName(),
-            'action': 'Made ' + review_state,
-            'review_state': review_state,
-            'time': DateTime(),
-            'comments': comment,
-            },)
-        self.review_history = rh
 
     # Cataloging methods
     # ------------------
@@ -211,18 +172,6 @@ class PortalContent(SimpleItem, DynamicType):
     # Contentish interface methods
     # ----------------------------
 
-    security.declarePrivate('listActions')
-    def listActions(self, info):
-        # Report toolbox actions applicable to all kinds of content
-        content_url = info.content_url
-        return (
-            {'name':'Status history',
-             'url': content_url + '/content_status_history',
-             'permissions': ['Request review', 'Review portal content'],
-             'category': 'object'
-             },
-            )
-
     def _index_html(self):
         '''
         Invokes the first customizable action.
@@ -231,11 +180,13 @@ class PortalContent(SimpleItem, DynamicType):
         if ti is not None:
             path = ti.getActionById('view', None)
             if path is not None:
-                return self.restrictedTraverse(path)
+                view = self.restrictedTraverse(path)
+                return view
             actions = ti.getActions()
             if actions:
                 path = actions[0]['action']
-                return self.restrictedTraverse(path)
+                view = self.restrictedTraverse(path)
+                return view
             raise 'Not Found', ('No default view defined for type "%s"'
                                 % ti.id)
         else:
@@ -247,6 +198,17 @@ class PortalContent(SimpleItem, DynamicType):
 
     security.declareProtected(CMFCorePermissions.View, 'view')
     view = index_html  # Necessary for catalog searches.
+
+    def asHTML(self):
+        '''
+        This is for when this object is used as an index_html
+        for a folder.
+        '''
+        view = self.view
+        if getattr(aq_base(view), 'isDocTemp', 0):
+            return apply(view, (self, self.REQUEST))
+        else:
+            return view()
 
 
 Globals.InitializeClass(PortalContent)

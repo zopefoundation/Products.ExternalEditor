@@ -102,20 +102,24 @@ import CMFCorePermissions
 
 class IndexableObjectWrapper:
 
-    def __init__(self, ob):
-        self.ob = ob
+    def __init__(self, vars, ob):
+        self.__vars = vars
+        self.__ob = ob
 
     def __getattr__(self, name):
-        return getattr(self.ob, name)
+        vars = self.__vars
+        if vars.has_key(name):
+            return vars[name]
+        return getattr(self.__ob, name)
 
-    def allowedRolesAndUsers(self, permission='View'):
+    def allowedRolesAndUsers(self):
         """
         Return a list of roles and users with View permission.
         Used by PortalCatalog to filter out items you're not allowed to see.
         """
-        ob = self.ob
+        ob = self.__ob
         allowed = {}
-        for r in rolesForPermissionOn(permission, ob):
+        for r in rolesForPermissionOn('View', ob):
             allowed[r] = 1
         localroles = mergedLocalRoles(ob)
         for user, roles in localroles.items():
@@ -141,9 +145,9 @@ class CatalogTool (UniqueObject, ZCatalog):
     def _initIndexes(self):
         # Reviewing indexes
         self._catalog.addIndex('review_state', 'FieldIndex')
+        # Content indexes
         self._catalog.addIndex('Date', 'FieldIndex')
         self._catalog.addIndex('allowedRolesAndUsers', 'KeywordIndex')
-        # Content indexes
         self._catalog.addIndex('Creator', 'FieldIndex')
         self._catalog.addIndex('Title', 'TextIndex')
         self._catalog.addIndex('Description', 'TextIndex')
@@ -177,7 +181,7 @@ class CatalogTool (UniqueObject, ZCatalog):
                                      ['Anonymous',
                                       'user:'+user.getUserName()]
         if not _checkPermission('Access inactive portal content', self):
-            if kw.has_key('Date') and None: #XXX
+            if kw.has_key('Date') and None:
                 if kw.has_key('Date_usage'):
                     kw['Date'] = min(kw['Date'])
                 kw['Date'] = [kw['Date'], DateTime()]
@@ -195,8 +199,14 @@ class CatalogTool (UniqueObject, ZCatalog):
         return join(ob.getPhysicalPath(), '/')
 
     def catalog_object(self, object, uid):
-        # Wraps the object with extra features just before cataloging.
-        w = IndexableObjectWrapper(object)
+        # Wraps the object with workflow and accessibility
+        # information just before cataloging.
+        wf = getattr(self, 'portal_workflow', None)
+        if wf is not None:
+            vars = wf.getCatalogVariablesFor(object)
+        else:
+            vars = {}
+        w = IndexableObjectWrapper(vars, object)
         ZCatalog.catalog_object(self, w, uid)
 
     security.declarePrivate('indexObject')
@@ -218,8 +228,9 @@ class CatalogTool (UniqueObject, ZCatalog):
         '''Update catalog after object data has changed.
         '''
         url = self.__url(object)
-        self.uncatalog_object(url)
+        ## Zope 2.3 ZCatalog is supposed to work better if
+        ## you don't uncatalog_object() when reindexing.
+        # self.uncatalog_object(url)
         self.catalog_object(object, url)
-
 
 InitializeClass(CatalogTool)

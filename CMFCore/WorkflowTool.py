@@ -89,178 +89,286 @@ $Id$
 __version__='$Revision$'[11:-2]
 
 
+import sys
 from utils import UniqueObject, _checkPermission, getToolByName
 from OFS.SimpleItem import SimpleItem
-from Globals import InitializeClass
-from AccessControl.Permission import Permission
+from Globals import InitializeClass, PersistentMapping
 from AccessControl import ClassSecurityInfo
+from Acquisition import aq_base
+from DefaultWorkflow import DefaultWorkflowDefinition
+from WorkflowCore import WorkflowException
+
+
+_marker = []  # Create a new marker object.
 
 
 class WorkflowTool (UniqueObject, SimpleItem):
-    # This tool accesses and changes the workflow state of content.
-    # This default implementation assumes there is a review_state
-    # attribute on all content objects.  This assumption can be
-    # changed in subclasses of WorkflowTool.
+    '''
+    This tool accesses and changes the workflow state of content.
+    '''
     id = 'portal_workflow'
     meta_type = 'CMF Workflow Tool'
 
+    _chains_by_type = None  # PersistentMapping
+    _default_chain = ('default_workflow',)
+    default_workflow = DefaultWorkflowDefinition()
+
     security = ClassSecurityInfo()
 
-    security.declarePublic('getStateFor')
-    def getStateFor(self, content):
-        '''Returns the current workflow state of content.  State
-        is implemented as a mapping object.
+    security.declarePrivate('getWorkflowById')
+    def getWorkflowById(self, wf_id):
+        wf = getattr(self, wf_id, None)
+        if getattr(wf, '_isAWorkflow', 0):
+            return wf
+        else:
+            return None
+
+    security.declarePrivate('getDefaultChainFor')
+    def getDefaultChainFor(self, ob):
+        if getattr(ob, '_isPortalContent', 0):
+            # Apply a default workflow to portal content.
+            return self._default_chain
+
+    security.declarePrivate('getChainFor')
+    def getChainFor(self, ob):
         '''
-        return content.getReviewState()
-
-    security.declarePublic('listAllowableTransitionsFor')
-    def listAllowableTransitionsFor(self, content):
-        '''Returns the list of transition names which are available
-        to the current user from the state of content.
+        Returns the chain that applies to the given object.
         '''
-        # Note that (1) this default implementation allows
-        # a transition from any review state to any other state and
-        # (2) the transition names are the same as the new state names.
-        # Neither of these assumptions is necessary in different
-        # implementations of workflow.
-        state = content.getReviewState()
-        r = []
-        if state == 'private':
-            if _checkPermission('Modify portal content', content):
-                r.append('private')
-            if _checkPermission('Request review', content):
-                r.append('pending')
-            if _checkPermission('Review portal content', content):
-                r.append('published')
-        elif state == 'pending':
-            if _checkPermission('Modify portal content', content):
-                r.append('private')
-                r.append('pending')
-            if _checkPermission('Review portal content', content):
-                r.append('published')
-        elif state == 'published':
-            if _checkPermission('Modify portal content', content):
-                r.append('private')
-                r.append('pending')
-                r.append('published')
-        return tuple(r)
+        cbt = self._chains_by_type
+        if hasattr(aq_base(ob), '_getPortalTypeName'):
+            pt = ob._getPortalTypeName()
+        else:
+            pt = ob.meta_type  # Use a common Zope idiom.
+        chain = None
+        if cbt is not None:
+            chain = cbt.get(pt, None)
+        if chain is None:
+            chain = self.getDefaultChainFor(ob)
+            if chain is None:
+                return ()
+        return chain
 
-    security.declarePublic('changeStateFor')
-    def changeStateFor(self, content, transition, comment, **kw):
-        '''Executes the given transition name on content with the
-        keyword arguments as modifiers and the comment as a history
-        attribute. Returns content, which may be in a new location.
-        Remember there are no implicit security assertions;
-        implementations will need to add code that calls checkPermission.
+    security.declarePrivate('getWorkflowIds')
+    def getWorkflowIds(self):
         '''
-        if transition not in self.listAllowableTransitionsFor(content):
-            raise 'WorkflowException', 'Specified transition is not allowed.'
-        content.setReviewState(transition, comment)
-
-        set = self.getPermissionUpdatesFor(content)
-        for role, grant, revoke in set:
-            for p in content.ac_inherited_permissions(1):
-                name, value = p[:2]
-                p=Permission(name, value, content)
-                if name in grant:
-                    p.setRole(role, 1)
-                elif name in revoke:
-                    p.setRole(role, 0)
-
-        content.reindexObject()
-        return content
-
-    security.declarePrivate('getPermissionUpdatesFor')
-    def getPermissionUpdatesFor(self, content):
-        '''Returns a list of roles and the permissions that
-        should be granted or revoked.'''
-        review_state = content.getReviewState()
-        if content.review_state == 'private':
-            # Revoke 'View' from Anonymous and Reviewer
-            set = (
-                ('Anonymous', (), ('View',)),
-                ('Reviewer', (), ('View',)),
-                )
-        elif content.review_state == 'pending':
-            # Give Reviewer 'View', revoke from Anonymous
-            set = (
-                ('Anonymous', (), ('View',)),
-                ('Reviewer', ('View',), ()),
-                )
-        elif content.review_state == 'published':
-            # Give Anonymous 'View'
-            set = (
-                ('Anonymous', ('View',), ()),
-                )
-        return set
-
-    security.declarePublic('listAddableTypesFor')
-    def listAddableTypesFor(self, container):
-        '''Lists the meta types that are allowed to be added by
-        the user to the given container.
+        Returns the list of workflow ids.
         '''
-        # Not implemented.  Is this the right way to add new content?
-        pass
+        # To do...
+        return self._default_chain
+
+    security.declarePrivate('getWorkflowsFor')
+    def getWorkflowsFor(self, ob):
+        '''
+        Finds the Workflow objects for the type of the given object.
+        '''
+        res = []
+        for wf_id in self.getChainFor(ob):
+            wf = self.getWorkflowById(wf_id)
+            if wf is not None:
+                res.append(wf)
+        return res
+
+    security.declarePrivate('getCatalogVariablesFor')
+    def getCatalogVariablesFor(self, ob):
+        '''
+        Invoked by portal_catalog.  Allows workflows
+        to add variables to the catalog based on workflow status,
+        making it possible to implement queues.
+        Returns a mapping containing the catalog variables
+        that apply to ob.
+        '''
+        wfs = self.getWorkflowsFor(ob)
+        if wfs is None:
+            return None
+        # Iterate through the workflows backwards so that
+        # earlier workflows can override later workflows.
+        wfs.reverse()
+        vars = {}
+        for wf in wfs:
+            v = wf.getCatalogVariablesFor(ob)
+            if v is not None:
+                vars.update(v)
+        return vars
 
     security.declarePrivate('listActions')
     def listActions(self, info):
-        actions = None
-        # The following operation is quite expensive.
-        # We don't need to perform it if the user
-        # doesn't have the required permission.
-        # Note we make the assumption that anonymous users aren't allowed
-        # to review content; this might need to be configurable.
-        if not info.isAnonymous:
-            content = info.content
-            content_url = info.content_url
-            content_creator = content.Creator()
-            membership = getToolByName(self, 'portal_membership')
-            current_user = membership.getAuthenticatedMember().getUserName()
-            review_state = getattr(content, 'review_state', None)
-            actions = []
+        '''
+        Invoked by the portal_actions tool.  Allows workflows to
+        include actions to be displayed in the actions box.
+        Object actions are supplied by workflows that apply
+        to the object.  Global actions are supplied by all
+        workflows.
+        Returns the actions to be displayed to the user.
+        '''
+        chain = self.getChainFor(info.content)
+        did = {}
+        actions = []
+        for wf_id in chain:
+            did[wf_id] = 1
+            wf = self.getWorkflowById(wf_id)
+            if wf is not None:
+                a = wf.listObjectActions(info)
+                if a is not None:
+                    actions.extend(a)
+                a = wf.listGlobalActions(info)
+                if a is not None:
+                    actions.extend(a)
 
-            if review_state == 'private':
-                actions.append({'name': 'Submit',
-                                'url': content_url + '/content_submit_form',
-                                'permission': 'Request review',
-                                'category': 'object' })
-
-            if review_state == 'pending':
-                if _checkPermission('Review portal content', info.portal):
-                    actions.extend([{'name': 'Publish',
-                                     'url': content_url + '/content_publish_form',
-                                     'permission': 'Review portal content',
-                                     'category': 'object' },
-                                    {'name': 'Reject',
-                                     'url': content_url + '/content_reject_form',
-                                     'permission': 'Review portal content',
-                                     'category': 'object' }])
-
-                if content_creator == current_user:
-                    actions.append({'name': 'Retract',
-                                    'url': content_url + '/content_retract_form',
-                                    'permission': 'Request review',
-                                    'category': 'object' })
-
-            if (review_state == 'published' and content_creator == current_user):
-                actions.append({'name': 'Retract',
-                                'url': content_url + '/content_retract_form',
-                                'permission': 'Request review',
-                                'category': 'object' })
-
-            catalog = getToolByName(self, 'portal_catalog', None)
-            if catalog is not None:
-                pending = len(catalog.searchResults(
-                    review_state='pending'))
-                if pending > 0:
-                    actions.append(
-                        {'name': 'Pending review (%d)' % pending,
-                         'url': info.portal_url +
-                         '/search?review_state=pending',
-                         'permissions': ['Review portal content'],
-                         'category': 'global'},
-                        )
+        wf_ids = self.getWorkflowIds()
+        for wf_id in wf_ids:
+            if not did.has_key(wf_id):
+                wf = self.getWorkflowById(wf_id)
+                if wf is not None:
+                    a = wf.listGlobalActions(info)
+                    if a is not None:
+                        actions.extend(a)
         return actions
 
+    security.declarePublic('doActionFor')
+    def doActionFor(self, ob, action, wf_id=None, *args, **kw):
+        '''
+        Invoked by user interface code.
+        Allows the user to request a workflow action.  The workflow object
+        must perform its own security checks.
+        '''
+        if wf_id is None:
+            wfs = self.getWorkflowsFor(ob)
+            if wfs is None:
+                raise WorkflowException('No workflows found.')
+            found = 0
+            for wf in wfs:
+                if wf.isActionSupported(ob, action):
+                    found = 1
+                    break
+            if not found:
+                raise WorkflowException(
+                    'No workflow provides the "%s" action.' % action)
+        else:
+            wf = self.getWorkflowById(wf_id)
+            if wf is None:
+                raise WorkflowException(
+                    'Requested workflow definition not found.')
+        return apply(wf.doActionFor, (ob, action) + args, kw)
+
+    security.declarePublic('getInfoFor')
+    def getInfoFor(self, ob, name, default=_marker, wf_id=None, *args, **kw):
+        '''
+        Invoked by user interface code.  Allows the user to request
+        information provided by the workflow.  The workflow object
+        must perform its own security checks.
+        '''
+        if wf_id is None:
+            wfs = self.getWorkflowsFor(ob)
+            if wfs is None:
+                if default is _marker:
+                    raise WorkflowException('No workflows found.')
+                else:
+                    return default
+            found = 0
+            for wf in wfs:
+                if wf.isInfoSupported(ob, name):
+                    found = 1
+                    break
+            if not found:
+                if default is _marker:
+                    raise WorkflowException(
+                        'No workflow provides "%s" information.' % name)
+                else:
+                    return default
+        else:
+            wf = self.getWorkflowById(wf_id)
+            if wf is None:
+                if default is _marker:
+                    raise WorkflowException(
+                        'Requested workflow definition not found.')
+                else:
+                    return default
+        res = apply(wf.getInfoFor, (ob, name, default) + args, kw)
+        if res is _marker:
+            raise WorkflowException('Could not get info: %s' % name)
+        return res
+
+    security.declarePrivate('notifyCreated')
+    def notifyCreated(self, ob):
+        '''
+        Notifies all applicable workflows after an object has been created
+        and put in its new place.
+        '''
+        wfs = self.getWorkflowsFor(ob)
+        for wf in wfs:
+            wf.notifyCreated(ob)
+
+    security.declarePrivate('notifyBefore')
+    def notifyBefore(self, ob, action):
+        '''
+        Notifies all applicable workflows of an action before it happens,
+        allowing veto by exception.  Unless an exception is thrown, either
+        a notifySuccess() or notifyException() can be expected later on.
+        The action usually corresponds to a method name.
+        '''
+        wfs = self.getWorkflowsFor(ob)
+        for wf in wfs:
+            wf.notifyBefore(ob, action)
+
+    security.declarePrivate('notifySuccess')
+    def notifySuccess(self, ob, action, result=None):
+        '''
+        Notifies all applicable workflows that an action has taken place.
+        '''
+        wfs = self.getWorkflowsFor(ob)
+        for wf in wfs:
+            wf.notifySuccess(ob, action, result)
+
+    security.declarePrivate('notifyException')
+    def notifyException(self, ob, action, exc):
+        '''
+        Notifies all applicable workflows that an action failed.
+        '''
+        wfs = self.getWorkflowsFor(ob)
+        for wf in wfs:
+            wf.notifyException(ob, action, exc)
+
+    security.declarePrivate('getHistoryOf')
+    def getHistoryOf(self, wf_id, ob):
+        '''
+        Invoked by workflow definitions.  Returns the history
+        of an object.
+        '''
+        if hasattr(aq_base(ob), 'workflow_history'):
+            wfh = ob.workflow_history
+            return wfh.get(wf_id, None)
+        return ()
+
+    security.declarePrivate('getStatusOf')
+    def getStatusOf(self, wf_id, ob):
+        '''
+        Invoked by workflow definitions.  Returns the last element of a
+        history.
+        '''
+        wfh = self.getHistoryOf(wf_id, ob)
+        if wfh:
+            return wfh[-1]
+        return None
+
+    security.declarePrivate('setStatusOf')
+    def setStatusOf(self, wf_id, ob, status):
+        '''
+        Invoked by workflow definitions.  Appends to the workflow history.
+        '''
+        wfh = None
+        has_history = 0
+        if hasattr(aq_base(ob), 'workflow_history'):
+            history = ob.workflow_history
+            if history is not None:
+                has_history = 1
+                wfh = history.get(wf_id, None)
+                if wfh is not None:
+                    wfh = list(wfh)
+        if not wfh:
+            wfh = []
+        wfh.append(status)
+        if not has_history:
+            ob.workflow_history = PersistentMapping()
+        ob.workflow_history[wf_id] = tuple(wfh)
 
 InitializeClass(WorkflowTool)
