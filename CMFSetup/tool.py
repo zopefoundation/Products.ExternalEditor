@@ -23,6 +23,23 @@ from registry import ExportStepRegistry
 
 from utils import _wwwdir
 
+
+def exportStepRegistries( context ):
+
+    """ Built-in handler for exporting import / export step registries.
+    """
+    site = context.getSite()
+    tool = getToolByName( site, 'portal_setup' )
+
+    import_steps_xml = tool.getImportStepRegistry().generateXML()
+    context.writeDataFile( 'import_steps.xml', import_steps_xml, 'text/xml' )
+
+    export_steps_xml = tool.getExportStepRegistry().generateXML()
+    context.writeDataFile( 'export_steps.xml', export_steps_xml, 'text/xml' )
+
+    return 'Step registries exported'
+
+
 class SetupTool( UniqueObject, Folder ):
 
     """ Profile-based site configuration manager.
@@ -465,19 +482,3 @@ class SetupTool( UniqueObject, Folder ):
                }
 
 InitializeClass( SetupTool )
-
-
-def exportStepRegistries( context ):
-
-    """ Built-in handler for exporting import / export step registries.
-    """
-    site = context.getSite()
-    tool = getToolByName( site, 'portal_setup' )
-
-    import_steps_xml = tool.getImportStepRegistry().generateXML()
-    context.writeDataFile( 'import_steps.xml', import_steps_xml, 'text/xml' )
-
-    export_steps_xml = tool.getExportStepRegistry().generateXML()
-    context.writeDataFile( 'export_steps.xml', export_steps_xml, 'text/xml' )
-
-    return 'Step registries exported'
