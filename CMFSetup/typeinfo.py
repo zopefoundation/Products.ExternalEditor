@@ -96,7 +96,7 @@ class TypeInfoConfigurator( Implicit ):
         """
         typestool = getToolByName( self._site, 'portal_types' )
         try:
-            ti = typestool.getTypeInfo( type_id )
+            ti = typestool.getTypeInfo( str( type_id ) ) # gTI expects ASCII?
         except KeyError:
             raise ValueError, 'Unknown type: %s' % type_id
         else:
@@ -114,10 +114,10 @@ class TypeInfoConfigurator( Implicit ):
         result = []
         typestool = getToolByName( self._site, 'portal_types' )
 
-        ids = typestool.listContentTypes()
+        type_ids = typestool.listContentTypes()
 
-        for id in ids:
-            mapping = self._makeTIMapping( typestool.getTypeInfo( id ) )
+        for type_id in type_ids:
+            mapping = self.getTypeInfo( type_id )
             result.append( mapping )
 
         return result

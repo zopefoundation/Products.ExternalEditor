@@ -2,6 +2,7 @@
 """
 import os
 import shutil
+import time
 from tarfile import TarFile
 
 from Products.CMFCore.tests.base.testcase import SecurityRequestTest
@@ -91,7 +92,7 @@ class FilesystemTestBase( SecurityRequestTest ):
 
 class TarballTester( DOMComparator ):
 
-    def _verifyTarballContents( self, fileish, toc_list ):
+    def _verifyTarballContents( self, fileish, toc_list, when=None ):
 
         fileish.seek( 0L )
         tarfile = TarFile.open( 'foo.tar.gz', fileobj=fileish, mode='r:gz' )
@@ -102,6 +103,10 @@ class TarballTester( DOMComparator ):
         self.assertEqual( len( items ), len( toc_list ) )
         for i in range( len( items ) ):
             self.assertEqual( items[ i ], toc_list[ i ] )
+
+        if when is not None:
+            for tarinfo in tarfile:
+                self.failIf( tarinfo.mtime < when )
 
     def _verifyTarballEntry( self, fileish, entry_name, data ):
 

@@ -5,6 +5,7 @@ $Id$
 
 import unittest
 import os
+import time
 from StringIO import StringIO
 
 from OFS.Folder import Folder
@@ -347,6 +348,7 @@ class TarballExportContextTests( FilesystemTestBase
     def test_writeDataFile_simple( self ):
 
         from string import printable
+        now = long( time.time() )
 
         site = DummySite( 'site' ).__of__( self.root )
         ctx = self._getTargetClass()( site )
@@ -355,7 +357,7 @@ class TarballExportContextTests( FilesystemTestBase
 
         fileish = StringIO( ctx.getArchive() )
 
-        self._verifyTarballContents( fileish, [ 'foo.txt' ] )
+        self._verifyTarballContents( fileish, [ 'foo.txt' ], now )
         self._verifyTarballEntry( fileish, 'foo.txt', printable )
 
     def test_writeDataFile_multiple( self ):

@@ -202,6 +202,7 @@ class TarballExportContext( Implicit ):
         stream = StringIO( text )
         info = TarInfo( filename )
         info.size = len( text )
+        info.mtime = time.time()
         self._archive.addfile( info, stream )
 
     security.declareProtected( ManagePortal, 'getArchive' )
