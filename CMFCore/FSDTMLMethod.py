@@ -196,7 +196,7 @@ class FSDTMLMethod(RestrictedDTML, FSObject, Globals.HTML):
         return result
 
     # Zope 2.3.x way:
-    def validate(self, inst, parent, name, value, md):
+    def validate(self, inst, parent, name, value, md=None):
         return getSecurityManager().validate(inst, parent, name, value)
 
     security.declareProtected(FTPAccess, 'manage_FTPget')
