@@ -38,6 +38,9 @@ class FTUser( Acquisition.Implicit ):
     def allowed( self, object, object_roles=None ):
         return 1
 
+    def getRoles( self ):
+        return ( 'Manager', )
+
 def fakeSecurity( site ):
     newSecurityManager( None, FTUser().__of__( site.acl_users ) )
 
