@@ -17,31 +17,34 @@
 
 </div>
 
-<div metal:fill-slot="main"
-     tal:define="transcript here/get_transcript">
+<div metal:fill-slot="main">
 
-  <!-- lotsa stuff will appear here -->
+  <div metal:define-macro="transcript">
 
-  <table>
-    <tr>
-      <th colspan="2" align="left">
-         Transcript of Issue
-           <span tal:replace="here/id">ID</span>
-           (<em><span tal:replace="here/Title">TITLE</span></em>)
-      </th>
-    </tr>
-    <tr>
-      <td colspan="2">
-        <table border="1">
-          <tr> <td>
-         <span tal:replace="structure
-                   python: transcript.CookedBody(stx_level=3)">TRANSCRIPT
-         </span>
-          </td> </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
+    <table tal:define="transcript here/get_transcript">
+
+      <tr>
+        <th colspan="2" align="left">
+           Transcript of Issue
+             <span tal:replace="here/id">ID</span>
+             (<em><span tal:replace="here/Title">TITLE</span></em>)
+        </th>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <table border="1">
+            <tr> <td>
+           <span tal:replace="structure
+                     python: transcript.CookedBody(stx_level=3)">TRANSCRIPT
+           </span>
+            </td> </tr>
+          </table>
+        </td>
+      </tr>
+
+    </table>
+
+  </div>
 
 </div>
 
