@@ -253,6 +253,7 @@ class CachingPolicyManagerTests( unittest.TestCase ):
         headers = mgr.getHTTPCachingHeaders( content=DummyContent(self._epoch)
                                            , view_method='foo_view'
                                            , keywords={}
+                                           , time=self._epoch
                                            )
         self.assertEqual( len( headers ), 0 )
 
@@ -268,6 +269,7 @@ class CachingPolicyManagerTests( unittest.TestCase ):
         headers = mgr.getHTTPCachingHeaders( content=DummyContent(self._epoch)
                                            , view_method='foo_view'
                                            , keywords={}
+                                           , time=self._epoch
                                            )
         self.assertEqual( len( headers ), 3 )
         self.assertEqual( headers[0][0].lower() , 'last-modified' )
@@ -321,6 +323,7 @@ class CachingPolicyManagerTests( unittest.TestCase ):
         headers = mgr.getHTTPCachingHeaders( content=DummyContent(self._epoch)
                                            , view_method='foo_view'
                                            , keywords={}
+                                           , time=self._epoch
                                            )
         self.assertEqual( len( headers ), 0 )
 
@@ -330,6 +333,7 @@ class CachingPolicyManagerTests( unittest.TestCase ):
         headers = mgr.getHTTPCachingHeaders( content=DummyContent(self._epoch)
                                            , view_method='foo_view'
                                            , keywords={ 'foo' : 1 }
+                                           , time=self._epoch
                                            )
         self.assertEqual( len( headers ), 1 )
         self.assertEqual( headers[0][0].lower(), 'last-modified' )
@@ -343,6 +347,7 @@ class CachingPolicyManagerTests( unittest.TestCase ):
         headers = mgr.getHTTPCachingHeaders( content=DummyContent(self._epoch)
                                            , view_method='foo_view'
                                            , keywords={ 'bar' : 1 }
+                                           , time=self._epoch
                                            )
         self.assertEqual( len( headers ), 3 )
         self.assertEqual( headers[0][0].lower() , 'last-modified' )
@@ -361,6 +366,7 @@ class CachingPolicyManagerTests( unittest.TestCase ):
         headers = mgr.getHTTPCachingHeaders( content=DummyContent(self._epoch)
                                            , view_method='foo_view'
                                            , keywords={ 'baz' : 1 }
+                                           , time=self._epoch
                                            )
         self.assertEqual( len( headers ), 3 )
         self.assertEqual( headers[0][0].lower() , 'last-modified' )
@@ -382,6 +388,7 @@ class CachingPolicyManagerTests( unittest.TestCase ):
         headers = mgr.getHTTPCachingHeaders( content=DummyContent(self._epoch)
                                            , view_method='foo_view'
                                            , keywords={ 'qux' : 1 }
+                                           , time=self._epoch
                                            )
         self.assertEqual( len( headers ), 3 )
         self.assertEqual( headers[0][0].lower() , 'last-modified' )
