@@ -1,9 +1,9 @@
 <tal:page i18n:domain="cmf_default"
-   tal:define="mtool context/portal_membership;
+   tal:define="atool context/portal_actions;
                ptool context/portal_properties;
                utool nocall:context/portal_url;
                member_email options/member/email | string:foo@example.org;
-               login_url python:mtool.getActionInfo('user/login')['url']"
+               login_url python:atool.getActionInfo('user/login')['url']"
 >Subject: <tal:span i18n:translate=""><tal:span i18n:name="portal_title"
     tal:content="ptool/title" />: Your Membership Information</tal:span>
 From: <tal:span

@@ -3,13 +3,13 @@
       metal:use-macro="here/main_template/macros/master">
 <body>
 <div metal:fill-slot="main" i18n:domain="cmf_default"
-   tal:define="mtool here/portal_membership">
+   tal:define="atool here/portal_actions">
 <div class="Desktop">
 
 <h2 i18n:translate="">Log in</h2>
 
 <form action="" method="post"
-   tal:attributes="action python: mtool.getActionInfo(
+   tal:attributes="action python: atool.getActionInfo(
                                                     'user/logged_in')['url']">
 
 <!-- ****** Enable the automatic redirect ***** -->
