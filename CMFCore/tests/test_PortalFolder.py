@@ -15,10 +15,10 @@ from Products.CMFCore.PortalFolder import ContentFilter
 from Products.CMFCore.PortalFolder import PortalFolder
 from Products.CMFCore.tests.base.dummy import DummyContent
 from Products.CMFCore.tests.base.dummy import DummyFactory
-from Products.CMFCore.tests.base.dummy import DummyFTI
 from Products.CMFCore.tests.base.security import OmnipotentUser
 from Products.CMFCore.tests.base.testcase import newSecurityManager
 from Products.CMFCore.tests.base.testcase import SecurityTest
+from Products.CMFCore.tests.base.tidata import FTIDATA_DUMMY
 from Products.CMFCore.tests.base.utils import has_path
 from Products.CMFCore.TypesTool import FactoryTypeInformation as FTI
 from Products.CMFCore.TypesTool import TypesTool
@@ -45,7 +45,8 @@ class PortalFolderFactoryTests( SecurityTest ):
                                   , filter_content_types=0
                                   )
                              )
-        types_tool._setObject( 'Dummy Content', DummyFTI )
+        fti = FTIDATA_DUMMY[0].copy()
+        types_tool._setObject( 'Dummy Content', FTI(**fti) )
 
     def _makeOne( self, id ):
         return PortalFolder( id ).__of__( self.root )
@@ -308,7 +309,8 @@ class PortalFolderTests( SecurityTest ):
 
         self.root._setObject( 'portal_types', TypesTool() )
         types_tool = self.root.portal_types
-        types_tool._setObject( 'Dummy Content', DummyFTI )
+        fti = FTIDATA_DUMMY[0].copy()
+        types_tool._setObject( 'Dummy Content', FTI(**fti) )
 
         self.root._setObject( 'portal_catalog', CatalogTool() )
         catalog = self.root.portal_catalog

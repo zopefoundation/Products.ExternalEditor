@@ -15,11 +15,12 @@ except ImportError:
 
 from Products.CMFCore.CatalogTool import CatalogTool
 from Products.CMFCore.tests.base.dummy import DummyContent
-from Products.CMFCore.tests.base.dummy import DummyFTI
 from Products.CMFCore.tests.base.dummy import DummySite
 from Products.CMFCore.tests.base.dummy import DummyTool
 from Products.CMFCore.tests.base.testcase import SecurityTest
+from Products.CMFCore.tests.base.tidata import FTIDATA_DUMMY
 from Products.CMFCore.tests.base.utils import has_path
+from Products.CMFCore.TypesTool import FactoryTypeInformation as FTI
 from Products.CMFCore.TypesTool import TypesTool
 from Products.CMFDefault.DiscussionItem import DiscussionItem
 from Products.CMFDefault.DiscussionItem import DiscussionItemContainer
@@ -85,7 +86,8 @@ class DiscussionTests( SecurityTest ):
 
         del test.talkback
         del test.allow_discussion
-        ttool._setObject( 'Dummy Content', DummyFTI )
+        fti = FTIDATA_DUMMY[0].copy()
+        ttool._setObject( 'Dummy Content', FTI(**fti) )
         self.assertRaises(DiscussionNotAllowed, dtool.getDiscussionFor, test)
         assert getattr( test, 'talkback', None ) is None
 

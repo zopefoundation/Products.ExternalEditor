@@ -121,27 +121,6 @@ class DummyFactory:
     __allow_access_to_unprotected_subobjects__ = { 'addFoo' : 1 }
 
 
-DummyFTI = FTI( 'Dummy Content'
-              , title='Dummy Content Title'
-              , meta_type=DummyContent.meta_type
-              , product='FooProduct'
-              , factory='addFoo'
-              , actions= ( { 'name'          : 'View'
-                           , 'action'        : 'string:view'
-                           , 'permissions'   : ( 'View', )
-                           }
-                         , { 'name'          : 'View2'
-                           , 'action'        : 'string:view2'
-                           , 'permissions'   : ( 'View', )
-                           }
-                         , { 'name'          : 'Edit'
-                           , 'action'        : 'string:edit'
-                           , 'permissions'   : ( 'forbidden permission',)
-                           }
-                         )
-              )
-
-
 class DummyFolder(DummyObject):
     """
         Dummy Container for testing
