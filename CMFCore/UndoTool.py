@@ -1,26 +1,29 @@
 ##############################################################################
 #
-# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+# Copyright (c) 2001-2003 Zope Corporation and Contributors.
+# All Rights Reserved.
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """ Basic undo tool.
 
 $Id$
 """
 
-from utils import UniqueObject, _getAuthenticatedUser, _checkPermission
-from utils import getToolByName, _dtmldir
 from OFS.SimpleItem import SimpleItem
 from Globals import InitializeClass, DTMLFile
-from string import split
 from AccessControl import ClassSecurityInfo, Unauthorized
+
+from utils import _checkPermission
+from utils import _dtmldir
+from utils import _getAuthenticatedUser
+from utils import UniqueObject
 from Expression import Expression
 from ActionInformation import ActionInformation
 from ActionProviderBase import ActionProviderBase
@@ -86,7 +89,7 @@ class UndoTool (UniqueObject, SimpleItem, ActionProviderBase):
             user_id = _getAuthenticatedUser(self).getId()
             transactions = filter(
                 lambda record, user_id=user_id:
-                split(record['user_name'])[-1] == user_id,
+                record['user_name'].split()[-1] == user_id,
                 transactions
                 )
         return transactions

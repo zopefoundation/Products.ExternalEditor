@@ -1,23 +1,22 @@
 ##############################################################################
 #
-# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+# Copyright (c) 2001-2003 Zope Corporation and Contributors.
+# All Rights Reserved.
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
-
 """ Basic workflow tool.
 
 $Id$
 """
 
 import sys
-from string import join, split, replace, strip
 
 from OFS.Folder import Folder
 from Globals import InitializeClass, PersistentMapping, DTMLFile
@@ -30,7 +29,6 @@ from WorkflowCore import WorkflowException, ObjectDeleted, ObjectMoved
 from interfaces.portal_workflow import portal_workflow
 
 from utils import UniqueObject
-from utils import _checkPermission
 from utils import getToolByName
 from utils import _dtmldir
 
@@ -147,7 +145,7 @@ class WorkflowTool (UniqueObject, Folder):
             if title == id:
                 title = None
             if cbt is not None and cbt.has_key(id):
-                chain = join(cbt[id], ', ')
+                chain = ', '.join(cbt[id])
             else:
                 chain = '(Default)'
             types_info.append({'id': id,
@@ -155,7 +153,7 @@ class WorkflowTool (UniqueObject, Folder):
                                'chain': chain})
         return self._manage_selectWorkflows(
             REQUEST,
-            default_chain=join(self._default_chain, ', '),
+            default_chain=', '.join(self._default_chain),
             types_info=types_info,
             management_view='Workflows',
             manage_tabs_message=manage_tabs_message)
@@ -175,15 +173,15 @@ class WorkflowTool (UniqueObject, Folder):
         for t in ti:
             id = t.getId()
             field_name = 'chain_%s' % id
-            chain = strip(props.get(field_name, '(Default)'))
+            chain = props.get(field_name, '(Default)').strip()
             if chain == '(Default)':
                 # Remove from cbt.
                 if cbt.has_key(id):
                     del cbt[id]
             else:
-                chain = replace(chain, ',', ' ')
+                chain = chain.replace(',', ' ')
                 ids = []
-                for wf_id in split(chain, ' '):
+                for wf_id in chain.split(' '):
                     if wf_id:
                         if not self.getWorkflowById(wf_id):
                             raise ValueError, (
@@ -191,9 +189,9 @@ class WorkflowTool (UniqueObject, Folder):
                         ids.append(wf_id)
                 cbt[id] = tuple(ids)
         # Set up the default chain.
-        default_chain = replace(default_chain, ',', ' ')
+        default_chain = default_chain.replace(',', ' ')
         ids = []
-        for wf_id in split(default_chain, ' '):
+        for wf_id in default_chain.split(' '):
             if wf_id:
                 if not self.getWorkflowById(wf_id):
                     raise ValueError, (
@@ -450,9 +448,9 @@ class WorkflowTool (UniqueObject, Folder):
 
         """ Set the default chain for this tool
         """
-        default_chain = replace(default_chain, ',', ' ')
+        default_chain = default_chain.replace(',', ' ')
         ids = []
-        for wf_id in split(default_chain, ' '):
+        for wf_id in default_chain.split(' '):
             if wf_id:
                 if not self.getWorkflowById(wf_id):
                     raise ValueError, ( '"%s" is not a workflow ID.' % wf_id)
@@ -470,7 +468,7 @@ class WorkflowTool (UniqueObject, Folder):
             self._chains_by_type = cbt = PersistentMapping()
 
         if type(chain) is type(''):
-            chain = map(strip, split(chain,','))
+            chain = map( lambda x: x.strip(), chain.split(',') )
 
         ti = self._listTypeInfo()
         for t in ti:
