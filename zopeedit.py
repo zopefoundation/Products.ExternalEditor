@@ -262,7 +262,7 @@ class ExternalEditor:
 
                 if editor is None:
                     try:
-                        nil, editor = FindExecutable(self.body_file, '')
+                        nil, editor = FindExecutable(self.content_file, '')
                     except pywintypes.error:
                         pass
             

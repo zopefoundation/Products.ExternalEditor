@@ -1,5 +1,12 @@
 External Editor Change Log
 
+    - Fixed Windows "body_file" bug.
+
+    - Added binary build support for Windows using py2exe and Inno setup.
+
+    - Fixed Windows config file locator. It now looks in the program directory
+      and then the user's home directory (if specified)
+
     - Fixed bug in Windows registry editor lookup.
 
   6/16/02 - 0.3 Release
