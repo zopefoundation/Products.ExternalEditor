@@ -1,14 +1,14 @@
 ##############################################################################
 #
 # Copyright (c) 2003 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """ Map CMF actions to icons, for ease of building icon-centric toolbars.
 
@@ -26,8 +26,8 @@ from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from Products.CMFCore.Expression import Expression
 from Products.CMFCore.utils import UniqueObject
 
+from permissions import ManagePortal
 from permissions import View
-from permissions import ManageSite
 
 _wwwdir = os.path.join( package_home( globals() ), 'www' )
 
@@ -94,14 +94,14 @@ class ActionIcon( SimpleItem ):
 
         return self._icon_expr( context )
 
-    security.declareProtected( ManageSite, 'updateIconExpression' )
+    security.declareProtected( ManagePortal, 'updateIconExpression' )
     def updateIconExpression( self, icon_expr_text ):
 
         """ Mutate icon expression. """
         self._icon_expr_text = icon_expr_text
 
         if not ':' in icon_expr_text: # default to 'string:' type
-            icon_expr_text = 'string:%s' % icon_expr_text 
+            icon_expr_text = 'string:%s' % icon_expr_text
 
         self._icon_expr = Expression( icon_expr_text )
 
@@ -125,11 +125,11 @@ class ActionIconsTool( UniqueObject, SimpleItem ):
     #
     #   Accessors
     #
-    security.declareProtected( ManageSite, 'listActionIcons' )
+    security.declareProtected( ManagePortal, 'listActionIcons' )
     def listActionIcons( self ):
 
         """ Return a sequence of mappings for action icons
-        
+
         o Mappings are in the form: ( category, action ) -> icon,
           where category and action are strings and icon is an ActionIcon
           instance.
@@ -150,7 +150,7 @@ class ActionIconsTool( UniqueObject, SimpleItem ):
         ai = self._lookup[ ( category, action_id ) ]
         return ( ai.getTitle()
                , ai.getPriority()
-               , ai.getIconURL( context ) 
+               , ai.getIconURL( context )
                )
 
     security.declareProtected( View, 'queryActionInfo' )
@@ -168,7 +168,7 @@ class ActionIconsTool( UniqueObject, SimpleItem ):
         ai = self._lookup.get( ( category, action_id ) )
         return ai and ( ai.getTitle()
                       , ai.getPriority()
-                      , ai.getIconURL( context ) 
+                      , ai.getIconURL( context )
                       ) or default
 
     security.declareProtected( View, 'getActionIcon' )
@@ -181,7 +181,7 @@ class ActionIconsTool( UniqueObject, SimpleItem ):
         o Context is an Expression context object, used to evaluate
           TALES expressions.
         """
-        return self._lookup[ ( category, action_id ) ].getIconURL( context ) 
+        return self._lookup[ ( category, action_id ) ].getIconURL( context )
 
     security.declareProtected( View, 'queryActionIcon' )
     def queryActionIcon( self, category, action_id
@@ -205,7 +205,7 @@ class ActionIconsTool( UniqueObject, SimpleItem ):
 
         o S.b. passed a data structure like that returned from ActionsTool's
           'listFilteredActionsFor':
-          
+
           - Dict mapping category -> seq. of dicts, where each of the
             leaf dicts must have 'category' and 'id' keys.
 
@@ -266,7 +266,7 @@ class ActionIconsTool( UniqueObject, SimpleItem ):
     #
     #   Mutators
     #
-    security.declareProtected( ManageSite, 'addActionIcon' )
+    security.declareProtected( ManagePortal, 'addActionIcon' )
     def addActionIcon( self
                      , category
                      , action_id
@@ -292,7 +292,7 @@ class ActionIconsTool( UniqueObject, SimpleItem ):
         self._lookup[ ( category, action_id ) ] = icons[-1]
         self._icons = tuple( icons )
 
-    security.declareProtected( ManageSite, 'updateActionIcon' )
+    security.declareProtected( ManagePortal, 'updateActionIcon' )
     def updateActionIcon( self
                         , category
                         , action_id
@@ -321,7 +321,7 @@ class ActionIconsTool( UniqueObject, SimpleItem ):
             raise KeyError, ( category, action_id )
         self._icons = tuple( icons )
 
-    security.declareProtected( ManageSite, 'removeActionIcon' )
+    security.declareProtected( ManagePortal, 'removeActionIcon' )
     def removeActionIcon( self, category, action_id ):
 
         """ Remove the icon for the given action.
@@ -338,7 +338,7 @@ class ActionIconsTool( UniqueObject, SimpleItem ):
         del self._lookup[ ( category, action_id ) ]
         self._icons = tuple( icons )
 
-    security.declareProtected( ManageSite, 'clearActionIcons' )
+    security.declareProtected( ManagePortal, 'clearActionIcons' )
     def clearActionIcons( self ):
 
         """ Remove all mappings from the tool.
@@ -355,10 +355,10 @@ class ActionIconsTool( UniqueObject, SimpleItem ):
                       ,
                       ) + SimpleItem.manage_options
 
-    security.declareProtected( ManageSite, 'manage_editActionIcons' )
+    security.declareProtected( ManagePortal, 'manage_editActionIcons' )
     manage_editActionIcons = PageTemplateFile( 'aitEdit', _wwwdir )
 
-    security.declareProtected( ManageSite, 'manage_addActionIcon' )
+    security.declareProtected( ManagePortal, 'manage_addActionIcon' )
     def manage_addActionIcon( self
                             , category
                             , action_id
@@ -382,7 +382,7 @@ class ActionIconsTool( UniqueObject, SimpleItem ):
                                     % self.absolute_url()
                                     )
 
-    security.declareProtected( ManageSite, 'manage_updateActionIcon' )
+    security.declareProtected( ManagePortal, 'manage_updateActionIcon' )
     def manage_updateActionIcon( self
                                , category
                                , action_id
@@ -406,7 +406,7 @@ class ActionIconsTool( UniqueObject, SimpleItem ):
                                     % self.absolute_url()
                                     )
 
-    security.declareProtected( ManageSite, 'manage_removeActionIcon' )
+    security.declareProtected( ManagePortal, 'manage_removeActionIcon' )
     def manage_removeActionIcon( self, category, action_id, REQUEST ):
 
         """ Remove the icon for the given action via the ZMI.
