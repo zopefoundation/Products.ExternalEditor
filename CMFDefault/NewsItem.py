@@ -61,7 +61,7 @@ def addNewsItem( self
                , title=''
                , description=''
                , text=''
-               , text_format='html'
+               , text_format=''
                ):
     """
         Add a NewsItem
@@ -93,7 +93,7 @@ class NewsItem( Document ):
             Edit the News Item
         """
         if text_format is None:
-            text_format = getattr(self, 'text_format', 'html')
+            text_format = getattr(self, 'text_format', 'structured-text')
         if description is not None:
             self.setDescription( description )
         Document.edit( self, text_format, text )

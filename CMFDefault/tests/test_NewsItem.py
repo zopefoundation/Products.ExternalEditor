@@ -125,6 +125,12 @@ class NewsItemTests(RequestTest):
         self.assertEqual( d.text_format, 'structured-text' )
         self.assertEqual( d.text, '' )
 
+    def test_default_format( self ):
+        d = self._makeOne('foo', text='')
+        self.assertEqual( d.Format(), 'text/plain' )
+        self.assertEqual( d.text_format, 'structured-text' )
+
+
 
 def test_suite():
     return TestSuite((
