@@ -63,20 +63,12 @@
 <p tal:condition="not:results"
    i18n:translate="">There are no items matching your specified criteria.</p>
 
-<p tal:define="mq python:modules['ZTUtils'].make_query">
- <span tal:define="p batch/previous" tal:condition="p">
-   <a href=""
-      tal:attributes="href python: '?' + mq( request.form, b_start=p.first )"
-      i18n:translate=""
-   >Previous <span tal:replace="p/length" i18n:name="count">n</span> items</a>
- </span>&nbsp;&nbsp;
- <span tal:define="n batch/next" tal:condition="n">
-   <a href=""
-      tal:attributes="href python: '?' + mq( request.form, b_start=n.first )"
-      i18n:translate=""
-   >Next <span tal:replace="n/length" i18n:name="count">n</span> items</a>
- </span>
- </p>
+<tal:span tal:define="target string:${here/portal_url}/search;
+                      batch python: {'navigation':
+                    here.getBatchNavigation(batch, target, **request.form) }">
+ <metal:block metal:use-macro="here/batch_widgets/macros/navigation" />
+</tal:span>
+
 </div>
 </div>
 </div>

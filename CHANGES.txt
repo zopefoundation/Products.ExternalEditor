@@ -2,6 +2,10 @@ CMF 1.5alpha (unreleased)
 
   New Features
 
+    - zpt skin: Added batch_widgets.pt and getBatchNavigation.py.
+      roster and search use now the new navigation macro. Looks like before,
+      but i18n works better and it's easier to reuse or replace the code.
+
     - zpt skin: Added zpt version of registered_notify_template.
 
     - CMFCorePermissions: Made them available for import by Scripts.

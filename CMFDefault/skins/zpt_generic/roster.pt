@@ -29,7 +29,7 @@
                    b_start request/b_start | b_start;
                    members mtool/getRoster;
                    Batch python:modules['ZTUtils'].Batch;
-                   batch python:Batch(members, 25, int(b_start), orphan=1)">
+                   global batch python:Batch(members, 25, int(b_start), orphan=1)">
  <tr tal:repeat="members batch">
   <td> <br /> </td>
   <td tal:define="id members/id;
@@ -46,26 +46,15 @@
    <span tal:replace="python: listed and 'Yes' or 'No'">Yes...Or No</span>
   </td>
  </tr>
-
- <tr>
-  <td> <br /> </td>
-  <td>
-   <span tal:define="p batch/previous" tal:condition="p">
-    <a href=""
-       tal:attributes="href string:?b_start=${p/first}"
-       i18n:translate="">Previous <span tal:replace="p/length"
-                                        i18n:name="count">p</span> Members</a>
-   </span>
-   <span tal:define="n batch/next" tal:condition="n">
-    <a href=""
-       tal:attributes="href string:?b_start=${batch/end}"
-       i18n:translate="">Next <span tal:replace="n/length"
-                                    i18n:name="count">n</span> Members</a>
-   </span>
-  </td>
- </tr>
 </tbody>
 </table>
+
+<tal:span tal:define="target python: mtool.getMembersFolder().absolute_url();
+                      batch python: {'navigation':
+               here.getBatchNavigation(batch, target, 'member', 'members') }">
+ <metal:block metal:use-macro="here/batch_widgets/macros/navigation" />
+</tal:span>
+
 </div>
 </div>
 </body>

@@ -1,0 +1,39 @@
+<html>
+<body>
+
+<tal:test tal:define="previous python: {'length': '20', 'text': 'Previous',
+                                        'type': 'items', 'url':'?'};
+                      next python: {'length': '', 'text': 'Next',
+                                    'type': 'item', 'url':'?'};
+                      navigation python: {'previous': previous, 'next': next};
+                      global batch python: {'navigation': navigation}" />
+
+ <metal:block metal:define-macro="navigation"
+              tal:define="p batch/navigation/previous/url;
+                          n batch/navigation/next/url"
+ ><p class="BatchNavigation" tal:condition="python: p or n"
+  ><tal:case tal:condition="p">
+  <a href="" tal:attributes="href p" i18n:translate=""
+  ><tal:span tal:content="batch/navigation/previous/text"
+   >Previous</tal:span
+  > <tal:case tal:condition="batch/navigation/previous/length"
+      tal:content="batch/navigation/previous/length"
+      i18n:name="count">n</tal:case
+  > <tal:span tal:content="batch/navigation/previous/type"
+   >items</tal:span></a></tal:case
+ ><tal:case tal:condition="python:p and n">
+  &nbsp;&nbsp;</tal:case
+ ><tal:case tal:condition="n">
+  <a href="" tal:attributes="href n" i18n:translate=""
+  ><tal:span tal:content="batch/navigation/next/text"
+   >Next</tal:span
+  > <tal:case tal:condition="batch/navigation/next/length"
+      tal:content="batch/navigation/next/length"
+      i18n:name="count">n</tal:case
+  > <tal:span tal:content="batch/navigation/next/type"
+   >items</tal:span></a></tal:case
+ ></p
+></metal:block>
+
+</body>
+</html>
