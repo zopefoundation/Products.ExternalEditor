@@ -2,13 +2,14 @@
    tal:define="mtool context/portal_membership;
                ptool context/portal_properties;
                utool nocall:context/portal_url;
+               member_email options/member/email | string:foo@example.org;
                login_url python:mtool.getActionInfo('user/login')['url']"
 >Subject: <tal:span i18n:translate=""><tal:span i18n:name="portal_title"
     tal:content="ptool/title" />: Your Membership Information</tal:span>
 From: <tal:span
    tal:content="ptool/email_from_name" /> <tal:span
    tal:replace="structure string:&lt;${ptool/email_from_address}>" />
-To: <tal:span tal:replace="structure string:&lt;${options/member/email}>" />
+To: <tal:span tal:replace="structure string:&lt;${member_email}>" />
 Content-Type: text/plain
 
 <tal:span i18n:translate=""
@@ -24,25 +25,26 @@ community.</tal:span>
 </tal:case>
 <tal:span i18n:translate=""
 >Visit us at <tal:span i18n:name="portal_url"
-   tal:replace="structure string:&lt;${utool}>" />.</tal:span>
+   tal:content="utool" /></tal:span>
 
 <tal:span i18n:translate=""
 >Your member id and password are:
 
 Member ID: <tal:span i18n:name="member_id"
-   tal:content="options/member/getId" />
+   tal:content="options/member/getId | default">foo</tal:span>
 Password: <tal:span i18n:name="password"
-   tal:content="options/password" /></tal:span>
+   tal:content="options/password | default">baz</tal:span></tal:span>
 
 <tal:span i18n:translate=""
 >You can use this URL to log in:</tal:span>
 
-<tal:span tal:replace="structure string:&lt;${login_url}>" />
+<tal:span tal:content="login_url" />
 <tal:case tal:condition="python:len(login_url)>70">
 <tal:span i18n:translate=""
 >Be aware that this URL might wrap over two lines. If your browser shows an
 error message when you try to access the URL please make sure that you put
 in the complete string.</tal:span>
 </tal:case>
+
 <tal:span tal:content="ptool/email_from_name" />
 </tal:page>
