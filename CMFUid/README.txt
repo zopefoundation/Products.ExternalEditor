@@ -1,7 +1,6 @@
-Unique id Readme
+CMFUid Readme
 
-    CMFUid introduces a unique id implementation to the CMF (from the 
-    beginning of CMF 1.5).
+    CMFUid introduces a unique id implementation to the CMF 1.5.0 and newer.
     
     Implementation
     
@@ -13,8 +12,12 @@ Unique id Readme
         of the catalog (except the IUniqueIdBrainQuery).
         
         The 'portal_uidgenerator' tools responsibility is to generate unique
-        ids. The 'portal_uidhandler' manages registering and accessing unique
-        ids. It's the tool through that applications are accessing unique ids.
+        ids. The 'portal_uidannotation' tool is responsible to attach unique
+        ids to a content object. The 'portal_uidhandler' manages registering 
+        and accessing unique ids. 
+        
+        'portal_uidhandler' implements 'IUniqueIdHandler' and represents the
+        hook through which applications are playing with unique ids.
         
     Dependencies
     
@@ -24,5 +27,9 @@ Unique id Readme
     
         'portal_uidhandler' fully implements IUniqueIdHandler (IUniqueIdSet
         for registering/unregistering unique ids, IUniqueIdQuery for queries
-        and IUniqueIdBrainQuery for more efficient querying).
+        and IUniqueIdBrainQuery for more efficient queries by returning 
+        catalog brains instead of objects).
         
+        Have a look at the interfaces.
+        
+        An example usage can be found in 'CMFDefault.Favorite.Favorite'.
