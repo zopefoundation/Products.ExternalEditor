@@ -19,6 +19,8 @@ $Id$
 
 import sys
 
+from ZPublisher import BeforeTraverse
+
 from Acquisition import Implicit, aq_parent, aq_base, aq_inner
 
 from AccessControl import ClassSecurityInfo, ModuleSecurityInfo
@@ -276,7 +278,7 @@ class PluggableAuthService( Folder ):
 
         if not is_top:
             return None
-                        
+
         #
         #   No other user folder above us can satisfy, and we have no user;
         #   return a constructed anonymous only if anonymous is authorized.
@@ -707,7 +709,8 @@ class PluggableAuthService( Folder ):
                             continue
 
                         if user_id is not None:
-                            mangled_id = self._verifyUser(plugins, user_id)
+                            mangled_id = self._mangleId(authenticator_id,
+                                                        user_id)
                             user_ids.append( (mangled_id, name) )
 
 
@@ -731,7 +734,7 @@ class PluggableAuthService( Folder ):
 
     security.declarePrivate( '_mangleId' )
     def _mangleId( self, namespace, id ):
-    
+
         return MANGLE_DELIMITER.join( ( namespace, id ) )
 
     security.declarePrivate( '_computeMangledId' )
@@ -1062,10 +1065,31 @@ class PluggableAuthService( Folder ):
             except:
                 pass
 
+            handle = self.meta_type + '/' + self.getId()
+            BeforeTraverse.unregisterBeforeTraverse(container, handle)
+
     security.declarePrivate( 'manage_afterAdd' )
     def manage_afterAdd(self, item, container):
         if item is self:
             container.__allow_groups__ = aq_base(self)
+
+            handle = self.meta_type + '/' + self.getId()
+            container = container.this()
+            nc = BeforeTraverse.NameCaller(self.getId())
+            BeforeTraverse.registerBeforeTraverse(container, nc, handle)
+
+    def __call__(self, container, req):
+        """ The __before_publishing_traverse__ hook. """
+        # resp = self.REQUEST['RESPONSE']
+
+        # plugins = self._getOb('plugins')
+
+        # challengers = plugins.listPlugins( IChallengePlugin )
+
+        # for challenger_id, challenger in challengers:
+        #     challenger.challenge(req, resp)
+
+        return
 
     security.declarePublic( 'hasUsers' )
     def hasUsers(self):
