@@ -21,6 +21,7 @@ supplement_query("topics", "topic")
 supplement_query("supporters", "assigned_to")
 supplement_query("resolution")
 supplement_query("version_info")
+supplement_query("importances", "importance")
 
 sr = reqget("security_related", [])
 if sr:
@@ -41,8 +42,8 @@ for i in reqget("status", []):
     #     and just do token processing according to their names.
     if i in ['Pending', 'Accepted']:
         rs.append("%s_confidential" % i)
-if rs:
-    query['status'] = rs
+    if rs:
+        query['status'] = rs
 
 got = context.get_internal_catalog()(REQUEST=query)
 return got
