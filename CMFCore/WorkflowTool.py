@@ -169,24 +169,25 @@ class WorkflowTool (UniqueObject, Folder):
             self._chains_by_type = cbt = PersistentMapping()
         ti = self._listTypeInfo()
         # Set up the chains by type.
-        for t in ti:
-            id = t.getId()
-            field_name = 'chain_%s' % id
-            chain = props.get(field_name, '(Default)').strip()
-            if chain == '(Default)':
-                # Remove from cbt.
-                if cbt.has_key(id):
-                    del cbt[id]
-            else:
-                chain = chain.replace(',', ' ')
-                ids = []
-                for wf_id in chain.split(' '):
-                    if wf_id:
-                        if not self.getWorkflowById(wf_id):
-                            raise ValueError, (
-                                '"%s" is not a workflow ID.' % wf_id)
-                        ids.append(wf_id)
-                cbt[id] = tuple(ids)
+        if props is not None:
+            for t in ti:
+                id = t.getId()
+                field_name = 'chain_%s' % id
+                chain = props.get(field_name, '(Default)').strip()
+                if chain == '(Default)':
+                    # Remove from cbt.
+                    if cbt.has_key(id):
+                        del cbt[id]
+                else:
+                    chain = chain.replace(',', ' ')
+                    ids = []
+                    for wf_id in chain.split(' '):
+                        if wf_id:
+                            if not self.getWorkflowById(wf_id):
+                                raise ValueError, (
+                                    '"%s" is not a workflow ID.' % wf_id)
+                            ids.append(wf_id)
+                    cbt[id] = tuple(ids)
         # Set up the default chain.
         default_chain = default_chain.replace(',', ' ')
         ids = []
