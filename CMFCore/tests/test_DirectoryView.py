@@ -1,6 +1,11 @@
-import Zope
-
 from unittest import TestCase, TestSuite, makeSuite, main
+
+import Zope
+try:
+    Zope.startup()
+except AttributeError:
+    # for Zope versions before 2.6.1
+    pass
 
 from Products.CMFCore.tests.base.dummy import DummyFolder
 from Products.CMFCore.tests.base.testcase import FSDVTest
@@ -45,7 +50,7 @@ class DirectoryViewPathTests( TestCase ):
         self.ob.fake_skin.manage_properties('Products/CMFCore/tests/fake_skins/fake_skin')        
         self.failUnless(hasattr(self.ob.fake_skin,'test1'),self.ob.fake_skin.getDirPath())
 
-    def test_getDirectoryInfo5( self ):
+    def test_getDirectoryInfo4( self ):
         """ *nix SOFTWARE_HOME  """
         self.ob.fake_skin.manage_properties('/usr/local/zope/2.5.1/Products/CMFCore/tests/fake_skins/fake_skin')        
         self.failUnless(hasattr(self.ob.fake_skin,'test1'),self.ob.fake_skin.getDirPath())
@@ -61,6 +66,11 @@ class DirectoryViewPathTests( TestCase ):
         """ linux PRODUCTS_PATH  """
         from tempfile import mktemp        
         self.ob.fake_skin.manage_properties(mktemp()+'Products/CMFCore/tests/fake_skins/fake_skin')
+        self.failUnless(hasattr(self.ob.fake_skin,'test1'),self.ob.fake_skin.getDirPath())
+
+    # second 'Products' in path
+    def test_getDirectoryInfo7( self ):
+        self.ob.fake_skin.manage_properties(r'C:\CoolProducts\Zope\2.5.1\Products\CMFCore\tests\fake_skins\fake_skin')        
         self.failUnless(hasattr(self.ob.fake_skin,'test1'),self.ob.fake_skin.getDirPath())
 
     # Test we do nothing if given a really wacky path

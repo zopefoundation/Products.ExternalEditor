@@ -665,9 +665,9 @@ def minimalpath(p):
     # otherwise, it returns what it was given.
     # In either case, the path is normalized.
     p = normalize(p)
-    index = p.find('Products')
+    index = p.rfind('Products')
     if index == -1:
-        index = p.find('products')
+        index = p.rfind('products')
         if index == -1:
             # couldn't normalise            
             return p
