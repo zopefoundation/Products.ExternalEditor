@@ -527,7 +527,7 @@ class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
         # TODO:  Call initial_values_hook, if present
 
 
-    security.declareProtected( CMFCorePermissions.ModifyPortalContent
+    security.declareProtected( CMFCorePermissions.View
                              , 'validateMetadata' )
     def validateMetadata( self, content ):
         """
