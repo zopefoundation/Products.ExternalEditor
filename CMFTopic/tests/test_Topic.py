@@ -9,14 +9,7 @@ Topic = Products.CMFTopic.Topic.Topic
 
 
 class TestCase( unittest.TestCase ):
-    """
-    """
-    def setUp( self ):
-        pass
-
-    def tearDown( self ):
-        pass
-    
+    """ Test all the general Topic cases  """
     def test_Empty( self ):
         topic = Topic('top')
         assert len(topic._criteriaTypes) == 3
@@ -62,7 +55,8 @@ class TestCase( unittest.TestCase ):
         topic._setObject('crit__foo', SSC('crit__foo', 'foo'))
         topic._setObject('crit__bar', SIC('crit__bar', 'bar'))
 
-        class CritRecord: pass
+        class CritRecord:
+            pass
         foorec = CritRecord()
         barrec = CritRecord()
 
