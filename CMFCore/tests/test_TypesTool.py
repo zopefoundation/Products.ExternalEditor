@@ -1,7 +1,7 @@
 import Zope
-import unittest
 import OFS.Folder, OFS.SimpleItem
-import Acquisition
+from unittest import TestCase, TestSuite, makeSuite, main
+from Acquisition import Implicit
 from AccessControl.SecurityManagement import newSecurityManager
 from AccessControl.SecurityManagement import noSecurityManager
 from AccessControl import SecurityManager
@@ -36,7 +36,7 @@ class PermissiveSecurityPolicy:
             return 0
         return 1
 
-class OmnipotentUser( Acquisition.Implicit ):
+class OmnipotentUser( Implicit ):
     """
         Stubbed out manager for unit testing purposes.
     """
@@ -48,7 +48,7 @@ class OmnipotentUser( Acquisition.Implicit ):
     def allowed( self, object, object_roles=None ):
         return 1
 
-class UserWithRoles( Acquisition.Implicit ):
+class UserWithRoles( Implicit ):
     """
         Stubbed out manager for unit testing purposes.
     """
@@ -66,7 +66,7 @@ class UserWithRoles( Acquisition.Implicit ):
                 return 1
         return 0
 
-class UnitTestUser( Acquisition.Implicit ):
+class UnitTestUser( Implicit ):
     """
         Stubbed out manager for unit testing purposes.
     """
@@ -113,7 +113,7 @@ class DummyTypeInfo(TypeInformation):
     """ new class of type info object """
     meta_type = "Dummy Test Type Info"
 
-class TypesToolTests( unittest.TestCase ):
+class TypesToolTests( TestCase ):
 
     def setUp( self ):
         get_transaction().begin()
@@ -219,7 +219,7 @@ class TypesToolTests( unittest.TestCase ):
         self.failUnless(isinstance(fs, DummyTypeInfo), fs.__class__)
         
 
-class TypeInfoTests( unittest.TestCase ):
+class TypeInfoTests( TestCase ):
     
     def test_construction( self ):
         ti = self._makeInstance( 'Foo'
@@ -409,7 +409,7 @@ class FauxFactory:
     __roles__ = ( 'FooAdder', )
     __allow_access_to_unprotected_subobjects__ = { 'addFoo' : 1 }
 
-class FauxFolder( Acquisition.Implicit ):
+class FauxFolder( Implicit ):
     """
         Shim container
     """
@@ -427,7 +427,7 @@ class FauxFolder( Acquisition.Implicit ):
     def _getOb( self, id ):
         return self._objects[id]
 
-class FTIConstructionTests( unittest.TestCase ):
+class FTIConstructionTests( TestCase ):
 
     def setUp( self ):
         noSecurityManager()
@@ -478,7 +478,7 @@ class FTIConstructionTests( unittest.TestCase ):
         self.assertRaises( Unauthorized, ti.isConstructionAllowed
                          , folder, raise_exc=1 )
 
-class FTIConstructionTests_w_Roles( unittest.TestCase ):
+class FTIConstructionTests_w_Roles( TestCase ):
 
     def tearDown( self ):
         noSecurityManager()
@@ -575,16 +575,16 @@ class FTIConstructionTests_w_Roles( unittest.TestCase ):
 
 
 def test_suite():
-    suite = unittest.TestSuite()
-    suite.addTest( unittest.makeSuite( TypesToolTests ) )
-    suite.addTest( unittest.makeSuite( FTIDataTests ) )
-    suite.addTest( unittest.makeSuite( STIDataTests ) )
-    suite.addTest( unittest.makeSuite( FTIConstructionTests ) )
-    suite.addTest( unittest.makeSuite( FTIConstructionTests_w_Roles ) )
-    return suite
+    return TestSuite((
+        makeSuite(TypesToolTests),
+        makeSuite(FTIDataTests),
+        makeSuite(STIDataTests),
+        makeSuite(FTIConstructionTests),
+        makeSuite(FTIConstructionTests_w_Roles),
+        ))
 
 def run():
-    unittest.TextTestRunner().run(test_suite())
+    main(defaultTest='test_suite')
 
 if __name__ == '__main__':
     run()
