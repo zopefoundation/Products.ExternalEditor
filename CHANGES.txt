@@ -55,6 +55,10 @@ Future
 
   Bug Fixes
 
+    - Ensure that a couple of calls to string.split only split into a 
+      maximum of two parts. 
+      (Collector #82)
+
     - Enabled the CMF to be installed in a PRODUCTS_PATH.
       In doing so, also made it easier to move CMF sites between 
       Windows and Unix.

@@ -112,7 +112,7 @@ class DirectoryInformation:
             f.close()
             props = {}
             for line in lines:
-                try: key, value = split(line, '=')
+                try: key, value = split(line, '=',1)
                 except: pass
                 else:
                     props[strip(key)] = strip(value)
