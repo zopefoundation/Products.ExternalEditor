@@ -184,20 +184,6 @@ function setup_safety() {
             </th>
           </tr>
 
-          <!-- workflow actions -->
-          <tr class="ContextActionsRow"
-              tal:condition="workflow_actions"> 
-            <td>
-            </td>
-            <td class="ActionLink"> <span class="ObjectStatus"> Status: <span
-    tal:replace="wf_state">Private</span><br>
-              </span> <span tal:repeat="action workflow_actions"> <a
-    href="content_submit_form"
-    tal:attributes="href action/url"
-    tal:content="action/name">Submit</a><br>
-              </span> </td>
-          </tr>
-
           <!-- object actions -->
           <tr tal:repeat="action object_actions">
             <td>
@@ -212,6 +198,26 @@ function setup_safety() {
             </td>
           </tr>
           
+          <!-- workflow actions -->
+          <tr class="ContextActionsRow"
+              tal:condition="workflow_actions"> 
+            <td class="division" colspan="2">
+              <span class="ObjectStatus"> Status:
+               <span tal:replace="wf_state">Private</span>
+              </span>
+            </td>
+          </tr>
+          <tr class="ContextActionsRow"
+              tal:condition="workflow_actions"
+              tal:repeat="action workflow_actions">
+            <td></td>
+            <td class="ActionLink">
+              <a href="content_submit_form"
+                 tal:attributes="href action/url"
+                 tal:content="action/name">Submit</a>
+            </td>
+          </tr>
+
           <!-- folder actions -->
           <tr tal:condition="folder_actions"> 
             <td class="division">
