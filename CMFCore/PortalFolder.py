@@ -79,6 +79,9 @@ class PortalFolder(DynamicType, CMFCatalogAware, Folder):
 
     description = ''
 
+    manage_options = Folder.manage_options + \
+                     CMFCatalogAware.manage_options
+
     def __init__( self, id, title='' ):
         self.id = id
         self.title = title
