@@ -28,15 +28,22 @@ CMF Events into the CMF Site instance.
 """
 
 from cStringIO import StringIO
+from warnings import warn
 
 from Products.CMFCore.TypesTool import ContentFactoryMetadata
 from Products.CMFCore.DirectoryView import addDirectoryViews
-from Products.CMFCore.utils import getToolByName, ToolInit
-from Products.CMFCalendar import Event, event_globals
+from Products.CMFCore.utils import getToolByName
 
+from Products.CMFCalendar import Event, event_globals
+from Products.CMFCalendar.exceptions import CatalogError
+from Products.CMFCalendar.exceptions import MetadataError
 
 def install(self):
     " Register the CMF Event with portal_types and friends "
+    warn('The install method is deprecated and will be removed in CMF 1.7. '
+         'Please use the profile instead.',
+         DeprecationWarning)
+
     out = StringIO()
     typestool = getToolByName(self, 'portal_types')
     skinstool = getToolByName(self, 'portal_skins')
@@ -44,23 +51,24 @@ def install(self):
     ctool = getToolByName(self, 'portal_catalog')
     portal_url = getToolByName(self, 'portal_url')
 
+    # Set up a catalog indexes and metadata
     try:
-        ctool.addIndex('start', 'FieldIndex')
-    except:  # XXX: bare except!
+        ctool.addIndex('start', 'DateIndex')
+    except CatalogError:
         pass
     try:
-        ctool.addIndex('end', 'FieldIndex')
-    except:  # XXX: bare except!
+        ctool.addIndex('end', 'DateIndex')
+    except CatalogError:
         pass
     try:
         ctool.addColumn('start')
-    except:  # XXX: bare except!
+    except CatalogError:
         pass
     try:
         ctool.addColumn('end')
-    except:  # XXX: bare except!
+    except CatalogError:
         pass
-    out.write('Added "start" and "end" field indexes and columns to '\
+    out.write('Added "start" and "end" date indexes and columns to '\
               'the portal_catalog\n')
 
     # Borrowed from CMFDefault.Portal.PortalGenerator.setupTypes()
@@ -75,7 +83,7 @@ def install(self):
             out.write('Object "%s" already existed in the types tool\n' % (
                 t['id']))
 
-    # Setup a MetadataTool Element Policy for Events
+    # Set up a MetadataTool element policy for events
     try:
         metadatatool.addElementPolicy(
             element='Subject',
@@ -86,9 +94,9 @@ def install(self):
             enforce_vocabulary=0,
             allowed_vocabulary=('Appointment', 'Convention', 'Meeting',
                                 'Social Event', 'Work'),
-            REQUEST=None,
-            )
-    except: pass
+            REQUEST=None)
+    except MetadataError:
+        pass
     out.write('Event added to Metadata element Policies\n')
 
     # Add the CMFCalendar tool to the site's root
@@ -97,12 +105,12 @@ def install(self):
 
     # Setup the skins
     # This is borrowed from CMFDefault/scripts/addImagesToSkinPaths.pys
-    if 'calendar' not in skinstool.objectIds():
+    if 'zpt_calendar' not in skinstool.objectIds():
         # We need to add Filesystem Directory Views for any directories
         # in our skins/ directory.  These directories should already be
         # configured.
         addDirectoryViews(skinstool, 'skins', event_globals)
-        out.write("Added 'calendar' directory view to portal_skins\n")
+        out.write("Added 'zpt_calendar' directory view to portal_skins\n")
 
     # Now we need to go through the skin configurations and insert
     # 'calendar' into the configurations.  Preferably, this should be
@@ -112,21 +120,18 @@ def install(self):
     for skin in skins:
         path = skinstool.getSkinPath(skin)
         path = [ id.strip() for id in path.split(',') ]
-        if 'calendar' not in path:
-            try: path.insert(path.index('content'), 'calendar')
-            except ValueError:
-                path.append('calendar')
-
-            try: path.insert(path.index('zpt_content'), 'zpt_calendar')
+        if 'zpt_calendar' not in path:
+            try:
+                path.insert(path.index('zpt_content'), 'zpt_calendar')
             except ValueError:
                 pass
 
             path = ', '.join(path)
             # addSkinSelection will replace exissting skins as well.
             skinstool.addSkinSelection(skin, path)
-            out.write("Added 'calendar' to %s skin\n" % skin)
+            out.write("Added 'zpt_calendar' to %s skin\n" % skin)
         else:
-            out.write("Skipping %s skin, 'calendar' is already set up\n" % (
+            out.write("Skipping %s skin, 'zpt_calendar' is already set up\n" % (
                 skin))
 
     return out.getvalue()
