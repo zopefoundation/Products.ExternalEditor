@@ -418,7 +418,9 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         # all duplicate addresses will be filtered out before actual send.
 
         candidates = [self.submitter_id, actor] + list(self.assigned_to())
-        continuing_accepted = (lower(orig_status) in ['accepted',
+        continuing_accepted = (orig_status
+                               and
+                               lower(orig_status) in ['accepted',
                                                       'accepted_confidential']
                                and
                                lower(new_status) in ['accepted',
