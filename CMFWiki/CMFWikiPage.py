@@ -722,7 +722,7 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
         ob._set_text(text)
         if log:
             get_transaction().note(log)
-        if user.getUserName() == 'Anonymous User':
+        if getSecurityManager().getUser().getUserName() == 'Anonymous User':
             username = ''
         ob.last_editor = userid
         ob.indexObject()
