@@ -45,7 +45,7 @@ from App.class_init import default__class_init__ as InitializeClass
 from Products.PluginRegistry.PluginRegistry import PluginRegistry
 import Products
 
-from interfaces.authservice import IUserFolder
+from interfaces.authservice import IPluggableAuthService
 from interfaces.authservice import _noroles
 from interfaces.plugins import IExtractionPlugin
 from interfaces.plugins import ILoginPasswordHostExtractionPlugin
@@ -159,7 +159,7 @@ class PluggableAuthService( Folder, Cacheable ):
 
     """ All-singing, all-dancing user folder.
     """
-    __implements__ = ( IUserFolder, )
+    __implements__ = ( IPluggableAuthService, )
 
     security = ClassSecurityInfo()
 
@@ -1192,7 +1192,7 @@ class PluggableAuthService( Folder, Cacheable ):
         """
         return True
 
-    security.declarePrivate('updateCredentials')
+    security.declarePublic('updateCredentials')
     def updateCredentials(self, request, response, login, new_password):
         """Central updateCredentials method
 
@@ -1218,9 +1218,11 @@ class PluggableAuthService( Folder, Cacheable ):
         # Little bit of a hack: Issuing a redirect to the same place
         # where the user was so that in the second request the now-destroyed
         # credentials can be acted upon to e.g. go back to the login page
-        REQUEST['RESPONSE'].redirect(REQUEST['HTTP_REFERER'])
+        referrer = REQUEST.get('HTTP_REFERER') # HTTP_REFERER is optional header
+        if referrer:
+            REQUEST['RESPONSE'].redirect(referrer)
 
-    security.declarePrivate('_resetCredentials')
+    security.declarePublic('resetCredentials')
     def resetCredentials(self, request, response):
         """Reset credentials by informing all active resetCredentials plugins
         """

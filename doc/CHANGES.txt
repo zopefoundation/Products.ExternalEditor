@@ -1,8 +1,20 @@
 PluggableAuthService changelog
 
-  After PluggableAuthService 1.0.3
+  PluggableAuthService 1.0.4 (2005/01/27)
 
     Features Added
+
+      - Made 'Extensions' a package, to allow importing its scripts
+        as modules.
+
+      - Declared new 'IPluggableAuthService' interface, describing additional
+        PAS-specific API.
+
+      - Exposed PAS' 'resetCredentials' and 'updateCredentials' as public
+        methods.
+
+      - Monkey-patch ZMI's logout to invoke PAS' 'resetCredentials', if
+        present.
 
       - CookieAuth plugin now encodes and decodes cookies in the same
         format as CookieCrumbler to provide compatibility between
@@ -30,6 +42,8 @@ PluggableAuthService changelog
         doc/caching.stx for the details.
 
     Bugs Fixed
+
+      - Harden 'logout' against missing HTTP_REFERRER.
 
       - Avoid triggering "Emergency user cannot own" when adding a
         CookieAuthHelper plugin as that user.
