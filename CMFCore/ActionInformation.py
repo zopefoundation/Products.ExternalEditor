@@ -112,14 +112,22 @@ class ActionInformation( SimpleItem ):
 
         """ Return the text of the TALES expression for our URL.
         """
-        return self.action and self.action.text or ''
+        action = getattr( self, 'action', None )
+
+        if action is None:  # Forward compatibility, used to be '_action'
+            action = getattr( self, '_action', None )
+            if action is not None:
+                self.action = self._action
+                del self._action
+
+        return action and action.text or ''
 
     security.declarePublic( 'getCondition' )
     def getCondition(self):
 
         """ Return the text of the TALES expression for our condition.
         """
-        return self.condition and self.condition.text or ''
+        return getattr( self, 'condition', None ) and self.condition.text or ''
 
     security.declarePublic( 'getPermission' )
     def getPermissions( self ):

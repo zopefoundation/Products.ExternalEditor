@@ -73,14 +73,8 @@ class ActionProviderBase:
                     a1['permission'] = ''
                 a1['category'] = a.getCategory() or 'object'
                 a1['visible'] = a.getVisibility()
-                if a._action:
-                    a1['action'] = a.getActionExpression()
-                else:
-                    a1['action'] = ''
-                if a.condition:
-                    a1['condition'] = a.getCondition()
-                else:
-                    a1['condition'] = ''
+                a1['action'] = a.getActionExpression()
+                a1['condition'] = a.getCondition()
                 actions.append(a1)
 
         # possible_permissions is in AccessControl.Role.RoleManager.
