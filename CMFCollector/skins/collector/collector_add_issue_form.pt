@@ -33,22 +33,17 @@
         <td>
          <input type="text" name="title" value="" size="40">
         </td>
-        <th valign="top"> Security Related? </th>
+        <td align="right">
+            <input type=hidden name="security_related:boolean" value="">
+            <input type=checkbox name="security_related:boolean">
+        </td>
         <td valign="top">
-          <table>
-            <tr>
-              <td>
-              <input type=hidden name="security_related:boolean" value=""/>
-              <input type=checkbox name="security_related:boolean"/>
-              </td>
-              <td>
-                <font size="-1" color="gray">
-                  If checked, will <em>not</em> be publicly visible until
-                  vetted. 
-                </font>
-              </td>
-            </tr>
-          </table>
+            Security Related?
+            <br>
+              <font size="-1" color="gray">
+                If checked, issue will <em>not</em> be publicly visible until
+                completed. 
+              </font>
         </td>
        </tr>
 
@@ -61,11 +56,7 @@
         </td>
         <th valign="middle" align="right"> Email
         </th>
-        <td>
-         <input type="text" name="email" value=""
-           tal:attributes="value python: getattr(member, 'email', '')"
-                size="20">
-        </td>
+        <td tal:content="python: member.getProperty('email', '')"> </td>
        </tr>
        <tr>
         <td> &nbsp;
