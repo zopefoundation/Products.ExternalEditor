@@ -249,35 +249,33 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
             self._create_transcript(comment)
         transcript = self.get_transcript()
 
-        entry_leader = self._entry_header(action, username) + "\n\n"
-        (uploadmsg, fileid) = self._process_file(file, fileid,
-                                                  filetype, comment)
-        additions, removals = self._supporters_diff(orig_supporters)
-        changes = []
+        comment_header = [self._entry_header(action, username)]
+
         if orig_status and (new_status != orig_status):
-            changes.append(" Status: %s => %s\n"
-                           % (orig_status, new_status))
+            comment_header.append(" Status: %s => %s"
+                                  % (orig_status, new_status))
+
+        additions, removals = self._supporters_diff(orig_supporters)
         if additions or removals:
             if additions:
-                changes.append(" Supporters added: %s\n"
-                               % ", ".join(additions))
-            if removals:
-                changes.append(" Supporters removed: %s\n" %
-                               ", ".join(removals))
-        if changes:
-            changesstr = "\n".join(changes) + "\n"
-            if uploadmsg:
-                uploadmsg = " " + uploadmsg + "\n\n"
-            else:
-                changesstr = changesstr + "\n"
-        else:
-            changesstr = ''
+                reroster = " Supporters added: %s" % ", ".join(additions)
+                if removals:
+                    reroster += "; removed: %s" % ", ".join(removals)
+            elif removals:
+                reroster = " Supporters removed: %s" % ", ".join(removals)
+            comment_header.append(reroster)
+
+        (uploadmsg, fileid) = self._process_file(file, fileid,
+                                                  filetype, comment)
+        if uploadmsg:
+            comment_header.append(" " + uploadmsg)
+
+        comment_header_str = "\n\n".join(comment_header) + "\n\n"
+
         transcript._edit('stx',
-                         entry_leader
-                         + changesstr
-                         + uploadmsg
+                         comment_header_str
                          + util.process_comment(string.strip(comment))
-                         + ((action_number > 1) and "<hr>\n" or '')
+                         + ((action_number > 1) and "\n<hr>\n" or '')
                          + transcript.EditableBody())
         self._send_update_notice(action, username, transcript.EditableBody(),
                                  orig_status, additions, removals,
@@ -287,7 +285,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         """Indicate supporter roster changes, relative to orig_supporters.
 
         Return (list-of-added-supporters, list-of-removed-supporters)."""
-        plus, minus = self.assigned_to(), []
+        plus, minus = list(self.assigned_to()), []
         for supporter in orig_supporters:
             if supporter in plus: plus.remove(supporter)
             else: minus.append(supporter)
@@ -343,10 +341,15 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
             to = ", ".join(["%s <%s>" % (name, email)
                             for name, email in recipients])
             title = self.aq_parent.title[:50]
+            short_title = " ".join(title[:40].split(" ")[:-1]) or title
+            if short_title != title[:40]:
+                short_title = short_title + " ..."
+            sender = ('"Collector: %s" <%s>'
+                      % (short_title, self.aq_parent.email))
+
             if '.' in title or ',' in title:
                 title = '"%s"' % title
-            sender = self.aq_parent.email
-            mgrfrom = ("For %s by Collector Manager <%s>" % (actor, sender))
+
             if self.abbrev:
                 subject = "[%s]" % self.abbrev
             else: subject = "[Collector]"
@@ -356,7 +359,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
 
             body = self._cook_links(self.get_transcript().text, email=1)
             cin = self.collector_issue_notice
-            message = cin(sender=mgrfrom,
+            message = cin(sender=sender,
                           recipients=to,
                           subject=subject,
                           issue_id=self.id,
@@ -387,7 +390,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
                 fileid = string.split(string.split(file.filename, '/')[-1],
                                       '\\')[-1]
             upload = self._add_artifact(fileid, filetype, comment, file)
-            uploadmsg = "%s%s\n\n" % (UPLOAD_PREFIX, fileid)
+            uploadmsg = "%s%s" % (UPLOAD_PREFIX, fileid)
             return (uploadmsg, fileid)
         else:
             return ('', '')
@@ -425,7 +428,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         (Security_related issues start confidential, and are made
         unconfidential on any completion.)"""
         wftool = getToolByName(self, 'portal_workflow')
-        return wftool.getInfoFor(self, 'state', 'confidential')
+        return wftool.getInfoFor(self, 'confidential', 0)
 
     def _create_transcript(self, description,
                            text_format=DEFAULT_TRANSCRIPT_FORMAT):
@@ -459,8 +462,9 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         """Return actions valid according to workflow and application logic."""
 
         pa = getToolByName(self, 'portal_actions', None)
+        allactions = pa.listFilteredActionsFor(self)
         return [entry['name']
-                for entry in pa.listFilteredActionsFor(self)['issue_workflow']]
+                for entry in allactions.get('issue_workflow', [])]
 
     security.declareProtected(CMFCorePermissions.View, 'valid_actions_pairs')
     def valid_actions_pairs(self):
