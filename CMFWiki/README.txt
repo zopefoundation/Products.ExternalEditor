@@ -33,9 +33,12 @@ One important note for use with Zope pre v2.4.  CMFWiki was developed
 for that version, and depends on a new feature where every
 authenticated user intrinsically has the 'Authenticated' role.  In
 order for the non-anonymous regulation category to work with pre-2.4
-Zope, all your users have to have this additional role added.  (If
-someone were to contribute a hotfix to make this automatic, we might
-include it with the CMFWiki product.)
+Zope, all your users have to have this additional role added.
+(Without it, the "non-anonymous" regulation category will not work
+right.)  Jeff Sasmor posted what he did to make this adjustment to the
+zope-cmf mailling list - see:
+
+  http://lists.zope.org/pipermail/zope-cmf/2001-June/007474.html
 
 Finally, for any of you running "WikiForNow wikis",
 http://dev.zope.org/Wikis/DevSite/Projects/WikiForNow , there's a
