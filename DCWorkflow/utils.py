@@ -22,6 +22,8 @@ _dtmldir = os.path.join( package_home( globals() ), 'dtml' )
 
 from AccessControl.Role import gather_permissions
 from AccessControl.Permission import Permission
+from Acquisition import aq_base
+
 
 def ac_inherited_permissions(ob, all=0):
     # Get all permissions not defined in ourself that are inherited
@@ -94,22 +96,4 @@ def modifyRolesForGroup(ob, group, grant_roles, managed_roles):
         else:
             local_roles[moniker] = roles
         ob.__ac_local_roles__ = local_roles
-    return changed
-
-def modifyExpandedGroups(ob, group, grant_roles, managed_roles):
-    """Modifies local roles for a group.
-
-    The group may expand into multiple groups as defined by a
-    context-sensitive aggregated group mapping.
-    """
-    groups = [group]
-    if hasattr(ob, "__group_mapping__"):
-        map = ob.getAggregatedGroupMapping()
-        expanded = map.get(group)
-        if expanded:
-            groups = expanded
-    changed = 0
-    for g in groups:
-        if modifyRolesForGroup(ob, g, grant_roles, managed_roles):
-            changed = 1
     return changed

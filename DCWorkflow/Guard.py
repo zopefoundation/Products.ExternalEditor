@@ -21,7 +21,7 @@ from cgi import escape
 import Globals
 from Globals import DTMLFile, Persistent
 from AccessControl import ClassSecurityInfo
-from Acquisition import Explicit
+from Acquisition import Explicit, aq_base
 
 from Products.CMFCore.CMFCorePermissions import ManagePortal
 
@@ -32,6 +32,7 @@ from utils import _dtmldir
 class Guard (Persistent, Explicit):
     permissions = ()
     roles = ()
+    groups = ()
     expr = None
 
     security = ClassSecurityInfo()
@@ -43,25 +44,31 @@ class Guard (Persistent, Explicit):
         '''
         Checks conditions in this guard.
         '''
-        pp = self.permissions
-        if pp:
-            found = 0
-            for p in pp:
+        if self.permissions:
+            for p in self.permissions:
                 if sm.checkPermission(p, ob):
-                    found = 1
                     break
-            if not found:
+            else:
                 return 0
-        roles = self.roles
-        if roles:
+        if self.roles:
             # Require at least one of the given roles.
-            found = 0
             u_roles = sm.getUser().getRolesInContext(ob)
-            for role in roles:
+            for role in self.roles:
                 if role in u_roles:
-                    found = 1
                     break
-            if not found:
+            else:
+                return 0
+        if self.groups:
+            # Require at least one of the specified groups.
+            u = sm.getUser()
+            if hasattr(aq_base(u), 'getContextualGroupMonikers'):
+                u_groups = u.getContextualGroupMonikers(ob)
+            else:
+                u_groups = ()
+            for group in self.groups:
+                if ('(Group) %s' % group) in u_groups:
+                    break
+            else:
                 return 0
         expr = self.expr
         if expr is not None:
@@ -77,26 +84,17 @@ class Guard (Persistent, Explicit):
         res = []
         if self.permissions:
             res.append('Requires permission:')
-            for idx in range(len(self.permissions)):
-                p = self.permissions[idx]
-                if idx > 0:
-                    if idx < len(self.permissions) - 1:
-                        res.append(';')
-                    else:
-                        res.append('or')
-                res.append('<code>' + escape(p) + '</code>')
+            res.append(formatNameUnion(self.permissions))
         if self.roles:
             if res:
                 res.append('<br/>')
             res.append('Requires role:')
-            for idx in range(len(self.roles)):
-                r = self.roles[idx]
-                if idx > 0:
-                    if idx < len(self.roles) - 1:
-                        res.append(';')
-                    else:
-                        res.append('or')
-                res.append('<code>' + escape(r) + '</code>')
+            res.append(formatNameUnion(self.roles))
+        if self.groups:
+            if res:
+                res.append('<br/>')
+            res.append('Requires group:')
+            res.append(formatNameUnion(self.groups))
         if self.expr is not None:
             if res:
                 res.append('<br/>')
@@ -121,6 +119,11 @@ class Guard (Persistent, Explicit):
             res = 1
             r = map(strip, split(s, ';'))
             self.roles = tuple(r)
+        s = props.get('guard_groups', None)
+        if s:
+            res = 1
+            r = map(strip, split(s, ';'))
+            self.groups = tuple(r)
         s = props.get('guard_expr', None)
         if s:
             res = 1
@@ -139,6 +142,12 @@ class Guard (Persistent, Explicit):
             return ''
         return join(self.roles, '; ')
 
+    security.declareProtected(ManagePortal, 'getGroupsText')
+    def getGroupsText(self):
+        if not self.groups:
+            return ''
+        return join(self.groups, '; ')
+
     security.declareProtected(ManagePortal, 'getExprText')
     def getExprText(self):
         if not self.expr:
@@ -146,3 +155,12 @@ class Guard (Persistent, Explicit):
         return str(self.expr.text)
 
 Globals.InitializeClass(Guard)
+
+
+def formatNameUnion(names):
+    escaped = ['<code>' + escape(name) + '</code>' for name in names]
+    if len(escaped) == 2:
+        return ' or '.join(escaped)
+    elif len(escaped) > 2:
+        escaped[-1] = ' or ' + escaped[-1]
+    return '; '.join(escaped)

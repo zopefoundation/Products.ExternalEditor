@@ -37,7 +37,7 @@ from Products.CMFCore.WorkflowCore import WorkflowException
 from Products.CMFCore.WorkflowTool import addWorkflowFactory
 
 # DCWorkflow
-from utils import _dtmldir, modifyRolesForPermission, modifyExpandedGroups
+from utils import _dtmldir, modifyRolesForPermission, modifyRolesForGroup
 from WorkflowUIMixin import WorkflowUIMixin
 from Transitions import TRIGGER_AUTOMATIC, TRIGGER_USER_ACTION, \
      TRIGGER_WORKFLOW_METHOD
@@ -400,10 +400,8 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
 
     security.declarePrivate('updateRoleMappingsFor')
     def updateRoleMappingsFor(self, ob):
-        '''
-        Changes the object permissions according to the current
-        state.
-        '''
+        """Changes the object permissions according to the current state.
+        """
         changed = 0
         sdef = self._getWorkflowStateOf(ob)
         if sdef is None:
@@ -424,7 +422,7 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
                 roles = ()
                 if sdef.group_roles is not None:
                     roles = sdef.group_roles.get(group, ())
-                if modifyExpandedGroups(ob, group, roles, managed_roles):
+                if modifyRolesForGroup(ob, group, roles, managed_roles):
                     changed = 1
         return changed
 

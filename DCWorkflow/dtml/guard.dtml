@@ -5,6 +5,8 @@
 <td><input type="text" name="guard_permissions" value="&dtml-getPermissionsText;" /></td>
 <th align="left">Role(s)</th>
 <td><input type="text" name="guard_roles" value="&dtml-getRolesText;" /></td>
+<th align="left">Group(s)</th>
+<td><input type="text" name="guard_groups" value="&dtml-getGroupsText;" /></td>
 </tr>
 
 <tr>
