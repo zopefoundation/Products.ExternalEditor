@@ -1,1 +1,1 @@
-Unreleased
+CMF-1.5+
