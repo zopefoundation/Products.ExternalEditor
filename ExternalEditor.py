@@ -17,6 +17,7 @@
 # Zope External Editor Product by Casey Duncan
 
 from string import join # For Zope 2.3 compatibility
+import urllib
 import Acquisition
 from Globals import InitializeClass
 from AccessControl.SecurityManagement import getSecurityManager
@@ -42,6 +43,7 @@ class ExternalEditor(Acquisition.Implicit):
     def __before_publishing_traverse__(self, self2, request):
         path = request['TraversalRequestNameStack']
         target = path[-1]
+        print `request['TraversalRequestNameStack']`
         request.set('target', target)
         path[:] = []
     
@@ -144,7 +146,7 @@ def EditLink(self, object):
                 '<img src="%s/misc_/ExternalEditor/edit_icon" '
                 'align="middle" hspace="2" border="0" alt="External Editor" />'
                 '</a>' % (object.aq_parent.absolute_url(), 
-                          object.getId(),
+                          urllib.quote(object.getId()),
                           object.REQUEST.BASEPATH1)
                )
     else:
