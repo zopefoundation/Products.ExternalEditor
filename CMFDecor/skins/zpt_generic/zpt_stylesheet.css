@@ -323,10 +323,12 @@ table.FormLayout tr {
 
 table.FormLayout tr th.TextField {
     vertical-align: top;
+    color: #000000;
 }
 
 table.FormLayout tr td.TextField {
     vertical-align: top;
+    color: #000000;
 }
 
 table.FormLayout th {
@@ -335,6 +337,18 @@ table.FormLayout th {
 
 table.FormLayout dl.FieldHelp dd {
     font-size: 70%;
+}
+
+table.FormLayout td.ListName {
+    background-color:  #336699;
+    color: #FFFFFF;
+    font-weight: bold;
+    verticle-align: middle;
+}
+
+table.FormLayout td.ListDefinition {
+    font-style: italic;
+    color: #000000;
 }
 
 table.ContentsList tr td {
@@ -417,12 +431,4 @@ tr.NewsItemRow td {
 
 p.NewsHeadline {
     background-color:  #336699;
-}
-td.ListName {
-    background-color:  #336699;
-    color: #FFFFFF;
-    font-weight: bold;
-}
-td.ListDefinition {
-    font-style: italic;
 }

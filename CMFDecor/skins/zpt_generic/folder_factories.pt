@@ -29,10 +29,10 @@
  </table>
  </td></tr></table>
 
-<table>
+<table class="FormLayout">
  <tr valign="top">
   <td> <br> </td>
-  <td colspan="2"> <strong> ID: </strong>
+  <td colspan="2" class="TextField"> <strong> ID: </strong>
        <input type="text" name="id" size="20">
        <input type="submit" value="Add"> </td>
  </tr>

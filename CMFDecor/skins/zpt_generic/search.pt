@@ -33,7 +33,7 @@
    <span tal:condition="results/getIcon|nothing">
      <a href="" tal:attributes="href objURL"><img src="" border="0" alt="" title=""
 	                                              tal:define="alt results/Type"
-	                                              tal:attributes="src results/portal_url/iconHTML; alt alt; title alt">
+	                                              tal:attributes="src results/getIcon; alt alt; title alt">
 	 </a>
     </span>
   </td>
