@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2002 Zope Corporation and Contributors. All Rights Reserved.
+# Copyright (c) 2004 Zope Corporation and Contributors. All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
@@ -10,7 +10,7 @@
 # FOR A PARTICULAR PURPOSE
 #
 ##############################################################################
-"""Unique Id Generation and Management
+"""Unique Id Generation and Handling
 
 These interfaces are intentionaly kept close to those from Zope3. Additionaly
 handling (IUniqueIdHandler) and generation (IUniqueIdGenerator) of unique ids 
@@ -18,7 +18,6 @@ are kept separate.
 
 $Id$
 """
-__version__ = "$Revision$"
 
 from Interface import Interface, Attribute
 
@@ -106,7 +105,7 @@ class IUniqueIdSet(Interface):
         UniqueIdError is raised if object was not registered previously.
         """
 
-
+# Main API for plaing with unique ids
 class IUniqueIdHandler(IUniqueIdSet, IUniqueIdQuery, IUniqueIdBrainQuery):
     """Handle registering, querying unique ids and objects.
     """

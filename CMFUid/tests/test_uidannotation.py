@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2002 Zope Corporation and Contributors. All Rights Reserved.
+# Copyright (c) 2004 Zope Corporation and Contributors. All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
@@ -14,7 +14,6 @@
 
 $Id$
 """
-__version__ = "$Revision$"
 
 from unittest import TestCase, TestSuite, makeSuite, main
 import Testing
