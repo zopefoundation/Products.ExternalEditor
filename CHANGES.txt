@@ -52,6 +52,8 @@ New Features
 
 Bugs Fixed
 
+  - Added 'text_format' wiget to NewsItem's edit forms (Tracker #460).
+
   - Fix sharing bug pointed out by Dieter Maurer (Tracker #484)
     in ActionProviderBase.  Thanks for the patch!
 
