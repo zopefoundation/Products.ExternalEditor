@@ -17,6 +17,7 @@ def supplement_query(field, index_name=None, reqget=reqget, query=query):
 supplement_query("SearchableText")
 supplement_query("Creator")
 supplement_query("classifications", "classification")
+supplement_query("topics", "topic")
 supplement_query("supporters", "assigned_to")
 supplement_query("resolution")
 supplement_query("version_info")
