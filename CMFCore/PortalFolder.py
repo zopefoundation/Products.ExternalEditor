@@ -216,7 +216,6 @@ class PortalFolder(DynamicType, CMFCatalogAware, Folder):
         get = self._getOb
         for id in ids:
             obj = get( id )
-            include = 0
             if query(obj):
                 append( (id, obj) )
         return result
@@ -265,7 +264,6 @@ class PortalFolder(DynamicType, CMFCatalogAware, Folder):
             except zExceptions_Unauthorized:  # Catch *all* Unauths!
                 pass
         return l
-
 
     security.declarePublic('contentItems')
     def contentItems( self, spec=None, filter=None ):
