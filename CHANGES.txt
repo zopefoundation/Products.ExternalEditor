@@ -43,6 +43,10 @@ CMF 1.5.0-beta (unreleased)
       
   Bug Fixes
 
+    - CMFSetup: Refactored rolemap.
+      Converted the roles attribute to role sub-elements. Fixed an acquisition
+      bug that caused incomplete exports. Updated default profile.
+
     - CMFWiki: Prevent deprecation notice for the deprecated
       CMFWikiPermissions module by replacing its usage in CMFWiki.__init__
       with the new permissions module.

@@ -1,9 +1,24 @@
+##############################################################################
+#
+# Copyright (c) 2004 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE
+#
+##############################################################################
 """ CMFSetup rolemap export / import unit tests
 
 $Id$
 """
 
 import unittest
+import Testing
+import Zope
+Zope.startup()
 
 from OFS.Folder import Folder
 
@@ -292,8 +307,10 @@ _ACQUIRED_EXPORT = """\
   </roles>
   <permissions>
     <permission name="Access contents information"
-                roles="Manager Owner"
-                acquire="True" />
+                acquire="True">
+      <role name="Manager"/>
+      <role name="Owner"/>
+    </permission>
   </permissions>
 </rolemap>
 """
@@ -309,8 +326,10 @@ _UNACQUIRED_EXPORT = """\
   </roles>
   <permissions>
     <permission name="Access contents information"
-                roles="Manager Owner"
-                acquire="False" />
+                acquire="False">
+      <role name="Manager"/>
+      <role name="Owner"/>
+    </permission>
   </permissions>
 </rolemap>
 """
@@ -327,8 +346,11 @@ _COMBINED_EXPORT = """\
   </roles>
   <permissions>
     <permission name="Access contents information"
-                roles="Manager Owner ZZZ"
-                acquire="False" />
+                acquire="False">
+      <role name="Manager"/>
+      <role name="Owner"/>
+      <role name="ZZZ"/>
+    </permission>
   </permissions>
 </rolemap>
 """
@@ -517,7 +539,7 @@ class Test_importRolemap( BaseRegistryTests ):
                                 if x[ 'selected' ] ]
 
         self.assertEqual( existing_allowed, [] )
-    
+
         self.failIf( site.acquiredRolesAreUsedBy( ACI ) )
         self.failIf( site.acquiredRolesAreUsedBy( VIEW ) )
 
@@ -532,7 +554,7 @@ class Test_importRolemap( BaseRegistryTests ):
                            if x[ 'selected' ] ]
 
         self.assertEqual( new_allowed, [ 'Manager', 'Owner' ] )
-    
+
         # ACI is overwritten by XML, but VIEW was purged
         self.failUnless( site.acquiredRolesAreUsedBy( ACI ) )
         self.failUnless( site.acquiredRolesAreUsedBy( VIEW ) )
@@ -552,7 +574,7 @@ class Test_importRolemap( BaseRegistryTests ):
                                 if x[ 'selected' ] ]
 
         self.assertEqual( existing_allowed, [] )
-    
+
         self.failIf( site.acquiredRolesAreUsedBy( ACI ) )
 
         context = DummyImportContext( site, False )
@@ -566,7 +588,7 @@ class Test_importRolemap( BaseRegistryTests ):
                            if x[ 'selected' ] ]
 
         self.assertEqual( new_allowed, [ 'Manager', 'Owner' ] )
-    
+
         # ACI is overwritten by XML, but VIEW is not
         self.failUnless( site.acquiredRolesAreUsedBy( ACI ) )
         self.failIf( site.acquiredRolesAreUsedBy( VIEW ) )
@@ -585,7 +607,7 @@ class Test_importRolemap( BaseRegistryTests ):
                                 if x[ 'selected' ] ]
 
         self.assertEqual( existing_allowed, [ 'Manager' ] )
-    
+
         self.failUnless( site.acquiredRolesAreUsedBy( ACI ) )
         self.failIf( site.acquiredRolesAreUsedBy( VIEW ) )
 
@@ -600,7 +622,7 @@ class Test_importRolemap( BaseRegistryTests ):
                            if x[ 'selected' ] ]
 
         self.assertEqual( new_allowed, [ 'Manager', 'Owner' ] )
-    
+
         self.failIf( site.acquiredRolesAreUsedBy( ACI ) )
         self.failUnless( site.acquiredRolesAreUsedBy( VIEW ) )
 
@@ -618,7 +640,7 @@ class Test_importRolemap( BaseRegistryTests ):
                                 if x[ 'selected' ] ]
 
         self.assertEqual( existing_allowed, [ 'Manager' ] )
-    
+
         self.failUnless( site.acquiredRolesAreUsedBy( ACI ) )
         self.failIf( site.acquiredRolesAreUsedBy( VIEW ) )
 
@@ -633,7 +655,7 @@ class Test_importRolemap( BaseRegistryTests ):
                            if x[ 'selected' ] ]
 
         self.assertEqual( new_allowed, [ 'Manager', 'Owner' ] )
-    
+
         self.failIf( site.acquiredRolesAreUsedBy( ACI ) )
         self.failIf( site.acquiredRolesAreUsedBy( VIEW ) )
 
@@ -651,7 +673,7 @@ class Test_importRolemap( BaseRegistryTests ):
                                 if x[ 'selected' ] ]
 
         self.assertEqual( existing_allowed, [ 'Manager' ] )
-    
+
         self.failUnless( site.acquiredRolesAreUsedBy( ACI ) )
         self.failIf( site.acquiredRolesAreUsedBy( VIEW ) )
 
@@ -670,7 +692,7 @@ class Test_importRolemap( BaseRegistryTests ):
                            if x[ 'selected' ] ]
 
         self.assertEqual( new_allowed, [ 'Manager', 'Owner', 'ZZZ' ] )
-    
+
         self.failIf( site.acquiredRolesAreUsedBy( ACI ) )
         self.failUnless( site.acquiredRolesAreUsedBy( VIEW ) )
 
@@ -688,7 +710,7 @@ class Test_importRolemap( BaseRegistryTests ):
                                 if x[ 'selected' ] ]
 
         self.assertEqual( existing_allowed, [ 'Manager' ] )
-    
+
         self.failUnless( site.acquiredRolesAreUsedBy( ACI ) )
         self.failIf( site.acquiredRolesAreUsedBy( VIEW ) )
 
@@ -707,7 +729,7 @@ class Test_importRolemap( BaseRegistryTests ):
                            if x[ 'selected' ] ]
 
         self.assertEqual( new_allowed, [ 'Manager', 'Owner', 'ZZZ' ] )
-    
+
         self.failIf( site.acquiredRolesAreUsedBy( ACI ) )
         self.failIf( site.acquiredRolesAreUsedBy( VIEW ) )
 
@@ -725,7 +747,7 @@ class Test_importRolemap( BaseRegistryTests ):
                                 if x[ 'selected' ] ]
 
         self.assertEqual( existing_allowed, [ 'Manager' ] )
-    
+
         self.failUnless( site.acquiredRolesAreUsedBy( ACI ) )
         self.failIf( site.acquiredRolesAreUsedBy( VIEW ) )
 
@@ -744,7 +766,7 @@ class Test_importRolemap( BaseRegistryTests ):
                            if x[ 'selected' ] ]
 
         self.assertEqual( new_allowed, [ 'Manager', 'Owner', 'ZZZ' ] )
-    
+
         self.failIf( site.acquiredRolesAreUsedBy( ACI ) )
         self.failIf( site.acquiredRolesAreUsedBy( VIEW ) )
 

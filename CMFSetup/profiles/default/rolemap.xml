@@ -1,23 +1,71 @@
 <?xml version="1.0"?>
 <rolemap>
   <roles>
+    <role name="Anonymous"/>
+    <role name="Authenticated"/>
+    <role name="Manager"/>
     <role name="Member"/>
+    <role name="Owner"/>
     <role name="Reviewer"/>
   </roles>
   <permissions>
     <permission name="Access future portal content"
-                acquire="True" roles="Reviewer"/>
-    <permission name="List portal members" acquire="True"
-                roles="Member"/>
-    <permission name="List undoable changes" acquire="True"
-                roles="Member"/>
-    <permission name="Reply to item" acquire="True"
-                roles="Member"/>
-    <permission name="Review portal content" acquire="True"
-                roles="Reviewer"/>
-    <permission name="Set own password" acquire="True"
-                roles="Member"/>
-    <permission name="Set own properties" acquire="True"
-                roles="Member"/>
+                acquire="True">
+      <role name="Reviewer"/>
+      <role name="Manager"/>
+    </permission>
+    <permission name="Add portal content" acquire="True">
+      <role name="Owner"/>
+      <role name="Manager"/>
+    </permission>
+    <permission name="Add portal folders" acquire="True">
+      <role name="Owner"/>
+      <role name="Manager"/>
+    </permission>
+    <permission name="Delete objects" acquire="True">
+      <role name="Owner"/>
+      <role name="Manager"/>
+    </permission>
+    <permission name="FTP access" acquire="True">
+      <role name="Owner"/>
+      <role name="Manager"/>
+    </permission>
+    <permission name="List portal members" acquire="True">
+      <role name="Member"/>
+      <role name="Manager"/>
+    </permission>
+    <permission name="List undoable changes" acquire="True">
+      <role name="Member"/>
+      <role name="Manager"/>
+    </permission>
+    <permission name="Manage properties" acquire="True">
+      <role name="Owner"/>
+      <role name="Manager"/>
+    </permission>
+    <permission name="Reply to item" acquire="True">
+      <role name="Member"/>
+      <role name="Manager"/>
+    </permission>
+    <permission name="Review portal content" acquire="True">
+      <role name="Reviewer"/>
+      <role name="Manager"/>
+    </permission>
+    <permission name="Set own password" acquire="True">
+      <role name="Member"/>
+      <role name="Manager"/>
+    </permission>
+    <permission name="Set own properties" acquire="True">
+      <role name="Member"/>
+      <role name="Manager"/>
+    </permission>
+    <permission name="Undo changes" acquire="True">
+      <role name="Owner"/>
+      <role name="Manager"/>
+    </permission>
+    <permission name="View management screens"
+                acquire="True">
+      <role name="Owner"/>
+      <role name="Manager"/>
+    </permission>
   </permissions>
 </rolemap>

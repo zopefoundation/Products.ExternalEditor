@@ -1,8 +1,21 @@
+##############################################################################
+#
+# Copyright (c) 2004 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE
+#
+##############################################################################
 """ CMFSetup:  Role-permission export / import
 
 $Id$
 """
-from xml.sax import parseString
+
+from xml.dom.minidom import parseString as domParseString
 
 from AccessControl import ClassSecurityInfo
 from AccessControl.Permission import Permission
@@ -11,7 +24,8 @@ from Globals import InitializeClass
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
 from permissions import ManagePortal
-from utils import HandlerBase
+from utils import _getNodeAttribute
+from utils import _getNodeAttributeBoolean
 from utils import _xmldir
 
 #
@@ -21,7 +35,7 @@ _FILENAME = 'rolemap.xml'
 
 def importRolemap( context ):
 
-    """ Export roles / permission map as an XML file
+    """ Import roles / permission map from an XML file.
 
     o 'context' must implement IImportContext.
 
@@ -38,7 +52,7 @@ def importRolemap( context ):
                            )
 
     o Register via XML:
- 
+
       <setup-step id="importRolemap"
                   version="20040518-01"
                   handler="Products.CMFSetup.rolemap.importRolemap"
@@ -109,7 +123,7 @@ def exportRolemap( context ):
                            )
 
     o Register via XML:
- 
+
       <export-script id="exportRolemap"
                      version="20040518-01"
                      handler="Products.CMFSetup.rolemap.exportRolemap"
@@ -130,9 +144,9 @@ class RolemapConfigurator( Implicit ):
 
     """ Synthesize XML description of sitewide role-permission settings.
     """
-    security = ClassSecurityInfo()   
+    security = ClassSecurityInfo()
     security.setDefaultAccess( 'allow' )
-    
+
     def __init__( self, site ):
         self._site = site
 
@@ -155,12 +169,12 @@ class RolemapConfigurator( Implicit ):
 
         o Returns a sqeuence of mappings describing locally-modified
           permission / role settings.  Keys include:
-          
+
           'permission' -- the name of the permission
-          
+
           'acquire' -- a flag indicating whether to acquire roles from the
               site's container
-              
+
           'roles' -- the list of roles which have the permission.
 
         o Do not include permissions which both acquire and which define
@@ -193,47 +207,49 @@ class RolemapConfigurator( Implicit ):
         return self._rolemap()
 
     security.declareProtected( ManagePortal, 'parseXML' )
-    def parseXML( self, text ):
+    def parseXML( self, xml, encoding=None ):
 
         """ Pseudo API.
         """
-        reader = getattr( text, 'read', None )
+        dom = domParseString(xml)
 
-        if reader is not None:
-            text = reader()
-
-        parser = _RolemapParser()
-        parseString( text, parser )
-
-        return parser._roles, parser._permissions
+        return _extractRolemapNode(dom, encoding)
 
 InitializeClass( RolemapConfigurator )
 
 
-class _RolemapParser( HandlerBase ):
+def _extractRolemapNode(parent, encoding=None):
 
-    def __init__( self, encoding='latin-1' ):
+    rm_node = parent.getElementsByTagName('rolemap')[0]
 
-        self._encoding = encoding
-        self._roles = []
-        self._permissions = []
+    r_node = rm_node.getElementsByTagName('roles')[0]
+    roles = _extractRoleNodes(r_node, encoding)
 
-    def startElement( self, name, attrs ):
+    p_node = rm_node.getElementsByTagName('permissions')[0]
+    permissions = _extractPermissionNodes(p_node, encoding)
 
-        if name == 'role':
-            self._roles.append( self._extract( attrs, 'name' )  )
+    return roles, permissions
 
-        elif name == 'permission':
+def _extractPermissionNodes(parent, encoding=None):
 
-            acquire = self._extract( attrs, 'acquire' ).lower()
-            acquire = acquire in ( '1', 'true', 'yes' )
+    result = []
 
-            info = { 'name'     : self._extract( attrs, 'name' )
-                   , 'roles'    : self._extract( attrs, 'roles' ).split()
-                   , 'acquire'  : acquire
-                   }
+    for p_node in parent.getElementsByTagName('permission'):
+        name    = _getNodeAttribute(p_node, 'name', encoding)
+        roles   = _extractRoleNodes(p_node, encoding)
+        acquire = _getNodeAttributeBoolean(p_node, 'acquire')
+        result.append( { 'name': name,
+                         'roles': roles,
+                         'acquire': acquire } )
 
-            self._permissions.append( info )
+    return tuple(result)
 
-        elif name not in ( 'rolemap', 'permissions', 'roles' ):
-            raise ValueError, 'Unknown element: %s' % name
+def _extractRoleNodes(parent, encoding=None):
+
+    result = []
+
+    for r_node in parent.getElementsByTagName('role'):
+        value = _getNodeAttribute(r_node, 'name', encoding)
+        result.append(value)
+
+    return tuple(result)
