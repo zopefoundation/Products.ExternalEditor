@@ -31,6 +31,9 @@ PluggableAuthService changelog
 
     Bugs Fixed
 
+      - Avoid triggering "Emergency user cannot own" when adding a
+        CookieAuthHelper plugin as that user.
+
       - Detect and prevent recursive redirecting in the CookieAuthHelper
         if the login_form cannot be reached by the Anonymous User.
 

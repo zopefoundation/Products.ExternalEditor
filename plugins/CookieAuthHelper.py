@@ -24,7 +24,7 @@ from AccessControl.SecurityInfo import ClassSecurityInfo
 from OFS.Folder import Folder
 from App.class_init import default__class_init__ as InitializeClass
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
-from Products.PageTemplates.ZopePageTemplate import manage_addPageTemplate
+from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
 
 from Products.PluggableAuthService.plugins.BasePlugin import BasePlugin
 from Products.PluggableAuthService.interfaces.plugins import \
@@ -151,12 +151,12 @@ class CookieAuthHelper(Folder, BasePlugin):
     security.declarePrivate('manage_afterAdd')
     def manage_afterAdd(self, item, container):
         """ Setup tasks upon instantiation """
-        manage_addPageTemplate( self
-                              , 'login_form'
-                              , title='Login Form'
-                              , text=BASIC_LOGIN_FORM
-                              )
-        self.login_form.__roles__ = []
+        login_form = ZopePageTemplate( id='login_form'
+                                     , text=BASIC_LOGIN_FORM
+                                     )
+        login_form.title = 'Login Form'
+        login_form.__roles__ = []
+        self._setObject( 'login_form', login_form, set_owner=0 )
 
 
     security.declarePrivate('unauthorized')
