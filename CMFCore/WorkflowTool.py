@@ -96,7 +96,7 @@ from Globals import InitializeClass, PersistentMapping, DTMLFile
 from AccessControl import ClassSecurityInfo
 from Acquisition import aq_base
 from WorkflowCore import WorkflowException
-from CMFCorePermissions import ManagePortal
+import CMFCorePermissions
 from string import join, split, replace, strip
 
 AUTO_MIGRATE_WORKFLOW_TOOLS = 1  # This will later be set to 0.
@@ -112,14 +112,23 @@ class WorkflowTool (UniqueObject, Folder):
     id = 'portal_workflow'
     meta_type = 'CMF Workflow Tool'
 
-    security = ClassSecurityInfo()
-
     _chains_by_type = None  # PersistentMapping
     _default_chain = ('default_workflow',)
 
-    manage_options = (
-        ({'label':'Workflows', 'action':'manage_selectWorkflows'},) +
-        Folder.manage_options)
+    security = ClassSecurityInfo()
+
+    manage_options = ( { 'label' : 'Overview', 'action' : 'manage_overview' }
+                     , { 'label' : 'Workflows'
+                       , 'action' : 'manage_selectWorkflows'
+                       }
+                     ) + Folder.manage_options
+
+    #
+    #   ZMI methods
+    #
+    security.declareProtected( CMFCorePermissions.ManagePortal
+                             , 'manage_overview' )
+    manage_overview = DTMLFile( 'explainWorkflowTool', _dtmldir )
 
     if AUTO_MIGRATE_WORKFLOW_TOOLS:
         def __setstate__(self, state):
@@ -141,7 +150,8 @@ class WorkflowTool (UniqueObject, Folder):
 
     _manage_addWorkflowForm = DTMLFile('addWorkflow', _dtmldir)
 
-    security.declareProtected(ManagePortal, 'manage_addWorkflowForm')
+    security.declareProtected( CMFCorePermissions.ManagePortal
+                             , 'manage_addWorkflowForm')
     def manage_addWorkflowForm(self, REQUEST):
         '''
         Form for adding workflows.
@@ -152,7 +162,8 @@ class WorkflowTool (UniqueObject, Folder):
         wft.sort()
         return self._manage_addWorkflowForm(REQUEST, workflow_types=wft)
 
-    security.declareProtected(ManagePortal, 'manage_addWorkflow')
+    security.declareProtected( CMFCorePermissions.ManagePortal
+                             , 'manage_addWorkflow')
     def manage_addWorkflow(self, workflow_type, id='', RESPONSE=None):
         '''
         Adds a workflow from the registered types.
@@ -170,7 +181,7 @@ class WorkflowTool (UniqueObject, Folder):
         mt = WorkflowTool.inheritedAttribute('all_meta_types')(self)
         return mt + ({'name': 'Workflow',
                       'action': 'manage_addWorkflowForm',
-                      'permission': ManagePortal},)
+                      'permission': CMFCorePermissions.ManagePortal },)
 
     def _listTypeInfo(self):
         pt = getToolByName(self, 'portal_types', None)
@@ -181,7 +192,8 @@ class WorkflowTool (UniqueObject, Folder):
 
     _manage_selectWorkflows = DTMLFile('selectWorkflows', _dtmldir)
 
-    security.declareProtected(ManagePortal, 'manage_selectWorkflows')
+    security.declareProtected( CMFCorePermissions.ManagePortal
+                             , 'manage_selectWorkflows')
     def manage_selectWorkflows(self, REQUEST, manage_tabs_message=None):
         '''
         Shows a management screen for changing type to workflow connections.
@@ -208,7 +220,8 @@ class WorkflowTool (UniqueObject, Folder):
             management_view='Workflows',
             manage_tabs_message=manage_tabs_message)
 
-    security.declareProtected(ManagePortal, 'manage_changeWorkflows')
+    security.declareProtected( CMFCorePermissions.ManagePortal
+                             , 'manage_changeWorkflows')
     def manage_changeWorkflows(self, default_chain, props=None, REQUEST=None):
         '''
         Changes which workflows apply to objects of which type.

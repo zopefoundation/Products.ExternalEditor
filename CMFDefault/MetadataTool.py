@@ -87,14 +87,15 @@
 CMFDefault portal_metadata tool.
 """
 
-import os
 from OFS.SimpleItem import SimpleItem
-from Globals import InitializeClass, HTMLFile, package_home, PersistentMapping
-from AccessControl import getSecurityManager, ClassSecurityInfo
-from Products.CMFCore.CMFCorePermissions import View, ManagePortal
 from Products.CMFCore.utils import UniqueObject
+from Globals import PersistentMapping
 
-_dtmldir = os.path.join( package_home( globals() ), 'dtml' )
+
+from Globals import InitializeClass, DTMLFile
+from AccessControl import ClassSecurityInfo, getSecurityManager
+from Products.CMFCore import CMFCorePermissions
+from utils import _dtmldir
 
 class MetadataElementPolicy:
     """
@@ -274,7 +275,10 @@ class MetadataTool( UniqueObject, SimpleItem ):
     #
     #   ZMI methods
     #
-    manage_options = ( ( { 'label'      : 'Properties'
+    manage_options = ( ( { 'label'      : 'Overview'
+                         , 'action'     : 'manage_overview'
+                         }
+                       , { 'label'      : 'Properties'
                          , 'action'     : 'propertiesForm'
                          }
                        , { 'label'      : 'Elements'
@@ -287,10 +291,16 @@ class MetadataTool( UniqueObject, SimpleItem ):
                      + SimpleItem.manage_options
                      )
 
-    security.declareProtected( ManagePortal , 'propertiesForm' )
-    propertiesForm = HTMLFile( 'metadataProperties', _dtmldir )
+    security.declareProtected( CMFCorePermissions.ManagePortal
+                             , 'manage_overview' )
+    manage_overview = DTMLFile( 'explainMetadataTool', _dtmldir )
 
-    security.declareProtected( ManagePortal , 'editProperties' )
+    security.declareProtected( CMFCorePermissions.ManagePortal
+                             , 'propertiesForm' )
+    propertiesForm = DTMLFile( 'metadataProperties', _dtmldir )
+
+    security.declareProtected( CMFCorePermissions.ManagePortal
+                             , 'editProperties' )
     def editProperties( self
                       , publisher=None
                # TODO , initial_values_hook=None
@@ -313,10 +323,12 @@ class MetadataTool( UniqueObject, SimpleItem ):
                                         + '?manage_tabs_message=Tool+updated.'
                                         )
 
-    security.declareProtected( ManagePortal , 'elementPoliciesForm' )
-    elementPoliciesForm = HTMLFile( 'metadataElementPolicies', _dtmldir )
+    security.declareProtected( CMFCorePermissions.ManagePortal
+                             , 'elementPoliciesForm' )
+    elementPoliciesForm = DTMLFile( 'metadataElementPolicies', _dtmldir )
 
-    security.declareProtected( ManagePortal , 'addElementPolicy' )
+    security.declareProtected( CMFCorePermissions.ManagePortal
+                             , 'addElementPolicy' )
     def addElementPolicy( self
                         , element
                         , content_type
@@ -349,7 +361,8 @@ class MetadataTool( UniqueObject, SimpleItem ):
                + '&manage_tabs_message=Policy+added.'
                )
 
-    security.declareProtected( ManagePortal , 'removeElementPolicy' )
+    security.declareProtected( CMFCorePermissions.ManagePortal
+                             , 'removeElementPolicy' )
     def removeElementPolicy( self
                            , element
                            , content_type
@@ -370,7 +383,8 @@ class MetadataTool( UniqueObject, SimpleItem ):
                + '&manage_tabs_message=Policy+removed.'
                )
 
-    security.declareProtected( ManagePortal , 'updateElementPolicy' )
+    security.declareProtected( CMFCorePermissions.ManagePortal
+                             , 'updateElementPolicy' )
     def updateElementPolicy( self
                            , element
                            , content_type
@@ -406,7 +420,8 @@ class MetadataTool( UniqueObject, SimpleItem ):
     #
     #   Element spec manipulation.
     #
-    security.declareProtected( ManagePortal , 'listElementSpecs' )
+    security.declareProtected( CMFCorePermissions.ManagePortal
+                             , 'listElementSpecs' )
     def listElementSpecs( self ):
         """
             Return a list of ElementSpecs representing
@@ -414,7 +429,8 @@ class MetadataTool( UniqueObject, SimpleItem ):
         """
         return tuple( self.element_specs.items() )
 
-    security.declareProtected( ManagePortal , 'getElementSpec' )
+    security.declareProtected( CMFCorePermissions.ManagePortal
+                             , 'getElementSpec' )
     def getElementSpec( self, element ):
         """
             Return an ElementSpec representing the tool's knowledge
@@ -422,7 +438,8 @@ class MetadataTool( UniqueObject, SimpleItem ):
         """
         return self.element_specs[ element ]
 
-    security.declareProtected( ManagePortal , 'addElementSpec' )
+    security.declareProtected( CMFCorePermissions.ManagePortal
+                             , 'addElementSpec' )
     def addElementSpec( self, element, is_multi_valued ):
         """
             Add 'element' to our list of managed elements.
@@ -433,7 +450,8 @@ class MetadataTool( UniqueObject, SimpleItem ):
 
         self.element_specs[ element ] = ElementSpec( is_multi_valued )
 
-    security.declareProtected( ManagePortal , 'removeElementSpec' )
+    security.declareProtected( CMFCorePermissions.ManagePortal
+                             , 'removeElementSpec' )
     def removeElementSpec( self, element ):
         """
             Remove 'element' from our list of managed elements.

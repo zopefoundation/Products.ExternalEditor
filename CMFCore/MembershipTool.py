@@ -89,10 +89,10 @@ $Id$
 __version__='$Revision$'[11:-2]
 
 
-from utils import UniqueObject, _getAuthenticatedUser, _checkPermission, \
-     getToolByName
+from utils import UniqueObject, _getAuthenticatedUser, _checkPermission
+from utils import getToolByName, _dtmldir
 from OFS.SimpleItem import SimpleItem
-from Globals import InitializeClass, HTMLFile, MessageDialog, \
+from Globals import InitializeClass, DTMLFile, MessageDialog, \
      PersistentMapping
 from AccessControl.User import nobody
 from AccessControl import ClassSecurityInfo
@@ -118,13 +118,26 @@ class MembershipTool (UniqueObject, SimpleItem):
 
     security = ClassSecurityInfo()
 
-    manage_options=(
-        ({ 'label' : 'Role Mapping', 'action' : 'manage_mapRoles' },) +
-        SimpleItem.manage_options
-        )
+    manage_options=( { 'label' : 'Overview'
+                     , 'action' : 'manage_overview'
+                     }
+                   , { 'label' : 'Role Mapping'
+                     , 'action' : 'manage_mapRoles'
+                     }
+                   ) + SimpleItem.manage_options
+
+    #
+    #   ZMI methods
+    #
+    security.declareProtected( CMFCorePermissions.ManagePortal
+                             , 'manage_overview' )
+    manage_overview = DTMLFile( 'explainMembershipTool', _dtmldir )
  
+    #
+    #   'portal_membership' interface methods
+    #
     security.declareProtected(ManagePortal, 'manage_mapRoles')
-    manage_mapRoles = HTMLFile('dtml/membershipRolemapping', globals())
+    manage_mapRoles = DTMLFile('dtml/membershipRolemapping', _dtmldir )
  
     security.declarePublic('getAuthenticatedMember')
     def getAuthenticatedMember(self):

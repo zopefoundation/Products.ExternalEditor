@@ -4,6 +4,9 @@
 from string import split, join, lstrip, lower, strip, capitalize
 from sgmllib import SGMLParser
 import re
+import os
+from Globals import package_home
+_dtmldir = os.path.join( package_home( globals() ), 'dtml' )
 
 def parseHeadersBody( body, headers=None ):
     """

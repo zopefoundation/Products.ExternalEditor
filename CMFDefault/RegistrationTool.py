@@ -90,15 +90,31 @@ $Id$
 __version__='$Revision$'[11:-2]
 
 
-from Products.CMFCore.utils import UniqueObject, _checkPermission, \
-     getToolByName
+from Products.CMFCore.utils import UniqueObject
+from Products.CMFCore.utils import _checkPermission, getToolByName
 from Products.CMFCore.RegistrationTool import RegistrationTool
-from Globals import default__class_init__
 
+from Globals import InitializeClass, DTMLFile
+from AccessControl import ClassSecurityInfo
+from Products.CMFCore import CMFCorePermissions
+from utils import _dtmldir
 
 class RegistrationTool (RegistrationTool):
     meta_type = 'Default Registration Tool'
 
+    security = ClassSecurityInfo()
+
+    #
+    #   ZMI methods
+    #
+    security.declareProtected( CMFCorePermissions.ManagePortal
+                             , 'manage_overview' )
+    manage_overview = DTMLFile( 'explainRegistrationTool', _dtmldir )
+
+    #
+    #   'portal_registration' interface methods
+    #
+    security.declarePublic( 'testPasswordValidity' )
     def testPasswordValidity(self, password, confirm=None):
         '''If the password is valid, returns None.  If not, returns
         a string explaining why.
@@ -110,6 +126,7 @@ class RegistrationTool (RegistrationTool):
                    'Please try again.'
         return None
 
+    security.declarePublic( 'testPropertiesValidity' )
     def testPropertiesValidity(self, props, member=None):
         '''If the properties are valid, returns None.  If not, returns
         a string explaining why.
@@ -126,6 +143,7 @@ class RegistrationTool (RegistrationTool):
                 return 'You must enter a valid email address.'
         return None
 
+    security.declarePublic( 'mailPassword' )
     def mailPassword(self, forgotten_userid, REQUEST):
         '''Email a forgotten password to a member.  Raises an exception
         if user ID is not found.
@@ -149,6 +167,7 @@ class RegistrationTool (RegistrationTool):
 
         return self.mail_password_response( self, REQUEST )
 
+    security.declarePublic( 'registeredNotify' )
     def registeredNotify( self, new_member_id ):
         """
             Handle mailing the registration / welcome message.
@@ -175,5 +194,4 @@ class RegistrationTool (RegistrationTool):
 
         return self.mail_password_response( self, self.REQUEST )
 
-
-default__class_init__(RegistrationTool)
+InitializeClass(RegistrationTool)

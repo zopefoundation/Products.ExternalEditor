@@ -90,10 +90,10 @@ __version__='$Revision$'[11:-2]
 
 
 from string import split
-from utils import UniqueObject, getToolByName
+from utils import UniqueObject, getToolByName, _dtmldir
 from PortalFolder import PortalFolder
 import Globals
-from Globals import HTMLFile, PersistentMapping
+from Globals import DTMLFile, PersistentMapping
 from SkinsContainer import SkinsContainer
 from Acquisition import aq_base
 from DateTime import DateTime
@@ -122,14 +122,11 @@ class SkinsTool(UniqueObject, SkinsContainer, PortalFolder):
     id = 'portal_skins'
     meta_type = 'CMF Skins Tool'
 
-    manage_options = modifiedOptions()
-
     security = ClassSecurityInfo()
 
-    default_skin = ''
-    request_varname = 'portal_skin'
-    allow_any = 0
-    selections = None
+    manage_options = ( { 'label' : 'Overview', 'action' : 'manage_overview' }
+                     , 
+                     ) + modifiedOptions()
 
     def __init__(self):
         self.selections = PersistentMapping()
@@ -141,8 +138,20 @@ class SkinsTool(UniqueObject, SkinsContainer, PortalFolder):
             self.selections = sels = PersistentMapping()
         return sels
 
+    #
+    #   ZMI methods
+    #
+    security.declareProtected( CMFCorePermissions.ManagePortal
+                             , 'manage_overview' )
+    manage_overview = DTMLFile( 'explainSkinsTool', _dtmldir )
+
+    default_skin = ''
+    request_varname = 'portal_skin'
+    allow_any = 0
+    selections = None
+
     security.declareProtected(ManagePortal, 'manage_propertiesForm')
-    manage_propertiesForm = HTMLFile('dtml/skinProps', globals())
+    manage_propertiesForm = DTMLFile('dtml/skinProps', globals())
 
     security.declareProtected(ManagePortal, 'manage_properties')
     def manage_properties(self, default_skin='', request_varname='',
@@ -182,6 +191,9 @@ class SkinsTool(UniqueObject, SkinsContainer, PortalFolder):
         '''
         self.getSkinByPath(p, raise_exc=1)
 
+    #
+    #   'portal_skins' interface methods
+    #
     security.declareProtected(AccessContentsInformation, 'getSkinPath')
     def getSkinPath(self, name):
         '''

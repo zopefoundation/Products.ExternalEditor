@@ -89,16 +89,31 @@ $Id$
 __version__='$Revision$'[11:-2]
 
 
-from Globals import default__class_init__
 from DiscussionItem import DiscussionItemContainer
 from Products.CMFCore.DiscussionTool import DiscussionTool
+
+from Globals import InitializeClass, DTMLFile
+from AccessControl import ClassSecurityInfo
+from Products.CMFCore import CMFCorePermissions
+from utils import _dtmldir
 
 class DiscussionTool (DiscussionTool):
     id = 'portal_discussion'
     meta_type = 'Default Discussion Tool'
-    # This tool is used to find the discussion for a given content object.
 
-    createDiscussionFor__roles__ = None
+    security = ClassSecurityInfo()
+
+    #
+    #   ZMI methods
+    #
+    security.declareProtected( CMFCorePermissions.ManagePortal
+                             , 'manage_overview' )
+    manage_overview = DTMLFile( 'explainDiscussionTool', _dtmldir )
+
+    #
+    #   'portal_discussion' interface methods
+    #
+    security.declarePublic( 'createDiscussionFor' )
     def createDiscussionFor(self, object):
         """
         This method will create the object that holds 
@@ -106,4 +121,4 @@ class DiscussionTool (DiscussionTool):
         """
         object.talkback = DiscussionItemContainer()
 
-default__class_init__(DiscussionTool)
+InitializeClass(DiscussionTool)

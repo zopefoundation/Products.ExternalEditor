@@ -92,29 +92,50 @@ __version__='$Revision$'[11:-2]
 
 from Products.CMFCore.utils import UniqueObject
 from OFS.SimpleItem import SimpleItem
-from Globals import default__class_init__
 import string
 from Acquisition import aq_inner, aq_parent
+
+from Globals import InitializeClass, DTMLFile
+from AccessControl import ClassSecurityInfo
+from Products.CMFCore import CMFCorePermissions
+from utils import _dtmldir
 
 
 class URLTool (UniqueObject, SimpleItem):
     id = 'portal_url'
     meta_type = 'Default URL Tool'
 
+    security = ClassSecurityInfo()
+
+    manage_options = ( { 'label' : 'Overview', 'action' : 'manage_overview' }
+                     , 
+                     ) + SimpleItem.manage_options
+
+    #
+    #   ZMI methods
+    #
+    security.declareProtected( CMFCorePermissions.ManagePortal
+                             , 'manage_overview' )
+    manage_overview = DTMLFile( 'explainURLTool', _dtmldir )
+
+    #
+    #   'portal_url' interface methods
+    #
+    security.declarePublic( '__call__' )
     def __call__(self, relative=0, *args, **kw):
         '''
         Returns the absolute URL of the portal.
         '''
         return aq_parent(aq_inner(self)).absolute_url(relative=relative)
 
-    getPortalObject = None
+    security.declarePublic( 'getPortalObject' )
     def getPortalObject( self ):
         """
             Return the portal object itself.
         """
         return self.aq_inner.aq_parent
 
-    getRelativeUrl__roles__ = None
+    security.declarePublic( 'getRelativeUrl' )
     def getRelativeUrl(self, content):
         """
         Returns a URL for an object that is relative 
@@ -127,7 +148,7 @@ class URLTool (UniqueObject, SimpleItem):
 
         return string.join(rel_path, '/')
 
-    getPortalPath__roles__ = None
+    security.declarePublic( 'getPortalPath' )
     def getPortalPath(self):
         """
         Returns the portal object's URL without the server URL component
@@ -135,4 +156,4 @@ class URLTool (UniqueObject, SimpleItem):
         return string.join(self.aq_inner.aq_parent.getPhysicalPath(), '/')
 
 
-default__class_init__(URLTool)
+InitializeClass(URLTool)

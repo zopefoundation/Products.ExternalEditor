@@ -89,10 +89,11 @@ $Id$
 __version__='$Revision$'[11:-2]
 
 
-from utils import UniqueObject, _checkPermission, _getAuthenticatedUser, \
-     limitGrantedRoles, getToolByName
+from utils import UniqueObject
+from utils import _checkPermission, _getAuthenticatedUser, limitGrantedRoles
+from utils import getToolByName, _dtmldir
 from OFS.SimpleItem import SimpleItem
-from Globals import InitializeClass
+from Globals import InitializeClass, DTMLFile
 from AccessControl import ClassSecurityInfo
 from CMFCorePermissions import AddPortalMember, MailForgottenPassword, \
      SetOwnPassword, SetOwnProperties
@@ -108,6 +109,20 @@ class RegistrationTool (UniqueObject, SimpleItem):
 
     security = ClassSecurityInfo()
 
+    manage_options = ( { 'label' : 'Overview', 'action' : 'manage_overview' }
+                     , 
+                     ) + SimpleItem.manage_options
+
+    #
+    #   ZMI methods
+    #
+    security.declareProtected( CMFCorePermissions.ManagePortal
+                             , 'manage_overview' )
+    manage_overview = DTMLFile( 'explainRegistrationTool', _dtmldir )
+
+    #
+    #   'portal_registration' interface methods
+    #
     security.declarePublic('isRegistrationAllowed')
     def isRegistrationAllowed(self, REQUEST):
         '''Returns a boolean value indicating whether the user

@@ -89,10 +89,10 @@ $Id$
 __version__='$Revision$'[11:-2]
 
 
-from utils import UniqueObject, getToolByName
+from utils import UniqueObject, getToolByName, _dtmldir
 from OFS.SimpleItem import SimpleItem
 from OFS.PropertyManager import PropertyManager
-from Globals import Acquisition, Persistent, HTMLFile
+from Globals import Acquisition, Persistent, DTMLFile
 import Globals
 from AccessControl.Role import RoleManager
 from BTree import BTree
@@ -113,19 +113,32 @@ class MemberDataTool (UniqueObject, SimpleItem, PropertyManager):
     _v_temps = None
     _properties = ()
 
-    manage_options=(
-        ({ 'label' : 'Contents', 'action' : 'manage_showContents' },) +
-        PropertyManager.manage_options +
-        SimpleItem.manage_options
-        )
-
     security = ClassSecurityInfo()
 
-    security.declareProtected(ViewManagementScreens, 'manage_showContents')
-    manage_showContents = HTMLFile('dtml/memberdataContents', globals())
+    manage_options=( ( { 'label' : 'Overview'
+                       , 'action' : 'manage_overview'
+                       }
+                     , { 'label' : 'Contents'
+                       , 'action' : 'manage_showContents'
+                       }
+                     )
+                   + PropertyManager.manage_options
+                   + SimpleItem.manage_options
+                   )
 
-    security.declareProtected(CMFCorePermissions.ViewManagementScreens,
-                              'getContentsInformation',)
+    #
+    #   ZMI methods
+    #
+    security.declareProtected( CMFCorePermissions.ManagePortal
+                             , 'manage_overview' )
+    manage_overview = DTMLFile( 'explainMemberDataTool', _dtmldir )
+
+    security.declareProtected( CMFCorePermissions.ViewManagementScreens
+                             , 'manage_showContents')
+    manage_showContents = DTMLFile('dtml/memberdataContents', _dtmldir )
+
+    security.declareProtected( CMFCorePermissions.ViewManagementScreens
+                             , 'getContentsInformation',)
 
 
     def __init__(self):
@@ -137,6 +150,9 @@ class MemberDataTool (UniqueObject, SimpleItem, PropertyManager):
         self._setProperty('login_time', '2000/01/01', 'date')
         self._setProperty('last_login_time', '2000/01/01', 'date')
 
+    #
+    #   'portal_memberdata' interface methods
+    #
     security.declarePrivate('getMemberDataContents')
     def getMemberDataContents(self):
         '''

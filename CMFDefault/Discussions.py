@@ -83,15 +83,14 @@
 # 
 ##############################################################################
  
-import urllib, string, os
+import urllib, string
 
 from ExtensionClass import Base
-from Globals import HTMLFile, package_home, default__class_init__
+from Globals import HTMLFile, default__class_init__
 from DateTime import DateTime
 from Products.CMFCore.PortalContent import PortalContent
 from Products.CMFCore.utils import getToolByName
-
-_dtmldir = os.path.join( package_home( globals() ), 'dtml' )
+from utils import _dtmldir
 
 VIEW_PERMISSION             = 'View'
 REPLY_TO_ITEM_PERMISSION    = 'Reply to item'

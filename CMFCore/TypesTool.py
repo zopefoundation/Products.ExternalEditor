@@ -90,7 +90,7 @@
 __version__='$Revision$'[11:-2]
 
 import OFS
-from Globals import InitializeClass, HTMLFile
+from Globals import InitializeClass, DTMLFile
 from utils import UniqueObject, SimpleItemWithProperties, tuplize, _dtmldir
 import string
 from AccessControl import getSecurityManager, ClassSecurityInfo
@@ -272,7 +272,7 @@ class TypeInformation (SimpleItemWithProperties):
     #
     #  Action editing interface
     #
-    _actions_form = HTMLFile( 'editActions', _dtmldir )
+    _actions_form = DTMLFile( 'editActions', _dtmldir )
     
     security.declareProtected(ManagePortal, 'manage_editActionsForm')
     def manage_editActionsForm(self, REQUEST, manage_tabs_message=None):
@@ -558,6 +558,17 @@ class TypesTool( UniqueObject, OFS.Folder.Folder ):
 
     security = ClassSecurityInfo()
 
+    manage_options = ( { 'label' : 'Overview', 'action' : 'manage_overview' }
+                     , 
+                     ) + OFS.Folder.Folder.manage_options
+
+    #
+    #   ZMI methods
+    #
+    security.declareProtected( CMFCorePermissions.ManagePortal
+                             , 'manage_overview' )
+    manage_overview = DTMLFile( 'explainTypesTool', _dtmldir )
+
     def all_meta_types(self):
         all = TypesTool.inheritedAttribute('all_meta_types')(self)
         return (
@@ -600,7 +611,7 @@ class TypesTool( UniqueObject, OFS.Folder.Folder ):
                         res.append((product.getId() + ': ' + mt, fti))
         return res
 
-    _addTIForm = HTMLFile( 'addTypeInfo', _dtmldir )
+    _addTIForm = DTMLFile( 'addTypeInfo', _dtmldir )
 
     security.declareProtected(ManagePortal, 'manage_addFactoryTIForm')
     def manage_addFactoryTIForm(self, REQUEST):

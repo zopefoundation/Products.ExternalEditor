@@ -47,6 +47,9 @@ setDefaultRoles(ManagePortal, ('Manager',))
 ModifyPortalContent = 'Modify portal content'
 setDefaultRoles(ModifyPortalContent, ('Manager',))
 
+ListPortalMembers = 'List portal members'
+setDefaultRoles(ListPortalMembers, ('Manager', 'Member'))
+
 AddPortalFolders = 'Add portal folders'
 setDefaultRoles(AddPortalFolders, ('Owner','Manager'))  # + Member
 

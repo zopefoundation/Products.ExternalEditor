@@ -90,10 +90,11 @@ $Id$
 __version__='$Revision$'[11:-2]
 
 
-from utils import UniqueObject, _getAuthenticatedUser, _checkPermission, \
-     getToolByName
+from utils import UniqueObject, _getAuthenticatedUser, _checkPermission
+from utils import getToolByName, _dtmldir
+import CMFCorePermissions
 from OFS.SimpleItem import SimpleItem
-from Globals import InitializeClass
+from Globals import InitializeClass, DTMLFile, package_home
 from urllib import quote
 from Acquisition import aq_base, aq_inner, aq_parent
 from AccessControl import ClassSecurityInfo
@@ -131,8 +132,13 @@ class ActionInformation:
 
 
 class ActionsTool (UniqueObject, SimpleItem):
+    """
+        Weave together the various sources of "actions" which are apropos
+        to the current user and context.
+    """
     id = 'portal_actions'
     meta_type = 'CMF Actions Tool'
+
     action_providers = (
         'portal_actions',
         'portal_discussion',
@@ -142,6 +148,20 @@ class ActionsTool (UniqueObject, SimpleItem):
 
     security = ClassSecurityInfo()
 
+    manage_options = ( { 'label' : 'Overview', 'action' : 'manage_overview' }
+                     , 
+                     ) + SimpleItem.manage_options
+
+    #
+    #   ZMI methods
+    #
+    security.declareProtected( CMFCorePermissions.ManagePortal
+                             , 'manage_overview' )
+    manage_overview = DTMLFile( 'explainActionsTool', _dtmldir )
+
+    #
+    #   'portal_actions' interface methods
+    #
     security.declarePublic('listFilteredActionsFor')
     def listFilteredActionsFor(self, object=None):
         '''Gets all actions available to the user and returns a mapping

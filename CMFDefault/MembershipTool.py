@@ -90,13 +90,16 @@ $Id$
 __version__='$Revision$'[11:-2]
 
 
-from Products.CMFCore.utils import _getAuthenticatedUser, _checkPermission, \
-     getToolByName
+from Products.CMFCore.utils import _getAuthenticatedUser, _checkPermission
+from Products.CMFCore.utils import getToolByName
 import Products.CMFCore.MembershipTool
 from Products.CMFCore.PortalFolder import manage_addPortalFolder
-from Globals import default__class_init__
 import Document
 
+from Globals import InitializeClass, DTMLFile
+from AccessControl import ClassSecurityInfo
+from Products.CMFCore import CMFCorePermissions
+from utils import _dtmldir
 
 default_member_content = '''Default page for %s
 
@@ -114,10 +117,21 @@ class MembershipTool ( Products.CMFCore.MembershipTool.MembershipTool ):
 
     meta_type = 'Default Membership Tool'
 
-    __ac_permissions__ = (
-        ('List portal members', ('getRoster',)),
-        )
 
+    security = ClassSecurityInfo()
+
+    #
+    #   ZMI methods
+    #
+    security.declareProtected( CMFCorePermissions.ManagePortal
+                             , 'manage_overview' )
+    manage_overview = DTMLFile( 'explainMembershipTool', _dtmldir )
+
+    #
+    #   'portal_membership' interface methods
+    #
+    security.declareProtected( CMFCorePermissions.ListPortalMembers
+                             , 'getRoster' )
     def getRoster(self):
         '''
         Return a list of mappings corresponding to those users who have
@@ -136,8 +150,13 @@ class MembershipTool ( Products.CMFCore.MembershipTool.MembershipTool ):
         '''Adds a new member to the user folder.  Security checks will have
         already been performed.  Called by portal_registration.
         '''
-        Products.CMFCore.MembershipTool.MembershipTool.addMember( self, id, password
-                                                                , roles, domains, properties )
+        Products.CMFCore.MembershipTool.MembershipTool.addMember( self
+                                                                , id
+                                                                , password
+                                                                , roles
+                                                                , domains
+                                                                , properties
+                                                                )
         member = self.getMemberById(id)
         if hasattr(getattr(member, 'aq_base', member), 'getUser'):
             user = member.getUser()
@@ -198,6 +217,7 @@ class MembershipTool ( Products.CMFCore.MembershipTool.MembershipTool ):
         else:
             return None
 
+    security.declarePrivate( 'listActions' )
     def listActions(self, info):
         '''Lists actions available to the user.'''
         if not info.isAnonymous:
@@ -211,4 +231,4 @@ class MembershipTool ( Products.CMFCore.MembershipTool.MembershipTool ):
                     )
         return None
 
-default__class_init__(MembershipTool)
+InitializeClass(MembershipTool)

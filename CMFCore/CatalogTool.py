@@ -100,6 +100,7 @@ from string import join
 from AccessControl.PermissionRole import rolesForPermissionOn
 from AccessControl import ClassSecurityInfo
 from utils import mergedLocalRoles
+import os
 import CMFCorePermissions
 
 
@@ -141,6 +142,10 @@ class CatalogTool (UniqueObject, ZCatalog):
     meta_type = 'CMF Catalog'
     security = ClassSecurityInfo()
 
+    manage_options = ( { 'label' : 'Overview', 'action' : 'manage_overview' }
+                     , 
+                     ) + ZCatalog.manage_options
+
     def __init__(self):
         ZCatalog.__init__(self, self.getId())
         self._initIndexes()
@@ -178,6 +183,17 @@ class CatalogTool (UniqueObject, ZCatalog):
         self._catalog.addColumn('EffectiveDate')
         self._catalog.addColumn('ExpiresDate')
         self._catalog.addColumn('ModifiedDate')
+
+    #
+    #   ZMI methods
+    #
+    security.declareProtected( CMFCorePermissions.ManagePortal
+                             , 'manage_overview' )
+    manage_overview = DTMLFile( 'explainCatalogTool', _dtmldir )
+
+    #
+    #   'portal_catalog' interface methods
+    #
 
     # searchResults has inherited security assertions.
     def searchResults(self, REQUEST=None, **kw):
