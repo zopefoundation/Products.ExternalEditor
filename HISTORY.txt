@@ -4,6 +4,9 @@
    CMFDefault/skins/control/reconfig.dtml.  Thanks to Hans de Wit
    <hw@scp.nl> for reporting this!
 
+ - Allow 'portal_type' to be a method, as well as an attribute
+   (eases ZClass-as-content).
+
 1.0 final (2001/03/29)
 
  - Removed embedded spaces in 'portal_status_message' strings

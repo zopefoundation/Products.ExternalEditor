@@ -114,6 +114,8 @@ class DynamicType:
         if pt is None:
             # Provide a fallback.
             pt = self.meta_type
+        if callable( pt ):
+            pt = pt()
         return pt
 
     security.declarePublic('getTypeInfo')
