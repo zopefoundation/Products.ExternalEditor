@@ -1,43 +1,48 @@
 <dtml-var standard_html_header>
 
+<div class="Desktop">
+
 <dtml-in folder_rename_items>
 
 <dtml-if sequence-start>
-<div class="Desktop">
-<H1> Rename Items </H2>
+<h2> Rename Items </h2>
 
-<FORM ACTION="folder_rename" METHOD="POST">
-<TABLE class="FormLayout">
+<form action="folder_rename" method="POST">
+<table class="FormLayout">
 </dtml-if sequence-start>
-<TR>
-  <TD ALIGN="LEFT" VALIGN="TOP" width="8%">
+
+<tr>
+  <td align="left" valign="top" width="8%">
   <dtml-var iconHTML>
-  </TD>
-  <TD ALIGN="LEFT" VALIGN="TOP" width="20%" NOWRAP>
+  </td>
+  <td align="left" valign="top" width="20%" nowrap>
   <dtml-var getId>
-  <INPUT TYPE="HIDDEN" NAME="ids:list" VALUE="&dtml-getId;">
-  </TD>
-  <TD ALIGN="LEFT" VALIGN="TOP" width="5%">
-  <STRONG>to</STRONG>
-  </TD>
-  <TD ALIGN="LEFT" VALIGN="TOP">
-  <INPUT TYPE="TEXT" NAME="new_ids:list" value="&dtml-getId;" SIZE="20">
-  </TD>
-</TR>
+  <input type="hidden" name="ids:list" value="&dtml-getId;">
+  </td>
+  <td align="left" valign="top" width="5%">
+  <strong>to</strong>
+  </td>
+  <td align="left" valign="top">
+  <input type="text" name="new_ids:list" value="&dtml-getId;" size="20">
+  </td>
+</tr>
 <dtml-if sequence-end>
-<TR>
-<TD COLSPAN=4>
-  <INPUT TYPE="submit" VALUE=" Ok ">
-</TD>
-</TR>
-</TABLE>
-</FORM>
+<tr>
+<td colspan="4">
+  <input type="submit" value=" Ok ">
+</td>
+</tr>
+</table>
+</form>
 </dtml-if sequence-end>
 
 <dtml-else>
-<FORM ACTION="folder_contents" METHOD="GET">
+<form action="folder_contents" method="GET">
 <p>You must select renamable items to rename.</p>
-<INPUT TYPE="submit" VALUE=" Ok ">
-</FORM>
+<input type="submit" value=" Ok ">
+</form>
 </dtml-in>
+
+</div>
+
 <dtml-var standard_html_footer>

@@ -20,7 +20,7 @@ Folder contents display.
 
 <h1> Desktop </h1>
 
-<form ACTION="&dtml-absolute_url;" METHOD="POST">
+<form action="&dtml-absolute_url;" method="POST">
  <table class="FormLayout">
   <tr>
    <td valign="top">
@@ -132,28 +132,33 @@ Folder contents display.
 </table><dtml-comment> End of listing table </dtml-comment>
 
 
-<TABLE BORDER="0" CELLSPACING="0" CELLPADDING=2>
-<TR>
-  <TD ALIGN="LEFT" VALIGN="TOP" WIDTH="16"></TD>
-  <TD ALIGN="LEFT" VALIGN="TOP">
-  <dtml-if expr="portal_membership.checkPermission('Add portal content', this())">
-    <INPUT TYPE="SUBMIT" NAME="folder_factories:method" VALUE="New...">
+<table border="0" cellspacing="0" cellpadding="2">
+<tr>
+  <td align="left" valign="top" width="16"></td>
+  <td align="left" valign="top">
+  <dtml-if expr="portal_membership.checkPermission('Add portal content'
+                                                  , this())">
+    <input type="submit" name="folder_factories:method" value="New...">
   </dtml-if>
-  <dtml-if expr="portal_membership.checkPermission('View management screens', this())">
-    <INPUT TYPE="SUBMIT" NAME="folder_rename_form:method" VALUE="Rename">
-    <INPUT TYPE="SUBMIT" NAME="folder_cut:method" VALUE="Cut"> 
-    <INPUT TYPE="SUBMIT" NAME="folder_copy:method" VALUE="Copy">
+  <dtml-if expr="portal_membership.checkPermission('View management screens'
+                                                  , this())">
+    <input type="submit" name="folder_rename_form:method" value="Rename">
+    <input type="submit" name="folder_cut:method" value="Cut"> 
+    <input type="submit" name="folder_copy:method" value="Copy">
     <dtml-if cb_dataValid>
-    <INPUT TYPE="SUBMIT" NAME="folder_paste:method" VALUE="Paste">
+    <input type="submit" name="folder_paste:method" value="Paste">
     </dtml-if>
   </dtml-if>
   <dtml-if expr="portal_membership.checkPermission('Delete objects', this())">
-    <INPUT TYPE="SUBMIT" NAME="folder_delete:method" VALUE="Delete">
+    <input type="submit" name="folder_delete:method" value="Delete">
   </dtml-if>
-  </TD>
-</TR>
-</TABLE>
+  </td>
+</tr>
+</table>
 
-</FORM>
+</form>
+
 <dtml-var folder_filter_form>
+</div>
+
 <dtml-var standard_html_footer>
