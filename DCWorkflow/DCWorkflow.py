@@ -572,10 +572,14 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
                 value = state_values[id]
             elif tdef_exprs.has_key(id):
                 expr = tdef_exprs[id]
-            elif vdef.default_expr is not None:
-                expr = vdef.default_expr
+            elif former_status.has_key(id):
+                # Preserve former value
+                value = former_status[id]
             else:
-                value = vdef.default_value
+                if vdef.default_expr is not None:
+                    expr = vdef.default_expr
+                else:
+                    value = vdef.default_value
             if expr is not None:
                 # Evaluate an expression.
                 if econtext is None:
