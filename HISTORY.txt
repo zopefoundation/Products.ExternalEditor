@@ -4,8 +4,12 @@
    CMFDefault/skins/control/reconfig.dtml.  Thanks to Hans de Wit
    <hw@scp.nl> for reporting this!
 
- - Allow 'portal_type' to be a method, as well as an attribute
+ - Allowed 'portal_type' to be a method, as well as an attribute
    (eases ZClass-as-content).
+
+ - Fixed to search form to pass 'created' instead of 'date' (probably
+   need 'modified', too);  also, added selection list for 'Subject',
+   and fixed the "Last Month" option value.
 
 1.0 final (2001/03/29)
 
