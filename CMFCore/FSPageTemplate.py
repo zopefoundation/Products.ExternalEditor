@@ -130,5 +130,7 @@ d['source.xml'] = d['source.html'] = Src()
 Globals.InitializeClass(FSPageTemplate)
 
 registerFileExtension('pt', FSPageTemplate)
+registerFileExtension('html', FSPageTemplate)
+registerFileExtension('htm', FSPageTemplate)
 registerMetaType('Page Template', FSPageTemplate)
 
