@@ -1,10 +1,185 @@
-Post 1.3 beta2
+CMF 1.3.1 (2003/03/06)
+
+  Bug Fixes
+
+    - Fixed editSyInformationProperties in SyndicationTool to ensure  
+      that updateBase is saved as a DateTime instance.
+
+CMF 1.3.1beta1 (2003/02/26)
+
+  New Features
+
+    - Implemented PUT and GET support to CMFCalendar.Event for
+      editing via FTP/WebDAV (thanks to Sidnei da Silva).
+
+  Bug Fixes
+
+    - Fixed incorrect security declaration in File.py (Collector #91).
+
+    - Remove over-helpful default argument values in
+      'CMFDefault.DefaultDublinCoreImpl._editMetadata'.  Now, if
+      called without a value for an argument, the method will not
+      change that value.  Collector #10.
+
+    - Remove workaround in CMFCore.utils for recognizing links in
+      StructuredText:  STX in CMF content should now recognize exactly
+      the same links as the underlying Zope.  Note that we *do* still
+      provide a customized HTML class, to permit embedding images without
+      generating the "whole" page.  Collector #6.
+
+    - Remove bizarre, shadowing import of CMFCore.utils as 'utils'
+      into package namespace of CMFDefault;  instead, import specific
+      names from that package directly (thanks to Paul Winkler for
+      pointing out the incongruity).
+
+    - Fix (theoretical) bug in CMFCore.DirectoryView which allowed
+      non-registered directories to slip through (UI didn't exercise it).
+
+    - Merge Christian Theune's fix for funky default argument values on
+      CMFCalendar.Event's constructor and edit methods (collector #76).
+
+    - FSPageTemplates overwrote a user-generated 'Content-Type' header.
+      We now check to make sure a Content-Type header is not already set
+      before allowing a page template to set its own.
+
+    - Fixed bugs around 'addActionProvider' in ActionsTool (Collector #42).
+
+    - Fixed race condition in lazy initialization of filesystem-based skin
+      methods;  the bug led to odd name errors on 'context' for
+      FSPythonScripts (Collector #37).
+
+    - Removed crufty 'isDesktop' stuff from 'folder_factories' and
+      'folder_contents' methods.
+
+    - Fixed HTML-invalidating call to 'filterCookie' in 'folder_contents'.
+    
+    - Fixed unclosed 'tr' element  in ZPT version of 'folder_edit_form'
+      (Collector #57).
+
+    - Fixed CalendarTool to use portal_type and not Type to search for
+      events in the catalog (Collector #28, thanks to Heimo Laukkanen
+      for the report).
+
+    - Fixed a bug in CalendarTool where events were not showing on the
+      last day of the month.
+
+CMF 1.3 (2002/08/06)
 
   New Features
   
-    - FSPageTemplates now autodetect XML if a document has the standard 
-      <?xml version="xx"?> at the top, setting the content_type to "text/xml"
-      so that it is parsed and served as XML.
+    - FSPageTemplates now autodetect XML if a document has the standard
+      '&lt;?xml version="xx"?&gt;' at the top, setting the content_type to
+      "text/xml" so that it is parsed and served as XML.
+
+    - Added a 'Workflows' tab in the ZMI that displays the workflow
+      state of the object.
+
+    - Wired 'scrubHTML' check into default versions of 'document_edit'
+      and 'newsitem_edit' skins (site managers who prefer to allow
+      JavaScript in content can customize to remove the check).
+
+    - Added utility methods for checking / scrubbing HTML content of
+      unwanted tags:  
+
+      CMFDefault.utils:  scrubHTML, isHTMLSafe
+
+      Known bad tags ('script', 'applet', 'embed', 'object'),
+      attributes (starting with 'on'), and values (starting with
+      'javascript:') cause 'scrubHTML' to raise an exception;  unknown
+      tags are silently dropped.  'isHTMLSafe' returns true if
+      'scrubHTML' would not raise an exception on the same text.
+
+    - Exposed useful utility methods to scripting / skinning.
+
+      CMFCore.utils:  getToolByName, cookString, tuplize, format_stx,
+        keywordsplitter, normalize, expandpath, minimalpath
+
+      CMFDefault.utils:  formatRFC822Headers, parseHeadersBody,
+        semi_split, comma_split, seq_strip, tuplize, bodyfinder,
+        html_headcheck.
+
+    - Added two utility functions, 'isHTMLSafe' and 'scrubHTML', to
+      CMFDefault utils;  these modules check for / remove undesirable
+      tags from textual content.
+
+    - Made public functions of 'CMFCore.utils' and 'CMFDefault.utils'
+      available for scripting.
+
+    - Allowed Portal Folders to be discussable.
+
+    - Improved the ActionsTool so that permission checking for actions
+      is done in the context of the object for all categories that start
+      with 'object' or 'workflow', in the context of the folder for
+      those that start with 'folder', and in the context of the portal
+      otherwise. This is useful for admin-defined additional categories.
+
+  Bug Fixes
+
+    - Fixed Image and File so that they reindex on PUT.
+
+    - Fixed WorkflowTool so that it doesn't pretend to workflow non-CMF
+      objects (Collector #19).
+
+    - Removed redundant block of code from CMFDefault/Link.py (Collector
+      #18).
+
+    - Fixed discussion tree display not to embed entire HTML document
+      (Collector #17, thanks to Jeffrey Shell for the inspiration).
+
+    - Fixed CookieCrumbler to emit "Basic" and not "basic" auth as per
+      HTTP spec (Collector #14, thanks to Simon Eisenmann for the
+      report). This fixes some WebDAV locking problems with (rightfully)
+      picky clients, like ExternalEditor.
+
+    - Made old ListCriterion instances forward-compatible across earlier
+      addition of 'operator' field.
+
+    - Defaulted CMFCore.MembershipTool's createMemberArea flag to true,
+      to preserve existing behavior:  member area should be created by
+      default on first login (Collector #5).
+
+    - Hardened DefaultDublinCoreImpl's EffectiveDate() and
+      ExpirationDate() methods to deal better with older / uninitialzed
+      content.
+
+    - Refactored content construction in the Types tool to make
+      cataloguing and workflow notification more uniform.
+
+    - Made Undo work again by removing any LF in transaction ids.
+
+    - Made WorkflowTool.updateRoleMappings update security-related
+      indexes.
+
+    - Append '/' to links in skin templates to the root of the site, to
+      pacify clients which won't send Basic Auth tokens because the path
+      doesn't match.
+
+    - Removed the binding of Folder and Topic types to the default
+      workflow for newly-created CMFSites (Collector #4).  Note that
+      existing sites will still need to remove these bindings manually,
+      as indicated in the "Upgrading" section of INSTALL.txt.
+
+    - Updated initial action reported by CMFDefault's DefaultWorkflow:
+      was "joined", now "created".
+
+    - Fix 'index_html' template to filter using 'View' permission
+      (folders which were not viewable were triggering authentication,
+      instead of being skipped).
+
+    - Repair free-form subject entry on 'full_metadata_edit_form' (was
+      merging all keywords onto the same line, plus soft-wrapping!).
+      Likewise the "Contributors" textarea.
+
+    - Ensured that Link, File, and Image content objects reindex
+      themselves after edit (wrapping 'edit' as a WorkflowMethod no
+      longer guarantees that).
+
+    - Fixed CMFCalendar's "day view" to accomodate the removal of
+      'title' metadata from catalog in favor of 'Title' (thanks to
+      Dieter Maurer for pointing this out).
+
+    - Corrected a skins performance optimization (the version as
+      released in the beta did not take effect).
 
 CMF 1.3 beta2 (2002/07/07)
 
@@ -186,7 +361,7 @@ CMF 1.3 beta2 (2002/07/07)
     - Updated caching policy manager tool to use correct date format
       (RFC 1123 instead of RFC 822).
 
-1.3 beta 1 (2001/04/03)
+CMF 1.3 beta 1 (2001/04/03)
 
  New Features
 
@@ -373,7 +548,7 @@ CMF 1.3 beta2 (2002/07/07)
    - Made 'CMFCore/interfaces/__init__.py' non-empty, to remove suspicion
      that the file was corrupted in the download (Tracker #426).
 
-1.2 beta (2001/12/07)
+CMF 1.2 beta (2001/12/07)
 
  New features
 
@@ -664,7 +839,7 @@ CMF 1.3 beta2 (2002/07/07)
       'unittest' module from Python 2.1 (it no longer has
       'JUnitTestTextRunner' class).
 
-1.1 final (2001/06/20)
+CMF 1.1 final (2001/06/20)
 
  New features
 
@@ -800,7 +975,7 @@ CMF 1.3 beta2 (2002/07/07)
   - Removed debugging / "paranoia" print statements (thanks to
     Chris Withers for the patches).
 
-1.1 beta (2001/06/01)
+CMF 1.1 beta (2001/06/01)
 
  New features
 
@@ -1026,7 +1201,7 @@ CMF 1.3 beta2 (2002/07/07)
     header is not needed when using the absolute URL of the
     object, and causes certain browsers to misbehave.
 
-1.0 final (2001/03/29)
+CMF 1.0 final (2001/03/29)
 
  - Removed embedded spaces in 'portal_status_message' strings
    (thanks to Dieter Maurer for pointing this out)
@@ -1148,7 +1323,7 @@ CMF 1.3 beta2 (2002/07/07)
    in type info objects, to permit configuration of the content
    types addable to a given folder type.
 
-0.10alpha (2001/02/02)
+CMF 0.10alpha (2001/02/02)
 
  * Fixed breakage of "reply" feature introduced by new
    constructor regime (PTK Tracker #159).
