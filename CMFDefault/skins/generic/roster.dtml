@@ -84,6 +84,12 @@
       Next
     </dtml-in>
 
+    <dtml-in roster size=bs orphan=1 start=qs>
+    <dtml-if sequence-start>
+      <em> of &dtml-sequence-length; members.</em>
+    </dtml-if>
+    </dtml-in>
+
     </form>
 
   </td>
