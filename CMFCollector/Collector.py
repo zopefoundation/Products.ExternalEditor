@@ -91,8 +91,8 @@ class Collector(SkinnedFolder):
         self.description = description
 
         username = str(getSecurityManager().getUser())
-        self._add_local_role(username, 'Manager')
-        self._add_local_role(username, 'Owner')
+        util.add_local_role(self, username, 'Manager')
+        util.add_local_role(self, username, 'Owner')
         if supporters is None:
             if username: supporters = [username]
             else: supporters = []
@@ -242,13 +242,7 @@ class Collector(SkinnedFolder):
         # Add 'Reviewer' local role to anyone on new_roster that lacks it:
         for u in new_roster:
             if u not in already:
-                self._add_local_role(u, 'Reviewer')
-                
-    def _add_local_role(self, userid, roleid):
-        """Add roleid for userid if not already there."""
-        roles = list(self.get_local_roles_for_userid(userid))
-        roles.append(roleid)
-        self.manage_setLocalRoles(userid, roles)
+                util.add_local_role(self, u, 'Reviewer')
 
     security.declareProtected(CMFCorePermissions.View, 'length')
     def length(self):
