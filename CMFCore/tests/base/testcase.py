@@ -92,10 +92,12 @@ class FSDVTest( TestCase ):
     _skinname = 'fake_skins'
     _layername = 'fake_skin'
 
-    def _registerDirectory(self,object=None):
+    def _registerDirectory(self, object=None, ignore=None):
         from Products.CMFCore.DirectoryView import registerDirectory
         from Products.CMFCore.DirectoryView import addDirectoryViews
-        registerDirectory(self._skinname, self.tempname)
+        if ignore is None:
+            from Products.CMFCore.DirectoryView import ignore
+        registerDirectory(self._skinname, self.tempname, ignore=ignore)
         if object is not None:
             ob = self.ob = DummyFolder()
             addDirectoryViews(ob, self._skinname, self.tempname)

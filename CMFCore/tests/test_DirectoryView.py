@@ -155,8 +155,10 @@ class DirectoryViewTests( FSDVTest ):
         self.assertEqual(self.ob.fake_skin.testPT.title, 'Zope Pope')
 
     def test_ignored(self):
-        # Test that the .test1.py is ignored
-        assert('#test1' not in self.ob.fake_skin.objectIds())
+        # Test that "artifact" files and dirs are ignored
+        for name in '#test1', 'CVS', '.test1', 'test1~':
+            assert(name not in self.ob.fake_skin.objectIds(),
+                   '%s not ignored' % name)
 
     def test_surrogate_writethrough(self):
         # CMF Collector 316: It is possible to cause ZODB writes because
@@ -181,6 +183,25 @@ class DirectoryViewTests( FSDVTest ):
                          , fs.__dict__['_real']
                          , 'foo'
                          )
+
+
+class DirectoryViewIgnoreTests(FSDVTest):
+
+    def setUp( self ):
+        FSDVTest.setUp(self)
+        self.manual_ign = ('CVS', 'SVN', 'test_manual_ignore.py')
+        self._registerDirectory(self , ignore=self.manual_ign)
+
+    def test_ignored(self):
+        # Test that "artifact" files and dirs are ignored,
+        # even when a custom ignore list is used; and that the
+        # custom ignore list is also honored
+        auto_ign = ('#test1', '.test1', 'test1~')
+        must_ignore = self.manual_ign + auto_ign + ('test_manual_ignore',)
+        visible = self.ob.fake_skin.objectIds()
+
+        for name in must_ignore:
+            self.failIf(name in visible)
 
 
 class DirectoryViewFolderTests(FSDVTest):
@@ -300,6 +321,7 @@ def test_suite():
     return TestSuite((
         makeSuite(DirectoryViewPathTests),
         makeSuite(DirectoryViewTests),
+        makeSuite(DirectoryViewIgnoreTests),
         makeSuite(DirectoryViewFolderTests),
         makeSuite(DebugModeTests),
         ))

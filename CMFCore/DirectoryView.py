@@ -43,39 +43,47 @@ from utils import normalize
 
 __reload_module__ = 0
 
+# Ignore filesystem artifacts
+base_ignore = ('.', '..')
 # Ignore version control subdirectories
 ignore = ('CVS', 'SVN', '.', '..', '.svn')
 # Ignore suspected backups and hidden files
 ignore_re = re.compile(r'\.|(.*~$)|#')
 
 # and special names.
-def _filtered_listdir(path):
+def _filtered_listdir(path, ignore=ignore):
     return [ name
              for name
              in listdir(path)
-             if name not in ignore ]
+             if name not in ignore and not ignore_re.match(name) ]
 
-def _walker (listdir, dirname, names):
-    names = [ (name, stat(path.join(dirname,name))[8])
-              for name
-              in names
-              if name not in ignore and not ignore_re.match(name) ]
-    listdir.extend(names)
+class _walker:
+    def __init__(self, ignore=ignore):
+        self.ignore = ignore
 
+    def __call__(self, listdir, dirname, names):
+        names = [ (name, stat(path.join(dirname,name))[8])
+                  for name
+                  in names
+                  if name not in self.ignore and not ignore_re.match(name) ]
+        listdir.extend(names)
 
 class DirectoryInformation:
     data = None
     _v_last_read = 0
     _v_last_filelist = [] # Only used on Win32
 
-    def __init__(self, filepath, minimal_fp):
+    def __init__(self, filepath, minimal_fp, ignore=ignore):
         self._filepath = filepath
         self._minimal_fp = minimal_fp
+        self.ignore=base_ignore + tuple(ignore)
+        if platform == 'nt':
+            self._walker = _walker(self.ignore)
         subdirs = []
-        for entry in _filtered_listdir(self._filepath):
-            entry_filepath = path.join(self._filepath, entry)
-            if path.isdir(entry_filepath):
-                subdirs.append(entry)
+        for entry in _filtered_listdir(self._filepath, ignore=self.ignore):
+           entry_filepath = path.join(self._filepath, entry)
+           if path.isdir(entry_filepath):
+               subdirs.append(entry)
         self.subdirs = tuple(subdirs)
 
     def getSubdirs(self):
@@ -123,7 +131,7 @@ class DirectoryInformation:
                     # when a file is added to or deleted from them :-(
                     # So keep a list of files as well, and see if that
                     # changes
-                    path.walk(self._filepath, _walker, filelist)
+                    path.walk(self._filepath, self._walker, filelist)
                     filelist.sort()
             except:
                 LOG('DirectoryView',
@@ -165,7 +173,7 @@ class DirectoryInformation:
         data = {}
         objects = []
         types = self._readTypesFile()
-        for entry in _filtered_listdir(self._filepath):
+        for entry in _filtered_listdir(self._filepath, ignore=self.ignore):
             if not self._isAllowableFilename(entry):
                 continue
             entry_minimal_fp = '/'.join( (self._minimal_fp, entry) )
@@ -295,15 +303,15 @@ class DirectoryRegistry:
     def getTypeByMetaType(self, mt):
         return self._meta_types.get(mt, None)
 
-    def registerDirectory(self, name, _prefix, subdirs=1):
+    def registerDirectory(self, name, _prefix, subdirs=1, ignore=ignore):
         # This what is actually called to register a
         # file system directory to become a FSDV.
         if not isinstance(_prefix, basestring):
             _prefix = package_home(_prefix)
         filepath = path.join(_prefix, name)
-        self.registerDirectoryByPath(filepath, subdirs)
+        self.registerDirectoryByPath(filepath, subdirs, ignore=ignore)
 
-    def registerDirectoryByPath(self, filepath, subdirs=1):
+    def registerDirectoryByPath(self, filepath, subdirs=1, ignore=ignore):
         # This is indirectly called during registration of
         # a directory. As you can see, minimalpath is called
         # on the supplied path at this point.
@@ -311,12 +319,15 @@ class DirectoryRegistry:
         # small paths that are likely to work across platforms
         # and SOFTWARE_HOME, INSTANCE_HOME and PRODUCTS_PATH setups
         minimal_fp = minimalpath(filepath)
-        info = DirectoryInformation(filepath, minimal_fp)
+        info = DirectoryInformation(filepath, minimal_fp, ignore=ignore)
         self._directories[minimal_fp] = info
         if subdirs:
             for entry in info.getSubdirs():
                 entry_filepath = path.join(filepath, entry)
-                self.registerDirectoryByPath(entry_filepath, subdirs)
+                self.registerDirectoryByPath( entry_filepath
+                                            , subdirs
+                                            , ignore=ignore
+                                            )
 
     def reloadDirectory(self, minimal_fp):
         info = self.getDirectoryInfo(minimal_fp)
