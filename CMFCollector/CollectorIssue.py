@@ -454,9 +454,11 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
 
         if (self.state_email.has_key(new_status)
             and self.state_email[new_status]):
-            se = ("_%s_ recipient" % new_status, self.state_email[new_status])
-            candidates.append(se)       # For recipients-debug
-            recipients.append(se)
+            for addr in re.split(", *| +", self.state_email[new_status]):
+                se = ("_%s_ recipient" % new_status, addr)
+                candidates.append(se)       # For recipients-debug
+                if addr not in recipients:
+                    recipients.append(se)
 
         if recipients:
             to = ", ".join(["%s <%s>" % (name, email)
