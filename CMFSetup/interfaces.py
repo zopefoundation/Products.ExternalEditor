@@ -1,3 +1,15 @@
+##############################################################################
+#
+# Copyright (c) 2004 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE
+#
+##############################################################################
 """ CMFSetup product interfaces
 
 $Id$
@@ -176,7 +188,7 @@ class IImportStepRegistry( IStepRegistry ):
     def sortSteps():
 
         """ Return a sequence of registered step IDs
-        
+
         o Sequence is sorted topologically by dependency, with the dependent
           steps *after* the steps they depend on.
         """
@@ -208,7 +220,7 @@ class IImportStepRegistry( IStepRegistry ):
           be a yyyy/mm/dd-ii formatted string (date plus two-digit
           ordinal).  when comparing two version strings, the version with
           the lower sort order is considered the older version.
-          
+
           - Newer versions of a step supplant older ones.
 
           - Attempting to register an older one after a newer one results
@@ -409,7 +421,7 @@ class ISetupTool( Interface ):
     def runImportStep( step_id, purge_old=True, run_dependencies=True ):
 
         """ Execute a given setup step
-        
+
         o 'step_id' is the ID of the step to run.
 
         o If 'purge_old' is True, then run the step after purging any

@@ -1,23 +1,39 @@
+##############################################################################
+#
+# Copyright (c) 2004 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE
+#
+##############################################################################
 """ Unit tests for CMFSetup tool.
 
 $Id$
 """
 
 import unittest
+import Testing
+import Zope
+Zope.startup()
+
 import os
 from StringIO import StringIO
 
 from Acquisition import aq_base
 from OFS.Folder import Folder
 
-from common import SecurityRequestTest
-
-from common import FilesystemTestBase
-from common import TarballTester
 from common import DOMComparator
 from common import DummyExportContext
 from common import DummyImportContext
+from common import FilesystemTestBase
+from common import SecurityRequestTest
+from common import TarballTester
 from conformance import ConformsToISetupTool
+
 
 class SetupToolTests( FilesystemTestBase
                     , TarballTester
@@ -55,7 +71,7 @@ class SetupToolTests( FilesystemTestBase
         self.assertEqual( len( import_registry.listSteps() ), 0 )
 
         export_registry = tool.getExportStepRegistry()
-        export_steps = export_registry.listSteps() 
+        export_steps = export_registry.listSteps()
         self.assertEqual( len( export_steps ), 1 )
         self.assertEqual( export_steps[ 0 ], 'step_registries' )
 
@@ -272,7 +288,7 @@ class SetupToolTests( FilesystemTestBase
         _PATH = 'tests/default_profile'
         tool = self._makeOne()
 
-        self.assertRaises( ValueError           
+        self.assertRaises( ValueError
                          , tool.setProfileDirectory, _PATH, 'NonesuchProduct' )
 
     def test_runImportStep_nonesuch( self ):
@@ -415,7 +431,7 @@ class SetupToolTests( FilesystemTestBase
         tool = self._makeOne().__of__( site )
 
         result = tool.runAllImportSteps()
-        
+
         self.assertEqual( len( result[ 'steps' ] ), 0 )
 
     def test_runAllImportSteps_sorted_default_purge( self ):
@@ -433,7 +449,7 @@ class SetupToolTests( FilesystemTestBase
                              , _purgeIfRequired )
 
         result = tool.runAllImportSteps()
-        
+
         self.assertEqual( len( result[ 'steps' ] ), 3 )
 
         self.assertEqual( result[ 'steps' ][ 0 ], 'purging' )
@@ -465,7 +481,7 @@ class SetupToolTests( FilesystemTestBase
                              , _purgeIfRequired )
 
         result = tool.runAllImportSteps( purge_old=True )
-        
+
         self.assertEqual( len( result[ 'steps' ] ), 3 )
 
         self.assertEqual( result[ 'steps' ][ 0 ], 'purging' )
@@ -490,7 +506,7 @@ class SetupToolTests( FilesystemTestBase
                              , _purgeIfRequired )
 
         result = tool.runAllImportSteps( purge_old=False )
-        
+
         self.assertEqual( len( result[ 'steps' ] ), 3 )
 
         self.assertEqual( result[ 'steps' ][ 0 ], 'purging' )
@@ -656,7 +672,7 @@ _DEFAULT_STEP_REGISTRIES_EXPORT_XML = """\
  <export-step id="step_registries"
               handler="Products.CMFSetup.tool.exportStepRegistries"
               title="Export import / export steps.">
-  
+
  </export-step>
 </export-steps>
 """
@@ -667,12 +683,12 @@ _EXTRAS_STEP_REGISTRIES_EXPORT_XML = """\
  <export-step id="properties"
               handler="Products.CMFSetup.tests.test_tool._exportPropertiesINI"
               title="properties">
-  
+
  </export-step>
  <export-step id="step_registries"
               handler="Products.CMFSetup.tool.exportStepRegistries"
               title="Export import / export steps.">
-  
+
  </export-step>
 </export-steps>
 """
@@ -685,20 +701,20 @@ _EXTRAS_STEP_REGISTRIES_IMPORT_XML = """\
               handler="Products.CMFSetup.tests.test_tool._underscoreSiteTitle"
               title="dependable">
   <dependency step="purging" />
-  
+
  </import-step>
  <import-step id="dependent"
               version="1"
               handler="Products.CMFSetup.tests.test_tool._uppercaseSiteTitle"
               title="dependent">
   <dependency step="dependable" />
-  
+
  </import-step>
  <import-step id="purging"
               version="1"
               handler="Products.CMFSetup.tests.test_tool._purgeIfRequired"
               title="purging">
-  
+
  </import-step>
 </import-steps>
 """
@@ -934,7 +950,7 @@ _REQUIRED_TOOLSET_XML = """\
     tool_id="mandatory"
     class="Products.CMFSetup.tests.test_tool.DummyTool" />
  <required
-    tool_id="obligatory" 
+    tool_id="obligatory"
     class="Products.CMFSetup.tests.test_tool.DummyTool" />
 </tool-setup>
 """

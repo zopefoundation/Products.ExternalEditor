@@ -1,8 +1,22 @@
+##############################################################################
+#
+# Copyright (c) 2004 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE
+#
+##############################################################################
 """ CMFSetup product:  unit test utilities.
+
+$Id$
 """
+
 import os
 import shutil
-import time
 from tarfile import TarFile
 
 from Products.CMFCore.tests.base.testcase import SecurityRequestTest
@@ -54,7 +68,7 @@ def _clearTestDirectory( root_path ):
 
     if os.path.exists( root_path ):
         shutil.rmtree( root_path )
-    
+
 def _makeTestFile( filename, root_path, contents ):
 
     path, filename = os.path.split( filename )

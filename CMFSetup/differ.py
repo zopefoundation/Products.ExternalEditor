@@ -1,7 +1,20 @@
+##############################################################################
+#
+# Copyright (c) 2004 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE
+#
+##############################################################################
 """ Diff utilities for comparing configurations.
 
 $Id$
 """
+
 from difflib import unified_diff
 import re
 
@@ -26,11 +39,11 @@ def unidiff( a
     generated also consists of newline-terminated strings, ready
     to be printed as-is via the writeline() method of a file-like
     object.
-    
+
     Note that the last line of a file may *not* have a newline;
     this is reported in the same way that GNU diff reports this.
     *This method only supports UNIX line ending conventions.*
-    
+
         filename_a and filename_b are used to generate the header,
         allowing other tools to determine what 'files' were used
         to generate this output.
@@ -182,7 +195,7 @@ class ConfigDiff:
 
         rhs_file = self._rhs.readDataFile( filename, subdir )
         rhs_time = self._rhs.getLastModified( path )
- 
+
         if rhs_file is None:
             assert self._missing_as_empty
             rhs_file = ''
@@ -190,7 +203,7 @@ class ConfigDiff:
 
         if lhs_file == rhs_file:
             diff_lines = []
-        else: 
+        else:
             diff_lines = unidiff( lhs_file
                                 , rhs_file
                                 , filename_a=path

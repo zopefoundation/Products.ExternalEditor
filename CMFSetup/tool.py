@@ -1,7 +1,20 @@
+##############################################################################
+#
+# Copyright (c) 2004 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE
+#
+##############################################################################
 """ Classes:  SetupTool
 
 $Id$
 """
+
 import os
 import time
 from cgi import escape
@@ -171,21 +184,21 @@ class SetupTool( UniqueObject, Folder ):
         self._updateImportStepsRegistry( encoding )
         self._updateExportStepsRegistry( encoding )
         self._updateToolsetRegistry( encoding )
-    
+
     security.declareProtected( ManagePortal, 'getImportStepRegistry' )
     def getImportStepRegistry( self ):
 
         """ See ISetupTool.
         """
         return self._import_registry
-    
+
     security.declareProtected( ManagePortal, 'getImportStepRegistry' )
     def getExportStepRegistry( self ):
 
         """ See ISetupTool.
         """
         return self._export_registry
-    
+
     security.declareProtected( ManagePortal, 'getToolsetRegistry' )
     def getToolsetRegistry( self ):
 
@@ -281,7 +294,7 @@ class SetupTool( UniqueObject, Folder ):
                }
 
     security.declareProtected(ManagePortal, 'compareConfigurations')
-    def compareConfigurations( self   
+    def compareConfigurations( self
                              , lhs_context
                              , rhs_context
                              , missing_as_empty=False
@@ -479,7 +492,7 @@ class SetupTool( UniqueObject, Folder ):
     def listSnapshotInfo( self ):
 
         """ Return a list of mappings describing available snapshots.
-        
+
         o Keys include:
 
           'id' -- snapshot ID
@@ -505,7 +518,7 @@ class SetupTool( UniqueObject, Folder ):
     def listProfileInfo( self ):
 
         """ Return a list of mappings describing registered profiles.
-        
+
         o Keys include:
 
           'id' -- profile ID
@@ -610,7 +623,7 @@ class SetupTool( UniqueObject, Folder ):
                 path = info[ 'path' ]
 
             return DirectoryImportContext( self, path )
-        
+
         # else snapshot
         context_id = context_id[ len( 'snapshot-' ): ]
         return SnapshotImportContext( self, context_id )

@@ -1,9 +1,24 @@
+##############################################################################
+#
+# Copyright (c) 2004 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE
+#
+##############################################################################
 """ Registry unit tests.
 
 $Id$
 """
+
 import unittest
-import os
+import Testing
+import Zope
+Zope.startup()
 
 from OFS.Folder import Folder
 from Products.CMFSetup.tests.common import BaseRegistryTests
@@ -13,6 +28,7 @@ from conformance import ConformsToIImportStepRegistry
 from conformance import ConformsToIExportStepRegistry
 from conformance import ConformsToIToolsetRegistry
 from conformance import ConformsToIProfileRegistry
+
 
 #==============================================================================
 #   Dummy handlers
@@ -1005,7 +1021,7 @@ _CONFUSED_TOOLSET_XML = """\
 
 class ProfileRegistryTests( BaseRegistryTests
                           , ConformsToIProfileRegistry
-                          ): 
+                          ):
 
     def _getTargetClass( self ):
 

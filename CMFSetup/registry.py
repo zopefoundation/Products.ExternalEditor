@@ -1,10 +1,21 @@
+##############################################################################
+#
+# Copyright (c) 2004 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE
+#
+##############################################################################
 """ Classes:  ImportStepRegistry, ExportStepRegistry
 
 $Id$
 """
-import re
+
 from xml.sax import parseString
-from xml.sax.handler import ContentHandler
 
 from AccessControl import ClassSecurityInfo
 from Acquisition import Implicit
@@ -49,7 +60,7 @@ class ImportStepRegistry( Implicit ):
     def sortSteps( self ):
 
         """ Return a sequence of registered step IDs
-        
+
         o Sequence is sorted topologically by dependency, with the dependent
           steps *after* the steps they depend on.
         """
@@ -130,7 +141,7 @@ class ImportStepRegistry( Implicit ):
             return default
 
         return _resolveDottedName( info[ 'handler' ] )
-    
+
     security.declarePrivate( 'registerStep' )
     def registerStep( self
                     , id
@@ -148,7 +159,7 @@ class ImportStepRegistry( Implicit ):
           be a yyyy/mm/dd-ii formatted string (date plus two-digit
           ordinal).  when comparing two version strings, the version with
           the lower sort order is considered the older version.
-          
+
           - Newer versions of a step supplant older ones.
 
           - Attempting to register an older one after a newer one results
@@ -249,12 +260,12 @@ class ExportStepRegistry( Implicit ):
     """ Registry of known site-configuration export steps.
 
     o Each step is registered with a unique id.
-    
+
     o When called, with the portal object passed in as an argument,
       the step must return a sequence of three-tuples,
       ( 'data', 'content_type', 'filename' ), one for each file exported
       by the step.
-      
+
       - 'data' is a string containing the file data;
 
       - 'content_type' is the MIME type of the data;
@@ -267,8 +278,8 @@ class ExportStepRegistry( Implicit ):
     security = ClassSecurityInfo()
 
     def __init__( self ):
- 
-        self._registered = {}   
+
+        self._registered = {}
 
     security.declareProtected( ManagePortal, 'listSteps' )
     def listSteps( self ):
@@ -403,7 +414,7 @@ class ToolsetRegistry( Implicit ):
 
     security = ClassSecurityInfo()
     security.setDefaultAccess( 'allow' )
-    
+
     def __init__( self ):
 
         self._clear()
@@ -525,7 +536,7 @@ class ProfileRegistry( Implicit ):
 
     security = ClassSecurityInfo()
     security.setDefaultAccess( 'allow' )
-    
+
     def __init__( self ):
 
         self._clear()

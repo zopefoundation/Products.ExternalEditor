@@ -1,17 +1,30 @@
+##############################################################################
+#
+# Copyright (c) 2004 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE
+#
+##############################################################################
 """ Unit tests for CMFSetup skins configurator
 
 $Id$
 """
 
 import unittest
-import os
+import Testing
+import Zope
+Zope.startup()
 
-_TESTS_PATH = os.path.split( __file__ )[ 0 ]
+import os
 
 from OFS.Folder import Folder
 from OFS.SimpleItem import Item
 
-from Products.CMFCore.ActionProviderBase import ActionProviderBase
 from Products.CMFCore import DirectoryView
 from Products.CMFCore.utils import expandpath
 from Products.CMFCore.utils import minimalpath
@@ -20,6 +33,9 @@ from common import BaseRegistryTests
 from common import DOMComparator
 from common import DummyExportContext
 from common import DummyImportContext
+
+_TESTS_PATH = os.path.split( __file__ )[ 0 ]
+
 
 class DummySkinsTool( Folder ):
 

@@ -1,14 +1,29 @@
+##############################################################################
+#
+# Copyright (c) 2004 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE
+#
+##############################################################################
 """ Unit tests for import / export contexts.
 
 $Id$
 """
 
 import unittest
+import Testing
+import Zope
+Zope.startup()
+
 import os
 import time
 from StringIO import StringIO
 
-from Acquisition import aq_parent
 from DateTime.DateTime import DateTime
 from OFS.Folder import Folder
 from OFS.Image import File
@@ -386,7 +401,7 @@ class TarballExportContextTests( FilesystemTestBase
         site = DummySite( 'site' ).__of__( self.root )
         ctx = self._getTargetClass()( site )
 
-        ctx.writeDataFile( 'foo.txt', printable, 'text/plain' ) 
+        ctx.writeDataFile( 'foo.txt', printable, 'text/plain' )
 
         fileish = StringIO( ctx.getArchive() )
 
@@ -401,8 +416,8 @@ class TarballExportContextTests( FilesystemTestBase
         site = DummySite( 'site' ).__of__( self.root )
         ctx = self._getTargetClass()( site )
 
-        ctx.writeDataFile( 'foo.txt', printable, 'text/plain' ) 
-        ctx.writeDataFile( 'bar.txt', digits, 'text/plain' ) 
+        ctx.writeDataFile( 'foo.txt', printable, 'text/plain' )
+        ctx.writeDataFile( 'bar.txt', digits, 'text/plain' )
 
         fileish = StringIO( ctx.getArchive() )
 
@@ -418,8 +433,8 @@ class TarballExportContextTests( FilesystemTestBase
         site = DummySite( 'site' ).__of__( self.root )
         ctx = self._getTargetClass()( site )
 
-        ctx.writeDataFile( 'foo.txt', printable, 'text/plain' ) 
-        ctx.writeDataFile( 'bar/baz.txt', digits, 'text/plain' ) 
+        ctx.writeDataFile( 'foo.txt', printable, 'text/plain' )
+        ctx.writeDataFile( 'bar/baz.txt', digits, 'text/plain' )
 
         fileish = StringIO( ctx.getArchive() )
 
@@ -614,8 +629,8 @@ class SnapshotExportContextTests( SecurityRequestTest
         tool = site.portal_setup
         ctx = self._makeOne( tool, 'multiple' )
 
-        ctx.writeDataFile( 'foo.txt', printable, 'text/plain' ) 
-        ctx.writeDataFile( 'bar.txt', digits, 'text/plain' ) 
+        ctx.writeDataFile( 'foo.txt', printable, 'text/plain' )
+        ctx.writeDataFile( 'bar.txt', digits, 'text/plain' )
 
         snapshot = tool.snapshots._getOb( 'multiple' )
 

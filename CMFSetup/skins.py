@@ -1,10 +1,22 @@
+##############################################################################
+#
+# Copyright (c) 2004 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE
+#
+##############################################################################
 """ Skin path configuration management
 
 Setup step and export script
 
 $Id$
 """
-import os
+
 import re
 from xml.sax import parseString
 
@@ -46,7 +58,7 @@ def importSkinsTool( context ):
                            )
 
     o Register via XML:
- 
+
       <setup-step id="importSkinsTool"
                   version="20040524-01"
                   handler="Products.CMFSetup.skins.importSkinsTool"
@@ -119,7 +131,7 @@ def exportSkinsTool( context ):
                            )
 
     o Register via XML:
- 
+
       <export-script id="exportSkinsTool"
                      version="20040518-01"
                      handler="Products.CMFSetup.skins.exportSkinsTool"
@@ -138,11 +150,11 @@ def exportSkinsTool( context ):
 
 class SkinsToolConfigurator( Implicit ):
 
-    security = ClassSecurityInfo()   
+    security = ClassSecurityInfo()
     security.setDefaultAccess('allow')
 
     _COMMA_SPLITTER = re.compile( r',[ ]*' )
-    
+
     def __init__( self, site ):
 
         self._site = site

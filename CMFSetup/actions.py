@@ -1,7 +1,20 @@
+##############################################################################
+#
+# Copyright (c) 2004 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE
+#
+##############################################################################
 """ Classes:  ActionsProviderConfigurator
 
 $Id$
 """
+
 from xml.dom.minidom import parseString as domParseString
 
 from AccessControl import ClassSecurityInfo
@@ -27,7 +40,7 @@ _FILENAME = 'actions.xml'
 
 def importActionProviders( context ):
 
-    """ Import action providers and their actions rom an XML file
+    """ Import action providers and their actions from an XML file.
 
     o 'context' must implement IImportContext.
 
