@@ -13,58 +13,60 @@ CMFSetup Product README
     The 'portal_setup' tool knows how to export / import configurations
     and scripts for the following tools:
 
-      - itself :)
+      - (x) itself :)
 
-      - the role / permission map on the site object
+      - (x) the role / permission map on the site object
 
-      - removal / creation of specified tools
+      - ( ) removal / creation of specified tools
 
-      - cookie crumbler configuration
+      - ( ) cookie crumbler configuration
 
-      - folder structure
+      - ( ) folder structure
 
-      - 'portal_actionicons'
-        (Products.CMFActionIcons.ActionIconsTool.ActionIconsTool)
+      - ( ) 'portal_actionicons'
+            (Products.CMFActionIcons.ActionIconsTool.ActionIconsTool)
 
-        o action title / icon bindings
+            o action title / icon bindings
 
-      - 'portal_actions'
-        (Products.CMFCore.ActionsTool.ActionsTool)
+      - (x) 'portal_actions'
+            (Products.CMFCore.ActionsTool.ActionsTool)
  
-        o action providers, and their actions; note that this removes
-          the requirement to have individual tools configure their own
-          actions
+            o action providers, and their actions; note that this removes
+              the requirement to have individual tools configure their own
+              actions
 
-      - 'portal_catalogs'
-        (Products.CMFCore.CatalogTool.CatalogTool)
+      - ( ) 'portal_catalogs'
+            (Products.CMFCore.CatalogTool.CatalogTool)
 
-        o index names / types
+            o index names / types
         
-        o metadata column names
+            o metadata column names
 
-      - 'portal_membership'
+      - ( ) 'portal_membership'
 
-        o "skeleton" home folder (XXX: is this in the core?)
+            o "skeleton" home folder (XXX: is this in the core?)
 
-      - 'portal_memberdata'
+      - ( ) 'portal_memberdata'
 
-        o member properties
+            o member properties
 
-      - 'portal_skins'
+      - (x) 'portal_skins'
 
-        o FilesystemDirectoryView instances
+            o tool properties
 
-        o skin path definitions
+            o FilesystemDirectoryView instances
 
-      - 'portal_types'
+            o skin path definitions
 
-        o content type definitions, including actions
+      - ( ) 'portal_types'
 
-      - 'portal_workflow'
+            o content type definitions, including actions
 
-        o bindings of workflows to content types
+      - ( ) 'portal_workflow'
 
-        o DCWorkflow definitions, including supporting scripts
+            o bindings of workflows to content types
+
+            o DCWorkflow definitions, including supporting scripts
 
   Extending The Tool
 
