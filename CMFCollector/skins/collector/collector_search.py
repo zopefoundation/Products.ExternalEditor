@@ -4,7 +4,7 @@
 query = {}
 query['sort_on'] = 'created'
 query['Type'] = "Collector Issue"
-query['path'] = context.absolute_url(1)
+query['path'] = "/".join(context.getPhysicalPath())
 
 reqget = context.REQUEST.get
 subj_items = []
@@ -14,12 +14,14 @@ def supplement_query(field, index_name=None, reqget=reqget, query=query):
     val = reqget(field, None)
     if val:
         query[index_name] = val
-def supplement_subject_one(field, index_name=None, reqget=reqget, items=subj_items):
+def supplement_subject_one(field, index_name=None,
+                           reqget=reqget, items=subj_items):
     if not index_name: index_name = field
     val = reqget(field, None)
     if val:
         items.append('%s:%s' % (index_name, val))
-def supplement_subject_many(field, index_name=None, reqget=reqget, items=subj_items):
+def supplement_subject_many(field, index_name=None,
+                            reqget=reqget, items=subj_items):
     if not index_name: index_name = field
     vals = reqget(field, [])
     for i in vals:
