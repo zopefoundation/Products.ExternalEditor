@@ -1,0 +1,104 @@
+<html metal:use-macro="here/main_template/macros/master">
+<body>
+
+<div metal:fill-slot="main">
+
+<div class="Desktop"
+     tal:define="noedit python: not here.isAllowed('create');
+                 page request/page;
+                 text python:request.get( 'text', '' );
+                 default_page_type python: 'structuredtext';
+                 page_type request/page_type | default_page_type;
+                 h3_color python: noedit and 'gray' or 'black';
+                 tr_color python: noedit and 'pink' or '#eeeeee';
+                 default_zwiki_height  python:18;
+                 default_zwiki_width  python:80;
+                 zwiki_height request/zwiki_height | default_zwiki_height;
+                 zwiki_width request/zwiki_width | default_zwiki_width;
+                 keydown python: noedit and 'this.blur();;return false' or '';
+                "
+>
+
+  <div tal:condition="not: wiki_header_present|nothing">
+    <span tal:condition="nothing"> In case master has no "header" macro. </span>
+    <div tal:replace="structure here/wikipage_header"> </div>
+  </div>
+
+
+  <h3 tal:attributes="style string:color: ${h3_color};"
+  > Create <em tal:content="page">PAGE_NAME</em> CMFWiki Page </h3>
+
+  <p tal:condition="noedit">
+    <strong> <span tal:replace="python: here.whichWho('create')">Only
+      the boss can</span> create new pages from
+      <span tal:replace="here/getId">this page</span>.
+    </strong>
+    </p>
+
+  <p tal:condition="not: noedit">
+    Fill in the text and hit the
+    <em> Create <span tal:replace="page" /> </em> button. </p>
+
+  <form method="POST"
+        action="wikipage_create_handler"
+        enctype="multipart/form-data">
+  <input type=hidden name=page
+         tal:attributes="value page;">
+
+  <table width="100%" border="0" cellspacing="0" cellpadding="5">
+
+    <!-- Readonly *and* onkeydown for bowser diversity. -->
+    <tr tal:attributes="bgcolor tr_color">
+      <td colspan="2" align="center">
+        <textarea wrap="soft" name="text"
+                  tal:attributes="rows zwiki_height;
+                                  cols zwiki_width;
+                                  readonly noedit;
+                                  onkeydown keydown;
+                                 "
+                  tal:content="text"></textarea>
+      </td>
+    </tr>
+
+    <tr tal:attributes="bgcolor tr_color">
+      <td valign="middle" align="left">
+        <br> Format: <em> <span tal:replace="page_type" /> </em>
+      </td>
+      <th valign="middle" align="center"
+          tal:condition="noedit" > Create Disabled </th>
+      <td valign="middle" align="right"
+          tal:condition="not: noedit"
+      >
+        <input type="submit" name="CreatePage" value="Create Page" size=20
+               tal:attributes="value string:Create ${page};" >
+      </td>
+    </tr>
+
+     <tr bgcolor="eeeeee"
+         tal:condition="not: noedit" >
+       <th colspan=2 align="center"> Log Message </th>
+     </tr>
+     <tr bgcolor="eeeeee">
+       <td colspan=2 align="center">
+         <textarea wrap="soft" name="log"
+                   rows=3
+                   cols=80 ></textarea>
+       </td>
+     </tr>
+     <tr bgcolor="eeeeee">
+       <td colspan=2>
+         Log for landmark changes - enter a note characterizing your
+         change.  It will be connected with the page version,
+         exposing the version for browsing in the condensed
+         <a href="wikipage_history">page history</a>.
+       </td>
+     </tr>
+  </table>
+ </form>
+
+</div>
+
+</div>
+
+</body>
+</html>
