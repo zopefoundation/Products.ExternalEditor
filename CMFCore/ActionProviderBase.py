@@ -60,6 +60,19 @@ class ActionProviderBase:
     def manage_editActionsForm( self, REQUEST, manage_tabs_message=None ):
 
         """ Show the 'Actions' management tab.
+
+        Bug note: Note that this method, when called by Management.py's
+        manage_workspace (when it is the first action of an object),
+        will be called with REQUEST equal to 'self' and
+        manage_tabs_message equal to the REQUEST.  This causes the
+        request to be printed by manage_tabs, because it considers
+        'manage_tabs_message' to be true.  The fix would be to remove
+        this method and put it all into DTML (probably easiest) or to
+        make manage_workspace sniff at the method it obtains to make sure
+        it's a DTMLFile before passing along self and REQUEST. I don't
+        care too much either way, and I'm too lazy to fix it at the moment.
+        - chrism
+        
         """
         actions = []
 
