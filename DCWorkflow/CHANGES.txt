@@ -1,4 +1,22 @@
 
+Version 0.5
+
+- Help documentation contributed by John Morton.
+
+- In the ZMI, states are now careful to show only transitions that
+still exist.
+
+- States now have a description, in addition to a title.
+
+- Worklist variables now allow matches with multiple values (separated
+by semicolons) and use Python string formatting for dynamic matches.
+
+- Fixed issues with ObjectMoved exceptions.
+
+- Fixed the default permissions for new DCWorkflow instances.
+
+- Expression.py was moved to CMFCore.
+
 Version 0.4.2
 
 - Fixed getInfoFor() using patch from Sebastien.Bigaret@inqual.com.  Thanks!
