@@ -1,4 +1,4 @@
-""" CMFConfiguration product initialization
+""" CMFSetup product initialization
 
 $Id$
 """

@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<rolemap xmlns:tal="http://xml.zope.org/namespaces/tal">
+  <roles>
+    <role name="ROLENAME"
+          tal:repeat="role here/listRoles"
+          tal:attributes="name role" />
+  </roles>
+  <permissions>
+    <permission name="PERMISSION NAME" acquire="1" roles="ROLE1 ROLE2"
+                tal:repeat="info here/listPermissions"
+                tal:attributes="name info/name;
+                                acquire info/acquire;
+                                roles python:' '.join(info['roles']);
+                               " />
+  </permissions>
+</rolemap>

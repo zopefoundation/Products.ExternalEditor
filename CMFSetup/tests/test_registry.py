@@ -5,7 +5,7 @@ $Id$
 import unittest
 import os
 
-from Products.CMFCore.tests.base.testcase import SecurityRequestTest
+from Products.CMFSetup.tests.common import BaseRegistryTests
 
 #==============================================================================
 #   Dummy handlers
@@ -19,21 +19,6 @@ ONE_FUNC_NAME = '%s.%s' % ( __name__, ONE_FUNC.__name__ )
 TWO_FUNC_NAME = '%s.%s' % ( __name__, TWO_FUNC.__name__ )
 THREE_FUNC_NAME = '%s.%s' % ( __name__, THREE_FUNC.__name__ )
 FOUR_FUNC_NAME = '%s.%s' % ( __name__, FOUR_FUNC.__name__ )
-
-
-class BaseRegistryTests( SecurityRequestTest ):
-
-    def _makeOne( self, *args, **kw ):
-
-        # Derived classes must implement _getTargetClass
-        return self._getTargetClass()( *args, **kw )
-
-    def _compareDOM( self, found_text, expected_text ):
-
-        from xml.dom.minidom import parseString
-        found = parseString( found_text )
-        expected = parseString( expected_text )
-        self.assertEqual( found.toxml(), expected.toxml() )
 
 
 #==============================================================================
