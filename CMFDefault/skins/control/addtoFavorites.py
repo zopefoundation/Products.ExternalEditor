@@ -1,7 +1,8 @@
 ## Script (Python) "addtoFavorites"
 ##title=Add item to favourites
 ##parameters=
-homeFolder=context.portal_membership.getHomeFolder()
+portal = context.portal_url.getPortalObject()
+homeFolder = portal.portal_membership.getHomeFolder()
 
 if not hasattr(homeFolder, 'Favorites'):
   homeFolder.manage_addPortalFolder(id='Favorites', title='Favorites')

@@ -29,7 +29,7 @@ CMF TODO's
 
       - Tracker #500:  Skin cookie for deleted skin causes traceback
 
-      - Tracker #501:  addToFavorites loses if no member folder
+      - Tracker #501:  addToFavorites loses if no favorites folder
 
       - Tracker #503:  index_html/folder_view don't skip unauth folders
 
@@ -88,7 +88,7 @@ CMF TODO's
         ( ) Tracker #485:  "External" users don't get member folder
                            (patch)
 
-        ( ) Tracker #501:  addToFavorites loses if no member folder
+        (x) Tracker #501:  addToFavorites loses if no favorites folder
 
         ( ) Tracker #508:  logged_in pukes if no email
 
