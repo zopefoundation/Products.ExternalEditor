@@ -1,4 +1,20 @@
-Version 0.3
+
+Version 0.4
+
+- Thanks to Ulrich Eck (ueck@net-labs.de), you can now set variables
+  on states and transitions.  Great job!
+
+- Changed expressions to TALES.  This means that it is now required that
+  you have the PageTemplates product installed; see
+  http://www.zope.org/Members/4am/ZPT .
+  Your expressions will need to be written
+  again, but they should be a lot cleaner now.
+
+- Added a second default workflow that closely resembles the "classic"
+  default workflow.  Just visit a workflow tool and click "Add workflow"
+  then select "Web-configurable workflow [Classic]".
+
+Version 0.3 (never officially released)
 
 - Fixed guard expressions.  Thanks to Jens Quade!
 
@@ -15,6 +31,7 @@ Quade.
 - What is passed to scripts is now an object whose attributes are from
   the expression namespace.
 
+
 Version 0.2
 
 - As suggested by Seb Bacon, simplified by making transitions trigger on
@@ -24,6 +41,7 @@ their own IDs.  Thanks!
 are passed an expression namespace as the first parameter.
  
 - Replaced the name "action_or_method" with "transition".
+
 
 Version 0.1
 
