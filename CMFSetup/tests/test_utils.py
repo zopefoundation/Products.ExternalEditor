@@ -86,6 +86,9 @@ class UtilsTests( unittest.TestCase ):
         self.assertRaises( ValueError, _getDottedName, doh )
 
 def test_suite():
+    # reimport to make sure tests are run from Products
+    from Products.CMFSetup.tests.test_utils import UtilsTests
+
     return unittest.TestSuite((
         unittest.makeSuite( UtilsTests ),
         ))

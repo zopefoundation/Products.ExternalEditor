@@ -652,11 +652,20 @@ class SetupToolTests( FilesystemTestBase
         for id in [ x[0] for x in _EXPECTED ]:
             self.failUnless( id in snapshot.objectIds() )
 
+        def normalize_xml(xml):
+            # using this might mask a real problem on windows, but so far the
+            # different newlines just caused problems in this test
+            lines = [ line for line in xml.splitlines() if line ]
+            return '\n'.join(lines) + '\n'
+
         fileobj = snapshot._getOb( 'import_steps.xml' )
-        self.assertEqual( fileobj.read() , _EMPTY_IMPORT_XML )
+        self.assertEqual( normalize_xml( fileobj.read() ),
+                          _EMPTY_IMPORT_XML )
 
         fileobj = snapshot._getOb( 'export_steps.xml' )
-        self.assertEqual( fileobj.read() , _DEFAULT_STEP_REGISTRIES_EXPORT_XML )
+
+        self.assertEqual( normalize_xml( fileobj.read() ),
+                          _DEFAULT_STEP_REGISTRIES_EXPORT_XML )
 
         self.assertEqual( len( tool.listSnapshotInfo() ), 1 )
 
@@ -672,7 +681,7 @@ _DEFAULT_STEP_REGISTRIES_EXPORT_XML = """\
  <export-step id="step_registries"
               handler="Products.CMFSetup.tool.exportStepRegistries"
               title="Export import / export steps.">
-
+  
  </export-step>
 </export-steps>
 """
@@ -956,6 +965,11 @@ _REQUIRED_TOOLSET_XML = """\
 """
 
 def test_suite():
+    # reimport to make sure tests are run from Products
+    from Products.CMFSetup.tests.test_tool import SetupToolTests
+    from Products.CMFSetup.tests.test_tool import Test_exportToolset
+    from Products.CMFSetup.tests.test_tool import Test_importToolset
+
     return unittest.TestSuite((
         unittest.makeSuite( SetupToolTests ),
         unittest.makeSuite( Test_exportToolset ),
