@@ -735,6 +735,8 @@ class TypesTool( UniqueObject, OFS.Folder.Folder, ActionProviderBase ):
         if type( contentType ) is not type( '' ):
             if hasattr(aq_base(contentType), '_getPortalTypeName'):
                 contentType = contentType._getPortalTypeName()
+                if contentType is None:
+                    return None
             else:
                 return None
         ob = getattr( self, contentType, None )
