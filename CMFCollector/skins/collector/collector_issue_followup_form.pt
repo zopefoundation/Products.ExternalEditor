@@ -1,9 +1,15 @@
+<span tal:condition="nothing"
+      tal:define="has_followup_priv nocall: here/do_action">
+  This span ensures that the visitor has edit privilege, by fetching - but
+  not displaying - the protected collector.do_action method.
+</span>
+
 <html xmlns:tal="http://xml.zope.org/namespaces/tal"
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       metal:use-macro="here/main_template/macros/master">
 <body>
 
-<span tal:replace="nothing">
+<span tal:condition="nothing">
   Template description: Form for entering new issue actions.
 </span>
 

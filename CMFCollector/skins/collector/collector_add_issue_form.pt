@@ -1,8 +1,14 @@
+<span tal:condition="nothing"
+      tal:define="has_add_priv nocall: here/add_issue">
+  This span ensures that the visitor has edit privilege, by fetching - but not
+  displaying - the protected collector.add_issue method.
+</span>
+
 <html xmlns:tal="http://xml.zope.org/namespaces/tal"
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       metal:use-macro="here/main_template/macros/master">
 
-<span tal:replace="nothing">
+<span tal:condition="nothing">
   Template description: Form for submitting new collector issues.
 </span>
 
