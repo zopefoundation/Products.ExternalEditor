@@ -14,7 +14,6 @@
     Allow the "view" of a folder to be skinned by type.
 """
 
-from OFS.Folder import Folder
 from Products.CMFCore.PortalFolder import PortalFolder
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore import CMFCorePermissions
@@ -69,8 +68,7 @@ class SkinnedFolder(CMFCatalogAware, PortalFolder):
 
     security = ClassSecurityInfo()
 
-    manage_options = Folder.manage_options + \
-                     CMFCatalogAware.manage_options
+    manage_options = PortalFolder.manage_options
 
     def __call__(self):
         '''
