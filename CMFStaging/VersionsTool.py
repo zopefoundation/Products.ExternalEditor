@@ -62,10 +62,37 @@ class VersionsTool(UniqueObject, SimpleItemWithProperties):
     security.declareProtected(ManagePortal, 'manage_overview' )
     manage_overview = DTMLFile( 'explainVersionsTool', _wwwdir )
 
+    # helper methods
+
     def _getVersionRepository(self):
         repo = aq_acquire(self, self.repository_name, containment=1)
         return repo
 
+    # unprotected methods
+
+    security.declarePublic('isUnderVersionControl')
+    def isUnderVersionControl(self, object):
+        """Returns a true value if the object is under version control."""
+        repo = self._getVersionRepository()
+        return repo.isUnderVersionControl(object)
+
+
+    security.declarePublic('isCheckedOut')
+    def isCheckedOut(self, object):
+        """Returns a true value if the object is checked out."""
+        repo = self._getVersionRepository()
+        if not repo.isUnderVersionControl(object):
+            return 0
+        info = repo.getVersionInfo(object)
+        return (info.status == info.CHECKED_OUT)
+
+    security.declarePublic('isResourceUpToDate')
+    def isResourceUpToDate(self, object, require_branch=0):
+        """Return true if a version-controlled resource is up to date."""
+        repo = self._getVersionRepository()
+        return repo.isResourceUpToDate(object, require_branch)
+
+    # protected methods
 
     security.declareProtected(UseVersionControl, 'checkout')
     def checkout(self, object):
@@ -128,23 +155,6 @@ class VersionsTool(UniqueObject, SimpleItemWithProperties):
                 repo.checkinResource(object, message)
 
 
-    security.declareProtected(UseVersionControl, 'isUnderVersionControl')
-    def isUnderVersionControl(self, object):
-        """Returns a true value if the object is under version control."""
-        repo = self._getVersionRepository()
-        return repo.isUnderVersionControl(object)
-
-
-    security.declareProtected(UseVersionControl, 'isCheckedOut')
-    def isCheckedOut(self, object):
-        """Returns a true value if the object is checked out."""
-        repo = self._getVersionRepository()
-        if not repo.isUnderVersionControl(object):
-            return 0
-        info = repo.getVersionInfo(object)
-        return (info.status == info.CHECKED_OUT)
-
-
     security.declareProtected(UseVersionControl, 'getLogEntries')
     def getLogEntries(self, object, only_checkins=0):
         """Returns the log entries for an object as a sequence of
@@ -203,12 +213,6 @@ class VersionsTool(UniqueObject, SimpleItemWithProperties):
         repo = self._getVersionRepository()
         return repo.getVersionInfo(object).history_id
 
-
-    security.declareProtected(UseVersionControl, 'isResourceUpToDate')
-    def isResourceUpToDate(self, object, require_branch=0):
-        """Return true if a version-controlled resource is up to date."""
-        repo = self._getVersionRepository()
-        return repo.isResourceUpToDate(object, require_branch)
 
     security.declareProtected(UseVersionControl, 'revertToVersion')
     def revertToVersion(self, object, version_id):
