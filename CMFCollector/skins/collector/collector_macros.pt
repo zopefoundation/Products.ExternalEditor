@@ -13,9 +13,7 @@
     </span>
 
     <div metal:define-macro="collector_header"
-         tal:define="global collector_header_present python: 1;
-                     upNav python: hasattr(here.aq_parent, 'portal_url');
-                     upID python: here.aq_parent.getId()">
+         tal:define="global collector_header_present python: 1">
 
       <table>
         <tr>
@@ -31,21 +29,9 @@
               </font>
             </div>
           </th>
-          <td tal:condition="upNav|nothing" align="center">
-            <a href="folder_contents"
-               tal:attributes="href python: here.aq_parent.absolute_url()
-                                            + '/folder_contents'">
-              <img src="" alt="[Link]" border="0"
-                   tal:attributes="src python: here.portal_url()
-                                               + '/UpFolder_icon.gif'"></a>
-            &nbsp;&nbsp;
-            Out to <a href="CONTAINER"
-                      tal:attributes="href here/aq_parent/absolute_url"
-                      tal:content="upID">Up ID</a>
-          </td>
         </tr>
         <tr>
-          <td colspan="2">
+          <td>
             <div id="DesktopDescription"
                  tal:content="here/description">DESCRIPTION</div>
           </td>
