@@ -1,19 +1,21 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """ Worklists in a web-configurable workflow.
 
 $Id$
 """
+
+from types import TupleType
 
 from OFS.SimpleItem import SimpleItem
 from Globals import DTMLFile, PersistentMapping
@@ -26,8 +28,7 @@ from Products.CMFCore.CMFCorePermissions import ManagePortal
 from ContainerTab import ContainerTab
 from Guard import Guard
 from utils import _dtmldir
-from string import split, strip, join
-from types import TupleType
+
 
 class WorklistDefinition (SimpleItem):
     """Worklist definiton"""
@@ -94,7 +95,7 @@ class WorklistDefinition (SimpleItem):
 
     def getVarMatchText(self, id):
         values = self.getVarMatch(id)
-        return join(values, '; ')
+        return '; '.join(values)
 
     _properties_form = DTMLFile('worklist_properties', _dtmldir)
 
@@ -121,7 +122,7 @@ class WorklistDefinition (SimpleItem):
             if v:
                 if not self.var_matches:
                     self.var_matches = PersistentMapping()
-                v = map(strip, split(v, ';'))
+                v = [ var.strip() for var in v.split(';') ]
                 self.var_matches[key] = tuple(v)
             else:
                 if self.var_matches and self.var_matches.has_key(key):
