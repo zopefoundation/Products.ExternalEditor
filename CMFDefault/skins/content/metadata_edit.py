@@ -61,9 +61,6 @@ else:
 
 action_path = context.getTypeInfo().getActionById( action_id )
 
-action_method = context.restrictedTraverse( action_path )
-
-return action_method( context
-                    , context.REQUEST
-                    , portal_status_message='Metadata changed.'
-                    )
+context.REQUEST['RESPONSE'].redirect(
+          '%s/%s?portal_status_message=Metadata+changed.'
+            % ( context.absolute_url(), action_path ) )
