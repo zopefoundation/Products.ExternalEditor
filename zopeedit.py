@@ -92,7 +92,12 @@ class ExternalEditor:
         try:
             # Read the configuration file
             if win32:
+                # Check the home dir first and then the program dir
                 config_path = path.expanduser('~\\ZopeEdit.ini')
+                global_config = path.join(sys.path[0], 'ZopeEdit.ini')
+                if not path.exists(config_path) \
+                   and os.path.exists(global_config):
+                    config_path = global_config
             else:
                 config_path = path.expanduser('~/.zope-external-edit')
                 

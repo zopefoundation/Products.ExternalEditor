@@ -12,7 +12,7 @@ AppUpdatesURL=http://www.zope.org/Members/Caseman/ExternalEditor/
 DefaultDirName={pf}\ZopeExternalEditor
 DefaultGroupName=Zope External Editor
 AllowNoIcons=yes
-LicenseFile=.. \LICENSE.txt
+LicenseFile=..\LICENSE.txt
 ChangesAssociations=yes
 
 [Registry]
@@ -31,6 +31,7 @@ Root: HKCR; SubKey: "MIME\Database\Content Type\application/x-zope-edit"; Flags:
 [Files]
 Source: "dist\zopeedit\*.*"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 Source: "*.txt"; DestDir: "{app}"; CopyMode: alwaysoverwrite
+Source: "ZopeEdit.ini"; DestDir: "{app}"; CopyMode: alwaysskipifsameorolder
 Source: "..\README.txt"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 Source: "..\LICENSE.txt"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 
