@@ -60,8 +60,8 @@ def addEvent(self
              , description=''
              , effective_date = None 
              , expiration_date = None 
-             , start_date = DateTime() 
-             , end_date = DateTime()
+             , start_date = None 
+             , end_date = None
              , location=''
              , contact_name=''
              , contact_email=''
@@ -121,8 +121,8 @@ class Event(PortalContent, DefaultDublinCoreImpl):
                  , description=''
                  , effective_date = None 
                  , expiration_date = None 
-                 , start_date = DateTime()
-                 , end_date = DateTime()
+                 , start_date = None
+                 , end_date = None
                  , location=''
                  , contact_name=''
                  , contact_email=''
@@ -136,6 +136,11 @@ class Event(PortalContent, DefaultDublinCoreImpl):
         self.effective_date = effective_date
         self.expiration_date = expiration_date
         self.setStartDate(start_date)
+
+        if start_date is None:
+            start_date = DateTime()
+        if end_date is None:
+            end_date = start_date
         
         if end_date < start_date:
             end_date = start_date
