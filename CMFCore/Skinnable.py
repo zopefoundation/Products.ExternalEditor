@@ -129,13 +129,16 @@ class SkinnableObjectManager (ObjectManager):
         if name[:1] != '_' and name[:3] != 'aq_':
             sd = self._v_skindata
             if sd is not None:
-                ob = sd[0]
-                subob = getattr(ob, name, _marker)
-                if subob is not _marker:
-                    # Return it in context of self, forgetting
-                    # its location and acting as if it were located
-                    # in self.
-                    return aq_base(subob)
+                ob, ignore = sd
+                if not ignore.has_key(name):
+                    subob = getattr(ob, name, _marker)
+                    if subob is not _marker:
+                        # Return it in context of self, forgetting
+                        # its location and acting as if it were located
+                        # in self.
+                        return aq_base(subob)
+                    else:
+                        ignore[name] = 1
         return superGetAttr(self, name)
 
     security.declarePublic('setupCurrentSkin')
@@ -149,7 +152,8 @@ class SkinnableObjectManager (ObjectManager):
             REQUEST = getattr(self, 'REQUEST', None)
         if REQUEST is None:
             # We are traversing without a REQUEST at the root.
-            # Don't change the skin right now.
+            # Don't change the skin right now. (Otherwise
+            # [un]restrictedTraverse messes up the skin data.)
             return
         self._v_skindata = None
         sfn = self.getSkinsFolderName()
@@ -161,7 +165,7 @@ class SkinnableObjectManager (ObjectManager):
                 sd = sf.getSkin(REQUEST)
                 if sd is not None:
                     # Hide from acquisition.
-                    self._v_skindata = (sd,)
+                    self._v_skindata = (sd, {})
 
     def __of__(self, parent):
         '''
