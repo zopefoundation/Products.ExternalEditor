@@ -33,6 +33,7 @@ from zLOG import LOG, ERROR
 from sys import exc_info
 from types import StringType
 from FSMetadata import FSMetadata
+import re
 
 _dtmldir = path.join( package_home( globals() ), 'dtml' )
 
@@ -40,6 +41,8 @@ __reload_module__ = 0
 
 # Ignore version control subdirectories
 ignore = ('CVS', 'SVN', '.', '..', '.svn')
+# Ignore suspected backups and hidden files
+ignore_re = re.compile(r'\.|(.*~$)|#')
 
 # and special names.
 def _filtered_listdir(path):
@@ -52,7 +55,7 @@ def _walker (listdir, dirname, names):
     names = [ (name, stat(path.join(dirname,name))[8])
               for name
               in names
-              if name not in ignore ]
+              if name not in ignore and not ignore_re.match(name) ]
     listdir.extend(names)
 
 class DirectoryInformation:
