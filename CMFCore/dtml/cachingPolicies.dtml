@@ -157,7 +157,7 @@
          <input type="text" name="max_age_secs:int" value="0">
        </td>
 
-       <th align="right"> Most-revalidate? </th>
+       <th align="right"> Must-revalidate? </th>
        <td>
          <input type="checkbox" name="must_revalidate:int"
                               value="1">
