@@ -381,7 +381,19 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
 
     security.declarePublic('getURLForStage')
     def getURLForStage(self, source, stage, relative=0):
-        """Returns the URL of the object on the given stage.
+        """Returns the public URL of the object on the given stage.
+        """
+        stages = self._getObjectStages(source)
+        ob = stages[stage]
+        if ob is not None:
+            return self.getPublicURL(ob, relative=relative)
+        else:
+            return None
+
+
+    security.declarePublic('getPublicURL')
+    def getPublicURL(self, ob, relative=0):
+        """Returns the URL of an object.
 
         Besides using absolute_url(), also looks for public_url
         properties on portal objects.  The public_url property is
@@ -391,37 +403,36 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
         This method is particularly useful when generating URLs for
         inclusion in an email notification regarding staging.
         """
-        verifyPermission(StageObjects, source)
-        stages = self._getObjectStages(source)
-        ob = stages[stage]
-        if ob is not None:
-            url = ob.absolute_url(relative)
-            p = getPortal(ob, None)
-            if p is not None:
-                # Modify the start of the URL according to the portal's
-                # public_url property.
-                public_url = getattr(aq_base(p), 'public_url', None)
-                if public_url:
-                    orig_url = p.absolute_url(relative)
-                    if url.startswith(orig_url):
-                        url = public_url + url[len(orig_url):]
-            return url
-        else:
-            return None
+        url = ob.absolute_url(relative)
+        p = getPortal(ob, None)
+        if p is not None:
+            # Modify the start of the URL according to the portal's
+            # public_url property.
+            public_url = getattr(aq_base(p), 'public_url', None)
+            if public_url:
+                orig_url = p.absolute_url(relative=relative)
+                if url.startswith(orig_url):
+                    url = public_url + url[len(orig_url):]
+        return url
 
 
     security.declarePublic('getObjectStats')
     def getObjectStats(self, source):
         """Returns a structure suitable for presentation of staging status.
         """
-        verifyPermission(StageObjects, source)
         res = []
         revisions = self._getObjectVersionIds(source, include_status=1)
         source_stage = self.getStageOf(source)
+        objs = self._getObjectStages(source)
         for stage_name, stage_title, path in self._stages:
             stageable = (stage_name != source_stage) and (
                 not revisions[stage_name]
                 or revisions[stage_name] != revisions[source_stage])
+            obj = objs.get(stage_name)
+            if obj is not None:
+                url = self.getPublicURL(obj)
+            else:
+                url = None
             stats = {
                 "name": stage_name,
                 "title": stage_title,
@@ -429,6 +440,8 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
                 "revision": revisions.get(stage_name),
                 "stageable": stageable,
                 "is_source": (stage_name == source_stage),
+                "object": obj,
+                "url": url,
                 }
             res.append(stats)
         return res
@@ -475,4 +488,3 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
 
 
 InitializeClass(StagingTool)
-
