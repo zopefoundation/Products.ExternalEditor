@@ -48,6 +48,10 @@ CMF 1.3 beta2 (2002/06/30)
 
   Bugs Fixed
 
+    - Enabled creation of "My Stuff" folder for users (e.g., the manager)
+      authenticated "above" the normal user folder (Tracker #485, thanks
+      to Dieter Maurer for the patch).
+
     - Fixed handling of discussion items so that they are correctly
       indexed, unindexed and reinserted into the workflows when copied
       or moved.

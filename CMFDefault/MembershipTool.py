@@ -11,104 +11,106 @@
 #
 ##############################################################################
 
-"""CMFDefault portal_membership tool.
+""" CMFDefault portal_membership tool.
 
 $Id$
 """
-__version__='$Revision$'[11:-2]
-
-
-from Products.CMFCore.utils import _getAuthenticatedUser, _checkPermission
-from Products.CMFCore.utils import getToolByName
-from Products.CMFCore.ActionsTool import ActionInformation
-import Products.CMFCore.MembershipTool
-from Products.CMFCore.PortalFolder import manage_addPortalFolder
-import Document
 
 from Globals import InitializeClass, DTMLFile
 from AccessControl import ClassSecurityInfo
+
+from Products.CMFCore.MembershipTool import MembershipTool as BaseTool
+from Products.CMFCore.PortalFolder import manage_addPortalFolder
+from Products.CMFCore.utils import _getAuthenticatedUser
+from Products.CMFCore.utils import _checkPermission
+from Products.CMFCore.utils import getToolByName
+from Products.CMFCore.ActionsTool import ActionInformation as AI
 from Products.CMFCore.Expression import Expression
-from Products.CMFCore.CMFCorePermissions import View, AccessContentsInformation
-from Products.CMFCore.CMFCorePermissions import ListPortalMembers, AddPortalMember
+from Products.CMFCore.CMFCorePermissions import View
+from Products.CMFCore.CMFCorePermissions import AccessContentsInformation
+from Products.CMFCore.CMFCorePermissions import ListPortalMembers
+from Products.CMFCore.CMFCorePermissions import AddPortalMember
 from Products.CMFCore.CMFCorePermissions import ManagePortal
+
+from Document import addDocument
+
 from utils import _dtmldir
 
-default_member_content = '''Default page for %s
+DEFAULT_MEMBER_CONTENT = """\
+Default page for %s
 
   This is the default document created for you when
   you joined this community.
 
   To change the content just select "Edit"
   in the Tool Box on the left.
-'''
+"""
 
-class MembershipTool ( Products.CMFCore.MembershipTool.MembershipTool ):
+class MembershipTool( BaseTool ):
+    """ Implement 'portal_membership' interface using "stock" policies.
     """
-    """
-    _actions =[ActionInformation(id='login'
-                            , title='Login'
-                            , description='Click here to Login'
-                            , action=Expression(
-            text='string: ${portal_url}/login_form')
-                            , permissions=(View,)
-                            , category='user'
-                            , condition=Expression(text='not: member')
-                            , visible=1
-                             )
-          , ActionInformation(id='preferences'
-                            , title='Preferences'
-                            , description='Change your user preferences'
-                            , action=Expression(
-            text='string: ${portal_url}/personalize_form')
-                            , permissions=(View,)
-                            , category='user'
-                            , condition=Expression(text='member')
-                            , visible=1
-                             )
-          , ActionInformation(id='logout'
-                            , title='Log out'
-                            , description='Click here to logout'
-                            , action=Expression(
-            text='string: ${portal_url}/logout')
-                            , permissions=(View,)
-                            , category='user'
-                            , condition=Expression(text='member')
-                            , visible=1
-                             )
-          , ActionInformation(id='addFavorite'
-                            , title='Add to favorites'
-                            , description='Add this item to your favorites'
-                            , action=Expression(
-            text='string: ${object_url}/addtoFavorites')
-                            , permissions=(View,)
-                            , category='user'
-                            , condition=Expression(
-            text='python: portal.portal_membership.getHomeFolder()')
-                            , visible=1
-                             )
-          , ActionInformation(id='mystuff'
-                            , title='My stuff'
-                            , description='Goto your home folder'
-                            , action=Expression(
-          text='python: portal.portal_membership.getHomeUrl()+"/folder_contents"')
-                            , permissions=(View,)
-                            , category='user'
-                            , condition=Expression(
-           text='python: member and portal.portal_membership.getHomeFolder()')
-                            , visible=1
-                             )
-          , ActionInformation(id='favorites'
-                            , title='My favorites'
-                            , description='Browser your favorites'
-                            , action=Expression(
-           text='python: portal.portal_membership.getHomeUrl() + \'/Favorites/folder_contents\'')
-                            , permissions=(View,)
-                            , category='user'
-                            , condition=Expression(
-           text='python: member and hasattr(portal.portal_membership.getHomeFolder(), \'Favorites\')')
-                            , visible=1
-                             )
-                           ]
+    _actions =[
+      AI( id='login'
+        , title='Login'
+        , description='Click here to Login'
+        , action=Expression(text='string:${portal_url}/login_form')
+        , permissions=(View,)
+        , category='user'
+        , condition=Expression(text='not: member')
+        , visible=1
+        )
+    , AI( id='preferences'
+        , title='Preferences'
+        , description='Change your user preferences'
+        , action=Expression(text='string:${portal_url}/personalize_form')
+        , permissions=(View,)
+        , category='user'
+        , condition=Expression(text='member')
+        , visible=1
+        )
+    , AI( id='logout'
+        , title='Log out'
+        , description='Click here to logout'
+        , action=Expression(text='string:${portal_url}/logout')
+        , permissions=(View,)
+        , category='user'
+        , condition=Expression(text='member')
+        , visible=1
+        )
+    , AI( id='addFavorite'
+        , title='Add to favorites'
+        , description='Add this item to your favorites'
+        , action=Expression(text='string:${object_url}/addtoFavorites')
+        , permissions=(View,)
+        , category='user'
+        , condition=Expression(text= 'string:${portal/portal_membership'
+                                   + '/getHomeFolder}')
+        , visible=1
+        )
+    , AI( id='mystuff'
+        , title='My stuff'
+        , description='Goto your home folder'
+        , action=Expression(text='string:${portal/portal_membership'
+                               + '/getHomeUrl}/folder_contents')
+        , permissions=(View,)
+        , category='user'
+        , condition=Expression( text='python: member and '
+                              + 'portal.portal_membership.getHomeFolder()')
+        , visible=1
+        )
+    , AI( id='favorites'
+        , title='My favorites'
+        , description='Browse your favorites'
+        , action=Expression(text='string:${portal/portal_membership'
+                               + '/getHomeUrl}/Favorites/folder_contents')
+        , permissions=(View,)
+        , category='user'
+        , condition=Expression( text='python: member and '
+                                   + 'hasattr(portal.portal_membership.'
+                                   +  'getHomeFolder(), "Favorites")')
+        , visible=1
+        )
+    ]
 
     meta_type = 'Default Membership Tool'
 
@@ -126,11 +128,12 @@ class MembershipTool ( Products.CMFCore.MembershipTool.MembershipTool ):
     #
     security.declareProtected( ListPortalMembers, 'getRoster' )
     def getRoster(self):
-        '''
-        Return a list of mappings corresponding to those users who have
-        made themselves "listed".  If Manager, return a list of all
-        usernames.  The mapping contains the id and listed variables.
-        '''
+
+        """ Return a list of mappings for 'listed' members.
+        
+        If Manager, return a list of all usernames.  The mapping
+        contains the id and listed variables.
+        """
         isManager = _checkPermission('Manage portal', self)
         roster = []
         for member in self.listMembers():
@@ -141,8 +144,8 @@ class MembershipTool ( Products.CMFCore.MembershipTool.MembershipTool ):
 
     security.declareProtected(ManagePortal, 'createMemberarea')
     def createMemberarea(self, member_id):
-        """
-        create a member area
+
+        """ Create a member area for 'member_id'.
         """
         parent = self.aq_inner.aq_parent
         members =  getattr(parent, 'Members', None)
@@ -154,20 +157,31 @@ class MembershipTool ( Products.CMFCore.MembershipTool.MembershipTool ):
 
             # Grant ownership to Member
             acl_users = self.__getPUS()
-            user = acl_users.getUser(member_id).__of__(acl_users)
+            user = acl_users.getUser(member_id)
+
+            if user is not None:
+                user= user.__of__(acl_users)
+            else:
+                from AccessControl import getSecurityManager
+                user= getSecurityManager().getUser()
+                # check that we do not do something wrong
+                if user.getUserName() != member_id:
+                    raise NotImplementedError, \
+                        'cannot get user for member area creation'
+
             f.changeOwnership(user)
             f.manage_setLocalRoles(member_id, ['Owner'])
 
             # Create Member's home page.
-            # default_member_content ought to be configurable per
+            # DEFAULT_MEMBER_CONTENT ought to be configurable per
             # instance of MembershipTool.
-            Document.addDocument( f
-                                , 'index_html'
-                                , member_id+"'s Home"
-                                , member_id+"'s front page"
-                                , "structured-text"
-                                , (default_member_content % member_id)
-                                )
+            addDocument( f
+                       , 'index_html'
+                       , member_id+"'s Home"
+                       , member_id+"'s front page"
+                       , "structured-text"
+                       , (DEFAULT_MEMBER_CONTENT % member_id)
+                       )
 
             f.index_html._setPortalTypeName( 'Document' )
 
@@ -177,7 +191,9 @@ class MembershipTool ( Products.CMFCore.MembershipTool.MembershipTool ):
             wftool.notifyCreated( f.index_html )
 
     def getHomeFolder(self, id=None, verifyPermission=0):
-        """Returns a member's home folder object."""
+
+        """ Return a member's home folder object, or None.
+        """
         if id is None:
             member = self.getAuthenticatedMember()
             if not hasattr(member, 'getMemberId'):
@@ -194,7 +210,9 @@ class MembershipTool ( Products.CMFCore.MembershipTool.MembershipTool ):
         return None
 
     def getHomeUrl(self, id=None, verifyPermission=0):
-        """Returns the URL to a member's home folder."""
+
+        """ Return the URL to a member's home folder, or None.
+        """
         home = self.getHomeFolder(id, verifyPermission)
         if home is not None:
             return home.absolute_url()
@@ -203,7 +221,9 @@ class MembershipTool ( Products.CMFCore.MembershipTool.MembershipTool ):
 
     security.declarePrivate( 'listActions' )
     def listActions(self, info=None):
-        '''Lists actions available through the tool.'''
+
+        """ List actions available through the tool.
+        """
         return self._actions
 
 InitializeClass(MembershipTool)
