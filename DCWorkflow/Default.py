@@ -88,6 +88,8 @@ $Id$
 '''
 __version__='$Revision$'[11:-2]
 
+from Products.CMFCore.WorkflowTool import addWorkflowFactory
+
 from Products.DCWorkflow.DCWorkflow import DCWorkflowDefinition
 
 p_access = 'Access contents information'
@@ -239,10 +241,12 @@ def setupDefaultWorkflow(wf):
                               'guard_permissions':p_review})
     
 
-def manage_addDefaultWorkflow(self):
+def createDefaultWorkflow(id):
     '''
     '''
-    ob = DCWorkflowDefinition('default_workflow_rev2')
-    self._setObject(ob.id, ob)
-    setupDefaultWorkflow(self.this()._getOb(ob.id))
-    return self.manage_main(self, self.REQUEST)
+    ob = DCWorkflowDefinition(id)
+    setupDefaultWorkflow(ob)
+    return ob
+
+addWorkflowFactory(createDefaultWorkflow, id='default_workflow',
+                   title='Web-configurable workflow [default]')

@@ -90,7 +90,7 @@ __version__='$Revision$'[11:-2]
 
 from Products.CMFCore.utils import registerIcon
 import DCWorkflow, States, Transitions, Variables, Worklists, Scripts
-from Default import manage_addDefaultWorkflow
+import Default
 
 
 def initialize(context):
@@ -111,6 +111,3 @@ def initialize(context):
     Worklists.WorklistDefinition.icon = Worklists.Worklists.icon
     registerIcon(Scripts.Scripts,
                  'images/script.gif', globals())
-
-    context.registerClass(constructors=(manage_addDefaultWorkflow,),
-                          meta_type='CMF default workflow (rev 2)')

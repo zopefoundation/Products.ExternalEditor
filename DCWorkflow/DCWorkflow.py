@@ -106,7 +106,7 @@ from DocumentTemplate.DT_Util import TemplateDict
 
 # CMFCore
 from Products.CMFCore.WorkflowCore import WorkflowException
-from Products.CMFCore.WorkflowTool import addWorkflowClass
+from Products.CMFCore.WorkflowTool import addWorkflowFactory
 from Products.CMFCore.CMFCorePermissions import ManagePortal
 from Products.CMFCore.utils import getToolByName
 
@@ -134,7 +134,6 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
     '''
     meta_type = 'Workflow'
     title = 'DC Workflow Definition'
-    id = 'dc_workflow'
     _isAWorkflow = 1
 
     state_var = 'state'
@@ -558,4 +557,5 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
 
 Globals.InitializeClass(DCWorkflowDefinition)
 
-addWorkflowClass(DCWorkflowDefinition)
+addWorkflowFactory(DCWorkflowDefinition, id='dc_workflow',
+                   title='Web-configurable workflow')

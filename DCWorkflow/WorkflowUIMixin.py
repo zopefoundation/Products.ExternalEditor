@@ -132,7 +132,7 @@ class WorkflowUIMixin:
         '''
         if p in self.permissions:
             raise ValueError, 'Already a managed permission: ' + p
-        if p not in self.getPossiblePermissions():
+        if REQUEST is not None and p not in self.getPossiblePermissions():
             raise ValueError, 'Not a valid permission name:' + p
         self.permissions = self.permissions + (p,)
         if REQUEST is not None:
