@@ -93,6 +93,8 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
     ACTIONS_ORDER = ['Accept', 'Resign', 'Assign',
                      'Resolve', 'Reject', 'Defer'] 
 
+    _collector_path = None
+
     def __init__(self,
                  id, container,
                  title='', description='',
@@ -110,15 +112,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         """ """
 
         SkinnedFolder.__init__(self, id, title)
-
-        # Take care of standard metadata:
-        DefaultDublinCoreImpl.__init__(self,
-                                       title=title, description=description,
-                                       effective_date=effective_date,
-                                       expiration_date=expiration_date)
-        if modification_date is None:
-            modification_date = self.creation_date
-        self.modification_date = modification_date
+        self._set_collector_path(container)
 
         user = getSecurityManager().getUser()
         if submitter_id is None:
@@ -139,19 +133,35 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
 
         self.topic = topic
         self.classification = classification
-        self.security_related = security_related
+        self.security_related = (security_related and 1) or 0
         self.importance = importance
         self.severity = severity
         self.resolution = resolution
         self.reported_version = reported_version
         self.other_version_info = other_version_info
 
+        self.portal_type = 'Collector Issue'
         container._setObject(id, self)
+        # 'contained' is for stuff that needs collector acquisition wrapping.
         contained = container._getOb(id)
-        # Following is acquisition-wrapped so, eg, invokeFactory can work.
         contained._setPortalTypeName('Collector Issue')
+        DefaultDublinCoreImpl.__init__(contained,
+                                       title=title, description=description,
+                                       effective_date=effective_date,
+                                       expiration_date=expiration_date)
+
+        if modification_date is None:
+            modification_date = self.creation_date
+        self.modification_date = modification_date
+
         contained.do_action('request', description, assignees,
                             file, fileid, filetype)
+
+    def _set_collector_path(self, collector):
+        """Stash path to containing collector."""
+        # For getting the internal catalog when being indexed - at which 
+        # time we don't have an acquisition content to use...
+        self._collector_path = "/".join(collector.getPhysicalPath())
 
     security.declareProtected(CMFCorePermissions.View, 'CookedBody')
     def CookedBody(self):
@@ -206,7 +216,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
             and ((not security_related) != (not self.security_related))):
             changes.append('security_related %s'
                            % (security_related and 'set' or 'unset'))
-            self.security_related = security_related
+            self.security_related = (security_related and 1) or 0
         if changed('description', description):
             changes.append('revised description')
             self.description = description
@@ -246,6 +256,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
                          + " Changes: " + ", ".join(changes)
                          + ((self.action_number > 1) and "\n\n<hr>\n")
                          + transcript.EditableBody())
+        self.reindexObject()
         self._send_update_notice('Edit', username)
         return ", ".join(changes)
 
@@ -317,6 +328,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
                          + util.process_comment(string.strip(comment))
                          + ((action_number > 1) and "\n<hr>\n" or '')
                          + transcript.EditableBody())
+        self.reindexObject()
         self._send_update_notice(action, username,
                                  orig_status, additions, removals,
                                  file=file, fileid=fileid)
@@ -446,6 +458,10 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         it.manage_upload(file)
         return it
 
+    def upload_number(self):
+        """ """
+        return len(self)
+
     security.declareProtected(CMFCorePermissions.View, 'assigned_to')
     def assigned_to(self):
         """Return the current supporters list, according to workflow."""
@@ -541,28 +557,42 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
     security.declareProtected(CMFCorePermissions.ModifyPortalContent,
                               'indexObject')
     def indexObject(self):
-        catalog = getToolByName(self, 'portal_catalog', None)
-        if catalog is not None:
-            catalog.indexObject(self)
+        for i in (self._get_internal_catalog(),
+                  getToolByName(self, 'portal_catalog', None)):
+            if i is not None:
+                i.indexObject(self)
 
     security.declareProtected(CMFCorePermissions.ModifyPortalContent,
                               'unindexObject')
     def unindexObject(self):
-        catalog = getToolByName(self, 'portal_catalog', None)
-        if catalog is not None:
-            catalog.unindexObject(self)
+        for i in (self._get_internal_catalog(),
+                  getToolByName(self, 'portal_catalog', None)):
+            if i is not None:
+                i.unindexObject(self)
 
     security.declareProtected(CMFCorePermissions.ModifyPortalContent,
                               'reindexObject')
-    def reindexObject(self):
-        catalog = getToolByName(self, 'portal_catalog', None)
-        if catalog is not None:
-            catalog.reindexObject(self)
+    def reindexObject(self, internal_only=0):
+        catalogs = [self._get_internal_catalog()]
+        if not internal_only:
+            catalogs.append(getToolByName(self, 'portal_catalog', None))
+        for i in catalogs:
+            if i is not None:
+                i.reindexObject(self)
+
+    def _get_internal_catalog(self):
+        if self._collector_path is None:
+            # Last ditch effort - this will only work when we're being called
+            # from the collector's .reindex_issues() method.
+            self._set_collector_path(self.aq_parent)
+        container = self.restrictedTraverse(self._collector_path)
+        return container.get_internal_catalog()
 
     def manage_afterAdd(self, item, container):
         """Add self to the workflow and catalog."""
         # Are we being added (or moved)?
         if aq_base(container) is not aq_base(self):
+            self._set_collector_path(self.aq_parent)
             wf = getToolByName(self, 'portal_workflow', None)
             if wf is not None:
                 wf.notifyCreated(self)
@@ -595,18 +625,16 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
                 + ((self.security_related and 'security_related') or ''))
 
     def Subject(self):
-        """The structured attrs, combined w/field names for targeted search."""
-        assigned_to = tuple(['assigned_to:' + i for i in self.assigned_to()])
-        return ('topic:' + self.topic,
-                'classification:' + self.classification,
-                'security_related:' + ((self.security_related and '1') or '0'),
-                'importance:' + self.importance,
-                'severity:' + self.severity,
-                'resolution:' + (self.resolution or ''),
-                'reported_version:' + self.reported_version,
-                'action_number:' + str(self.action_number),
-                'upload_number:' + str(len(self.objectIds()) - 1),
-                ) + assigned_to
+        """The structured attributes."""
+        return (self.topic,
+                self.classification,
+                self.importance,
+                self.severity,
+                )
+
+    def __len__(self):
+        """Number of uploaded artifacts (ie, excluding transcript)."""
+        return len(self.objectIds()) - 1
 
     def __repr__(self):
         return ("<%s %s \"%s\" at 0x%s>"
