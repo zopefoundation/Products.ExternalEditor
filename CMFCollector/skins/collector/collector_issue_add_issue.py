@@ -1,10 +1,12 @@
-## Script (Python) "collector_issue_add_issue.py"
 ##title=Submit a Request
+##
+collector = context.aq_parent
+try:
+    target = collector.getActionInfo('object/addissue')['url']
+except AttributeError:
+    # for usage with CMF < 1.5
+    ti = collector.getTypeInfo()
+    target = "%s/%s" % ( collector.absolute_url(),
+                         ti.getActionById('addissue') )
 
-typeinfo = context.portal_types.getTypeInfo('Collector')
-addissue = typeinfo.getActionById('addissue')
-
-context.REQUEST.RESPONSE.redirect("%s/%s"
-                                  % (context.aq_parent.absolute_url(),
-                                     addissue))
-
+context.REQUEST.RESPONSE.redirect(target)

@@ -23,15 +23,11 @@ from webdav.WriteLockInterface import WriteLockInterface
 
 from interfaces.Contentish import Contentish
 from DynamicType import DynamicType
-from utils import _getViewFor
 from CMFCatalogAware import CMFCatalogAware
+from exceptions import NotFound
 from exceptions import ResourceLockedError
 from permissions import FTPAccess
 from permissions import View
-
-
-# Old names that some third-party packages may need.
-NoWL = 0
 
 
 class PortalContent(DynamicType, CMFCatalogAware, SimpleItem):
@@ -95,22 +91,18 @@ class PortalContent(DynamicType, CMFCatalogAware, SimpleItem):
         return "%s %s" % (self.Title(), self.Description())
 
     def __call__(self):
-        '''
-        Invokes the default view.
-        '''
-        view = _getViewFor(self)
-        if getattr(aq_base(view), 'isDocTemp', 0):
-            return view(self, self.REQUEST)
+        """ Invokes the default view.
+        """
+        ti = self.getTypeInfo()
+        method_id = ti and ti.queryMethodID('(Default)')
+        if method_id:
+            method = getattr(self, method_id)
+            if getattr(aq_base(method), 'isDocTemp', 0):
+                return method(self, self.REQUEST)
+            else:
+                return method()
         else:
-            return view()
-
-    index_html = None  # This special value informs ZPublisher to use __call__
-
-    security.declareProtected(View, 'view')
-    def view(self):
-        '''
-        Returns the default view even if index_html is overridden.
-        '''
-        return self()
+            raise NotFound( 'Cannot find default view for "%s"' %
+                            '/'.join( obj.getPhysicalPath() ) )
 
 InitializeClass(PortalContent)

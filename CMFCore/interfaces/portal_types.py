@@ -69,14 +69,6 @@ class ContentTypeInformation(Interface):
             Can this type of object support discussion?
         """
 
-    def getActionById(id):
-        """ Get method ID by action ID.
-
-        This method is deprecated and will be removed in CMF 1.6. Please use
-        getActionInfo()['url'] if you need an URL or queryMethodID() if you
-        need a method ID.
-        """
-
     def getIcon():
         """
             Returns the portal-relative icon for this type.

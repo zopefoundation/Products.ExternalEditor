@@ -108,12 +108,9 @@ class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
     def enumerateIndexes( self ):
         #   Return a list of ( index_name, type ) pairs for the initial
         #   index set.
-        #   Creator is deprecated and may go away, use listCreators!
-        #   meta_type is deprecated and may go away, use portal_type!
         return ( ('Title', 'TextIndex')
                , ('Subject', 'KeywordIndex')
                , ('Description', 'TextIndex')
-               , ('Creator', 'FieldIndex')
                , ('listCreators', 'KeywordIndex')
                , ('SearchableText', 'TextIndex')
                , ('Date', 'FieldIndex')
@@ -125,7 +122,6 @@ class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
                , ('allowedRolesAndUsers', 'KeywordIndex')
                , ('review_state', 'FieldIndex')
                , ('in_reply_to', 'FieldIndex')
-               , ('meta_type', 'FieldIndex')
                , ('getId', 'FieldIndex')
                , ('path', 'PathIndex')
                , ('portal_type', 'FieldIndex')
@@ -134,13 +130,11 @@ class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
     security.declarePublic( 'enumerateColumns' )
     def enumerateColumns( self ):
         #   Return a sequence of schema names to be cached.
-        #   Creator is deprecated and may go away, use listCreators!
         return ( 'Subject'
                , 'Title'
                , 'Description'
                , 'Type'
                , 'review_state'
-               , 'Creator'
                , 'listCreators'
                , 'Date'
                , 'getIcon'

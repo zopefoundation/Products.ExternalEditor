@@ -9,10 +9,27 @@ HEAD only (unreleased)
 
   Bug Fixes
 
-    - CMFDefault and CMFTopic skins: Removed deprecated DTML skins and layers.
+    -
 
-    - FSFile: Allow setting a content_type value using a .metadata file
-      (http://www.zope.org/Collectors/CMF/281)
+  Removed Features
+
+    - CatalogTool: Removed deprecated indexes and metadata.
+      'Creator' was replaced by 'listCreators', 'portal_type' should be used
+      instead of 'meta_type'.
+
+    - CMFCore: Removed some deprecated aliases and constants.
+
+    - Permissions: Removed deprecated oldstyle permission modules.
+
+    - TypeInformation: Removed deprecated Type method.
+
+    - PortalFolder: Removed deprecated _morphSpec() and spec arguments.
+
+    - Portal Types: Removed deprecated _getViewFor / getActionById machinery.
+      PortalContent objects might be used as methods, so __call__() still
+      returns their default view.
+
+    - CMFDefault and CMFTopic skins: Removed deprecated DTML skins and layers.
 
     - ActionsTool: Removed deprecated support for oldstyle Action Providers.
       If Action Providers don't implement the ActionProvider interface they
@@ -27,6 +44,9 @@ CMF 1.5.0beta2 (unreleased)
     - Feature
 
   Bug Fixes
+
+    - FSFile: Allow setting a content_type value using a .metadata file
+      (http://www.zope.org/Collectors/CMF/281)
 
     - FSPageTemplate: Refine the XML content type detection so that
       addtional data such as encoding is preserved

@@ -16,11 +16,10 @@ $Id$
 """
 
 from AccessControl import ClassSecurityInfo
-from Acquisition import aq_parent, aq_inner, aq_base
+from Acquisition import aq_parent, aq_inner
 from Globals import InitializeClass
 
 from Products.CMFCore.PortalFolder import PortalFolder
-from Products.CMFCore.utils import _getViewFor
 from Products.CMFCore.utils import getToolByName
 
 from permissions import ListFolderContents
@@ -108,26 +107,6 @@ class Topic( PortalFolder ):
 
     acquireCriteria = 1
     _criteriaTypes = []
-
-    def __call__( self ):
-
-        """ Invoke the default action.
-        """
-        view = _getViewFor( self )
-
-        if getattr( aq_base( view ), 'isDocTemp', 0 ):
-            return view(self, self.REQUEST)
-        else:
-            return view()
-
-    index_html = None  # This special value informs ZPublisher to use __call__
-
-    security.declareProtected(View, 'view')
-    def view( self ):
-
-        """ Return the default view even if index_html is overridden.
-        """
-        return self()
 
     security.declareProtected(ChangeTopics, 'listCriteria')
     def listCriteria( self ):

@@ -42,7 +42,8 @@ tidyleadspace = re.compile("\n ([^ ])").sub
 def collector_webtext_migration(self):
     """Migrate old CMF "Document" based transcripts to "WebTextDocument"."""
     total_changed = 0
-    issues = self.objectValues(spec="CMF Collector Issue")
+    _filter = { 'portal_type': ('Collector Issue',) }
+    issues = self.objectValues(filter=_filter)
     for issue in issues:
         transcript = issue.get_transcript()
         was_p_mtime = transcript._p_mtime

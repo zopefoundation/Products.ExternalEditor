@@ -65,10 +65,6 @@ class portal_actions(Interface):
         Returns -- Dictionary of category / ActionInfo list pairs
         """
 
-    def listFilteredActions(object=None):
-        """ Deprecated alias of listFilteredActionsFor.
-        """
-
 
 class ActionProvider(Interface):
     """ The interface expected of an object that can provide actions.

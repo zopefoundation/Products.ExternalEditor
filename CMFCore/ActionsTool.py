@@ -175,8 +175,4 @@ class ActionsTool(UniqueObject, Folder, ActionProviderBase):
             #    catlist.append(action)
         return filtered_actions
 
-    # listFilteredActions() is an alias.
-    security.declarePublic('listFilteredActions')
-    listFilteredActions = listFilteredActionsFor
-
 InitializeClass(ActionsTool)

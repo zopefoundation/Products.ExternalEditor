@@ -45,10 +45,6 @@ import SyndicationTool
 import DefaultWorkflow
 
 
-# Old name that some third-party packages may need.
-ADD_CONTENT_PERMISSION = AddPortalContent
-
-
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #   N.B.:  The following symbol controls whether we "inject" the
 #          content types which formerly lived in CMFCore back into
@@ -85,7 +81,6 @@ contentClasses = ( Document.Document
                  , NewsItem.NewsItem
                  , SkinnedFolder.SkinnedFolder
                  )
-
 
 contentConstructors = ( Document.addDocument
                       , File.addFile

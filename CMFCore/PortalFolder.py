@@ -18,7 +18,6 @@ $Id$
 import base64
 import marshal
 import re
-from warnings import warn
 
 from AccessControl import ClassSecurityInfo
 from AccessControl import getSecurityManager
@@ -169,30 +168,6 @@ class PortalFolder(DynamicType, CMFCatalogAware, OrderedFolder):
             return self.folder_contents( # XXX: ick!
                 self, REQUEST, portal_status_message="Folder added")
 
-    def _morphSpec(self, spec):
-        '''
-        spec is a sequence of meta_types, a string containing one meta type,
-        or None.  If spec is empty or None, returns all contentish
-        meta_types.  Otherwise ensures all of the given meta types are
-        contentish.
-        '''
-        warn('Using the \'spec\' argument is deprecated. In CMF 1.6 '
-             'contentItems(), contentIds(), contentValues() and '
-             'listFolderContents() will no longer support \'spec\'. Use the '
-             '\'filter\' argument with \'portal_type\' instead.',
-             DeprecationWarning)
-        new_spec = []
-        types_tool = getToolByName(self, 'portal_types')
-        types = types_tool.listContentTypes( by_metatype=1 )
-        if spec is not None:
-            if type(spec) == type(''):
-                spec = [spec]
-            for meta_type in spec:
-                if not meta_type in types:
-                    raise ValueError('%s is not a content type' % meta_type)
-                new_spec.append(meta_type)
-        return new_spec or types
-
     def _filteredItems( self, ids, filt ):
         """
             Apply filter, a mapping, to child objects indicated by 'ids',
@@ -230,44 +205,29 @@ class PortalFolder(DynamicType, CMFCatalogAware, OrderedFolder):
         return result
 
     security.declarePublic('contentIds')
-    def contentIds( self, spec=None, filter=None):
+    def contentIds(self, filter=None):
         """
             Provide a filtered view onto 'objectIds', allowing only
             PortalFolders and PortalContent-derivatives to show through.
         """
-        if spec is None:
-            ids = self.objectIds()
-        else:
-            # spec is deprecated, use filter instead!
-            spec = self._morphSpec(spec)
-            ids = self.objectIds(spec)
-        return map( lambda item: item[0],
-                    self._filteredItems( ids, filter ) )
+        return [ item[0] for item in self.contentItems(filter) ]
 
     security.declarePublic('contentValues')
-    def contentValues( self, spec=None, filter=None ):
+    def contentValues(self, filter=None):
         """
             Provide a filtered view onto 'objectValues', allowing only
             PortalFolders and PortalContent-derivatives to show through.
         """
-        if spec is None:
-            ids = self.objectIds()
-        else:
-            # spec is deprecated, use filter instead!
-            spec = self._morphSpec(spec)
-            ids = self.objectIds(spec)
-        return map( lambda item: item[1],
-                    self._filteredItems( ids, filter ) )
+        return [ item[1] for item in self.contentItems(filter) ]
 
     security.declareProtected(ListFolderContents, 'listFolderContents')
-    def listFolderContents( self, spec=None, contentFilter=None ):
+    def listFolderContents(self, contentFilter=None):
         """
             Hook around 'contentValues' to let 'folder_contents'
             be protected.  Duplicating skip_unauthorized behavior of dtml-in.
         """
-        items = self.contentItems(spec=spec, filter=contentFilter)
         l = []
-        for id, obj in items:
+        for id, obj in self.contentItems(contentFilter):
             # validate() can either raise Unauthorized or return 0 to
             # mean unauthorized.
             try:
@@ -278,18 +238,13 @@ class PortalFolder(DynamicType, CMFCatalogAware, OrderedFolder):
         return l
 
     security.declarePublic('contentItems')
-    def contentItems( self, spec=None, filter=None ):
+    def contentItems(self, filter=None):
         """
             Provide a filtered view onto 'objectItems', allowing only
             PortalFolders and PortalContent-derivatives to show through.
         """
-        if spec is None:
-            ids = self.objectIds()
-        else:
-            # spec is deprecated, use filter instead!
-            spec = self._morphSpec(spec)
-            ids = self.objectIds(spec)
-        return self._filteredItems( ids, filter )
+        ids = self.objectIds()
+        return self._filteredItems(ids, filter)
 
     # protected by 'WebDAV access'
     def listDAVObjects(self):
@@ -563,7 +518,6 @@ class ContentFilter:
         Represent a predicate against a content object's metadata.
     """
     MARKER = []
-    filterCreator = []
     filterSubject = []
     def __init__( self
                 , Title=MARKER
@@ -588,8 +542,7 @@ class ContentFilter:
             self.description.append( 'Title: %s' % Title )
 
         if Creator and Creator is not self.MARKER:
-            self.filterCreator = Creator
-            self.predicates.append( lambda x, creator=self.filterCreator:
+            self.predicates.append( lambda x, creator=Creator:
                                     creator in x.listCreators() )
             self.description.append( 'Creator: %s' % Creator )
 

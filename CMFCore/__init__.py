@@ -34,10 +34,6 @@ import utils
 from permissions import AddPortalFolders
 
 
-# Old name that some third-party packages may need.
-ADD_FOLDERS_PERMISSION = AddPortalFolders
-HAS_PAGE_TEMPLATES = 1
-
 bases = (
     PortalObject.PortalObjectBase,
     PortalFolder.PortalFolder,

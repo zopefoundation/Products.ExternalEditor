@@ -177,13 +177,6 @@ class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
     #
     #   Accessors
     #
-    security.declareProtected(View, 'Type')
-    def Type(self):
-        """ Deprecated. Use Title(). """
-        warn('TypeInformation.Type() is deprecated, use Title().',
-             DeprecationWarning)
-        return self.Title()
-
     security.declareProtected(View, 'Title')
     def Title(self):
         """
@@ -269,38 +262,6 @@ class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
             self._convertActions()
 
         return self._actions or ()
-
-    security.declarePublic('getActionById')
-    def getActionById( self, id, default=_marker ):
-        """ Get method ID by action ID.
-        """
-        warn('getActionById() is deprecated and will be removed in CMF 1.6. '
-             'Please use getActionInfo()[\'url\'] if you need an URL or '
-             'queryMethodID() if you need a method ID.',
-             DeprecationWarning)
-        context = getActionContext( self )
-        for action in self.listActions():
-
-            __traceback_info__ = (self.getId(), action)
-
-            if action.getId() == id:
-                target = action.action(context).strip()
-                if target.startswith('/'):
-                    target = target[1:]
-                return target
-            else:
-                # Temporary backward compatibility.
-                if action.Title().lower() == id:
-                    target = action.action(context).strip()
-                    if target.startswith('/'):
-                        target = target[1:]
-                    return target
-
-        if default is _marker:
-            raise ValueError, ('No action "%s" for type "%s"'
-                               % (id, self.getId()))
-        else:
-            return default
 
     security.declarePrivate( '_convertActions' )
     def _convertActions( self ):
@@ -879,7 +840,6 @@ class TypesTool(UniqueObject, Folder, ActionProviderBase):
         result = typenames.keys()
         result.sort()
         return result
-
 
     security.declarePublic('constructContent')
     def constructContent( self

@@ -6,7 +6,7 @@ CMF Collector Update Notes
   changes, when necessary.
 
   The file is ordered most recent items first, and the items refer to
-  the collector version as indicated by the VERSION.text file in the
+  the collector version as indicated by the version.txt file in the
   same directory.
 
   See KNOWN_PROBLEMS.txt for pending bugs and problems to beware.
@@ -15,6 +15,8 @@ CMF Collector Update Notes
   Changes after release 0.9b
 
     Bug fixes
+
+      - Improved post CMF 1.5 compatibility.
 
       - Removed imports of WorkflowMethod which broke the product
 

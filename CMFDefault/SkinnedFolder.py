@@ -16,12 +16,10 @@ $Id$
 """
 
 from AccessControl import ClassSecurityInfo
-from Acquisition import aq_base
 from Globals import InitializeClass
 
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
 from Products.CMFCore.PortalFolder import PortalFolder
-from Products.CMFCore.utils import _getViewFor
 
 from DublinCore import DefaultDublinCoreImpl
 from permissions import AddPortalContent
@@ -84,21 +82,6 @@ class SkinnedFolder(CMFCatalogAware, PortalFolder):
     security = ClassSecurityInfo()
 
     manage_options = PortalFolder.manage_options
-
-    def __call__(self):
-        '''
-        Invokes the default view.
-        '''
-        view = _getViewFor(self)
-        if getattr(aq_base(view), 'isDocTemp', 0):
-            return view(self, self.REQUEST)
-        else:
-            return view()
-
-    security.declareProtected(View, 'view')
-    view = __call__
-
-    index_html = None  # This special value informs ZPublisher to use __call__
 
     # XXX: maybe we should subclass from DefaultDublinCoreImpl or refactor it
 

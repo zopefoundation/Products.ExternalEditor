@@ -18,7 +18,6 @@ $Id$
 from os import path as os_path
 from os.path import abspath
 import re
-from warnings import warn
 
 from AccessControl import ClassSecurityInfo
 from AccessControl import getSecurityManager
@@ -44,7 +43,6 @@ from OFS.PropertySheets import PropertySheets
 from OFS.SimpleItem import SimpleItem
 from Products.PageTemplates.Expressions import getEngine
 from Products.PageTemplates.Expressions import SecureModuleImporter
-from StructuredText.StructuredText import HTML
 
 from exceptions import AccessControl_Unauthorized
 from exceptions import NotFound
@@ -146,23 +144,11 @@ def _checkPermission(permission, obj):
 
     return context.user.allowed(obj, roles)
 
-security.declarePrivate('_verifyActionPermissions')
-def _verifyActionPermissions(obj, action):
-    # _verifyActionPermissions is deprecated and will be removed in CMF 1.6.
-    # This was only used by the deprecated _getViewFor function.
-    pp = action.getPermissions()
-    if not pp:
-        return 1
-    for p in pp:
-        if _checkPermission(p, obj):
-            return 1
-    return 0
-
 security.declarePublic( 'getActionContext' )
 def getActionContext( self ):
-    # getActionContext is deprecated and will be removed in CMF 1.6.
-    # This is only used by the deprecated _getViewFor function and the
-    # deprecated getActionById method.
+    # getActionContext is deprecated and will be removed as soon as the
+    # backwards compatibility code in TypeInformation._guessMethodAliases is
+    # removed.
     data = { 'object_url'   : ''
            , 'folder_url'   : ''
            , 'portal_url'   : ''
@@ -175,46 +161,6 @@ def getActionContext( self ):
            , 'member'       : None
            }
     return getEngine().getContext( data )
-
-security.declarePrivate('_getViewFor')
-def _getViewFor(obj, view='view'):
-    warn('__call__() and view() methods using _getViewFor() as well as '
-         '_getViewFor() itself are deprecated and will be removed in CMF 1.6. '
-         'Bypass these methods by defining \'(Default)\' and \'view\' Method '
-         'Aliases.',
-         DeprecationWarning)
-    ti = obj.getTypeInfo()
-
-    if ti is not None:
-
-        context = getActionContext( obj )
-        actions = ti.listActions()
-
-        for action in actions:
-            if action.getId() == view:
-                if _verifyActionPermissions( obj, action ):
-                    target = action.action(context).strip()
-                    if target.startswith('/'):
-                        target = target[1:]
-                    __traceback_info__ = ( ti.getId(), target )
-                    return obj.restrictedTraverse( target )
-
-        # "view" action is not present or not allowed.
-        # Find something that's allowed.
-        for action in actions:
-            if _verifyActionPermissions(obj, action):
-                target = action.action(context).strip()
-                if target.startswith('/'):
-                    target = target[1:]
-                __traceback_info__ = ( ti.getId(), target )
-                return obj.restrictedTraverse( target )
-
-        raise AccessControl_Unauthorized( 'No accessible views available for '
-                                    '%s' % '/'.join( obj.getPhysicalPath() ) )
-    else:
-        raise NotFound('Cannot find default view for "%s"' %
-                            '/'.join(obj.getPhysicalPath()))
-
 
 # If Zope ever provides a call to getRolesInContext() through
 # the SecurityManager API, the method below needs to be updated.
@@ -233,8 +179,6 @@ def _limitGrantedRoles(roles, context, special_roles=()):
     for role in roles:
         if role not in special_roles and role not in user_roles:
             raise AccessControl_Unauthorized('Too many roles specified.')
-
-limitGrantedRoles = _limitGrantedRoles  # XXX: Deprecated spelling
 
 security.declarePrivate('_mergedLocalRoles')
 def _mergedLocalRoles(object):
@@ -262,8 +206,6 @@ def _mergedLocalRoles(object):
             continue
         break
     return merged
-
-mergedLocalRoles = _mergedLocalRoles    # XXX: Deprecated spelling
 
 security.declarePrivate('_ac_inherited_permissions')
 def _ac_inherited_permissions(ob, all=0):
@@ -597,15 +539,6 @@ def registerIcon(klass, iconspec, _prefix=None):
     if not hasattr(misc_images, pid):
         setattr(misc_images, pid, MiscImage(pid, {}))
     getattr(misc_images, pid)[name]=icon
-
-security.declarePublic('format_stx')
-def format_stx( text, level=1 ):
-    """ Render STX to HTML.
-    """
-    warn('format_stx() will be removed in CMF 1.6. Please use '
-         'StructuredText.StructuredText.HTML instead.',
-         DeprecationWarning)
-    return HTML(text, level=level, header=0)
 
 #
 #   Metadata Keyword splitter utilities

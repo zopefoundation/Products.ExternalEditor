@@ -10,8 +10,10 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
+""" Implement the Collector issue-container content type.
 
-"""Implement the Collector issue-container content type."""
+$Id$
+"""
 
 import os, urllib
 from DateTime import DateTime
@@ -28,15 +30,16 @@ from Products.CMFDefault.SkinnedFolder import SkinnedFolder
 
 import util
 
-from permissions import View
-from permissions import AddPortalContent
-from permissions import AccessInactivePortalContent
 from permissions import AccessFuturePortalContent
-from permissions import ViewCollector
+from permissions import AccessInactivePortalContent
 from permissions import AddCollectorIssue
-from permissions import EditCollectorIssue
 from permissions import AddCollectorIssueFollowup
+from permissions import AddPortalContent
+from permissions import EditCollectorIssue
+from permissions import ListFolderContents
 from permissions import ManageCollector
+from permissions import View
+from permissions import ViewCollector
 
 from CollectorIssue import addCollectorIssue, CollectorIssue
 
@@ -69,6 +72,20 @@ factory_type_information = (
                   'name': 'Configure',
                   'action': 'string:${object_url}/collector_edit_form',
                   'permissions': (ManageCollector,)},
+                 {'id': 'folderContents',
+                  'name': 'Folder contents',
+                  'action': 'string:${object_url}/folder_contents',
+                  'permissions': (ListFolderContents,)},
+                 {'id': 'new',
+                  'name': 'New...',
+                  'action': 'string:${object_url}/folder_factories',
+                  'permissions': (AddPortalContent,),
+                  'visible': 0},
+                 {'id': 'rename_items',
+                  'name': 'Rename items',
+                  'action': 'string:${object_url}/folder_rename_form',
+                  'permissions': (AddPortalContent,),
+                  'visible': 0},
                  ),
      },
     )
@@ -414,7 +431,8 @@ class Collector(SkinnedFolder):
         acquires (old workflows controlled this).  This isn't exactly the
         right place, but it is an expedient one."""
 
-        for i in self.objectValues(spec='CMF Collector Issue'):
+        _filter = { 'portal_type': ('Collector Issue',) }
+        for i in self.objectValues(filter=_filter):
 
             # Ensure the issue acquires AddCollectorIssueFollowup
             # and AddPortalContent permissions.
