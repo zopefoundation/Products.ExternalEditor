@@ -1,9 +1,12 @@
 import Zope
 from unittest import TestCase, TestSuite, makeSuite, main
 
-from Products.CMFCore.ContentTypeRegistry import \
-     ContentTypeRegistry,MajorMinorPredicate,ExtensionPredicate, \
-     NameRegexPredicate, MimeTypeRegexPredicate
+
+from Products.CMFCore.ContentTypeRegistry import ContentTypeRegistry
+from Products.CMFCore.ContentTypeRegistry import MajorMinorPredicate
+from Products.CMFCore.ContentTypeRegistry import ExtensionPredicate
+from Products.CMFCore.ContentTypeRegistry import NameRegexPredicate
+from Products.CMFCore.ContentTypeRegistry import MimeTypeRegexPredicate
 
 class MajorMinorPredicateTests( TestCase ):
 
