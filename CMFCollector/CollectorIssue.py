@@ -212,7 +212,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         body = self.get_transcript().CookedBody()
         body = util.format_webtext(body)
         body = uploadexp.sub(r'\1 <a href="%s/\2/view">\2</a>\3'
-                             % self.aq_parent.absolute_url(),
+                             % self.absolute_url(),
                              body)
         return body
 
