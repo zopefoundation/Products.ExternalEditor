@@ -138,7 +138,7 @@ class SkinsTool(UniqueObject, SkinsContainer, PortalFolder, ActionProviderBase):
                         sels[key] = val
         if REQUEST is not None:
             return self.manage_propertiesForm(
-                self, REQUEST, manage_tabs_message='Properties changed.')
+                self, REQUEST, management_view='Properties', manage_tabs_message='Properties changed.')
 
     security.declarePrivate('PUT_factory')
 

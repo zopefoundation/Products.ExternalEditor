@@ -1,7 +1,18 @@
-<html><head><title>portal_skins properties</title></head>
-<body bgcolor="#ffffff">
+<dtml-let form_title="'Properties'">
+<dtml-if manage_page_header>
+ <dtml-var manage_page_header>
+<dtml-else>
+ <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+ <html lang="en">
+ <head>
+ <title>&dtml-form_title;</title>
+ </head>
+ <body bgcolor="#FFFFFF" link="#000099" vlink="#555555">
+ <h3>&dtml-form_title;</h3>
+</dtml-if>
+</dtml-let>
 <dtml-var manage_tabs>
-<h2>Properties</h2>
+
 <form action="manage_properties" method="POST">
 <table>
   <tr>
@@ -17,12 +28,12 @@
          </tr>
          <dtml-in getSkinPaths>
          <tr>
-           <td>
+           <td class="form-label">
              <input type="checkbox" name="chosen:list"
               value="&dtml-sequence-key;">
              &dtml-sequence-key;
            </td>
-           <td>
+           <td class="form-element">
              <input type="text" name="skinpath_&dtml-sequence-key;"
               value="&dtml-sequence-item;" size="70">
            </td>
@@ -53,8 +64,8 @@
    <td> <br /> </td>
   </tr>
   <tr>
-     <th valign="top" align="left">Default skin</th>
-     <td><select name="default_skin" size="1">
+     <td class="form-label" valign="top" align="left">Default skin</td>
+     <td class="form-element"><select name="default_skin" size="1">
        <dtml-in getSkinSelections>
          <option value="&dtml-sequence-item;" <dtml-if
           expr="_['sequence-item'] == getDefaultSkin()"
@@ -63,20 +74,20 @@
      </select></td>
   </tr>
   <tr>
-     <th valign="top" align="left">REQUEST variable name</th>
-     <td><input type="text" name="request_varname"
+     <td class="form-label" valign="top" align="left">REQUEST variable name</td>
+     <td class="form-element"><input type="text" name="request_varname"
           value="&dtml-getRequestVarname;" size="25"></td>
   </tr>
   <tr>
-     <th valign="top" align="left">Skin flexibility</th>
-     <td><input type="checkbox" name="allow_any" id="cb_allowany"
+     <td class="form-label" valign="top" align="left">Skin flexibility</td>
+     <td class="form-element"><input type="checkbox" name="allow_any" id="cb_allowany"
           <dtml-if getAllowAny>checked="checked"</dtml-if> />
          <label for="cb_allowany">Allow arbitrary skins to be
 	 selected</label></td>
   </tr>
   <tr>
-    <th valign="top" align="left">Skin Cookie persistence</th>
-    <td><input type="checkbox" name="cookie_persistence" id="cb_cookiep"
+    <td class="form-label" valign="top" align="left">Skin Cookie persistence</td>
+    <td class="form-element"><input type="checkbox" name="cookie_persistence" id="cb_cookiep"
          <dtml-if getCookiePersistence>checked="checked"</dtml-if> />
         <label for="cb_cookiep">Make skin cookie persist indefinitely
         </label></td>
