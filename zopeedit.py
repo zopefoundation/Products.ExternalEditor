@@ -325,7 +325,6 @@ class ExternalEditor:
         if bin is not None:
             # Try to load the plugin for this editor
             try:
-                import Plugins # Just to assert dependancy
                 module = 'Plugins.%s' % bin
                 Plugin = __import__(module, globals(), locals(), 
                                     ('EditorProcess',))
