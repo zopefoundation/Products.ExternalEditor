@@ -8,6 +8,7 @@
                   object_title here/Title;
                   portal_url utool;
                   member mtool/getAuthenticatedMember;
+                  membersfolder mtool/getMembersFolder;
                   isAnon mtool/isAnonymousUser;
                   actions python: atool.listFilteredActionsFor( here );
                   user_actions actions/user;
@@ -60,8 +61,11 @@
 
    <td id="NavBar">
     <a href="." tal:attributes="href string:${portal_url}/">home</a>&nbsp;
+    <span tal:condition="membersfolder" tal:omit-tag="">
     <a href="roster"
-       tal:attributes="href string:${portal_url}/Members">members</a>&nbsp;
+       tal:attributes="href python: membersfolder.absolute_url()"
+       tal:content="python: membersfolder.getId().lower()">members</a>&nbsp;
+    </span>
     <a href="recent_news"
        tal:attributes="href string:${portal_url}/recent_news">news</a>&nbsp;
     <a href="search_form"

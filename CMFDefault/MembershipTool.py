@@ -15,24 +15,29 @@
 $Id$
 """
 
-from Globals import InitializeClass, DTMLFile
 from AccessControl import ClassSecurityInfo
+from Acquisition import aq_inner
+from Acquisition import aq_parent
+from Globals import DTMLFile
+from Globals import InitializeClass
 
 from Products.CMFCore.MembershipTool import MembershipTool as BaseTool
 from Products.CMFCore.PortalFolder import manage_addPortalFolder
 from Products.CMFCore.utils import _checkPermission
 from Products.CMFCore.utils import getToolByName
+from Products.CMFCore.ActionProviderBase import ActionProviderBase
 from Products.CMFCore.ActionsTool import ActionInformation as AI
 from Products.CMFCore.Expression import Expression
-from Products.CMFCore.CMFCorePermissions import View
-from Products.CMFCore.CMFCorePermissions import AccessContentsInformation
 from Products.CMFCore.CMFCorePermissions import ListPortalMembers
-from Products.CMFCore.CMFCorePermissions import AddPortalMember
 from Products.CMFCore.CMFCorePermissions import ManagePortal
+from Products.CMFCore.CMFCorePermissions import View
 
 from Document import addDocument
-
 from utils import _dtmldir
+
+from interfaces.portal_membership \
+        import portal_membership as IMembershipTool
+
 
 DEFAULT_MEMBER_CONTENT = """\
 Default page for %s
@@ -48,7 +53,7 @@ class MembershipTool( BaseTool ):
     """ Implement 'portal_membership' interface using "stock" policies.
     """
 
-    __implements__ = BaseTool.__implements__
+    __implements__ = (IMembershipTool, ActionProviderBase.__implements__)
 
     meta_type = 'Default Membership Tool'
     _actions = (
@@ -114,6 +119,8 @@ class MembershipTool( BaseTool ):
         )
     )
 
+    membersfolder_id = 'Members'
+
     security = ClassSecurityInfo()
 
     #
@@ -122,12 +129,25 @@ class MembershipTool( BaseTool ):
     security.declareProtected( ManagePortal, 'manage_overview' )
     manage_overview = DTMLFile( 'explainMembershipTool', _dtmldir )
 
+    security.declareProtected(ManagePortal, 'manage_mapRoles')
+    manage_mapRoles = DTMLFile('membershipRolemapping', _dtmldir )
+
+    security.declareProtected(ManagePortal, 'manage_setMembersFolderById')
+    def manage_setMembersFolderById(self, id='', REQUEST=None):
+        """ ZMI method to set the members folder object by its id.
+        """
+        self.setMembersFolderById(id)
+        if REQUEST is not None:
+            REQUEST['RESPONSE'].redirect( self.absolute_url()
+                    + '/manage_mapRoles'
+                    + '?manage_tabs_message=Members+folder+changed.'
+                    )
+
     #
     #   'portal_membership' interface methods
     #
     security.declareProtected( ListPortalMembers, 'getRoster' )
     def getRoster(self):
-
         """ Return a list of mappings for 'listed' members.
         
         If Manager, return a list of all usernames.  The mapping
@@ -141,14 +161,25 @@ class MembershipTool( BaseTool ):
                                'listed':member.listed})
         return roster
 
+    security.declareProtected(ManagePortal, 'setMembersFolderById')
+    def setMembersFolderById(self, id=''):
+        """ Set the members folder object by its id.
+        """
+        self.membersfolder_id = id.strip()
+
+    security.declarePublic('getMembersFolder')
+    def getMembersFolder(self):
+        """ Get the members folder object.
+        """
+        parent = aq_parent( aq_inner(self) )
+        members = getattr(parent, self.membersfolder_id, None)
+        return members
+
     security.declareProtected(ManagePortal, 'createMemberarea')
     def createMemberarea(self, member_id):
-
         """ Create a member area for 'member_id'.
         """
-        parent = self.aq_inner.aq_parent
-        members =  getattr(parent, 'Members', None)
-
+        members = self.getMembersFolder()
         if members is not None and not hasattr(members, member_id):
             f_title = "%s's Home" % member_id
             members.manage_addPortalFolder( id=member_id, title=f_title )
@@ -190,7 +221,6 @@ class MembershipTool( BaseTool ):
             wftool.notifyCreated( f.index_html )
 
     def getHomeFolder(self, id=None, verifyPermission=0):
-
         """ Return a member's home folder object, or None.
         """
         if id is None:
@@ -198,9 +228,10 @@ class MembershipTool( BaseTool ):
             if not hasattr(member, 'getMemberId'):
                 return None
             id = member.getMemberId()
-        if hasattr(self, 'Members'):
+        members = self.getMembersFolder()
+        if members:
             try:
-                folder = self.Members[id]
+                folder = members[id]
                 if verifyPermission and not _checkPermission('View', folder):
                     # Don't return the folder if the user can't get to it.
                     return None
@@ -209,7 +240,6 @@ class MembershipTool( BaseTool ):
         return None
 
     def getHomeUrl(self, id=None, verifyPermission=0):
-
         """ Return the URL to a member's home folder, or None.
         """
         home = self.getHomeFolder(id, verifyPermission)

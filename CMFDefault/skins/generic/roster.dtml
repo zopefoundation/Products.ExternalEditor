@@ -9,7 +9,8 @@
 <h1> Portal Members </h1>
 
 <dtml-let roster="portal_membership.getRoster()"
-          userMgr="portal_membership.checkPermission( 'Manage_users', Members )"
+          isUserManager="portal_membership.checkPermission( 'Manage_users',
+                                       portal_membership.getMembersFolder() )"
 >
 
 <table class="SearchResults">
@@ -18,7 +19,7 @@
   </td>
   <th> Member
   </th>
-  <dtml-if userMgr>
+  <dtml-if isUserManager>
    <th> Listed?
    </th>
    <dtml-comment> We don't have a good interface for querying/setting roles
@@ -38,7 +39,7 @@
           &dtml-id;
        </dtml-if>
   </td>
- <dtml-if userMgr>
+ <dtml-if isUserManager>
   <td>
    <dtml-if listed> Yes <dtml-else> No </dtml-if>
   </td>

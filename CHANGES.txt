@@ -28,6 +28,12 @@ Future
     - (__future__) Added DCWorkflow (through-the-web configurable
       workflows) to the core set of CMF products.
 
+    - MembershipTool (CMFDefault): Un-hardwired members folder.
+      You now can get the members folder object using 'getMembersFolder()'.
+      If you want to change the id of the members folder, rename the folder
+      and set the members folder using portal_membership's configuration tab.
+      (Collector #128)
+
     - utils: Changed behavior of 'bodyfinder' and 'html_headcheck'.
       The head check in html_headcheck is now a bit different, but the result
       should be closer to what people expect.
