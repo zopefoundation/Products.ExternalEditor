@@ -86,6 +86,7 @@ class CMFHtmlWithImages(HTMLWithImages):
 
 CMFHtmlWithImages = CMFHtmlWithImages()
 
+
 class Document(PortalContent, DefaultDublinCoreImpl):
     """ A Document - Handles both StructuredText and HTML """
 
@@ -314,14 +315,10 @@ class Document(PortalContent, DefaultDublinCoreImpl):
         """
         return self.text
 
-    security.declareProtected(View, 'Description')
-    def Description(self):
-        """ Dublin core description, also important for indexing """
-        return self.description
-
     security.declareProtected(View, 'Format')
     def Format(self):
-        """ Returns a content-type style format of the underlying source """
+        """ Dublin Core Format element - resource format.
+        """
         if self.text_format == 'html':
             return 'text/html'
         else:

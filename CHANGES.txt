@@ -118,6 +118,9 @@ CMF 1.5alpha (unreleased)
 
   Bug Fixes
 
+    - DefaultDublinCoreImpl: Changed accessor permissions.
+      As defined in the interface accessors are now protected by 'View'.
+
     - CMFDefault utils: Made 'tuplize()' work correctly with string types.
 
     - CMFCore utils: Reverted obsolete workaround in _checkPermission.

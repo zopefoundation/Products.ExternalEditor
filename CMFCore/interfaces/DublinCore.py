@@ -1,14 +1,14 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """ Dublin Core interface.
 
@@ -23,229 +23,252 @@ except ImportError:
 
 
 class DublinCore(Interface):
-    """
-        Define which Dublin Core metadata elements are supported by the CMF,
-        and the semantics therof.
+    """ Dublin Core metadata elements supported by CMF and their semantics.
     """
 
     def Title():
-        """
-            Dublin Core element - resource name
+        """ Dublin Core Title element - resource name.
 
-            Return type: string
-            Permissions: View
+        Permission -- View
+
+        Returns -- String
         """
-        
+
     def Creator():
-        """
-            Dublin Core element - resource creator
+        """ Dublin Core Creator element - resource creator.
 
-            Return the full name(s) of the author(s) of the content object.
+        Return the full name(s) of the author(s) of the content object.
 
-            Return type: string
-            Permission: View
+        Permission -- View
+
+        Returns -- String
         """
 
     def Subject():
-        """
-            Dublin Core element - resource keywords
+        """ Dublin Core Subject element - resource keywords.
 
-            Return zero or more keywords associated with the content object.
+        Return zero or more keywords associated with the content object.
 
-            Return type: sequence of strings
-            Permission: View
+        Permission -- View
+
+        Returns -- Sequence of strings
         """
 
     def Description():
-        """
-            Dublin Core element - resource summary
+        """ Dublin Core Description element - resource summary.
 
-            Return a natural language description of this object.
+        Return a natural language description of this object.
 
-            Return type: string
-            Permissions: View
+        Permission -- View
+
+        Returns -- String
         """
 
     def Publisher():
-        """
-            Dublin Core element - resource publisher
+        """ Dublin Core Publisher element - resource publisher.
 
-            Return full formal name of the entity or person responsible
-            for publishing the resource.
+        Return full formal name of the entity or person responsible for
+        publishing the resource.
 
-            Return type: string
-            Permission: View
+        Permission -- View
+
+        Returns -- String
         """
 
     def Contributors():
-        """
-            Dublin Core element - resource collaborators
+        """ Dublin Core Contributor elements - resource collaborators.
 
-            Return zero or additional collaborators.
+        Return zero or additional collaborators.
 
-            Return type: sequence of strings
-            Permission: View
+        Permission -- View
+
+        Returns -- Sequence of strings
         """
-    
+
     def Date():
-        """
-            Dublin Core element - default date
+        """ Dublin Core Date element - default date.
 
-            Return type: string, formatted 'YYYY-MM-DD H24:MN:SS TZ'
-            Permissions: View
+        Permission -- View
+
+        Returns -- String, formatted 'YYYY-MM-DD H24:MN:SS TZ'
         """
-    
+
     def CreationDate():
-        """
-            Dublin Core element - date resource created.
+        """ Dublin Core Date element - date resource created.
 
-            Return type: string, formatted 'YYYY-MM-DD H24:MN:SS TZ'
-            Permissions: View
+        Permission -- View
+
+        Returns -- String, formatted 'YYYY-MM-DD H24:MN:SS TZ'
         """
-    
+
     def EffectiveDate():
-        """
-            Dublin Core element - date resource becomes effective.
+        """ Dublin Core Date element - date resource becomes effective.
 
-            Return type: string, formatted 'YYYY-MM-DD H24:MN:SS TZ'
-            Permissions: View
+        Permission -- View
+
+        Returns -- String, formatted 'YYYY-MM-DD H24:MN:SS TZ'
         """
-    
+
     def ExpirationDate():
-        """
-            Dublin Core element - date resource expires.
+        """ Dublin Core Date element - date resource expires.
 
-            Return type: string, formatted 'YYYY-MM-DD H24:MN:SS TZ'
-            Permissions: View
+        Permission -- View
+
+        Returns -- String, formatted 'YYYY-MM-DD H24:MN:SS TZ'
         """
-    
+
     def ModificationDate():
-        """
-            Dublin Core element - date resource last modified.
+        """ Dublin Core Date element - date resource last modified.
 
-            Return type: string, formatted 'YYYY-MM-DD H24:MN:SS TZ'
-            Permissions: View
+        Permission -- View
+
+        Returns -- String, formatted 'YYYY-MM-DD H24:MN:SS TZ'
         """
 
     def Type():
-        """
-            Dublin Core element - resource type
+        """ Dublin Core Type element - resource type.
 
-            Return a human-readable type name for the resource
-            (perhaps mapped from its Zope meta_type).
+        Return a human-readable type name for the resource (perhaps mapped
+        from its Zope meta_type).
 
-            Return type: string
-            Permissions: View
+        Permission -- View
+
+        Returns -- String
         """
 
     def Format():
-        """
-            Dublin Core element - resource format
+        """ Dublin Core Format element - resource format.
 
-            Return the resource's MIME type (e.g., 'text/html',
-            'image/png', etc.).
+        Return the resource's MIME type (e.g. 'text/html', 'image/png', etc.).
 
-            Return type: string
-            Permissions: View
+        Permission -- View
+
+        Returns -- String
         """
 
     def Identifier():
-        """
-            Dublin Core element - resource ID
+        """ Dublin Core Identifier element - resource ID.
 
-            Returns unique ID (a URL) for the resource.
+        Returns unique ID (a URL) for the resource.
 
-            Return type: string
-            Permissions: View
+        Permission -- View
+
+        Returns -- String
         """
 
     def Language():
-        """
-            Dublin Core element - resource language
+        """ Dublin Core Language element - resource language.
 
-            Return the RFC language code (e.g., 'en-US', 'pt-BR')
-            for the resource.
+        Return the RFC language code (e.g. 'en-US', 'pt-BR') for the resource.
 
-            Return type: string
-            Permissions: View
+        Permission -- View
+
+        Returns -- String
         """
 
     def Rights():
-        """
-            Dublin Core element - resource copyright
+        """ Dublin Core Rights element - resource copyright.
 
-            Return a string describing the intellectual property status,
-            if any, of the resource.
-            for the resource.
+        Return a string describing the intellectual property status, if any,
+        of the resource.
 
-            Return type: string
-            Permissions: View
+        Permission -- View
+
+        Returns -- String
         """
+
 
 class CatalogableDublinCore(Interface):
+    """ Provide Zope-internal date objects for cataloging purposes.
     """
-        Provide Zope-internal date objects for cataloging purposes.
-    """
+
     def created():
-        """
-            Dublin Core element - date resource created,
+        """ Dublin Core Date element - date resource created.
 
-            Return type: DateTime
-            Permissions: View
+        Permission -- View
+
+        Returns -- DateTime
         """
-    
+
     def effective():
-        """
-            Dublin Core element - date resource becomes effective,
+        """ Dublin Core Date element - date resource becomes effective.
 
-            Return type: DateBound
-            Permissions: View
+        Permission -- View
+
+        Returns -- DateTime
         """
-    
+
     def expires():
-        """
-            Dublin Core element - date resource expires,
+        """ Dublin Core Date element - date resource expires.
 
-            Return type: DateBound
-            Permissions: View
+        Permission -- View
+
+        Returns -- DateTime
         """
-    
+
     def modified():
-        """
-            Dublin Core element - date resource last modified,
+        """ Dublin Core Date element - date resource last modified.
 
-            Return type: DateTime
-            Permissions: View
+        Permission -- View
+
+        Returns -- DateTime
         """
+
 
 class MutableDublinCore(Interface):
+    """ Update interface for mutable metadata.
     """
-        Update interface for mutable metadata.
-    """
+
     def setTitle(title):
-        "Dublin Core element - update resource name"
+        """ Set Dublin Core Title element - resource name.
+
+        Permission -- Modify portal content
+        """
 
     def setSubject(subject):
-        "Dublin Core element - update resource keywords"
+        """ Set Dublin Core Subject element - resource keywords.
+
+        Permission -- Modify portal content
+        """
 
     def setDescription(description):
-        "Dublin Core element - update resource summary"
+        """ Set Dublin Core Description element - resource summary.
+
+        Permission -- Modify portal content
+        """
 
     def setContributors(contributors):
-        "Dublin Core element - update additional contributors to resource"
+        """ Set Dublin Core Contributor elements - resource collaborators.
+
+        Permission -- Modify portal content
+        """
 
     def setEffectiveDate(effective_date):
-        """ Dublin Core element - update date resource becomes effective.  """
-    
+        """ Set Dublin Core Date element - date resource becomes effective.
+
+        Permission -- Modify portal content
+        """
+
     def setExpirationDate(expiration_date):
-        """ Dublin Core element - update date resource expires.  """
-    
+        """ Set Dublin Core Date element - date resource expires.
+
+        Permission -- Modify portal content
+        """
+
     def setFormat(format):
-        """ Dublin Core element - update resource format """
+        """ Set Dublin Core Format element - resource format.
+
+        Permission -- Modify portal content
+        """
 
     def setLanguage(language):
-        """ Dublin Core element - update resource language """
+        """ Set Dublin Core Language element - resource language.
+
+        Permission -- Modify portal content
+        """
 
     def setRights(rights):
-        """ Dublin Core element - update resource copyright """
+        """ Set Dublin Core Rights element - resource copyright.
 
+        Permission -- Modify portal content
+        """
