@@ -266,7 +266,10 @@
           - last_batch
       </span>
 
-      <table bgcolor="#eeeeee">
+      <table bgcolor="#eeeeee"
+             tal:define="url_query nocall: modules/ZTUtils/url_query;
+                         make_query nocall: modules/ZTUtils/make_query;
+                         base python: url_query(request, omit='b_start')">
 
         <tr>
           <td align="right" width="10%">
@@ -282,9 +285,8 @@
           <th align="center" width="30%">
             <span tal:condition="prev">
               <a href="PREVIOUS BATCH"
-                tal:attributes="href python: '%s/collector_contents?b_start=%s'
-                                             % (here.absolute_url(),
-                                                prev.first)">
+                tal:attributes="href python:
+                                     base+'&'+make_query(b_start=prev.first)">
                Previous</a>
              </span>
           </th>
@@ -309,10 +311,9 @@
 
           <th align="center" width="30%">
             <span tal:condition="next">
-              <a href=""
-                tal:attributes="href python: '%s/collector_contents?b_start=%s'
-                                             % (here.absolute_url(),
-                                                next.first)">
+              <a href="NEXT BATCH"
+                tal:attributes="href python:
+                                     base+'&'+make_query(b_start=next.first)">
               Next</a>
             </span>
           </th>
@@ -321,9 +322,8 @@
             <strong>
             <span tal:condition="next">
               <a href="LAST BATCH"
-                tal:attributes="href python: '%s/collector_contents?b_start=%s'
-                                             % (here.absolute_url(),
-                                                last_batch)">
+                tal:attributes="href python:
+                                     base+'&'+make_query(b_start=last_batch)">
                &gt;&gt; </a>
             </span>
             </strong>
