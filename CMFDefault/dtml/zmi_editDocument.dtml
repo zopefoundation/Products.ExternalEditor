@@ -29,13 +29,17 @@
   </th>
   <td>
    <input type="radio" name="text_format" value="structured-text"
-          <dtml-if "text_format=='structured-text'">checked</dtml-if>
-          id="cb_structuredtext" />
+          id="cb_structuredtext"
+          <dtml-if "text_format=='structured-text'">checked</dtml-if> />
           <label for="cb_structuredtext">structured-text</label>
    <input type="radio" name="text_format" value="html"
-          <dtml-if "text_format=='html'">checked</dtml-if>
-	  id="cb_html" />
+          id="cb_html"
+          <dtml-if "text_format=='html'">checked</dtml-if> />
 	  <label for="cb_html">html</label>
+   <input type="radio" name="text_format" value="plain"
+          id="cb_plain"
+          <dtml-if "text_format=='plain'">checked</dtml-if> />
+          <label for="cb_plain">plain text</label>
   </td>
  </tr>
 
