@@ -234,7 +234,7 @@ class File( OFS.Image.File
     def SearchableText(self):
         """
         SeachableText is used for full text seraches of a portal.  It
-        should return a concatanation of all useful text.
+        should return a concatenation of all useful text.
         """
         return "%s %s" % (self.title, self.description)
 
