@@ -216,7 +216,7 @@ FTIDATA_CMF14_SPECIAL2 = (
       , 'actions' : (
             { 'id': 'top',
               'name': 'View Mail Archive',
-              'category':'object',
+              'category': 'object',
               'action':'python:object.getArchive().absolute_url()',
               'permissions':(View,) }
           , { 'id':'view',
