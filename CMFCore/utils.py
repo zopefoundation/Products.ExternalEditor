@@ -259,12 +259,12 @@ def _setCacheHeaders(obj, extra_context):
     """Set cache headers according to cache policy manager for the obj."""
     REQUEST = getattr(obj, 'REQUEST', None)
     if REQUEST is not None:
-        obj = aq_parent(obj)
+        content = aq_parent(obj)
         manager = getToolByName(obj, 'caching_policy_manager', None)
         if manager is not None:
             view_name = obj.getId()
             headers = manager.getHTTPCachingHeaders(
-                              obj, view_name, extra_context
+                              content, view_name, extra_context
                               )
             RESPONSE = REQUEST['RESPONSE']
             for key, value in headers:
