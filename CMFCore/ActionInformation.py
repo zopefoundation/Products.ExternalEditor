@@ -21,6 +21,7 @@ from Globals import DTMLFile
 from Acquisition import aq_inner, aq_parent
 from OFS.SimpleItem import SimpleItem
 
+from Expression import Expression
 from CMFCorePermissions import View
 from CMFCorePermissions import ManagePortal
 from utils import _dtmldir
@@ -49,18 +50,23 @@ class ActionInformation( SimpleItem ):
                 , visible=1
                 , action=''
                 ):
-       """ Set up an instance.
-       """
-       self.id = id
-       self.title = title
-       self.description = description
-       self.category = category 
-       self.condition = condition
-       self.permissions = permissions
-       self.priority = priority 
-       self.visible = visible
-       self.action = action
+        """ Set up an instance.
+        """
+        if condition and type( condition ) == type( '' ):
+            condition = Expression( condition )
 
+        if action and type( action ) == type( '' ):
+            action = Expression( action )
+
+        self.id = id
+        self.title = title
+        self.description = description
+        self.category = category 
+        self.condition = condition
+        self.permissions = permissions
+        self.priority = priority 
+        self.visible = visible
+        self.action = action
 
     security.declareProtected( View, 'Title' )
     def Title(self):
@@ -147,11 +153,11 @@ class ActionInformation( SimpleItem ):
                              , title=self.title
                              , description=self.description
                              , category =self.category
-                             , condition=self.condition
+                             , condition=self.getCondition()
                              , permissions=self.permissions
                              , priority =self.priority
                              , visible=self.visible
-                             , action=self.action
+                             , action=self.getActionExpression()
                              )
 
 InitializeClass( ActionInformation )
