@@ -151,8 +151,6 @@ def process_comment(comment, strip=string.strip):
     # More elaborate stuff snarfed from my wiki commenting provisions.
     # Process the comment:
     # - Strip leading whitespace,
-    # - indent every line so it's contained as part of the prefix
-    #   definition list, and
     # - cause all cited text to be preformatted.
 
     inpre = incited = atcited = 0
@@ -162,7 +160,7 @@ def process_comment(comment, strip=string.strip):
     unpresplit = unpreexp.split
     citedsearch = citedexp.search
     got = []
-    for i in string.split(string.strip(comment), '\n') + ['']:
+    for i in string.split('\n' + string.rstrip(comment), '\n') + ['']:
         atcited = citedsearch(i)
         if not atcited:
             if incited:
@@ -170,7 +168,7 @@ def process_comment(comment, strip=string.strip):
                 incited = 0
                 if inpre:
                     # Close <pre> that we prepended.
-                    got.append(' </pre>')
+                    got.append("</pre collector:deleteme>")
                     inpre = 0
 
             # Check line for toggling of inpre.
@@ -195,10 +193,27 @@ def process_comment(comment, strip=string.strip):
             if not incited:
                 incited = 1
                 if not inpre:
-                    got.append(' <pre>')
+                    got.append("<pre collector:deleteme>")
                     inpre = 1
-        got.append(' ' + i)
+        got.append(i)
     return string.strip(string.join(got, '\n'))
+
+
+def unprocess_comments(text):
+    """Invert the process_comment transformations to yield literal text.
+
+    Specifically, remove (special) <pre>/</pre> and turn the small set of
+    character entities back to characters."""
+    
+    if text.find("<pre collector:deleteme>\n"):
+        text = text.replace("<pre collector:deleteme>\n", '')
+    if text.find("</pre collector:deleteme>\n"):
+        text = text.replace("</pre collector:deleteme>\n", '')
+    if text.find('&amp;'):
+        text = text.replace('&amp;', '&')
+    if text.find('&lt;'):
+        text = text.replace('&lt;', '<')
+    return text
 
 def sorted(l):
     x = list(l[:])
