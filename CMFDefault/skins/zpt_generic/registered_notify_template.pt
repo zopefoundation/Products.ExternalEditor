@@ -1,0 +1,42 @@
+<tal:page xmlns:tal="http://xml.zope.org/namespaces/tal"
+   xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+   tal:define="control python: here.registered_notify_control(**options)"
+   i18n:domain="cmf_default"
+>Subject: <tal:span i18n:translate=""><tal:span i18n:name="portal_title"
+                                         tal:content="control/portal_title"
+                                    />: Your Membership Information</tal:span>
+From: <tal:span tal:content="control/email_from_name"
+   /> <tal:span tal:replace="structure control/email_from_address" />
+To: <tal:span tal:replace="structure control/member_email" />
+Content-Type: text/plain
+
+<tal:span i18n:translate=""
+>You have been registered as a member of "<tal:span i18n:name="portal_title"
+                                 tal:content="control/portal_title" />", which
+allows you to personalize your view of the website and participate in the
+community.
+
+This describes the purpose of the website:
+<tal:span i18n:name="portal_description"
+   tal:content="control/portal_description" />
+
+Visit us at <span i18n:name="portal_url"
+><tal:span tal:replace="structure control/portal_url" /></span>
+
+Your member id and password are:
+
+Member ID: <tal:span i18n:name="member_id" tal:content="control/member_id" />
+Password: <tal:span i18n:name="password" tal:content="control/password" />
+
+You can use this URL to log on:
+
+<span i18n:name="login_url"
+><tal:span tal:replace="structure control/login_url" /></span>
+
+Be aware that this URL might wrap over two lines. If your browser shows an
+error message when you try to access the URL please make sure that you put
+in the complete string.
+
+<tal:span i18n:name="email_from_name"
+   tal:content="control/email_from_name" />
+</tal:span></tal:page>

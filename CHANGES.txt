@@ -2,6 +2,8 @@ CMF 1.5alpha (unreleased)
 
   New Features
 
+    - zpt skin: Added zpt version of registered_notify_template.
+
     - CMFCorePermissions: Made them available for import by Scripts.
 
     - CMFCore MembershipTool and MemberDataTool: Added 'delete' methods.
