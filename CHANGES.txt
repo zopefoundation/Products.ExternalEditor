@@ -1,5 +1,7 @@
 External Editor Change Log
 
+  6/24/02 - 0.4 Release
+
     - Added --version command line argument
 
     - Made manage_FTPget the default source for the editable content, instead

@@ -282,7 +282,8 @@ class ExternalEditor:
             return editor
         else:
             fatalError('No editor was found for that object.\n'
-                       'Specify an editor in the configuration file.')
+                       'Specify an editor in the configuration file:\n'
+                       '(%s)' % self.config.path)
         
     def launch(self):
         """Launch external editor"""

@@ -3,10 +3,10 @@
 [Setup]
 DisableStartupPrompt=yes
 AppName=Zope External Editor Helper Application
-AppVerName=Zope External Editor
+AppVerName=Zope External Editor 0.4
 AppPublisher=Casey Duncan, Zope Corporation
 AppPublisherURL=http://www.zope.com
-AppVersion=(Unreleased)
+AppVersion=0.4
 AppSupportURL=http://www.zope.org/Members/Caseman/ExternalEditor/
 AppUpdatesURL=http://www.zope.org/Members/Caseman/ExternalEditor/
 DefaultDirName={pf}\ZopeExternalEditor
@@ -35,4 +35,5 @@ Source: "*.txt"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 Source: "ZopeEdit.ini"; DestDir: "{app}"; CopyMode: onlyifdoesntexist
 Source: "..\README.txt"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 Source: "..\LICENSE.txt"; DestDir: "{app}"; CopyMode: alwaysoverwrite
+Source: "..\CHANGES.txt"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 
