@@ -135,7 +135,7 @@ class CalendarTool (UniqueObject, SimpleItem):
         ## This line was cropping the last day of the month out of the
         ## calendar when doing the query
         ## last_date=DateTime(year, month, last_day)
-        last_date=first_date + last_day
+        last_date = DateTime('%d/%d/%s 23:59:59' % (month, last_day , year))
 
         query = self.portal_catalog(
                         portal_type=self.calendar_types,
