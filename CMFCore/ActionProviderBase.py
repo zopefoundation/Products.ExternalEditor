@@ -256,7 +256,10 @@ class ActionProviderBase:
             category = 'object'
 
         if type( visible ) is not type( 0 ):
-            visible = 0
+            try:
+                visible = int( visible )
+            except:
+                visible = 0
 
         if type( permissions ) is type( '' ):
             permissions = ( permissions, )
