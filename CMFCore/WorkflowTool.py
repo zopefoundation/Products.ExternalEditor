@@ -363,8 +363,13 @@ class WorkflowTool (UniqueObject, Folder):
         '''
         Returns the list of workflow ids.
         '''
-        # To do...
-        return self._default_chain
+        wf_ids = []
+
+        for obj_name, obj in self.objectItems():
+            if getattr(obj, '_isAWorkflow', 0):
+                wf_ids.append(obj_name)
+
+        return tuple(wf_ids)
 
     security.declarePrivate('getWorkflowsFor')
     def getWorkflowsFor(self, ob):
