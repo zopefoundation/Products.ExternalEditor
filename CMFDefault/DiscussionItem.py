@@ -90,6 +90,7 @@ from Discussions import DiscussionResponse
 from Document import Document
 from DublinCore import DefaultDublinCoreImpl
 from DateTime import DateTime
+from Products.CMFCore.utils import getToolByName
 import urllib, string
 
 def addDiscussionItem(self, id, title, description, text_format, text,
@@ -144,11 +145,15 @@ class DiscussionItem( Document
     review_state='published'
 
     def absolute_url(self, relative=0):
+        portal_url = getToolByName(self, 'portal_url')
+        container = self.aq_inner.aq_parent
+        content_item = container.aq_inner.aq_parent
+        parent_rel_url = portal_url.getRelativeUrl(content_item)
+
         if relative:
-            parent_rel_url = string.join(string.split(self.aq_parent.absolute_url(), '/')[3:], '/')
-            return '/' + parent_rel_url + '/talkback/' + str(self.id)
+            return parent_rel_url + '/talkback/' + str(self.id)
         else:
-            return self.aq_parent.absolute_url() + '/talkback/' + str(self.id)
+            return portal_url() + '/' + parent_rel_url + '/talkback/' + str(self.id)
 
     def getPhysicalPath(self):
         """
@@ -164,7 +169,6 @@ class DiscussionItem( Document
         """
         result = []
         my_url = self.absolute_url(1)
-        if my_url[0] != '/': my_url = '/' + my_url
         talkback = self.aq_inner.aq_parent
 
         for item in talkback._container.values():
@@ -303,8 +307,8 @@ class DiscussionItemContainer(Persistent, Implicit):
            in reply to me
         """
         result = []
-        my_url = self.absolute_url(1)
-        if my_url[0] != '/': my_url = '/' + my_url
+        portal_url = getToolByName(self, 'portal_url')
+        my_url = portal_url.getRelativeUrl(self)
 
         for item in self._container.values():
             if item.in_reply_to == urllib.unquote(my_url):

@@ -195,8 +195,9 @@ class DiscussionResponse(Base):
         if REQUEST is None:
             REQUEST = self.REQUEST
 
+        portal_url = getToolByName(self, 'portal_url')
         script = REQUEST.script
-        path = self.in_reply_to
+        path = portal_url.getPortalPath() + '/' + self.in_reply_to
         if string.find(path, script) != 0:
             path='%s/%s' % (script, path)
         return REQUEST.resolve_url(path)
@@ -216,8 +217,12 @@ class DiscussionResponse(Base):
         if not reply_to.portal_discussion.isDiscussionAllowedFor(reply_to):
             raise ValueError, "Reply target does not accept replies"
 
-        reply_url = reply_to.absolute_url(1)
-        if reply_url[0] != '/': reply_url = '/' + reply_url
+        if hasattr(reply_to, 'meta_type') and reply_to.meta_type == 'Discussion Item':
+            reply_url = reply_to.absolute_url(1)
+        else:
+            portal_url = getToolByName(self, 'portal_url')
+            reply_url = portal_url.getRelativeUrl(reply_to)
+    
         self.in_reply_to = urllib.unquote(reply_url)
 
         if hasattr(self, 'reindexObject'):
