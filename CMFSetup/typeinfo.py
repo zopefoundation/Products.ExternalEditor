@@ -59,7 +59,12 @@ def importTypesTool( context ):
 
     for type_info in tool_info[ 'types' ]:
 
-        text = context.readDataFile( type_info[ 'filename' ] )
+        filename = type_info[ 'filename' ]
+        sep = filename.rfind( '/' )
+        if sep == -1:
+            text = context.readDataFile( filename )
+        else:
+            text = context.readDataFile( filename[sep+1:], filename[:sep] )
         info = tic.parseXML( text )
 
         for mt_info in Products.meta_types:

@@ -176,7 +176,7 @@ class DummyImportContext:
     def readDataFile( self, filename, subdir=None ):
 
         if subdir is not None:
-            filename = '/'.join( subdir, filename )
+            filename = '/'.join( (subdir, filename) )
 
         return self._files.get( filename )
 

@@ -97,7 +97,13 @@ def importWorkflowTool( context ):
 
             if info[ 'meta_type' ] == DCWorkflowDefinition.meta_type:
 
-                wf_text = context.readDataFile( info[ 'filename' ] )
+                filename = info[ 'filename' ]
+                sep = filename.rfind( '/' )
+                if sep == -1:
+                    wf_text = context.readDataFile( filename )
+                else:
+                    wf_text = context.readDataFile( filename[sep+1:],
+                                                    filename[:sep] )
 
                 ( workflow_id
                 , title
@@ -793,7 +799,7 @@ InitializeClass( WorkflowDefinitionConfigurator )
 
 def _getWorkflowFilename( workflow_id ):
 
-    """ Return the name of the file which holds info for a given type.
+    """ Return the name of the file which holds info for a given workflow.
     """
     return 'workflows/%s/definition.xml' % workflow_id.replace( ' ', '_' )
 
@@ -1128,13 +1134,6 @@ _METATYPE_SUFFIXES = \
 , ExternalMethod.meta_type : 'em'
 , DTMLMethod.meta_type : 'dtml'
 }
-
-def _getWorkflowFilename( wf_id ):
-
-    """ Return the name of the file which holds info for a given workflow.
-    """
-    return 'workflows/%s/definition.xml' % wf_id.replace( ' ', '_' )
-
 
 def _initDCWorkflow( workflow
                    , title
