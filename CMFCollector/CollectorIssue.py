@@ -85,7 +85,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
     ACTIONS_ORDER = ['Accept', 'Resign', 'Assign',
                      'Resolve', 'Reject', 'Defer'] 
 
-    def __init__(self, 
+    def __init__(self,
                  id, container,
                  title='', description='',
                  submitter_id=None, submitter_name=None, submitter_email=None,
@@ -96,7 +96,8 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
                  resolution=None,
                  reported_version=None, other_version_info=None,
                  creation_date=None, modification_date=None,
-                 effective_date=None, expiration_date=None):
+                 effective_date=None, expiration_date=None,
+                 file=None, fileid=None, filetype=None):
         """ """
 
         SkinnedFolder.__init__(self, id, title)
@@ -109,7 +110,11 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
             modification_date = self.creation_date
         self.modification_date = modification_date
 
-        self._create_transcript(description, container)
+        # Acquisition-wrapped self so, eg, invokeFactory can find stuff.
+        contained = self.__of__(container)
+        attach_msg = contained._process_file(file, fileid, filetype,
+                                             description)
+        contained._create_transcript(description, attach_msg)
 
         user = getSecurityManager().getUser()
         if submitter_id is None:
@@ -209,24 +214,29 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
                                              username=username,
                                              assignees=assignees)
 
-        if file is not None:
-            if not fileid:
-                fileid = string.split(string.split(file.filename, '/')[-1],
-                                      '\\')[-1]
-            attachment = self._add_artifact(fileid, filetype, comment, file)
-            attachment_msg = (" - Attachment: %s\n\n" % fileid)
-        else:
-            attachment_msg = ''
-
         transcript = self.get_transcript()
+        attach_msg = self._process_file(file, fileid, filetype, comment)
         self.comment_number = self.comment_number + 1
         entry_leader = self._entry_header(action, username) + "\n\n"
         transcript._edit('stx',
                          entry_leader
-                         + attachment_msg
+                         + attach_msg
                          + util.process_comment(string.strip(comment))
                          + "\n<hr>\n"
                          + transcript.EditableBody())
+
+    def _process_file(self, file, fileid, filetype, comment):
+        """Attach file to issue if it is substantial (has a name).
+
+        Return a message describing the file, for transcript inclusion."""
+        if file and file.filename:
+            if not fileid:
+                fileid = string.split(string.split(file.filename, '/')[-1],
+                                      '\\')[-1]
+            attachment = self._add_artifact(fileid, filetype, comment, file)
+            return " - Attachment: %s\n\n" % fileid
+        else:
+            return ''
 
     def _add_artifact(self, id, type, description, file):
         """Add new artifact, and return object."""
@@ -254,21 +264,23 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         wftool = getToolByName(self, 'portal_workflow')
         return wftool.getInfoFor(self, 'state', '??')
 
-    def _create_transcript(self, description, container,
-                           text_format=DEFAULT_TRANSCRIPT_FORMAT):
+    def _create_transcript(self, description,
+                           text_format=DEFAULT_TRANSCRIPT_FORMAT,
+                           attachment_msg=''):
         """Create events and comments transcript, with initial entry."""
 
         user = getSecurityManager().getUser()
         addDocument(self, TRANSCRIPT_NAME, description=description)
         it = self.get_transcript()
         it._setPortalTypeName('Collector Issue Transcript')
-        text = ("%s\n\n %s " %
-                (self._entry_header('Request', user, prefix="== "),
-                 description))
+        text = ("%s\n\n%s %s " %
+                (self._entry_header('Request', user),
+                 description,
+                 attachment_msg))
         it._edit(text_format=text_format, text=text)
         it.title = self.title
 
-    def _entry_header(self, type, user, prefix=" == ", suffix=" =="):
+    def _entry_header(self, type, user, prefix="= ", suffix=" ="):
         """Return text for the header of a new transcript entry."""
         # Ideally this would be a skin method (probly python script), but i
         # don't know how to call it from the product, sigh.
@@ -410,6 +422,7 @@ def addCollectorIssue(self,
                       severity=None,
                       reported_version=None,
                       other_version_info=None,
+                      file=None, fileid=None, filetype=None,
                       REQUEST=None):
     """
     Create a new issue in the collector.
@@ -429,7 +442,8 @@ def addCollectorIssue(self,
                         importance=importance,
                         severity=severity,
                         reported_version=reported_version,
-                        other_version_info=other_version_info)
+                        other_version_info=other_version_info,
+                        file=file, fileid=fileid, filetype=filetype)
     it._setPortalTypeName('Collector Issue')
     self._setObject(id, it)
     return id
