@@ -5,42 +5,42 @@
 <div metal:fill-slot="main">
 <div class="Desktop">
 <h3> Rename Items </h3>
-<TABLE class="FormLayout"
+<table class="FormLayout"
        tal:condition="here/folder_rename_items">
-	   <FORM ACTION="folder_rename" METHOD="POST">
-  <TR tal:repeat="item here/folder_rename_items">
-    <TD ALIGN="LEFT" VALIGN="TOP" width="8%">
+	   <form action="folder_rename" method="POST">
+  <tr tal:repeat="item here/folder_rename_items">
+    <td align="left" valign="top" width="8%">
       <span tal:replace="structure item/iconHTML">Type Image</span>
-    </TD>
-    <TD ALIGN="LEFT" VALIGN="TOP" width="20%" NOWRAP>
+    </td>
+    <td align="left" valign="top" width="20%" nowrap>
       <span tal:replace="item/getId">ID</span>
-      <INPUT TYPE="HIDDEN" NAME="ids:list" VALUE=""
+      <input type="hidden" name="ids:list" value=""
 	         tal:attributes="value item/getId">
-    </TD>
-    <TD ALIGN="LEFT" VALIGN="TOP" width="5%">
-      <STRONG>to</STRONG>
-    </TD>
-    <TD ALIGN="LEFT" VALIGN="TOP">
-      <INPUT TYPE="TEXT" NAME="new_ids:list" value=""
-	         tal:attributes="value item/getId" SIZE="20">
-    </TD>
-  </TR>
+    </td>
+    <td align="left" valign="top" width="5%">
+      <strong>to</strong>
+    </td>
+    <td align="left" valign="top">
+      <input type="text" name="new_ids:list" value=""
+	         tal:attributes="value item/getId" size="20">
+    </td>
+  </tr>
 
-  <TR>
-    <TD COLSPAN=4>
-      <INPUT TYPE="submit" VALUE=" Ok ">
-    </TD>
-  </TR>
-  </FORM>
-</TABLE>
+  <tr>
+    <td colspan=4>
+      <input type="submit" value=" Ok ">
+    </td>
+  </tr>
+  </form>
+</table>
 
 
 
 <div tal:condition="python: not(here.folder_rename_items())">
-  <FORM ACTION="folder_contents" METHOD="GET">
+  <form action="folder_contents" method="GET">
   <p>You must select one or more items to rename.</p>
-  <INPUT TYPE="submit" VALUE=" Ok ">
-  </FORM>
+  <input type="submit" value=" Ok ">
+  </form>
 </div>
 </div>
 </div>

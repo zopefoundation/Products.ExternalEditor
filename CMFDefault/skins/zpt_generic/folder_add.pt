@@ -4,37 +4,37 @@
 <body>
 <div metal:fill-slot="main">	  
 <div class="Desktop">
-<H1>Add Folder</H1>
+<h1>Add Folder</h1>
 
-<P> A Folder contains other objects. Use Folders to organize your
+<p> A Folder contains other objects. Use Folders to organize your
     web objects in to logical groups.</P>
 
-<FORM ACTION="manage_addPortalFolder" METHOD="POST">
-<TABLE class="FormLayout">
- <TR>
-  <TD>
-   <STRONG>Id</STRONG>
-  </TD>
-  <TD ALIGN="LEFT" VALIGN="TOP">
-   <INPUT TYPE="TEXT" NAME="id" SIZE="40">
-  </TD>
- </TR>
- <TR>
-  <TD>
-   <EM><STRONG>Title</STRONG></EM>
-  </TD>
-  <TD ALIGN="LEFT" VALIGN="TOP">
-   <INPUT TYPE="TEXT" NAME="title" SIZE="40">
-  </TD>
- </TR>
- <TR><TD COLSPAN="2"><BR></TD></TR>
- <TR>
-  <TD><br></TD>
-  <TD>
-   <BR><INPUT TYPE="SUBMIT" VALUE=" Add ">
-  </TD>
- </TR>
-</TABLE>
+<form action="manage_addPortalFolder" method="POST">
+<table class="FormLayout">
+ <tr>
+  <td>
+   <strong>Id</strong>
+  </td>
+  <td align="left" valign="top">
+   <input type="text" name="id" size="40">
+  </td>
+ </tr>
+ <tr>
+  <td>
+   <em><strong>Title</strong></em>
+  </td>
+  <td align="left" valign="top">
+   <input type="text" name="title" size="40">
+  </td>
+ </tr>
+ <tr><td colspan="2"><br></td></tr>
+ <tr>
+  <td><br></td>
+  <td>
+   <br><input type="submit" value=" Add ">
+  </td>
+ </tr>
+</table>
 </form>
 </div>
 </div>

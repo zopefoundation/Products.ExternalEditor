@@ -15,7 +15,7 @@
 <td>
 <table width="100%" class="FormLayout" tal:repeat="item here/allowedContentTypes">
 <tr valign="top">
-  <td align="left" width="2%" NOWRAP><input type="radio" name="type_name" value="" id="" tal:attributes="value item/getId; id string:cb_${repeat/item/number}"/>
+  <td align="left" width="2%" nowrap><input type="radio" name="type_name" value="" id="" tal:attributes="value item/getId; id string:cb_${repeat/item/number}"/>
   </td>
   <td align="left" colspan="2" class="ListName"><label for="" 
 	  tal:attributes="for string:cb_${repeat/item/number}"

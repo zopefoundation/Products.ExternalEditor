@@ -10,38 +10,42 @@
      tal:content="structure options/error_message" />
 
 <div tal:condition="not: options/error_message">
-  <H2>Site Error</H2>
+  <h2>Site Error</h2>
 
-  <P>An error was encountered while publishing this resource.
-  </P>
+  <p>An error was encountered while publishing this resource.</p>
   
-  <P>
-  <STRONG>Error Type: <span tal:replace="structure options/error_type" /></STRONG><BR>
-  <STRONG>Error Value: <span tal:replace="structure options/error_value" /></STRONG><BR> 
-  </P>
+  <p> <strong>Error Type:
+        <span tal:replace="structure options/error_type" />
+      </strong>
+  <br><strong>Error Value:
+      <span tal:replace="structure options/error_value" /></strong>
+  <br> 
+  </p>
  
-  <HR NOSHADE>
+  <hr noshade>
  
-  <P>Troubleshooting Suggestions</P>
+  <p>Troubleshooting Suggestions</p>
 
-  <UL>
-  <div tal:condition="python: options['error_type'] in ('KeyError','NameError')">
-  <LI>This resource may be trying to reference a
-  nonexistent object or variable <STRONG><span tal:replace="options/error_value" /></STRONG>.</LI>
+  <ul>
+  <div tal:condition="python: options['error_type'] in ('KeyError'
+                                                       ,'NameError')">
+  <li>This resource may be trying to reference a
+      nonexistent object or variable
+      <strong><span tal:replace="options/error_value" /></strong>.</li>
   </div>
-  <LI>The URL may be incorrect.</LI>
-  <LI>The parameters passed to this resource may be incorrect.</LI>
-  <LI>A resource that this resource relies on may be encountering
-      an error.</LI>
-  </UL>
+  <li>The URL may be incorrect.</li>
+  <li>The parameters passed to this resource may be incorrect.</li>
+  <li>A resource that this resource relies on may be encountering
+      an error.</li>
+  </ul>
 
-  <P>For more detailed information about the error, please
+  <p>For more detailed information about the error, please
   refer to the HTML source for this page.
-  </P>
+  </p>
 
-  <P>If the error persists please contact the site maintainer.
+  <p>If the error persists please contact the site maintainer.
   Thank you for your patience.
-  </P>
+  </p>
 
 </div>
 </div>
