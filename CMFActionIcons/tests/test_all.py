@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2003 Zope Corporation and Contributors. All Rights Reserved.
+# Copyright (c) 2004 Zope Corporation and Contributors. All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
@@ -10,7 +10,7 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-""" DCWorkflow tests.
+""" CMFActionIcons tests.
 
 $Id$
 """
@@ -24,9 +24,8 @@ from Products.CMFCore.tests.base.utils import build_test_suite
 
 
 def suite():
-    return build_test_suite('Products.DCWorkflow.tests',[
-        'test_DCWorkflow',
-        'test_roles',
+    return build_test_suite('Products.CMFActionIcons.tests',[
+        'test_ActionIconsTool',
         ])
 
 def test_suite():
