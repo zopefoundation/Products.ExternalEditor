@@ -8,7 +8,7 @@
 
 <div tal:define="user_id request/user_id|options/user_id|nothing;
                  search_term request/search_term|options/search_term|nothing;
-                 acl_users here/acl_users;
+                 acl_users nocall: here/acl_users;
                  my_url here/absolute_url;"
      tal:omit-tag="">
 
