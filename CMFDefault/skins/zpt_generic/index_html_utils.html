@@ -34,7 +34,7 @@
       tal:attributes="src   string:${item/portal_url}/${item/getIcon};
                       alt   string:${item/Type};
                       title string:${item/Type}"
-      i18n:attributes="alt title" /></a>
+      i18n:attributes="alt; title" /></a>
     <a href="item_url" tal:attributes="href item/absolute_url"
        tal:content="item/Title"> Title </a>
      <blockquote tal:condition="exists: item/Description"
@@ -72,7 +72,7 @@
       tal:attributes="src   string:${item/portal_url}/${item/getIcon};
                       alt   string:${item/Type};
                       title string:${item/Type}"
-      i18n:attributes="alt title" /></a>
+      i18n:attributes="alt; title" /></a>
     <a href="item_url" tal:attributes="href item/absolute_url"
        tal:content="item/Title"> Title </a>
      <blockquote tal:condition="exists: item/Description"
@@ -108,7 +108,7 @@
       tal:attributes="src   string:${item/portal_url}/${item/getIcon};
                       alt   string:${item/Type};
                       title string:${item/Type}"
-      i18n:attributes="alt title" /></a>
+      i18n:attributes="alt; title" /></a>
     <a href="item_url" tal:attributes="href item/absolute_url"
        tal:content="item/TitleOrId"> Title </a>
      <blockquote tal:condition="exists: item/Description"
