@@ -49,4 +49,4 @@ for i in reqget("status", []):
 if rs:
     query['review_state'] = rs
 
-return context.portal_catalog(REQUEST=query)]
+return context.portal_catalog(REQUEST=query)
