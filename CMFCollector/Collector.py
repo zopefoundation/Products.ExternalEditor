@@ -36,7 +36,7 @@ from CollectorIssue import addCollectorIssue
 # with the Types Tool (portal_types)
 factory_type_information = (
     {'id': 'Collector',
-#     'content_icon': 'event_icon.gif',
+     'content_icon': 'collector_icon.gif',
      'meta_type': 'CMF Collector',
      'description': ('A Collector is a facility for tracking bug reports and'
                      ' other issues.'), 
