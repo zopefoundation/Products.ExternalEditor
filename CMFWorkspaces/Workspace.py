@@ -164,7 +164,8 @@ class Workspace (PortalContent.PortalContent, DefaultDublinCoreImpl):
         # Things currently missing: recursion and globbing support
         # Hey, I said it was basic ;^)
         out = []
-        for id, ob in self.listReferencedItems():
+        obs = [('..', self.aq_parent)] + self.listReferencedItems()
+        for id, ob in obs:
             try:
                 stat = marshal.loads(ob.manage_FTPstat(REQUEST))
             except:
