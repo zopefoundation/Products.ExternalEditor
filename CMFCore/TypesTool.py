@@ -265,14 +265,19 @@ class TypeInformation (SimpleItemWithProperties):
         """
         if not name:
             raise ValueError('A name is required.')
-        self._actions = self._actions + (
-            {'id': str(id),
-             'name': str(name),
-             'action': str(action),
-             'permissions': (str(permission),),
-             'category': str(category),
-             'visible': int(visible),
-             },)
+
+        new_actions = self._cloneActions()
+
+        new_actions.append( { 'id'          : str(id)
+                            , 'name'        : str(name)
+                            , 'action'      : str(action)
+                            , 'permissions' : (str(permission),)
+                            , 'category'    : str(category)
+                            , 'visible'     : int(visible) 
+                            } )
+
+        self._actions = tuple( new_actions )
+
         if REQUEST is not None:
             return self.manage_editActionsForm(
                 REQUEST, manage_tabs_message='Added.')
@@ -309,13 +314,17 @@ class TypeInformation (SimpleItemWithProperties):
         """
         Deletes actions.
         """
-        actions = list(self._actions)
         sels = list(map(int, selections))  # Convert to a list of integers.
         sels.sort()
         sels.reverse()
+
+        new_actions = self._cloneActions()
+
         for idx in sels:
-            del actions[idx]
-        self._actions = tuple(actions)
+            del new_actions[idx]
+
+        self._actions = tuple(new_actions)
+
         if REQUEST is not None:
             return self.manage_editActionsForm(
                 REQUEST, manage_tabs_message=(
@@ -326,19 +335,23 @@ class TypeInformation (SimpleItemWithProperties):
         """
         Moves the specified actions up one slot.
         """
-        actions = list(self._actions)
         sels = list(map(int, selections))  # Convert to a list of integers.
         sels.sort()
+
+        new_actions = self._cloneActions()
+
         for idx in sels:
             idx2 = idx - 1
             if idx2 < 0:
                 # Wrap to the bottom.
-                idx2 = len(actions) - 1
+                idx2 = len(new_actions) - 1
             # Swap.
-            a = actions[idx2]
-            actions[idx2] = actions[idx]
-            actions[idx] = a
-        self._actions = tuple(actions)
+            a = new_actions[idx2]
+            new_actions[idx2] = new_actions[idx]
+            new_actions[idx] = a
+
+        self._actions = tuple(new_actions)
+
         if REQUEST is not None:
             return self.manage_editActionsForm(
                 REQUEST, manage_tabs_message=(
@@ -349,24 +362,35 @@ class TypeInformation (SimpleItemWithProperties):
         """
         Moves the specified actions down one slot.
         """
-        actions = list(self._actions)
         sels = list(map(int, selections))  # Convert to a list of integers.
         sels.sort()
         sels.reverse()
+
+        new_actions = self._cloneActions()
+
         for idx in sels:
             idx2 = idx + 1
-            if idx2 >= len(actions):
+            if idx2 >= len(new_actions):
                 # Wrap to the top.
                 idx2 = 0
             # Swap.
-            a = actions[idx2]
-            actions[idx2] = actions[idx]
-            actions[idx] = a
-        self._actions = tuple(actions)
+            a = new_actions[idx2]
+            new_actions[idx2] = new_actions[idx]
+            new_actions[idx] = a
+
+        self._actions = tuple(new_actions)
+
         if REQUEST is not None:
             return self.manage_editActionsForm(
                 REQUEST, manage_tabs_message=(
                 'Moved down %d action(s).' % len(sels)))
+
+    security.declarePrivate( '_cloneActions' )
+    def _cloneActions( self ):
+        """
+            Return a "deep copy" of our list of actions.
+        """
+        return map( lambda x: x.copy(), list( self._actions ) )
 
 InitializeClass( TypeInformation )
 
