@@ -195,6 +195,12 @@ class VersionsTool(UniqueObject, SimpleItemWithProperties):
         return repo.getVersionInfo(object).history_id
 
 
+    security.declareProtected(UseVersionControl, 'isResourceUpToDate')
+    def isResourceUpToDate(self, object, require_branch=0):
+        """Return true if a version-controlled resource is up to date."""
+        repo = self._getVersionRepository()
+        return repo.isResourceUpToDate(object, require_branch)
+
     security.declareProtected(UseVersionControl, 'revertToVersion')
     def revertToVersion(self, object, version_id):
         """Reverts the object to the given version.
