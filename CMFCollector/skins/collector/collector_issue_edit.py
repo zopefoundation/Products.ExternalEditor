@@ -3,19 +3,21 @@
 
 from Products.PythonScripts.standard import url_quote_plus
 
-reqget = context.REQUEST.get
+REQGET = context.REQUEST.get
 
 was_security_related = context.security_related
 
-changed = context.edit(title=reqget('title'),
-                       security_related=reqget('security_related', 0),
-                       description=reqget('description'),
-                       topic=reqget('topic'),
-                       classification=reqget('classification'),
-                       importance=reqget('importance'),
-                       version_info=reqget('version_info'),
-                       comment=reqget('comment'),
-                       text=reqget('text'))
+changed = context.edit(title=REQGET('title'),
+                       submitter_name=REQGET('submitter_name', None),
+                       submitter_email=REQGET('submitter_email', None),
+                       security_related=REQGET('security_related', 0),
+                       description=REQGET('description'),
+                       topic=REQGET('topic'),
+                       classification=REQGET('classification'),
+                       importance=REQGET('importance'),
+                       version_info=REQGET('version_info'),
+                       comment=REQGET('comment'),
+                       text=REQGET('text'))
 
 if context.security_related != was_security_related:
     # We're toggling security_related - we have to do the corresponding

@@ -85,12 +85,16 @@
         <tr>
           <td> FROM </td>
           <td>
-            <span metal:fill-slot="issue_submitter_id_slot">
+            <span metal:fill-slot="issue_submitter_id_slot"
+                  tal:define="pm python: here.portal_membership;
+                              member python: pm.getAuthenticatedMember()">
               <input name="submitter_id" value="ID" size="7"
                      tal:attributes="value python: here.submitter_id">
                 <font size="-1">Email:</font>
                 <input name="submitter_email" value="EMAIL" size="22"
-                     tal:attributes="value python: here.submitter_email or ''">
+                     tal:attributes="value python:
+                                           here.submitter_email
+                                           or member.getProperty('email')">
             </span>
           </td>
         </tr>
