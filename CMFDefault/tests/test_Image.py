@@ -1,3 +1,20 @@
+##############################################################################
+#
+# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE.
+#
+##############################################################################
+""" Unit tests for Image module.
+
+$Id$
+"""
+
 from unittest import TestCase, TestSuite, makeSuite, main
 import Testing
 import Zope
@@ -73,7 +90,7 @@ class TestImageCopyPaste(RequestTest):
         try:
             newSecurityManager(None, UnrestrictedUser('manager', '', ['Manager'], []))
             factory = self.root.manage_addProduct['CMFSetup'].addConfiguredSite
-            factory('cmf', 'default', snapshot=False)
+            factory('cmf', 'CMFDefault:default', snapshot=False)
             self.site = self.root.cmf
             self.site.invokeFactory('File', id='file')
             self.site.portal_workflow.doActionFor(self.site.file, 'publish')

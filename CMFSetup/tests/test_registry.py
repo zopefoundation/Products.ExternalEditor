@@ -1043,15 +1043,16 @@ class ProfileRegistryTests( BaseRegistryTests
 
     def test_registerProfile_normal( self ):
 
-        PROFILE_ID = 'one'
+        NAME = 'one'
         TITLE = 'One'
         DESCRIPTION = 'One profile'
         PATH = '/path/to/one'
         PRODUCT = 'TestProduct'
         PROFILE_TYPE = EXTENSION
+        PROFILE_ID = 'TestProduct:one'
 
         registry = self._makeOne()
-        registry.registerProfile( PROFILE_ID
+        registry.registerProfile( NAME
                                 , TITLE
                                 , DESCRIPTION
                                 , PATH

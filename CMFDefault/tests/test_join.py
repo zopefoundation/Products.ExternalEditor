@@ -1,3 +1,20 @@
+##############################################################################
+#
+# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE.
+#
+##############################################################################
+""" Unit tests for adding members.
+
+$Id$
+"""
+
 from unittest import TestSuite, makeSuite, main
 import Testing
 import Zope
@@ -10,7 +27,7 @@ class MembershipTests( TransactionalTest ):
 
     def test_join( self ):
         factory = self.root.manage_addProduct['CMFSetup'].addConfiguredSite
-        factory('site', 'default', snapshot=False)
+        factory('site', 'CMFDefault:default', snapshot=False)
         site = self.root.site
         member_id = 'test_user'
         site.portal_registration.addMember( member_id
@@ -24,7 +41,7 @@ class MembershipTests( TransactionalTest ):
 
     def test_join_without_email( self ):
         factory = self.root.manage_addProduct['CMFSetup'].addConfiguredSite
-        factory('site', 'default', snapshot=False)
+        factory('site', 'CMFDefault:default', snapshot=False)
         site = self.root.site
         self.assertRaises(ValueError,
                           site.portal_registration.addMember,
@@ -35,7 +52,7 @@ class MembershipTests( TransactionalTest ):
 
     def test_join_with_variable_id_policies( self ):
         factory = self.root.manage_addProduct['CMFSetup'].addConfiguredSite
-        factory('site', 'default', snapshot=False)
+        factory('site', 'CMFDefault:default', snapshot=False)
         site = self.root.site
         member_id = 'test.user'
 

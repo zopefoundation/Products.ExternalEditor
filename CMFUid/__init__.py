@@ -47,7 +47,7 @@ def initialize(context):
                   , icon='tool.gif'
                   ).initialize(context)
 
-    profile_registry.registerProfile('default-uid',
+    profile_registry.registerProfile('default',
                                      'CMFUid',
                                      'Adds UID support.',
                                      'profiles/default',

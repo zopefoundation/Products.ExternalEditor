@@ -43,6 +43,10 @@ HEAD only (unreleased)
 
   Bug Fixes
 
+    - CMFSetup: Reduced probability of profile ID conflicts.
+      The first argument of 'registerProfile' is now 'name' instead of
+      'profile_id'. The profile ID combines 'name' and 'product'.
+
     - CMFSetup.skins made the assumption that the CMF site can always
       acquire REQUEST and would set up the current skin with it. Added a test
       to see if REQUEST is available and if it is not, skip the step that

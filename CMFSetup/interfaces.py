@@ -364,16 +364,16 @@ class IProfileRegistry( Interface ):
         o See 'getProfileInfo' for a description of the mappings' keys.
         """
 
-    def registerProfile( profile_id
+    def registerProfile( name
                        , title
                        , description
                        , path
                        , product=None
                        , profile_type=BASE
                        ):
-        """ Add a new profile to tne registry.
+        """ Add a new profile to the registry.
 
-        o If an existing profile is already registered for 'profile_id',
+        o If an existing profile is already registered for 'product:name',
           raise KeyError.
 
         o If 'product' is passed, then 'path' should be interpreted as

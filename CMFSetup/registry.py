@@ -553,7 +553,7 @@ class ProfileRegistry( Implicit ):
 
     security.declareProtected( ManagePortal, 'registerProfile' )
     def registerProfile( self
-                       , profile_id
+                       , name
                        , title
                        , description
                        , path
@@ -562,6 +562,7 @@ class ProfileRegistry( Implicit ):
                        ):
         """ See IProfileRegistry.
         """
+        profile_id = '%s:%s' % (product or 'other', name)
         if self._profile_info.get( profile_id ) is not None:
             raise KeyError, 'Duplicate profile ID: %s' % profile_id
 

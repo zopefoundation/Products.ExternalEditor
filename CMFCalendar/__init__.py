@@ -58,7 +58,7 @@ def initialize( context ):
                      , fti = Event.factory_type_information
                      ).initialize( context )
 
-    profile_registry.registerProfile('default-calendar',
+    profile_registry.registerProfile('default',
                                      'CMFCalendar',
                                      'Adds calendar support.',
                                      'profiles/default',

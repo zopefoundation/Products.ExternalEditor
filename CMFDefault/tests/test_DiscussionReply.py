@@ -20,7 +20,7 @@ class DiscussionReplyTest(RequestTest):
         RequestTest.setUp(self)
         try:
             factory = self.root.manage_addProduct['CMFSetup'].addConfiguredSite
-            factory('cmf', 'default', snapshot=False)
+            factory('cmf', 'CMFDefault:default', snapshot=False)
             self.portal = self.root.cmf
             # Become a Manager
             self.uf = self.portal.acl_users

@@ -45,19 +45,10 @@ class TestCalendar(unittest.TestCase):
         try: app._delObject('CalendarTest')
         except AttributeError: pass
         factory = app.manage_addProduct['CMFSetup'].addConfiguredSite
-        factory('CalendarTest', 'default', snapshot=False)
+        factory('CalendarTest', 'CMFDefault:default', snapshot=False,
+                extension_ids=('CMFCalendar:default',))
         self.Site = app.CalendarTest
-
-        manage_addExternalMethod(app.CalendarTest,
-                                 id='install_events',
-                                 title="Install Events",
-                                 module="CMFCalendar.Install",
-                                 function="install")
-
-        ExMethod = app.restrictedTraverse('/CalendarTest/install_events')
-        ExMethod()
-
-        self.Tool = app.restrictedTraverse('/CalendarTest/portal_calendar')
+        self.Tool = app.CalendarTest.portal_calendar
 
         # sessioning bodge until we find out how to do this properly
 
