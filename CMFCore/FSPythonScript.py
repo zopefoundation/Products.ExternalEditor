@@ -85,7 +85,7 @@
 """Customizable Python scripts that come from the filesystem."""
 __version__='$Revision$'[11:-2]
 
-from string import split
+from string import strip, split
 from os import path, stat
 import new
 
@@ -191,10 +191,10 @@ class FSPythonScript (FSObject, Script):
     def ZScriptHTML_tryParams(self):
         """Parameters to test the script with."""
         param_names = []
-        for name in self._params.split(','):
-            name = name.strip()
+        for name in split(self._params, ','):
+            name = strip(name)
             if name and name[0] != '*':
-                param_names.append(name.split('=', 1)[0])
+                param_names.append(split(name, '=', 1)[0])
         return param_names
 
     def read(self):
