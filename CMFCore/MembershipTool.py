@@ -121,7 +121,7 @@ class MembershipTool (UniqueObject, SimpleItem):
     manage_options=( { 'label' : 'Overview'
                      , 'action' : 'manage_overview'
                      }
-                   , { 'label' : 'Role Mapping'
+                   , { 'label' : 'Configuration'
                      , 'action' : 'manage_mapRoles'
                      }
                    ) + SimpleItem.manage_options
