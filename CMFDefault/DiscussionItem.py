@@ -90,7 +90,7 @@ from Discussions import DiscussionResponse
 from Document import Document
 from DublinCore import DefaultDublinCoreImpl
 from DateTime import DateTime
-from Products.CMFCore.utils import getToolByName
+from Products.CMFCore.utils import getToolByName, _checkPermission
 import urllib, string
 
 def addDiscussionItem(self, id, title, description, text_format, text,
@@ -173,12 +173,14 @@ class DiscussionItem( Document
         attribute set to my own URL
         """
         result = []
-        my_url = self.absolute_url(1)
+        my_url = urllib.unquote( self.absolute_url(1) )
+        wf = getToolByName( self, 'portal_workflow' )
         talkback = self.aq_inner.aq_parent
 
         for item in talkback._container.values():
-            if item.in_reply_to == urllib.unquote(my_url):
-                result.append(item.__of__(talkback))
+            if item.in_reply_to == my_url:
+                if wf.getInfoFor( item, 'review_state' ) == 'published':
+                    result.append(item.__of__(talkback))
 
         return result
 
@@ -322,11 +324,13 @@ class DiscussionItemContainer(Persistent, Implicit):
         """
         result = []
         portal_url = getToolByName(self, 'portal_url')
-        my_url = portal_url.getRelativeUrl(self)
+        my_url = urllib.unquote( portal_url.getRelativeUrl( self ) )
+        wf = getToolByName( self, 'portal_workflow' )
 
         for item in self._container.values():
-            if item.in_reply_to == urllib.unquote(my_url):
-                result.append(item.id)
+            if item.in_reply_to == my_url:
+                if wf.getInfoFor( item, 'review_state' ) == 'published':
+                    result.append(item.id)
 
         return result
 

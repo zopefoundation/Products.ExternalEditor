@@ -274,13 +274,14 @@ class DefaultWorkflowDefinition (Acquisition.Implicit):
         Allows the user to request information provided by the
         workflow.  This method must perform its own security checks.
         '''
+        # Treat this as public.
+        if name == 'review_state':
+            return self.getReviewStateOf(ob)
+
         allow_review = _checkPermission('Review portal content', ob)
         allow_request = _checkPermission('Request review', ob)
         if not allow_review and not allow_request:
             return default
-
-        if name == 'review_state':
-            return self.getReviewStateOf(ob)
 
         elif name == 'review_history':
             tool = aq_parent(aq_inner(self))
