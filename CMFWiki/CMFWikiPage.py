@@ -712,7 +712,7 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
             goodroles = []
             for localrole in localroles:
                 if localrole in self._local_roles_map.values():
-                    goodroles.append(role)
+                    goodroles.append(localrole)
             localuser and goodroles and \
                       ob.manage_addLocalRoles(localuser,goodroles)
 
