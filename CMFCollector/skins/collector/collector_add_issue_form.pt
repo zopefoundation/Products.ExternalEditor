@@ -21,7 +21,8 @@
   <h2> Submit New Issue </h2>
  
   <div tal:define="member python:
-                          here.portal_membership.getAuthenticatedMember()">
+                          here.portal_membership.getAuthenticatedMember();
+                   authenticated python: member.has_role('Authenticated')">
 
   <form method="POST" enctype="multipart/form-data"
         action="collector_add_issue">
@@ -47,21 +48,31 @@
         </td>
        </tr>
 
-       <tr>
-        <th valign="middle" align="right"> Submitter </th>
-        <td>
-         <input type="text" name="submitter" value=""
-           tal:attributes="value python: getattr(member, 'full_name', '')"
-                size="20">
-        </td>
-        <th valign="middle" align="right"> Email
-        </th>
-        <td tal:content="python: member.getProperty('email', '')"> </td>
-       </tr>
-       <tr>
-        <td> &nbsp;
-        </td>
-       </tr>
+        <tr>
+          <th valign="middle" align="right"> Submitter </th>
+          <td>
+            <input type="text" name="submitter" value="" size="20"
+                   tal:attributes="value python:
+                                         getattr(member, 'full_name', '')">
+          </td>
+          <th valign="middle" align="right"
+              tal:condition="authenticated"> Email </th>
+          <td tal:content="python: member.getProperty('email', '')"
+              tal:condition="authenticated">
+            EMAIL ADDR
+          </td>
+        </tr>
+
+        <tr tal:condition="not: authenticated">
+          <td> &nbsp;
+          </td>
+          <td colspan="4">
+            <font color="red"> <em> If you wish to be able to followup to your
+              issue, receive email notifications about its conduct, etc.,
+              you must log in. </em>
+            </font>
+          </td>
+        </tr>
 
        <tr valign="top">
         <th align="right"> Topic </th>
@@ -123,9 +134,8 @@
         <th align="right"> </th>
         <td colspan=3>
           <font color="gray" size="-1">
-            Provide enough pertinent details so the supporters can pinpoint
-            your problem.  You'll be able to upload related files and images
-            once the issue is submitted.
+            Provide pertinent details to help the supporters pinpoint
+            the causes.
           </font>
         </td>
 
@@ -149,7 +159,7 @@
        </tr>
 
        <tr>
-         <th> Attachment </th>
+         <th> Upload </th>
          <td colspan="3">
 
     <div metal:use-macro="here/collector_macros/macros/add_artifacts_table">
