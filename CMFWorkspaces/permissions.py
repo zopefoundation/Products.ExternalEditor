@@ -7,13 +7,22 @@ from AccessControl import ModuleSecurityInfo
 security = ModuleSecurityInfo('Products.CMFWorkspace.permissions')
 
 security.declarePublic('AddPortalFolders')
-from Products.CMFCore.permissions import AddPortalFolders
+try:
+    from Products.CMFCore.permissions import AddPortalFolders
+except ImportError:
+    from Products.CMFCore.CMFCorePermissions import AddPortalFolders
 
 security.declarePublic('ManagePortal')
-from Products.CMFCore.permissions import ManagePortal
+try:
+    from Products.CMFCore.permissions import ManagePortal
+except ImportError:
+    from Products.CMFCore.CMFCorePermissions import ManagePortal
 
 security.declarePublic('View')
-from Products.CMFCore.permissions import View
+try:
+    from Products.CMFCore.permissions import View
+except ImportError:
+    from Products.CMFCore.CMFCorePermissions import View
 
 security.declarePublic('ManageWorkspaces')
 ManageWorkspaces = 'Manage Workspaces'
