@@ -36,3 +36,6 @@ Future
       sometimes led to initialization problems in FSPythonScripts.
       (Collector #37)
 
+    - FSPageTemplates overwrote a user-generated 'Content-Type' header.
+      We now check to make sure a Content-Type header is not already set
+      before allowing a page template to set its own.
