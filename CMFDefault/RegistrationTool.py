@@ -225,7 +225,7 @@ _TESTS = ( ( re.compile("^[0-9a-zA-Z\.\-\_\+]+\@[0-9a-zA-Z\.\-]+$")
            , False
            , "Failed b"
            )
-         , ( re.compile("([0-9a-zA-Z]{1})\@.")
+         , ( re.compile("([0-9a-zA-Z_]{1})\@.")
            , True
            , "Failed c"
            )
@@ -253,3 +253,4 @@ def _checkEmail( address ):
         if matched != expected:
             return False, message
     return True, ''
+

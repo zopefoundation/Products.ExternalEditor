@@ -46,6 +46,19 @@ class RegistrationToolTests(RequestTest):
 
         self.failUnless( result is None )
 
+    def test_testPropertiesValidity_email_with_underscore( self ):
+        # Test for collector item 326: Email alias ending w/underscore
+        tool = self._makeOne().__of__( self.root )
+        self.root.portal_membership = FauxMembershipTool()
+
+        props = { 'email' : 'username_@example.com'
+                , 'username' : 'username'
+                }
+
+        result = tool.testPropertiesValidity( props, None )
+
+        self.failUnless( result is None )
+
     def test_testPropertiesValidity_new_invalid_email( self ):
 
         tool = self._makeOne().__of__( self.root )
