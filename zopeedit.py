@@ -146,6 +146,15 @@ class ExternalEditor:
             body_f.close()
             self.clean_up = int(self.options.get('cleanup_files', 1))
             if self.clean_up: os.remove(input_file)
+            
+            if self.ssl:
+                # See if our Python build supports ssl
+                try:
+                    from socket import ssl
+                except ImportError:
+                    fatalError('SSL support is not available on this system. '
+                               'Make sure openssl is installed '
+                               'and reinstall Python.')
         except:
             # for security, always delete the input file even if
             # a fatal error occurs, unless explicitly stated otherwise
@@ -360,7 +369,7 @@ class ExternalEditor:
             
             response = NullResponse()
             response.reason = sys.exc_info()[1]
-            sys.stderr.write('\n -- Zope Request Traceback --\n')
+            sys.stderr.write('\n-- Zope Request Traceback --\n')
             traceback.print_exc(file=sys.stderr)
             
             try:
