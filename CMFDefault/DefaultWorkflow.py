@@ -26,6 +26,7 @@ from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.utils import SimpleItemWithProperties
 from Products.CMFCore.WorkflowCore import WorkflowException
 from Products.CMFCore.WorkflowTool import addWorkflowClass
+from Products.CMFCore.CMFCorePermissions.py import ReviewPortalContent
 
 from Products.CMFCore.interfaces.portal_workflow \
         import WorkflowDefinition as IWorkflowDefinition
@@ -154,7 +155,7 @@ class DefaultWorkflowDefinition (SimpleItemWithProperties):
                     {'name': 'Pending review (%d)' % pending,
                      'url': info.portal_url +
                      '/search?review_state=pending',
-                     'permissions': (),
+                     'permissions': (ReviewPortalContent, ),
                      'category': 'global'}
                     )
         return actions

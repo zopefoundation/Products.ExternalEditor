@@ -88,6 +88,9 @@ CMF 1.4 alpha
     - Added 'listMetaTags' skin method, which filters the DublinCore
       metadata into a form suitable for inclusion as <meta> tags.
 
+    - Protected the Pending review action in DefaultWorkflow by
+      ReviewPortalContent (Collector #52).
+
   Bug Fixes
 
     - Action providers: Default _actions' are now tuples, not lists.
