@@ -22,12 +22,12 @@
   - Made it possible to map "normal" Zope objects as content
     (Tracker #283):
 
-    o Skin and tool code which currently queries the object
+    o Skin and tool code which used to query the object
       for its Type in order to then ask the types tool for a
-      TypeInfo object should instead just ask the types tool
-      for type TypeInfo object directly.
+      TypeInfo object now just asks the types tool for type
+      TypeInfo object directly.
    
-    o Modify the TypesTool interface to signal that passing an
+    o Modified the TypesTool interface to signal that passing an
       object to 'getTypeInfo' is acceptable, with the semantic
       that the tool will attempt to find a TypeInfo object based
       on the tool's type or metatype.
@@ -45,7 +45,29 @@
 
  Bug fixes
 
-  - *LARGE* patch to CMFDefault.DiscussionItem and
+  - Stopped polluting the browser with persistent skin cookie;
+    clear it as well on logout (Tracker #304).
+
+  - Cleaned up folder content filtering (Tracker #298, thanks
+    to Chris Withers for the patch).
+
+  - Implement new "List folder contents" permission (Tracker
+    #320), to prevent non-privileged users from being able to
+    browse 'folder_contents' (permission is by default mapped
+    to 'Owner' and 'Manager').
+
+    Note that this is really only a UI change:
+    'PortalFolder.contentIds', 'PortalFolder.contentValues', and
+    'PortalFolder.contentItems' are still public, to allow for
+    reasonable "site map" views on folders.
+
+  - Use saner type ID listing in 'search_form' (Tracker #324).
+
+  - Rewired "POST target" skin methods, replacing filesystem-based
+    DTML Methods with filesystem-based Python Scripts (from
+    Tracker #301 -- thanks to Chris Withers).
+
+  - Implemented *LARGE* patch to CMFDefault.DiscussionItem and
     CMFDefault.DiscussionTool, plus removal of
     CMFDefault.Discussions:  changed threading strategy to remove
     dependency on the path of the "host" content object.  Includes
