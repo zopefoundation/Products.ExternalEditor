@@ -12,7 +12,7 @@ SupportIssue = 'Support collector issue'
 
 # Set up default roles for permissions
 setDefaultRoles(AddCollector,
-                ('Manager', ))
+                ('Manager', 'Owner'))
 setDefaultRoles(ManageCollector,
                 ('Manager', 'Owner'))
 setDefaultRoles(AddCollectorIssue,
