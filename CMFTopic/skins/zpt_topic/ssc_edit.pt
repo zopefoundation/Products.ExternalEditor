@@ -1,0 +1,33 @@
+<table border="0" cellpadding="0" cellspacing="2" class="FormLayout">
+<tr>
+    <td width="20">
+        <input type="checkbox" value="" name="criterion_ids:list" id=""
+            tal:attributes="value here/getId; id string:cb_${here/getId}"/>
+    </td>
+    <td align="left">
+    <label for=""
+        tal:attributes="for string:cb_${here/getId}">
+        <strong title=""
+            tal:attributes="title here/Description">
+                String:
+        </strong>
+        <tt
+            tal:content="here/Field">
+                Field
+        </tt>
+    </label>
+    <input type="hidden" name="criteria.id:records" value=""
+        tal:attributes="value here/getId"/>
+    </td>
+</tr>
+<tr>
+    <td width="20">&nbsp;</td>
+    <td>
+        <strong>Value:</strong>
+        <input type="text" name="criteria.value:records"
+            value="" size="40"
+            tal:attributes="value here/value | nothing" />
+    </td>
+</tr>
+</table>
+
