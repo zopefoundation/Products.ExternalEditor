@@ -23,7 +23,7 @@
     </td>
     <td align="left" valign="top">
     <dtml-in workflow_types>
-      <input type="radio" name="workflow_type" value="&dtml-sequence-key;">
+      <input type="radio" name="workflow_type" value="&dtml-sequence-item;">
       &dtml-sequence-item;<br />
     </dtml-in>
     </td>
