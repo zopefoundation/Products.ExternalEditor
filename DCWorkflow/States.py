@@ -213,6 +213,7 @@ class StateDefinition (SimpleItem):
             for r in self.getAvailableRoles():
                 if REQUEST.get('%s|%s' % (p, r), 0):
                     roles.append(r)
+            roles.sort()
             if not acquired:
                 roles = tuple(roles)
             pr[p] = roles
