@@ -179,6 +179,10 @@ class TypeInformation (SimpleItemWithProperties):
             if ti is None or ti.globalAllow():
                 return 1
 
+        #If a type is enabled to filter and no content_types are allowed
+        if not self.allowed_content_types:
+            return 0
+
         if contentType in self.allowed_content_types:
             return 1
 
