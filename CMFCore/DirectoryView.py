@@ -290,10 +290,11 @@ class DirectoryRegistry:
 
     def registerDirectoryByPath(self, filepath, subdirs=1):
         fp = minimalpath(filepath)
-        self._directories[fp] = di = DirectoryInformation(filepath, fp)
+        normfilepath = path.normpath(filepath)
+        self._directories[fp] = di = DirectoryInformation(normfilepath, fp)
         if subdirs:
             for entry in di.getSubdirs():
-                e_filepath = path.join(filepath, entry)
+                e_filepath = path.join(normfilepath, entry)
                 self.registerDirectoryByPath(e_filepath, subdirs)
 
     def reloadDirectory(self, filepath):
