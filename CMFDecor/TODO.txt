@@ -1,0 +1,3 @@
+CMFDecor To-do's
+
+  o Build out a complete set of skin methods using FSPageTemplate.

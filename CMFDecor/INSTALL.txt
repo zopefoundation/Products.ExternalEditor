@@ -1,0 +1,8 @@
+Installing CMFDecor
+
+  1. Unpack the tarball.
+
+  2. Copy or link the 'CMFDecor' directory into the 'Products'
+     directory of your INSTANCE_HOME / SOFTWARE_HOME.
+
+  3. Restart Zope.

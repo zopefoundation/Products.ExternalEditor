@@ -1,0 +1,3 @@
+requires "CMF" "1.1"
+requires "ZPT" "1.2+"
+
