@@ -12,5 +12,5 @@
 <dtml-var sequence-item>
 </dc:subject>
 </dtml-in>
-<dc:date><dtml-var ModificationDate></dc:date>
+<dc:date><dtml-var "this().modified().HTML4()"></dc:date>
 </item>
