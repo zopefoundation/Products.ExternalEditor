@@ -3,45 +3,31 @@
 ##bind namespace=
 ##bind script=script
 ##bind subpath=traverse_subpath
-##parameters=
-##title=return breadcrumbs
+##parameters=include_root=1
+##title=Return breadcrumbs
 ##
-from string import split, join, upper
-from Products.PythonScripts.standard import url_quote, html_quote
-portal_url = context.portal_url
+from string import join
 
-path = portal_url.getRelativeUrl(context)
-if not path:
-    return ''
+result = []
+portal_url = context.portal_url()
 
-PATTERN = (
-    '<a href="%(url)s">%(title)s</a>'
-    )
+if include_root:
+    result.append( { 'id'      : 'root'
+                   , 'title'   : context.portal_properties.title()
+                   , 'url'     : portal_url
+                   }
+                 )
 
-LASTPATTERN = (
-    '%(title)s'
-    )
+relative = context.portal_url.getRelativeContentPath( context )
+portal = context.portal_url.getPortalObject()
 
-JOINER = (
-    '<font color="#666666">&nbsp;&gt;&nbsp;</font>'
-    )
+for i in range( len( relative ) ):
+    now = relative[ :i+1 ]
+    obj = portal.restrictedTraverse( now )
+    result.append( { 'id'      : now[ -1 ]
+                   , 'title'   : obj.Title()
+                   , 'url'     : portal_url + '/' + join( now, '/' )
+                   }
+                 )
 
-url = portal_url()
-steps = split(path,'/')
-breadcrumbs = []
-last = steps.pop()                      # Remove last element
-last = context.Title()
-
-# Add the home link:
-breadcrumbs.append( PATTERN % { 'url'  : url,
-                                'title': 'Home', } )
-
-for step in steps:
-    url = '%s/%s' % (url,url_quote(step))
-    breadcrumbs.append( PATTERN % { 'url'  : url,
-                                    'title': html_quote(step), } )
-
-if last:
-    breadcrumbs.append(LASTPATTERN % { 'title': html_quote(last) })
-
-return join(breadcrumbs, JOINER)
+return result

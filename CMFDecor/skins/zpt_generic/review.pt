@@ -1,0 +1,103 @@
+<html metal:use-macro="here/main_template/macros/master">
+
+<body>
+
+<div metal:fill-slot="main">
+
+<div class="Desktop"
+     tal:define="results python: here.portal_catalog( review_state='pending' );
+                 Batch modules/ZTUtils/Batch;
+                 def_start string:0;
+                 bstart request/b_start | def_start;
+                 batch python: Batch( results, 25, int( bstart ), orphan=0 );
+                ">
+
+<div tal:condition="results">
+
+<h1> Items pending review </h1>
+
+<form action="/" method="GET"
+      tal:attributes="action here/portal_url"
+>
+
+<table class="SearchResults">
+ <tr>
+  <td width="16"><br></td>
+  <td width="16"><br></td>
+  <th> Title
+  </th>
+  <th> Type
+  </th>
+  <th> Date
+  </th>
+  </tr>
+
+  <tbody tal:repeat="item batch">
+  <tr tal:define="objURL string:${item/getURL}/view;
+                  objPath item/getpath;
+                 ">
+  <td>
+   <input type="checkbox" name="items:list"
+          tal:attributes="value objPath">
+  </td>
+  <td>
+   <span tal:condition="item/icon">
+   <a href="url"
+      tal:attributes="href objURL"
+   ><img border="0" src="icon" alt="Type" title="Type"
+         tal:attributes="src string:${here/portal_url}/${item/icon};
+                         alt item/Type|nothing;
+                         title item/Type|nothing;
+                        "></a>
+   </span>
+  </td>
+  <td>
+   <a href="url"
+      tal:attributes="href objURL"
+      tal:content="python: item.Title() or '(No title)'">Title</a>
+  </td>
+  <td>
+    <span tal:replace="item/Type" />
+  </td>
+  <td>
+    <span tal:replace="item/Date" />
+  </td>
+ </tr>
+
+ <tr>
+  <td>&nbsp;</td>
+  <td colspan="3"
+      tal:define="desc python: item.Description() or '(No description)'"
+  >
+   <em><span tal:replace="python: desc[:100]">Description</span></em>
+  </td>
+ </tr>
+ </tbody>
+
+ <tr>
+  <td><br></td>
+  <td><br></td>
+  <td>
+   <textarea name="comment:text" rows="3" cols="65"></textarea>
+   <input type="submit" name="publishItems:method" value="Publish">
+   <input type="submit" name="rejectItems:method" value="Reject">
+  </td>
+ </tr>
+  
+</table>
+
+</form>
+
+</div>
+
+
+<div tal:condition="python: not results">
+ <p> There are no items matching your specified criteria.  </p>
+</div>
+
+</div>
+
+</div>
+
+</body>
+</html>
