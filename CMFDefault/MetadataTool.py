@@ -93,11 +93,12 @@ from Globals import PersistentMapping
 
 
 from Globals import InitializeClass, DTMLFile
+from Persistence import Persistent
 from AccessControl import ClassSecurityInfo, getSecurityManager
 from Products.CMFCore import CMFCorePermissions
 from utils import _dtmldir
 
-class MetadataElementPolicy:
+class MetadataElementPolicy( Persistent ):
     """
         Represent a type-specific policy about a particular DCMI element.
     """
@@ -175,7 +176,7 @@ DEFAULT_ELEMENT_SPECS = ( ( 'Title', 0 )
                         , ( 'Rights', 0 )
                         )
 
-class ElementSpec:
+class ElementSpec( Persistent ):
     """
         Represent all the tool knows about a single metadata element.
     """
