@@ -21,6 +21,8 @@
    new SimpleItem API. Thanks to Jens Quade <jq@jquade.de> for pointing this
    out. (Issue PTK(241)[]).
 
+ - Render portal description using STX (Tracker issue #246).
+
 1.0 final (2001/03/29)
 
  - Removed embedded spaces in 'portal_status_message' strings

@@ -10,7 +10,7 @@
 
 <dl>
  <dt> Overview </dt>
- <dd> <dtml-var description> </dd>
+ <dd> <dtml-var description fmt="structured-text"> </dd>
 </dl>
 
   </td>
