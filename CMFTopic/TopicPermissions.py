@@ -10,6 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 #
 ##############################################################################
+"""TopicPermissions: Permissions used throughout CMFTopic.
+$Id$
+"""
+__version__='$Revision$'[11:-2]
 
 from Products.CMFCore.CMFCorePermissions import setDefaultRoles
 

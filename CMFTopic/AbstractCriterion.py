@@ -10,7 +10,6 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-
 """Home of the abstract Criterion base class.
 $Id$
 """

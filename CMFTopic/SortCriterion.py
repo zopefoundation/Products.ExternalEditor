@@ -10,9 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
+""" Allow topic to specify sorting.
+$Id$
 """
-    Declare simple string-match criterion class.
-"""
+__version__='$Revision$'[11:-2]
 from AbstractCriterion import AbstractCriterion
 from AccessControl import ClassSecurityInfo
 from Topic import Topic

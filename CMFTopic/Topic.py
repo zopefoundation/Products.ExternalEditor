@@ -10,7 +10,6 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-
 """Topic: Canned catalog queries
 $Id$
 """
@@ -184,7 +183,7 @@ class Topic(PortalFolder):
                 # parent = aq_parent(self)
                 parent = aq_parent(aq_inner(self))
                 result.update(parent.buildQuery())
-            except:
+            except: # oh well, can't find parent, or it isn't a Topic.
                 pass
 
         for criterion in self.listCriteria():

@@ -10,7 +10,6 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-
 """List Criterion: A criterion that is a list
 $Id$
 """
