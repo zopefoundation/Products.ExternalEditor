@@ -127,4 +127,7 @@ def modifyRolesForPermission(ob, pname, roles):
             data = value
             break
     p = Permission(pname, data, ob)
-    p.setRoles(roles)
+    if p.getRoles() != roles:
+        p.setRoles(roles)
+        return 1
+    return 0

@@ -450,6 +450,23 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
         '''
         pass
 
+    security.declarePrivate('updateRoleMappingsFor')
+    def updateRoleMappingsFor(self, ob):
+        '''
+        Changes the object permissions according to the current
+        state.
+        '''
+        changed = 0
+        sdef = self._getWorkflowStateOf(ob)
+        if self.permissions:
+            for p in self.permissions:
+                roles = []
+                if sdef.permission_roles is not None:
+                    roles = sdef.permission_roles.get(p, roles)
+                if modifyRolesForPermission(ob, p, roles):
+                    changed = 1
+        return changed
+
     def _checkTransitionGuard(self, t, ob):
         guard = t.guard
         if guard is None:
@@ -529,15 +546,10 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
             else:
                 value = vdef.default_value
             status[id] = value
-        # Update role to permission assignments.
-        if self.permissions:
-            for p in self.permissions:
-                roles = []
-                if sdef.permission_roles is not None:
-                    roles = sdef.permission_roles.get(p, roles)
-                modifyRolesForPermission(ob, p, roles)
         # Update state.
         status[self.state_var] = state
+        # Update role to permission assignments.
+        self.updateRoleMappingsFor(ob)
 
         tool = aq_parent(aq_inner(self))
         tool.setStatusOf(self.id, ob, status)
