@@ -18,7 +18,6 @@ $Id$
 """
 from urllib import quote_plus
 from OFS.Folder import Folder
-from Acquisition import aq_parent, aq_inner
 from AccessControl import ClassSecurityInfo
 from AccessControl.Permissions import manage_users as ManageUsers
 from App.class_init import default__class_init__ as InitializeClass
@@ -99,8 +98,8 @@ class ScriptablePlugin(Folder, BasePlugin):
             interface assertions the object might implement. 
         """
         myId = self.getId()
-        parent = aq_parent( aq_inner( self ) )
-        plugins = parent._getOb( 'plugins' )
+        pas_instance = self._getPAS()
+        plugins = pas_instance._getOb( 'plugins' )
 
         del_interfaces = filter( lambda x: id in x.names()
                                , self.__implements__ )
@@ -120,8 +119,8 @@ class ScriptablePlugin(Folder, BasePlugin):
     def manage_updateInterfaces( self, interfaces, RESPONSE=None ):
         """ For ZMI update of interfaces. """
 
-        parent = aq_parent( aq_inner( self ) )
-        plugins = parent._getOb( 'plugins' )
+        pas_instance = self._getPAS()
+        plugins = pas_instance._getOb( 'plugins' )
 
         new_interfaces = []
 

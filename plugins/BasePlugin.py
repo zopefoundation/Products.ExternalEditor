@@ -67,8 +67,8 @@ class BasePlugin(SimpleItem):
     def manage_activateInterfaces( self, interfaces, RESPONSE=None ):
         """ For ZMI update of active interfaces. """
 
-        parent = aq_parent( aq_inner( self ) )
-        plugins = parent._getOb( 'plugins' )
+        pas_instance = self._getPAS()
+        plugins = pas_instance._getOb( 'plugins' )
 
         active_interfaces = []
 
@@ -91,5 +91,10 @@ class BasePlugin(SimpleItem):
                               '?manage_tabs_message='
                               'Interface+activations+updated.'
                             % self.absolute_url())
+
+    security.declarePrivate( '_getPAS' )
+    def _getPAS( self ):
+        """ Canonical way to get at the PAS instance from a plugin """
+        return aq_parent( aq_inner( self ) )
 
 InitializeClass(BasePlugin)
