@@ -118,7 +118,7 @@ class DirectoryInformation:
             filelist=[]
             try:
                 mtime = stat(self._filepath)[8]
-                if platform == 'nt':
+                if platform == 'win32':
                     # some Windows directories don't change mtime
                     # when a file is added to or deleted from them :-(
                     # So keep a list of files as well, and see if that

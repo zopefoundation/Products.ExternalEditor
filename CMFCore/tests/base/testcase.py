@@ -125,7 +125,8 @@ class FSDVTest( TestCase ):
 
     def _addedOrRemoved(self, old_mtime):
         # Called after adding/removing a file from self.skin_path_name.
-        if sys.platform == 'nt':
+        
+        if sys.platform == 'win32':
             # Windows doesn't reliably update directory mod times, so
             # DirectoryView has an expensive workaround.  The
             # workaround does not rely on directory mod times.
