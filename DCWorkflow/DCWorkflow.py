@@ -24,9 +24,9 @@ from DocumentTemplate.DT_Util import TemplateDict
 from Globals import InitializeClass
 from OFS.Folder import Folder
 from OFS.ObjectManager import bad_id
+from AccessControl import Unauthorized
 
 # CMFCore
-from Products.CMFCore.CMFCoreExceptions import AccessControl_Unauthorized
 from Products.CMFCore.CMFCorePermissions import ManagePortal
 from Products.CMFCore.interfaces.portal_workflow \
         import WorkflowDefinition as IWorkflowDefinition
@@ -74,6 +74,9 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
     scripts = None
 
     permissions = ()
+    groups = ()     # The group IDs managed by this workflow.
+    roles = None  # The role names managed by this workflow.
+    # If roles is None, listRoles() provides a default.
 
     manage_options = (
         {'label': 'Properties', 'action': 'manage_properties'},
@@ -83,7 +86,8 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
         {'label': 'Worklists', 'action': 'worklists/manage_main'},
         {'label': 'Scripts', 'action': 'scripts/manage_main'},
         {'label': 'Permissions', 'action': 'manage_permissions'},
-        ) + UndoSupport.manage_options
+        {'label': 'Groups', 'action': 'manage_groups'},
+        )
 
     security = ClassSecurityInfo()
     security.declareObjectProtected(ManagePortal)
@@ -266,13 +270,13 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
         if sdef is None:
             raise WorkflowException, 'Object is in an undefined state'
         if action not in sdef.transitions:
-            raise AccessControl_Unauthorized
+            raise Unauthorized(action)
         tdef = self.transitions.get(action, None)
         if tdef is None or tdef.trigger_type != TRIGGER_USER_ACTION:
             raise WorkflowException, (
                 'Transition %s is not triggered by a user action' % action)
         if not self._checkTransitionGuard(tdef, ob):
-            raise AccessControl_Unauthorized
+            raise Unauthorized(action)
         self._changeStateOf(ob, tdef, kw)
 
     security.declarePrivate('isWorkflowMethodSupported')
@@ -302,14 +306,14 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
         if sdef is None:
             raise WorkflowException, 'Object is in an undefined state'
         if method_id not in sdef.transitions:
-            raise AccessControl_Unauthorized
+            raise Unauthorized(method_id)
         tdef = self.transitions.get(method_id, None)
         if tdef is None or tdef.trigger_type != TRIGGER_WORKFLOW_METHOD:
             raise WorkflowException, (
                 'Transition %s is not triggered by a workflow method'
                 % method_id)
         if not self._checkTransitionGuard(tdef, ob):
-            raise AccessControl_Unauthorized
+            raise Unauthorized(method_id)
         res = apply(func, args, kw)
         try:
             self._changeStateOf(ob, tdef)

@@ -18,10 +18,18 @@ $Id$
 from Globals import DTMLFile
 import Globals
 from AccessControl import ClassSecurityInfo
-
+from Acquisition import aq_get
 from Products.CMFCore.CMFCorePermissions import ManagePortal
+from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
 from utils import _dtmldir
+
+try:
+    # If base_cms exists, include the roles it defines.
+    from Products.base_cms.permissions import getDefaultRolePermissionMap
+except ImportError:
+    def getDefaultRolePermissionMap():
+        return {}
 
 
 class WorkflowUIMixin:
@@ -32,6 +40,7 @@ class WorkflowUIMixin:
 
     security.declareProtected(ManagePortal, 'manage_properties')
     manage_properties = DTMLFile('workflow_properties', _dtmldir)
+    manage_groups = PageTemplateFile('workflow_groups.pt', _dtmldir)
 
     security.declareProtected(ManagePortal, 'setProperties')
     def setProperties(self, title, REQUEST=None):
@@ -86,5 +95,96 @@ class WorkflowUIMixin:
         # possible_permissions is in AccessControl.Role.RoleManager.
         return list(self.possible_permissions())
 
+
+    def _getGroupFolder(self):
+        try:
+            return aq_get(self, "acl_groups", None, 1)
+        except AttributeError:
+            pass
+        return None
+
+    security.declareProtected(ManagePortal, 'getGroups')
+    def getGroups(self):
+        """Returns the groups managed by this workflow.
+        """
+        gf = self._getGroupFolder()
+        if gf is None:
+            return ()
+        return [gf.getGroupById(gid) for gid in self.groups]
+
+    security.declareProtected(ManagePortal, 'getAvailableGroups')
+    def getAvailableGroups(self):
+        """Returns a list of group objects.
+        """
+        gf = self._getGroupFolder()
+        if gf is None:
+            return ()
+        r = []
+        r.extend(gf.getDynamicGroups())
+        r.extend(gf.getStaticGroups())
+        return r
+
+    security.declareProtected(ManagePortal, 'addGroup')
+    def addGroup(self, gid, RESPONSE=None):
+        """Adds a group by id.
+        """
+        gf = self._getGroupFolder()
+        group = gf.getGroupById(gid)
+        if group is None:
+            raise ValueError(gid)
+        self.groups = self.groups + (gid,)
+        if RESPONSE is not None:
+            RESPONSE.redirect(
+                "%s/manage_groups?manage_tabs_message=Added+group."
+                % self.absolute_url())
+
+    security.declareProtected(ManagePortal, 'delGroups')
+    def delGroups(self, gids, RESPONSE=None):
+        """Removes groups by id.
+        """
+        self.groups = tuple([gid for gid in self.groups if gid not in gids])
+        if RESPONSE is not None:
+            RESPONSE.redirect(
+                "%s/manage_groups?manage_tabs_message=Groups+removed."
+                % self.absolute_url())
+
+    security.declareProtected(ManagePortal, 'getAvailableRoles')
+    def getAvailableRoles(self):
+        """Returns the acquired roles mixed with base_cms roles.
+        """
+        roles = list(self.valid_roles())
+        for role in getDefaultRolePermissionMap().keys():
+            if role not in roles:
+                roles.append(role)
+        roles.sort()
+        return roles
+
+    security.declareProtected(ManagePortal, 'getRoles')
+    def getRoles(self):
+        """Returns the list of roles managed by this workflow.
+        """
+        roles = self.roles
+        if roles is not None:
+            return roles
+        roles = getDefaultRolePermissionMap().keys()
+        if roles:
+            # Map the base_cms roles by default.
+            roles.sort()
+            return roles
+        return self.valid_roles()
+
+    security.declareProtected(ManagePortal, 'setRoles')
+    def setRoles(self, roles, RESPONSE=None):
+        """Changes the list of roles mapped to groups by this workflow.
+        """
+        avail = self.getAvailableRoles()
+        for role in roles:
+            if role not in avail:
+                raise ValueError(role)
+        self.roles = tuple(roles)
+        if RESPONSE is not None:
+            RESPONSE.redirect(
+                "%s/manage_groups?manage_tabs_message=Roles+changed."
+                % self.absolute_url())
 
 Globals.InitializeClass(WorkflowUIMixin)

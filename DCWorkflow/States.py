@@ -24,6 +24,7 @@ from OFS.SimpleItem import SimpleItem
 from AccessControl import ClassSecurityInfo
 
 from Products.CMFCore.CMFCorePermissions import ManagePortal
+from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
 from ContainerTab import ContainerTab
 from utils import _dtmldir
@@ -40,13 +41,15 @@ class StateDefinition (SimpleItem):
     manage_options = (
         {'label': 'Properties', 'action': 'manage_properties'},
         {'label': 'Permissions', 'action': 'manage_permissions'},
+        {'label': 'Groups', 'action': 'manage_groups'},
         {'label': 'Variables', 'action': 'manage_variables'},
         )
 
     title = ''
     description = ''
     transitions = ()  # The ids of possible transitions.
-    permission_roles = None
+    permission_roles = None  # { permission: [role] or (role,) }
+    group_roles = None  # { gid : (role,) }
     var_values = None  # PersistentMapping if set.  Overrides transition exprs.
 
     security = ClassSecurityInfo()
@@ -81,9 +84,11 @@ class StateDefinition (SimpleItem):
         return list(self.getWorkflow().permissions)
 
     def getAvailableRoles(self):
-        return list(self.valid_roles())
+        return self.getWorkflow().getAvailableRoles()
 
     def getPermissionInfo(self, p):
+        """Returns the list of roles to be assigned to a permission.
+        """
         roles = None
         if self.permission_roles:
             roles = self.permission_roles.get(p, None)
@@ -95,6 +100,13 @@ class StateDefinition (SimpleItem):
             else:
                 acq = 1
             return {'acquired':acq, 'roles':list(roles)}
+
+    def getGroupInfo(self, gid):
+        """Returns the list of roles to be assigned to a group.
+        """
+        if self.group_roles:
+            return self.group_roles.get(gid, ())
+        return ()
 
     _properties_form = DTMLFile('state_properties', _dtmldir)
 
@@ -215,6 +227,31 @@ class StateDefinition (SimpleItem):
         else:
             roles = tuple(roles)
         pr[permission] = roles
+
+    manage_groups = PageTemplateFile('state_groups.pt', _dtmldir)
+
+    def setGroups(self, REQUEST, RESPONSE=None):
+        """Set the group to role mappings in REQUEST for this State.
+        """
+        map = self.group_roles
+        if map is None:
+            self.group_roles = map = PersistentMapping()
+        all_roles = self.getWorkflow().getRoles()
+        for group in self.getWorkflow().getGroups():
+            gid = group.getId()
+            roles = []
+            for r in all_roles:
+                if REQUEST.get('%s|%s' % (gid, r), 0):
+                    roles.append(r)
+            roles.sort()
+            roles = tuple(roles)
+            map[gid] = roles
+        if RESPONSE is not None:
+            RESPONSE.redirect(
+                "%s/manage_groups?manage_tabs_message=Groups+changed."
+                % self.absolute_url())
+
+
 
 Globals.InitializeClass(StateDefinition)
 
