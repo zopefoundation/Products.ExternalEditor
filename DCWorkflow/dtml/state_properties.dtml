@@ -15,7 +15,7 @@
 </tr>
 
 <tr>
-<th align="left">Description</th>
+<th align="left" valign="top">Description</th>
 <td><textarea name="description" rows="6" cols="35">&dtml-description;</textarea></td>
 </tr>
 
