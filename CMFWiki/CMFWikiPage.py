@@ -319,7 +319,8 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
             obj = getattr(folder, m)
             if not hasattr(obj, 'absolute_url'):
                 # Whoops!  Probly an acquired method, which we do *not* want
-                # to shadow (or people could create infinite recursions).
+                # want to link, and which we do *not* want to allow being
+                # shadowed by a wiki page.
                 return '%s<font color="red"><sup>x</sup></font>' % m
             # Obtained by acquisition - make sure to use the real URL:
             return '<a href="%s">%s</a>' % (obj.absolute_url(), m)
@@ -380,8 +381,9 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
             # Obtained by acquisition - make sure to use the real URL:
             obj = getattr(folder, m)
             if not hasattr(obj, 'absolute_url'):
-                # Whoops!  Probly an acquired method, which we do *not* want
-                # to shadow (or people could create infinite recursions).
+                # Whoops!  Probly an acquired method, to which we do *not*
+                # want to link, and which we do *not* want to allow being
+                # shadowed by a wiki page.
                 return '%s<font color="red"><sup>x</sup></font>' % m + e
             return '<a href="%s">%s</a>' % (obj.absolute_url(), m) + e
 
