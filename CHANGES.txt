@@ -36,6 +36,9 @@ CMF 1.5.0-beta (unreleased)
       
   Bug Fixes
 
+    - CMFTopic: Change topic_view template to show title and ID (it only
+      showed title before; http://www.zope.org/Collectors/CMF/180)
+
     - CMFCore.PortalFolder: Unlike other content, only Managers were able
       to create PortalFolders using mkdir in FTP. Fixed by inserting
       missing security declaration for PortalFolder.manage_addFolder
