@@ -8,7 +8,7 @@
 # FITNESS FOR A PARTICULAR PURPOSE.
 
 from Products.CMFDefault import Portal
-import Collector, CollectorIssue
+import Collector, CollectorIssue, WebTextDocument
 import Products.CMFCore
 
 from Products.CMFCore import utils, CMFCorePermissions
@@ -25,10 +25,10 @@ factory_type_information = (
 
      + ({'id': 'Collector Issue Transcript',
          #     'content_icon': 'event_icon.gif',
-         'meta_type': 'Document',
+         'meta_type': 'WebText Document',
          'description': ('A transcript of issue activity, including comments,'
                          ' state changes, and so forth.'), 
-         'product': 'CMFDefault',
+         'product': 'CMFCollector',
          'factory': None,               # So not included in 'New' add form
          'allowed_content_types': None,
          'immediate_view': 'collector_transcript_view',
