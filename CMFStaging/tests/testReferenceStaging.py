@@ -21,7 +21,11 @@ import Testing
 import Zope
 Zope.startup()
 
-from Products.References.PathReference import PathReference
+has_refs = 1
+try:
+    from Products.References.PathReference import PathReference
+except ImportError:
+    has_refs = 0
 
 from Products.CMFStaging.tests.testStaging import StagingTests
 
@@ -46,9 +50,10 @@ class ReferenceStagingTests(StagingTests):
 
 
 def test_suite():
-    return unittest.TestSuite((
-        unittest.makeSuite(ReferenceStagingTests),
-        ))
+    suite = unittest.TestSuite()
+    if has_refs:
+        suite.addTest(unittest.makeSuite(ReferenceStagingTests))
+    return suite
 
 if __name__ == '__main__':
     unittest.main(defaultTest='test_suite')
