@@ -98,10 +98,10 @@ import sys
 from ZPublisher.HTTPRequest import HTTPRequest
 
 # Constants.
-ATTEMPT_DISABLED = -1
-ATTEMPT_NONE = 0
-ATTEMPT_LOGIN = 1
-ATTEMPT_CONT = 2
+ATTEMPT_DISABLED = -1  # Disable cookie crumbler
+ATTEMPT_NONE = 0       # No attempt at authentication
+ATTEMPT_LOGIN = 1      # Attempt to log in
+ATTEMPT_RESUME = 2     # Attempt to resume session
 
 
 class CookieCrumbler (SimpleItemWithProperties):
@@ -177,14 +177,17 @@ class CookieCrumbler (SimpleItemWithProperties):
         if req.environ.has_key( 'WEBDAV_SOURCE_PORT' ):
             return ATTEMPT_DISABLED
 
-        if not req._auth:
-            if (req.has_key(self.pw_cookie) and
-                req.has_key(self.name_cookie)):
+        if req._auth and not getattr(req, '_cookie_auth', 0):
+            # Using basic auth.
+            return ATTEMPT_DISABLED
+        else:
+            if req.has_key(self.pw_cookie) and req.has_key(self.name_cookie):
                 # Attempt to log in and set cookies.
                 name = req[self.name_cookie]
                 pw = req[self.pw_cookie]
                 ac = encodestring('%s:%s' % (name, pw))
                 req._auth = 'basic %s' % ac
+                req._cookie_auth = 1
                 resp._auth = 1
                 if req.get(self.persist_cookie, 0):
                     # Persist the user name (but not the pw or session)
@@ -204,10 +207,11 @@ class CookieCrumbler (SimpleItemWithProperties):
                 # Copy __ac to the auth header.
                 ac = unquote(req[self.auth_cookie])
                 req._auth = 'basic %s' % ac
+                req._cookie_auth = 1
                 resp._auth = 1
                 self.delRequestVar(req, self.auth_cookie)
-                return ATTEMPT_CONT
-        return ATTEMPT_NONE
+                return ATTEMPT_RESUME
+            return ATTEMPT_NONE
 
     def __call__(self, container, req):
         '''The __before_publishing_traverse__ hook.'''
@@ -215,17 +219,13 @@ class CookieCrumbler (SimpleItemWithProperties):
         attempt = self.modifyRequest(req, resp)
         if attempt == ATTEMPT_DISABLED:
             return
-        if self.auto_login_page:
-            if not req.get('disable_cookie_login__', 0):
-                if (attempt == ATTEMPT_LOGIN or
-                    not getattr(resp, '_auth', 0)):
-                    page = getattr(container, self.auto_login_page, None)
-                    if page is not None:
-                        # Provide a login page.
-                        req._hold(ResponseCleanup(resp))
-                        resp.unauthorized = self.unauthorized
-                        resp._unauthorized = self._unauthorized
-        if attempt:
+        if not req.get('disable_cookie_login__', 0):
+            if attempt == ATTEMPT_LOGIN or attempt == ATTEMPT_NONE:
+                # Modify the "unauthorized" response.
+                req._hold(ResponseCleanup(resp))
+                resp.unauthorized = self.unauthorized
+                resp._unauthorized = self._unauthorized
+        if attempt != ATTEMPT_NONE:
             phys_path = self.getPhysicalPath()
             if self.logout_page:
                 # Cookies are in use.
@@ -254,22 +254,29 @@ class CookieCrumbler (SimpleItemWithProperties):
 
     security.declarePrivate('unauthorized')
     def unauthorized(self):
-        url = self.getLoginURL()
-        if url:
-            raise 'Redirect', url
-        # Use the standard unauthorized() call.
         resp = self._cleanupResponse()
+        # If we set the auth cookie before, delete it now.
+        if resp.cookies.has_key(self.auth_cookie):
+            del resp.cookies[self.auth_cookie]
+        # Redirect if desired.
+        url = self.getLoginURL()
+        if url is not None:
+            raise 'Redirect', url
+        # Fall through to the standard unauthorized() call.
         resp.unauthorized()
 
     def _unauthorized(self):
+        resp = self._cleanupResponse()
+        # If we set the auth cookie before, delete it now.
+        if resp.cookies.has_key(self.auth_cookie):
+            del resp.cookies[self.auth_cookie]
+        # Redirect if desired.
         url = self.getLoginURL()
-        if url:
-            resp = self.REQUEST['RESPONSE']
+        if url is not None:
             resp.redirect(url, lock=1)
             # We don't need to raise an exception.
             return
-        # Use the standard _unauthorized() call.
-        resp = self._cleanupResponse()
+        # Fall through to the standard _unauthorized() call.
         resp._unauthorized()
 
     security.declarePublic('getLoginURL')
@@ -283,10 +290,13 @@ class CookieCrumbler (SimpleItemWithProperties):
             iself = getattr(self, 'aq_inner', self)
             parent = getattr(iself, 'aq_parent', None)
             page = getattr(parent, self.auto_login_page, None)
-            if page:
+            if page is not None:
                 retry = getattr(resp, '_auth', 0) and '1' or ''
+                came_from = req.get('came_from', None)
+                if came_from is None:
+                    came_from = req['URL']
                 url = '%s?came_from=%s&retry=%s' % (
-                    page.absolute_url(), quote(req['URL']), retry)
+                    page.absolute_url(), quote(came_from), retry)
                 return url
         return None
 
