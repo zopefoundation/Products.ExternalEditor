@@ -227,6 +227,21 @@ class WorkflowToolTests(TestCase):
         self.failUnless( 'dummy' in vars.keys() )
         self.failUnless( 'a: dummy' in vars.values() )
 
+    def test_setChainForPortalTypes(self):
+
+        tool = self._makeWithTypes()
+        dummy = DummyContent('dummy')
+
+        tool.setChainForPortalTypes( ('Dummy Content',), ('a', 'b') )
+        self.assertEquals( tool.getChainFor(dummy), ('a', 'b') )
+        tool.setChainForPortalTypes( ('Dummy Content',), 'a, b' )
+        self.assertEquals( tool.getChainFor(dummy), ('a', 'b') )
+
+        tool.setChainForPortalTypes( ('Dummy Content',), () )
+        self.assertEquals( tool.getChainFor(dummy), () )
+        tool.setChainForPortalTypes( ('Dummy Content',), '' )
+        self.assertEquals( tool.getChainFor(dummy), () )
+
     def test_getCatalogVariablesFor( self ):
 
         tool = self._makeWithTypesAndChain()

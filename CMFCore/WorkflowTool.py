@@ -472,8 +472,8 @@ class WorkflowTool(UniqueObject, Folder, ActionProviderBase):
         if cbt is None:
             self._chains_by_type = cbt = PersistentMapping()
 
-        if type(chain) is type(''):
-            chain = map( lambda x: x.strip(), chain.split(',') )
+        if isinstance(chain, basestring):
+            chain = [ wf.strip() for wf in chain.split(',') if wf.strip() ]
 
         ti = self._listTypeInfo()
         for t in ti:
