@@ -169,22 +169,15 @@ class ActionsTool(UniqueObject, Folder, ActionProviderBase):
                 actions.extend( provider.listActionInfos(object=object) )
             else:
                 # for Action Providers written for CMF versions before 1.5
-                warn('ActionProvider interface not up to date. In CMF 1.6 '
-                     'portal_actions will ignore listActions() of \'%s\'.'
-                     % provider_name,
-                     DeprecationWarning)
                 actions.extend( self._listActionInfos(provider, object) )
 
-        # for objects written for CMF versions before 1.5
         # Include actions from object.
         if object is not None:
             base = aq_base(object)
-            if hasattr(base, 'listActions'):
-                warn('Providing Actions by the object itself is deprecated. '
-                     'In CMF 1.6 portal_actions will ignore listActions() of '
-                     '\'%s\' if it is not registered as action provider.'
-                     % object.getId(),
-                     DeprecationWarning)
+            if hasattr(base, 'listActionInfos'):
+                actions.extend( object.listActionInfos(object=object) )
+            elif hasattr(base, 'listActions'):
+                # for objects written for CMF versions before 1.5
                 actions.extend( self._listActionInfos(object, object) )
 
         # Reorganize the actions by category.
@@ -218,6 +211,10 @@ class ActionsTool(UniqueObject, Folder, ActionProviderBase):
     def _listActionInfos(self, provider, object):
         """ for Action Providers written for CMF versions before 1.5
         """
+        warn('ActionProvider interface not up to date. In CMF 1.6 '
+             'portal_actions will ignore listActions() of \'%s\'.'
+             % provider.getId(),
+             DeprecationWarning)
         info = getOAI(self, object)
         actions = provider.listActions(info)
 

@@ -84,8 +84,7 @@ CMF 1.5alpha (unreleased)
       o To ease transition it will be sufficient to implement the
         OldstyleActionProvider Interface, using OldstyleActionProviderBase.
         The use of Action providers not implementing one of these Interfaces
-        or Actions provided by objects themselves is deprecated. Support for
-        them might be removed after CMF 1.5.
+        is deprecated. Support for them will be removed after CMF 1.5.
 
       o Added helper methods getOAI() and getExprContext() to get computed
         contexts from REQUEST cache or create new ones.
