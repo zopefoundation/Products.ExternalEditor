@@ -536,12 +536,12 @@ class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
                 raise MetadataError, \
                         'Metadata element %s is required.' % element
 
-            if policy.enforceVocabulary():
+            if value and policy.enforceVocabulary():
                 values = policy.isMultiValued() and value or [ value ]
                 for value in values:
                     if not value in policy.allowedVocabulary():
                         raise MetadataError, \
-                        'Value %s is not in allowed vocabulary for' \
+                        'Value %s is not in allowed vocabulary for ' \
                         'metadata element %s.' % ( value, element )
 
         # TODO:  Call validation_hook, if present

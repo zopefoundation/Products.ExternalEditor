@@ -56,6 +56,10 @@ CMF 1.5.0beta (2004/08/06)
       
   Bug Fixes
 
+    - CMFDefault.MetadataTool: Validation would disallow
+      vocabulary-constrained metadata elements to be empty
+      (http://www.zope.org/Collectors/CMF/217)
+
     - CMFDefault.DiscussionItem: Replies were not sorted chronologically
       (http://www.zope.org/Collectors/CMF/211)
 
