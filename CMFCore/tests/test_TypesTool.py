@@ -229,12 +229,12 @@ class TypeInfoTests( TestCase ):
         marker = []
         self.assertEqual( id( ti.getActionById( 'view', marker ) )
                         , id( marker ) )
-        self.assertRaises( TypeError, ti.getActionById, 'view' )
+        self.assertRaises( ValueError, ti.getActionById, 'view' )
 
         ti = self._makeInstance( 'Foo', actions=self.ACTION_LIST )
         self.assertEqual( id( ti.getActionById( 'foo', marker ) )
                         , id( marker ) )
-        self.assertRaises( TypeError, ti.getActionById, 'foo' )
+        self.assertRaises( ValueError, ti.getActionById, 'foo' )
         
         action = ti.getActionById( 'view' )
         self.assertEqual( action, 'foo_view' )

@@ -473,7 +473,7 @@ class PortalFolder(DynamicType, CMFCatalogAware, Folder):
         """
         try:
             action = self.getTypeInfo().getActionById( 'mkdir' )
-        except TypeError:
+        except ValueError:
             self.invokeFactory( type_name='Folder', id=id )
         else:
             # call it
