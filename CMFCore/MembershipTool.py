@@ -28,6 +28,7 @@ from Globals import DTMLFile
 from Globals import InitializeClass
 from Globals import MessageDialog
 from Globals import PersistentMapping
+from ZODB.POSException import ConflictError
 
 from ActionProviderBase import ActionProviderBase
 from CMFCoreExceptions import AccessControl_Unauthorized
@@ -136,6 +137,8 @@ class MembershipTool(UniqueObject, Folder, ActionProviderBase):
         if mdtool:
             try:
                 u = mdtool.wrapUser(u)
+            except ConflictError:
+                raise
             except:
                 from zLOG import LOG, ERROR
                 import sys
