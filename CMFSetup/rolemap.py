@@ -149,9 +149,38 @@ class RolemapConfigurator( Implicit ):
 
 InitializeClass( RolemapConfigurator )
 
-def exportRolemap(site):
+
+#
+#   Configurator entry points
+#
+_FILENAME = 'rolemap.xml'
+
+def importRolemap( context ):
 
     """ Export roles / permission map as an XML file
+
+    o 'context' must implement IImportContext.
     """
-    rpe = RolemapConfigurator( site ).__of__( site )
-    return rpe.generateXML(), 'text/xml', 'rolemap.xml'
+    site = context.getSite()
+    text = context.readDatafile( FILENAME )
+
+    if text is not None:
+
+        rc = RolemapConfigurator( site ).__of__( site )
+        rc.parseXML( text )
+
+    return 'Role / permission map imported.'
+
+
+def exportRolemap( context ):
+
+    """ Export roles / permission map as an XML file
+
+    o 'context' must implement IExportContext.
+    """
+    rc = RolemapConfigurator( site ).__of__( site )
+    text = rc.generateXML()
+
+    context.writeDataFile( _FILENAME, text, 'text/xml' )
+
+    return 'Role / permission map exported.'
