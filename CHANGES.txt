@@ -23,11 +23,15 @@ CMF 1.5.0beta (2004/08/06)
         compatible mapping interface.
 
     - Added CMFUid product which provides tools for generating,
-      registering, and storing unique IDs for content.
+      registering, and storing unique IDs for content (gregweb).
 
       o As an example of how to use unique ids, enhanced CMFDefault.Favorite
         content class, using unique ids to track moved or renamed 
         content items.
+        
+      o At the bottom of the page the permanent link to the content object
+        is shown (http://www.example.com/<cmf_root>/permalink/1234, where 
+        1234 is the unique id of the content object)
 
     - Added __init__ method to the IOpaqueItems.ICallableOpaqueItem 
       interface.
