@@ -61,7 +61,6 @@ factory_type_information = (
 def addWebTextDocument(self, id, title='', description='', text_format='',
                        text=''):
     """ Add a WebText Document """
-    import pdb; pdb.set_trace()
     o = WebTextDocument(id, title=title, description=description,
                         text_format=text_format, text=text)
     self._setObject(id,o)
