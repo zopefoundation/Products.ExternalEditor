@@ -11,6 +11,9 @@
    need 'modified', too);  also, added selection list for 'Subject',
    and fixed the "Last Month" option value.
 
+ - Fixed non-import in CMFCore/WorkflowCore.py (Tracker issue #239,
+   thanks to 'snej' for the patch).
+
 1.0 final (2001/03/29)
 
  - Removed embedded spaces in 'portal_status_message' strings

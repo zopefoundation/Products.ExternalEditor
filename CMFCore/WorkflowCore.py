@@ -90,6 +90,7 @@ __version__='$Revision$'[11:-2]
 
 from MethodObject import Method
 from utils import getToolByName
+import sys
 
 
 class WorkflowException (Exception):
