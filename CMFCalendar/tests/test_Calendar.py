@@ -1,5 +1,5 @@
+import unittest
 import Zope
-from unittest import TestCase, TestSuite, main, makeSuite
 from Testing.makerequest import makerequest
 from Products.CMFCalendar import CalendarTool
 from DateTime import DateTime
@@ -7,7 +7,7 @@ from AccessControl.SecurityManagement import newSecurityManager
 from AccessControl.User import UnrestrictedUser
 from Products.ExternalMethod.ExternalMethod import manage_addExternalMethod
 
-class TestCalendar(TestCase):
+class TestCalendar(unittest.TestCase):
 
     def setUp(self):
         get_transaction().begin()
@@ -41,8 +41,10 @@ class TestCalendar(TestCase):
 
         # sessioning bodge until we find out how to do this properly
 
-        session = app.unrestrictedTraverse('/session_data_manager').getSessionData
-        app.REQUEST.set_lazy('SESSION', session)
+        self.have_session = hasattr( app, 'session_data_manager' )
+        if self.have_session:
+            app.REQUEST.set_lazy( 'SESSION'
+                                , app.session_data_manager.getSessionData )
         
         # bodge us a URL1
         
@@ -65,25 +67,31 @@ class TestCalendar(TestCase):
     def test_types(self):
         self.assertEqual(self.Tool.getCalendarTypes(),['Event'])
 
-        self.Tool.edit_configuration(show_types=['Event','Party'], use_session="True")
+        self.Tool.edit_configuration(show_types=['Event','Party']
+                                    , use_session="")
         self.assertEqual(self.Tool.getCalendarTypes(),['Event', 'Party'])
         
     def test_Days(self):
         assert self.Tool.getDays() == ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
 
     def test_sessions(self):
+
+        if not self.have_session:
+            return
+
         self.Tool.edit_configuration(show_types=['Event'], use_session="True")
         
         self._testURL('/CalendarTest/calendarBox', ())
         
-        self.assertNotEqual(self.app.REQUEST.SESSION.get('calendar_year',None),None)
+        self.failUnless(self.app.REQUEST.SESSION.get('calendar_year',None))
 
     def test_noSessions(self):
         self.Tool.edit_configuration(show_types=['Event'], use_session="")
         
         self._testURL('/CalendarTest/calendarBox', ())
         
-        self.assertEqual(self.app.REQUEST.SESSION.get('calendar_year',None),None)
+        if self.have_session:
+            self.failIf(self.app.REQUEST.SESSION.get('calendar_year',None))
 
     def test_simpleCalendarRendering(self):
         data = [
@@ -408,9 +416,9 @@ class TestCalendar(TestCase):
         assert len(self.Site.portal_calendar.getEventsForThisDay(thisDay=DateTime('1/1/2002'))) == 4
 
 def test_suite():
-    return TestSuite((
-        makeSuite( TestCalendar ),
+    return unittest.TestSuite((
+        unittest.makeSuite( TestCalendar ),
         ))
 
 if __name__ == '__main__':
-    main(defaultTest='test_suite')
+    unittest.main(defaultTest='test_suite')
