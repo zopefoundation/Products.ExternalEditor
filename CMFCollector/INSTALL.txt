@@ -50,7 +50,7 @@ Installing CMFCollector
       o function name: install
 
     Go to the management screen for the newly added external method and
-    click the 'Try it' tab.
+    click the 'Test' tab.
 
     The install function will execute and give information about the
     steps it took to register and install the CMF Events into the CMF
