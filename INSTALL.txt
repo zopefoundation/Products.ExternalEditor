@@ -1,4 +1,4 @@
-Installing CMF 1.3beta2
+Installing CMF 1.3-beta2
 
   Requirements
 
@@ -22,15 +22,15 @@ Installing CMF 1.3beta2
     - New installation
 
     - Zope configured using INSTANCE_HOME, /var/zope, and
-      SOFTWARE_HOME, /usr/local/zope/Zope-2.3.2
+      SOFTWARE_HOME, /usr/local/zope/Zope-2.5.1
 
   Procedure
 
-    1. Unpack the CMF-1.x.tar.gz tarball into a working
+    1. Unpack the CMF-1.3-beta2.tar.gz tarball into a working
        directory. For instance::
 
         $ cd /usr/local/zope
-        $ tar xzf /tmp/CMF-1.x.tar.gz
+        $ tar xzf /tmp/CMF-1.3-beta2.tar.gz
 
        Note for Windows users:  if you are using WinZip to unpack
           the file, be *sure* to disable the "TAR file smart CR/LF
@@ -43,13 +43,13 @@ Installing CMF 1.3beta2
        For instance::
 
         $ cd /var/zope/Products  # /var/zope is INSTANCE_HOME
-        $ ln -s /usr/local/zope/CMF-1.x/CMFCore .
-        $ ln -s /usr/local/zope/CMF-1.x/CMFDefault .
-        $ ln -s /usr/local/zope/CMF-1.x/CMFTopic .
+        $ ln -s /usr/local/zope/CMF-1.3-beta2/CMFCore .
+        $ ln -s /usr/local/zope/CMF-1.3-beta2/CMFDefault .
+        $ ln -s /usr/local/zope/CMF-1.3-beta2/CMFTopic .
 
        or, as a shortcut::
 
-        $ ln -s /usr/local/zope/CMF-1.x/CMF* .
+        $ ln -s /usr/local/zope/CMF-1.3beta2/CMF* .
 
        Since linking doesn't apply on Windows, you will need
        to cut or copy the files from the place where you unpacked
@@ -60,12 +60,6 @@ Installing CMF 1.3beta2
 
     4. Create a CMF Site object. join, and begin adding content.
        Enjoy!
-
-    *Note:* --
-          the optional 'CMFDecor' product **requires** that you have
-          "Zope Page Templates", http://www.zope.org/Members/4am/ZPT
-          installed;  if you don't have it, then don't link/copy in
-          'CMFDecor'.
 
 Upgrading from Earlier Versions
 
@@ -84,7 +78,7 @@ Upgrading from Earlier Versions
 
   Follow additionnal version-specific information below.
 
-Upgrading from versions earlier than CMF 1.3beta2
+Upgrading from versions earlier than CMF 1.3-beta2
 
   Add New Metadata: "portal_type"
 

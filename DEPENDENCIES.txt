@@ -1,1 +1,0 @@
-requires "Zope" "2.3.2"

@@ -1,7 +1,0 @@
-#! /bin/sh
-/usr/bin/find Products -follow -name "*.pyc" | xargs rm
-
-for d in Products/{CMF,DC}*; do
-    echo Testing package $d
-    ./zctl.py test $d/tests/test_all.py
-done

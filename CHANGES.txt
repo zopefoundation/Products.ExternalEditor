@@ -21,7 +21,7 @@ Future
     - (__future__) Added DCWorkflow (through-the-web configurable
       workflows) to the core set of CMF products.
 
-CMF 1.3 beta2 (2002/06/30)
+CMF 1.3 beta2 (2002/07/07)
 
   New Features
 
