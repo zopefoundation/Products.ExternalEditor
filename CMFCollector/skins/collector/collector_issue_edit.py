@@ -13,9 +13,8 @@ changed = context.edit(title=reqget('title'),
                        topic=reqget('topic'),
                        classification=reqget('classification'),
                        importance=reqget('importance'),
-                       severity=reqget('severity'),
-                       reported_version=reqget('reported_version'),
-                       other_version_info=reqget('other_version_info'),
+                       version_info=reqget('version_info'),
+                       comment=reqget('comment'),
                        text=reqget('text'))
 
 if context.security_related != was_security_related:

@@ -1,5 +1,5 @@
 ## Script (Python) "collector_edit.py"
-##parameters=title, description, email, abbrev, supporters, topics, classifications, importances, severities, versions, other_versions_spiel
+##parameters=title, description, email, abbrev, supporters, topics, classifications, importances, version_info_spiel
 ##title=Configure Collector
  
 from Products.PythonScripts.standard import url_quote_plus
@@ -12,9 +12,7 @@ changed = context.edit(title=title,
                        topics=topics,
                        classifications=classifications,
                        importances=importances,
-                       severities=severities,
-                       versions=versions,
-                       other_versions_spiel=other_versions_spiel)
+                       version_info_spiel=version_info_spiel)
 
 if changed:
     changes = "Configuration changed"

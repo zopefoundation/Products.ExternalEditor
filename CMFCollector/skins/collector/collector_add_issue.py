@@ -1,5 +1,5 @@
 ## Script (Python) "collector_add_issue.py"
-##parameters=submitter, title, security_related, topic, importance, classification, severity, description, reported_version, other_version_info
+##parameters=submitter, title, security_related, topic, importance, classification, description, version_info
 ##title=Submit a Request
 
 REQUEST = context.REQUEST
@@ -9,11 +9,9 @@ id = context.add_issue(submitter=submitter,
                        description=description,
                        security_related=security_related,
                        topic=topic,
-                       importance=importance,
                        classification=classification,
-                       severity=severity,
-                       reported_version=reported_version,
-                       other_version_info=other_version_info,
+                       importance=importance,
+                       version_info=version_info,
                        assignees=REQUEST.get('assignees', []),
                        file=REQUEST.get('file'),
                        fileid=REQUEST.get('fileid', ''),

@@ -17,10 +17,9 @@ def supplement_query(field, index_name=None, reqget=reqget, query=query):
 supplement_query("SearchableText")
 supplement_query("Creator")
 supplement_query("classifications", "classification")
-supplement_query("severities", "severity")
 supplement_query("supporters", "assigned_to")
 supplement_query("resolution")
-supplement_query("reported_version")
+supplement_query("version_info")
 
 sr = reqget("security_related", [])
 if sr:

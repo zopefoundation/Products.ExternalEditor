@@ -76,26 +76,12 @@
        <tr valign="top">
         <th align="right"> Topic </th>
         <td>
-          <table>
-            <tr>
-              <td>
-                <select name="topic">
-                  <option value=""
-                          tal:repeat="it here/topics"
-                          tal:attributes="value it"
-                          tal:content="it"></option>
-                </select>
-                <th align="right"> Version </th>
-                <td>
-                 <select name="reported_version">
-                   <option value=""
-                           tal:repeat="it here/versions"
-                           tal:attributes="value it"
-                           tal:content="it"></option>
-                 </select>
-                </td>
-              </tr>
-            </table>
+            <select name="topic">
+              <option value=""
+                      tal:repeat="it here/topics"
+                tal:attributes="value it"
+                tal:content="it"></option>
+            </select>
         </td>
         <th align="right"> Importance </th>
         <td>
@@ -118,14 +104,18 @@
                    tal:content="it"></option>
          </select>
         </td>
-        <th align="right"> Severity </th>
+
+       </tr>
+
+       <tr>
+        <th> Version Info </th>
         <td>
-         <select name="severity">
-           <option value=""
-                   tal:repeat="it here/severities"
-                   tal:attributes="value it"
-                   tal:content="it"></option>
-         </select>
+            <textarea name="version_info" rows="3" cols="30"></textarea>
+        </td>
+        <td colspan="2">
+          <font color="gray">
+            <span tal:replace="here/version_info_spiel"></span>
+          </font>
         </td>
        </tr>
 
@@ -161,18 +151,6 @@
            </select>
          </td>
               
-       </tr>
-
-       <tr>
-        <th > Other Version Info </th>
-        <td>
-            <textarea name="other_version_info" rows="3" cols="30"></textarea>
-        </td>
-        <td colspan="2">
-          <font color="gray">
-            <span tal:replace="here/other_versions_spiel"></span>
-          </font>
-        </td>
        </tr>
 
        <tr>

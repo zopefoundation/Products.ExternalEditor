@@ -100,36 +100,23 @@
  </tr>
   
  <tr valign="top">
-  <th align="right"> Issue Importances
+  <th align="right"> Importance
   </th>
   <td>
    <textarea name="importances:lines" rows="5" cols="15">
 <span tal:repeat="it here/importances|nothing" tal:replace="it">
 </span></textarea>
   </td>
-  <th align="right"> Issue Severities
-  </th>
-  <td>
-   <textarea name="severities:lines" rows="5" cols="15">
-<span tal:repeat="it here/severities|nothing" tal:replace="it">
-</span></textarea>
-  </td>
  </tr>
   
  <tr valign="top">
-  <th align="right"> Product Versions
-  </th>
-  <td>
-   <textarea name="versions:lines" rows="5" cols="15">
-<span tal:repeat="it here/versions|nothing" tal:replace="it">
-</span></textarea>
-  </td>
-  <td colspan=2>
-    <b> Other Versions Spiel </b>
-    <font size="-1" color="gray"> Prompt text for new-issue form... </font>
+  <th align="right"> Version Info Spiel </th>
+  <td colspan=3>
+    <font size="-1" color="gray"> Something to prompt requesters for useful
+    version info... </font>
     <br> 
-   <textarea name="other_versions_spiel:text" rows="4" cols="33">
-<span tal:replace="here/other_versions_spiel|nothing">
+   <textarea name="version_info_spiel:text" rows="3" cols="50">
+<span tal:replace="here/version_info_spiel|nothing">
 </span></textarea>
   </td>
  </tr>

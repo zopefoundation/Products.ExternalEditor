@@ -73,12 +73,13 @@ class Collector(SkinnedFolder):
     effective_date = expiration_date = None
     
     DEFAULT_IMPORTANCES = ['medium', 'critical', 'low']
-    DEFAULT_SEVERITIES = ['normal', 'critical', 'major', 'minor']
-    DEFAULT_CLASSIFICATIONS = ['bug', 'bug+solution', 'feature', 'doc', 'test']
-    DEFAULT_VERSIONS = ['current', 'development', 'old', 'unique']
-    DEFAULT_OTHER_VERSIONS_SPIEL = (
-        "Pertinent other-system details, eg browser, webserver,"
-        " database, python, OS, etc.") 
+    DEFAULT_CLASSIFICATIONS = ['bug', 'bug+solution',
+                               'feature', 'feature+solution',
+                               'doc', 'test']
+    DEFAULT_VERSION_INFO_SPIEL = (
+        "Pertinent version details, including related systems like browser,"
+        " webserver, database, python, OS, etc.")
+    version_info_spiel = DEFAULT_VERSION_INFO_SPIEL
 
     security = ClassSecurityInfo()
 
@@ -86,10 +87,9 @@ class Collector(SkinnedFolder):
 
     def __init__(self, id, title='', description='', abbrev='',
                  email=None,
-                 topics=None, classifications=None,
-                 importances=None, severities=None,
+                 topics=None, classifications=None, importances=None,
                  supporters=None,
-                 versions=None, other_versions_spiel=None):
+                 version_info_spiel=None):
 
         SkinnedFolder.__init__(self, id, title)
 
@@ -125,17 +125,9 @@ class Collector(SkinnedFolder):
             self.importances = self.DEFAULT_IMPORTANCES
         else: self.importances = importances
 
-        if severities is None:
-            self.severities = self.DEFAULT_SEVERITIES
-        else: self.severities = severities
-
-        if versions is None:
-            self.versions = self.DEFAULT_VERSIONS
-        else: self.versions = versions
-
-        if other_versions_spiel is None:
-            self.other_versions_spiel = self.DEFAULT_OTHER_VERSIONS_SPIEL
-        else: self.other_versions_spiel = other_versions_spiel
+        if version_info_spiel is None:
+            self.version_info_spiel = self.DEFAULT_VERSION_INFO_SPIEL
+        else: self.version_info_spiel = version_info_spiel
 
         return self
 
@@ -166,9 +158,7 @@ class Collector(SkinnedFolder):
                   topic=None,
                   importance=None,
                   classification=None,
-                  severity=None,
-                  reported_version=None,
-                  other_version_info=None,
+                  version_info=None,
                   assignees=None,
                   file=None, fileid=None, filetype=None):
         """Instigate a new collector issue."""
@@ -186,9 +176,7 @@ class Collector(SkinnedFolder):
                           classification=classification,
                           security_related=security_related,
                           importance=importance,
-                          severity=severity,
-                          reported_version=reported_version,
-                          other_version_info=other_version_info,
+                          version_info=version_info,
                           assignees=assignees,
                           file=file, fileid=fileid, filetype=filetype)
         return id
@@ -199,8 +187,8 @@ class Collector(SkinnedFolder):
              abbrev=None, email=None,
              supporters=None,
              topics=None, classifications=None,
-             importances=None, severities=None,
-             versions=None, other_versions_spiel=None):
+             importances=None,
+             version_info_spiel=None):
         changed = reindex = 0
         if title is not None and title != self.title:
             self.title = title
@@ -237,20 +225,10 @@ class Collector(SkinnedFolder):
             if self.importances != x:
                 self.importances = x
                 changed = 1
-        if versions is not None:
-            x = filter(None, versions)
-            if self.versions != x:
-                self.versions = x
-                changed = 1
 
-        if versions is not None:
-            x = filter(None, versions)
-            if self.versions != x:
-                self.versions = x
-                changed = 1
-        if other_versions_spiel is not None:
-            if self.other_versions_spiel != other_versions_spiel:
-                self.other_versions_spiel = other_versions_spiel
+        if version_info_spiel is not None:
+            if self.version_info_spiel != version_info_spiel:
+                self.version_info_spiel = version_info_spiel
                 changed = 1
 
         if reindex:
@@ -376,10 +354,9 @@ InitializeClass(CollectorCatalog)
 ModuleSecurityInfo('pdb').declarePublic('set_trace')
 
 def addCollector(self, id, title='', description='', abbrev='',
-                 topics=None, classifications=None,
-                 importances=None, severities=None,
+                 topics=None, classifications=None, importances=None, 
                  supporters=None,
-                 versions=None, other_versions_spiel=None,
+                 version_info_spiel=None,
                  REQUEST=None):
     """
     Create a collector.
@@ -387,8 +364,7 @@ def addCollector(self, id, title='', description='', abbrev='',
     it = Collector(id, title=title, description=description, abbrev=abbrev,
                    topics=topics, classifications=classifications,
                    supporters=supporters, 
-                   versions=versions,
-                   other_versions_spiel=other_versions_spiel)
+                   version_info_spiel=version_info_spiel)
     self._setObject(id, it)
     it = self._getOb(id)
     it._setPortalTypeName('Collector')
