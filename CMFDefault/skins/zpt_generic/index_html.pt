@@ -40,7 +40,7 @@
                                                            , 'File'
                                                            , 'News Item'
                                                            ) } );
-                   items python: auth_filter( raw_items, skip='' );
+                   items python: auth_filter( raw_items, skip='View' );
                   ">
   <div tal:condition="items">
 
@@ -71,7 +71,7 @@
                                                            , 'Favorite'
                                                            , 'Topic'
                                                            ) } );
-                   items python: auth_filter( raw_items, skip='' );
+                   items python: auth_filter( raw_items, skip='View' );
                   ">
   <div tal:condition="items">
   <h4> Related Resources </h4>
@@ -98,7 +98,7 @@
 
   <div tal:define="raw_items python: here.contentValues(
                             filter={ 'portal_type': 'Folder' } );
-                   items python: auth_filter( raw_items, skip='' );
+                   items python: auth_filter( raw_items, skip='View' );
                   ">
   <div tal:condition="items">
   <h4> Folders </h4>
