@@ -23,67 +23,97 @@ from utils import HandlerBase
 from utils import _resolveDottedName
 from utils import _xmldir
 
-class _SkinsParser( HandlerBase ):
+#
+#   Entry points
+#
+_FILENAME = 'skins.xml'
 
-    def __init__( self, site, encoding='latin-1' ):
+def importSkinsTool( context ):
 
-        self._site = site
-        self._skins_tool = getToolByName( site, 'portal_skins' )
-        self._encoding = encoding
-        self._skin_dirs = []
-        self._skin_paths = []
-        self._default_skin = None
-        self._request_var = None
-        self._allow_arbitrary = False
-        self._persist_cookie = False
+    """ Import skins tool FSDirViews and skin paths from an XML file
 
-    def startElement( self, name, attrs ):
+    o 'context' must implement IImportContext.
 
-        if name == 'skins-tool':
-            self._default_skin = self._extract( attrs, 'default_skin' )
-            self._request_var = self._extract( attrs, 'request_varname' )
-            self._allow_arbitrary = self._extractBoolean( attrs
-                                                        , 'allow_any'
-                                                        , False
-                                                        )
-            self._persist_cookie = self._extractBoolean( attrs
-                                                       , 'cookie_persistence'
-                                                       , False
-                                                       )
+    o Register via Python:
 
-        elif name == 'skin-directory':
+      registry = site.portal_setup.getImportStepRegistry()
+      registry.registerStep( 'importSkinsTool'
+                           , '20040518-01'
+                           , Products.CMFSetup.skins.importSkinsTool
+                           , ()
+                           , 'Skins Tool import'
+                           , 'Import skins tool FSDVs and skin paths.'
+                           )
 
-            self._skin_dirs.append( ( self._extract( attrs, 'id' )
-                                    , self._extract( attrs, 'directory' )
-                                    ) )
+    o Register via XML:
+ 
+      <setup-step id="importSkinsTool"
+                  version="20040524-01"
+                  handler="Products.CMFSetup.skins.importSkinsTool"
+                  title="Skins Tool import"
+      >Import skins tool FSDVs and skin paths.</setup-step>
 
-        elif name == 'skin-path':
+    """
+    site = context.getSite()
+    encoding = context.getEncoding()
 
-            path_name = self._extract( attrs,'id' )
-            self._skin_paths.append( ( path_name, [] ) )
+    skins_tool = getToolByName( site, 'portal_skins' )
 
-        elif name == 'layer':
+    if context.shouldPurge():
 
-            path_name, layers = self._skin_paths[ -1 ]
-            layers.append( self._extract( attrs, 'name' ) )
+        skins_tool._getSelections().clear()
 
-        else:
-            raise ValueError, 'Unknown element %s' % name
+        for id in skins_tool.objectIds( DirectoryView.meta_type ):
+            skins_tool._delObject(id)
 
-    def endDocument( self ):
+    text = context.readDataFile( _FILENAME )
 
-        tool = self._skins_tool
-        tool.default_skin = str( self._default_skin )
-        tool.request_varname = str( self._request_var )
-        tool.allow_any =  self._allow_arbitrary and 1 or 0
-        tool.cookie_persistence =  self._persist_cookie and 1 or 0
+    if text is not None:
 
-        for id, directory in self._skin_dirs:
+        stc = SkinsToolConfigurator( site ).__of__( site )
+        stc.parseXML( text, encoding )
 
-            createDirectoryView( tool, directory, id )
+    #
+    #   Purge and rebuild the skin path, now that we have added our stuff.
+    #
+    site._v_skindata = None
+    skins_tool.setupCurrentSkin( site.REQUEST )
 
-        for path_name, layers in self._skin_paths:
-            tool.addSkinSelection( path_name, ', '.join( layers ) )
+    return 'Skins tool imported'
+
+
+def exportSkinsTool( context ):
+
+    """ Export skins tool FSDVs and skin paths as an XML file
+
+    o 'context' must implement IExportContext.
+
+    o Register via Python:
+
+      registry = site.portal_setup.getExportStepRegistry()
+      registry.registerStep( 'exportSkinsTool'
+                           , Products.CMFSetup.skins.exportSkinsTool
+                           , 'Skins Tool export'
+                           , 'Export skins tool FSDVs and skin paths.'
+                           )
+
+    o Register via XML:
+ 
+      <export-script id="exportSkinsTool"
+                     version="20040518-01"
+                     handler="Products.CMFSetup.skins.exportSkinsTool"
+                     title="Skins Tool export"
+      >Export skins tool FSDVs and skin paths.</export-script>
+
+    """
+    site = context.getSite()
+    stc = SkinsToolConfigurator( site ).__of__( site )
+    text = stc.generateXML()
+
+    context.writeDataFile( _FILENAME, text, 'text/xml' )
+
+    return 'Skins tool exported.'
+
 
 class SkinsToolConfigurator( Implicit ):
 
@@ -176,7 +206,7 @@ class SkinsToolConfigurator( Implicit ):
         return self._skinsConfig()
 
     security.declareProtected( ManagePortal, 'parseXML' )
-    def parseXML( self, text ):
+    def parseXML( self, text, encoding=None ):
 
         """ Pseudo API.
         """
@@ -185,7 +215,22 @@ class SkinsToolConfigurator( Implicit ):
         if reader is not None:
             text = reader()
 
-        parseString( text, _SkinsParser( self._site ) )
+        parser = _SkinsParser( encoding )
+        parseString( text, parser )
+
+        tool = getToolByName( self._site, 'portal_skins' )
+
+        tool.default_skin = str( parser._default_skin )
+        tool.request_varname = str( parser._request_var )
+        tool.allow_any =  parser._allow_arbitrary and 1 or 0
+        tool.cookie_persistence =  parser._persist_cookie and 1 or 0
+
+        for id, directory in parser._skin_dirs:
+
+            createDirectoryView( tool, directory, id )
+
+        for path_name, layers in parser._skin_paths:
+            tool.addSkinSelection( path_name, ', '.join( layers ) )
 
     #
     #   Helper methods
@@ -199,88 +244,53 @@ class SkinsToolConfigurator( Implicit ):
 InitializeClass( SkinsToolConfigurator )
 
 
-_FILENAME = 'skins.xml'
+class _SkinsParser( HandlerBase ):
 
-def importSkinsTool( context ):
+    security = ClassSecurityInfo()
+    security.declareObjectPrivate()
+    security.setDefaultAccess( 'deny' )
 
-    """ Import skins tool FSDirViews and skin paths from an XML file
+    def __init__( self, encoding ):
 
-    o 'context' must implement IImportContext.
+        self._encoding = encoding
+        self._skin_dirs = []
+        self._skin_paths = []
+        self._default_skin = None
+        self._request_var = None
+        self._allow_arbitrary = False
+        self._persist_cookie = False
 
-    o Register via Python:
+    def startElement( self, name, attrs ):
 
-      registry = site.portal_setup.getImportStepRegistry()
-      registry.registerStep( 'importSkinsTool'
-                           , '20040518-01'
-                           , Products.CMFSetup.skins.importSkinsTool
-                           , ()
-                           , 'Skins Tool import'
-                           , 'Import skins tool FSDVs and skin paths.'
-                           )
+        if name == 'skins-tool':
+            self._default_skin = self._extract( attrs, 'default_skin' )
+            self._request_var = self._extract( attrs, 'request_varname' )
+            self._allow_arbitrary = self._extractBoolean( attrs
+                                                        , 'allow_any'
+                                                        , False
+                                                        )
+            self._persist_cookie = self._extractBoolean( attrs
+                                                       , 'cookie_persistence'
+                                                       , False
+                                                       )
 
-    o Register via XML:
- 
-      <setup-step id="importSkinsTool"
-                  version="20040524-01"
-                  handler="Products.CMFSetup.skins.importSkinsTool"
-                  title="Skins Tool import"
-      >Import skins tool FSDVs and skin paths.</setup-step>
+        elif name == 'skin-directory':
 
-    """
-    site = context.getSite()
-    skins_tool = getToolByName( site, 'portal_skins' )
+            self._skin_dirs.append( ( self._extract( attrs, 'id' )
+                                    , self._extract( attrs, 'directory' )
+                                    ) )
 
-    if context.shouldPurge():
+        elif name == 'skin-path':
 
-        skins_tool._getSelections().clear()
+            path_name = self._extract( attrs,'id' )
+            self._skin_paths.append( ( path_name, [] ) )
 
-        for id in skins_tool.objectIds( DirectoryView.meta_type ):
-            skins_tool._delObject(id)
+        elif name == 'layer':
 
-    text = context.readDataFile( _FILENAME )
+            path_name, layers = self._skin_paths[ -1 ]
+            layers.append( self._extract( attrs, 'name' ) )
 
-    if text is not None:
+        else:
+            raise ValueError, 'Unknown element %s' % name
 
-        stc = SkinsToolConfigurator( site ).__of__( site )
-        stc.parseXML( text )
-
-    #
-    #   Purge and rebuild the skin path, now that we have added our stuff.
-    #
-    site._v_skindata = None
-    skins_tool.setupCurrentSkin( site.REQUEST )
-
-    return 'Skins tool imported'
-
-
-def exportSkinsTool( context ):
-
-    """ Export skins tool FSDVs and skin paths as an XML file
-
-    o 'context' must implement IExportContext.
-
-    o Register via Python:
-
-      registry = site.portal_setup.getExportStepRegistry()
-      registry.registerStep( 'exportSkinsTool'
-                           , Products.CMFSetup.skins.exportSkinsTool
-                           , 'Skins Tool export'
-                           , 'Export skins tool FSDVs and skin paths.'
-                           )
-
-    o Register via XML:
- 
-      <export-script id="exportSkinsTool"
-                     version="20040518-01"
-                     handler="Products.CMFSetup.skins.exportSkinsTool"
-                     title="Skins Tool export"
-      >Export skins tool FSDVs and skin paths.</export-script>
-
-    """
-    site = context.getSite()
-    stc = SkinsToolConfigurator( site ).__of__( site )
-    text = stc.generateXML()
-
-    context.writeDataFile( _FILENAME, text, 'text/xml' )
-
-    return 'Skins tool exported.'
+InitializeClass( _SkinsParser )
