@@ -139,7 +139,7 @@ class WorkflowAction (Method):
 
 def afterCreate(ob):
     wf = getToolByName(ob, 'portal_workflow', None)
-    if ob is not None:
+    if wf is not None:
         wf.notifyCreated(ob)
         catalog = getToolByName(ob, 'portal_catalog', None)
         if catalog is not None:
