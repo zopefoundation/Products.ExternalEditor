@@ -44,6 +44,9 @@ New Features
 
 Bugs Fixed
 
+  - Made 'PortalFolder.invokeFactory' enforce the 'filter_content_types'
+    property of the folder's type information object.
+
   - Added stripping of leading / trailing whitespace from
     Subject keywords (Tracker #479, thanks to Lucas Hofman
     for the patch!)

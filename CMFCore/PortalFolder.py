@@ -292,6 +292,12 @@ class PortalFolder( Folder, DynamicType ):
         """
         return None
 
+    def reindexObject( self ):
+        """
+            Make content-assuming factory mechanism happy.
+        """
+        pass
+
     def PUT_factory( self, name, typ, body ):
         """
             Dispatcher for PUT requests to non-existent IDs.  Returns
@@ -325,6 +331,12 @@ class PortalFolder( Folder, DynamicType ):
         Invokes the portal_types tool.
         '''
         pt = getToolByName( self, 'portal_types' )
+        myType = pt.getTypeInfo(self)
+
+        if myType is not None:
+            if not myType.allowType( type_name ):
+                raise ValueError, 'Disallowed suboject type: %s' % type_name
+
         apply( pt.constructContent
              , (type_name, self, id, RESPONSE) + args
              , kw

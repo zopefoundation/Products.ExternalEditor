@@ -1,23 +1,74 @@
-import Zope
 from unittest import TestCase, TestSuite, makeSuite, main
-
-from Products.CMFCore.tests.base.dummy import \
-     DummyContent, DummyFTI
-
-from Products.CMFCore.tests.base.testcase import \
-     SecurityTest
-
-from Products.CMFCore.tests.base.utils import \
-     has_path
+import Zope
 
 from DateTime import DateTime
-from Products.CMFCore.TypesTool import\
-     TypesTool,FactoryTypeInformation as FTI
+
+from Products.CMFCore.tests.base.dummy import DummyContent
+from Products.CMFCore.tests.base.dummy import DummyFTI
+from Products.CMFCore.tests.base.testcase import SecurityTest
+from Products.CMFCore.tests.base.testcase import newSecurityManager
+from Products.CMFCore.tests.base.utils import has_path
+from Products.CMFCore.tests.base.security import OmnipotentUser
+
+from Products.CMFCore.TypesTool import TypesTool
+from Products.CMFCore.TypesTool import FactoryTypeInformation as FTI
 from Products.CMFCore.CatalogTool import CatalogTool
-from Products.CMFCore.PortalFolder import PortalFolder, ContentFilter
+from Products.CMFCore.PortalFolder import PortalFolder
+from Products.CMFCore.PortalFolder import ContentFilter
 
 def extra_meta_types():
     return [  { 'name' : 'Dummy', 'action' : 'manage_addFolder' } ]
+
+class PortalFolderFactoryTests( SecurityTest ):
+
+    def setUp( self ):
+        SecurityTest.setUp( self )
+
+        self.root._setObject( 'portal_types', TypesTool() )
+        types_tool = self.root.portal_types
+        types_tool._setObject( 'Folder'
+                             , FTI( id='Folder'
+                                  , meta_type=PortalFolder.meta_type
+                                  , product='CMFCore'
+                                  , factory='manage_addPortalFolder'
+                                  , filter_content_types=0
+                                  )
+                             )
+        types_tool._setObject( 'Dummy', DummyFTI )
+
+    def _makeOne( self, id ):
+        return PortalFolder( id ).__of__( self.root )
+
+    def test_invokeFactory( self ):
+
+        f = self._makeOne( 'container' )
+
+        self.failIf( 'foo' in f.objectIds() )
+
+        f.invokeFactory( type_name='Dummy', id='foo' )
+
+        self.failUnless( 'foo' in f.objectIds() )
+        foo = f.foo
+        self.assertEqual( foo.getId(), 'foo' )
+        self.assertEqual( foo.Type(), 'Dummy' )
+
+    def test_invokeFactory_disallowed_type( self ):
+
+        f = self._makeOne( 'container' )
+
+        ftype = self.root.portal_types.Folder
+        ftype.filter_content_types = 1
+
+        self.assertRaises( ValueError
+                         , f.invokeFactory, type_name='Folder', id='sub' )
+
+        ftype.allowed_content_types = ( 'Folder', )
+        f.invokeFactory( type_name='Folder', id='sub' )
+        self.failUnless( 'sub' in f.objectIds() )
+
+        self.assertRaises( ValueError
+                         , f.invokeFactory, type_name='Dummy', id='foo' )
+
 
 class PortalFolderTests( SecurityTest ):
 
@@ -187,6 +238,7 @@ class PortalFolderTests( SecurityTest ):
                                   , meta_type=PortalFolder.meta_type
                                   , product='CMFCore'
                                   , factory='manage_addPortalFolder'
+                                  , filter_content_types=0
                                   )
                              )
         types_tool._setObject( 'Grabbed'
@@ -509,6 +561,7 @@ class ContentFilterTests( TestCase ):
 
 def test_suite():
     return TestSuite((
+        makeSuite( PortalFolderFactoryTests ),
         makeSuite( PortalFolderTests ),
         makeSuite( ContentFilterTests ),
         ))
