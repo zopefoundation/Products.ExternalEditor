@@ -1,2 +1,3 @@
 <?xml version="1.0"?>
-<test tal:content="here/test">This is only a test</test>
+<test xmlns:tal="http://xml.zope.org/namespaces/tal"
+   tal:content="here/getId">This is only a test</test>
