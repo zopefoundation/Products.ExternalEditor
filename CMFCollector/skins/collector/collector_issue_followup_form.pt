@@ -78,21 +78,24 @@
         </td>
       </tr>
 
-      <tr tal:condition="artifacts">
-        <td colspan="2">
-          <span tal:repeat="item artifacts">
-            <input type="checkbox" name="attachments:list" value="ID"
-                   tal:attributes="value item/id">
-            <a href="ITEM URL"
-               tal:attributes="href python:item.absolute_url() + '/view'"
-               tal:content="item/id">ITEM ID</a>&nbsp;&nbsp;
-          </span>
-        </td>
-      </tr>
+    </table>
+
+    <table>
 
       <tr>
-        <td align="center" colspan=2>
-          <input type="submit" name="submit" value="Submit">
+        <th align="left" valign="top"> Add </th>
+        <td align="left" NOWRAP>
+          <input type=radio name="filetype" value="File" checked> File or
+          <br>
+          <input type=radio name="filetype" value="Image"> Image
+        </td>
+        <td> <input type=file name="file" size="35"> </td>
+        <th align="right"> Id: </th>
+        <td> <input type=text name="fileid" size="15"> </td>
+      </tr>
+      <tr>
+        <td colspan="5">
+            <input type="submit" name="submit" value="Submit">
         </td>
       </tr>
 
