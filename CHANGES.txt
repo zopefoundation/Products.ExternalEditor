@@ -172,6 +172,8 @@ CMF 1.5alpha (unreleased)
 
   Bug Fixes
 
+    - DynamicType: Added 'getPortalTypeName()' to the interface.
+
     - Collector #227:  expose ZPT filename in tracebacks which include
       FSPageTemplates.
 

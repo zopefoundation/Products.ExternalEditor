@@ -26,6 +26,14 @@ class DynamicType(Interface):
     """ General interface for dynamic items.
     """
 
+    def getPortalTypeName():
+        """ Get the portal type name that can be passed to portal_types.
+
+        If the object is uninitialized, returns None.
+
+        Permission -- Always available
+        """
+
     def getTypeInfo():
         """ Get the TypeInformation object specified by the portal type.
 

@@ -15,12 +15,13 @@
 $Id$
 """
 
-from AccessControl import ClassSecurityInfo
-from Globals import InitializeClass
-from utils import getToolByName
 from urllib import quote
 
+from AccessControl import ClassSecurityInfo
+from Globals import InitializeClass
+
 from interfaces.Dynamic import DynamicType as IDynamicType
+from utils import getToolByName
 
 
 class DynamicType:
@@ -36,24 +37,23 @@ class DynamicType:
     security = ClassSecurityInfo()
 
     def _setPortalTypeName(self, pt):
-        '''
-        Called by portal_types during construction, records an
-        ID that will be used later to locate the correct
-        ContentTypeInformation.
-        '''
+        """ Set the portal type name.
+
+        Called by portal_types during construction, records an ID that will be
+        used later to locate the correct ContentTypeInformation.
+        """
         self.portal_type = pt
 
     security.declarePublic('getPortalTypeName')
     def getPortalTypeName(self):
-        """
-        Returns the portal type name that can be passed to portal_types.
-        If the object is uninitialized, returns None.
+        """ Get the portal type name that can be passed to portal_types.
         """
         pt = self.portal_type
         if callable( pt ):
             pt = pt()
         return pt
 
+    # deprecated alias
     _getPortalTypeName = getPortalTypeName
 
     security.declarePublic('getTypeInfo')

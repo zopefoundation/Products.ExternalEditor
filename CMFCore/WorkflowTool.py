@@ -527,8 +527,8 @@ class WorkflowTool(UniqueObject, Folder, OldstyleActionProviderBase):
         cbt = self._chains_by_type
         if type(ob) == type(''):
             pt = ob
-        elif hasattr(aq_base(ob), '_getPortalTypeName'):
-            pt = ob._getPortalTypeName()
+        elif hasattr(aq_base(ob), 'getPortalTypeName'):
+            pt = ob.getPortalTypeName()
         else:
             pt = None
 

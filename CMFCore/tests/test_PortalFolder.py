@@ -62,7 +62,7 @@ class PortalFolderFactoryTests( SecurityTest ):
         self.failUnless( 'foo' in f.objectIds() )
         foo = f.foo
         self.assertEqual( foo.getId(), 'foo' )
-        self.assertEqual( foo._getPortalTypeName(), 'Dummy Content' )
+        self.assertEqual( foo.getPortalTypeName(), 'Dummy Content' )
         self.assertEqual( foo.Type(), 'Dummy Content Title' )
 
     def test_invokeFactory_disallowed_type( self ):
@@ -281,7 +281,7 @@ class PortalFolderTests( SecurityTest ):
 
         # First, test default behavior
         test.manage_addFolder( id='simple', title='Simple' )
-        self.assertEqual( test.simple._getPortalTypeName(), 'Folder' )
+        self.assertEqual( test.simple.getPortalTypeName(), 'Folder' )
         self.assertEqual( test.simple.Type(), 'Folder or Directory' )
         self.assertEqual( test.simple.getId(), 'simple' )
         self.assertEqual( test.simple.Title(), 'Simple' )
@@ -304,7 +304,7 @@ class PortalFolderTests( SecurityTest ):
         self.root.grabbed = Grabbed( test )
 
         test.manage_addFolder( id='indirect', title='Indirect' )
-        self.assertEqual( test.indirect._getPortalTypeName(), 'Grabbed' )
+        self.assertEqual( test.indirect.getPortalTypeName(), 'Grabbed' )
         self.assertEqual( test.indirect.Type(), 'Grabbed Content' )
         self.assertEqual( test.indirect.getId(), 'indirect' )
         self.assertEqual( test.indirect.Title(), 'Indirect' )

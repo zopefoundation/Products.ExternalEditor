@@ -792,8 +792,8 @@ class TypesTool(UniqueObject, Folder, ActionProviderBase):
             the appropriate type info using its portal_type.
         """
         if type( contentType ) is not type( '' ):
-            if hasattr(aq_base(contentType), '_getPortalTypeName'):
-                contentType = contentType._getPortalTypeName()
+            if hasattr(aq_base(contentType), 'getPortalTypeName'):
+                contentType = contentType.getPortalTypeName()
                 if contentType is None:
                     return None
             else:
