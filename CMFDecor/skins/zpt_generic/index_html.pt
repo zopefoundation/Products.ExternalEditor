@@ -110,7 +110,7 @@
                       alt   string:${item/Type};
                       title string:${item/Type}"></a>
     <a href="item_url" tal:attributes="href item/absolute_url"
-       tal:content="item/Title"> Title </a>
+       tal:content="item/TitleOrId"> Title </a>
      <blockquote tal:condition="exists: item/Description"
                  tal:content="item/Description">
        Description <!--fmt="structured-text'-->
