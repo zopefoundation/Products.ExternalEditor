@@ -192,7 +192,7 @@ class CatalogTool (UniqueObject, ZCatalog):
                , 'CreationDate'
                , 'EffectiveDate'
                , 'ExpiresDate'
-               , 'ModifiedDate'
+               , 'ModificationDate'
                )
 
     def _initIndexes(self):
