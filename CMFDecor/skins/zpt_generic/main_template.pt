@@ -1,0 +1,36 @@
+<html metal:define-macro="master">
+ <head>
+  <title tal:define="ob_title here/Title; portal_title container/title" tal:content="string:${portal_title}: ${ob_title}">The title</title>
+  <div tal:replace="structure container/css_inline_or_link"/>
+ </head>
+ <body>
+  <div metal:use-macro="container/standard_top_bar/macros/top_bar"/>
+
+  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+   <tr>
+   <!-- Vertical whitespace -->
+   <td colspan="4"><br/></td>
+   </tr>
+
+   <tr valign="top">
+   <td class="SideBar" width="15%" align="left" valign="top" tal:content="structure container/actions_box">
+   Actions box
+   </td>
+
+   <!-- Horizontal whitespace -->
+   <td width="1%">&nbsp;</td>
+
+   <td class="Desktop" colspan="2" width="84%" valign="top">
+
+   <p tal:condition="exists:options/portal_status_message" tal:content="options/portal_status_message" class="DesktopStatusBar"></p>
+
+   <div tal:condition="exists:here/localHeader" replace="structure here/localHeader"/>
+   <div metal:define-slot="main"/>
+   <div tal:condition="exists:here/localFooter" replace="structure here/localFooter"/>
+
+  </td>
+  </tr>
+  </table>
+
+ </body>
+</html>
