@@ -184,7 +184,7 @@ class NewsItem( PortalContent
 
             if not headers.has_key( 'Format' ): # not supplied in headers
                 from NullPortalResource import sniffContentType
-                sniffFmt = sniffContentType( self.id, body )
+                sniffFmt = sniffContentType( self.getId(), body )
                 fmt = REQUEST.get_header( 'content-type', sniffFmt )
                 headers[ 'Format' ] = fmt
 

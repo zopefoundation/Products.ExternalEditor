@@ -161,6 +161,10 @@ class File( OFS.Image.File
     # gnashing of teeth and fraying of nerves.  Don't do it.
     #
     # Really.
+    # 
+    # Note that if you use getId() to retrieve an object's ID, you will avoid
+    # this problem altogether. getId is the new way, accessing .id is
+    # deprecated.
     
     meta_type='Portal File'
     effective_date = expiration_date = None
@@ -231,7 +235,7 @@ class File( OFS.Image.File
         """
 
         RESPONSE.setHeader('Content-Disposition',
-                           'attachment; filename=%s' % self.id())
+                           'attachment; filename=%s' % self.getId())
         return OFS.Image.File.index_html(self, REQUEST, RESPONSE)
 
     index_html = download

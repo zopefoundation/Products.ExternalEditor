@@ -9,7 +9,7 @@
 
 <div class="File">
 
-<h2>Edit &dtml-id;</h2>
+<h2>Edit &dtml-getId;</h2>
 
 <form action="file_edit" method="post" enctype="multipart/form-data">
 <table class="FormLayout">

@@ -5,7 +5,7 @@
     name="criterion_ids:list" id="cb_&dtml-getId;">
   </td>
   <td align="left">
-   <label for="cb_&dtml-id;">
+   <label for="cb_&dtml-getId;">
     <strong title="&dtml-Description;">Integer:</strong> 
     <tt>&dtml-Field;</tt>
    </label>
@@ -27,17 +27,17 @@
    <dtml-let minChecked="direction=='min' and 'checked' or ''"
              maxChecked="direction=='max' and 'checked' or ''"
              minmaxChecked="direction=='min:max' and 'checked' or ''">
-   <input type="radio" name="criteria.direction__&dtml-id;:records"
-    value="min" &dtml-minChecked; id="&dtml-id;_min" /> 
-      <label for="&dtml-id;_min">Minimum</label>
+   <input type="radio" name="criteria.direction__&dtml-getId;:records"
+    value="min" &dtml-minChecked; id="&dtml-getId;_min" /> 
+      <label for="&dtml-getId;_min">Minimum</label>
 
-   <input type="radio" name="criteria.direction__&dtml-id;:records"
-    value="max" &dtml-maxChecked; id="&dtml-id;_max" />
-      <label for="&dtml-id;_max">Maximum</label>
+   <input type="radio" name="criteria.direction__&dtml-getId;:records"
+    value="max" &dtml-maxChecked; id="&dtml-getId;_max" />
+      <label for="&dtml-getId;_max">Maximum</label>
 
-   <input type="radio" name="criteria.direction__&dtml-id;:records" 
-    value="min:max" &dtml-minmaxChecked; id="&dtml-id;_minmax">
-      <label for="&dtml-id;_minmax">Min/Max</label>
+   <input type="radio" name="criteria.direction__&dtml-getId;:records" 
+    value="min:max" &dtml-minmaxChecked; id="&dtml-getId;_minmax">
+      <label for="&dtml-getId;_minmax">Min/Max</label>
    </dtml-let>
   </td>
 </table>

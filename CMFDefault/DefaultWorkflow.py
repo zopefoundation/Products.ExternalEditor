@@ -112,7 +112,7 @@ class DefaultWorkflowDefinition (SimpleItemWithProperties):
     security.declarePrivate('getReviewStateOf')
     def getReviewStateOf(self, ob):
         tool = aq_parent(aq_inner(self))
-        status = tool.getStatusOf(self.id, ob)
+        status = tool.getStatusOf(self.getId(), ob)
         if status is not None:
             review_state = status['review_state']
         else:
@@ -291,7 +291,7 @@ class DefaultWorkflowDefinition (SimpleItemWithProperties):
 
         elif name == 'review_history':
             tool = aq_parent(aq_inner(self))
-            history = tool.getHistoryOf(self.id, ob)
+            history = tool.getHistoryOf(self.getId(), ob)
             # Make copies for security.
             return tuple(map(lambda dict: dict.copy(), history))
 
@@ -309,7 +309,7 @@ class DefaultWorkflowDefinition (SimpleItemWithProperties):
                 'time': DateTime(),
                 'comments': comment,
                 }
-            tool.setStatusOf(self.id, ob, status)
+            tool.setStatusOf(self.getId(), ob, status)
         except:
             tool.notifyException(ob, action, sys.exc_info())
             raise

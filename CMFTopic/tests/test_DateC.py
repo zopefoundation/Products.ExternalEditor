@@ -19,7 +19,7 @@ class TestFriendlyDate(unittest.TestCase):
 
     def test_Empty(self):
         friendly = FriendlyDate('foo', 'foofield')
-        assert friendly.id == 'foo'
+        assert friendly.getId() == 'foo'
         assert friendly.field == 'foofield'
         assert friendly.value == None, 'Value should be None'
         assert friendly.operation == 'min', 'Operator should be min'

@@ -229,7 +229,7 @@ class MemberData (SimpleItem):
         tool = getattr(self, '_tool', None)
         if tool is not None:
             del self._tool
-            tool.registerMemberData(self, self.id)
+            tool.registerMemberData(self, self.getId())
 
     security.declarePublic('getUser')
     def getUser(self):

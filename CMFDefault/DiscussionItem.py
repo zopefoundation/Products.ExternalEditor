@@ -158,7 +158,7 @@ class DiscussionItem( Document
         else:
             prefix = portal_url()
 
-        return fmt_string % ( prefix, parent_rel_url, str( self.id ) )
+        return fmt_string % ( prefix, parent_rel_url, str( self.getId() ) )
 
     def getPhysicalPath(self):
         """
@@ -330,7 +330,7 @@ class DiscussionItemContainer(Persistent, Implicit):
         for item in self._container.values():
             if item.in_reply_to == my_url:
                 if wf.getInfoFor( item, 'review_state' ) == 'published':
-                    result.append(item.id)
+                    result.append(item.getId())
 
         return result
 

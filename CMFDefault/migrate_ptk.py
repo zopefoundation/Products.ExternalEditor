@@ -107,7 +107,7 @@ class SimpleClassConverter (Converter):
             newob = k.__basicnew__()
         else:
             newob = new.instance(k, {})
-        try: newob.id = ob.id
+        try: newob.id = ob.getId()
         except AttributeError: pass
         newob.__dict__.update(ob.__dict__)
         if hasattr(newob, '_objects'):

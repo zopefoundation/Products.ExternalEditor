@@ -39,7 +39,7 @@ Folder contents display.
      <dtml-if "portal_membership.checkPermission( 'Access contents information'
                                                 , this(), 'aq_parent')">
       <dtml-let upNav="_.hasattr(this().aq_parent, 'portal_url')"
-                upID="this().aq_parent.id"
+                upID="this().aq_parent.getId()"
       >
       <tr valign="top">
       <td width="16"><br></td>
@@ -64,7 +64,7 @@ Folder contents display.
 
 <dtml-in expr="contentValues(filter=decodeFolderFilter(
          REQUEST.get('folderfilter', '')))"
-         sort="id" size="19" start=qs skip_unauthorized>
+         sort="getId" size="19" start=qs skip_unauthorized>
  <dtml-if next-sequence>
   <dtml-call "REQUEST.set('next-sequence'
                          , _['next-sequence-start-number'])">
@@ -83,19 +83,19 @@ Folder contents display.
  >
      <tr valign="top">
       <td>
-         <input type="checkbox" name="ids:list" value="&dtml-id;"
-          id="cb_&dtml-id;" />
+         <input type="checkbox" name="ids:list" value="&dtml-getId;"
+          id="cb_&dtml-getId;" />
       </td>
       <td>
          <dtml-if icon>
-         <a href="&dtml.url_quote-id;&dtml-methodID;"
+         <a href="&dtml.url_quote-getId;&dtml-methodID;"
           ><img src="&dtml-BASEPATH1;/&dtml-icon;"
                 alt="&dtml-Type;" border="0"></a> 
          </dtml-if>
       </td>
       <td>
-         <a href="&dtml.url_quote-id;&dtml-methodID;"
-           >&dtml-id;<dtml-if title> (&dtml-title;)</dtml-if></a>
+         <a href="&dtml.url_quote-getId;&dtml-methodID;"
+           >&dtml-getId;<dtml-if title> (&dtml-title;)</dtml-if></a>
       </td>
      </tr>
 

@@ -415,7 +415,7 @@ class PortalFolder( Folder, DynamicType ):
                                                      None, object):
                         # validation succeeded
                         return
-                    raise 'Unauthorized', absattr(object.id)
+                    raise 'Unauthorized', object.getId()
                 else:
                     raise 'Unauthorized', permission_name
             #
@@ -439,8 +439,7 @@ class PortalFolder( Folder, DynamicType ):
                     if getSecurityManager().validate(None, parent,
                                                      None, object):
                         return
-                    id = object.id
-                    if callable(id): id = id()
+                    id = object.getId()
                     raise 'Unauthorized', id
                 else:
                     raise 'Unauthorized', method_name
@@ -539,10 +538,6 @@ class ContentFilter:
         """
         return "Subject: %s; Type: %s" % ( self.filterSubject,
                                            self.filterType )
-
-def absattr(attr):
-    if callable(attr): return attr()
-    else: return attr
 
 manage_addPortalFolder = PortalFolder.manage_addPortalFolder
 manage_addPortalFolderForm = HTMLFile( 'folderAdd', globals() )

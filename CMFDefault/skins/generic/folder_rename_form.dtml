@@ -16,7 +16,7 @@
   </dtml-if>
   </TD>
   <TD ALIGN="LEFT" VALIGN="TOP">
-  <dtml-var id>
+  <dtml-var getId>
   </TD>
 </TR>
 <TR>
@@ -24,13 +24,13 @@
   <STRONG>to:</STRONG>
   </TD>
   <TD ALIGN="LEFT" VALIGN="TOP">
-  <INPUT TYPE="TEXT" NAME="new_id" value="&dtml-id;" SIZE="20">
+  <INPUT TYPE="TEXT" NAME="new_id" value="&dtml-getId;" SIZE="20">
   </TD>
 </TR>
 <TR>
 <TD></TD>
 <TD>
-  <INPUT TYPE="HIDDEN" NAME="id" VALUE="&dtml-id;">
+  <INPUT TYPE="HIDDEN" NAME="id" VALUE="&dtml-getId;">
   <INPUT TYPE="submit" VALUE=" Ok ">
 </TD>
 </TR>
@@ -38,7 +38,7 @@
 </FORM>
 <dtml-else>
 <FORM ACTION="folder_contents" METHOD="GET">
-<p>The item <EM>&dtml-id;</EM> does not support this operation.</P>
+<p>The item <EM>&dtml-getId;</EM> does not support this operation.</P>
 <INPUT TYPE="submit" NAME="submit" VALUE=" Ok ">
 </FORM>
 </dtml-if>

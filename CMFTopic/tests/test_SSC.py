@@ -8,7 +8,7 @@ class TestSimpleString(unittest.TestCase):
     
     def test_Empty( self ):
         ssc = SSC('foo', 'foofield')
-        assert ssc.id == 'foo'
+        assert ssc.getId() == 'foo'
         assert ssc.field == 'foofield'
         assert ssc.value == ''
         assert len( ssc.getCriteriaItems() ) == 0
@@ -16,7 +16,7 @@ class TestSimpleString(unittest.TestCase):
     def test_Nonempty( self ):
         ssc = SSC('foo', 'foofield')
         ssc.edit('bar')
-        assert ssc.id == 'foo'
+        assert ssc.getId() == 'foo'
         assert ssc.field == 'foofield'
         assert ssc.value == 'bar'
 

@@ -198,7 +198,7 @@ class TypeInformation (SimpleItemWithProperties):
         if self.title:
             return self.title
         else:
-            return self.id
+            return self.getId()
     
     security.declareProtected(View, 'Description')
     def Description(self):
@@ -267,7 +267,7 @@ class TypeInformation (SimpleItemWithProperties):
                 if string.lower(action['name']) == id:
                     return action['action']
         if default is _marker:
-            raise TypeError, 'No action "%s" for type "%s"' % ( id, self.id )
+            raise TypeError, 'No action "%s" for type "%s"' % ( id, self.getId() )
         else:
             return default
 
@@ -468,12 +468,12 @@ class FactoryTypeInformation (TypeInformation):
         # in the process.
         m = self._getFactoryMethod(container, raise_exc=1)
         if m is None:
-            raise 'Unauthorized', ('Cannot create %s' % self.id)
+            raise 'Unauthorized', ('Cannot create %s' % self.getId())
         id = str(id)
         apply(m, (id,) + args, kw)
         ob = container._getOb(id)
         if hasattr(ob, '_setPortalTypeName'):
-            ob._setPortalTypeName(self.id)
+            ob._setPortalTypeName(self.getId())
         return '%s/%s' % ( ob.absolute_url(), self.immediate_view )
 
 InitializeClass( FactoryTypeInformation )
@@ -528,7 +528,7 @@ class ScriptableTypeInformation( TypeInformation ):
         id = str(id)
         ob = apply(constructor, (container, id) + args, kw)
         if hasattr(ob, '_setPortalTypeName'):
-            ob._setPortalTypeName(self.id)
+            ob._setPortalTypeName(self.getId())
         return '%s/%s' % ( ob.absolute_url(), self.immediate_view )
 
 InitializeClass( ScriptableTypeInformation )
@@ -586,7 +586,7 @@ class TypesTool( UniqueObject, OFS.Folder.Folder ):
             if hasattr(aq_base(product), 'factory_type_information'):
                 ftis = product.factory_type_information
             else:
-                package = getattr(Products, product.id, None)
+                package = getattr(Products, product.getId(), None)
                 dispatcher = getattr(package, '__FactoryDispatcher__', None)
                 ftis = getattr(dispatcher, 'factory_type_information', None)
             if ftis is not None:
@@ -595,7 +595,7 @@ class TypesTool( UniqueObject, OFS.Folder.Folder ):
                 for fti in ftis:
                     mt = fti.get('meta_type', None)
                     if mt:
-                        res.append((product.id + ': ' + mt, fti))
+                        res.append((product.getId() + ': ' + mt, fti))
         return res
 
     _addTIForm = HTMLFile( 'addTypeInfo', _dtmldir )

@@ -9,7 +9,7 @@
 
 <div class="DiscussionItem">
 
-<h2>Edit &dtml-id;</h2>
+<h2>Edit &dtml-getId;</h2>
 
 <form action="edit" method="post" enctype="multipart/form-data">
 <table class="FormLayout">
@@ -37,7 +37,7 @@
    <input type="radio" name="text_format" value="structured-text"
         <dtml-if "text_format=='structured-text'">checked
         </dtml-if> id="cb_structuredtext" /> 
-        <label for="cb_structuredtext">structured-text></label>
+        <label for="cb_structuredtext">structured-text</label>
    <input type="radio" name="text_format" value="html"
         <dtml-if "text_format=='html'">checked
         </dtml-if> id="cb_html" />

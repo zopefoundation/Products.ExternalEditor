@@ -147,7 +147,7 @@ class FSDTMLMethod (HTML, Acquisition.Implicit, Item_w__name__):
         folder = self.restrictedTraverse(fpath)
         if data is None:
             data = self.read()
-        id = self.id()
+        id = self.getId()
         obj = DTMLMethod(data, __name__=id)
         folder._verifyObjectPaste(obj, validate_src=0)
         folder._setObject(id, obj)

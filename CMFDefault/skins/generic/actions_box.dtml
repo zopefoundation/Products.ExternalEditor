@@ -40,7 +40,7 @@
   <td class="ActionTitle">
    <dtml-let icon="_.getattr(obj, 'icon', '')"
              typ="_.getattr(obj, 'Type', '')"
-             objID="obj.id"
+             objID="obj.getId()"
    >
      <dtml-if icon>
      <img src="&dtml-BASEPATH1;/&dtml-icon;" align="left" alt="&dtml-typ;" />

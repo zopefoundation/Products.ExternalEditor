@@ -159,6 +159,10 @@ class Image( OFS.Image.Image
     # gnashing of teeth and fraying of nerves.  Don't do it.
     #
     # Really.
+    # 
+    # Note that if you use getId() to retrieve an object's ID, you will avoid
+    # this problem altogether. getId is the new way, accessing .id is
+    # deprecated.
     
     meta_type='Portal Image'
     effective_date = expiration_date = None

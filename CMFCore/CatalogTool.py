@@ -143,7 +143,7 @@ class CatalogTool (UniqueObject, ZCatalog):
     security = ClassSecurityInfo()
 
     def __init__(self):
-        ZCatalog.__init__(self, self.id)
+        ZCatalog.__init__(self, self.getId())
         self._initIndexes()
 
     def _initIndexes(self):

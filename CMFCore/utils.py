@@ -123,7 +123,7 @@ def getToolByName(obj, name, default=_marker):
 
 class ImmutableId (Base):
     def _setId(self, id):
-        if id != self.id:
+        if id != self.getId():
             raise Globals.MessageDialog(
                 title='Invalid Id',
                 message='Cannot change the id of this object',
@@ -306,7 +306,7 @@ def manage_addTool(self, type, REQUEST=None):
             break
     if obj is None:
         raise 'NotFound', type
-    self._setObject(obj.id, obj)
+    self._setObject(obj.getId(), obj)
     if REQUEST is not None:
         return self.manage_main(self, REQUEST)
 

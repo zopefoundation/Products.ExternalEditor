@@ -286,14 +286,14 @@ class CookieCrumbler (SimpleItemWithProperties):
 
     def manage_beforeDelete(self, item, container):
         if item is self:
-            handle = self.meta_type + '/' + self.id
+            handle = self.meta_type + '/' + self.getId()
             BeforeTraverse.unregisterBeforeTraverse(container, handle)
 
     def manage_afterAdd(self, item, container):
         if item is self:
-            handle = self.meta_type + '/' + self.id
+            handle = self.meta_type + '/' + self.getId()
             container = container.this()
-            nc = BeforeTraverse.NameCaller(self.id)
+            nc = BeforeTraverse.NameCaller(self.getId())
             BeforeTraverse.registerBeforeTraverse(container, nc, handle)
 
 Globals.InitializeClass(CookieCrumbler)

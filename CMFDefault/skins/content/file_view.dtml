@@ -7,7 +7,7 @@
 <dtml-var content_byline>
 
 <p>
-<b>Filename</b>: <dtml-var id><br>
+<b>Filename</b>: <dtml-var getId><br>
 <b>Size</b>: <dtml-var size><br>
 <b>Content type</b>: <dtml-var content_type><br>
 <b>Description</b>: <dtml-var name="description" newline_to_br>

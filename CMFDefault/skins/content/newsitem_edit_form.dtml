@@ -9,7 +9,7 @@
 
 <div class="NewsItem">
 
-<h2>Edit &dtml-id;</h2>
+<h2>Edit &dtml-getId;</h2>
 
 <form action="newsitem_edit" method="post">
 <table class="FormLayout">

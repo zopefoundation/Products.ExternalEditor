@@ -4,7 +4,7 @@
 
 <div class="Topic">
 
-<h2> Topic Criteria: &dtml-id; </h2>
+<h2> Topic Criteria: &dtml-getId; </h2>
 
 <form action="&dtml-absolute_url;" method="post">
 

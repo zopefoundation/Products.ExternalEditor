@@ -8,7 +8,7 @@ class TestListCriterion(unittest.TestCase):
     
     def test_Empty( self ):
         listc = LISTC('foo', 'foofield')
-        assert listc.id == 'foo'
+        assert listc.getId() == 'foo'
         assert listc.field == 'foofield'
         assert listc.value == ('',)
         assert len(listc.getCriteriaItems()) == 0
@@ -16,7 +16,7 @@ class TestListCriterion(unittest.TestCase):
     def test_Nonempty( self ):
         listc = LISTC( 'foo', 'foofield' )
         listc.edit('bar\nbaz')
-        assert listc.id == 'foo'
+        assert listc.getId() == 'foo'
         assert listc.field == 'foofield'
         assert listc.value == ( 'bar', 'baz' )
         items =listc.getCriteriaItems()

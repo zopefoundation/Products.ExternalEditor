@@ -9,7 +9,7 @@
 
 <div class="Link">
 
-<h2>Edit &dtml-id;</h2>
+<h2>Edit &dtml-getId;</h2>
 
 <form action="link_edit" method="post">
 <table class="FormLayout">

@@ -178,7 +178,7 @@ class PortalContent(DynamicType, SimpleItem):
                 view = self.restrictedTraverse(path)
                 return view
             raise 'Not Found', ('No default view defined for type "%s"'
-                                % ti.id)
+                                % ti.getId())
         else:
             raise 'Not Found', ('Cannot find default view for "%s"'
                                 % string.join( self.getPhysicalPath() ) )

@@ -5,11 +5,11 @@
     name="criterion_ids:list" id="cb_&dtml-getId;">
   </td>
   <td align="left">
-   <label for="cb_&dtml-id;">
+   <label for="cb_&dtml-getId;">
     <strong title="&dtml-Description;">List:</strong>
     <tt>&dtml-Field;</tt>
    </label>
-   <input type="hidden" name="criteria.id:records" value="&dtml-id;">
+   <input type="hidden" name="criteria.id:records" value="&dtml-getId;">
   </td>
  </tr>
  <tr valign="top">

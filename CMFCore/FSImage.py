@@ -206,7 +206,7 @@ class FSImage (Acquisition.Implicit, Item_w__name__):
         folder = self.restrictedTraverse(fpath)
         if data is None:
             data = self._readFile()
-        id = self.id()
+        id = self.getId()
         obj = Image(id, '', data)
         folder._verifyObjectPaste(obj, validate_src=0)
         folder._setObject(id, obj)

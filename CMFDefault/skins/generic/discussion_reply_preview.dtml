@@ -20,7 +20,7 @@
   <td width="15%"></td>
   <td>
    <input type="submit" value="Edit"
-          name="&dtml-id;/discussion_reply_form:method">
+          name="&dtml-getId;/discussion_reply_form:method">
    <input type="submit" value="Reply" name="createReply:method">
   </td>
  </tr></table>

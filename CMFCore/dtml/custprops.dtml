@@ -16,7 +16,7 @@
     <TABLE CELLSPACING="2">
       <TR>
 	<TH ALIGN="LEFT" VALIGN="TOP">Id</TH>
-	<TD ALIGN="LEFT" VALIGN="TOP"><dtml-var id></TD>
+	<TD ALIGN="LEFT" VALIGN="TOP"><dtml-var getId></TD>
       </TR>
       <tr>
 	<th align="left" valign="top">
