@@ -10,7 +10,7 @@
     <td align="right">
         <small>
           Last 
-          <a href="&wiki_page_url;/&dtml-history;">edited</a>
+          <a href="&dtml-wiki_page_url;/&dtml-history;">edited</a>
             <dtml-if last_editor> by <b><dtml-var last_editor></b> </dtml-if>
           on <dtml-var bobobase_modification_time fmt=aCommon> </small>
       </small>
