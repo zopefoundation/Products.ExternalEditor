@@ -346,7 +346,6 @@ class SyndicationTool (UniqueObject, SimpleItem, ActionProviderBase):
         Additionally, sitewide policy checks might have a place
         here...
         """
-        #import pdb; pdb.set_trace()
         if not self.isSiteSyndicationAllowed():
             raise 'Syndication is not Allowed'
 
