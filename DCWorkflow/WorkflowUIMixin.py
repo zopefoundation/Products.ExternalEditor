@@ -105,16 +105,13 @@ class WorkflowUIMixin:
 
     security.declareProtected(ManagePortal, 'getGroups')
     def getGroups(self):
-        """Returns the groups managed by this workflow.
+        """Returns the group security monikers managed by this workflow.
         """
-        gf = self._getGroupFolder()
-        if gf is None:
-            return ()
-        return [gf.getGroupById(gid) for gid in self.groups]
+        return tuple(self.groups)
 
     security.declareProtected(ManagePortal, 'getAvailableGroups')
     def getAvailableGroups(self):
-        """Returns a list of group objects.
+        """Returns a list of available group security monikers.
         """
         gf = self._getGroupFolder()
         if gf is None:
@@ -122,27 +119,27 @@ class WorkflowUIMixin:
         r = []
         r.extend(gf.getDynamicGroups())
         r.extend(gf.getStaticGroups())
-        return r
+        return [g.getSecurityMoniker() for g in r]
 
     security.declareProtected(ManagePortal, 'addGroup')
-    def addGroup(self, gid, RESPONSE=None):
-        """Adds a group by id.
+    def addGroup(self, group, RESPONSE=None):
+        """Adds a group by moniker.
         """
         gf = self._getGroupFolder()
-        group = gf.getGroupById(gid)
-        if group is None:
-            raise ValueError(gid)
-        self.groups = self.groups + (gid,)
+        g = gf.getPrincipalByMoniker(group)
+        if g is None:
+            raise ValueError(group)
+        self.groups = self.groups + (group,)
         if RESPONSE is not None:
             RESPONSE.redirect(
                 "%s/manage_groups?manage_tabs_message=Added+group."
                 % self.absolute_url())
 
     security.declareProtected(ManagePortal, 'delGroups')
-    def delGroups(self, gids, RESPONSE=None):
-        """Removes groups by id.
+    def delGroups(self, groups, RESPONSE=None):
+        """Removes groups by moniker.
         """
-        self.groups = tuple([gid for gid in self.groups if gid not in gids])
+        self.groups = tuple([g for g in self.groups if g not in groups])
         if RESPONSE is not None:
             RESPONSE.redirect(
                 "%s/manage_groups?manage_tabs_message=Groups+removed."

@@ -58,3 +58,39 @@ def modifyRolesForPermission(ob, pname, roles):
         p.setRoles(roles)
         return 1
     return 0
+
+def modifyRolesForGroup(ob, group, grant_roles, managed_roles):
+    """Modifies local roles for one group.
+    """
+    local_roles = getattr(ob, '__ac_local_roles__', None)
+    if local_roles is None:
+        local_roles = {}
+    roles = local_roles.get(group)
+    if not roles:
+        if not grant_roles:
+            # No roles exist and no grants requested.  Leave unchanged.
+            return 0
+        else:
+            # Add new roles for this group.
+            local_roles[group] = tuple(grant_roles)
+            ob.__ac_local_roles__ = local_roles
+            return 1
+    roles = list(roles)
+    changed = 0
+    for role in managed_roles:
+        if role in grant_roles and role not in roles:
+            # Add one role for this group.
+            roles.append(role)
+            changed = 1
+        elif role not in grant_roles and role in roles:
+            # Remove one role for this group.
+            roles.remove(role)
+            changed = 1
+    if changed:
+        if not roles and local_roles.has_key(group):
+            del local_roles[group]
+        else:
+            local_roles[group] = tuple(roles)
+        ob.__ac_local_roles__ = local_roles
+    return changed
+

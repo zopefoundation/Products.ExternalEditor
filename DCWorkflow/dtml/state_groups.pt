@@ -33,13 +33,13 @@ and roles managed by this workflow</a> are shown.
 
 <tr tal:repeat="group wf/getGroups" tal:attributes="class
   python: repeat['group'].odd and 'row-normal' or 'row-hilite'">
-<td tal:content="group/getSecurityMoniker" class="list-item">
+<td tal:content="group" class="list-item">
   (Group) Everyone
 </td>
-<tal:block tal:define="group_roles python: here.getGroupInfo(group.getId())">
+<tal:block tal:define="group_roles python: here.getGroupInfo(group)">
 <td tal:repeat="role roles">
   <input type="checkbox"
-    tal:attributes="name python: '%s|%s' % (group.getId(), role);
+    tal:attributes="name python: '%s|%s' % (group, role);
       checked python: role in group_roles" />
 </td>
 </tal:block>

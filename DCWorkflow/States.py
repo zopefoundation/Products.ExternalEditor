@@ -49,7 +49,7 @@ class StateDefinition (SimpleItem):
     description = ''
     transitions = ()  # The ids of possible transitions.
     permission_roles = None  # { permission: [role] or (role,) }
-    group_roles = None  # { gid : (role,) }
+    group_roles = None  # { group moniker : (role,) }
     var_values = None  # PersistentMapping if set.  Overrides transition exprs.
 
     security = ClassSecurityInfo()
@@ -101,11 +101,11 @@ class StateDefinition (SimpleItem):
                 acq = 1
             return {'acquired':acq, 'roles':list(roles)}
 
-    def getGroupInfo(self, gid):
+    def getGroupInfo(self, group):
         """Returns the list of roles to be assigned to a group.
         """
         if self.group_roles:
-            return self.group_roles.get(gid, ())
+            return self.group_roles.get(group, ())
         return ()
 
     _properties_form = DTMLFile('state_properties', _dtmldir)
@@ -205,6 +205,7 @@ class StateDefinition (SimpleItem):
         pr = self.permission_roles
         if pr is None:
             self.permission_roles = pr = PersistentMapping()
+        pr.clear()
         for p in self.getManagedPermissions():
             roles = []
             acquired = REQUEST.get('acquire_' + p, 0)
@@ -236,22 +237,20 @@ class StateDefinition (SimpleItem):
         map = self.group_roles
         if map is None:
             self.group_roles = map = PersistentMapping()
+        map.clear()
         all_roles = self.getWorkflow().getRoles()
         for group in self.getWorkflow().getGroups():
-            gid = group.getId()
             roles = []
-            for r in all_roles:
-                if REQUEST.get('%s|%s' % (gid, r), 0):
-                    roles.append(r)
+            for role in all_roles:
+                if REQUEST.get('%s|%s' % (group, role), 0):
+                    roles.append(role)
             roles.sort()
             roles = tuple(roles)
-            map[gid] = roles
+            map[group] = roles
         if RESPONSE is not None:
             RESPONSE.redirect(
                 "%s/manage_groups?manage_tabs_message=Groups+changed."
                 % self.absolute_url())
-
-
 
 Globals.InitializeClass(StateDefinition)
 

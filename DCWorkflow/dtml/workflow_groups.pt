@@ -14,8 +14,8 @@ This workflow controls access by the selected groups.  The mappings
 from group to role depend on the workflow state.
 </div>
 <div tal:repeat="group groups">
-<input type="checkbox" name="gids:list" tal:attributes="value group/getId" />
-<span tal:replace="group/getSecurityMoniker">Everyone</span>
+<input type="checkbox" name="groups:list" tal:attributes="value group" />
+<span tal:replace="group">Everyone</span>
 </div>
 <div tal:condition="not:groups">
 <em>No groups are managed by this workflow.</em>
@@ -28,9 +28,9 @@ from group to role depend on the workflow state.
 <hr />
 
 <h3>Add a managed group</h3>
-<select name="gid">
+<select name="group">
  <option tal:repeat="group here/getAvailableGroups"
-   tal:attributes="value group/getId" tal:content="group/getSecurityMoniker" />
+   tal:attributes="value group" tal:content="group" />
 </select>
 <input type="submit" name="addGroup:method" value="Add" />
 </form>
@@ -58,4 +58,3 @@ are managed outside this workflow.
 </table>
 
 <h1 tal:replace="structure here/manage_page_footer">Footer</h1>
-

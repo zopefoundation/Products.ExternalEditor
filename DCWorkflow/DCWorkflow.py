@@ -37,7 +37,7 @@ from Products.CMFCore.WorkflowCore import WorkflowException
 from Products.CMFCore.WorkflowTool import addWorkflowFactory
 
 # DCWorkflow
-from utils import _dtmldir, modifyRolesForPermission
+from utils import _dtmldir, modifyRolesForPermission, modifyRolesForGroup
 from WorkflowUIMixin import WorkflowUIMixin
 from Transitions import TRIGGER_AUTOMATIC, TRIGGER_USER_ACTION, \
      TRIGGER_WORKFLOW_METHOD
@@ -74,7 +74,7 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
     scripts = None
 
     permissions = ()
-    groups = ()     # The group IDs managed by this workflow.
+    groups = ()     # Security monikers of groups managed by this workflow.
     roles = None  # The role names managed by this workflow.
     # If roles is None, listRoles() provides a default.
 
@@ -406,12 +406,25 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
         '''
         changed = 0
         sdef = self._getWorkflowStateOf(ob)
-        if sdef is not None and self.permissions:
+        if sdef is None:
+            return 0
+        # Update the role -> permission map.
+        if self.permissions:
             for p in self.permissions:
                 roles = []
                 if sdef.permission_roles is not None:
                     roles = sdef.permission_roles.get(p, roles)
                 if modifyRolesForPermission(ob, p, roles):
+                    changed = 1
+        # Update the group -> role map.
+        groups = self.getGroups()
+        managed_roles = self.getRoles()
+        if groups and managed_roles:
+            for group in groups:
+                roles = ()
+                if sdef.group_roles is not None:
+                    roles = sdef.group_roles.get(group, ())
+                if modifyRolesForGroup(ob, group, roles, managed_roles):
                     changed = 1
         return changed
 
