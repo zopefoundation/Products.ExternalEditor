@@ -45,17 +45,50 @@ class DefaultDublinCoreImpl( PropertyManager ):
                 , language=''
                 , rights=''
                 ):
-            self.creation_date = DateTime()
-            self._editMetadata( title
-                              , subject
-                              , description
-                              , contributors
-                              , effective_date
-                              , expiration_date
-                              , format
-                              , language
-                              , rights
-                              )
+        now = DateTime()
+        self.creation_date = now
+        self.modification_date = now
+        self._editMetadata( title
+                          , subject
+                          , description
+                          , contributors
+                          , effective_date
+                          , expiration_date
+                          , format
+                          , language
+                          , rights
+                          )
+
+    #
+    #  Set-modification-date-related methods.
+    #  In DefaultDublinCoreImpl for lack of a better place.
+    #
+
+    # Class variable default for an upgrade.
+    modification_date = None
+
+    security.declarePrivate('notifyModified')
+    def notifyModified(self):
+        """
+        Take appropriate action after the resource has been modified.
+        For now, change the modification_date.
+        """
+        # XXX This could also store the id of the user doing modifications.
+        self.setModificationDate()
+
+    # XXX Could this be simply protected by ModifyPortalContent ?
+    security.declarePrivate('setModificationDate')
+    def setModificationDate(self, modification_date=None):
+        """
+            Set the date when the resource was last modified.
+            When called without an argument, sets the date to now.
+        """
+        if modification_date is None:
+            # XXX which one is more correct ?
+            #self.modification_date = DateTime()
+            self.modification_date = self.bobobase_modification_time()
+        else:
+            self.modification_date = self._datify(modification_date)
 
     #
     #  DublinCore interface query methods
@@ -103,7 +136,7 @@ class DefaultDublinCoreImpl( PropertyManager ):
         # Return effective_date if set, modification date otherwise
         date = getattr(self, 'effective_date', None )
         if date is None:
-            date = self.bobobase_modification_time()
+            date = self.modified()
         return date.ISO()
 
     security.declarePublic( 'CreationDate' )
@@ -133,7 +166,7 @@ class DefaultDublinCoreImpl( PropertyManager ):
         """
             Dublin Core element - date resource last modified.
         """
-        return self.bobobase_modification_time().ISO()
+        return self.modified().ISO()
 
     security.declarePublic( 'Type' )
     def Type( self ):
@@ -236,7 +269,12 @@ class DefaultDublinCoreImpl( PropertyManager ):
             Dublin Core element - date resource last modified,
               returned as DateTime.
         """
-        return self.bobobase_modification_time()
+        date = self.modification_date
+        if date is None:
+            # Upgrade.
+            date = self.bobobase_modification_time()
+            self.modification_date = date
+        return date
 
     security.declarePublic( 'getMetadataHeaders' )
     def getMetadataHeaders( self ):
@@ -422,4 +460,5 @@ class DefaultDublinCoreImpl( PropertyManager ):
                      , rights=rights
                      )
         self.reindexObject()
+
 InitializeClass(DefaultDublinCoreImpl)

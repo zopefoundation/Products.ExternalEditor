@@ -25,6 +25,13 @@ CMF 1.3 beta2 (2002/06/30)
 
   New Features
 
+    - Changed the modification date so that it is updated at reindex
+      time and does not rely anymore on bobobase_modification_time. This
+      makes export+import of objects not lose the modification date.
+      Before exporting objects created with an older CMF version,
+      reindex the "modified" index in the catalog (you just have to do
+      it once, and only if you need to export objects).
+
     - Made the workflow tool compute chains using type names, as well
       as instances (Tracker #441).
 

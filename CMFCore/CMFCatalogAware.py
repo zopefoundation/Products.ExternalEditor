@@ -42,6 +42,9 @@ class CMFCatalogAware:
 
     security.declareProtected(ModifyPortalContent, 'reindexObject')
     def reindexObject(self, idxs=[]):
+        if hasattr(aq_base(self), 'notifyModified'):
+            # Update modification date.
+            self.notifyModified()
         catalog = getToolByName(self, 'portal_catalog', None)
         if catalog is not None:
             catalog.reindexObject(self, idxs=idxs)
