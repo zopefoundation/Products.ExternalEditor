@@ -12,6 +12,7 @@
 """Sundry collector utilities."""
 
 import string, re
+from Products.CMFCore.utils import getToolByName
 
 preexp = re.compile(r'<pre>')
 unpreexp = re.compile(r'</pre>')
@@ -24,6 +25,7 @@ def cited_text(text, rfind=string.rfind, strip=string.strip):
 
     We prepend '>' to each line, splitting long lines (propagating
     existing citation and leading whitespace) when necessary."""
+    # (Over?) elaborate stuff snarfed from my wiki commenting provisions.
 
     got = []
     for line in string.split(text, '\n'):
@@ -78,6 +80,7 @@ def cited_text(text, rfind=string.rfind, strip=string.strip):
 
 def process_comment(comment, strip=string.strip):
     """Return formatted comment, escaping cited text."""
+    # More elaborate stuff snarfed from my wiki commenting provisions.
     # Process the comment:
     # - Strip leading whitespace,
     # - indent every line so it's contained as part of the prefix
@@ -135,3 +138,21 @@ def add_local_role(object, userid, roleid):
     if roleid not in roles:
         roles.append(roleid)
         object.manage_setLocalRoles(userid, roles)
+
+def get_email_fullname(self, userid):
+    """Get full_name or userid, and email, from membership tool."""
+    mbrtool = getToolByName(self, 'portal_membership')
+    user = mbrtool.getMemberById(userid)
+    if user is not None:
+        email = None
+        name = userid
+        try: 
+            email = user.email
+            name = email.full_name
+        except AttributeError:
+            pass
+        if email:
+            if '.' in name or ',' in name:
+                name = '"%s"' % name
+            return (name or userid, email)
+    return (None, None)
