@@ -1,5 +1,9 @@
 1.1 beta
 
+ - Added ContentTypeRegistry class and related predicates for
+   mapping PUT requests (name,content_type,body) to type object
+   names.
+
  - Fixed a bug in CMFDefault.Document with PUT that only affected
    FTP: when a StructuredText document that contained a full HTML
    example (complete with <html>, <head>, and <body> tags) in its
