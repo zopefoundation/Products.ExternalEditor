@@ -106,6 +106,13 @@ class URLTool (UniqueObject, SimpleItem):
         '''
         return self.aq_inner.aq_parent.absolute_url()
 
+    getPortalObject = None
+    def getPortalObject( self ):
+        """
+            Return the portal object itself.
+        """
+        return self.aq_inner.aq_parent
+
     getRelativeUrl__roles__ = None
     def getRelativeUrl(self, content):
         """

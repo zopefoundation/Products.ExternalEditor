@@ -92,7 +92,7 @@ class Contentish:
     PortalContent implements this interface.
     """
     
-    def getIcon(self):
+    def getIcon(self, relative_to_portal=0):
         """
         This method returns the path to an object's icon. It is used 
         in the folder_contents view to generate an appropriate icon 
@@ -101,6 +101,10 @@ class Contentish:
         If the content item does not define an attribute named "icon"
         this method will return the path "/misc_/dtmldoc.gif", which is 
         the icon used for DTML Documents.
+
+        If 'relative_to_portal' is true, return only the portion of
+        the icon's URL which finds it "within" the portal;  otherwise,
+        return it as an absolute URL.
         """
 
     def listActions(self):

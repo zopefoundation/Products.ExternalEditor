@@ -34,6 +34,11 @@
 
  - Fixed display of replies on discussion items.
 
+ - Make appropriate use of 'portal_url', instead of ad hockery.
+
+ - Synch up interface definition of 'Contentish.getIcon' with
+   reality.
+
 1.0 final (2001/03/29)
 
  - Removed embedded spaces in 'portal_status_message' strings

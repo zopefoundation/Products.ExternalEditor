@@ -100,13 +100,6 @@ except ImportError: UNIQUE = 2
 
 _marker = []  # Create a new marker object.
 
-def getPortal(ob):
-    # This isn't as efficient as it could be.
-    while ob is not None:
-        if getattr(ob, '_isPortalRoot', 0):
-            return ob
-        ob = aq_parent(aq_inner(ob))
-
 def getToolByName(obj, name, default=_marker):
     " Get the tool, 'toolname', by acquiring it. "
     try:

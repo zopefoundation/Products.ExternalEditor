@@ -84,7 +84,7 @@
 ##############################################################################
 
 from AccessControl import ClassSecurityInfo
-from utils import getPortal, getToolByName
+from utils import getToolByName
 import Globals
 from urllib import quote
 
@@ -146,8 +146,8 @@ class DynamicType:
                     return icon
                 else:
                     # Need the full path to the icon.
-                    portal_url = getPortal(self).absolute_url(relative=1)
-                    return portal_url + '/' + icon
+                    portal_url = getToolByName( self, 'portal_url' )
+                    return portal_url() + '/' + icon
         return 'misc_/OFSP/dtmldoc.gif'
 
     security.declarePublic('icon')
