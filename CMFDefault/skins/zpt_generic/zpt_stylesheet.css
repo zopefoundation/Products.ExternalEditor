@@ -207,7 +207,12 @@ td {
     margin-right: 2pt;
 }
 
+#Permalink {
+    font-size: 80%;
+}
+
 #ContentByline {
+    margin-top: 8pt;
     font-size: 90%;
     font-style: italic;
 }

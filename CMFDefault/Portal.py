@@ -279,6 +279,7 @@ class PortalGenerator:
         p._setProperty('email_from_name', email_from_name, 'string')
         p._setProperty('validate_email', validate_email and 1 or 0, 'boolean')
         p._setProperty('default_charset', default_charset, 'string')
+        p._setProperty('enable_permalink', 0, 'boolean')
         p.title = title
         p.description = description
 
