@@ -5,34 +5,74 @@ The Zope Content Managment Framework
     - What is content management, what is unique about CMF, what's the
       future for the CMF
 
+    - Content and services, metadata, search, distributed control,
+      workflow, etc.
+
   Quickstart
 
-    Installing 
+    - A quick, hands-on tour of CMF features. 
 
-  Overview of Content Types
+  Using the CMF
 
-    - Site, Folder, Topic, Document, Image, etc.
+    - Accounts - how to create an account, log in, log out, etc.
 
-    - Remote authoring
+    - Getting around - how to use navigation, actions box, etc.
+
+    - Using Services - use of pubic services: search, discussion, etc.
+
+  Working with Content
+
+    - Overview of content - distributed authorship, distributed
+      through out site, ownership, catalogability, etc.
+
+    - Site, Folder, Topic, Document, Image, etc. Desribe what each
+      built-in content type is good for, how to create and edit them,
+      and other features (if applicable).
 
     - Formats (stx, html)
 
-  CMF Services
+    - Metadata - overview, why its important, and definition of the
+      various metadata fields.
 
-    - Skins, workflow, cataloging, syndication, discussion,
-      membership, versioning, personalization, authentication sources,
+    - Remote authoring - FTP & WebDAV. How to use various editors. How
+      to set metadata headers, how to handle errors, etc.
 
-  CMF Configuration
+  Configuring and Customizing the CMF
 
-    - security settings, default skins, reconfigure portal options,
-      editing selection of subjects, discussability, DAV, cookie
-      crumbler, virtual host monster, reviewers
+    - Overview of services - they are customizable and
+      configurable. 
 
-  Customizing Look and Feel
+      The following sections describe each service, including it
+      purpose and use.
+
+    - Basic configuration - Portal configuration stuff
+
+    - Look and Feel - Skins, Page Templates, etc.
+
+    - Workflow
+
+    - Search - cataloging
+
+    - Syndication
+
+    - Discussion,
+      
+    - Membership, (using various authentication sources)
+
+    - Versioning XXX fiction? XXX
+
+    - Personalization XXX fiction? XXX
 
   CMF Interfaces
 
+    - Overview of scripting CMF
+
+    - API docs for CMF tools and other scriptable objects. Should
+      include plenty of examples.
+
   Glossary
+
+    - XXX is this needed? XXX
 
   Notes
 
