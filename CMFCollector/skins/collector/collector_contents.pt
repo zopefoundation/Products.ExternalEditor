@@ -54,9 +54,10 @@
 
     <table class="FormLayout">
 
-      <tbody tal:repeat="item batch">
+      <tbody tal:repeat="itemnum python: range(len(batch))">
 
-        <tr tal:define="global itemattrs python:
+        <tr tal:define="global item python: batch[itemnum];
+                        global itemattrs python:
                                here.collector_issue_subject_attrs(item);
                         itemurl item/getURL;
                         itemtype item/Type|nothing;
@@ -101,6 +102,7 @@
           </td>
 
         </tr>
+
         <tr tal:define="numcmts python: int(itemattrs['action_number'])-1;
                         plrlcmts python: (numcmts != 1) and 's' or '';
                         numuploads python: int(itemattrs['upload_number']);
@@ -108,8 +110,12 @@
                         security python: int(itemattrs['security_related']);
                         confidential python: split(item.review_state, '_')[-1]
                                              == 'confidential'">
-          <td> </td>
-          <td> </td>
+          <td> <font color="gray"> # </font> </td>
+          <td>
+            <font color="gray">
+              <span tal:replace="python: itemnum + b_start + 1">#</span>
+            </font>
+          </td>
 
           <td NOWRAP colspan="2">
 
@@ -129,7 +135,8 @@
             </font>
 
             From
-            <span tal:replace="item/Creator|nothing">SUBMITTER ID</span>
+            <span tal:replace="item/Creator|nothing">SUBMITTER ID</span
+              ><span tal:condition="numcmts">,</span>
             <span tal:condition="not: item/Creator|nothing">
               <em>???</em></span>
 
@@ -144,7 +151,7 @@
               <span tal:replace="numuploads">NUM ARTIFACTS</span>
               upload<span tal:replace="plrluploads">S?
             </span></span><span tal:condition="itemattrs/assigned_to|nothing">,
-              Assigned to: 
+              Assigned: 
               <span tal:content="itemattrs/assigned_to">SUPPORTERS</span>
             </span>
           </td>
@@ -168,8 +175,8 @@
         </tr>
 
         <tr tal:condition="item/Description">
-          <td>
-          </td>
+          <td> </td>
+          <td> </td>
           <td colspan="7">
             <font color="gray"
                   tal:content="python: item.Description[:DESCRLEN]
@@ -206,28 +213,12 @@
                      value="TEXT"
                      tal:attributes="value request/SearchableText|nothing">
             </td>
-            <td align="center">
-              Security Related:
-              <table> <tr><td NOWRAP>
-              <input type="radio" name="security_related" value="2"
-                     tal:attributes="checked python:
-                                 request.get('security_related', '2') == '2'">
-                Either
-              <input type="radio" name="security_related" value="0"
-                     tal:attributes="checked python:
-                                 request.get('security_related', 'x') == '0'">
-                No
-              <input type="radio" name="security_related" value="1"
-                     tal:attributes="checked python:
-                                 request.get('security_related', 'x') == '1'">
-                Yes
-                </td></tr></table>
-            </td>
           </tr>
           <tr>
             <th align="center"> Status </th>
             <th align="center"> Requester</th>
             <th align="center"> Supporter </th>
+            <th align="center"> Security Related </th>
           </tr>
           <tr>
             <td align="center">
@@ -247,12 +238,14 @@
             <td align="center">
               <select name="Creator:list" multiple size="SIZE"
                       tal:define="values python: uniqueValuesFor('Creator')"
-                      tal:attributes="size python: min(max(len(values), 3), 5)">
+                      tal:attributes="size python: min(max(len(values), 3), 
+                                                       5)">
                 <span tal:repeat="creator values">
                   <option value=""
-                          tal:attributes="value creator;
-                                          selected python: creator
-                                                           in request.get('Creator', [])"
+                          tal:attributes="
+                              value creator;
+                              selected python: creator
+                                               in request.get('Creator', [])"
                           tal:content="creator">
                   </option>
                 </span>
@@ -261,17 +254,32 @@
             <td align="center">
               <select name="supporters:list" multiple size="SIZE"
                       tal:define="values python: here.supporters"
-                      tal:attributes="size python: min(max(len(values), 3), 5)">
+                      tal:attributes="size python: min(max(len(values), 3),
+                                                       5)">
                 <span tal:repeat="supporter values">
                   <option value=""
-                          tal:attributes="value supporter;
-                                          selected python: supporter 
-                                                           in request.get('supporters', [])"
+                          tal:attributes="
+                              value supporter;
+                              selected python: supporter 
+                                       in request.get('supporters', [])"
                           tal:content="supporter">
                   </option>
                 </span>
               </select>
             </td>
+            <td align="center">
+              <select name="security_related:list" size="3" multiple
+                      tal:define="was python: request.get('security_related',
+                                                          [])">
+                <option value="No"
+                        tal:attributes="selected python: 'No' in was">
+                  No </option>
+                <option value="Yes"
+                        tal:attributes="selected python: 'Yes' in was">
+                  Yes </option>
+              </select>
+            </td>
+
           </tr>
           <tr>
             <th align="center"> Topic </th>
@@ -286,9 +294,10 @@
                     tal:attributes="size python: min(max(len(values), 3), 5)">
                 <span tal:repeat="topic values">
                   <option value=""
-                          tal:attributes="value topic;
-                                          selected python: topic
-                                                           in request.get('topics', [])"
+                          tal:attributes="
+                              value topic;
+                              selected python: topic
+                                               in request.get('topics', [])"
                           tal:content="topic">
                   </option>
                 </span>
@@ -297,13 +306,15 @@
             <td align="center">
               <select name="classifications:list" multiple size="SIZE"
                       tal:define="values python: here.classifications"
-                      tal:attributes="size python: min(max(len(values), 3), 5)">
+                      tal:attributes="size python: min(max(len(values), 3),
+                                                       5)">
                 <span tal:repeat="classification values">
                   <option value=""
-                          tal:attributes="value classification;
-                                          selected python: classification
-                                                           in request.get('classifications',
-                                                                          [])"
+                          tal:attributes="
+                             value classification;
+                             selected python: classification
+                                              in request.get('classifications',
+                                                             [])"
                           tal:content="classification">
                   </option>
                 </span>
@@ -312,12 +323,15 @@
             <td align="center">
               <select name="importances:list" multiple size="SIZE"
                       tal:define="values python: here.importances"
-                      tal:attributes="size python: min(max(len(values), 3), 5)">
+                      tal:attributes="size python: min(max(len(values), 3), 
+                                                       5)">
                 <span tal:repeat="importance values">
                   <option value=""
-                          tal:attributes="value importance;
-                                          selected python: importance
-                                                           in request.get('importances',[])"
+                          tal:attributes="
+                              value importance;
+                              selected python: importance
+                                               in request.get('importances',
+                                                              [])"
                           tal:content="importance">
                   </option>
                 </span>
@@ -326,12 +340,15 @@
             <td align="center">
               <select name="severities:list" multiple size="SIZE"
                       tal:define="values python: here.severities"
-                      tal:attributes="size python: min(max(len(values), 3), 5)">
+                      tal:attributes="size python: min(max(len(values), 3), 
+                                                       5)">
                 <span tal:repeat="severity values">
                   <option value=""
-                          tal:attributes="value severity;
-                                          selected python: severity
-                                                           in request.get('severities', [])"
+                          tal:attributes="
+                              value severity;
+                              selected python: severity
+                                               in request.get('severities', 
+                                                              [])"
                           tal:content="severity">
                   </option>
                 </span>
