@@ -63,9 +63,9 @@ CMF TODO's
 
         (x) Tracker #475:  FDC has broken ZPT edit form
 
-      - ( ) STX Fixes (Seb Bacon)
+      - (x) STX Fixes (Seb Bacon)
 
-        ( ) Tracker #476:  STX gobbling paragraphs with parens
+        (/) Tracker #476:  STX gobbling paragraphs with parens
 
         (x) Tracker #514:  Document STX messing up anchors
 

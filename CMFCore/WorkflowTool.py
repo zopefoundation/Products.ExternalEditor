@@ -475,9 +475,11 @@ class WorkflowTool (UniqueObject, Folder):
 
     security.declarePrivate('getDefaultChainFor')
     def getDefaultChainFor(self, ob):
-        if getattr(ob, '_isPortalContent', 0):
-            # Apply a default workflow to portal content.
+        types_tool = getToolByName( self, 'portal_types', None )
+        if ( types_tool is not None
+            and types_tool.getTypeInfo( ob ) is not None ):
             return self._default_chain
+
         return ()
 
     security.declarePrivate('getChainFor')
@@ -486,7 +488,9 @@ class WorkflowTool (UniqueObject, Folder):
         Returns the chain that applies to the given object.
         '''
         cbt = self._chains_by_type
-        if hasattr(aq_base(ob), '_getPortalTypeName'):
+        if type(ob) == type(''):
+            pt = ob
+        elif hasattr(aq_base(ob), '_getPortalTypeName'):
             pt = ob._getPortalTypeName()
         else:
             pt = getattr( ob, 'meta_type', None )  # Use a common Zope idiom.

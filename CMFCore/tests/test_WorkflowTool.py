@@ -93,6 +93,11 @@ class DummyTypesTool( SimpleItem ):
 
     def listTypeInfo( self ):
         return [ DummyTypeInfo( 'DummyContent' ) ]
+
+    def getTypeInfo( self, ob ):
+        if getattr( ob, 'meta_type', None ) is 'DummyContent':
+            return DummyTypeInfo( 'DummyContent' )
+        return None
         
 
 class WorkflowToolTests( unittest.TestCase ):
@@ -123,10 +128,13 @@ class WorkflowToolTests( unittest.TestCase ):
         root._setObject( 'portal_types', tt )
         return root
 
+    def _makeWithTypes( self ):
+        root = self._makeRoot()
+        return self._makeOne( workflow_ids=( 'a', 'b' ) ).__of__( root )
+
     def _makeWithTypesAndChain( self ):
 
-        root = self._makeRoot()
-        tool = self._makeOne( workflow_ids=( 'a', 'b' ) ).__of__( root )
+        tool = self._makeWithTypes()
         tool.setChainForPortalTypes( ( 'DummyContent', ), ( 'a', 'b' ) )
         return tool
 
@@ -157,7 +165,7 @@ class WorkflowToolTests( unittest.TestCase ):
 
         from Products.CMFCore.WorkflowTool import WorkflowException
 
-        tool = self._makeOne( workflow_ids=( 'a', 'b' ) )
+        tool = self._makeWithTypes()
 
         wfids = tool.getWorkflowIds()
         self.assertEqual( len( wfids ), 2 )
@@ -174,14 +182,14 @@ class WorkflowToolTests( unittest.TestCase ):
 
     def test_nonContent( self ):
 
-        tool = self._makeOne( workflow_ids=( 'a', 'b' ) )
+        tool = self._makeWithTypesAndChain()
         self.assertEquals( len( tool.getDefaultChainFor( None ) ), 0 )
         self.assertEquals( len( tool.getChainFor( None ) ), 0 )
         self.assertEquals( len( tool.getCatalogVariablesFor( None ) ), 0 )
 
     def test_content_default_chain( self ):
 
-        tool = self._makeOne( workflow_ids=( 'a', 'b' ) )
+        tool = self._makeWithTypes()
         dummy = DummyContent( 'dummy' )
         self.assertEquals( len( tool.getDefaultChainFor( dummy ) ), 1 )
         self.assertEquals( len( tool.getChainFor( dummy ) ), 1 )

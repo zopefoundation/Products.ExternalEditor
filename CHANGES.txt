@@ -25,6 +25,9 @@ CMF 1.3 beta2 (2002/06/30)
 
   New Features
 
+    - Made the workflow tool compute chains using type names, as well
+      as instances (Tracker #441).
+
     - Made the DCWorkflow worklists accept a list of formatted values
       for cataloged variable matches. The separator is a semicolon
       (Tracker #496).
