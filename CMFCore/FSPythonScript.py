@@ -30,6 +30,12 @@ from CMFCorePermissions import ViewManagementScreens, View, FTPAccess
 from DirectoryView import registerFileExtension, registerMetaType, expandpath
 from FSObject import FSObject
 
+
+class bad_func_code:
+    co_varnames = ()
+    co_argcount = 0
+
+
 class FSPythonScript (FSObject, Script):
     """FSPythonScripts act like Python Scripts but are not directly
     modifiable from the management interface."""
@@ -52,7 +58,8 @@ class FSPythonScript (FSObject, Script):
     security.declareObjectProtected(View)
     security.declareProtected(View, 'index_html',)
     # Prevent the bindings from being edited TTW
-    security.declarePrivate('ZBindings_edit','ZBindingsHTML_editForm','ZBindingsHTML_editAction')
+    security.declarePrivate('ZBindings_edit','ZBindingsHTML_editForm',
+                            'ZBindingsHTML_editAction')
 
     security.declareProtected(ViewManagementScreens, 'manage_main')
     manage_main = Globals.DTMLFile('custpy', _dtmldir)
@@ -100,22 +107,24 @@ class FSPythonScript (FSObject, Script):
         f = self._v_f
         if f is None:
             # The script has errors.
+            __traceback_supplement__ = (
+                FSPythonScriptTracebackSupplement, self, 0)
             raise RuntimeError, '%s has errors.' % self._filepath
 
-        __traceback_info__ = bound_names, args, kw, self.func_defaults
-
+        # Updating func_globals directly is not thread safe here.
+        # In normal PythonScripts, every thread has its own
+        # copy of the function.  But in FSPythonScripts
+        # there is only one copy.  So here's another way.
+        new_globals = f.func_globals.copy()
+        new_globals['__traceback_supplement__'] = (
+            FSPythonScriptTracebackSupplement, self)
         if bound_names:
-            # Updating func_globals directly is not thread safe here.
-            # In normal PythonScripts, every thread has its own
-            # copy of the function.  But in FSPythonScripts
-            # there is only one copy.  So here's another way.
-            new_globals = f.func_globals.copy()
             new_globals.update(bound_names)
-            if f.func_defaults:
-                f = new.function(f.func_code, new_globals, f.func_name,
-                                 f.func_defaults)
-            else:
-                f = new.function(f.func_code, new_globals, f.func_name)
+        if f.func_defaults:
+            f = new.function(f.func_code, new_globals, f.func_name,
+                             f.func_defaults)
+        else:
+            f = new.function(f.func_code, new_globals, f.func_name)
 
         # Execute the function in a new security context.
         security=getSecurityManager()
@@ -191,7 +200,7 @@ class FSPythonScript (FSObject, Script):
             else:
                 # There were errors in the compile.
                 # No signature.
-                self.func_code = None
+                self.func_code = bad_func_code()
                 self.func_defaults = None
         self._body = ps._body
         self._params = ps._params
@@ -219,8 +228,30 @@ class FSPythonScript (FSObject, Script):
         return self.__dict__.get('title', None)
     title = ComputedAttribute(title, 1)
 
+    def getBindingAssignments(self):
+        # Override of the version in Bindings.py.
+        # This version ensures that bindings get loaded on demand.
+        if not hasattr(self, '_bind_names'):
+            # Set a default first to avoid recursion
+            self._setupBindings()
+            # Now do it for real
+            self._updateFromFS()
+        return self._bind_names
+
 
 Globals.InitializeClass(FSPythonScript)
+
+
+class FSPythonScriptTracebackSupplement:
+    """Implementation of ITracebackSupplement
+
+    Makes script-specific info available in exception tracebacks.
+    """
+    def __init__(self, script, line=-1):
+        self.object = script
+        # If line is set to -1, it means to use tb_lineno.
+        self.line = line
+
 
 registerFileExtension('py', FSPythonScript)
 registerMetaType('Script (Python)', FSPythonScript)
