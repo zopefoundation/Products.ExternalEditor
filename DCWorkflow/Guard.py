@@ -123,12 +123,12 @@ class Guard (Persistent, Explicit):
         s = props.get('guard_roles', None)
         if s:
             res = 1
-            r = [ permission.strip() for permission in s.split(';') ]
+            r = [ role.strip() for role in s.split(';') ]
             self.roles = tuple(r)
         s = props.get('guard_groups', None)
         if s:
             res = 1
-            g = [ permission.strip() for permission in s.split(';') ]
+            g = [ group.strip() for group in s.split(';') ]
             self.groups = tuple(g)
         s = props.get('guard_expr', None)
         if s:
