@@ -140,7 +140,7 @@ class RegistrationTool (RegistrationTool, ActionProviderBase):
     
         # assert that we can actually get an email address, otherwise
         # the template will be made with a blank To:, this is bad
-        if not member.getProperties('email'):
+        if not member.getProperty('email'):
             raise 'ValueError', 'That user does not have an email address.'
         
         # Rather than have the template try to use the mailhost, we will
