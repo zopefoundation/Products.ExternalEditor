@@ -58,13 +58,24 @@ class DynamicType:
 
     security.declarePublic('getTypeInfo')
     def getTypeInfo(self):
-        '''
-        Returns an object that supports the ContentTypeInformation interface.
-        '''
+        """ Get the TypeInformation object specified by the portal type.
+        """
         tool = getToolByName(self, 'portal_types', None)
         if tool is None:
             return None
         return tool.getTypeInfo(self)  # Can return None.
+
+    security.declarePublic('getActionInfo')
+    def getActionInfo(self, action_chain, check_visibility=0,
+                      check_condition=0):
+        """ Get an Action info mapping specified by a chain of actions.
+        """
+        ti = self.getTypeInfo()
+        if ti:
+            return ti.getActionInfo(action_chain, self, check_visibility,
+                                    check_condition)
+        else:
+            raise ValueError('No Action meets the given specification.')
 
     # Support for dynamic icons
 

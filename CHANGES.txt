@@ -2,6 +2,9 @@ CMF 1.5alpha (unreleased)
 
   New Features
 
+    - DynamicType: Added 'getActionInfo' method.
+      This is a shortcut to getActionInfo() of the related TypeInformation.
+
     - DublinCore: setModificationDate is now guarded by 'ModifyPortalContent'.
 
     - zpt skin: Reimplemented 'folder_contents'.

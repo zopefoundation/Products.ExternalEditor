@@ -25,12 +25,28 @@ except ImportError:
 class DynamicType(Interface):
     """ General interface for dynamic items.
     """
-    
-    def getIcon(relative_to_portal=0):
+
+    def getTypeInfo():
+        """ Get the TypeInformation object specified by the portal type.
+
+        A shortcut to 'getTypeInfo' of portal_types.
+
+        Permission -- Always available
         """
-        This method returns the path to an object's icon. It is used 
-        in the folder_contents view to generate an appropriate icon 
-        for the items found in the folder.
+
+    def getActionInfo(action_chain, check_visibility=0, check_condition=0):
+        """ Get an Action info mapping specified by a chain of actions.
+
+        A shortcut to 'getActionInfo' of the related TypeInformation object.
+
+        Permission -- Always available
+        """
+
+    def getIcon(relative_to_portal=0):
+        """ Get the path to an object's icon.
+        
+        This method is used in the folder_contents view to generate an
+        appropriate icon for the items found in the folder.
 
         If the content item does not define an attribute named "icon"
         this method will return the path "/misc_/dtmldoc.gif", which is 
@@ -39,4 +55,6 @@ class DynamicType(Interface):
         If 'relative_to_portal' is true, return only the portion of
         the icon's URL which finds it "within" the portal;  otherwise,
         return it as an absolute URL.
+
+        Permission -- Always available
         """
