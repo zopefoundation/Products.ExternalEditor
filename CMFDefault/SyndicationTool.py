@@ -57,7 +57,7 @@ class SyndicationTool (UniqueObject, SimpleItem, ActionProviderBase):
                   , condition=Expression(
                         text='python: folder is object')
                   , permissions=(ManageProperties,)
-                  , category='folder'
+                  , category='object'
                   , visible=1
                   )
                ,
