@@ -150,8 +150,9 @@
 
         <tr>
           <td> Other versions </td>
-          <td rowspan="2" metal:fill-slot="issue_other_versions_slot">
-            <textarea name="other_version_info" rows="2" cols="20"
+          <td rowspan="2" colspan="2"
+              metal:fill-slot="issue_other_versions_slot">
+            <textarea name="other_version_info" rows="2" cols="30"
                       tal:content="here/other_version_info">
 </textarea>
 
