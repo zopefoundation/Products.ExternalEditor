@@ -414,8 +414,8 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
             getSecurityManager(), self, ob):
             return default
         status = self._getStatusOf(ob)
-        if status is not None and status.has_key(id):
-            value = status[id]
+        if status is not None and status.has_key(name):
+            value = status[name]
 
         # Not set yet.  Use a default.
         elif vdef.default_expr is not None:

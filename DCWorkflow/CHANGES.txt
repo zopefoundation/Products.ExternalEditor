@@ -1,4 +1,8 @@
 
+Version 0.4.2
+
+- Fixed getInfoFor() using patch from Sebastien.Bigaret@inqual.com.  Thanks!
+
 Version 0.4.1
 
 - Corrected an expression in the classic workflow implementation.
