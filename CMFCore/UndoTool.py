@@ -22,7 +22,7 @@ from utils import getToolByName, _dtmldir
 from OFS.SimpleItem import SimpleItem
 from Globals import InitializeClass, DTMLFile
 from string import split
-from AccessControl import ClassSecurityInfo
+from AccessControl import ClassSecurityInfo, Unauthorized
 from Expression import Expression
 from ActionInformation import ActionInformation
 from ActionProviderBase import ActionProviderBase
@@ -91,12 +91,30 @@ class UndoTool (UniqueObject, SimpleItem, ActionProviderBase):
                 transactions
                 )
         return transactions
-        
 
-    security.declareProtected(UndoChanges, 'undo')
+    security.declarePublic('undo')
     def undo(self, object, transaction_info):
-        '''Performs an undo operation.
-        '''
+        """
+            Undo the list of transactions passed in 'transaction_info',
+            first verifying that the current user is allowed to undo them.
+        """
+        # Belt and suspenders:  make sure that the user is actually
+        # allowed to undo the transation(s) in transaction_info.
+
+        xids = {}  # set of allowed transaction IDs
+
+        allowed = self.listUndoableTransactionsFor( object )
+
+        for xid in map( lambda x: x['id'], allowed ):
+            xids[xid] = 1
+
+        if type( transaction_info ) == type( '' ):
+            transaction_info = [ transaction_info ]
+
+        for tinfo in transaction_info:
+            if not xids.get( tinfo, None ):
+                raise Unauthorized
+
         object.manage_undo_transactions(transaction_info)
 
 
