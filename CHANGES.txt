@@ -57,6 +57,10 @@ HEAD only (unreleased)
 
   Others
 
+    - CMFCore.FSPropertiesObject: This module has not only been superceded by
+      CMFCore.FSMetadata, it's actually completely unused in both CMF and
+      Plone CVS HEAD. RIP FSPropertiesObject.
+
     - CMFDefault: Oldstyle DefaultWorkflowDefinition is no longer registered.
       So you can't accidentally add this deprecated workflow.
 

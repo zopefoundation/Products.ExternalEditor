@@ -22,7 +22,7 @@ import MembershipTool, WorkflowTool, CatalogTool, DiscussionTool
 import ActionsTool, UndoTool, RegistrationTool, SkinsTool
 import MemberDataTool, TypesTool
 import URLTool
-import DirectoryView, FSImage, FSFile, FSPropertiesObject
+import DirectoryView, FSImage, FSFile
 import FSDTMLMethod, FSPythonScript, FSSTXMethod
 import FSPageTemplate
 import FSZSQLMethod
@@ -141,8 +141,6 @@ def initialize(context):
                        'images/fsfile.gif', globals())
     utils.registerIcon(FSPageTemplate.FSPageTemplate,
                        'images/fspt.gif', globals())
-    utils.registerIcon(FSPropertiesObject.FSPropertiesObject,
-                       'images/fsprops.gif', globals())
     utils.registerIcon(FSZSQLMethod.FSZSQLMethod,
                        'images/fssqlmethod.gif', globals())
 
