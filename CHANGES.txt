@@ -43,3 +43,6 @@ Future
     - Fixed CalendarTool to use portal_type and not Type to search for
       events in the catalog (Collector #28, thanks to Heimo Laukkanen
       for the report).
+
+    - Fixed a bug in CalendarTool where events were not showing on the
+      last day of the month.
