@@ -19,7 +19,7 @@
 
 __version__ = '0.5'
 
-import sys, os
+import sys, os, re
 import traceback
 from tempfile import mktemp
 from ConfigParser import ConfigParser
@@ -314,17 +314,41 @@ class ExternalEditor:
         launch_success = 0
         last_mtime = os.path.getmtime(self.content_file)
         command = self.getEditorCommand()
-        
+
+        # Extract the executable name from the command
         if win32:
-            file_insert = '%1'
+            if command.find('\\') != -1:
+                bin = re.search(r'\\([^\.\\]+)\.exe', command.lower())
+                if bin is not None:
+                    bin = bin.group(1)
+            else:
+                bin = command.strip()
         else:
-            file_insert = '$1'
-            
-        if command.find(file_insert) > -1:
-            command = command.replace(file_insert, self.content_file)
-        else:
-            command = '%s %s' % (command, self.content_file)
-        editor = EditorProcess(command)
+            bin = None # TODO Add Unix command extraction
+
+        if bin is not None:
+            # Try to load the plugin for this editor
+            try:
+                module = 'Plugins.%s' % bin
+                Plugin = __import__(module, globals(), locals(), 
+                                    ('EditorProcess',))
+                editor = Plugin.EditorProcess(self.content_file)
+            except (ImportError, AttributeError):
+                bin = None
+
+        if bin is None: 
+            # Use the standard EditorProcess class for this editor
+            if win32:
+                file_insert = '%1'
+            else:
+                file_insert = '$1'
+                
+            if command.find(file_insert) > -1:
+                command = command.replace(file_insert, self.content_file)
+            else:
+                command = '%s %s' % (command, self.content_file)
+
+            editor = EditorProcess(command)
         
         if use_locks:
             self.lock()

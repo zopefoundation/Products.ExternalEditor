@@ -1,5 +1,9 @@
 External Editor Change Log
 
+    - Added HomeSite plugin (win32)
+
+    - Added win32 editor plugin support for the helper application.
+
   8/19/02 - 0.5 Release
 
     - Added patch for Zope find template so that you can use external editor
