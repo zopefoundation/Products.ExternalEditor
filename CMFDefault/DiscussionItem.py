@@ -340,10 +340,7 @@ class DiscussionItemContainer( Persistent, Implicit, Traversable ):
         """
             Test to see if there are any dicussion items
         """
-        if len(self._container) == 0:
-            return 0
-
-        return len( self._getReplyResults() )
+        return len( self._container )
 
     security.declareProtected( CMFCorePermissions.View, 'getReplies' )
     def getReplies( self ):
