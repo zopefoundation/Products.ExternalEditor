@@ -19,8 +19,8 @@ from sys import modules
 
 from Products.CMFCore import utils
 
-import Products.CMFUid.UniqueIdGeneratorTool
-import Products.CMFUid.UniqueIdHandlerTool
+import UniqueIdGeneratorTool
+import UniqueIdHandlerTool
 
 tools = (
     UniqueIdGeneratorTool.UniqueIdGeneratorTool,
