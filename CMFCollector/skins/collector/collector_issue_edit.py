@@ -8,6 +8,7 @@ REQGET = context.REQUEST.get
 was_security_related = context.security_related
 
 changed = context.edit(title=REQGET('title'),
+                       submitter_id=REQGET('submitter_id', None),
                        submitter_name=REQGET('submitter_name', None),
                        submitter_email=REQGET('submitter_email', None),
                        security_related=REQGET('security_related', 0),
