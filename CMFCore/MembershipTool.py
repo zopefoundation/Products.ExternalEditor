@@ -138,7 +138,7 @@ class MembershipTool(UniqueObject, Folder, ActionProviderBase):
                     u.roles.append(portal_role)
 
         mdtool = getToolByName(self, 'portal_memberdata', None)
-        if mdtool:
+        if mdtool is not None:
             try:
                 u = mdtool.wrapUser(u)
             except ConflictError:
@@ -486,7 +486,7 @@ class MembershipTool(UniqueObject, Folder, ActionProviderBase):
 
         # Delete member data in portal_memberdata.
         mdtool = getToolByName(self, 'portal_memberdata', None)
-        if mdtool:
+        if mdtool is not None:
             for member_id in member_ids:
                 mdtool.deleteMemberData(member_id)
 
