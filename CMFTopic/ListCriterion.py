@@ -88,7 +88,7 @@ Declare list criterion class.
 from AccessControl import ClassSecurityInfo
 from Topic import Topic
 from AbstractCriterion import AbstractCriterion
-import Globals, string, interfaces
+import Globals, string, interfaces, operator
 
 from Products.CMFCore import CMFCorePermissions
 import TopicPermissions
@@ -129,7 +129,9 @@ class ListCriterion(AbstractCriterion):
     security.declareProtected(CMFCorePermissions.View, 'getCriteriaItems')
     def getCriteriaItems(self):
         """ Used by Topic.buildQuery to construct catalog queries """
-        return self.value is not None and ((self.field, self.value),) or ()
+        # filter out empty strings
+        value = tuple(filter(operator.truth, self.value)) 
+        return operator.truth(value) and ((self.field, self.value),) or ()
 
 
 

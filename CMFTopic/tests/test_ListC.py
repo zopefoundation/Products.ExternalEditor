@@ -1,7 +1,7 @@
 import unittest
-import Products.PTKTopic.ListCriterion
+import Products.CMFTopic.ListCriterion
 
-LISTC = Products.PTKTopic.ListCriterion.ListCriterion
+LISTC = Products.CMFTopic.ListCriterion.ListCriterion
 
 
 class TestCase( unittest.TestCase ):
@@ -14,19 +14,22 @@ class TestCase( unittest.TestCase ):
         pass
     
     def test_Empty( self ):
-        listc = LISTC( 'foo' )
+        listc = LISTC('foo', 'foofield')
         assert listc.id == 'foo'
-        assert listc.value == None
-        assert len( listc.getCriteriaItems() ) == 0
+        assert listc.field == 'foofield'
+        assert listc.value == ('',)
+        assert len(listc.getCriteriaItems()) == 0
     
     def test_Nonempty( self ):
-        listc = LISTC( 'foo', 'bar\nbaz' )
+        listc = LISTC( 'foo', 'foofield' )
+        listc.edit('bar\nbaz')
         assert listc.id == 'foo'
+        assert listc.field == 'foofield'
         assert listc.value == ( 'bar', 'baz' )
         items =listc.getCriteriaItems()
         assert len( items ) == 1
         assert len( items[0] ) == 2
-        assert items[0][0] == 'foo'
+        assert items[0][0] == 'foofield'
         assert items[0][1] == ( 'bar', 'baz' )
         abc = [ 'a', 'b', 'c' ]
         listc.edit( abc )

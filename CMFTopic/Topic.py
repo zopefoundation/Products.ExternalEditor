@@ -146,13 +146,11 @@ class Topic( PortalFolder ):
     acquireCriteria = 1
     _criteriaTypes = []
 
-    TOPIC_ACTION = 'manage_addProduct/CMFTopic/manage_addPortalTopicForm'
-    topicMetatype = ({ 'name'         : meta_type,
-                       'action'       : TOPIC_ACTION,
-                       'permission'   : TopicPermissions.AddTopics,
-                       },
-                     )
-
+##    topicMetatype = ({ 'name'         : meta_type,
+##                       'action'       : TOPIC_ACTION,
+##                       'permission'   : TopicPermissions.AddTopics,
+##                       },
+##                     )
 
     def _criteria_metatype_ids(self):
         result = []

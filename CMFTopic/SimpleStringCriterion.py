@@ -122,7 +122,7 @@ class SimpleStringCriterion(AbstractCriterion):
     security.declareProtected(CMFCorePermissions.View, 'getCriteriaItems')
     def getCriteriaItems( self ):
         """ Return a sequence of criteria items, used by Topic.buildQuery """
-        return self.value is not None and ((self.field, self.value),) or ()
+        return self.value is not '' and ((self.field, self.value),) or ()
 
 
 Globals.InitializeClass(SimpleStringCriterion)

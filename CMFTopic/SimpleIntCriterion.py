@@ -88,7 +88,7 @@
 from AbstractCriterion import AbstractCriterion
 from AccessControl import ClassSecurityInfo
 from Topic import Topic
-import Globals, interfaces
+import Globals, interfaces, string
 
 from Products.CMFCore import CMFCorePermissions
 import TopicPermissions
@@ -119,14 +119,17 @@ class SimpleIntCriterion(AbstractCriterion):
         return 'sic_edit'
 
     security.declareProtected(TopicPermissions.ChangeTopics, 'edit')
-    def edit(self, value, direction=''):
+    def edit(self, value, direction=None):
         """ Update the value we match against. """
         if type(value) == type('') and (not string.strip(value)):
             # An empty string was passed in, which evals to None
             self.value = self.direction = None
-        else:
+        elif direction:
             self.value = int(value)
             self.direction = direction
+        else:
+            self.value = int(value)
+            self.direction = None
 
     security.declareProtected(CMFCorePermissions.View, 'getCriteriaItems')
     def getCriteriaItems(self):
