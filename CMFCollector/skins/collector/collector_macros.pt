@@ -208,7 +208,7 @@
          </tr>
 
          <tr tal:condition="here/assigned_to">
-           <td>Assigned to:</td>
+           <td align="right">Assigned:</td>
            <td colspan="3">
              <span tal:content="python: ', '.join(here.assigned_to())">
                SUPPORTERS</span>
@@ -296,8 +296,8 @@
                           found python: len(items)">
             <b>
               <span tal:condition="python: batch.start != batch.end"
-                    tal:replace="python: '%s=>%s of'
-                                   % (batch.start, batch.end)">X=>X of</span>
+                    tal:replace="python: '%s to %s of'
+                                   % (batch.start, batch.end)">X to X of</span>
               <span tal:condition="python: batch.start == batch.end"
                     tal:replace="python: '%s of'
                                    % (batch.start)">X of</span>
