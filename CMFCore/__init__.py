@@ -171,8 +171,11 @@ def initialize(context):
     utils.registerIcon(TypesTool.ScriptableTypeInformation,
                        'images/typeinfo.gif', globals())
 
-    context.registerHelpTitle( 'CMF Core Help' )
-    context.registerHelp(directory='interfaces')
+    try:
+        context.registerHelpTitle( 'CMF Core Help' )
+        context.registerHelp(directory='interfaces')
+    except: # AARGH!!
+        pass
 
     utils.ToolInit( 'CMF Core Tool'
                   , tools=tools
