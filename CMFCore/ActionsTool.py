@@ -158,6 +158,17 @@ class ActionsTool(UniqueObject, OFS.Folder.Folder, ActionProviderBase):
     #
     #   'portal_actions' interface methods
     #
+
+    def _listActions(self,append,object,info,ec):
+        a = object.listActions(info)
+        if a and type(a[0]) is not type({}):
+            for ai in a:
+                if ai.testCondition(ec):
+                    append(ai.getAction(ec))
+        else:
+            for i in a:
+                append(i)
+        
     security.declarePublic('listFilteredActionsFor')
     def listFilteredActionsFor(self, object=None):
         '''Gets all actions available to the user and returns a mapping
@@ -177,23 +188,13 @@ class ActionsTool(UniqueObject, OFS.Folder.Folder, ActionProviderBase):
                 else:
                     folder = aq_parent(aq_inner(folder))
         ec = createExprContext(folder, portal, object)
-        ai_objs = []
         actions = []
+        append = actions.append
         info = oai(self, folder, object)
         # Include actions from specific tools.
         for provider_name in self.listActionProviders():
             provider = getattr(self, provider_name)
-            a = provider.listActions(info)
-            if a and type(a[0]) is not type({}):
-                ai_objs.extend(list(a))
-            else:
-                for i in a: 
-                    actions.append(i)
-
-        if ai_objs:
-            for ai in ai_objs:
-                if ai.testCondition(ec):
-                    actions.append(ai.getAction(ec))
+            self._listActions(append,provider,info,ec)
 
         # Include actions from object.
         if object is not None:
@@ -217,11 +218,10 @@ class ActionsTool(UniqueObject, OFS.Folder.Folder, ActionProviderBase):
                             'permissions': d['permissions'],
                             'category': d.get('category', 'object'),
                             'visible': d.get('visible', 1),
-                            })
+                            })                
             if hasattr(base, 'listActions'):
-                a = object.listActions(info)
-                if a:
-                    actions.extend(list(a))
+                self._listActions(append,object,info,ec)
+                
 
         # Reorganize the actions by category,
         # filtering out disallowed actions.

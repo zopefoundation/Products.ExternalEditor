@@ -46,6 +46,10 @@ New Features
 
 Bugs Fixed
 
+  - Allowed the ActionsTool to gracefully handle objects
+    which return ActionInformation objects. Thanks to 
+    Andy Dawkins for the analysis. (Tracker #457)
+
   - Made workflow Expressions use the correct ModuleImporter
     so that they operate correctly in their restricted 
     environment. Thanks to Dieter Maurer for the patch.
