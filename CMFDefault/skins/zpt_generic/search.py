@@ -1,24 +1,19 @@
-## Script (Python) "search_results_control"
-##bind container=container
-##bind context=context
-##bind namespace=
-##bind script=script
-##bind subpath=traverse_subpath
-##parameters=b_start=0, **kw
-##title=
+##parameters=b_start=0
 ##
 from Products.PythonScripts.standard import thousands_commas
 from ZTUtils import Batch
 from Products.CMFCore.utils import getToolByName
+
 ctool = getToolByName(script, 'portal_catalog')
 utool = getToolByName(script, 'portal_url')
 portal_url = utool()
 epoch = DateTime('1970/01/01 00:00:01 GMT')
 
 
-control = {}
+options = {}
 
 target = '%s/search' % portal_url
+kw = context.REQUEST.form.copy()
 for k, v in kw.items():
     if k in ('review_state', 'Title', 'Subject', 'Description', 'portal_type',
              'listCreators'):
@@ -32,7 +27,7 @@ for k, v in kw.items():
         else:
             # work around problems with DateTime in records
             kw[k] = v.copy()
-    elif k in ('go', 'go.x', 'go.y'):
+    elif k in ('go', 'go.x', 'go.y', 'b_start'):
             del kw[k]
 items = ctool.searchResults(kw)
 batch_obj = Batch(items, 25, b_start, orphan=1)
@@ -41,8 +36,8 @@ summary = { 'length': length and thousands_commas(length) or '',
             'type': (length == 1) and 'item' or 'items',
             'match': kw.get('SearchableText') }
 navigation = context.getBatchNavigation(batch_obj, target, **kw)
-control['batch'] = { 'summary': summary,
+options['batch'] = { 'summary': summary,
                      'listItemBrains': batch_obj,
                      'navigation': navigation }
 
-return control
+return context.search_results_template(**options)

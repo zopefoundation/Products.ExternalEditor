@@ -1,18 +1,15 @@
-<tal:page
-   xmlns:tal="http://xml.zope.org/namespaces/tal"
-   xmlns:metal="http://xml.zope.org/namespaces/metal"
-   tal:define="control python: here.search_results_control(**request.form)"
-   tal:condition="control"
-><html metal:use-macro="here/main_template/macros/master">
+<html metal:use-macro="context/main_template/macros/master">
 <body>
 
-<metal:block metal:fill-slot="main"
-   tal:define="batch control/batch">
-<div class="Desktop" i18n:domain="cmf_default">
+<metal:slot metal:fill-slot="header" i18n:domain="cmf_default">
+<h1 i18n:translate="">Search Results</h1>
+</metal:slot>
 
-<h2 i18n:translate="">Search Results</h2>
+<metal:slot metal:fill-slot="main" i18n:domain="cmf_default"
+   tal:define="batch options/batch">
+<div class="Desktop">
 
-<metal:block metal:use-macro="here/batch_widgets/macros/summary" />
+<metal:macro metal:use-macro="context/batch_widgets/macros/summary" />
 <table class="SearchResults" tal:condition="batch/listItemBrains">
  <thead>
   <tr>
@@ -51,10 +48,10 @@
   </tr>
  </tbody>
 </table>
-<metal:block metal:use-macro="here/batch_widgets/macros/navigation" />
+<metal:macro metal:use-macro="context/batch_widgets/macros/navigation" />
 
 </div>
-</metal:block>
+</metal:slot>
 
 </body>
-</html></tal:page>
+</html>

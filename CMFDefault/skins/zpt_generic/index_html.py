@@ -1,10 +1,10 @@
-## Script (Python) "index_html_control"
 ##parameters=b_start=0
-##title=
 ##
 from ZTUtils import Batch
 
-control = {}
+options = {}
+
+options['has_local'] = 'local_pt' in context.objectIds()
 
 key, reverse = context.getDefaultSorting()
 items = context.listFolderContents()
@@ -13,7 +13,7 @@ batch_obj = Batch(items, 25, b_start, orphan=0)
 listItemInfos = context.getBatchItemInfos(batch_obj)
 target = context.getActionInfo('object/view')['url']
 navigation = context.getBatchNavigation(batch_obj, target)
-control['batch'] = { 'listItemInfos': listItemInfos,
+options['batch'] = { 'listItemInfos': listItemInfos,
                      'navigation': navigation }
 
-return control
+return context.index_html_template(**options)
