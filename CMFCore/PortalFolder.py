@@ -131,13 +131,13 @@ class PortalFolder( Folder, DynamicType ):
     #
     #   Each module defining a PortalContent derivative registers here.
     #
-    FOLDER_ACTION = 'manage_addProduct/CMFCore/manage_addPortalFolderForm'
-    content_meta_types = ( { 'name'         : 'Portal Folder'
-                           , 'action'       : FOLDER_ACTION
-                           , 'permission'   : 'Add portal folders'
-                           }
-                         ,
-                         )
+##    FOLDER_ACTION = 'manage_addProduct/CMFCore/manage_addPortalFolderForm'
+##    content_meta_types = ( { 'name'         : 'Portal Folder'
+##                           , 'action'       : FOLDER_ACTION
+##                           , 'permission'   : 'Add portal folders'
+##                           }
+##                         ,
+##                         )
 
     def __init__( self, id, title='' ):
         self.id = id
@@ -147,9 +147,9 @@ class PortalFolder( Folder, DynamicType ):
         names = {}
         types = []
 
-        for cmt in self.content_meta_types:
-            names[ cmt[ 'name' ] ] = 1
-            types.append( cmt )
+##        for cmt in self.content_meta_types:
+##            names[ cmt[ 'name' ] ] = 1
+##            types.append( cmt )
 
         superTypes = PortalFolder.inheritedAttribute(
             'all_meta_types' )( self )
@@ -197,60 +197,62 @@ class PortalFolder( Folder, DynamicType ):
             return self.folder_contents(
                 self, REQUEST, portal_status_message="Folder added")
     
-
-    security.declarePublic('getIcon')
-    def getIcon(self):
-        """
-          Return the correct icon file
-        """
-        return getattr(self, 'icon', '/misc_/OFSP/Folder_icon.gif')
-
     security.declarePublic('listContentTypes')
-    def listContentTypes(self):
+    def listContentTypes(self, by_meta_type=0):
         """
            List all registered portal content types.
         """
         mtSet = {}
         for info in getToolByName(self, 'portal_types').listTypeInfo():
-            mtSet[info.Metatype()] = 1
+            if by_meta_type:
+                mtSet[info.Metatype()] = 1
+            else:
+                mtSet[info.Type()] = 1
         return mtSet.keys()
 
     def _morphSpec(self, spec):
+        '''
+        spec is a sequence of meta_types, a string containing one meta type,
+        or None.  If spec is empty or None, returns all contentish
+        meta_types.  Otherwise ensures all of the given meta types are
+        contentish.
+        '''
         new_spec = []
-        types = self.listContentTypes()
+        types = self.listContentTypes(1)
         if spec is not None:
             if type(spec) == type(''):
                 spec = [spec]
             for meta_type in spec:
                 if not meta_type in types:
-                    raise 'PortalFolderError', ('%s is not a content type'
-                                                 % meta_type )
+                    raise ValueError, ('%s is not a content type'
+                                       % meta_type )
                 new_spec.append(meta_type)
         return new_spec or types
     
-    def _filteredItems( self, ids, kw, REQUEST=None ):
+    def _filteredItems( self, ids, filter ):
         """
-            Use 'kw' as filter on child objects indicated by 'ids',
+            Apply filter, a mapping, to child objects indicated by 'ids',
             returning a sequence of ( id, obj ) tuples.
         """
-        if REQUEST is not None:
-            for key,value in REQUEST.items():
-                if not kw.has_key(key):
-                    kw[key] = value
-        query = apply( ContentFilter, (), kw )
+        query = apply( ContentFilter, (), filter )
         result = []
         append = result.append
         get = self._getOb
+        always_incl_folders = not filter.get('FilterIncludesFolders', 0)
         for id in ids:
             obj = get( id )
-            if ((hasattr(obj, 'Type') and obj.Type() == 'Portal Folder'
-                 and not REQUEST.get('FilterIncludesFolders', 0))
-                or query( obj )):
-                append( ( id, obj ) )
+            include = 0
+            if (always_incl_folders and hasattr(obj, 'meta_type') and
+                obj.meta_type == PortalFolder.meta_type):
+                include = 1
+            elif query(obj):
+                include = 1
+            if include:
+                append( (id, obj) )
         return result
 
     security.declarePublic('contentIds')
-    def contentIds( self, spec=None, REQUEST=None, **kw ):
+    def contentIds( self, spec=None, filter=None):
         """
             Provide a filtered view onto 'objectIds', allowing only
             PortalFolders and PortalContent-derivatives to show through.
@@ -261,79 +263,71 @@ class PortalFolder( Folder, DynamicType ):
         spec = self._morphSpec( spec )
         ids = self.objectIds( spec )
 
-        if not kw and not REQUEST:
+        if not filter:
             return ids
-        
+
         return map( lambda item: item[0],
-                    self._filteredItems( ids, kw, REQUEST ) )
+                    self._filteredItems( ids, filter ) )
 
     security.declarePublic('contentValues')
-    def contentValues( self, spec=None, REQUEST=None, **kw ):
+    def contentValues( self, spec=None, filter=None ):
         """
             Provide a filtered view onto 'objectValues', allowing only
             PortalFolders and PortalContent-derivatives to show through.
         """
         spec = self._morphSpec( spec )
-        if not kw and not REQUEST:
+        if not filter:
             return self.objectValues( spec )
 
         ids = self.objectIds( spec )
         return map( lambda item: item[1],
-                    self._filteredItems( ids, kw, REQUEST ) )
+                    self._filteredItems( ids, filter ) )
 
     security.declarePublic('contentItems')
-    def contentItems( self, spec=None, REQUEST=None, **kw ):
+    def contentItems( self, spec=None, filter=None ):
         """
             Provide a filtered view onto 'objectItems', allowing only
             PortalFolders and PortalContent-derivatives to show through.
         """
         spec = self._morphSpec( spec )
-        if not kw and not REQUEST:
+        if not filter:
             return self.objectItems( spec )
 
         ids = self.objectIds( spec )
-        return self._filteredItems( ids, kw, REQUEST )
+        return self._filteredItems( ids, filter )
 
     security.declareProtected(View, 'Type')
     def Type( self ):
         """
              Implement dublin core type
         """
+        ti = self.getTypeInfo()
+        if ti is not None:
+            return ti.Type()
         return self.meta_type
 
-    def createFilterString( self, decoded ):
-        """
-            Build Filter string for cookie munging from the REQUEST variables.
-        """
-        encoded = string.strip(base64.encodestring( marshal.dumps( decoded )))
-        encoded = string.join(string.split(encoded, '\n'), '')
-        return encoded
-
-    security.declarePublic('parseFilterString')
-    def parseFilterString( self, REQUEST=None ):
+    security.declarePublic('encodeFolderFilter')
+    def encodeFolderFilter(self, REQUEST):
         """
             Parse cookie string for using variables in dtml.
         """
-        if REQUEST is None:
-			REQUEST = {}
-        # Set up defaults.
-        decoded = { 'open': 0
-                  , 'Subject': ''
-                  , 'Type': []
-                  }
-        # Parse the cookie
-        if REQUEST.has_key('folderfilter'):
-            decoded.update(marshal.loads(
-                base64.decodestring(REQUEST['folderfilter'])))
-        # Update the REQUEST (only if it doesn't have the key!).
-        for key in ( 'open', 'Subject', 'Type' ):
-            if REQUEST.has_key( key ) and (
-                type(REQUEST[key]) in [type(""), type([]), type(1)]):
-                decoded[ key ] = REQUEST[ key ]
-            else:
-                REQUEST[ key ] = decoded[ key ]
-        # Make the cookie.
-        REQUEST['encoded'] = self.createFilterString(decoded)
+        filter = {}
+        for key, value in REQUEST.items():
+            if key[:10] == 'filter_by_':
+                filter[key[10:]] = value
+        encoded = string.strip(base64.encodestring( marshal.dumps( filter )))
+        encoded = string.join(string.split(encoded, '\n'), '')
+        return encoded
+
+    security.declarePublic('decodeFolderFilter')
+    def decodeFolderFilter(self, encoded):
+        """
+            Parse cookie string for using variables in dtml.
+        """
+        filter = {}
+        if encoded:
+            filter.update(marshal.loads(base64.decodestring(encoded)))
+        return filter
 
     def PUT_factory( self, name, typ, body ):
         """
@@ -348,12 +342,13 @@ class PortalFolder( Folder, DynamicType ):
         return obj
 
     security.declareProtected(AddPortalContent, 'invokeFactory')
-    def invokeFactory(self, type_name, id, RESPONSE=None):
+    def invokeFactory(self, type_name, id, RESPONSE=None, *args, **kw):
         '''
         Invokes the portal_types tool.
         '''
         pt = getToolByName(self, 'portal_types')
-        pt.constructContent(type_name, self, id, RESPONSE)
+        apply(pt.constructContent, (type_name, self, id, RESPONSE) + args,
+              kw)
 
     def _checkId(self, id, allow_dup=0):
         PortalFolder.inheritedAttribute('_checkId')(self, id, allow_dup)
@@ -506,7 +501,7 @@ class ContentFilter:
         Converts Subject string into a List for content filter view.
         """
         for sub in obj.Subject():
-            if sub in self.Subject:
+            if sub in self.filterSubject:
                 return 1
         return 0
 
@@ -517,7 +512,7 @@ class ContentFilter:
             try:
                 if not predicate( content ):
                     return 0
-            except:
+            except: # XXX
                 return 0
         
         return 1
@@ -525,7 +520,8 @@ class ContentFilter:
     def __str__( self ):
         """
         """
-        return "Subject: %s; Type: %s" % ( self.filterSubject, self.filterType )
+        return "Subject: %s; Type: %s" % ( self.filterSubject,
+                                           self.filterType )
 
 def absattr(attr):
     if callable(attr): return attr()

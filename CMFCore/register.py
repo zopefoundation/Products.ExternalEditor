@@ -111,7 +111,9 @@ def registerPortalContent(instance_class,
 
     icon is the name of an image file to use as the document's icon
     """
+    return
 
+if 0:
     meta_type = meta_type or getattr(instance_class, 'meta_type', '')
     
     if constructors:
