@@ -15,7 +15,8 @@
 
 <form action="document_edit" method="post" enctype="multipart/form-data">
 
- <input type="hidden" name="SafetyBelt" value="&dtml-SafetyBelt;">
+ <input type="hidden" name="SafetyBelt" value=""
+        tal:attributes="value here/SafetyBelt">
 
 <table class="FormLayout">
  <tr>
