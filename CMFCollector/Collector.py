@@ -77,7 +77,7 @@ class Collector(SkinnedFolder):
                                'feature', 'feature+solution',
                                'doc', 'test']
     DEFAULT_VERSION_INFO_SPIEL = (
-        "Pertinent version details, including related systems like browser,"
+        "Version details; also include related info like browser,"
         " webserver, database, python, OS, etc.")
     version_info_spiel = DEFAULT_VERSION_INFO_SPIEL
 
@@ -160,8 +160,9 @@ class Collector(SkinnedFolder):
     def add_issue(self,
                   title=None,
                   description=None,
-                  submitter=None,
                   security_related=None,
+                  submitter_name=None,
+                  submitter_email=None,
                   kibitzers=None,
                   topic=None,
                   importance=None,
@@ -178,7 +179,8 @@ class Collector(SkinnedFolder):
                           title=title,
                           description=description,
                           submitter_id=submitter_id,
-                          submitter_name=submitter,
+                          submitter_name=submitter_name,
+                          submitter_email=submitter_email,
                           kibitzers=kibitzers,
                           topic=topic,
                           classification=classification,
@@ -219,6 +221,8 @@ class Collector(SkinnedFolder):
             x = filter(None, managers)
             if not self.managers:
                 changes.append("(Managers set must be non-empty)")
+                # Somehow we arrived here with self.managers empty - reinstate
+                # at least the owner, if any found, else the current manager.
                 owners = self.users_with_local_role('Owner')
                 if owners:
                     x.extend(owners)
@@ -390,7 +394,7 @@ InitializeClass(CollectorCatalog)
 
 
 # XXX Enable use of pdb.set_trace() in python scripts
-ModuleSecurityInfo('pdb').declarePublic('set_trace')
+#ModuleSecurityInfo('pdb').declarePublic('set_trace')
 
 def addCollector(self, id, title='', description='', abbrev='',
                  topics=None, classifications=None, importances=None, 
@@ -409,12 +413,13 @@ def addCollector(self, id, title='', description='', abbrev='',
     it = self._getOb(id)
     it._setPortalTypeName('Collector')
 
-    it.manage_permission(ManageCollector, roles=['Owner'], acquire=1)
+    it.manage_permission(ManageCollector, roles=['Manager', 'Owner'],
+                         acquire=1)
     it.manage_permission(EditCollectorIssue,
                          roles=['Reviewer'],
                          acquire=1)
     it.manage_permission(AddCollectorIssueFollowup,
-                         roles=['Reviewer', 'Owner'],
+                         roles=['Reviewer', 'Manager', 'Owner'],
                          acquire=1)
     it.manage_permission(CMFCorePermissions.AccessInactivePortalContent,
                          roles=['Anonymous', 'Reviewer', 'Manager', 'Owner'],
