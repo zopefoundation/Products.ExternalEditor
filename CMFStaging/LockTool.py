@@ -42,6 +42,8 @@ from permissions import UnlockObjects
 from staging_utils import verifyPermission
 from BTrees.OOBTree import OOBTree
 from BTrees.OIBTree import OIBTree
+from OFS.Traversable import NotFound
+from staging_utils import unproxied
 
 _wwwdir = os.path.join(os.path.dirname(__file__), 'www') 
 
@@ -101,7 +103,50 @@ class LockTool(UniqueObject, SimpleItemWithProperties):
         items = mapping.get(user_id, None)
         if items is None:
             return []
-        return items.keys()   
+        # Because locks can be timed out and broken in ways that do not
+        # go through the lock tool, we need to filter for locks that
+        # aren't really there anymore :( The impact of this is mitigated
+        # by the fact that we clean up user lock records on writes so
+        # the list of actually-dead locks shouldn't become a problem.
+        result = []
+        for key in items.keys():
+            try: obj = self.unrestrictedTraverse(key, None)
+            except NotFound:
+                obj = None
+            if obj is not None:
+                if self.locker(obj) == user_id:
+                    result.append(key)
+        return result
+
+    _lock_gc_threshold = 50
+    
+    security.declarePrivate('cleanupLockData')
+    def cleanupLockData(self, user_id):
+        # This gets called on lock to avoid write-on-read, and its
+        # possible to lock more than one object in a request so we
+        # want to avoid doing this multiple times in a request!
+        if self.REQUEST.get('_lock_gc_%s' % user_id, None):
+            return
+        mapping = getattr(self, '_locks', None)
+        if mapping is None:
+            return
+        items = mapping.get(user_id, None)
+        if items is None:
+            return
+        # stupid heuristic to occasionally go through and clean out
+        # timed out and otherwise invalid lock records without taking
+        # the hit on every lock request.
+        if len(items) < self._lock_gc_threshold:
+            return
+        for key in items.keys():
+            try: obj = self.unrestrictedTraverse(key, None)
+            except NotFound:
+                obj = None
+            if obj is None or self.locker(obj) != user_id:
+                del items[key]
+            if hasattr(obj, '_p_deactivate'):
+                unproxied(obj)._p_deactivate()
+        setattr(self.REQUEST, '_lock_gc_%s' % user_id, 1)
 
     security.declarePrivate('noteLock')
     def noteLock(self, obj, user_id):
@@ -114,6 +159,7 @@ class LockTool(UniqueObject, SimpleItemWithProperties):
             items = OIBTree()
             mapping[user_id] = items
         items[path] = 1
+        self.cleanupLockData(user_id)
 
     security.declarePublic('lock')
     def lock(self, obj):
