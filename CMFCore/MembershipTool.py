@@ -131,18 +131,15 @@ class MembershipTool(UniqueObject, Folder, ActionProviderBase):
             try:
                 portal_user = md.wrapUser(u)
                 return portal_user
+
             except:
                 from zLOG import LOG, ERROR
                 import sys
-                type,value,tb = sys.exc_info()
-                try:
-                    LOG('CMFCore.MembershipTool',
-                        ERROR,
-                        'Error during wrapUser:',
-                        "\nType:%s\nValue:%s\n" % (type,value))
-                finally:
-                    tb = None       # Avoid leaking frame
-                pass
+                LOG('CMFCore.MembershipTool',
+                    ERROR,
+                    'Error during wrapUser',
+                    error=sys.exc_info(),
+                    )
         # Failed.
         return u
 
