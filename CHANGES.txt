@@ -85,6 +85,9 @@
 
  Bug Fixes
 
+  - Added 'manage_beforeDelete' to DiscussionItemContainer class,
+    and propagated to it from content deletion (Tracker #269).
+
   - Only display the "join" action if the user has the "Add
     portal member" permission.
 
