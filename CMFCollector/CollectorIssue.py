@@ -44,7 +44,7 @@ DEFAULT_TRANSCRIPT_FORMAT = 'stx'
 
 factory_type_information = (
     {'id': 'Collector Issue',
-#XXX     'content_icon': 'event_icon.gif',
+#     'content_icon': 'images/puzzlepieceoutline.gif',
      'meta_type': 'CMF Collector Issue',
      'description': ('A Collector Issue represents a bug report or'
                      ' other support request.'),
@@ -353,7 +353,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
             if self.abbrev:
                 subject = "[%s]" % self.abbrev
             else: subject = "[Collector]"
-            subject = ('%s #%s/%s %s "%s"'
+            subject = ('%s %s/%2d %s "%s"'
                        % (subject, self.id, self.action_number,
                           string.capitalize(action), self.title))
 
@@ -421,6 +421,9 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         wftool = getToolByName(self, 'portal_workflow')
         return wftool.getInfoFor(self, 'state', 'Pending')
 
+    security.declareProtected(CMFCorePermissions.View, 'review_state')
+    review_state = status
+
     security.declareProtected(CMFCorePermissions.View, 'confidential')
     def confidential(self):
         """True if workflow has the issue marked confidential.
@@ -440,7 +443,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         it._setPortalTypeName('Collector Issue Transcript')
         it.title = self.title
 
-    def _entry_header(self, type, user, prefix="= ", suffix=" ="):
+    def _entry_header(self, type, user, prefix="= ", suffix=""):
         """Return text for the header of a new transcript entry."""
         # Ideally this would be a skin method (probly python script), but i
         # don't know how to call it from the product, sigh.
@@ -556,9 +559,11 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
                 'security_related:' + ((self.security_related and '1') or '0'),
                 'importance:' + self.importance,
                 'severity:' + self.severity,
-                'status:' + (self.status() or ''),
                 'resolution:' + (self.resolution or ''),
-                'reported_version:' + self.reported_version) + assigned_to
+                'reported_version:' + self.reported_version,
+                'action_number:' + str(self.action_number),
+                'upload_number:' + str(len(self.objectIds()) - 1),
+                ) + assigned_to
 
     def __repr__(self):
         return ("<%s %s \"%s\" at 0x%s>"
