@@ -1249,13 +1249,19 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
                                no_anchors=1)
 
     security.declarePublic('offspring')
-    def offspring(self, REQUEST=None):
-        """Return a presentation of all my offspring."""
+    def offspring(self, raw=0, REQUEST=None):
+        """Return a presentation of all my offspring.
+
+        If 'raw' is true (default is not true), return the nesting list of
+        offspring, instead."""
         myid = self.getId()
         page_meta_type = self.meta_type
         nesting = WikiNesting(self._my_folder(), page_meta_type)
-        return present_nesting(myid, nesting.get_offspring([myid]),
-                               self.wiki_base_url()) # SKWM
+        if not raw:
+            return present_nesting(myid, nesting.get_offspring([myid]),
+                                   self.wiki_base_url()) # SKWM
+        else:
+            return unravel_nesting(nesting.get_offspring([myid])[0])
 
     security.declarePublic('wiki_map')
     def wiki_map(self, REQUEST=None):
@@ -1669,6 +1675,24 @@ def descend_ancestors(page, ancestors, did, children):
             got.append(c)
     got.sort()                  # Terminals will come before composites.
     got.insert(0, page)
+    return got
+
+def unravel_nesting(nesting, curdepth=0, list_type=type([])):
+    """Translate a wiki nesting structure for easy presentation.
+
+        Returns a flat list of tuples indicating the nested page's depth and
+        whether or not they have offspring that have been suppressed:
+
+        [(pagename, depth, offspring_suppressed?)]"""
+
+    if len(nesting) == 1:
+        return [(nesting[0], curdepth, 1)]
+    got = []
+    for p in nesting:
+        if type(p) == list_type:
+            got.extend(unravel_nesting(p, curdepth+1))
+        else:
+            got.append((p, curdepth, 0))
     return got
 
 def html_unquote(v, name='(Unknown name)', md={},
