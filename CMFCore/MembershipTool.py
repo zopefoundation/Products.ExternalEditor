@@ -11,10 +11,10 @@
 # 
 ##############################################################################
 
-"""Basic membership tool.
+""" Basic membership tool.
+
 $Id$
 """
-__version__='$Revision$'[11:-2]
 
 from string import find
 from utils import UniqueObject, _getAuthenticatedUser, _checkPermission
@@ -46,6 +46,7 @@ class MembershipTool (UniqueObject, SimpleItem, ActionProviderBase):
     meta_type = 'CMF Membership Tool'
     _actions = []
     security = ClassSecurityInfo()
+    memberareaCreationFlag = 1
 
     manage_options=( ({ 'label' : 'Configuration'
                      , 'action' : 'manage_mapRoles'
@@ -205,9 +206,6 @@ class MembershipTool (UniqueObject, SimpleItem, ActionProviderBase):
         an underlying user folder logs in first without going 
         through the join process
         """
-        if not hasattr(self, 'memberareaCreationFlag'):
-            self.memberareaCreationFlag = 0
-
         return self.memberareaCreationFlag
 
     security.declareProtected(ManagePortal, 'setMemberareaCreationFlag')
