@@ -1,5 +1,13 @@
 PluggableAuthService changelog
 
+  HEAD
+  
+    Bugs Fixed
+    
+      - Added WARNING-level logs with tracebacks for all swallowed
+        plugin exceptions, so that you notice that there is something
+        wrong with the plugins.
+
   Version 1.0.2 (2004/07/15)
 
     Bugs Fixed

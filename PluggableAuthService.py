@@ -27,6 +27,8 @@ from AccessControl.Permissions import manage_users as ManageUsers
 from AccessControl.User import nobody
 from AccessControl.SpecialUsers import emergency_user
 
+import sys
+from zLOG import LOG, WARNING
 from zExceptions import Unauthorized
 from Persistence import PersistentMapping
 from OFS.Folder import Folder
@@ -206,7 +208,9 @@ class PluggableAuthService( Folder ):
                                                      , exact_match=True )
                     assert( len( user_info ) in [ 0, 1 ] )
                 except _SWALLOWABLE_PLUGIN_EXCEPTIONS:
-                    pass # XXX: ???
+                    LOG('PluggableAuthService', WARNING, 
+                        'UserEnumerationPlugin %s error' % plugin_id,
+                        error=sys.exc_info())
                 else:
                     if user_info:
                         user_id = id
@@ -305,6 +309,9 @@ class PluggableAuthService( Folder ):
                     else:
                         return ()
                 except _SWALLOWABLE_PLUGIN_EXCEPTIONS:
+                    LOG('PluggableAuthService', WARNING, 
+                        'UserEnumerationPlugin %s error' % plugin_id,
+                        error=sys.exc_info())
                     return ()
         
         result = []
@@ -338,7 +345,9 @@ class PluggableAuthService( Folder ):
                     result.append(info)
                     
             except _SWALLOWABLE_PLUGIN_EXCEPTIONS:
-                pass
+                LOG('PluggableAuthService', WARNING, 
+                    'UserEnumerationPlugin %s error' % enumerator_id,
+                    error=sys.exc_info())
 
         if sort_by:
             result.sort( lambda a, b: cmp( a.get(sort_by, '').lower()
@@ -381,6 +390,9 @@ class PluggableAuthService( Folder ):
                     else:
                         return ()
                 except _SWALLOWABLE_PLUGIN_EXCEPTIONS:
+                    LOG('PluggableAuthService', WARNING, 
+                        'GroupEnumerationPlugin %s error' % plugin_id,
+                        error=sys.exc_info())
                     return ()
         
         result = []
@@ -413,7 +425,9 @@ class PluggableAuthService( Folder ):
                     info[ 'title' ] = "(Group) %s" % info[ 'groupid' ]
                     result.append(info)
             except _SWALLOWABLE_PLUGIN_EXCEPTIONS:
-                pass
+                LOG('PluggableAuthService', WARNING, 
+                    'GroupEnumerationPlugin %s error' % enumerator_id,
+                    error=sys.exc_info())
 
         if sort_by:
             result.sort( lambda a, b: cmp( a.get(sort_by, '').lower()
@@ -473,6 +487,9 @@ class PluggableAuthService( Folder ):
                     else:
                         return ()
                 except _SWALLOWABLE_PLUGIN_EXCEPTIONS:
+                    LOG('PluggableAuthService', WARNING, 
+                        'UserEnumeratePlugin %s error' % plugin_id,
+                        error=sys.exc_info())
                     return ()
 
         users = [ d.copy() for d in self.searchUsers( **kw ) ]
@@ -610,6 +627,9 @@ class PluggableAuthService( Folder ):
         try:
             extractors = plugins.listPlugins( IExtractionPlugin )
         except _SWALLOWABLE_PLUGIN_EXCEPTIONS:
+            LOG('PluggableAuthService', WARNING, 
+                'Plugin listing error',
+                error=sys.exc_info())
             extractors = ()
 
         if not extractors:
@@ -618,6 +638,9 @@ class PluggableAuthService( Folder ):
         try:
             authenticators = plugins.listPlugins( IAuthenticationPlugin )
         except _SWALLOWABLE_PLUGIN_EXCEPTIONS:
+            LOG('PluggableAuthService', WARNING, 
+                'Plugin listing error',
+                error=sys.exc_info())
             authenticators = ()
 
         for extractor_id, extractor in extractors:
@@ -625,6 +648,9 @@ class PluggableAuthService( Folder ):
             try:
                 credentials = extractor.extractCredentials( request )
             except _SWALLOWABLE_PLUGIN_EXCEPTIONS:
+                LOG('PluggableAuthService', WARNING, 
+                    'ExtractionPlugin %s error' % extractor_id,
+                    error=sys.exc_info())
                 continue
 
             if credentials:
@@ -636,6 +662,9 @@ class PluggableAuthService( Folder ):
                     items.sort()
                     cache_key = tuple( items )
                 except _SWALLOWABLE_PLUGIN_EXCEPTIONS:
+                    LOG('PluggableAuthService', WARNING, 
+                        'Credentials error: %s' % credentials,
+                        error=sys.exc_info())
                     cache_key = None
                 else:
                     user_ids = cache.get( cache_key, [] )
@@ -656,6 +685,9 @@ class PluggableAuthService( Folder ):
                             user_id, name = auth.authenticateCredentials( 
                                                                 credentials ) 
                         except _SWALLOWABLE_PLUGIN_EXCEPTIONS:
+                            LOG('PluggableAuthService', WARNING, 
+                                'AuthenticationPlugin %s error' % authenticator_id,
+                                error=sys.exc_info())
                             continue
 
                         if user_id is not None:
@@ -706,6 +738,9 @@ class PluggableAuthService( Folder ):
             eua = EmergencyUserAuthenticator()
             user_id, name = eua.authenticateCredentials( credentials )
         except _SWALLOWABLE_PLUGIN_EXCEPTIONS:
+            LOG('PluggableAuthService', WARNING, 
+                'Credentials error: %s' % credentials,
+                error=sys.exc_info())
             user_id, name = ( None, None )
 
         return ( user_id, name )
@@ -848,7 +883,9 @@ class PluggableAuthService( Folder ):
                         return self._computeMangledId( info[0] )
 
                 except _SWALLOWABLE_PLUGIN_EXCEPTIONS:
-                    pass
+                    LOG('PluggableAuthService', WARNING, 
+                        'UserEnumerationPlugin %s error' % enumerator_id,
+                        error=sys.exc_info())
 
         return 0
 
@@ -990,6 +1027,9 @@ class PluggableAuthService( Folder ):
                 try:
                     roleassigner.doAssignRoleToPrincipal( user.getId(), role )
                 except _SWALLOWABLE_PLUGIN_EXCEPTIONS:
+                    LOG('PluggableAuthService', WARNING, 
+                        'RoleAssigner %s error' % roleassigner_id,
+                        error=sys.exc_info())
                     pass
 
     security.declarePublic('all_meta_types')
