@@ -2,13 +2,18 @@ from unittest import TestSuite, makeSuite, main
 from StringIO import StringIO
 from re import compile
 
-from Products.CMFCore.tests.base.testcase import \
-     RequestTest
+from Products.CMFCore.tests.base.testcase import RequestTest
 
-from Products.CMFCore.tests.base.content import \
-     DOCTYPE, HTML_TEMPLATE, BASIC_HTML, ENTITY_IN_TITLE, BASIC_STRUCTUREDTEXT, \
-     STX_WITH_HTML, STX_NO_HEADERS, STX_NO_HEADERS_BUT_COLON, \
-     SIMPLE_STRUCTUREDTEXT, SIMPLE_HTML
+from Products.CMFCore.tests.base.content import DOCTYPE
+from Products.CMFCore.tests.base.content import HTML_TEMPLATE
+from Products.CMFCore.tests.base.content import BASIC_HTML
+from Products.CMFCore.tests.base.content import ENTITY_IN_TITLE
+from Products.CMFCore.tests.base.content import BASIC_STRUCTUREDTEXT
+from Products.CMFCore.tests.base.content import STX_WITH_HTML
+from Products.CMFCore.tests.base.content import STX_NO_HEADERS
+from Products.CMFCore.tests.base.content import STX_NO_HEADERS_BUT_COLON
+from Products.CMFCore.tests.base.content import SIMPLE_STRUCTUREDTEXT
+from Products.CMFCore.tests.base.content import SIMPLE_HTML
 
 from Products.CMFDefault.Document import Document
 

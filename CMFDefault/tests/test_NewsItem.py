@@ -2,11 +2,12 @@ from unittest import makeSuite, main
 
 from Products.CMFDefault.NewsItem import NewsItem
 
-from Products.CMFCore.tests.base.testcase import \
-     RequestTest
+from Products.CMFCore.tests.base.testcase import RequestTest
 
-from Products.CMFCore.tests.base.content import \
-     DOCTYPE, BASIC_HTML, ENTITY_IN_TITLE, BASIC_STRUCTUREDTEXT
+from Products.CMFCore.tests.base.content import DOCTYPE
+from Products.CMFCore.tests.base.content import BASIC_HTML
+from Products.CMFCore.tests.base.content import ENTITY_IN_TITLE
+from Products.CMFCore.tests.base.content import BASIC_STRUCTUREDTEXT
 
 class NewsItemTests(RequestTest):
 
