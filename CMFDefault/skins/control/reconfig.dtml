@@ -1,2 +1,3 @@
 <dtml-call expr="portal_properties.editProperties(REQUEST)">
-<dtml-return expr="reconfig_form(_.None, _, portal_status_message='Settings changed')">
+<dtml-call expr="REQUEST['RESPONSE'].redirect( portal_url()
+                  + '/reconfig_form?portal_status_message=Settings+changed.')">
