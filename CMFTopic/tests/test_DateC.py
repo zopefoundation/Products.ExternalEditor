@@ -17,6 +17,12 @@ class TestFriendlyDate(unittest.TestCase):
         'daterange': 'ahead',
         }
 
+    def setUp( self ):
+        get_transaction().begin()
+
+    def tearDown( self ):
+        get_transaction().abort()
+
     def test_Empty(self):
         friendly = FriendlyDate('foo', 'foofield')
         assert friendly.getId() == 'foo'

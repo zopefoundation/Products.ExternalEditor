@@ -6,6 +6,12 @@ SIC = Products.CMFTopic.SimpleIntCriterion.SimpleIntCriterion
 
 class TestSimpleInt(unittest.TestCase):
 
+    def setUp( self ):
+        get_transaction().begin()
+
+    def tearDown( self ):
+        get_transaction().abort()
+
     def test_Empty(self):
         sic = SIC('foo', 'foofield' )
         assert sic.getId() == 'foo'

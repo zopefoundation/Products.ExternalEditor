@@ -14,6 +14,12 @@ lines.  It can even include "headerish" lines, like:
 
 Header: value
 '''
+
+    def setUp( self ):
+        get_transaction().begin()
+
+    def tearDown( self ):
+        get_transaction().abort()
     
     def test_NoBody( self ):
         headers, body = parseHeadersBody( '%s\n\n' % self.COMMON_HEADERS )

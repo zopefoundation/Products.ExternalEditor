@@ -73,6 +73,12 @@ Title Phrase
 
 class DocumentTests(unittest.TestCase):
 
+    def setUp( self ):
+        get_transaction().begin()
+
+    def tearDown( self ):
+        get_transaction().abort()
+
     def test_Empty(self):
         d = Document('foo')
         assert d.title == ''

@@ -7,12 +7,14 @@ from Products.CMFDefault.DublinCore import DefaultDublinCoreImpl
 class TestMetadataElementPolicy( unittest.TestCase ):
 
     def setUp( self ):
+        get_transaction().begin()
         self.sv_policy = MetadataElementPolicy( 0 )
         self.mv_policy = MetadataElementPolicy( 1 )
 
     def tearDown( self ):
         del self.sv_policy
         del self.mv_policy
+        get_transaction().abort()
 
     def test_emptySV( self ):
         assert not self.sv_policy.isMultiValued()

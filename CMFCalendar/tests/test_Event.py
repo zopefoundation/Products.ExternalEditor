@@ -5,6 +5,13 @@ from Products.CMFCalendar.Event import *
 from DateTime import DateTime
 
 class TestEvent(unittest.TestCase):
+
+    def setUp( self ):
+        get_transaction().begin()
+
+    def tearDown( self ):
+        get_transaction().abort()
+
     def test_new(self):
         event = Event('test')
         assert event.getId() == 'test'

@@ -8,6 +8,12 @@ TEST_JPG = os.path.join(TESTS_HOME, 'TestImage.jpg')
 
 class TestImageElement(unittest.TestCase):
 
+    def setUp( self ):
+        get_transaction().begin()
+
+    def tearDown( self ):
+        get_transaction().abort()
+
     def test_EditWithEmptyFile(self):
         """ Test handling of empty file uploads """
         image = Image('testimage')

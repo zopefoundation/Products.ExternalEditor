@@ -5,6 +5,12 @@ LISTC = Products.CMFTopic.ListCriterion.ListCriterion
 
 
 class TestListCriterion(unittest.TestCase):
+
+    def setUp( self ):
+        get_transaction().begin()
+
+    def tearDown( self ):
+        get_transaction().abort()
     
     def test_Empty( self ):
         listc = LISTC('foo', 'foofield')

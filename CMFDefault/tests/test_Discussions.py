@@ -48,12 +48,13 @@ class DiscussionTests( unittest.TestCase ):
         types_tool = self.types_tool = self.root.portal_types
     
     def tearDown( self ):
-        del self.root
+        del self.types_tool
+        del self.workflow_tool
+        del self.url_tool
         del self.discussion_tool
         del self.catalog_tool
-        del self.url_tool
-        del self.workflow_tool
-        del self.types_tool
+        del self.root
+        del self._policy
         get_transaction().abort()
 
     def test_policy( self ):

@@ -5,6 +5,12 @@ SSC = Products.CMFTopic.SimpleStringCriterion.SimpleStringCriterion
 
 
 class TestSimpleString(unittest.TestCase):
+
+    def setUp( self ):
+        get_transaction().begin()
+
+    def tearDown( self ):
+        get_transaction().abort()
     
     def test_Empty( self ):
         ssc = SSC('foo', 'foofield')

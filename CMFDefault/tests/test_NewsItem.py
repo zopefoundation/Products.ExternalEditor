@@ -44,6 +44,12 @@ This is the header and it supercedes the title
 
 class NewsItemTests(unittest.TestCase):
 
+    def setUp( self ):
+        get_transaction().begin()
+
+    def tearDown( self ):
+        get_transaction().abort()
+
     def test_Empty(self):
         d = NewsItem('foo')
         assert d.title == ''

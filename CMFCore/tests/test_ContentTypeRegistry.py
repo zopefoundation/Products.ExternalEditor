@@ -5,6 +5,12 @@ from Products.CMFCore.ContentTypeRegistry import *
 
 class MajorMinorPredicateTests( unittest.TestCase ):
 
+    def setUp( self ):
+        get_transaction().begin()
+
+    def tearDown( self ):
+        get_transaction().abort()
+
     def test_empty( self ):
         pred = MajorMinorPredicate( 'empty' )
         assert pred.getMajorType() == 'None'
@@ -39,6 +45,12 @@ class MajorMinorPredicateTests( unittest.TestCase ):
 
 class ExtensionPredicateTests( unittest.TestCase ):
 
+    def setUp( self ):
+        get_transaction().begin()
+
+    def tearDown( self ):
+        get_transaction().abort()
+
     def test_empty( self ):
         pred = ExtensionPredicate( 'empty' )
         assert pred.getExtensions() == 'None'
@@ -67,6 +79,12 @@ class ExtensionPredicateTests( unittest.TestCase ):
 
 class MimeTypeRegexPredicateTests( unittest.TestCase ):
 
+    def setUp( self ):
+        get_transaction().begin()
+
+    def tearDown( self ):
+        get_transaction().abort()
+
     def test_empty( self ):
         pred = MimeTypeRegexPredicate( 'empty' )
         assert pred.getPatternStr() == 'None'
@@ -88,6 +106,12 @@ class MimeTypeRegexPredicateTests( unittest.TestCase ):
         assert not pred( 'foo', 'image/png', 'asdfljksadf' )
     
 class NameRegexPredicateTests( unittest.TestCase ):
+
+    def setUp( self ):
+        get_transaction().begin()
+
+    def tearDown( self ):
+        get_transaction().abort()
 
     def test_empty( self ):
         pred = NameRegexPredicate( 'empty' )
@@ -111,6 +135,12 @@ class NameRegexPredicateTests( unittest.TestCase ):
         assert not pred( 'bar', 'text/plain', 'asdfljksadf' )
     
 class ContentTypeRegistryTests( unittest.TestCase ):
+
+    def setUp( self ):
+        get_transaction().begin()
+
+    def tearDown( self ):
+        get_transaction().abort()
 
     def test_empty( self ):
         reg = ContentTypeRegistry()
