@@ -90,7 +90,7 @@ import PortalObject, PortalContent, PortalFolder
 import MembershipTool, WorkflowTool, CatalogTool, DiscussionTool
 import ActionsTool, UndoTool, RegistrationTool, SkinsTool
 import MemberDataTool, TypesTool
-import DirectoryView, FSDTMLMethod, FSImage, FSPropertiesObject
+import DirectoryView, FSDTMLMethod, FSImage, FSPropertiesObject, FSPythonScript
 import CookieCrumbler
 import utils
 
@@ -151,6 +151,8 @@ def initialize(context):
 
     utils.registerIcon(FSDTMLMethod.FSDTMLMethod,
                        'images/fsdtml.gif', globals())
+    utils.registerIcon(FSPythonScript.FSPythonScript,
+                       'images/fspy.gif', globals())
     utils.registerIcon(FSImage.FSImage,
                        'images/fsimage.gif', globals())
     utils.registerIcon(FSPropertiesObject.FSPropertiesObject,
