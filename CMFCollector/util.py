@@ -72,17 +72,28 @@ def get_email_fullname(self, userid):
 def safeGetProperty(userobj, property, default=None):
     """Defaulting user.getProperty(), allowing for variant user folders."""
     try:
-        return userobj.getProperty(property, default)
-    except TypeError:
-        try:
-            # Some (eg, our LDAP user folder) support getProperty but not
-            # defaulting:
-            return userobj.getProperty(property)
-        except:
-            return default
-    except AttributeError:
-        # Some don't support getProperty:
-        return getattr(userobj, property, default)
+        if not hasattr(userobj, 'getProperty'):
+            return getattr(userobj, property, default)
+        else:
+            return userobj.getProperty(property, default)
+    except:
+        # We can't just itemize the possible candidate exceptions because one
+        # is a string with spaces, which isn't interned and hence object id
+        # won't match.  Sigh.
+        import sys
+        exc = sys.exc_info()[0]
+        if (exc == 'Property not found'
+            or isinstance(exc, TypeError)
+            or isinstance(exc, AttributeError)
+            or isinstance(exc, LookupError)):
+            try:
+                # Some (eg, our old LDAP user folder) support getProperty but
+                # not defaulting:
+                return userobj.getProperty(property)
+            except:
+                return default
+        else:
+            raise
 
 ##############################
 # WebText processing utilities
