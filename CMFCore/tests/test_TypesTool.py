@@ -284,7 +284,6 @@ class FTIConstructionTests( TestCase ):
         ti = self._makeInstance( 'foo' )
 
         self.failIf( ti.isConstructionAllowed( None ) )
-        self.failIf( ti.isConstructionAllowed( None, raise_exc=1 ) )
 
         ti = self._makeInstance( 'Foo'
                                , product='FooProduct'
@@ -292,8 +291,6 @@ class FTIConstructionTests( TestCase ):
                                )
 
         self.failIf( ti.isConstructionAllowed( None ) )
-        self.assertRaises( Exception, ti.isConstructionAllowed
-                         , None, raise_exc=1 )
 
     def test_isConstructionAllowed_wo_ProductFactory( self ):
 
@@ -301,11 +298,9 @@ class FTIConstructionTests( TestCase ):
 
         folder = self._makeFolder()
         self.failIf( ti.isConstructionAllowed( folder ) )
-        self.failIf( ti.isConstructionAllowed( folder, raise_exc=1 ) )
 
         folder = self._makeFolder( fake_product=1 )
         self.failIf( ti.isConstructionAllowed( folder ) )
-        self.failIf( ti.isConstructionAllowed( folder, raise_exc=1 ) )
 
     def test_isConstructionAllowed_wo_Security( self ):
 
@@ -316,8 +311,6 @@ class FTIConstructionTests( TestCase ):
         folder = self._makeFolder( fake_product=1 )
 
         self.failIf( ti.isConstructionAllowed( folder ) )
-        self.assertRaises( Unauthorized, ti.isConstructionAllowed
-                         , folder, raise_exc=1 )
 
 class FTIConstructionTests_w_Roles( TestCase ):
 
@@ -355,8 +348,6 @@ class FTIConstructionTests_w_Roles( TestCase ):
 
         newSecurityManager( None
                           , UserWithRoles( 'FooViewer' ).__of__( folder ) )
-        self.assertRaises( Unauthorized, ti.isConstructionAllowed
-                         , folder, raise_exc=1 )
 
     def test_constructInstance_wo_Roles( self ):
 
