@@ -186,7 +186,7 @@ class SkinsTool(UniqueObject, SkinsContainer, Folder, ActionProviderBase):
     security.declarePrivate('testSkinPath')
     def testSkinPath(self, p):
         '''
-        Calls SkinsContainer.getSkinByName().
+        Calls SkinsContainer.getSkinByPath().
         '''
         self.getSkinByPath(p, raise_exc=1)
 
