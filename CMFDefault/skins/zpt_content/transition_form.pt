@@ -1,23 +1,23 @@
-<metal:block metal:define-macro="master">
-<html xmlns:tal="http://xml.zope.org/namespaces/tal"
-      xmlns:metal="http://xml.zope.org/namespaces/metal"
-      metal:use-macro="here/main_template/macros/master">
+<metal:macro metal:define-macro="master"
+><html metal:use-macro="context/main_template/macros/master">
 <body>
-<div metal:fill-slot="main">
-<div class="Desktop"
-     tal:define="wtool here/portal_workflow;
-                 review_state python: wtool.getInfoFor(here, 'review_state');
-                 review_history python: wtool.getInfoFor(here, 'review_history')">
+
+<metal:slot metal:fill-slot="main" i18n:domain="cmf_default"
+   tal:define="wtool context/portal_workflow;
+               review_state python: wtool.getInfoFor(context, 'review_state');
+               review_history python: wtool.getInfoFor(context,
+                                                       'review_history')">
+<div class="Desktop">
 
 <div metal:define-slot="main" i18n:domain="cmf_default">
-<h1 i18n:translate="">Transition of <span tal:replace="here/getId"
+<h1 i18n:translate="">Transition of <span tal:replace="context/getId"
                              i18n:name="objectid">Item</span>.</h1>
 
 <p i18n:translate="">Transition description.</p>
 </div>
 
 <form method="post" action="content_status_modify"
-      tal:attributes="action string:${here/absolute_url}/content_status_modify">
+   tal:attributes="action string:${context/absolute_url}/content_status_modify">
  <table class="FormLayout">
   <tr i18n:domain="cmf_default">
    <td valign="top" align="left">
@@ -50,10 +50,10 @@
  </table>
 </form>
 
-<div tal:condition="review_history|nothing" i18n:domain="cmf_default">
+<tal:case tal:condition="review_history|nothing" i18n:domain="cmf_default">
  <p><strong i18n:translate="">Reviewing history</strong>
  <br />
- <span tal:repeat="items python: here.reverseList(review_history)">
+ <tal:loop tal:repeat="items python: review_history[::-1]">
   <span tal:replace="python: items['time'].aCommon()"></span>
   <span tal:omit-tag="" tal:content="items/action" i18n:translate=""></span>
   <span tal:condition="items/effective_date|nothing" i18n:translate="">
@@ -64,12 +64,11 @@
   <br />
    <span tal:define="rhComments items/comments"
          tal:replace="rhComments">Comments</span>
- </span>
-</div>
+ </tal:loop>
+</tal:case>
 
+</div>
+</metal:slot>
 
-</div>
-</div>
 </body>
-</html>
-</metal:block>
+</html></metal:macro>

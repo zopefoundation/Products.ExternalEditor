@@ -1,12 +1,12 @@
-<html xmlns:tal="http://xml.zope.org/namespaces/tal"
-      xmlns:metal="http://xml.zope.org/namespaces/metal"
-      metal:use-macro="here/main_template/macros/master">
+<html metal:use-macro="context/main_template/macros/master">
 <body>
-<div metal:fill-slot="main" i18n:domain="cmf_default">
-<div class="Desktop"
-     tal:define="review_state python: here.portal_workflow.getInfoFor(here, 'review_state');
-	 review_history python: here.portal_workflow.getInfoFor(here, 'review_history')">
 
+<metal:slot metal:fill-slot="main" i18n:domain="cmf_default"
+   tal:define="wtool context/portal_workflow;
+               review_state python: wtool.getInfoFor(context, 'review_state');
+               review_history python: wtool.getInfoFor(context,
+                                                       'review_history')">
+<div class="Desktop">
 
 <h1 i18n:translate="">Content Item status history</h1>
 
@@ -29,8 +29,8 @@
 
 <div tal:condition="review_history|nothing">
   <h3><strong i18n:translate="">Reviewing history</strong></h3>
-    <div tal:repeat="items python: here.reverseList(review_history)">
-	  <span tal:replace="python: items['time'].aCommon()" />
+    <div tal:repeat="items python: review_history[::-1]">
+    <span tal:replace="python: items['time'].aCommon()" />
     <span tal:omit-tag="" tal:content="items/action" i18n:translate=""></span>
     <span tal:condition="items/effective_date|nothing" i18n:translate="">
      (effective: <span tal:replace="python: items['effective_date'].aCommon()"
@@ -39,12 +39,14 @@
      <span tal:replace="items/actor" i18n:name="actor">Actor</span></span>
     <br />
       <div tal:define="rhComments items/comments"
-		 tal:replace="rhComments">Comments</div>
+           tal:replace="rhComments">Comments</div>
     </div>
 </div>
 <div tal:condition="python: not(review_history)"
      i18n:translate="">This item has not had any status changes.</div>
- </div>
+
 </div>
+</metal:slot>
+
 </body>
 </html>
