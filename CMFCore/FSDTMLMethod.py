@@ -97,11 +97,13 @@ from CMFCorePermissions import View, ViewManagementScreens, FTPAccess
 from DirectoryView import registerFileExtension, registerMetaType, expandpath
 from FSObject import FSObject
 try:
-    from AccessControl import full_read_guard
-except ImportError: pass
+    # Zope 2.4.x
+    from AccessControl.DTML import RestrictedDTML
+except ImportError:
+    class RestrictedDTML: pass
 
 
-class FSDTMLMethod(FSObject, Globals.HTML):
+class FSDTMLMethod(RestrictedDTML, FSObject, Globals.HTML):
     """FSDTMLMethods act like DTML methods but are not directly
     modifiable from the management interface."""
 
@@ -196,9 +198,6 @@ class FSDTMLMethod(FSObject, Globals.HTML):
     # Zope 2.3.x way:
     def validate(self, inst, parent, name, value, md):
         return getSecurityManager().validate(inst, parent, name, value)
-    # Zope 2.4.x way:
-    def read_guard(self, ob):
-        return full_read_guard(ob)
 
     security.declareProtected(FTPAccess, 'manage_FTPget')
     security.declareProtected(ViewManagementScreens, 'PrincipiaSearchSource',
