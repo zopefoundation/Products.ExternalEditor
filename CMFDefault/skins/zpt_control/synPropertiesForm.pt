@@ -57,7 +57,7 @@
      <option value="hourly"
 		   tal:define="upd python: portal_syndication.getUpdatePeriod(here)"
 		   tal:repeat="item portal_syndication/buildUpdatePeriods"
-		   tal:attributes="value python: item[0]; selected python: item == upd"
+		   tal:attributes="value python: item[0]; selected python: item[0] == upd"
 		   tal:content="python: item[1]">Hourly
       </option>
     </select> 

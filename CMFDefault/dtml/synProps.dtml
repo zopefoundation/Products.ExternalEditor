@@ -22,14 +22,14 @@
              UpdatePeriod
            </td>
            <td>
-		 <select name="updatePeriod">
-			<dtml-in buildUpdatePeriods>
-				<option value="&dtml-sequence-key;"
-				<dtml-if expr="_['sequence-key'] == getUpdatePeriod()">
-				selected="selected"</dtml-if>>&dtml-sequence-item;
-				</option>
-			</dtml-in>
-		</select>
+ <select name="updatePeriod">
+	<dtml-in buildUpdatePeriods>
+	<option value="&dtml-sequence-key;"
+	<dtml-if expr="_['sequence-key'] == getUpdatePeriod()">
+		selected="selected"</dtml-if>>&dtml-sequence-item;
+	</option>
+</dtml-in>
+</select>
            </td>
          </tr>
          <tr>
@@ -38,7 +38,7 @@
            </td>
            <td>
              <input type="text" name="updateFrequency"
-              value="&dtml-syUpdateFrequency;" size="3">
+              value="&dtml-getUpdateFrequency;" size="3">
            </td>
          </tr>
 		 <tr>
@@ -47,7 +47,7 @@
            </td>
            <td>
              <input type="text" name="updateBase:date"
-              value="&dtml-syUpdateBase;" size="70">
+              value="&dtml-getUpdateBase;" size="70">
            </td>
          </tr>
            <tr>
@@ -56,7 +56,7 @@
            </td>
            <td>
              <input type="text" name="max_items"
-              value="&dtml-max_items;" size="3">
+              value="&dtml-getMaxItems;" size="3">
            </td>
          </tr>
 	</dtml-with>
