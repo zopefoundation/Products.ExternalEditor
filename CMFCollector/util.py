@@ -185,6 +185,6 @@ def process_comment(comment, strip=string.strip):
     return string.strip(string.join(got, '\n'))
 
 def sorted(l):
-    x = l[:]
+    x = list(l[:])
     x.sort()
     return x
