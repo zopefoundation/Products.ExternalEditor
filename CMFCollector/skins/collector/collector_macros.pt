@@ -65,8 +65,8 @@
                      TRUNCDESCR python: 150;
                      global artifacts
                             python: [i for i in here.objectValues()
-                                       if i.portal_type
-                                          != 'Collector Issue Transcript']">
+                                       if i.Type()
+                                         != 'Collector Issue Transcript']">
 
        <table summary="Issue Characteristics" cellspacing="4">
 
@@ -94,7 +94,7 @@
            </td>
            <td tal:condition="here/security_related">
                 Security Related -
-             <font color="RED or BLACK"
+             <font color="BROWN or BLACK"
                    tal:attributes="color python: (here.confidential() and 'red'
                                                   or 'black')"
                    tal:content="python: (here.confidential()
@@ -131,20 +131,25 @@
          </tr>
 
          <tr>
+           <td align="right"> Import/Severity: </td>
+           <td>
+             <span tal:replace="python: here.importance.capitalize()">
+               IMPORTANCE
+             </span>/<span tal:replace="here/severity">SEVERITY</span>
+           </td>
+
+           <td align="right"> on: </td>
+           <td tal:content="crdate">CREATIONDATE</td>
+         </tr>
+
+         <tr>
+
            <td align="right">Status:</td>
            <td>
               <code>
                 <span tal:content="here/status">STATUS</span>
               </code>
            </td>
-           <td align="right"> on: </td>
-           <td tal:content="crdate">CREATIONDATE</td>
-         </tr>
-
-         <tr tal:condition="python: here.action_number > 1">
-
-           <td align="right"> Entries: </td>
-           <td tal:content="here/action_number"> NUMBER </td>
 
            <td align="right">Last update:</td>
            <td tal:content="moddate">MODDATE</td>
@@ -286,7 +291,7 @@
             <br>
             <input type=radio name="filetype" value="Image"> Image
           </td>
-          <td> <input type=file name="file" size="30"> </td>
+          <td> <input type=file name="file" size="20"> </td>
           <th align="right" valign="top"> (Optional) Id: </th>
           <td> <input type=text name="fileid" size="12"> </td>
         </tr>
