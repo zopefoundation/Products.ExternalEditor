@@ -88,15 +88,18 @@ $Id$
 '''
 __version__='$Revision$'[11:-2]
 
+from Products.CMFCore.CMFCorePermissions import RequestReview, \
+                                                ModifyPortalContent, \
+                                                ReviewPortalContent
 from Products.CMFCore.WorkflowTool import addWorkflowFactory
-
 from Products.DCWorkflow.DCWorkflow import DCWorkflowDefinition
+from AccessControl.Permissions import view, access_contents_information
 
-p_access = 'Access contents information'
-p_modify = 'Modify portal content'
-p_view = 'View'
-p_review = 'Review portal content'
-p_request = 'Request review'
+p_access = access_contents_information
+p_modify = ModifyPortalContent
+p_view = view
+p_review = ReviewPortalContent
+p_request = RequestReview
 
 r_anon = 'Anonymous'
 r_manager = 'Manager'
