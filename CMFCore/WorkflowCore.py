@@ -99,11 +99,16 @@ class WorkflowException (Exception):
     '''
 
 
-class NoReindex (Exception):
+class ObjectDeleted (Exception):
     '''
-    Raised to tell the workflow tool not to reindex the object.
+    Raised to tell the workflow tool that the object has been deleted.
     Swallowed by the workflow tool.
     '''
+    def __init__(self, result=None):
+        self._r = result
+
+    def getResult(self):
+        return self._r
 
 
 class ObjectMoved (Exception):
@@ -111,8 +116,12 @@ class ObjectMoved (Exception):
     Raised to tell the workflow tool that the object has moved.
     Swallowed by the workflow tool.
     '''
-    def __init__(self, ob):
-        self._ob = ob  # Includes acquisition wrappers.
+    def __init__(self, new_ob, result=None):
+        self._ob = new_ob  # Includes acquisition wrappers.
+        self._r = result
+
+    def getResult(self):
+        return self._r
 
     def getNewObject(self):
         return self._ob
@@ -140,8 +149,8 @@ class WorkflowMethod (Method):
             # No workflow tool found.
             try:
                 res = apply(self._m, (instance,) + args, kw)
-            except NoReindex:
-                pass
+            except NoReindex, ex:
+                res = ex.getResult()
             else:
                 catalog = getToolByName(instance, 'portal_catalog', None)
                 if catalog is not None:

@@ -95,7 +95,7 @@ from OFS.Folder import Folder
 from Globals import InitializeClass, PersistentMapping, DTMLFile
 from AccessControl import ClassSecurityInfo
 from Acquisition import aq_base, aq_inner, aq_parent
-from WorkflowCore import WorkflowException, NoReindex, ObjectMoved
+from WorkflowCore import WorkflowException, ObjectDeleted, ObjectMoved
 import CMFCorePermissions
 from string import join, split, replace, strip
 
@@ -425,9 +425,11 @@ class WorkflowTool (UniqueObject, Folder):
             w.notifyBefore(ob, action)
         try:
             res = apply(func, args, kw)
-        except NoReindex:
+        except ObjectDeleted, ex:
+            res = ex.getResult()
             reindex = 0
         except ObjectMoved, ex:
+            res = ex.getResult()
             ob = ex.getNewObject()
         except:
             exc = sys.exc_info()
