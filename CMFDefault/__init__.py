@@ -21,11 +21,12 @@ from Products.CMFCore.utils import initializeBasesPhase2
 from Products.CMFCore.utils import ToolInit
 from Products.CMFCore.utils import ContentInit
 from Products.CMFCore.utils import registerIcon
+from Products.CMFSetup import BASE
 from Products.CMFSetup import profile_registry
 
 import utils
 from permissions import AddPortalContent
- 
+
 import Portal
 import Document
 import Link
@@ -112,7 +113,8 @@ def initialize( context ):
                                      'CMFDefault Site',
                                      'Profile for a default CMFSite.',
                                      'profiles/default',
-                                     'CMFDefault')
+                                     'CMFDefault',
+                                     BASE)
 
     context.registerClass( Portal.CMFSite
                          , constructors=( Portal.manage_addCMFSiteForm

@@ -21,6 +21,9 @@ security = ModuleSecurityInfo('Products.CMFDefault.exceptions')
 security.declarePublic('AccessControl_Unauthorized')
 from Products.CMFCore.exceptions import AccessControl_Unauthorized
 
+security.declarePublic('BadRequest')
+from Products.CMFCore.exceptions import BadRequest
+
 security.declarePublic('CopyError')
 from Products.CMFCore.exceptions import CopyError
 

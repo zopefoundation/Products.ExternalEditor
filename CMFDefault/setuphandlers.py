@@ -17,6 +17,7 @@ $Id$
 
 from Products.CMFCore.utils import getToolByName
 
+from exceptions import BadRequest
 from Portal import PortalGenerator
 
 
@@ -28,19 +29,12 @@ def importVarious(context):
     """
     site = context.getSite()
 
-    # try to install CMFUid without raising exceptions if not available
-    try:
-        addCMFUidTool = site.manage_addProduct['CMFUid'].manage_addTool
-    except AttributeError:
-        pass
-    else:
-        addCMFUidTool('Unique Id Annotation Tool', None)
-        addCMFUidTool('Unique Id Generator Tool', None)
-        addCMFUidTool('Unique Id Handler Tool', None)
-
     # add custom skin folder
     stool = getToolByName(site, 'portal_skins')
-    stool.manage_addProduct['OFSP'].manage_addFolder(id='custom')
+    try:
+        stool.manage_addProduct['OFSP'].manage_addFolder(id='custom')
+    except BadRequest:
+        return 'Various settings: Nothing to import.'
 
     gen = PortalGenerator()
     gen.setupMailHost(site)
