@@ -9,7 +9,7 @@ states = context.portal_catalog.uniqueValuesFor('review_state')
 
 got = []
 for i in states:
-    if i in ['private', 'published']:
+    if i in ['private', 'published', 'pending']:
         continue
     trim = string.split(i, '_')[0]
     if trim not in got:
