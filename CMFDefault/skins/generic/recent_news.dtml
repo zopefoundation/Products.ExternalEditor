@@ -1,6 +1,6 @@
 <dtml-var standard_html_header>
 
-<dtml-let newsitems="portal_catalog.searchResults(meta_type='News Item',
+<dtml-let newsitems="portal_catalog.searchResults(portal_type='News Item',
   sort_on='Date', sort_order='reverse', review_state='published')">
 
 <dtml-in newsitems size="10" start="batch_start" previous>

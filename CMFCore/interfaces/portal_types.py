@@ -27,7 +27,7 @@ class ContentTypeInformation(Base):
             Return the Zope 'meta_type' for this content object.
         """
     
-    def Type():
+    def Title():
         """
             Return the "human readable" type name (note that it
             may not map exactly to the 'meta_type', e.g., for
@@ -88,7 +88,7 @@ class portal_types(Base):
             ContentTypeInformation interface, corresponding to
             the specified 'contentType'.  If contentType is actually
             an object, rather than a string, attempt to look up
-            the appropriate type info using its Type or meta_type.
+            the appropriate type info using its portal_type or meta_type.
         """
 
     # listTypeInfo__roles__ = None  # Public

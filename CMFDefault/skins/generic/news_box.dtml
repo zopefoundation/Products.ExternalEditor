@@ -10,7 +10,7 @@
    </td>
   </tr>
 
-  <dtml-in "portal_catalog.searchResults( Type='News Item'
+  <dtml-in "portal_catalog.searchResults( portal_type='News Item'
                                         , sort_on='Date'
                                         , sort_order='reverse'
                                         , review_state='published'

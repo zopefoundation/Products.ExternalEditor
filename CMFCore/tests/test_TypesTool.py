@@ -86,7 +86,7 @@ class TypeInfoTests( TestCase ):
                                , icon='foo.gif'
                                )
         self.assertEqual( ti.getId(), 'Foo' )
-        self.assertEqual( ti.Type(), 'Foo' )
+        self.assertEqual( ti.Title(), 'Foo' )
         self.assertEqual( ti.Description(), 'Description' )
         self.assertEqual( ti.Metatype(), 'Foo' )
         self.assertEqual( ti.getIcon(), 'foo.gif' )

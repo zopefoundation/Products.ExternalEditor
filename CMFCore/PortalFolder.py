@@ -118,7 +118,7 @@ class PortalFolder( Folder, DynamicType ):
 
         if myType is not None:
             for contentType in portal_types.listTypeInfo(self):
-                if myType.allowType( contentType.Type() ):
+                if myType.allowType( contentType.getId() ):
                     result.append( contentType )
         else:
             result = portal_types.listTypeInfo()
@@ -157,12 +157,33 @@ class PortalFolder( Folder, DynamicType ):
                 new_spec.append(meta_type)
         return new_spec or types
     
-    def _filteredItems( self, ids, filter ):
+    def _filteredItems( self, ids, filt ):
         """
             Apply filter, a mapping, to child objects indicated by 'ids',
             returning a sequence of ( id, obj ) tuples.
         """
-        query = apply( ContentFilter, (), filter )
+        # Restrict allowed content types
+        if filt is None:
+            filt = {}
+        else:
+            # We'll modify it, work on a copy.
+            filt = filt.copy()
+        pt = filt.get('portal_type', [])
+        if type(pt) is type(''):
+            pt = [pt]
+        types_tool = getToolByName(self, 'portal_types')
+        allowed_types = types_tool.listContentTypes()
+        if not pt:
+            pt = allowed_types
+        else:
+            pt = [t for t in pt if t in allowed_types]
+        if not pt:
+            # After filtering, no types remain, so nothing should be
+            # returned.
+            return []
+        filt['portal_type'] = pt
+
+        query = apply( ContentFilter, (), filt )
         result = []
         append = result.append
         get = self._getOb
@@ -184,10 +205,6 @@ class PortalFolder( Folder, DynamicType ):
         """
         spec = self._morphSpec( spec )
         ids = self.objectIds( spec )
-
-        if not filter:
-            return ids
-
         return map( lambda item: item[0],
                     self._filteredItems( ids, filter ) )
 
@@ -198,9 +215,6 @@ class PortalFolder( Folder, DynamicType ):
             PortalFolders and PortalContent-derivatives to show through.
         """
         spec = self._morphSpec( spec )
-        if not filter:
-            return self.objectValues( spec )
-
         ids = self.objectIds( spec )
         return map( lambda item: item[1],
                     self._filteredItems( ids, filter ) )
@@ -234,9 +248,6 @@ class PortalFolder( Folder, DynamicType ):
             PortalFolders and PortalContent-derivatives to show through.
         """
         spec = self._morphSpec( spec )
-        if not filter:
-            return self.objectItems( spec )
-
         ids = self.objectIds( spec )
         return self._filteredItems( ids, filter )
 
@@ -262,7 +273,7 @@ class PortalFolder( Folder, DynamicType ):
         portal_types = getToolByName(self, 'portal_types')
         ti = portal_types.getTypeInfo(self)
         if ti is not None:
-            return ti.Type()
+            return ti.Title()
         return self.meta_type
 
     security.declarePublic('encodeFolderFilter')
@@ -492,6 +503,7 @@ class ContentFilter:
                 , modified=MARKER
                 , modified_usage='range:min'
                 , Type=MARKER
+                , portal_type=MARKER
                 , **Ignored
                 ):
 
@@ -499,7 +511,6 @@ class ContentFilter:
         self.description = []
 
         if Title is not self.MARKER: 
-            self.filterTitle = Title
             self.predicates.append( lambda x, pat=re.compile( Title ):
                                       pat.search( x.Title() ) )
             self.description.append( 'Title: %s' % Title )
@@ -548,6 +559,14 @@ class ContentFilter:
             self.description.append( 'Type: %s'
                                    % string.join( Type, ', ' ) )
 
+        if portal_type and portal_type is not self.MARKER:
+            if type(portal_type) is type(''):
+                portal_type = [portal_type]
+            self.predicates.append(lambda x, pt=portal_type:
+                                   x.getPortalTypeName() in pt)
+            self.description.append('Portal Type: %s'
+                                    % string.join(portal_type, ', '))
+
     def hasSubject( self, obj ):
         """
         Converts Subject string into a List for content filter view.
@@ -564,9 +583,10 @@ class ContentFilter:
             try:
                 if not predicate( content ):
                     return 0
-            except: # predicates are *not* allowed to throw exceptions
+            except (AttributeError, KeyError, IndexError, ValueError):
+                # predicates are *not* allowed to throw exceptions
                 return 0
-        
+
         return 1
 
     def __str__( self ):

@@ -95,9 +95,9 @@ CMF TODO's
         (x) Tracker #519:  CMFDefault.MembershipTool always creates
                            member folder
 
-      - ( ) Folder fixes (Florent Guillaume)
+      - (x) Folder fixes (Florent Guillaume)
 
-        ( ) Tracker #483:  listFolderContents doesn't filter properly
+        (x) Tracker #483:  listFolderContents doesn't filter properly
 
         (x) Tracker #503:  index_html/folder_view don't skip unauth
                            folders

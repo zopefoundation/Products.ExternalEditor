@@ -86,11 +86,21 @@ Upgrading from Earlier Versions
 
 Upgrading from versions earlier than CMF 1.3beta2
 
-  Add New Index: "path"
+  Add New Metadata: "portal_type"
 
-      1. From the ZMI of your CMFSite, go to the 'portal_catalog' tool,
-         and select the "Indexes" tab. Add a "PathIndex" using the Add
-         list, and give it an Id of "path".
+      From the ZMI of your CMFSite, go to the 'portal_catalog' tool, and
+      select the "Metadata" tab. Add a Metadata for "portal_type".
+
+  Add New Indexes: "path", "portal_type"
+
+      In the Indexes tab of the 'portal_catalog' tool, add a "PathIndex"
+      using the Add list, and give it an Id of "path". Then add a
+      "FieldIndex" and give it an Id of "portal_type".
+
+  Reindex the New Indexes
+
+      In the Indexes tab of the 'portal_catalog' tool, select the two
+      new indexes ("path" and "portal_type") and click "Reindex".
 
 Upgrading from CMF 1.0
 

@@ -408,7 +408,7 @@ class ContentTypeRegistry( SimpleItem ):
             typeName = '<unknown>'
         else:
             types_tool = getToolByName(self, 'portal_types')
-            typeName = types_tool.getTypeInfo(typeName).Type()
+            typeName = types_tool.getTypeInfo(typeName).Title()
         REQUEST[ 'RESPONSE' ].redirect( self.absolute_url()
                                + '/manage_testRegistry'
                                + '?testResults=Type:+%s'

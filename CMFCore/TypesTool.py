@@ -28,6 +28,7 @@ import Products, CMFCorePermissions
 from ActionProviderBase import ActionProviderBase
 from ActionInformation import ActionInformation
 from Expression import Expression
+from zLOG import LOG, WARNING
 
 from CMFCorePermissions import View, ManagePortal, AccessContentsInformation
 
@@ -122,17 +123,21 @@ class TypeInformation (SimpleItemWithProperties):
     #
     security.declareProtected(View, 'Type')
     def Type(self):
+        """ Deprecated. Use Title(). """
+        LOG('CMFCore.TypesTool', WARNING,
+            'TypeInformation.Type() is deprecated, use Title().')
+        return self.Title()
+
+    security.declareProtected(View, 'Title')
+    def Title(self):
         """
             Return the "human readable" type name (note that it
-            may not map exactly to the 'meta_type', e.g., for
+            may not map exactly to the 'portal_type', e.g., for
             l10n/i18n or where a single content class is being
             used twice, under different names.
         """
-        if self.title:
-            return self.title
-        else:
-            return self.getId()
-    
+        return self.title or self.getId()
+
     security.declareProtected(View, 'Description')
     def Description(self):
         """
@@ -168,23 +173,13 @@ class TypeInformation (SimpleItemWithProperties):
             if ti is None or ti.globalAllow():
                 return 1
 
-        # XXX The whole TypesTool needs to be fixed so that what we pass
-        # around is always a type id, and what we store in
-        # allowed_content_types too.
-
-        # When called from PortalFolder.allowedContentTypes, contentType
-        # is a ti.Type(), which is compatible with what
-        # allowed_content_types contains (human-readable string instead
-        # of type id, unfortunately).
         if contentType in self.allowed_content_types:
             return 1
 
-        # When called from PortalFolder.invokeFactory, contentType is a
-        # type id (the portal_type attribute, ti.getId()), which may be
-        # different from ti.Type() if the title is non-empty.
-        for t in self.listTypeInfo():
-            if t.getId() == contentType:
-                return t.Type() in self.allowed_content_types
+        # Backward compatibility for code that expected Type() to work.
+        for ti in self.listTypeInfo():
+            if ti.Title() == contentType:
+                return ti.getId() in self.allowed_content_types
 
         return 0
 
@@ -716,12 +711,13 @@ class TypesTool( UniqueObject, OFS.Folder.Folder, ActionProviderBase ):
             TypeInformation interface, corresponding to
             the specified 'contentType'.  If contentType is actually
             an object, rather than a string, attempt to look up
-            the appropriate type info using its Type or meta_type.
+            the appropriate type info using its portal_type or meta_type.
         """
         if type( contentType ) is not type( '' ):
             try:
                 contentType = contentType._getPortalTypeName()
-            except: # if we can't get or call it for any reason, fall back...
+            except AttributeError:
+                # if we can't get or call it for any reason, fall back...
                 contentType = contentType.meta_type
         ob = getattr( self, contentType, None )
         if getattr(aq_base(ob), '_isTypeInformation', 0):
@@ -732,10 +728,10 @@ class TypesTool( UniqueObject, OFS.Folder.Folder, ActionProviderBase ):
     security.declarePrivate('_checkViewType')
     def _checkViewType(self,t):
         try:
-            return getSecurityManager().validate(t, t, 'Type', t.Type)
+            return getSecurityManager().validate(t, t, 'Title', t.Title)
         except Unauthorized:
-            return 0        
-        
+            return 0
+
     security.declareProtected(AccessContentsInformation, 'listTypeInfo')
     def listTypeInfo( self, container=None ):
         """
@@ -749,7 +745,8 @@ class TypesTool( UniqueObject, OFS.Folder.Folder, ActionProviderBase ):
             # types for which the user does not have adequate permission.
             if not getattr(aq_base(t), '_isTypeInformation', 0):
                 continue
-            if not t.Type():
+            if not t.getId():
+                # XXX What's this used for ?
                 # Not ready.
                 continue
             # check we're allowed to access the type object
@@ -764,7 +761,7 @@ class TypesTool( UniqueObject, OFS.Folder.Folder, ActionProviderBase ):
     security.declareProtected(AccessContentsInformation, 'listContentTypes')
     def listContentTypes( self, container=None, by_metatype=0 ):
         """
-            Return list of content metatypes.
+            Return list of content types.
         """
         typenames = {}
         for t in self.listTypeInfo( container ):
@@ -772,16 +769,16 @@ class TypesTool( UniqueObject, OFS.Folder.Folder, ActionProviderBase ):
             if by_metatype:
                 name = t.Metatype()
             else:
-                name = t.Type()
+                name = t.getId()
 
             if name:
-                typenames[ name ] = 1
+                typenames[ name ] = None
 
         result = typenames.keys()
         result.sort()
         return result
 
-    
+
     security.declarePublic('constructContent')
     def constructContent( self
                         , type_name
@@ -798,11 +795,11 @@ class TypesTool( UniqueObject, OFS.Folder.Folder, ActionProviderBase ):
         info = self.getTypeInfo( type_name )
         if info is None:
             raise 'ValueError', 'No such content type: %s' % type_name
-        
+
         # check we're allowed to access the type object
         if not self._checkViewType(info):
             raise Unauthorized,info
-        
+
         ob = apply(info.constructInstance, (container, id) + args, kw)
 
         # reindex after _setPortalTypeName has been called.

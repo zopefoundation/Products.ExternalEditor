@@ -122,6 +122,7 @@ class DummyTypeInfo(TypeInformation):
     meta_type = "Dummy Test Type Info"
 
 DummyFTI = FactoryTypeInformation( 'Dummy',
+                                   title='Dummy Content',
                                    meta_type=DummyContent.meta_type,
                                    product='CMFDefault',
                                    factory='addDocument',

@@ -137,7 +137,7 @@ class WorkflowTool (UniqueObject, Folder):
         types_info = []
         for t in ti:
             id = t.getId()
-            title = t.Type()
+            title = t.Title()
             if title == id:
                 title = None
             if cbt is not None and cbt.has_key(id):

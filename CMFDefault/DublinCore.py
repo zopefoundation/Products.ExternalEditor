@@ -174,7 +174,7 @@ class DefaultDublinCoreImpl( PropertyManager ):
         if hasattr(aq_base(self), 'getTypeInfo'):
             ti = self.getTypeInfo()
             if ti is not None:
-                return ti.Type()
+                return ti.Title()
         return self.meta_type
 
     security.declarePublic( 'Format' )

@@ -85,12 +85,12 @@ class Foo( DefaultDublinCoreImpl ):
     def __init__( self ):
         pass # skip DDCI's default values
 
-    def Type( self ):
+    def getPortalTypeName( self ):
         return 'Foo'
 
 class Bar( Foo ):
 
-    def Type( self ):
+    def getPortalTypeName( self ):
         return 'Bar'
 
 class TestMetadataTool( TestCase ):
@@ -308,7 +308,7 @@ class TestMetadataTool( TestCase ):
         foo     = Foo()
         tSpec   = self.tool.getElementSpec( 'Title' )
         tSpec.addPolicy( 'Foo' )
-        tPolicy = tSpec.getPolicy( foo.Type() )
+        tPolicy = tSpec.getPolicy( foo.getPortalTypeName() )
         tPolicy.edit( 1, 0, '', 0, () )
 
         try:
@@ -345,7 +345,7 @@ class TestMetadataTool( TestCase ):
 
         tSpec   = self.tool.getElementSpec( 'Title' )
         tSpec.addPolicy( 'Foo' )
-        tPolicy = tSpec.getPolicy( foo.Type() )
+        tPolicy = tSpec.getPolicy( foo.getPortalTypeName() )
         tPolicy.edit( 1, 0, '', 0, () )
 
         try:

@@ -75,6 +75,17 @@ CMF 1.3 beta2 (2002/06/30)
 
   Bugs Fixed
 
+    - Fixed PortalFolder's filtering so that it correctly restricts
+      itself to the portal types allowed by the TypesTool (Tracker #483).
+
+    - Fixed the TypesTool so that TypeInformation's Title is
+      decorrelated from its Id (the old TypeInformation.Type() should
+      not be used anymore). The Id is what gets put in the "portal_type"
+      attribute of a content object, which one gets at using
+      somecontent.getPortalTypeName(). The Title is returned by
+      somecontent.Type(). "portal_type" is now indexed, and in most
+      cases should be used when doing catalog queries instead of "Type".
+
     - Provided all default skins (content_hide_form, content_show_form)
       for the DCWorkflow default workflow [rev 2]. Note that, when using
       this workflow, the descriptions in the retract and reject forms

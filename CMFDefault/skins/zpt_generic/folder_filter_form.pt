@@ -24,7 +24,7 @@
     tal:condition="showfilter"
     tal:define="filter python:here.decodeFolderFilter(
                                         request.get('folderfilter', '') );
-                Type python:filter.get( 'Type', [] );
+                portal_type python:filter.get( 'portal_type', [] );
                 Subject python:filter.get( 'Subject', () );
                ">
 <tr>
@@ -43,15 +43,15 @@
 <tr>
     <td align="left" valign="top" width="*">Content Type:</td>
     <td align="left" valign="top">
-        <select name="filter_by_Type:list" multiple size="3"
-            tal:define="types python:here.portal_types.listContentTypes()">
+        <select name="filter_by_portal_type:list" multiple size="3"
+            tal:define="typeinfos here/portal_types/listTypeInfo">
                                         container=here )">
             <option value="type"
-                tal:repeat="type types"
-                tal:attributes="value type;
-                                selected python:type in Type;
+                tal:repeat="typeinfo typeinfos"
+                tal:attributes="value typeinfo/getId;
+                                selected python:typeinfo.getId() in portal_type;
                                "
-                tal:content="type"
+                tal:content="typeinfo/Title"
                 > type </option>
             <option tal:condition="nothing">Foo</option>
         </select>

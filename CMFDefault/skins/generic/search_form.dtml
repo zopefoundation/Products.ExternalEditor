@@ -115,10 +115,10 @@
   <th> Item type
   </th>
   <td>
-   <select name="Type:list" multiple size="5">
+   <select name="portal_type:list" multiple size="5">
     <option value="" selected>-- any --</option>
-    <dtml-in expr="portal_types.listContentTypes()">
-     <option><dtml-var sequence-item></option>
+    <dtml-in expr="portal_types.listTypeInfo()">
+     <option value="&dtml-getId;">&dtml-Title;</option>
     </dtml-in>
    </select>
 

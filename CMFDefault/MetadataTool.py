@@ -472,18 +472,18 @@ class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
     security.declarePublic( 'listAllowedVocabulary' )
     def listAllowedVocabulary( self, element, content=None, content_type=None ):
         """
-            List allowed keywords for a given meta_type, or all
+            List allowed keywords for a given portal_type, or all
             possible keywords if none supplied.
         """
         spec = self.getElementSpec( element )
-        if content_type is None:
-            content_type  = content and content.Type() or None
+        if content_type is None and content:
+            content_type = content.getPortalTypeName()
         return spec.getPolicy( content_type ).allowedVocabulary()
 
     security.declarePublic( 'listAllowedSubjects' )
     def listAllowedSubjects( self, content=None, content_type=None ):
         """
-            List allowed keywords for a given meta_type, or all
+            List allowed keywords for a given portal_type, or all
             possible keywords if none supplied.
         """
         return self.listAllowedVocabulary( 'Subject', content, content_type )
@@ -492,7 +492,7 @@ class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
     def listAllowedFormats( self, content=None, content_type=None ):
         """
             List the allowed 'Content-type' values for a particular
-            meta_type, or all possible formats if none supplied.
+            portal_type, or all possible formats if none supplied.
         """
         return self.listAllowedVocabulary( 'Format', content, content_type )
 
@@ -519,7 +519,7 @@ class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
             Set initial values for content metatdata, supplying
             any site-specific defaults.
         """
-        for element, policy in self.listPolicies( content.Type() ):
+        for element, policy in self.listPolicies(content.getPortalTypeName()):
 
             if not getattr( content, element )():
 
@@ -542,7 +542,7 @@ class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
             by the CMF immediately before saving changes to the
             metadata of an object.
         """
-        for element, policy in self.listPolicies( content.Type() ):
+        for element, policy in self.listPolicies(content.getPortalTypeName()):
 
             value = getattr( content, element )()
             if not value and policy.isRequired():

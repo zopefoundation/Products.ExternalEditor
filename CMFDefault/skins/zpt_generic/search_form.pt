@@ -120,13 +120,13 @@
  <tr>
   <th> Item type
   </th>
-  <td tal:define="items python: here.portal_types.listContentTypes()" >
-   <select name="Type:list" multiple size="5">
+  <td tal:define="typeinfos here/portal_types/listTypeInfo" >
+   <select name="portal_type:list" multiple size="5">
     <option value="" selected>-- any --</option>
     <option value=""
-		    tal:repeat="item items"
-		    tal:attributes="value item"
-		    tal:content="item"></option>
+		    tal:repeat="typeinfo typeinfos"
+		    tal:attributes="value typeinfo/getId"
+		    tal:content="typeinfo/Title"></option>
     </select> 
    <dl class="FieldHelp">
     <dd> You may limit your results to particular kinds of

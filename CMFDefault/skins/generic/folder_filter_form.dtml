@@ -9,9 +9,10 @@
 
 <form ACTION="&dtml-absolute_url;/folder_contents" METHOD="POST">
  <dtml-if expr="REQUEST.get('show_filter_form', 0)">
-  <dtml-let Type="()" Subject="''">
-  <dtml-with expr="decodeFolderFilter(REQUEST.get('folderfilter', ''))"
-             mapping>
+  <dtml-let Subject="''"
+            filter="decodeFolderFilter(REQUEST.get('folderfilter', ''))"
+            portalType="filter.get('portal_type', ())">
+  <dtml-with filter mapping>
   <TABLE BORDER="0" CELLSPACING="0" CELLPADDING=2>
    <TR>
     <th colspan="2" align="left">Contents View Filter</th>
@@ -27,14 +28,16 @@
    <TR>
     <TD ALIGN="left" VALIGN="TOP" WIDTH="*">Content Type:</TD>
     <TD ALIGN="left" VALIGN="TOP">
-     <select name="filter_by_Type:list" multiple size="3">
-      <dtml-in expr="portal_types.listContentTypes( container=this() )" sort>
-       <dtml-unless "_['sequence-item'] == 'Portal Folder'">
-        <option value="&dtml-sequence-item;"
-         <dtml-if expr="not Type or (_['sequence-item'] in Type)">selected
+     <select name="filter_by_portal_type:list" multiple size="3">
+      <dtml-in expr="portal_types.listTypeInfo( container=this() )" sort>
+      <dtml-let typeinfo=sequence-item typeid=getId>
+       <dtml-unless "typeid == 'Portal Folder'">
+        <option value="&dtml-typeid;"
+         <dtml-if expr="not portalType or (typeid in portalType)">selected
          </dtml-if>
-        >  &dtml-sequence-item;</option>
+        >  &dtml-Title;</option>
        </dtml-unless>
+      </dtml-let>
       </dtml-in>
      </select>
     </TD>
