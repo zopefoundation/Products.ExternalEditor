@@ -1,3 +1,9 @@
+<script type="text/javascript">
+function guardExprDocs() {
+  window.open('guardExprDocs', '', 'width=640, height=480, resizable, scrollbars, status');
+}
+</script>
+
 <table>
 
 <tr>
@@ -12,7 +18,8 @@
 <tr>
 <th align="left">Expression</th>
 <td colspan="3">
- <input type="text" name="guard_expr" value="&dtml-getExprText;" size="50" />
+<input type="text" name="guard_expr" value="&dtml-getExprText;" size="50" />
+<a href="#" onclick="guardExprDocs(); return false;">[?]</a>
 </td>
 </tr>
 

@@ -15,6 +15,8 @@
 $Id$
 """
 
+import os
+
 from Globals import DTMLFile
 import Globals
 from AccessControl import ClassSecurityInfo
@@ -202,5 +204,18 @@ class WorkflowUIMixin:
         else:
             return Guard().__of__(self)  # Create a temporary guard.
 
+    security.declarePublic('guardExprDocs')
+    def guardExprDocs(self):
+        """Returns documentation on guard expressions.
+        """
+        here = os.path.dirname(__file__)
+        fn = os.path.join(here, 'doc', 'expressions.stx')
+        f = open(fn, 'rt')
+        try:
+            text = f.read()
+        finally:
+            f.close()
+        from DocumentTemplate.DT_Var import structured_text
+        return structured_text(text)
 
 Globals.InitializeClass(WorkflowUIMixin)

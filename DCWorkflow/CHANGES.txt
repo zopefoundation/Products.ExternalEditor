@@ -1,4 +1,18 @@
 
+Next release
+
+- Added support for groups.  Although the implementation is currently
+tied to a particular implementation of groups, it should be
+easy to generalize to any product that adds groups to Zope.
+
+- Added a pop-up expression reference.
+
+- Gave Managers the option to bypass all guards.
+
+- Workflow can now help decide whether object types appear in add
+menus.  This requires help from the types tool.
+
+
 Version 0.5
 
 - Help documentation contributed by John Morton.
@@ -17,6 +31,7 @@ by semicolons) and use Python string formatting for dynamic matches.
 
 - Expression.py was moved to CMFCore.
 
+
 Version 0.4.2
 
 - Fixed getInfoFor() using patch from Sebastien.Bigaret@inqual.com.  Thanks!
@@ -28,12 +43,14 @@ status variables.
 
 - Added scripts that get executed after a transition.
 
+
 Version 0.4.1
 
 - Corrected an expression in the classic workflow implementation.
 
 - Made expressions work again in scripts by removing the requirement
   that "REQUEST" exist.
+
 
 Version 0.4
 
@@ -49,6 +66,7 @@ Version 0.4
 - Added a second default workflow that closely resembles the "classic"
   default workflow.  Just visit a workflow tool and click "Add workflow"
   then select "Web-configurable workflow [Classic]".
+
 
 Version 0.3 (never officially released)
 
