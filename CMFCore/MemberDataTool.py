@@ -318,7 +318,7 @@ class MemberData (SimpleItem):
 
         # Then, check the tool for a value other than ''
         value = tool.getProperty( id, _marker )
-        if value is not _marker and value != '':
+        if value is not _marker:
             return value
 
         # Finally, try the user object.
