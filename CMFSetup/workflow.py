@@ -169,7 +169,7 @@ def exportWorkflowTool( context ):
 
 class WorkflowToolConfigurator( Implicit ):
 
-    """ Synthesize XML description of site's action providers.
+    """ Synthesize XML description of site's workflows.
     """
     security = ClassSecurityInfo()   
     security.setDefaultAccess( 'allow' )
@@ -866,8 +866,8 @@ def _extractTransitionNodes( root, encoding=None ):
         for assignment in t_node.getElementsByTagName( 'assignment' ):
 
             name = _getNodeAttribute( assignment, 'name', encoding )
-            value = _coalesceTextNodeChildren( assignment, encoding )
-            var_map[ name ] = value # XXX: type lost, only know strings???
+            expr = _coalesceTextNodeChildren( assignment, encoding )
+            var_map[ name ] = expr
 
         result.append( info )
 
@@ -1131,6 +1131,7 @@ def _initDCWorkflow( workflow
 
     _initDCWorkflowVariables( workflow, variables )
     _initDCWorkflowStates( workflow, states )
+    _initDCWorkflowTransitions( workflow, transitions )
 
 
 def _initDCWorkflowVariables( workflow, variables ):
@@ -1203,3 +1204,42 @@ def _initDCWorkflowStates( workflow, states ):
 
         workflow.states._setObject( id, s )
 
+
+def _initDCWorkflowTransitions( workflow, transitions ):
+
+    """ Initialize DCWorkflow transitions
+    """
+    from Globals import PersistentMapping
+    from Products.DCWorkflow.Transitions import TransitionDefinition
+
+    for t_info in transitions:
+
+        id = str( t_info[ 'transition_id' ] ) # no unicode!
+        t = TransitionDefinition( id )
+
+        trigger_type = list( TRIGGER_TYPES ).index( t_info[ 'trigger' ] )
+
+        action = t_info[ 'action' ]
+
+        guard = t_info[ 'guard' ]
+        props = { 'guard_roles' : ';'.join( guard[ 'roles' ] )
+                , 'guard_permissions' : ';'.join( guard[ 'permissions' ] )
+                , 'guard_groups' : ';'.join( guard[ 'groups' ] )
+                , 'guard_expr' : guard[ 'expression' ]
+                }
+
+        t.setProperties( title = t_info[ 'title' ]
+                       , description = t_info[ 'description' ]
+                       , new_state_id = t_info[ 'new_state' ]
+                       , trigger_type = trigger_type
+                       , script_name = t_info[ 'before_script' ]
+                       , after_script_name = t_info[ 'after_script' ]
+                       , actbox_name = action[ 'name' ]
+                       , actbox_url = action[ 'url' ]
+                       , actbox_category = action[ 'category' ]
+                       , props = props
+                       )
+
+        t.var_exprs = PersistentMapping( t_info[ 'variables' ].items() )
+
+        workflow.transitions._setObject( id, t )

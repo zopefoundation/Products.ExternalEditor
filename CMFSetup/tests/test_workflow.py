@@ -2089,7 +2089,7 @@ class Test_importWorkflow( _WorkflowSetup
             self.assertEqual( guard.permissions, expected[ 6 ] )
             self.assertEqual( guard.roles, expected[ 7 ] )
             self.assertEqual( guard.groups, expected[ 8 ] )
-            self.assertEqual( guard.expr, expected[ 9 ] or None )
+            self.assertEqual( guard.getExprText(), expected[ 9 ] )
 
     def test_from_empty_dcworkflow_workflow_states( self ):
 
@@ -2147,6 +2147,48 @@ class Test_importWorkflow( _WorkflowSetup
             for var_id, value in state.getVariableValues():
 
                 self.assertEqual( value, expected[ 5 ][ var_id ] )
+
+    def test_from_empty_dcworkflow_workflow_transitions( self ):
+
+        WF_ID = 'dcworkflow_transitions'
+        WF_TITLE = 'DC Workflow testing transitions'
+        WF_INITIAL_STATE = 'closed'
+
+        tool = self._importNormalWorkflow( WF_ID, WF_TITLE, WF_INITIAL_STATE )
+
+        workflow = tool.objectValues()[ 0 ]
+
+        transitions = workflow.transitions
+
+        self.assertEqual( len( transitions.objectItems() )
+                        , len( _WF_TRANSITIONS ) )
+
+        for id, transition in transitions.objectItems():
+
+            expected = _WF_TRANSITIONS[ transition.getId() ]
+            self.assertEqual( transition.title, expected[ 0 ] )
+            self.failUnless( expected[ 1 ] in transition.description )
+            self.assertEqual( transition.new_state_id, expected[ 2 ] )
+            self.assertEqual( transition.trigger_type, expected[ 3 ] )
+            self.assertEqual( transition.script_name, expected[ 4 ] )
+            self.assertEqual( transition.after_script_name, expected[ 5 ] )
+            self.assertEqual( transition.actbox_name, expected[ 6 ] )
+            self.assertEqual( transition.actbox_url, expected[ 7 ] )
+            self.assertEqual( transition.actbox_category, expected[ 8 ] )
+
+            var_exprs = transition.var_exprs
+
+            self.assertEqual( len( var_exprs ), len( expected[ 9 ] ) )
+
+            for var_id, expr in var_exprs.items():
+                self.assertEqual( expr, expected[ 9 ][ var_id ] )
+
+            guard = transition.getGuard()
+
+            self.assertEqual( guard.permissions, expected[ 10 ] )
+            self.assertEqual( guard.roles, expected[ 11 ] )
+            self.assertEqual( guard.groups, expected[ 12 ] )
+            self.assertEqual( guard.getExprText(), expected[ 13 ] )
 
 def test_suite():
     return unittest.TestSuite((
