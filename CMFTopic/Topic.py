@@ -164,7 +164,7 @@ class Topic(PortalFolder):
         '''
         Invokes the action identified by the id "view" or the first action.
         '''
-        tool = getToolByName( self, 'portal_types' )
+        tool = utils.getToolByName( self, 'portal_types' )
         ti = tool.getTypeInfo( self )
         if ti is not None:
             path = ti.getActionById('view', None)
@@ -297,7 +297,7 @@ class Topic(PortalFolder):
     security.declareProtected(TopicPermissions.AddTopics, 'addSubtopic')
     def addSubtopic(self, id):
         """ Add a new subtopic """
-        tool = getToolByName( self, 'portal_types' )
+        tool = utils.getToolByName( self, 'portal_types' )
         topictype = tool.getTypeInfo(self)
         topictype.constructInstance(self, id)
 
