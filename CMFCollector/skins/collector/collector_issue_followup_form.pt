@@ -81,7 +81,8 @@
         </td>
 
 
-        <td tal:define="assigning python: [1 for i in actions_pairs
+        <td valign="top"
+            tal:define="assigning python: [1 for i in actions_pairs
                                              if i[1] == 'Assign'];
                         supporters here/aq_parent/supporters"
             tal:condition="assigning">
