@@ -73,7 +73,7 @@
              title="Reviewer publishes content"
              new_state="published" trigger="USER"
              before_script="" after_script="">
-  <action url="%(content_url)s/content_publish_form"
+  <action url="%(object_url)s/content_publish_form"
           category="workflow">Publish</action>
   <guard>
    <guard-permission>Review portal content</guard-permission>
@@ -84,7 +84,7 @@
              title="Reviewer rejects submission"
              new_state="private" trigger="USER"
              before_script="" after_script="">
-  <action url="%(content_url)s/content_reject_form"
+  <action url="%(object_url)s/content_reject_form"
           category="workflow">Reject</action>
   <guard>
    <guard-permission>Review portal content</guard-permission>
@@ -95,7 +95,7 @@
              title="Member retracts submission"
              new_state="private" trigger="USER"
              before_script="" after_script="">
-  <action url="%(content_url)s/content_retract_form"
+  <action url="%(object_url)s/content_retract_form"
           category="workflow">Retract</action>
   <guard>
    <guard-permission>Request review</guard-permission>
@@ -106,7 +106,7 @@
              title="Member requests publishing"
              new_state="pending" trigger="USER"
              before_script="" after_script="">
-  <action url="%(content_url)s/content_submit_form"
+  <action url="%(object_url)s/content_submit_form"
           category="workflow">Submit</action>
   <guard>
    <guard-permission>Request review</guard-permission>
