@@ -20,7 +20,6 @@ from types import ListType
 from Globals import DTMLFile
 from Globals import InitializeClass
 from Globals import PersistentMapping
-from SkinsContainer import SkinsContainer
 from Acquisition import aq_base
 from DateTime import DateTime
 from AccessControl import ClassSecurityInfo
@@ -36,6 +35,7 @@ from CMFCorePermissions import AccessContentsInformation
 from CMFCorePermissions import ManagePortal
 from CMFCorePermissions import View
 from interfaces.portal_skins import portal_skins as ISkinsTool
+from SkinsContainer import SkinsContainer
 from utils import _dtmldir
 from utils import getToolByName
 from utils import UniqueObject
@@ -53,11 +53,13 @@ def modifiedOptions():
                   'action':'manage_propertiesForm'}]
     return tuple(rval)
 
+
 class SkinsTool(UniqueObject, SkinsContainer, Folder, ActionProviderBase):
     """ This tool is used to supply skins to a portal.
     """
 
-    __implements__ = (ISkinsTool, ActionProviderBase.__implements__)
+    __implements__ = (ISkinsTool, SkinsContainer.__implements__,
+                      ActionProviderBase.__implements__)
 
     id = 'portal_skins'
     meta_type = 'CMF Skins Tool'
@@ -184,13 +186,12 @@ class SkinsTool(UniqueObject, SkinsContainer, Folder, ActionProviderBase):
         self.getSkinByPath(p, raise_exc=1)
 
     #
-    #   'portal_skins' interface methods
+    #   'SkinsContainer' interface methods
     #
     security.declareProtected(AccessContentsInformation, 'getSkinPath')
     def getSkinPath(self, name):
-        '''
-        Converts a skin name to a skin path.  Used by SkinsContainer.
-        '''
+        """ Convert a skin name to a skin path.
+        """
         sels = self._getSelections()
         p = sels.get(name, None)
         if p is None:
@@ -200,19 +201,19 @@ class SkinsTool(UniqueObject, SkinsContainer, Folder, ActionProviderBase):
 
     security.declareProtected(AccessContentsInformation, 'getDefaultSkin')
     def getDefaultSkin(self):
-        '''
-        Returns the default skin name.  Used by SkinsContainer.
-        '''
+        """ Get the default skin name.
+        """
         return self.default_skin
 
     security.declareProtected(AccessContentsInformation, 'getRequestVarname')
     def getRequestVarname(self):
-        '''
-        Returns the variable name to look for in the REQUEST.  Used by
-        SkinsContainer.
-        '''
+        """ Get the variable name to look for in the REQUEST.
+        """
         return self.request_varname
 
+    #
+    #   UI methods
+    #
     security.declareProtected(AccessContentsInformation, 'getAllowAny')
     def getAllowAny(self):
         '''
@@ -242,11 +243,13 @@ class SkinsTool(UniqueObject, SkinsContainer, Folder, ActionProviderBase):
         rval.sort()
         return rval
 
+    #
+    #   'portal_skins' interface methods
+    #
     security.declarePublic('getSkinSelections')
     def getSkinSelections(self):
-        '''
-        Returns the sorted list of available skin names.
-        '''
+        """ Get the sorted list of available skin names.
+        """
         sels = self._getSelections()
         rval = list(sels.keys())
         rval.sort()

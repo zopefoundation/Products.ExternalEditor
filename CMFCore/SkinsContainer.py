@@ -19,6 +19,9 @@ from Acquisition import aq_base
 from AccessControl import ClassSecurityInfo
 from Globals import InitializeClass
 
+from CMFCorePermissions import AccessContentsInformation
+from interfaces.portal_skins import SkinsContainer as ISkinsContainer
+
 
 class SkinPathError (Exception):
     'Invalid skin path'
@@ -26,35 +29,33 @@ class SkinPathError (Exception):
 
 
 class SkinsContainer:
+
+    __implements__ = ISkinsContainer
+
     security = ClassSecurityInfo()
 
-    security.declarePublic('getSkinPath')
+    security.declareProtected(AccessContentsInformation, 'getSkinPath')
     def getSkinPath(self, name):
-        '''
-        Converts a skin name to a skin path.
-        '''
-        raise 'Not implemented'
+        """ Convert a skin name to a skin path.
+        """
+        raise NotImplementedError
 
-    security.declarePublic('getDefaultSkin')
+    security.declareProtected(AccessContentsInformation, 'getDefaultSkin')
     def getDefaultSkin(self):
-        '''
-        Returns the default skin name.
-        '''
-        raise 'Not implemented'
+        """ Get the default skin name.
+        """
+        raise NotImplementedError
 
-    security.declarePublic('getRequestVarname')
+    security.declareProtected(AccessContentsInformation, 'getRequestVarname')
     def getRequestVarname(self):
-        '''
-        Returns the variable name to look for in the REQUEST.
-        '''
-        raise 'Not implemented'
+        """ Get the variable name to look for in the REQUEST.
+        """
+        raise NotImplementedError
 
     security.declarePrivate('getSkinByPath')
     def getSkinByPath(self, path, raise_exc=0):
-        '''
-        Returns a skin at the given path.  A skin path is of the format:
-        "some/path, some/other/path, ..."  The first part has precedence.
-        '''
+        """ Get a skin at the given path.
+        """
         baseself = aq_base(self)
         skinob = baseself
         parts = list( path.split(',') )
@@ -87,6 +88,8 @@ class SkinsContainer:
 
     security.declarePrivate('getSkinByName')
     def getSkinByName(self, name):
+        """ Get the named skin.
+        """
         path = self.getSkinPath(name)
         if path is None:
             return None
