@@ -93,6 +93,7 @@ __version__='$Revision$'[11:-2]
 from Products.CMFCore.utils import UniqueObject
 from OFS.SimpleItem import SimpleItem
 from Globals import default__class_init__
+from Acquisition import aq_inner, aq_parent
 
 
 class PropertiesTool (UniqueObject, SimpleItem):
@@ -105,7 +106,7 @@ class PropertiesTool (UniqueObject, SimpleItem):
 
     def editProperties(self, props):
         '''Change portal settings'''
-        self.aq_inner.aq_parent.manage_changeProperties(props)
+        aq_parent(aq_inner(self)).manage_changeProperties(props)
         self.MailHost.smtp_host = props['smtp_server']
         if hasattr(self, 'propertysheets'):
             ps = self.propertysheets
