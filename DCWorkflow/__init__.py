@@ -22,7 +22,10 @@ import Default
 
 
 def initialize(context):
-
+    
+    context.registerHelp(directory='help')
+    context.registerHelpTitle('DCWorkflow')
+    
     registerIcon(DCWorkflow.DCWorkflowDefinition,
                  'images/workflow.gif', globals())
     registerIcon(States.States,
