@@ -95,7 +95,7 @@ from CMFCorePermissions import View, ManageProperties, ListFolderContents
 from CMFCorePermissions import AddPortalFolders, AddPortalContent
 from OFS.Folder import Folder
 from OFS.ObjectManager import REPLACEABLE
-from Globals import HTMLFile
+from Globals import DTMLFile
 from AccessControl import getSecurityManager, ClassSecurityInfo
 from Acquisition import aq_parent, aq_inner, aq_base
 from DynamicType import DynamicType
@@ -215,16 +215,10 @@ class PortalFolder( Folder, DynamicType ):
         result = []
         append = result.append
         get = self._getOb
-        always_incl_folders = not filter.get('FilterIncludesFolders', 0)
         for id in ids:
             obj = get( id )
             include = 0
-            if (always_incl_folders and hasattr(obj, 'meta_type') and
-                obj.meta_type == PortalFolder.meta_type):
-                include = 1
-            elif query(obj):
-                include = 1
-            if include:
+            if query(obj):
                 append( (id, obj) )
         return result
 
@@ -462,7 +456,7 @@ class ContentFilter:
         Represent a predicate against a content object's metadata.
     """
     MARKER = []
-    filterSubject = filterType = []
+    filterSubject = []
     def __init__( self
                 , Title=MARKER
                 , Creator=MARKER
@@ -477,46 +471,57 @@ class ContentFilter:
                 ):
 
         self.predicates = []
+        self.description = []
 
         if Title is not self.MARKER: 
             self.filterTitle = Title
-            self.predicates.append( lambda x, pat=re( Title ):
+            self.predicates.append( lambda x, pat=re.compile( Title ):
                                       pat.search( x.Title() ) )
+            self.description.append( 'Title: %s' % Title )
 
         if Creator is not self.MARKER: 
-            self.predicates.append( lambda x, pat=re( Creator ):
+            self.predicates.append( lambda x, pat=re.compile( Creator ):
                                       pat.search( x.Creator() ) )
+            self.description.append( 'Creator: %s' % Creator )
 
         if Subject and Subject is not self.MARKER: 
             self.filterSubject = Subject
             self.predicates.append( self.hasSubject )
+            self.description.append( 'Subject: %s'
+                                   % string.join( Subject, ', ' ) )
 
         if Description is not self.MARKER: 
-            self.predicates.append( lambda x, pat=re( Description ):
+            self.predicates.append( lambda x, pat=re.compile( Description ):
                                       pat.search( x.Description() ) )
+            self.description.append( 'Description: %s' % Description )
 
         if created is not self.MARKER: 
             if created_usage == 'range:min':
                 self.predicates.append( lambda x, cd=created:
                                           cd <= x.created() )
+                self.description.append( 'Created since: %s' % created )
             if created_usage == 'range:max':
                 self.predicates.append( lambda x, cd=created:
                                           cd >= x.created() )
+                self.description.append( 'Created before: %s' % created )
 
         if modified is not self.MARKER: 
             if modified_usage == 'range:min':
                 self.predicates.append( lambda x, md=modified:
                                           md <= x.modified() )
+                self.description.append( 'Modified since: %s' % modified )
             if modified_usage == 'range:max':
                 self.predicates.append( lambda x, md=modified:
                                           md >= x.modified() )
+                self.description.append( 'Modified before: %s' % modified )
 
         if Type:
             if type( Type ) == type( '' ):
                 Type = [ Type ]
-            self.filterType = Type
             self.predicates.append( lambda x, Type=Type:
                                       x.Type() in Type )
+            self.description.append( 'Type: %s'
+                                   % string.join( Type, ', ' ) )
 
     def hasSubject( self, obj ):
         """
@@ -534,18 +539,18 @@ class ContentFilter:
             try:
                 if not predicate( content ):
                     return 0
-            except: # XXX
+            except: # predicates are *not* allowed to throw exceptions
                 return 0
         
         return 1
 
     def __str__( self ):
         """
+            Return a stringified description of the filter.
         """
-        return "Subject: %s; Type: %s" % ( self.filterSubject,
-                                           self.filterType )
-
-manage_addPortalFolder = PortalFolder.manage_addPortalFolder
-manage_addPortalFolderForm = HTMLFile( 'folderAdd', globals() )
+        return string.join( self.description, '; ' )
 
 Globals.InitializeClass(PortalFolder)
+
+manage_addPortalFolder = PortalFolder.manage_addPortalFolder
+manage_addPortalFolderForm = DTMLFile( 'folderAdd', globals() )

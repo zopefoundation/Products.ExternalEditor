@@ -5,6 +5,7 @@ import OFS.Folder, OFS.SimpleItem
 from AccessControl import SecurityManager
 from AccessControl.SecurityManagement import newSecurityManager
 import Acquisition
+from DateTime import DateTime
 from Products.CMFCore.TypesTool import TypesTool, FactoryTypeInformation
 from Products.CMFCore.CatalogTool import CatalogTool
 from Products.CMFCore.PortalContent import PortalContent
@@ -314,10 +315,242 @@ def has_path( catalog, path ):
             return 1
     return 0
 
+class DummyContentWithMetadata( DummyContent ):
+
+    def Title( self ):
+        return self.title
+
+    def Creator( self ):
+        return self.creator
+
+    def Subject( self ):
+        return self.subject
+
+    def Description( self ):
+        return self.description
+
+    def created( self ):
+        return self.created_date
+
+    def modified( self ):
+        return self.modified_date
+    
+    def Type( self ):
+        return 'Dummy Content'
+
+class ContentFilterTests( unittest.TestCase ):
+
+    def setUp( self ):
+        get_transaction().begin()
+
+    def tearDown( self ):
+        get_transaction().abort()
+
+    def test_empty( self ):
+        cfilter = ContentFilter()
+        dummy = DummyContentWithMetadata( 'Dummy' )
+        assert cfilter( dummy )
+        desc = str( cfilter )
+        lines = filter( None, string.split( desc, '; ' ) )
+        assert not lines
+
+    def test_Type( self ):
+        cfilter = ContentFilter( Type='foo' )
+        dummy = DummyContentWithMetadata( 'Dummy' )
+        assert not cfilter( dummy )
+        cfilter = ContentFilter( Type='Dummy Content' )
+        assert cfilter( dummy )
+        desc = str( cfilter )
+        lines = string.split( desc, '; ' )
+        assert len( lines ) == 1
+        assert lines[0] == 'Type: Dummy Content'
+
+        cfilter = ContentFilter( Type=( 'foo', 'bar' ) )
+        dummy = DummyContentWithMetadata( 'Dummy' )
+        assert not cfilter( dummy )
+        cfilter = ContentFilter( Type=( 'Dummy Content', 'something else' ) )
+        assert cfilter( dummy )
+        desc = str( cfilter )
+        lines = string.split( desc, '; ' )
+        assert len( lines ) == 1
+        assert lines[0] == 'Type: Dummy Content, something else'
+
+    def test_Title( self ):
+        cfilter = ContentFilter( Title='foo' )
+        dummy = DummyContentWithMetadata( 'Dummy' )
+        assert not cfilter( dummy )
+        dummy.title = 'asdf'
+        assert not cfilter( dummy )
+        dummy.title = 'foolish'
+        assert cfilter( dummy )
+        dummy.title = 'ohsofoolish'
+        assert cfilter( dummy )
+        desc = str( cfilter )
+        lines = string.split( desc, '; ' )
+        assert len( lines ) == 1
+        assert lines[0] == 'Title: foo'
+    
+    def test_Creator( self ):
+        cfilter = ContentFilter( Creator='moe' )
+        dummy = DummyContentWithMetadata( 'Dummy' )
+        assert not cfilter( dummy )
+        dummy.creator = 'curly'
+        assert not cfilter( dummy )
+        dummy.creator = 'moe'
+        assert cfilter( dummy )
+        dummy.creator = 'shmoe'
+        assert cfilter( dummy )
+        desc = str( cfilter )
+        lines = string.split( desc, '; ' )
+        assert len( lines ) == 1
+        assert lines[0] == 'Creator: moe'
+    
+    def test_Description( self ):
+        cfilter = ContentFilter( Description='funny' )
+        dummy = DummyContentWithMetadata( 'Dummy' )
+        assert not cfilter( dummy )
+        dummy.description = 'sad'
+        assert not cfilter( dummy )
+        dummy.description = 'funny'
+        assert cfilter( dummy )
+        dummy.description = 'it is funny you should mention it...'
+        assert cfilter( dummy )
+        desc = str( cfilter )
+        lines = string.split( desc, '; ' )
+        assert len( lines ) == 1
+        assert lines[0] == 'Description: funny'
+    
+    def test_Subject( self ):
+        cfilter = ContentFilter( Subject=('foo',) )
+        dummy = DummyContentWithMetadata( 'Dummy' )
+        assert not cfilter( dummy )
+        dummy.subject = ( 'bar', )
+        assert not cfilter( dummy )
+        dummy.subject = ( 'foo', )
+        assert cfilter( dummy )
+        dummy.subject = ( 'foo', 'bar', )
+        assert cfilter( dummy )
+        desc = str( cfilter )
+        lines = string.split( desc, '; ' )
+        assert len( lines ) == 1
+        assert lines[0] == 'Subject: foo'
+
+        # Now test with mutli-valued
+        cfilter = ContentFilter( Subject=('foo', 'bar' ) )
+        dummy = DummyContentWithMetadata( 'Dummy' )
+        assert not cfilter( dummy )
+        dummy.subject = ( 'baz', )
+        assert not cfilter( dummy )
+        dummy.subject = ( 'bar', )
+        assert cfilter( dummy )
+        dummy.subject = ( 'foo', )
+        assert cfilter( dummy )
+        dummy.subject = ( 'foo', 'bar', )
+        assert cfilter( dummy )
+        desc = str( cfilter )
+        lines = string.split( desc, '; ' )
+        assert len( lines ) == 1
+        assert lines[0] == 'Subject: foo, bar'
+    
+    def test_created( self ):
+        cfilter = ContentFilter( created=DateTime( '2001/01/01' )
+                               , created_usage='range:min' )
+        dummy = DummyContentWithMetadata( 'Dummy' )
+        assert not cfilter( dummy )
+        dummy.created_date = DateTime( '2000/12/31' )
+        assert not cfilter( dummy )
+        dummy.created_date = DateTime( '2001/12/31' )
+        assert cfilter( dummy )
+        dummy.created_date = DateTime( '2001/01/01' )
+        assert cfilter( dummy )
+        desc = str( cfilter )
+        lines = string.split( desc, '; ' )
+        assert len( lines ) == 1
+        assert lines[0] == 'Created since: 2001/01/01'
+
+        cfilter = ContentFilter( created=DateTime( '2001/01/01' )
+                               , created_usage='range:max' )
+
+        dummy = DummyContentWithMetadata( 'Dummy' )
+        assert not cfilter( dummy )
+        dummy.created_date = DateTime( '2000/12/31' )
+        assert cfilter( dummy )
+        dummy.created_date = DateTime( '2001/12/31' )
+        assert not cfilter( dummy )
+        dummy.created_date = DateTime( '2001/01/01' )
+        assert cfilter( dummy )
+        desc = str( cfilter )
+        lines = string.split( desc, '; ' )
+        assert len( lines ) == 1
+        assert lines[0] == 'Created before: 2001/01/01'
+    
+    def test_modified( self ):
+        cfilter = ContentFilter( modified=DateTime( '2001/01/01' )
+                               , modified_usage='range:min' )
+        dummy = DummyContentWithMetadata( 'Dummy' )
+        assert not cfilter( dummy )
+        dummy.modified_date = DateTime( '2000/12/31' )
+        assert not cfilter( dummy )
+        dummy.modified_date = DateTime( '2001/12/31' )
+        assert cfilter( dummy )
+        dummy.modified_date = DateTime( '2001/01/01' )
+        assert cfilter( dummy )
+        desc = str( cfilter )
+        lines = string.split( desc, '; ' )
+        assert len( lines ) == 1
+        assert lines[0] == 'Modified since: 2001/01/01'
+
+        cfilter = ContentFilter( modified=DateTime( '2001/01/01' )
+                               , modified_usage='range:max' )
+
+        dummy = DummyContentWithMetadata( 'Dummy' )
+        assert not cfilter( dummy )
+        dummy.modified_date = DateTime( '2000/12/31' )
+        assert cfilter( dummy )
+        dummy.modified_date = DateTime( '2001/12/31' )
+        assert not cfilter( dummy )
+        dummy.modified_date = DateTime( '2001/01/01' )
+        assert cfilter( dummy )
+        desc = str( cfilter )
+        lines = string.split( desc, '; ' )
+        assert len( lines ) == 1
+        assert lines[0] == 'Modified before: 2001/01/01'
+ 
+    def test_mixed( self ):
+        cfilter = ContentFilter( created=DateTime( '2001/01/01' )
+                               , created_usage='range:max'
+                               , Title='foo'
+                               )
+
+        dummy = DummyContentWithMetadata( 'Dummy' )
+        assert not cfilter( dummy )
+        dummy.created_date = DateTime( '2000/12/31' )
+        assert not cfilter( dummy )
+        dummy.created_date = DateTime( '2001/12/31' )
+        assert not cfilter( dummy )
+        dummy.created_date = DateTime( '2001/01/01' )
+        assert not cfilter( dummy )
+
+        dummy.title = 'ohsofoolish'
+        del dummy.created_date
+        assert not cfilter( dummy )
+        dummy.created_date = DateTime( '2000/12/31' )
+        assert cfilter( dummy )
+        dummy.created_date = DateTime( '2001/12/31' )
+        assert not cfilter( dummy )
+        dummy.created_date = DateTime( '2001/01/01' )
+        assert cfilter( dummy )
+
+        desc = str( cfilter )
+        lines = string.split( desc, '; ' )
+        assert len( lines ) == 2, lines
+        assert 'Created before: 2001/01/01' in lines
+        assert 'Title: foo' in lines
 
 def test_suite():
     suite = unittest.TestSuite()
     suite.addTest( unittest.makeSuite( PortalFolderTests ) )
+    suite.addTest( unittest.makeSuite( ContentFilterTests ) )
     return suite
 
 def run():
