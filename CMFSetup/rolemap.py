@@ -160,6 +160,27 @@ def importRolemap( context ):
     """ Export roles / permission map as an XML file
 
     o 'context' must implement IImportContext.
+
+    o Register via Python:
+
+      registry = site.portal_setup.setup_steps
+      registry.registerStep( 'importRoleMap'
+                           , '20040518-01'
+                           , Products.CMFSetup.rolemap.importRoleMap
+                           , ()
+                           , 'Role / Permission import'
+                           , 'Import additional roles, and map '
+                           'roles to permissions'
+                           )
+
+    o Register via XML:
+ 
+      <setup-step id="importRoleMap"
+                  version="20040518-01"
+                  handler="Products.CMFSetup.rolemap.importRoleMap"
+                  title="Role / Permission import"
+      >Import additional roles, and map roles to permissions.</setup-step>
+
     """
     site = context.getSite()
     text = context.readDatafile( FILENAME )
@@ -177,6 +198,27 @@ def exportRolemap( context ):
     """ Export roles / permission map as an XML file
 
     o 'context' must implement IExportContext.
+
+    o Register via Python:
+
+      registry = site.portal_setup.export_steps
+      registry.registerStep( 'exportRoleMap'
+                           , '20040518-01'
+                           , Products.CMFSetup.rolemap.exportRoleMap
+                           , ()
+                           , 'Role / Permission export'
+                           , 'Export additional roles, and '
+                             'role / permission map '
+                           )
+
+    o Register via XML:
+ 
+      <export-script id="exportRoleMap"
+                     version="20040518-01"
+                     handler="Products.CMFSetup.rolemap.exportRoleMap"
+                     title="Role / Permission export"
+      >Export additional roles, and role / permission map.</export-script>
+
     """
     rc = RolemapConfigurator( site ).__of__( site )
     text = rc.generateXML()
