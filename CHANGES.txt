@@ -1,6 +1,10 @@
-CMF 1.5alpha (unreleased)
+CMF 1.5.0-alpha (2004/07/09)
 
   New Features
+
+    - New CMFSetup tool provides export / import of various site
+      configuration choices, both as tarballs and as TTW "snapshots".
+      See the "README":CMFSetup/README.txt.
 
     - zpt skin: Some forms are now scripts.
       These scripts are dispatchers that call validators and controllers and
@@ -285,7 +289,3 @@ CMF 1.5alpha (unreleased)
       cruft. A later platform is required since CMF 1.3.
 
     - Collector #153: CookieCrumbler didn't preserve query strings.
-
-CMF 1.4x
-
-  see CHANGES.txt of CMF-1_4-branch
