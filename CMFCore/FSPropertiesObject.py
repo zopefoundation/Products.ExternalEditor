@@ -120,14 +120,14 @@ class FSPropertiesObject (FSObject, PropertyManager):
                             'manage_changePropertyTypes',)
                                
     security.declareProtected(ViewManagementScreens, 'manage_doCustomize')
-    def manage_doCustomize(self, folder_path, data=None, RESPONSE=None):
+    def manage_doCustomize(self, folder_path, RESPONSE=None):
         """Makes a ZODB Based clone with the same data.
 
         Calls _createZODBClone for the actual work.
         """
         # Overridden here to provide a different redirect target.
 
-        FSObject.manage_doCustomize(self, folder_path, data, RESPONSE)
+        FSObject.manage_doCustomize(self, folder_path, RESPONSE)
 
         if RESPONSE is not None:
             fpath = tuple(split(folder_path, '/'))
