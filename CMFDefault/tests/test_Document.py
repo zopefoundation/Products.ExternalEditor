@@ -1,6 +1,8 @@
 import unittest, string
 from Products.CMFDefault.Document import Document
 #" 
+DOCTYPE = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">'''
+
 BASIC_HTML = '''\
 <html>
  <head>
@@ -54,6 +56,19 @@ class TestCase(unittest.TestCase):
         assert d.Description() == 'DESCRIBE ME'
         assert len(d.Contributors()) == 2
 
+    def test_HtmlWithDoctype(self):
+        d = Document('foo')
+        html = '%s\n%s' % (DOCTYPE, BASIC_HTML)
+        d.edit(text_format='', text=html)
+        assert d.Description() == 'Describe me'
+
+    def test_HtmlWithoutNewlines(self):
+        d = Document('foo')
+        html = string.join(string.split(BASIC_HTML, '\n'), '')
+        d.edit(text_format='', text=html)
+        assert d.Format() == 'text/html'
+        assert d.Description() == 'Describe me'
+
     def test_StructuredText(self):
         d = Document('foo')
         d.edit(text_format='structured-text', text=BASIC_STRUCTUREDTEXT)
@@ -81,6 +96,8 @@ class TestCase(unittest.TestCase):
         assert d.text == ''
         assert d.title == 'Foodoc'
         assert d.Format() == 'text/plain'
+
+
 
 def test_suite():
     return unittest.makeSuite(TestCase)
