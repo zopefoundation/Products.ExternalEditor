@@ -86,10 +86,10 @@
           <td> FROM </td>
           <td>
             <span metal:fill-slot="issue_submitter_id_slot">
-              <input name="submitter_id" value="ID" size="10"
+              <input name="submitter_id" value="ID" size="7"
                      tal:attributes="value python: here.submitter_id">
-                @
-              <input name="submitter_email" value="EMAIL" size="20"
+                <font size="-1">Email:</font>
+                <input name="submitter_email" value="EMAIL" size="22"
                      tal:attributes="value python: here.submitter_email or ''">
             </span>
           </td>
