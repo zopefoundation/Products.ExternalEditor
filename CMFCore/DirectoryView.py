@@ -33,23 +33,26 @@ from zLOG import LOG, ERROR
 from sys import exc_info
 from types import StringType
 
-_dtmldir = os.path.join( package_home( globals() ), 'dtml' )
+_dtmldir = path.join( package_home( globals() ), 'dtml' )
 
 __reload_module__ = 0
 
 # Ignore version control subdirectories
-# and special names.
-def _filter(name):
-    return name not in ('CVS', 'SVN', '.', '..')
+ignore = ('CVS', 'SVN', '.', '..')
 
+# and special names.
 def _filtered_listdir(path):
-    n = filter(_filter,
-               listdir(path))
-    return n
+    return [ name
+             for name
+             in listdir(path)
+             if name not in ignore ]
 
 # This walker is only used on the Win32 version of _changed
 def _walker (listdir, dirname, names):
-    names[:]=filter(_filter,names)
+    names = [ (name, stat(path.join(dirname,name))[8])
+              for name
+              in names
+              if name not in ignore ]
     listdir.extend(names)
 
 class DirectoryInformation:
@@ -166,7 +169,7 @@ class DirectoryInformation:
                     ERROR,
                     'Error checking for directory modification',
                     error=exc_info())
-                
+
             if mtime != self._v_last_read or filelist != self._v_last_filelist:
                 self._v_last_read = mtime
                 self._v_last_filelist = filelist

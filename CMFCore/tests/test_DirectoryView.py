@@ -8,7 +8,7 @@ from Products.CMFCore.DirectoryView import \
      registerDirectory,addDirectoryViews,DirectoryViewSurrogate
 from Globals import package_home, DevelopmentMode
 
-from os import remove, mkdir, rmdir, curdir
+from os import remove, mkdir, rmdir, curdir, stat
 from os.path import join, abspath, dirname
 from shutil import copy2
 from time import sleep
@@ -31,6 +31,25 @@ def _registerDirectory(self=None):
         ob = self.ob = DummyFolder()
         addDirectoryViews(ob, 'fake_skins', _prefix)
     
+def _writeFile(filename, stuff):
+    # write some stuff to a file on disk
+    # make sure the file's modification time has changed
+    thePath = join(skin_path_name,filename)
+    try:
+        mtime1 = stat(thePath)[8]
+    except:
+        mtime1 = 0
+    mtime2 = mtime1
+    while mtime2==mtime1:
+        f = open(thePath,'w')
+        f.write(stuff)
+        f.close()
+        mtime2 = stat(thePath)[8]
+
+def _deleteFile(filename):
+    # nuke it
+    remove(join(skin_path_name,filename))
+
 class DirectoryViewTests1( TestCase ):
 
     def test_registerDirectory( self ):
@@ -77,15 +96,11 @@ if DevelopmentMode:
         _registerDirectory(self)
 
         # add a method to the fake skin folder
-        f = open(test2path,'w')
-        f.write("return 'test2'")
-        f.close()
+        _writeFile(test2path, "return 'test2'")
 
         # edit the test1 method
         copy2(test1path,test1path+'.bak')
-        f = open(test1path,'w')
-        f.write("return 'new test1'")
-        f.close()
+        _writeFile(test1path, "return 'new test1'")
 
         # add a new folder
         mkdir(test3path)
@@ -154,9 +169,7 @@ if DevelopmentMode:
             self.fail('test2 still exists')
             
         # add method back to the fake skin folder
-        f = open(test2path,'w')
-        f.write("return 'test2.2'")
-        f.close()
+        _writeFile(test2path, "return 'test2.2'")
         
         # we need to wait a second here or the mtime will actually
         # have the same value, no human makes two edits in less
@@ -166,11 +179,8 @@ if DevelopmentMode:
         # check
         self.assertEqual(self.ob.fake_skin.test2(),'test2.2')
 
-        
         # edit method
-        f = open(test2path,'w')
-        f.write("return 'test2.3'")
-        f.close()
+        _writeFile(test2path, "return 'test2.3'")
 
         # check
         self.assertEqual(self.ob.fake_skin.test2(),'test2.3')
