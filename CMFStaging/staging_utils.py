@@ -59,15 +59,6 @@ def unproxied(obj):
     return d.get('_Proxy__target', obj)
 
 
-def getProxyTarget(obj):
-    """Returns the target of a proxy, with the target wrapped in acquisition.
-
-    If the argument is not a proxy, an error will occur.
-    """
-    ref = obj.__dict__["_Proxy__reference"]
-    return ref.getTarget(obj)
-    
-
 def getProxyReference(obj):
     """Returns the reference that created a proxy.
 
