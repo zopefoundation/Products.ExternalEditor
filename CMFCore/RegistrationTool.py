@@ -69,7 +69,7 @@ class RegistrationTool(UniqueObject, SimpleItem, ActionProviderBase):
         '''Returns a boolean value indicating whether the user
         is allowed to add a member to the portal.
         '''
-        return _checkPermission('Add Portal Member', self.aq_inner.aq_parent)
+        return _checkPermission(AddPortalMember, self.aq_inner.aq_parent)
 
     security.declarePublic('testPasswordValidity')
     def testPasswordValidity(self, password, confirm=None):
