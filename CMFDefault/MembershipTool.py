@@ -119,7 +119,7 @@ class MembershipTool( BaseTool ):
                                    +  'getHomeFolder(), "Favorites")')
         , visible=1
         )
-    , AI( id='managemembers'
+    , AI( id='manage_members'
         , title='Manage members'
         , description='Manage portal members'
         , action=Expression(text='string:${portal_url}/members_manage_form')
