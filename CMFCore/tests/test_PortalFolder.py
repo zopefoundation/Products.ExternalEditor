@@ -1,25 +1,43 @@
+##############################################################################
+#
+# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE.
+#
+##############################################################################
+""" Unit tests for PortalFolder module.
+
+$Id$
+"""
+
 from unittest import TestCase, TestSuite, makeSuite, main
 import Testing
 import Zope
 Zope.startup()
-  
+from Interface.Verify import verifyClass
+
 import cStringIO
 
 from AccessControl import SecurityManager
-from Acquisition import Implicit
 from Acquisition import aq_base
+from Acquisition import Implicit
 from DateTime import DateTime
-from webdav.WriteLockInterface import WriteLockInterface
 from OFS.Application import Application
 from OFS.Image import manage_addFile
 from OFS.tests.testCopySupport import makeConnection
 from Testing.makerequest import makerequest
 
 from Products.CMFCore.CatalogTool import CatalogTool
-from Products.CMFCore.interfaces.Dynamic import DynamicType as IDynamicType
+from Products.CMFCore.exceptions import BadRequest
 from Products.CMFCore.tests.base.dummy import DummyContent
 from Products.CMFCore.tests.base.dummy import DummyFactory
-from Products.CMFCore.tests.base.security import OmnipotentUser
+from Products.CMFCore.tests.base.dummy import DummySite
+from Products.CMFCore.tests.base.dummy import DummyUserFolder
 from Products.CMFCore.tests.base.testcase import newSecurityManager
 from Products.CMFCore.tests.base.testcase import noSecurityManager
 from Products.CMFCore.tests.base.testcase import SecurityTest
@@ -27,7 +45,6 @@ from Products.CMFCore.tests.base.tidata import FTIDATA_DUMMY
 from Products.CMFCore.tests.base.utils import has_path
 from Products.CMFCore.TypesTool import FactoryTypeInformation as FTI
 from Products.CMFCore.TypesTool import TypesTool
-from Products.CMFCore.exceptions import BadRequest
 
 
 def extra_meta_types():
@@ -92,76 +109,108 @@ class PortalFolderFactoryTests( SecurityTest ):
                          , type_name='Dummy Content', id='foo' )
 
 
-class PortalFolderTests( SecurityTest ):
+class PortalFolderTests(SecurityTest):
 
-    def setUp( self ):
-        from Products.CMFCore.PortalFolder import PortalFolder
+    def setUp(self):
         SecurityTest.setUp(self)
+        self.site = DummySite('site').__of__(self.root)
 
-        root = self.root
-        root._setObject( 'test', PortalFolder( 'test','' ) )
+    def _makeOne(self, id, *args, **kw):
+        from Products.CMFCore.PortalFolder import PortalFolder
 
-    def test_deletePropagation( self ):
+        return self.site._setObject( id, PortalFolder(id, *args, **kw) )
 
-        test = self.root.test
-        foo = DummyContent( 'foo' )
+    def test_contents_methods(self):
+        ttool = self.site._setObject( 'portal_types', TypesTool() )
+        f = self._makeOne('foo')
+        self.assertEqual( f.objectValues(), [] )
+        self.assertEqual( f.contentIds(), [] )
+        self.assertEqual( f.contentItems(), [] )
+        self.assertEqual( f.contentValues(), [] )
+        self.assertEqual( f.listFolderContents(), [] )
+        self.assertEqual( f.listDAVObjects(), [] )
+
+        f._setObject('sub1', DummyContent('sub1') )
+        self.assertEqual( f.objectValues(), [f.sub1] )
+        self.assertEqual( f.contentIds(), [] )
+        self.assertEqual( f.contentItems(), [] )
+        self.assertEqual( f.contentValues(), [] )
+        self.assertEqual( f.listFolderContents(), [] )
+        self.assertEqual( f.listDAVObjects(), [f.sub1] )
+
+        fti = FTIDATA_DUMMY[0].copy()
+        ttool._setObject( 'Dummy Content', FTI(**fti) )
+        self.assertEqual( f.objectValues(), [f.sub1] )
+        self.assertEqual( f.contentIds(), ['sub1'] )
+        self.assertEqual( f.contentItems(), [ ('sub1', f.sub1) ] )
+        self.assertEqual( f.contentValues(), [f.sub1] )
+        self.assertEqual( f.listFolderContents(), [f.sub1] )
+        self.assertEqual( f.listDAVObjects(), [f.sub1] )
+
+        f._setObject('hidden_sub2', DummyContent('hidden_sub2') )
+        self.assertEqual( f.objectValues(), [f.sub1, f.hidden_sub2] )
+        self.assertEqual( f.contentIds(), ['sub1', 'hidden_sub2'] )
+        self.assertEqual( f.contentItems(), [ ('sub1', f.sub1),
+                                            ('hidden_sub2', f.hidden_sub2) ] )
+        self.assertEqual( f.contentValues(), [f.sub1, f.hidden_sub2] )
+        self.assertEqual( f.listFolderContents(), [f.sub1] )
+        self.assertEqual( f.listDAVObjects(), [f.sub1, f.hidden_sub2] )
+
+    def test_deletePropagation(self):
+        test = self._makeOne('test')
+        foo = DummyContent('foo')
+        foo.reset()
+        self.failIf( foo.after_add_called )
+        self.failIf( foo.before_delete_called )
+
+        test._setObject('foo', foo)
+        self.failUnless( foo.after_add_called )
+        self.failIf( foo.before_delete_called )
 
         foo.reset()
-        assert not foo.after_add_called
-        assert not foo.before_delete_called
-        test._setObject( 'foo', foo )
-        assert foo.after_add_called
-        assert not foo.before_delete_called
+        test._delObject('foo')
+        self.failIf( foo.after_add_called )
+        self.failUnless( foo.before_delete_called )
 
         foo.reset()
-        test._delObject( 'foo' )
-        assert not foo.after_add_called
-        assert foo.before_delete_called
+        test._setObject('foo', foo)
+        test._delOb('foo')    # doesn't propagate
+        self.failUnless( foo.after_add_called )
+        self.failIf( foo.before_delete_called )
 
+    def test_manageDelObjects(self):
+        test = self._makeOne('test')
+        foo = DummyContent('foo')
+
+        test._setObject('foo', foo)
         foo.reset()
-        test._setObject( 'foo', foo )
-        test._delOb( 'foo' )    # doesn't propagate
-        assert foo.after_add_called
-        assert not foo.before_delete_called
+        test.manage_delObjects( ids=['foo'] )
+        self.failIf( foo.after_add_called )
+        self.failUnless( foo.before_delete_called )
 
-    def test_manageDelObjects( self ):
-
-        test = self.root.test
-        foo = DummyContent( 'foo' )
-
-        test._setObject( 'foo', foo )
-        foo.reset()
-        test.manage_delObjects( ids=[ 'foo' ] )
-        assert not foo.after_add_called
-        assert foo.before_delete_called
-
-    def test_catalogUnindexAndIndex( self ):
+    def test_catalogUnindexAndIndex(self):
         #
         # Test is a new object does get cataloged upon _setObject
         # and uncataloged upon manage_deleteObjects
         #
-        test = self.root.test
-
-        self.root._setObject( 'portal_types', TypesTool() )
-        types_tool = self.root.portal_types
-
-        self.root._setObject( 'portal_catalog', CatalogTool() )
-        catalog = self.root.portal_catalog
-        assert len( catalog ) == 0
+        test = self._makeOne('test')
+        ttool = self.site._setObject( 'portal_types', TypesTool() )
+        ctool = self.site._setObject( 'portal_catalog', CatalogTool() )
+        self.assertEqual( len(ctool), 0 )
 
         test._setObject( 'foo', DummyContent( 'foo' , catalog=1 ) )
         foo = test.foo
-        assert foo.after_add_called
-        assert not foo.before_delete_called
-        assert len( catalog ) == 1
+        self.failUnless( foo.after_add_called )
+        self.failIf( foo.before_delete_called )
+        self.assertEqual( len(ctool), 1 )
 
         foo.reset()
-        test._delObject( 'foo' )
-        assert not foo.after_add_called
-        assert foo.before_delete_called
-        assert len( catalog ) == 0
+        test._delObject('foo')
+        self.failIf( foo.after_add_called )
+        self.failUnless( foo.before_delete_called )
+        self.assertEqual( len(ctool), 0 )
 
-    def test_tracker261( self ):
+    def test_tracker261(self):
 
         #
         #   Tracker issue #261 says that content in a deleted folder
@@ -170,14 +219,10 @@ class PortalFolderTests( SecurityTest ):
         #
         from Products.CMFCore.PortalFolder import PortalFolder
 
-        test = self.root.test
-
-        self.root._setObject( 'portal_types', TypesTool() )
-        types_tool = self.root.portal_types
-
-        self.root._setObject( 'portal_catalog', CatalogTool() )
-        catalog = self.root.portal_catalog
-        assert len( catalog ) == 0
+        test = self._makeOne('test')
+        ttool = self.site._setObject( 'portal_types', TypesTool() )
+        ctool = self.site._setObject( 'portal_catalog', CatalogTool() )
+        self.assertEqual( len(ctool), 0 )
 
         test._setObject( 'sub', PortalFolder( 'sub', '' ) )
         sub = test.sub
@@ -185,115 +230,52 @@ class PortalFolderTests( SecurityTest ):
         sub._setObject( 'foo', DummyContent( 'foo', catalog=1 ) )
         foo = sub.foo
 
-        assert foo.after_add_called
-        assert not foo.before_delete_called
-        assert len( catalog ) == 1
+        self.failUnless( foo.after_add_called )
+        self.failIf( foo.before_delete_called )
+        self.assertEqual( len(ctool), 1 )
 
         foo.reset()
-        test.manage_delObjects( ids=[ 'sub' ] )
-        assert not foo.after_add_called
-        assert foo.before_delete_called
-        assert len( catalog ) == 0
+        test.manage_delObjects( ids=['sub'] )
+        self.failIf( foo.after_add_called )
+        self.failUnless( foo.before_delete_called )
+        self.assertEqual( len(ctool), 0 )
 
-    def test_tracker215( self ):
-        self.failUnless(IDynamicType.isImplementedBy(self.root.test))
-        self.failUnless(WriteLockInterface.isImplementedBy(self.root.test))
-
-    def test_folderMove( self ):
-        #
-        #   Does the catalog stay synched when folders are moved?
-        #
-        from Products.CMFCore.PortalFolder import PortalFolder
-
-        test = self.root.test
-
-        self.root._setObject( 'portal_types', TypesTool() )
-        types_tool = self.root.portal_types
-
-        self.root._setObject( 'portal_catalog', CatalogTool() )
-        catalog = self.root.portal_catalog
-        assert len( catalog ) == 0
-
-        test._setObject( 'folder', PortalFolder( 'folder', '' ) )
-        folder = test.folder
-
-        folder._setObject( 'sub', PortalFolder( 'sub', '' ) )
-        sub = folder.sub
-
-        sub._setObject( 'foo', DummyContent( 'foo', catalog=1 ) )
-        foo = sub.foo
-        assert len( catalog ) == 1
-        self.failUnless( 'foo' in catalog.uniqueValuesFor('getId') )
-        assert has_path( catalog._catalog, '/test/folder/sub/foo' )
-
-        get_transaction().commit(1)
-        folder.manage_renameObject(id='sub', new_id='new_sub')
-
-        self.failUnless( 'foo' in catalog.uniqueValuesFor('getId') )
-        assert len( catalog ) == 1
-        assert has_path( catalog._catalog, '/test/folder/new_sub/foo' )
-
-        folder._setObject( 'bar', DummyContent( 'bar', catalog=1 ) )
-        bar = folder.bar
-        self.failUnless( 'bar' in catalog.uniqueValuesFor('getId') )
-        assert len( catalog ) == 2
-        assert has_path( catalog._catalog, '/test/folder/bar' )
-
-        folder._setObject( 'sub2', PortalFolder( 'sub2', '' ) )
-        sub2 = folder.sub2
-        # Waaa! force sub2 to allow paste of Dummy object.
-        sub2.all_meta_types = []
-        sub2.all_meta_types.extend( sub2.all_meta_types )
-        sub2.all_meta_types.extend( extra_meta_types() )
-
-        get_transaction().commit(1)
-        cookie = folder.manage_cutObjects(ids=['bar'])
-        sub2.manage_pasteObjects(cookie)
-
-        self.failUnless( 'foo' in catalog.uniqueValuesFor('getId') )
-        self.failUnless( 'bar' in catalog.uniqueValuesFor('getId') )
-        assert len( catalog ) == 2
-        assert has_path( catalog._catalog, '/test/folder/sub2/bar' )
-
-    def test_manageAddFolder( self ):
+    def test_manageAddFolder(self):
         #
         #   Does MKDIR/MKCOL intercept work?
         #
         from Products.CMFCore.PortalFolder import PortalFolder
 
-        test = self.root.test
-        test._setPortalTypeName( 'Folder' )
-        self.root.reindexObject = lambda: 0
+        test = self._makeOne('test')
 
-        self.root._setObject( 'portal_types', TypesTool() )
-        types_tool = self.root.portal_types
-        types_tool._setObject( 'Folder'
-                             , FTI( id='Folder'
-                                  , title='Folder or Directory'
-                                  , meta_type=PortalFolder.meta_type
-                                  , product='CMFCore'
-                                  , factory='manage_addPortalFolder'
-                                  , filter_content_types=0
-                                  )
+        ttool = self.site._setObject( 'portal_types', TypesTool() )
+        ttool._setObject( 'Folder'
+                        , FTI( id='Folder'
+                             , title='Folder or Directory'
+                             , meta_type=PortalFolder.meta_type
+                             , product='CMFCore'
+                             , factory='manage_addPortalFolder'
+                             , filter_content_types=0
                              )
-        types_tool._setObject( 'Grabbed'
-                             , FTI( 'Grabbed'
-                                  , title='Grabbed Content'
-                                  , meta_type=PortalFolder.meta_type
-                                  , product='CMFCore'
-                                  , factory='manage_addPortalFolder'
-                                  )
+                        )
+        ttool._setObject( 'Grabbed'
+                        , FTI( 'Grabbed'
+                             , title='Grabbed Content'
+                             , meta_type=PortalFolder.meta_type
+                             , product='CMFCore'
+                             , factory='manage_addPortalFolder'
                              )
+                        )
 
         # First, test default behavior
-        test.manage_addFolder( id='simple', title='Simple' )
+        test.manage_addFolder(id='simple', title='Simple')
         self.assertEqual( test.simple.getPortalTypeName(), 'Folder' )
         self.assertEqual( test.simple.Type(), 'Folder or Directory' )
         self.assertEqual( test.simple.getId(), 'simple' )
         self.assertEqual( test.simple.Title(), 'Simple' )
 
         # Now, test overridden behavior
-        types_tool.Folder.setMethodAliases( {'mkdir': 'grabbed'} )
+        ttool.Folder.setMethodAliases( {'mkdir': 'grabbed'} )
 
         class Grabbed:
 
@@ -307,119 +289,36 @@ class PortalFolderTests( SecurityTest ):
                 self._context._setOb( id, PortalFolder( id ) )
                 self._context._getOb( id )._setPortalTypeName( 'Grabbed' )
 
-        self.root.grabbed = Grabbed( test )
+        self.root.grabbed = Grabbed(test)
 
-        test.manage_addFolder( id='indirect', title='Indirect' )
+        test.manage_addFolder(id='indirect', title='Indirect')
         self.assertEqual( test.indirect.getPortalTypeName(), 'Grabbed' )
         self.assertEqual( test.indirect.Type(), 'Grabbed Content' )
         self.assertEqual( test.indirect.getId(), 'indirect' )
         self.assertEqual( test.indirect.Title(), 'Indirect' )
 
-    def test_contentPaste( self ):
-        #
-        #   Does copy / paste work?
-        #
-        from Products.CMFCore.PortalFolder import PortalFolder
-
-        test = self.root.test
-
-        self.root._setObject( 'portal_types', TypesTool() )
-        types_tool = self.root.portal_types
-        fti = FTIDATA_DUMMY[0].copy()
-        types_tool._setObject( 'Dummy Content', FTI(**fti) )
-
-        self.root._setObject( 'portal_catalog', CatalogTool() )
-        catalog = self.root.portal_catalog
-        assert len( catalog ) == 0
-
-        test._setObject( 'sub1', PortalFolder( 'sub1', '' ) )
-        sub1 = test.sub1
-
-        test._setObject( 'sub2', PortalFolder( 'sub2', '' ) )
-        sub2 = test.sub2
-
-        test._setObject( 'sub3', PortalFolder( 'sub3', '' ) )
-        sub3 = test.sub3
-
-        sub1._setObject( 'dummy', DummyContent( 'dummy', catalog=1 ) )
-        dummy = sub1.dummy
-
-        assert 'dummy' in sub1.objectIds()
-        assert 'dummy' in sub1.contentIds()
-        assert not 'dummy' in sub2.objectIds()
-        assert not 'dummy' in sub2.contentIds()
-        assert not 'dummy' in sub3.objectIds()
-        assert not 'dummy' in sub3.contentIds()
-        assert has_path( catalog._catalog, '/test/sub1/dummy' )
-        assert not has_path( catalog._catalog, '/test/sub2/dummy' )
-        assert not has_path( catalog._catalog, '/test/sub3/dummy' )
-
-        cookie = sub1.manage_copyObjects( ids = ( 'dummy', ) )
-        # Waaa! force sub2 to allow paste of Dummy object.
-        sub2.all_meta_types = []
-        sub2.all_meta_types.extend( sub2.all_meta_types )
-        sub2.all_meta_types.extend( extra_meta_types() )
-        sub2.manage_pasteObjects( cookie )
-        assert 'dummy' in sub1.objectIds()
-        assert 'dummy' in sub1.contentIds()
-        assert 'dummy' in sub2.objectIds()
-        assert 'dummy' in sub2.contentIds()
-        assert not 'dummy' in sub3.objectIds()
-        assert not 'dummy' in sub3.contentIds()
-        assert has_path( catalog._catalog, '/test/sub1/dummy' )
-        assert has_path( catalog._catalog, '/test/sub2/dummy' )
-        assert not has_path( catalog._catalog, '/test/sub3/dummy' )
-
-        get_transaction().commit(1)
-        cookie = sub1.manage_cutObjects( ids = ('dummy',) )
-        # Waaa! force sub2 to allow paste of Dummy object.
-        sub3.all_meta_types = []
-        sub3.all_meta_types.extend(sub3.all_meta_types)
-        sub3.all_meta_types.extend( extra_meta_types() )
-        sub3.manage_pasteObjects(cookie)
-
-        assert not 'dummy' in sub1.objectIds()
-        assert not 'dummy' in sub1.contentIds()
-        assert 'dummy' in sub2.objectIds()
-        assert 'dummy' in sub2.contentIds()
-        assert 'dummy' in sub3.objectIds()
-        assert 'dummy' in sub3.contentIds()
-        assert not has_path( catalog._catalog, '/test/sub1/dummy' )
-        assert has_path( catalog._catalog, '/test/sub2/dummy' )
-        assert has_path( catalog._catalog, '/test/sub3/dummy' )
-
-    def test_contentPasteAllowedTypes( self ):
+    def test_contentPasteAllowedTypes(self):
         #
         #   _verifyObjectPaste() should honor allowed content types
         #
-        from Products.CMFCore.PortalFolder import PortalFolder
-
-        test = self.root.test
-
-        self.root._setObject( 'portal_types', TypesTool() )
-        types_tool = self.root.portal_types
-
+        ttool = self.site._setObject( 'portal_types', TypesTool() )
         fti = FTIDATA_DUMMY[0].copy()
-        types_tool._setObject( 'Dummy Content', FTI(**fti) )
-        types_tool._setObject( 'Folder', FTI(**fti) )
-
-        test._setObject( 'sub1', PortalFolder( 'sub1', '' ) )
-        sub1 = test.sub1
+        ttool._setObject( 'Dummy Content', FTI(**fti) )
+        ttool._setObject( 'Folder', FTI(**fti) )
+        sub1 = self._makeOne('sub1')
         sub1._setObject( 'dummy', DummyContent( 'dummy' ) )
-
-        test._setObject( 'sub2', PortalFolder( 'sub2', '' ) )
-        sub2 = test.sub2
+        sub2 = self._makeOne('sub2')
         sub2.all_meta_types = extra_meta_types()
 
         # Allow adding of Dummy Content
-        types_tool.Folder.manage_changeProperties(filter_content_types=False)
+        ttool.Folder.manage_changeProperties(filter_content_types=False)
 
-        # Copy/paste should work fine 
-        cookie = sub1.manage_copyObjects( ids = ( 'dummy', ) )
+        # Copy/paste should work fine
+        cookie = sub1.manage_copyObjects( ids = ['dummy'] )
         sub2.manage_pasteObjects( cookie )
 
         # Disallow adding of Dummy Content
-        types_tool.Folder.manage_changeProperties(filter_content_types=True)
+        ttool.Folder.manage_changeProperties(filter_content_types=True)
 
         # Now copy/paste should raise a ValueError
         cookie = sub1.manage_copyObjects( ids = ( 'dummy', ) )
@@ -429,16 +328,16 @@ class PortalFolderTests( SecurityTest ):
         #
         #   _setObject() should raise BadRequest on duplicate id
         #
-        test = self.root.test
+        test = self._makeOne('test')
         test._setObject('foo', DummyContent('foo'))
-        self.assertRaises(BadRequest, test._setObject, 'foo', 
+        self.assertRaises(BadRequest, test._setObject, 'foo',
                                       DummyContent('foo'))
 
     def test_checkIdRaisesBadRequest(self):
         #
         #   _checkId() should raise BadRequest on duplicate id
         #
-        test = self.root.test
+        test = self._makeOne('test')
         test._setObject('foo', DummyContent('foo'))
         self.assertRaises(BadRequest, test._checkId, 'foo')
 
@@ -446,9 +345,137 @@ class PortalFolderTests( SecurityTest ):
         #
         #   checkIdAvailable() should catch BadRequest
         #
-        test = self.root.test
+        test = self._makeOne('test')
         test._setObject('foo', DummyContent('foo'))
         self.failIf(test.checkIdAvailable('foo'))
+
+    def test_interface(self):
+        from Products.CMFCore.interfaces.Dynamic \
+                import DynamicType as IDynamicType
+        from OFS.IOrderSupport import IOrderedContainer
+        from webdav.WriteLockInterface import WriteLockInterface
+        from Products.CMFCore.PortalFolder import PortalFolder
+
+        verifyClass(IDynamicType, PortalFolder)
+        verifyClass(IOrderedContainer, PortalFolder)
+        verifyClass(WriteLockInterface, PortalFolder)
+
+
+class PortalFolderMoveTests(SecurityTest):
+
+    def setUp(self):
+        SecurityTest.setUp(self)
+        self.root._setObject( 'site', DummySite('site') )
+        self.site = self.root.site
+
+    def _makeOne(self, id, *args, **kw):
+        from Products.CMFCore.PortalFolder import PortalFolder
+
+        return self.site._setObject( id, PortalFolder(id, *args, **kw) )
+
+    def test_folderMove(self):
+        #
+        #   Does the catalog stay synched when folders are moved?
+        #
+        from Products.CMFCore.PortalFolder import PortalFolder
+
+        ttool = self.site._setObject( 'portal_types', TypesTool() )
+        ctool = self.site._setObject( 'portal_catalog', CatalogTool() )
+        self.assertEqual( len(ctool), 0 )
+
+        folder = self._makeOne('folder')
+        folder._setObject( 'sub', PortalFolder( 'sub', '' ) )
+        folder.sub._setObject( 'foo', DummyContent( 'foo', catalog=1 ) )
+        self.assertEqual( len(ctool), 1 )
+        self.failUnless( 'foo' in ctool.uniqueValuesFor('getId') )
+        self.failUnless( has_path(ctool._catalog,
+                                  '/bar/site/folder/sub/foo') )
+
+        get_transaction().commit(1)
+        folder.manage_renameObject(id='sub', new_id='new_sub')
+        self.assertEqual( len(ctool), 1 )
+        self.failUnless( 'foo' in ctool.uniqueValuesFor('getId') )
+        self.failUnless( has_path(ctool._catalog,
+                                  '/bar/site/folder/new_sub/foo') )
+
+        folder._setObject( 'bar', DummyContent( 'bar', catalog=1 ) )
+        self.assertEqual( len(ctool), 2 )
+        self.failUnless( 'bar' in ctool.uniqueValuesFor('getId') )
+        self.failUnless( has_path(ctool._catalog, '/bar/site/folder/bar') )
+
+        folder._setObject( 'sub2', PortalFolder( 'sub2', '' ) )
+        sub2 = folder.sub2
+        # Waaa! force sub2 to allow paste of Dummy object.
+        sub2.all_meta_types = []
+        sub2.all_meta_types.extend( sub2.all_meta_types )
+        sub2.all_meta_types.extend( extra_meta_types() )
+
+        get_transaction().commit(1)
+        cookie = folder.manage_cutObjects(ids=['bar'])
+        sub2.manage_pasteObjects(cookie)
+
+        self.failUnless( 'foo' in ctool.uniqueValuesFor('getId') )
+        self.failUnless( 'bar' in ctool.uniqueValuesFor('getId') )
+        self.assertEqual( len(ctool), 2 )
+        self.failUnless( has_path(ctool._catalog,
+                                  '/bar/site/folder/sub2/bar') )
+
+    def test_contentPaste(self):
+        #
+        #   Does copy / paste work?
+        #
+        ctool = self.site._setObject( 'portal_catalog', CatalogTool() )
+        ttool = self.site._setObject( 'portal_types', TypesTool() )
+        fti = FTIDATA_DUMMY[0].copy()
+        ttool._setObject( 'Dummy Content', FTI(**fti) )
+        sub1 = self._makeOne('sub1')
+        sub2 = self._makeOne('sub2')
+        sub3 = self._makeOne('sub3')
+        self.assertEqual( len(ctool), 0 )
+
+        sub1._setObject( 'dummy', DummyContent( 'dummy', catalog=1 ) )
+        self.failUnless( 'dummy' in sub1.objectIds() )
+        self.failUnless( 'dummy' in sub1.contentIds() )
+        self.failIf( 'dummy' in sub2.objectIds() )
+        self.failIf( 'dummy' in sub2.contentIds() )
+        self.failIf( 'dummy' in sub3.objectIds() )
+        self.failIf( 'dummy' in sub3.contentIds() )
+        self.failUnless( has_path(ctool._catalog, '/bar/site/sub1/dummy') )
+        self.failIf( has_path(ctool._catalog, '/bar/site/sub2/dummy') )
+        self.failIf( has_path(ctool._catalog, '/bar/site/sub3/dummy') )
+
+        cookie = sub1.manage_copyObjects( ids = ( 'dummy', ) )
+        # Waaa! force sub2 to allow paste of Dummy object.
+        sub2.all_meta_types = []
+        sub2.all_meta_types.extend( sub2.all_meta_types )
+        sub2.all_meta_types.extend( extra_meta_types() )
+        sub2.manage_pasteObjects( cookie )
+        self.failUnless( 'dummy' in sub1.objectIds() )
+        self.failUnless( 'dummy' in sub1.contentIds() )
+        self.failUnless( 'dummy' in sub2.objectIds() )
+        self.failUnless( 'dummy' in sub2.contentIds() )
+        self.failIf( 'dummy' in sub3.objectIds() )
+        self.failIf( 'dummy' in sub3.contentIds() )
+        self.failUnless( has_path(ctool._catalog, '/bar/site/sub1/dummy') )
+        self.failUnless( has_path(ctool._catalog, '/bar/site/sub2/dummy') )
+        self.failIf( has_path(ctool._catalog, '/bar/site/sub3/dummy') )
+
+        get_transaction().commit(1)
+        cookie = sub1.manage_cutObjects( ids = ('dummy',) )
+        # Waaa! force sub2 to allow paste of Dummy object.
+        sub3.all_meta_types = []
+        sub3.all_meta_types.extend(sub3.all_meta_types)
+        sub3.all_meta_types.extend( extra_meta_types() )
+        sub3.manage_pasteObjects(cookie)
+        self.failIf( 'dummy' in sub1.objectIds() )
+        self.failIf( 'dummy' in sub1.contentIds() )
+        self.failUnless( 'dummy' in sub2.objectIds() )
+        self.failUnless( 'dummy' in sub2.contentIds() )
+        self.failUnless( 'dummy' in sub3.objectIds() )
+        self.failUnless( 'dummy' in sub3.contentIds() )
+        self.failIf( has_path(ctool._catalog, '/bar/site/sub1/dummy') )
+        self.failUnless( has_path(ctool._catalog, '/bar/site/sub2/dummy') )
+        self.failUnless( has_path(ctool._catalog, '/bar/site/sub3/dummy') )
 
 
 class ContentFilterTests( TestCase ):
@@ -827,7 +854,7 @@ class PortalFolderCopySupportTests( TestCase ):
         except CopyError, e:
 
             if ce_regex is not None:
-                
+
                 pattern = re.compile( ce_regex, re.DOTALL )
                 if pattern.search( e ) is None:
                     self.fail( "Paste failed; didn't match pattern:\n%s" % e )
@@ -841,7 +868,7 @@ class PortalFolderCopySupportTests( TestCase ):
         else:
             self.fail( "Paste allowed unexpectedly." )
 
-    def _initPolicyAndUser( self    
+    def _initPolicyAndUser( self
                           , a_lambda=None
                           , v_lambda=None
                           , c_lambda=None
@@ -899,7 +926,7 @@ class PortalFolderCopySupportTests( TestCase ):
                                    )
 
     def test_copy_cant_create_target_metatype_not_supported( self ):
-        
+
         from OFS.CopySupport import CopyError
 
         folder1, folder2 = self._initFolders()
@@ -930,7 +957,7 @@ class PortalFolderCopySupportTests( TestCase ):
         self.failUnless( 'file' in folder2.objectIds() )
 
     def test_move_cant_read_source( self ):
-        
+
         from OFS.CopySupport import CopyError
 
         folder1, folder2 = self._initFolders()
@@ -950,7 +977,7 @@ class PortalFolderCopySupportTests( TestCase ):
                                    )
 
     def test_move_cant_create_target_metatype_not_supported( self ):
-        
+
         from OFS.CopySupport import CopyError
 
         folder1, folder2 = self._initFolders()
@@ -965,7 +992,7 @@ class PortalFolderCopySupportTests( TestCase ):
                                    )
 
     def test_move_cant_create_target_metatype_not_allowed( self ):
-        
+
         #
         #   This test can't succeed on Zope's earlier than 2.7.3 because
         #   of the DWIM'y behavior of 'guarded_getattr', which tries to
@@ -993,7 +1020,7 @@ class PortalFolderCopySupportTests( TestCase ):
                                    )
 
     def test_move_cant_delete_source( self ):
-        
+
         #
         #   This test fails on Zope's earlier than 2.7.3 because of the
         #   changes required to 'OFS.CopytSupport.manage_pasteObjects'
@@ -1049,10 +1076,12 @@ class DummyTypesTool( Implicit ):
 
         return DummyTypeInfo()
 
+
 def test_suite():
     return TestSuite((
         makeSuite( PortalFolderFactoryTests ),
         makeSuite( PortalFolderTests ),
+        makeSuite( PortalFolderMoveTests ),
         makeSuite( ContentFilterTests ),
         makeSuite( PortalFolderCopySupportTests ),
         ))

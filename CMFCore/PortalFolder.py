@@ -30,16 +30,17 @@ from OFS.OrderedFolder import OrderedFolder
 from CMFCatalogAware import CMFCatalogAware
 from DynamicType import DynamicType
 from exceptions import AccessControl_Unauthorized
-from exceptions import zExceptions_Unauthorized
 from exceptions import BadRequest
+from exceptions import zExceptions_Unauthorized
 from permissions import AddPortalContent
 from permissions import AddPortalFolders
 from permissions import ChangeLocalRoles
+from permissions import DeleteObjects
 from permissions import ListFolderContents
 from permissions import ManagePortal
 from permissions import ManageProperties
 from permissions import View
-from permissions import DeleteObjects
+from utils import _checkPermission
 from utils import getToolByName
 
 
@@ -289,6 +290,13 @@ class PortalFolder(DynamicType, CMFCatalogAware, OrderedFolder):
             spec = self._morphSpec(spec)
             ids = self.objectIds(spec)
         return self._filteredItems( ids, filter )
+
+    # protected by 'WebDAV access'
+    def listDAVObjects(self):
+        if _checkPermission(ManagePortal, self):
+            return self.objectValues()
+        else:
+            return self.listFolderContents()
 
     security.declareProtected(View, 'Title')
     def Title( self ):

@@ -1,4 +1,19 @@
-from types import StringType, UnicodeType
+##############################################################################
+#
+# Copyright (c) 2002 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE.
+#
+##############################################################################
+""" Unit test security.
+
+$Id$
+"""
 
 from AccessControl.PermissionRole import rolesForPermissionOn
 from Acquisition import Implicit
@@ -20,13 +35,16 @@ class PermissiveSecurityPolicy:
                 , roles=None
                 , *args
                 , **kw):
-        return 1
-    
+        if name and name.startswith('hidden'):
+            return False
+        else:
+            return True
+
     def checkPermission(self, permission, object, context):
         if permission == 'forbidden permission':
             return 0
         roles = rolesForPermissionOn(permission, object)
-        if type(roles) in (StringType, UnicodeType):
+        if isinstance(roles, basestring):
             roles=[roles]
         return context.user.allowed(object, roles)
 
@@ -37,7 +55,7 @@ class OmnipotentUser( Implicit ):
     """
     def getId( self ):
         return 'all_powerful_Oz'
-    
+
     getUserName = getId
 
     def allowed( self, object, object_roles=None ):
@@ -57,7 +75,7 @@ class UserWithRoles( Implicit ):
 
     def getId( self ):
         return 'high_roller'
-    
+
     getUserName = getId
 
     def allowed( self, object, object_roles=None ):
@@ -74,7 +92,7 @@ class AnonymousUser( Implicit ):
     """
     def getId( self ):
         return 'Anonymous User'
-    
+
     getUserName = getId
 
     def has_permission(self, permission, obj):

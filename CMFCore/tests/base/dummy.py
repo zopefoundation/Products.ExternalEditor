@@ -1,7 +1,25 @@
+##############################################################################
+#
+# Copyright (c) 2002 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE.
+#
+##############################################################################
+""" Unit test dummies.
+
+$Id$
+"""
+
 from Acquisition import Implicit, aq_base, aq_inner, aq_parent
 from OFS.SimpleItem import Item
-from Products.CMFCore.PortalContent import PortalContent
+
 from Products.CMFCore.ActionProviderBase import ActionProviderBase
+from Products.CMFCore.PortalContent import PortalContent
 from security import OmnipotentUser
 
 
@@ -184,7 +202,13 @@ class DummySite(DummyFolder):
         return self
 
     def unrestrictedTraverse(self, path, default=None, restricted=0):
-        return self.acl_users
+        if path == ['acl_users']:
+            return self.acl_users
+        else:
+            obj = self
+            for id in path[3:]:
+                obj = getattr(obj, id)
+            return obj
 
     def userdefined_roles(self):
         return ('Member', 'Reviewer')
