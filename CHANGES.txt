@@ -18,10 +18,9 @@ CMF 1.5alpha (unreleased)
 
     - DublinCore: setModificationDate is now guarded by 'ModifyPortalContent'.
 
-    - zpt skin: Reimplemented 'folder_contents'.
-      Uses a controller script instead of 'folder_copy', 'folder_cut',
-      'folder_delete' and 'folder_paste' scripts. The result looks almost the
-      same as before.
+    - zpt skin: Reimplemented 'folder_contents' and related controllers.
+      Uses a dispatcher script that calls the right validators and controllers
+      if a form button is pushed. The result looks almost the same as before.
 
     - PortalFolder and SkinnedFolder: Added 'new' and 'rename_items' Actions.
       Used for redirects they are invisible by default.
