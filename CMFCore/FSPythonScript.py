@@ -240,12 +240,13 @@ class FSPythonScript (FSObject, Script):
             ps._makeFunction(1)
             self._v_f = f = ps._v_f
             if f is not None:
-                fc = f.func_code
-                self._setFuncSignature(f.func_defaults, fc.co_varnames,
-                                       fc.co_argcount)
+                self.func_code = f.func_code
+                self.func_defaults = f.func_defaults
             else:
                 # There were errors in the compile.
-                self._setFuncSignature()  # No signature.
+                # No signature.
+                self.func_code = None
+                self.func_defaults = None
         self._body = ps._body
         self._params = ps._params
         self.title = ps.title
