@@ -30,6 +30,9 @@ class FSMetadata(FSSecurityBase):
             'Access contents information',
             1,
             ['Manager','Anonymous'])
+        self._checkProxyRoles(
+            self.ob.fake_skin.test6, 
+            ['Manager', 'Anonymous'])
     
     def test_proxy(self):
         """ Test roles """
