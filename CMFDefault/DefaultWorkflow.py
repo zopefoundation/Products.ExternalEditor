@@ -26,7 +26,7 @@ from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.utils import SimpleItemWithProperties
 from Products.CMFCore.WorkflowCore import WorkflowException
 from Products.CMFCore.WorkflowTool import addWorkflowClass
-from Products.CMFCore.CMFCorePermissions.py import ReviewPortalContent
+from Products.CMFCore.CMFCorePermissions import ReviewPortalContent
 
 from Products.CMFCore.interfaces.portal_workflow \
         import WorkflowDefinition as IWorkflowDefinition
