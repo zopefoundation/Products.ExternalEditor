@@ -32,7 +32,10 @@
                  cap nocall: strmod/capitalize;
                  split nocall: strmod/split;
                  DateTime nocall: modules/DateTime/DateTime;
-                 BATCHSIZE python: 10;
+                 BATCHSIZE_STR request/batch_size
+                               | here/batch_size
+                               | python: 10;
+                 BATCHSIZE python: int(BATCHSIZE_STR);
                  TITLELEN python: 110;
                  DESCRLEN python: 200;
                  b_start python: request.get('b_start', 0);
