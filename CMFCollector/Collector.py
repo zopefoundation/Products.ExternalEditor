@@ -385,7 +385,7 @@ class Collector(SkinnedFolder):
                                roles=target_roles,
                                acquire=1)
         # Adjust who can add "attachments":
-        self.manage_permission(AddPortalContent,
+        self.manage_permission(CMFCorePermissions.AddPortalContent,
                                roles=target_roles,
                                acquire=1)
 
@@ -414,7 +414,8 @@ class Collector(SkinnedFolder):
             # Ensure the issue acquires AddCollectorIssueFollowup
             # and AddPortalContent permissions.
             for m in i.ac_inherited_permissions(1):
-                if m[0] in [AddCollectorIssueFollowup, AddPortalContent]:
+                if m[0] in [AddCollectorIssueFollowup,
+                            CMFCorePermissions.AddPortalContent]:
                     perm = Permission.Permission(m[0], m[1], i)
                     roles = perm.getRoles()
                     if type(roles) == type(()):
@@ -542,7 +543,7 @@ def addCollector(self, id, title='', description='', abbrev='',
     it.manage_permission(AddCollectorIssueFollowup,
                          roles=['Reviewer', 'Manager', 'Owner'],
                          acquire=1)
-    it.manage_permission(AddPortalContent,
+    it.manage_permission(CMFCorePermissions.AddPortalContent,
                          roles=['Reviewer', 'Manager', 'Owner'],
                          acquire=1)
     it.manage_permission(CMFCorePermissions.AccessInactivePortalContent,
