@@ -41,17 +41,17 @@
         <td>
          <input type="text" name="title" value="" size="40">
         </td>
-        <td colspan="3">
+          <td colspan="3">
             <input type=hidden name="security_related:boolean" value="">
             <input type=checkbox name="security_related:boolean">
             Security Related?
             <br>
-              <font size="-1" color="gray">
-                If checked, issue will <em>not</em> be publicly visible until
-                completed. 
-              </font>
-        </td>
-       </tr>
+            <font size="-1" color="gray">
+              If checked, issue will <em>not</em> be publicly visible until
+              completed. 
+            </font>
+          </td>
+        </tr>
 
         <tr>
           <th valign="middle" align="right"> Submitter </th>
@@ -67,6 +67,16 @@
             <input type="text" name="submitter_email" size="30"
                    tal:attributes="value python: member.getProperty('email',
                                                                     '')">
+          </td>
+        </tr>
+
+        <tr tal:condition="not: authenticated">
+          <td> &nbsp; </td>
+          <td colspan="3">
+            <font color="brown" size="-1">
+              NOTE that anonymous-submitted issues do not provide submitter
+              followup.
+            </font>
           </td>
         </tr>
 
