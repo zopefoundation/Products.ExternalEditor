@@ -37,9 +37,14 @@ from common import DummyImportContext
 _TESTS_PATH = os.path.split( __file__ )[ 0 ]
 
 
-class DummySkinsTool( Folder ):
+class DummySite(Folder):
+    _skin_setup_called = False
+    def clearCurrentSkin(self):
+        pass
+    def setupCurrentSkin(self, REQUEST):
+        self._skin_setup_called = True
 
-    _setup_called = False
+class DummySkinsTool( Folder ):
 
     default_skin = 'default_skin'
     request_varname = 'request_varname'
@@ -66,13 +71,6 @@ class DummySkinsTool( Folder ):
     def addSkinSelection( self, skinname, skinpath, test=0, make_default=0 ):
 
         self._selections[ skinname ] = skinpath
-
-    def setupCurrentSkin( self, REQEUEST ):
-
-        self._setup_called = True
-
-    def clearCurrentSkin(self):
-        pass
 
 class DummyFSDV( Item ):
 
@@ -102,7 +100,7 @@ class _SkinsSetup( BaseRegistryTests ):
         if fsdvs is None:
             fsdvs = []
 
-        self.root.site = Folder( id='site' )
+        self.root.site = DummySite()
 
         for id, fsdv in fsdvs:
             self._registerDirectoryView( expandpath(fsdv._dirpath) )
@@ -206,7 +204,7 @@ class SkinsToolConfiguratorTests( _SkinsSetup ):
         site = self._initSite( selections=_PATHS, fsdvs=_FSDVS )
         skins_tool = site.portal_skins
 
-        self.failIf( skins_tool._setup_called )
+        self.failIf( site._skin_setup_called )
         self.assertEqual( len( skins_tool.getSkinPaths() ), 2 )
         self.assertEqual( len( skins_tool.objectItems() ), 3 )
 
@@ -228,7 +226,7 @@ class SkinsToolConfiguratorTests( _SkinsSetup ):
         self._registerDirectoryView( os.path.join( _TESTS_PATH, 'three' ) )
         skins_tool = site.portal_skins
 
-        self.failIf( skins_tool._setup_called )
+        self.failIf( site._skin_setup_called )
         self.assertEqual( len( skins_tool.getSkinPaths() ), 0 )
         self.assertEqual( len( skins_tool.objectItems() ), 0 )
 
@@ -349,7 +347,7 @@ class Test_importSkinsTool( _SkinsSetup ):
         site = self._initSite( selections=_PATHS, fsdvs=_FSDVS )
         skins_tool = site.portal_skins
 
-        self.failIf( skins_tool._setup_called )
+        self.failIf( site._skin_setup_called )
         self.assertEqual( len( skins_tool.getSkinPaths() ), 2 )
         self.assertEqual( len( skins_tool.objectItems() ), 3 )
 
@@ -364,7 +362,7 @@ class Test_importSkinsTool( _SkinsSetup ):
         self.failIf( skins_tool.allow_any )
         self.failIf( skins_tool.cookie_persistence )
 
-        self.failUnless( skins_tool._setup_called )
+        self.failUnless( site._skin_setup_called )
         self.assertEqual( len( skins_tool.getSkinPaths() ), 0 )
         self.assertEqual( len( skins_tool.objectItems() ), 0 )
 
@@ -379,7 +377,7 @@ class Test_importSkinsTool( _SkinsSetup ):
         site = self._initSite( selections=_PATHS, fsdvs=_FSDVS )
         skins_tool = site.portal_skins
 
-        self.failIf( skins_tool._setup_called )
+        self.failIf( site._skin_setup_called )
         self.assertEqual( len( skins_tool.getSkinPaths() ), 2 )
         self.assertEqual( len( skins_tool.objectItems() ), 3 )
 
@@ -394,7 +392,7 @@ class Test_importSkinsTool( _SkinsSetup ):
         self.failIf( skins_tool.allow_any )
         self.failIf( skins_tool.cookie_persistence )
 
-        self.failUnless( skins_tool._setup_called )
+        self.failUnless( site._skin_setup_called )
         self.assertEqual( len( skins_tool.getSkinPaths() ), 0 )
         self.assertEqual( len( skins_tool.objectItems() ), 0 )
 
@@ -409,7 +407,7 @@ class Test_importSkinsTool( _SkinsSetup ):
         site = self._initSite( selections=_PATHS, fsdvs=_FSDVS )
         skins_tool = site.portal_skins
 
-        self.failIf( skins_tool._setup_called )
+        self.failIf( site._skin_setup_called )
         self.assertEqual( len( skins_tool.getSkinPaths() ), 2 )
         self.assertEqual( len( skins_tool.objectItems() ), 3 )
 
@@ -424,7 +422,7 @@ class Test_importSkinsTool( _SkinsSetup ):
         self.failIf( skins_tool.allow_any )
         self.failIf( skins_tool.cookie_persistence )
 
-        self.failUnless( skins_tool._setup_called )
+        self.failUnless( site._skin_setup_called )
         self.assertEqual( len( skins_tool.getSkinPaths() ), 2 )
         self.assertEqual( len( skins_tool.objectItems() ), 3 )
 
@@ -436,7 +434,7 @@ class Test_importSkinsTool( _SkinsSetup ):
         self._registerDirectoryView( os.path.join( _TESTS_PATH, 'three' ) )
         skins_tool = site.portal_skins
 
-        self.failIf( skins_tool._setup_called )
+        self.failIf( site._skin_setup_called )
         self.assertEqual( len( skins_tool.getSkinPaths() ), 0 )
         self.assertEqual( len( skins_tool.objectItems() ), 0 )
 
@@ -451,7 +449,7 @@ class Test_importSkinsTool( _SkinsSetup ):
         self.failUnless( skins_tool.allow_any )
         self.failUnless( skins_tool.cookie_persistence )
 
-        self.failUnless( skins_tool._setup_called )
+        self.failUnless( site._skin_setup_called )
         self.assertEqual( len( skins_tool.getSkinPaths() ), 2 )
         self.assertEqual( len( skins_tool.objectItems() ), 3 )
 
@@ -463,7 +461,7 @@ class Test_importSkinsTool( _SkinsSetup ):
         self._registerDirectoryView( os.path.join( _TESTS_PATH, 'three' ) )
         skins_tool = site.portal_skins
 
-        self.failIf( skins_tool._setup_called )
+        self.failIf( site._skin_setup_called )
         self.assertEqual( len( skins_tool.getSkinPaths() ), 0 )
         self.assertEqual( len( skins_tool.objectItems() ), 0 )
 
@@ -478,7 +476,7 @@ class Test_importSkinsTool( _SkinsSetup ):
         self.failUnless( skins_tool.allow_any )
         self.failUnless( skins_tool.cookie_persistence )
 
-        self.failUnless( skins_tool._setup_called )
+        self.failUnless( site._skin_setup_called )
         self.assertEqual( len( skins_tool.getSkinPaths() ), 2 )
         self.assertEqual( len( skins_tool.objectItems() ), 3 )
 
@@ -492,7 +490,7 @@ class Test_importSkinsTool( _SkinsSetup ):
         self._registerDirectoryView( os.path.join( _TESTS_PATH, 'three' ) )
         skins_tool = site.portal_skins
 
-        self.failIf( skins_tool._setup_called )
+        self.failIf( site._skin_setup_called )
         skin_paths = skins_tool.getSkinPaths()
         self.assertEqual( len( skin_paths ), 2 )
         self.assertEqual( skin_paths[ 0 ], ( 'basic', 'one' ) )
@@ -510,7 +508,7 @@ class Test_importSkinsTool( _SkinsSetup ):
         self.failIf( skins_tool.allow_any )
         self.failIf( skins_tool.cookie_persistence )
 
-        self.failUnless( skins_tool._setup_called )
+        self.failUnless( site._skin_setup_called )
         skin_paths = skins_tool.getSkinPaths()
         self.assertEqual( len( skin_paths ), 2 )
         self.assertEqual( skin_paths[ 0 ], ( 'basic', 'one,three' ) )
@@ -526,7 +524,7 @@ class Test_importSkinsTool( _SkinsSetup ):
         self.failIf( skins_tool.allow_any )
         self.failIf( skins_tool.cookie_persistence )
 
-        self.failUnless( skins_tool._setup_called )
+        self.failUnless( site._skin_setup_called )
         skin_paths = skins_tool.getSkinPaths()
         self.assertEqual( len( skin_paths ), 2 )
         self.assertEqual( skin_paths[ 0 ], ( 'basic', 'one,three,four' ) )
