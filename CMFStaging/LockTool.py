@@ -21,6 +21,7 @@ $Id$
 
 import os
 
+from Acquisition import aq_parent
 from Globals import InitializeClass, DTMLFile
 from AccessControl import ClassSecurityInfo, getSecurityManager
 from Products.CMFCore.utils import UniqueObject, getToolByName, \
@@ -29,6 +30,7 @@ from Products.CMFCore.CMFCorePermissions import ManagePortal, \
      ModifyPortalContent
 from webdav.WriteLockInterface import WriteLockInterface
 from webdav.LockItem import LockItem
+from zExceptions import Unauthorized
 
 from staging_utils import verifyPermission
 
@@ -103,6 +105,19 @@ class LockTool(UniqueObject, SimpleItemWithProperties):
         obj.wl_setLock(lockitem.getLockToken(), lockitem)
 
 
+    security.declarePublic('autolock')
+    def autolock(self, obj=None):
+        """Tries to lock an object, swallowing LockingErrors and Unauthorized.
+        """
+        if obj is None:
+            obj = aq_parent(self)
+        try:
+            self.lock(obj)
+        except (LockingError, Unauthorized):
+            return 0
+        return 1
+
+
     security.declarePublic('breaklock')
     def breaklock(self, obj, message=''):
         """Breaks the lock in an emergency.
@@ -113,7 +128,9 @@ class LockTool(UniqueObject, SimpleItemWithProperties):
         if self.auto_version:
             vt = getToolByName(self, 'portal_versions', None)
             if vt is not None:
-                vt.checkin(obj, message)
+                if (vt.isUnderVersionControl(obj)
+                    and vt.isCheckedOut(obj)):
+                    vt.checkin(obj, message)
 
 
     security.declarePublic('unlock')
@@ -138,7 +155,9 @@ class LockTool(UniqueObject, SimpleItemWithProperties):
         if self.auto_version:
             vt = getToolByName(self, 'portal_versions', None)
             if vt is not None:
-                vt.checkin(obj, message)
+                if (vt.isUnderVersionControl(obj)
+                    and vt.isCheckedOut(obj)):
+                    vt.checkin(obj, message)
 
 
     security.declarePublic('locker')
