@@ -131,22 +131,6 @@ Use folders to put content in categories."""
                            ,
                            )
 
-#
-#   HACK! HACK! HACK! HACK! HACK! HACK! HACK! HACK! HACK!
-#
-#   This registry needs to go away, and be replaced by a web-configurable,
-#   instance-specific 'portal_types' tool.
-#
-_mime_type_registry = {}
-
-def addPortalTypeHandler( MIMEType, klass ):
-    """
-        Set up a mapping from 'MIMEType' to 'klass', so that
-        PortalFolder.PUT_factory knows what to make.  'klass' should be
-        either an actual class object, whose __init__() takes no paramters
-        (except 'self'), or a function taking no paramters.
-    """
-    _mime_type_registry[ MIMEType ] = klass
 
 class PortalFolder( Folder, DynamicType ):
     """
@@ -361,20 +345,37 @@ class PortalFolder( Folder, DynamicType ):
             an object of the appropriate type (or None, if we don't
             know what to do).
         """
-        klass = _mime_type_registry.get( typ, None )
-        if klass is None:
+        registry = getToolByName( self, 'content_type_registry' )
+        if registry is None:
             return None
-        obj = klass(id=name)
+
+        typeObjectName = registry.findTypeName( name, typ, body )
+        if typeObjectName is None:
+            return None
+        
+        self.invokeFactory( typeObjectName, name )
+
+        # XXX: this is butt-ugly.
+        obj = aq_base( self._getOb( name ) )
+        self._delObject( name )
         return obj
 
     security.declareProtected(AddPortalContent, 'invokeFactory')
-    def invokeFactory(self, type_name, id, RESPONSE=None, *args, **kw):
+    def invokeFactory( self
+                     , type_name
+                     , id
+                     , RESPONSE=None
+                     , *args
+                     , **kw
+                     ):
         '''
         Invokes the portal_types tool.
         '''
-        pt = getToolByName(self, 'portal_types')
-        apply(pt.constructContent, (type_name, self, id, RESPONSE) + args,
-              kw)
+        pt = getToolByName( self, 'portal_types' )
+        apply( pt.constructContent
+             , (type_name, self, id, RESPONSE) + args
+             , kw
+             )
 
     def _checkId(self, id, allow_dup=0):
         PortalFolder.inheritedAttribute('_checkId')(self, id, allow_dup)

@@ -531,6 +531,7 @@ class ScriptableTypeInformation( TypeInformation ):
         ob = apply(constructor, (container, id) + args, kw)
         if hasattr(ob, '_setPortalTypeName'):
             ob._setPortalTypeName(self.getId())
+
         return '%s/%s' % ( ob.absolute_url(), self.immediate_view )
 
 InitializeClass( ScriptableTypeInformation )
@@ -712,8 +713,14 @@ class TypesTool( UniqueObject, OFS.Folder.Folder ):
 
     
     security.declarePublic('constructContent')
-    def constructContent( self, type_name, container, id,
-                          RESPONSE=None, *args, **kw ):
+    def constructContent( self
+                        , type_name
+                        , container
+                        , id
+                        , RESPONSE=None
+                        , *args
+                        , **kw
+                        ):
         """
             Build an instance of the appropriate content class in
             'container', using 'id'.
@@ -723,7 +730,7 @@ class TypesTool( UniqueObject, OFS.Folder.Folder ):
             raise 'ValueError', 'No such content type: %s' % type_name
         
         immediate_url = apply(info.constructInstance,
-                              (container, id) + args, kw)
+                            (container, id) + args, kw)
 
         if RESPONSE is not None:
             RESPONSE.redirect( immediate_url )
