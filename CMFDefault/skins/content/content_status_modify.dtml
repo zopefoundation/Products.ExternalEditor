@@ -1,6 +1,0 @@
-<dtml-call expr="portal_workflow.doActionFor(this(),
-                 REQUEST['workflow_action'],
-                 comment=REQUEST.get('comment', ''))">
-<dtml-let portal_status_message="'Status changed.'">
-  <dtml-return view>
-</dtml-let>

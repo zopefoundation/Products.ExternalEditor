@@ -1,4 +1,0 @@
-<dtml-call expr="edit(remote_url=REQUEST['remote_url'])">
-<dtml-let portal_status_message="'Link changed.'">
-<dtml-return link_edit_form>
-</dtml-let>

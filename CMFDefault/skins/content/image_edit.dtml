@@ -1,6 +1,0 @@
-<dtml-call expr="edit(
-    precondition=REQUEST.get('precondition', ''),
-    file=REQUEST.get('file', ''))">
-<dtml-let portal_status_message="'Image changed.'">
-<dtml-return image_edit_form>
-</dtml-let>
