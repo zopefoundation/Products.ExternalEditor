@@ -64,6 +64,7 @@ class Tests(unittest.TestCase):
         app = self.app
         if hasattr(app, 'testroot'):
             app._delObject('testroot')
+        get_transaction().abort()
         self.app._p_jar.close()
 
     def testNotInitiallyLocked(self):
@@ -115,7 +116,6 @@ class Tests(unittest.TestCase):
         self.assert_(not self.tool.isLockedOut(self.root.content))
         
 
-
 def test_suite():
     return unittest.TestSuite((
         unittest.makeSuite(Tests),
@@ -123,4 +123,3 @@ def test_suite():
 
 if __name__ == '__main__':
     unittest.main(defaultTest='test_suite')
-

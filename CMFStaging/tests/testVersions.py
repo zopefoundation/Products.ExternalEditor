@@ -52,14 +52,13 @@ class Tests(unittest.TestCase):
         user = TestUser('sally')
         newSecurityManager(None, user.__of__(self.root.acl_users))
 
-
     def tearDown(self):
         app = self.app
         if hasattr(app, 'testroot'):
             app._delObject('testroot')
+        get_transaction().abort()
         self.app._p_jar.close()
         noSecurityManager()
-
 
     def testCheckinCheckout(self):
         vt = self.tool
@@ -68,7 +67,6 @@ class Tests(unittest.TestCase):
         self.assert_(not vt.isCheckedOut(content))
         vt.checkout(content)
         self.assert_(vt.isCheckedOut(content))
-
 
     def testGetVersionId(self):
         vt = self.tool
@@ -82,7 +80,6 @@ class Tests(unittest.TestCase):
         new_id = vt.getVersionId(content)
         self.assertNotEqual(new_id, '')
         self.assertNotEqual(old_id, new_id)
-
 
     def testRevertToVersion(self):
         vt = self.tool
@@ -98,7 +95,6 @@ class Tests(unittest.TestCase):
         current_id = vt.getVersionId(content)
         self.assertNotEqual(new_id, current_id)
         self.assertEqual(old_id, current_id)
-
 
     def testRevertToStickyThenCheckout(self):
         # Test that the versions tool automatically unsticks objects
@@ -129,7 +125,6 @@ class Tests(unittest.TestCase):
         self.assertNotEqual(current_id, old_id)
         self.assertNotEqual(current_id, new_id)
 
-
     def testRevertToOldThenCheckout(self):
         # Test that the versions tool automatically copies old states forward
         vt = self.tool
@@ -156,7 +151,6 @@ class Tests(unittest.TestCase):
         current_id = vt.getVersionId(content)
         self.assertNotEqual(current_id, old_id)
         self.assertNotEqual(current_id, new_id)
-
 
     def testGetLogEntries(self):
         vt = self.tool
@@ -185,4 +179,3 @@ def test_suite():
 
 if __name__ == '__main__':
     unittest.main(defaultTest='test_suite')
-
