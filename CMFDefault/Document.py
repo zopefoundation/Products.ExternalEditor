@@ -239,10 +239,8 @@ class Document(PortalContent, DefaultDublinCoreImpl):
     security.declarePrivate('guessFormat')
     def guessFormat(self, text):
         """ Simple stab at guessing the inner format of the text """
-        if bodyfinder.search(text) is not None:
-            return 'html'
-        else:
-            return 'structured-text'
+        if utils.html_headcheck(text): return 'html'
+        else: return 'structured-text'
     
     security.declarePrivate('handleText')
     def handleText(self, text, format=None, stx_level=None):

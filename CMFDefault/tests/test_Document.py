@@ -139,6 +139,13 @@ class DocumentTests(unittest.TestCase):
         assert d.Format() == 'text/html'
         assert d.Description() == 'Describe me'
 
+    def test_EditStructuredTextWithHTML(self):
+        d = Document('foo')
+        d.edit(text_format=None, text=STX_WITH_HTML)
+        
+        assert d.Format() == 'text/plain', "%s != %s" % (
+            d.Format(), 'text/plain')
+
     def test_StructuredText(self):
         d = Document('foo')
         assert hasattr(d, 'cooked_text')
