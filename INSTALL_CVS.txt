@@ -7,7 +7,7 @@ Overview
   * You want to install the "latest-and-greatest" version of
     the CMF from a CVS checkout.
 
-    - See "Installing CMF":INSTALL.txt to install from a tarball.
+    - See "Installing CMF":CMF-1.1/INSTALL.txt to install from a tarball.
 
     - See the note below [1] if you want to export or check out
       the sources for a specific version from CVS.
@@ -19,8 +19,8 @@ Overview
     http://www.loria.fr/~molli/cvs-index.html
 
   * For direcitons on using the Zope CVS server, see "Public CVS
-    Access", http://classic.zope.org:8080/Community/CVS_public_access;
-    substitute 'CMF' for 'Zope2'.
+    Access", http://dev.zope.org/CVS/ReadOnlyAccess;
+    substitute 'CMF' for 'Zope'.
 
 Installation
 
