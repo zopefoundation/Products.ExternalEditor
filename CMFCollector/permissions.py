@@ -10,6 +10,18 @@ security = ModuleSecurityInfo('Products.CMFCollector.permissions')
 security.declarePublic('View')
 from Products.CMFCore.permissions import View
 
+security.declarePublic('AddPortalContent')
+from Products.CMFCore.permissions import AddPortalContent
+
+security.declarePublic('AccessInactivePortalContent')
+from Products.CMFCore.permissions import AccessInactivePortalContent
+
+security.declarePublic('AccessFuturePortalContent')
+from Products.CMFCore.permissions import AccessFuturePortalContent
+
+security.declarePublic('ModifyPortalContent')
+from Products.CMFCore.permissions import ModifyPortalContent
+
 security.declarePublic('ViewCollector')
 ViewCollector = View
 
