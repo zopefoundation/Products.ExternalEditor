@@ -137,9 +137,15 @@
  <tr valign="top">
   <td> <br> </td>
   <td>
-   <input type="submit" value=" Change ">
+   <input type="submit" value=" Submit ">
+   <input type="reset" value=" Reset ">
+  </td>
+  <td colspan="2">
+    <input type="checkbox" name="recatalog" value="1">
+    Reinstate internal catalog?
   </td>
  </tr>
+
  
 </table>
 </form>
