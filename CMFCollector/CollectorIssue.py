@@ -96,6 +96,8 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
 
     # Accumulated instance-data backwards-compatability values:
     _collector_path = None
+    # XXX This security declaration doesn't seem to have an effect?
+    security.declareProtected(EditCollectorIssue, 'submitter_email')
     submitter_email = None
     submitter_name = None
     version_info = ''
