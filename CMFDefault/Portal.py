@@ -74,8 +74,8 @@ class CMFSite ( PortalObjectBase
     meta_type = 'CMF Site'
 
     _properties = (
-        {'id':'title', 'type':'string'},
-        {'id':'description', 'type':'text'},
+        {'id':'title', 'type':'string', 'mode': 'w'},
+        {'id':'description', 'type':'text', 'mode': 'w'},
         )
     title = ''
     description = ''
