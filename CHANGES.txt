@@ -2,6 +2,10 @@ CMF 1.5alpha (unreleased)
 
   New Features
 
+    - CMFDefault utils: Added 'html_marshal' function.
+      This is similar to ZTUtils.make_hidden_input(), but returns a sequence
+      of (name, value) pairs instead of html code.
+
     - CMFCore utils and content types: Marked _getViewFor as deprecated.
       __call__() and view() methods using _getViewFor() are deprecated as
       well. Use Method Aliases instead.

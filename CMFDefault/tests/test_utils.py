@@ -17,6 +17,7 @@ from Products.CMFCore.tests.base.content import STX_WITH_HTML
 from Products.CMFDefault.utils import bodyfinder
 from Products.CMFDefault.utils import comma_split
 from Products.CMFDefault.utils import html_headcheck
+from Products.CMFDefault.utils import html_marshal
 from Products.CMFDefault.utils import parseHeadersBody
 from Products.CMFDefault.utils import scrubHTML
 from Products.CMFDefault.utils import seq_strip
@@ -127,11 +128,16 @@ Header: value
         self.assertEqual( tuplize('list', ['one',' two','three ']), wanted )
         self.assertEqual( tuplize('tuple', ('one','two','three')), wanted )
 
-    def test_seq_strip( self ):
+    def test_seq_strip(self):
         self.assertEqual( seq_strip(['one ', ' two', ' three ']),
                           ['one','two','three'] )
         self.assertEqual( seq_strip(('one ', ' two', ' three ')),
                           ('one','two','three') )
+
+    def test_html_marshal(self):
+        self.assertEqual( html_marshal(foo=1), ( ('foo:int', '1'), ) )
+        self.assertEqual( html_marshal(foo=1, bar='baz >&baz'),
+                          ( ('foo:int', '1'), ('bar', 'baz &gt;&amp;baz') ) )
 
 
 def test_suite():

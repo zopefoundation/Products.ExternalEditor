@@ -15,6 +15,7 @@
 $Id$
 """
 
+from cgi import escape
 from sgmllib import SGMLParser
 from types import ListType, StringType, TupleType, UnicodeType
 import re
@@ -22,6 +23,7 @@ import os
 
 from Globals import package_home
 from AccessControl import ModuleSecurityInfo
+from ZTUtils.Zope import complex_marshal
 
 from Products.CMFCore.CMFCoreExceptions import IllegalHTML
 
@@ -414,3 +416,12 @@ def html_headcheck(html):
         return 1
     else:
         return 0
+
+security.declarePublic('html_marshal')
+def html_marshal(**kw):
+    """ Marshal variables for html forms.
+    """
+    vars = []
+    for key, converter, value in complex_marshal( kw.items() ):
+        vars.append( ( key + converter, escape( str(value) ) ) )
+    return tuple(vars)
