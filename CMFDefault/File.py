@@ -231,7 +231,7 @@ class File( OFS.Image.File
         """
 
         RESPONSE.setHeader('Content-Disposition',
-                           'attachment; filename="%s"' % self.id())
+                           'attachment; filename=%s' % self.id())
         return OFS.Image.File.index_html(self, REQUEST, RESPONSE)
 
     index_html = download

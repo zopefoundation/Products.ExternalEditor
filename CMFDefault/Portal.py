@@ -113,11 +113,11 @@ factory_type_information = (
      'icon': 'file_icon.gif',
      'product':'CMFDefault', 'factory':'addFile',
      'immediate_view':'metadata_edit_form', 'actions':
-     ({'name': 'View statistics',
+     ({'name': 'View',
        'action': 'file_view',
        'permissions': ('View',)},
       {'name': 'Download',
-       'action': 'download',
+       'action': '',
        'permissions': ('View',)},
       {'name': 'Edit',
        'action': 'file_edit_form',
