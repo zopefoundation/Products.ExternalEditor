@@ -96,20 +96,21 @@ factory_type_information = (
     # Perhaps this ought to be in an external XML file.
     {'id': 'News Item', 'meta_type': 'News Item', 'description':
      'News Items contain short text articles and carry a title '
-     'as well as an optional description.',
+     'as well as an optional description.', 'icon': 'newsitem_icon.gif',
      'product':'CMFDefault', 'factory':'addNewsItem',
      'immediate_view':'metadata_edit_form', 'actions_for':'newsitem',
      },
 
     {'id': 'Document', 'meta_type': 'Document', 'description':
      'Documents can contain text that can be formatted using '
-     'Structured Text.',
+     'Structured Text.', 'icon': 'document_icon.gif',
      'product':'CMFDefault', 'factory':'addDocument',
      'immediate_view':'metadata_edit_form', 'actions_for':'document',
      },
 
     {'id': 'File', 'meta_type': 'File', 'description':
      'File objects can contain arbitrary downloadable files.',
+     'icon': 'file_icon.gif',
      'product':'CMFDefault', 'factory':'addFile',
      'immediate_view':'metadata_edit_form', 'actions':
      ({'name': 'View statistics',
@@ -129,6 +130,7 @@ factory_type_information = (
 
     {'id': 'Image', 'meta_type': 'Image', 'description':
      'Image objects can be embedded in Portal documents.',
+     'icon': 'image_icon.gif',
      'product':'CMFDefault', 'factory':'addImage',
      'immediate_view':'metadata_edit_form', 'actions':
      ({'name': 'View',
@@ -145,13 +147,13 @@ factory_type_information = (
 
     {'id': 'Link', 'meta_type': 'Link', 'description':
      'Link items are URLs that come with additional information '
-     'such as a Title and a Description.',
+     'such as a Title and a Description.', 'icon': 'link_icon.gif',
      'product':'CMFDefault', 'factory':'addLink',
      'immediate_view':'metadata_edit_form', 'actions_for':'link',
      },
 
     {'id': 'Folder', 'meta_type': 'Portal Folder', 'description':
-     'Use folders to put content in categories.',
+     'Use folders to put content in categories.', 'icon': 'folder_icon.gif',
      'product':'CMFCore', 'factory':'manage_addPortalFolder',
      'immediate_view':'folder_contents', 'actions':
      ({'name': 'View',
@@ -167,6 +169,7 @@ factory_type_information = (
 
     {'id': 'Favorite', 'meta_type': 'Favorite', 'description':
      'A Favorite is a Link to an intra-portal resource.',
+     'icon': 'link_icon.gif',
      'product': 'CMFDefault', 'factory': 'addFavorite',
      'immediate_view': 'metadata_edit_form', 'actions':
      ({'name': 'View',
