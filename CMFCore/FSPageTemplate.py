@@ -111,34 +111,31 @@ class FSPageTemplate(FSObject, Script, PageTemplate):
         self._updateFromFS()
         return FSPageTemplate.inheritedAttribute('pt_macros')(self)
 
+    security.declarePrivate('_setCacheHeaders')
+    def _setCacheHeaders(self, extra_context):
+        """Set cache headers according to cache policy manager."""
+        REQUEST = getattr(self, 'REQUEST', None)
+        if REQUEST is not None:
+            content = aq_parent(self)
+            manager = getToolByName(content, 'caching_policy_manager', None)
+            if manager is not None:
+                view_name = self.getId()
+                headers = manager.getHTTPCachingHeaders(
+                                  content, view_name, extra_context
+                                  )
+                RESPONSE = REQUEST['RESPONSE']
+                for key, value in headers:
+                    RESPONSE.setHeader(key, value)
+
     def pt_render(self, source=0, extra_context={}):
         self._updateFromFS()  # Make sure the template has been loaded.
         try:
-            if not source: # Hook up to caching policy.
-
-                REQUEST = getattr( self, 'REQUEST', None )
-
-                if REQUEST:
-
-                    content = aq_parent( self )
-
-                    mgr = getToolByName( content
-                                       , 'caching_policy_manager'
-                                       , None
-                                       )
-
-                    if mgr:
-                        view_name = self.getId()
-                        RESPONSE = REQUEST[ 'RESPONSE' ]
-                        headers = mgr.getHTTPCachingHeaders( content
-                                                           , view_name
-                                                           , extra_context
-                                                           )
-                        for key, value in headers:
-                            RESPONSE.setHeader( key, value )
-
-            return FSPageTemplate.inheritedAttribute('pt_render')( self,
-                    source, extra_context )
+            result = FSPageTemplate.inheritedAttribute('pt_render')(
+                                    self, source, extra_context
+                                    )
+            if not source:
+                self._setCacheHeaders(extra_context)
+            return result
 
         except RuntimeError:
             if Globals.DevelopmentMode:
