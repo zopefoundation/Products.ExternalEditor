@@ -1,4 +1,3 @@
-## Script (Python) "breadcrumbs.py $Revision$"
 ##parameters=include_root=1
 ##title=Return breadcrumbs
 ##
