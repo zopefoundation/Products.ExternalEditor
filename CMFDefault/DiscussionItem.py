@@ -58,6 +58,8 @@ interface."""
                            )
 
 
+from utils import scrubHTML
+
 def addDiscussionItem(self, id, title, description, text_format, text,
                       reply_to, RESPONSE=None):
     """
@@ -69,9 +71,9 @@ def addDiscussionItem(self, id, title, description, text_format, text,
 
     Otherwise, same as addDocument
     """
-
+    
     if not description: description = title
-        
+    text = scrubHTML(text) 
     item = DiscussionItem( id )
     item.title = title
     item.description = description
