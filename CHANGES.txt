@@ -2,6 +2,12 @@ External Editor Change Log
 
   Next Release
 
+    - If Word was exited before a user actively saved, if there were
+      outstanding changes in the document being edited, those changes
+      would not be saved to the server despite the user answering
+      "yes" to the "do you want to save before you exit" dialog
+      presented by Word.
+
     - The "title" attribute of the object being externally edited is
       now available within the set of headers returned by EE to the
       zopeedit client.
