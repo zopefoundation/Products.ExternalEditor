@@ -35,7 +35,9 @@
      </select>
   </td>
   <td colspan="2" align="right">
-   <a href="full_metadata_edit_form"> Edit all metadata </a>
+   <a href="full_metadata_edit_form"
+      tal:attributes="href string:${here/absolute_url}/full_metadata_edit_form"
+     >Edit all metadata</a>
   </td>
 
  </tr>

@@ -114,7 +114,7 @@ CMF TODO's
 
         (?) Tracker #500:  Skin cookie for deleted skin causes traceback
 
-        ( ) Tracker #506:  Invalid relative URL on metadata_edit_form
+        (x) Tracker #506:  Invalid relative URL on metadata_edit_form
 
       - (x) Content fixes
 

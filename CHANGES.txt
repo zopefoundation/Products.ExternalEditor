@@ -48,6 +48,9 @@ CMF 1.3 beta2 (2002/06/30)
 
   Bugs Fixed
 
+    - Fixed relative URL in metadata_edit_form that broke if the
+      main_template had a base tag (Tracker #506).
+
     - Made discussion replies work correctly when hitting Enter in the
       title field (Tracker #515), and corrected discussion Preview
       followed by an Edit that lost body information (Tracker #516).
