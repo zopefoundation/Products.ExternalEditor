@@ -1,5 +1,12 @@
 1.1 beta
 
+ - Remove ugly '_mimetype_registry' hack for 'PUT_factory'.
+
+ - Make 'PUT_factory' use new 'content_type_registry' tool.
+
+ - Make 'PUT_factory' use 'invokeFactory', so that objects created
+   via PUT have their 'portal_type' set properly.
+
  - Added ContentTypeRegistry class and related predicates for
    mapping PUT requests (name,content_type,body) to type object
    names.
