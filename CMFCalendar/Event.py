@@ -23,6 +23,7 @@ from webdav.Lockable import ResourceLockedError
 from Products.CMFCore.PortalContent import PortalContent
 from Products.CMFCore.WorkflowCore import WorkflowAction
 from Products.CMFCore.utils import keywordsplitter
+from Products.CMFCore.utils import contributorsplitter
 
 from Products.CMFDefault.DublinCore import DefaultDublinCoreImpl
 from Products.CMFDefault.utils import formatRFC822Headers
@@ -348,9 +349,11 @@ class Event(PortalContent, DefaultDublinCoreImpl):
         headers['Format'] = self.Format()
         new_subject = keywordsplitter(headers)
         headers['Subject'] = new_subject or self.Subject()
+        new_contrib = contributorsplitter(headers)
+        headers['Contributors'] = new_contrib or self.Contributors()
         haveheader = headers.has_key
         for key, value in self.getMetadataHeaders():
-            if key != 'Format' and not haveheader(key):
+            if not haveheader(key):
                 headers[key] = value
         self._editMetadata(title=headers['Title'],
                           subject=headers['Subject'],

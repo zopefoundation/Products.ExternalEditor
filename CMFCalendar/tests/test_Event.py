@@ -25,6 +25,7 @@ from DateTime import DateTime
 from Products.CMFCalendar.Event import Event
 from Products.CMFCore.tests.base.dummy import DummySite
 from Products.CMFCore.tests.base.dummy import DummyTool
+from Products.CMFCore.tests.base.testcase import RequestTest
 
 
 class TestEvent(TestCase):
@@ -75,9 +76,35 @@ class TestEvent(TestCase):
                          )
 
 
+class EventPUTTests(RequestTest):
+
+    def setUp(self):
+        RequestTest.setUp(self)
+        self.site = DummySite('site')
+        self.site._setObject( 'portal_membership', DummyTool() )
+
+    def _makeOne(self, id, *args, **kw):
+        return self.site._setObject( id, Event(id, *args, **kw) )
+
+    def test_PutWithoutMetadata(self):
+        self.REQUEST['BODY'] = ''
+        d = self._makeOne('foo') 
+        d.PUT(self.REQUEST, self.RESPONSE)
+        self.assertEqual( d.Title(), '' )
+        self.assertEqual( d.Format(), 'text/plain' )
+        self.assertEqual( d.Description(), '' )
+        self.assertEqual( d.Subject(), () )
+        self.assertEqual( d.Contributors(), () )
+        self.assertEqual( d.EffectiveDate(), 'None' )
+        self.assertEqual( d.ExpirationDate(), 'None' )
+        self.assertEqual( d.Language(), '' )
+        self.assertEqual( d.Rights(), '' )
+
+
 def test_suite():
     return TestSuite((
         makeSuite(TestEvent),
+        makeSuite(EventPUTTests),
         ))
 
 if __name__ == '__main__':

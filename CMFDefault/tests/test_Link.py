@@ -73,6 +73,19 @@ class LinkTests(TestCase):
         self.assertEqual( len(d.Subject()), 3 )
         self.assertEqual( d.getRemoteUrl(), 'http://www.zope.org' )
 
+    def test_PutWithoutMetadata(self):
+        d = self._makeOne('foo')
+        d._writeFromPUT( body='' )
+        self.assertEqual( d.Title(), '' )
+        self.assertEqual( d.Format(), 'text/url' )
+        self.assertEqual( d.Description(), '' )
+        self.assertEqual( d.Subject(), () )
+        self.assertEqual( d.Contributors(), () )
+        self.assertEqual( d.EffectiveDate(), 'None' )
+        self.assertEqual( d.ExpirationDate(), 'None' )
+        self.assertEqual( d.Language(), '' )
+        self.assertEqual( d.Rights(), '' )
+
     def test_fixupMissingScheme(self):
         table = {
             'http://foo.com':      'http://foo.com',

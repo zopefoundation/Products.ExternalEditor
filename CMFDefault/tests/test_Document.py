@@ -469,6 +469,22 @@ class DocumentPUTTests(RequestTestBase):
         self.assertEqual( d.Description(), 'Describe me' )
         self.assertEqual( r.status, 204 )
 
+    def test_PutHtmlWithoutMetadata(self):
+        html = HTML_TEMPLATE % {'title': 'Foo', 'body': 'Bar'}
+        self.REQUEST['BODY'] = html
+        d = self._makeOne('foo')
+        r = d.PUT(self.REQUEST, self.RESPONSE)
+        self.assertEqual( d.Title(), 'Foo' )
+        self.assertEqual( d.Format(), 'text/html' )
+        self.assertEqual( d.Description(), '' )
+        self.assertEqual( d.Subject(), () )
+        self.assertEqual( d.Contributors(), () )
+        self.assertEqual( d.EffectiveDate(), 'None' )
+        self.assertEqual( d.ExpirationDate(), 'None' )
+        self.assertEqual( d.Language(), '' )
+        self.assertEqual( d.Rights(), '' )
+        self.assertEqual( r.status, 204 )
+
 
 def test_suite():
     return TestSuite((

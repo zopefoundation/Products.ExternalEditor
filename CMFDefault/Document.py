@@ -25,6 +25,7 @@ from StructuredText.StructuredText import HTML
 
 from Products.CMFCore.PortalContent import PortalContent
 from Products.CMFCore.utils import keywordsplitter
+from Products.CMFCore.utils import contributorsplitter
 
 from DublinCore import DefaultDublinCoreImpl
 from exceptions import EditingConflict
@@ -174,9 +175,11 @@ class Document(PortalContent, DefaultDublinCoreImpl):
         headers['Format'] = self.Format()
         new_subject = keywordsplitter(headers)
         headers['Subject'] = new_subject or self.Subject()
+        new_contrib = contributorsplitter(headers)
+        headers['Contributors'] = new_contrib or self.Contributors()
         haveheader = headers.has_key
         for key, value in self.getMetadataHeaders():
-            if key != 'Format' and not haveheader(key):
+            if not haveheader(key):
                 headers[key] = value
         self._editMetadata(title=headers['Title'],
                           subject=headers['Subject'],
