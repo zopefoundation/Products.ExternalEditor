@@ -185,7 +185,7 @@ class ActionProviderBase:
             new_actions[idx2] = new_actions[idx]
             new_actions[idx] = a
 
-        self._actions = tuple( actions )
+        self._actions = tuple( new_actions )
 
         if REQUEST is not None:
             return self.manage_editActionsForm(
@@ -209,7 +209,7 @@ class ActionProviderBase:
                 # Wrap to the top.
                 idx2 = 0
             # Swap.
-            a = actions[idx2]
+            a = new_actions[idx2]
             new_actions[idx2] = new_actions[idx]
             new_actions[idx] = a
 
