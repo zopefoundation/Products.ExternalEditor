@@ -85,10 +85,13 @@ class Collector(SkinnedFolder):
 
     abbrev = 'CLTR'
 
+    managers = ()
+    dispatching = 1
+
     def __init__(self, id, title='', description='', abbrev='',
                  email=None,
                  topics=None, classifications=None, importances=None,
-                 supporters=None,
+                 managers=None, supporters=None, dispatching=None,
                  version_info_spiel=None):
 
         SkinnedFolder.__init__(self, id, title)
@@ -103,11 +106,16 @@ class Collector(SkinnedFolder):
         username = str(getSecurityManager().getUser())
         util.add_local_role(self, username, 'Manager')
         util.add_local_role(self, username, 'Owner')
+        if managers is None:
+            if username: managers = [username]
+            else: managers = []
+        elif username and username not in managers:
+            managers.append(username)
+        self.managers = managers
         if supporters is None:
-            if username: supporters = [username]
-            else: supporters = []
-        self._adjust_supporters_roster(supporters)
+            supporters = []
         self.supporters = supporters
+        self._adjust_staff_roles(no_reindex=1)
 
         # XXX We need to ensure *some* collector email addr...
         self.email = email
@@ -185,79 +193,103 @@ class Collector(SkinnedFolder):
     security.declareProtected(ManageCollector, 'edit')
     def edit(self, title=None, description=None,
              abbrev=None, email=None,
-             supporters=None,
+             managers=None, supporters=None, dispatching=None,
              topics=None, classifications=None,
              importances=None,
              version_info_spiel=None):
-        changed = reindex = 0
+
+        changes = []
+        staff_changed = 0
+        userid = str(getSecurityManager().getUser())
+
         if title is not None and title != self.title:
             self.title = title
-            changed = 1
+            changes.append("Title")
         if description is not None and self.description != description:
             self.description = description
-            changed = 1
+            changes.append("Description")
         if abbrev is not None and self.abbrev != abbrev:
             self.abbrev = abbrev
-            changed = 1
+            changes.append("Abbrev")
         if email is not None and self.email != email:
             self.email = email
-            changed = 1
+            changes.append("Email")
+        if managers is not None:
+            # XXX Vette managers - they must exist, etc.
+            x = filter(None, managers)
+            if ((userid in self.managers)
+                and (userid not in x)):
+                changes.append("(Managers may not deenlist themselves)")
+                x.append(userid)
+            if util.sorted(self.managers) != util.sorted(x):
+                self.managers = x
+                staff_changed = 1
         if supporters is not None:
             # XXX Vette supporters - they must exist, etc.
             x = filter(None, supporters)
-            if self.supporters != x:
-                self._adjust_supporters_roster(x)
+            if util.sorted(self.supporters) != util.sorted(x):
                 self.supporters = x
-                changed = 1
-                reindex = 1
+                staff_changed = 1
+        if staff_changed:
+            changes.extend(self._adjust_staff_roles())
+        if dispatching is not None and self.dispatching != dispatching:
+            self.dispatching = dispatching
+            changes.append("Dispatching %s"
+                           % ((dispatching and "on") or "off"))
         if topics is not None:
             x = filter(None, topics)
             if self.topics != x:
                 self.topics = x
-                changed = 1
+                changes.append("Topics")
         if classifications is not None:
             x = filter(None, classifications)
             if self.classifications != x:
                 self.classifications = x
-                changed = 1
+                changes.append("Classifications")
+                changes = 1
         if importances is not None:
             x = filter(None, importances)
             if self.importances != x:
                 self.importances = x
-                changed = 1
+                changes.append("Importance")
 
         if version_info_spiel is not None:
             if self.version_info_spiel != version_info_spiel:
                 self.version_info_spiel = version_info_spiel
-                changed = 1
+                changes.append("Version Info spiel")
 
-        if reindex:
+        return ", ".join(changes)
+
+    def _adjust_staff_roles(self, no_reindex=0):
+        """Adjust local-role assignments to track staff roster settings.
+        Ie, ensure: only designated supporters and managers have 'Reviewer'
+        local role, only designated managers have 'Manager' local role.
+
+        We reindex the issues if any local role changes occur, so
+        allowedRolesAndUsers catalog index tracks.
+
+        We return a list of changes (or non-changes)."""
+
+        managers = self.managers
+        supporters = self.supporters
+        changes = []
+
+        if not managers:
+            # Something is awry.  Manager are not allowed to remove themselves
+            # from the managers roster, and only managers should be able to
+            # adjust the roles, so:
+            changes.append("Populated empty managers roster")
+            self.managers = managers = [str(getSecurityManager().getUser())]
+        if util.users_for_local_role(self, managers, 'Manager'):
+            changes.append("Managers")
+
+        if util.users_for_local_role(self, managers + supporters, 'Reviewer'):
+            changes.append("Supporters")
+
+        if changes and not no_reindex:
             self._reindex_issues()
 
-        return changed
-
-    def _adjust_supporters_roster(self, new_roster):
-        """Adjust supporters local-role assignments to track roster changes.
-        Ie, ensure all and only designated supporters have 'Reviewer' local
-        role."""
-
-        already = []
-        # Remove 'Reviewer' local role from anyone having it not on new_roster:
-        for u in self.users_with_local_role('Reviewer'):
-            if u in new_roster:
-                already.append(u)
-            else:
-                # Remove the 'Reviewer' local role:
-                roles = list(self.get_local_roles_for_userid(u))
-                roles.remove('Reviewer')
-                if roles:
-                    self.manage_setLocalRoles(u, roles)
-                else:
-                    self.manage_delLocalRoles([u])
-        # Add 'Reviewer' local role to anyone on new_roster that lacks it:
-        for u in new_roster:
-            if u not in already:
-                util.add_local_role(self, u, 'Reviewer')
+        return changes
 
     security.declareProtected(ManageCollector, 'reinstate_catalog')
     def reinstate_catalog(self, internal_only=0):
@@ -355,7 +387,7 @@ ModuleSecurityInfo('pdb').declarePublic('set_trace')
 
 def addCollector(self, id, title='', description='', abbrev='',
                  topics=None, classifications=None, importances=None, 
-                 supporters=None,
+                 managers=None, supporters=None, dispatching=None,
                  version_info_spiel=None,
                  REQUEST=None):
     """
@@ -363,7 +395,8 @@ def addCollector(self, id, title='', description='', abbrev='',
     """
     it = Collector(id, title=title, description=description, abbrev=abbrev,
                    topics=topics, classifications=classifications,
-                   supporters=supporters, 
+                   managers=managers, supporters=supporters,
+                   dispatching=dispatching,
                    version_info_spiel=version_info_spiel)
     self._setObject(id, it)
     it = self._getOb(id)
