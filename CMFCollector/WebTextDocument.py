@@ -100,25 +100,35 @@ class WebTextDocument(Document):
         else:
             return Document.guessFormat(self, text)
 
-    def edit(self, text_format, text, file='', safety_belt=''):
-        got = Document.edit(self, text_format or self.text_format,
-                             text=text, file=file, safety_belt=safety_belt)
-        # The document stubbornly insists on a text format it likes, despite
-        # our explicit specification - set it back:
-        self.text_format = text_format or self.TEXT_FORMAT
+    def _edit(self, text, text_format='', safety_belt=''):
+        """ Edit the Document - Parses headers and cooks the body"""
+        headers = {}
+        if not text_format:
+            text_format = self.text_format
+        if not safety_belt:
+            safety_belt = headers.get('SafetyBelt', '')
+        if not self._safety_belt_update(safety_belt=safety_belt):
+            msg = ("Intervening changes from elsewhere detected."
+                   " Please refetch the document and reapply your changes."
+                   " (You may be able to recover your version using the"
+                   " browser 'back' button, but will have to apply them"
+                   " to a freshly fetched copy.)")
+            raise 'EditingConflict', msg
+        self.cooked_text = self.cookText(text)
+        self.text = text
 
+    def cookText(self, text):
+        return util.format_webtext(text)
+
+    # XXX This is obsolete for CMF 1.2 Document.  It may be sufficient for
+    # compatability with pre-CMF-1.2 Document architecture, but that's
+    # untested.
     security.declarePrivate('handleText')
     def handleText(self, text, format=None, stx_level=None):
         """Handle the raw text, returning headers, body, cooked, format"""
-        if not format:
-            format = self.guessFormat(text)
-        if format != self.TEXT_FORMAT:
-            return Document.handleText(self, text, format=format,
-                                       stx_level=stx_level or self._stx_level)
-        else:
-            body = text
-            cooked = util.format_webtext(body)
-            headers = {}
-            return headers, body, cooked, format
+        body = text
+        cooked = self.cookText(text)
+        headers = {}
+        return headers, body, cooked, self.TEXT_FORMAT
 
 InitializeClass(WebTextDocument)
