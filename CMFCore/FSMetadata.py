@@ -98,7 +98,7 @@ class FSMetadata:
 
         Security lines must be of the format
 
-        (0|1):Role[,Role...]
+        Permission = (0|1):Role[,Role...]
 
         Where 0|1 is the acquire permission setting
         and Role is the roles for this permission

@@ -18,6 +18,10 @@ HEAD only (unreleased)
       document content if the format has been changed (arising from
       discussion about http://www.zope.org/Collectors/CMF/214)
 
+    - DirectoryViews/FSMetadata: Corrected some erroneous docstrings
+      about proxy role handling using .metadata files 
+      (http://www.zope.org/Collectors/CMF/177)
+
   Features:
 
     - RegistrationTool: The regular expression that limits what people 

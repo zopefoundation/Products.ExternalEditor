@@ -249,7 +249,7 @@ class DirectoryInformation:
                                     'Error setting permissions',
                                     error=exc_info())
 
-                    # only DTML Methods can have proxy roles
+                    # only DTML Methods and Python Scripts can have proxy roles
                     if hasattr(ob, '_proxy_roles'):
                         try:
                             ob._proxy_roles = tuple(metadata.getProxyRoles())
