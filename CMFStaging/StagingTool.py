@@ -365,6 +365,17 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
                     % (p, stage))
 
 
+    security.declarePublic('stageExists')
+    def stageExists(self, stage):
+        """Return 1 if named stage exists, else 0."""
+        portal = aq_parent(aq_inner(self))
+        for stage_name, stage_title, stage_path in self._stages:
+            if stage_name == stage:
+                stage = self._getStage(portal, stage_path)
+                if stage: return 1
+                else: return 0
+        return 0
+
     security.declarePublic('checkContainers')
     def checkContainers(self, obj, stages):
         """Verifies that the container exists on the given stages.
