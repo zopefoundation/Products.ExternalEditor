@@ -99,6 +99,9 @@ class DynamicType:
         # XXX hack around a bug(?) in BeforeTraverse.MultiHook
         REQUEST = arg2 or arg1
 
+        if REQUEST['REQUEST_METHOD'] not in ('GET', 'POST'):
+            return
+
         stack = REQUEST['TraversalRequestNameStack']
         key = stack and stack[-1] or '(Default)'
         ti = self.getTypeInfo()
