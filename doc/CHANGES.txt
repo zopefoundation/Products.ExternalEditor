@@ -1,5 +1,13 @@
 PluggableAuthService changelog
 
+  After PluggableAuthService 1.0.3
+
+    Bugs Fixed
+
+      - Clarified interface of IAuthenticationPlugin, which should return
+        None rather than raising an exception if asked to authenticate an
+        unknown principal;  adjusted ZODBUserManager accordingly.
+
   PluggableAuthService 1.0.3 (2004/10/16)
 
     Bugs Fixed
