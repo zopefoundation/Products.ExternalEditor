@@ -1,11 +1,18 @@
 import unittest
+
+import Testing
 import Zope
+try:
+    Zope.startup()
+except AttributeError:
+    # for Zope versions before 2.6.1
+    pass
 
-class DummyCachingManager:
-    def getHTTPCachingHeaders( self, content, view_name, keywords, time=None ):
-        return ( ( 'foo', 'Foo' ), ( 'bar', 'Bar' ) )
+from Products.CMFCore.tests.base.dummy import DummyCachingManager
+from Products.CMFCore.tests.base.testcase import FSDVTest
+from Products.CMFCore.tests.base.testcase import RequestTest
+from Products.CMFCore.tests.base.testcase import SecurityTest
 
-from Products.CMFCore.tests.base.testcase import RequestTest, SecurityTest, FSDVTest
 
 class FSPTMaker(FSDVTest):
 
@@ -15,6 +22,7 @@ class FSPTMaker(FSDVTest):
         from os.path import join
 
         return FSPageTemplate( id, join( self.skin_path_name, filename ) )
+
 
 class FSPageTemplateTests( RequestTest, FSPTMaker ):
 
@@ -78,6 +86,7 @@ class FSPageTemplateTests( RequestTest, FSPTMaker ):
         self.failUnless( 'foo' in self.RESPONSE.headers.keys() )
         self.failUnless( 'bar' in self.RESPONSE.headers.keys() )
 
+
 class FSPageTemplateCustomizationTests( SecurityTest, FSPTMaker ):
 
     def setUp( self ):
@@ -119,6 +128,7 @@ class FSPageTemplateCustomizationTests( SecurityTest, FSPTMaker ):
         SecurityTest.tearDown(self)
         FSPTMaker.tearDown(self)
 
+
 def test_suite():
     return unittest.TestSuite((
         unittest.makeSuite(FSPageTemplateTests),
@@ -127,4 +137,3 @@ def test_suite():
 
 if __name__ == '__main__':
     unittest.main(defaultTest='test_suite')
-

@@ -280,3 +280,12 @@ class DummyTool(Implicit,ActionProviderBase):
 
     def notifyCreated(self, ob):
         self.test_notified = ob
+
+
+class DummyCachingManager:
+
+    def getHTTPCachingHeaders( self, content, view_name, keywords, time=None ):
+        return ( ( 'foo', 'Foo' ), ( 'bar', 'Bar' ) )
+
+    def getPhysicalPath(self):
+        return ('baz',)

@@ -1,12 +1,19 @@
 import unittest
+
+import Testing
 import Zope
-import os.path
+try:
+    Zope.startup()
+except AttributeError:
+    # for Zope versions before 2.6.1
+    pass
 
-class DummyCachingManager:
-    def getHTTPCachingHeaders( self, content, view_name, keywords, time=None ):
-        return ( ( 'foo', 'Foo' ), ( 'bar', 'Bar' ) )
+from os.path import join as path_join
 
-from Products.CMFCore.tests.base.testcase import RequestTest, FSDVTest
+from Products.CMFCore.tests.base.dummy import DummyCachingManager
+from Products.CMFCore.tests.base.testcase import FSDVTest
+from Products.CMFCore.tests.base.testcase import RequestTest
+
 
 class FSFileTests( RequestTest, FSDVTest):
 
@@ -22,11 +29,11 @@ class FSFileTests( RequestTest, FSDVTest):
 
         from Products.CMFCore.FSFile import FSFile
         
-        return FSFile( id, os.path.join( self.skin_path_name, filename ) )
+        return FSFile( id, path_join(self.skin_path_name, filename) )
 
     def _extractFile( self ):
 
-        path = os.path.join( self.skin_path_name, 'test_file.swf' )
+        path = path_join(self.skin_path_name, 'test_file.swf')
         f = open( path, 'rb' )
         try:
             data = f.read()
@@ -113,6 +120,7 @@ class FSFileTests( RequestTest, FSDVTest):
         self.failUnless( data, '' )
         self.assertEqual( self.RESPONSE.getStatus(), 200 )
 
+
 def test_suite():
     return unittest.TestSuite((
         unittest.makeSuite(FSFileTests),
@@ -120,4 +128,3 @@ def test_suite():
 
 if __name__ == '__main__':
     unittest.main(defaultTest='test_suite')
-
