@@ -161,7 +161,7 @@ class NewsItem( Document ):
             Edit the News Item
         """
         if text_format is None:
-            text_format = self.text_format
+            text_format = getattr(self, 'text_format', 'html')
         if description is not None:
             self.setDescription( description )
         Document._edit( self, text_format, text )
