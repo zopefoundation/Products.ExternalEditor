@@ -122,6 +122,7 @@ class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
                , ('review_state', 'FieldIndex')
                , ('in_reply_to', 'FieldIndex')
                , ('meta_type', 'FieldIndex')
+               , ('id', 'FieldIndex')
                )
     
     security.declarePublic( 'enumerateColumns' )
@@ -161,10 +162,13 @@ class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
             addColumn = self._catalog.addColumn
 
         # Content indexes
+        self._catalog.indexes.clear()
         for index_name, index_type in self.enumerateIndexes():
             addIndex( index_name, index_type )
 
         # Cached metadata
+        self._catalog.names = ()
+        self._catalog.schema.clear()
         for column_name in self.enumerateColumns():
             addColumn( column_name )
 
