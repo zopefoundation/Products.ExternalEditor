@@ -138,7 +138,7 @@ class SimpleHTMLParser(SGMLParser):
 
 bodyfinder = re.compile(r'<body.*?>(?P<bodycontent>.*?)</body>',
                         re.DOTALL|re.I)
-htfinder = re.compile(r'<html.*?>', re.DOTALL|re.I)
+htfinder = re.compile(r'<html', re.DOTALL|re.I)
 
 def html_headcheck(html):
     """ Returns 'true' if document looks HTML-ish enough """
