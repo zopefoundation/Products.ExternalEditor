@@ -1,6 +1,9 @@
 Future
 
   New Features
+  
+    - Added .js to the extensions that create FSFile objects in
+      DirectoryViews
 
     - (__future__) Exposed role management for manager users on the
       default roster:  managers can now "promote" members without going
