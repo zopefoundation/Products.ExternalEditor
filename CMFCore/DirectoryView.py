@@ -316,12 +316,20 @@ class DirectoryRegistry:
         return self._meta_types.get(mt, None)
 
     def registerDirectory(self, name, _prefix, subdirs=1):
+        # This what is actually called to register a
+        # file system directory to become a FSDV.
         if not isinstance(_prefix, StringType):
             _prefix = package_home(_prefix)
         filepath = path.join(_prefix, name)
         self.registerDirectoryByPath(filepath, subdirs)
 
     def registerDirectoryByPath(self, filepath, subdirs=1):
+        # This is indirectly called during registration of
+        # a directory. As you can see, minimalpath is called
+        # on the supplied path at this point.
+        # The idea is that the registry will only contain
+        # small paths that are likely to work across platforms
+        # and SOFTWARE_HOME, INSTANCE_HOME and PRODUCTS_PATH setups
         fp = minimalpath(filepath)
         normfilepath = path.normpath(filepath)
         self._directories[fp] = di = DirectoryInformation(normfilepath, fp)
@@ -336,6 +344,10 @@ class DirectoryRegistry:
             info.reload()
 
     def getDirectoryInfo(self, filepath):
+        # This is called when we need to get hold of the information
+        # for a minimal path.
+        # minimalpath is called on the supplied path on the hope
+        # that if it is incorrect, something ca
         # Can return None.
         return self._directories.get(minimalpath(filepath), None)
 

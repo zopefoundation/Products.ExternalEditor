@@ -595,36 +595,48 @@ def keywordsplitter( headers
 #
 security.declarePublic('normalize')
 def normalize(p):
-    return os_path.normcase(os_path.normpath(p.replace('\\','/')))
-
-normINSTANCE_HOME = normalize(INSTANCE_HOME)
-normSOFTWARE_HOME = normalize(SOFTWARE_HOME)
+    return os_path.normcase(os_path.normpath(p))
 
 separators = (os.sep, os.altsep)
+
+import Products
+ProductsPath = []
+ProductsPath = map(normalize,Products.__path__)
 
 security.declarePublic('expandpath')
 def expandpath(p):
     # Converts a minimal path to an absolute path.
+
+    # This has a slight weakness in that if someone creates a new
+    # product with the same name as an old one, then the skins may
+    # become confused between the two.
+    # However, that's an acceptable risk as people don't seem
+    # to re-use product names ever (it would create ZODB persistence
+    # problems too ;-)
+    
     p = os_path.normpath(p)
     if os_path.isabs(p):
         return p
-    abs = os_path.join(normINSTANCE_HOME, p)
-    if os_path.exists(abs):
-        return abs
-    return os_path.join(normSOFTWARE_HOME, p)
+    
+    for ppath in ProductsPath:
+        abs = os_path.join(ppath, p)
+        if os_path.exists(abs):
+            return abs
+
+    # return the last one, errors will happen else where as as result
+    # and be caught
+    return abs
 
 security.declarePublic('minimalpath')
 def minimalpath(p):
-    # This trims down to a 'Products' root if it can.
+    # This trims down to just beyond a 'Products' root if it can.
     # otherwise, it returns what it was given.
     # In either case, the path is normalized.
     p = normalize(p)
     index = p.find('Products')
     if index == -1:
         index = p.find('products')
-    if index == -1:
-        return p
-    p = p[index:]
-    while p[:1] in separators:
-        p = p[1:]
-    return p
+        if index == -1:
+            # couldn't normalise            
+            return p
+    return p[index+len('products/'):]

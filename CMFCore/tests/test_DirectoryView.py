@@ -1,4 +1,5 @@
 import Zope
+
 from unittest import TestCase, TestSuite, makeSuite, main
 
 from Products.CMFCore.tests.base.dummy import DummyFolder
@@ -14,9 +15,10 @@ class DirectoryViewPathTests( TestCase ):
     """
     These test that, no matter what is stored in their dirpath,
     FSDV's will do their best to find an appropriate skin
-    and only do nothing in difficult cases (such as where
-    people have chosen to use PRODUCTS_PATH )
+    and only do nothing in the case where an appropriate skin
+    can't be found.
     """
+    
     def setUp(self):
         from Products.CMFCore.DirectoryView import registerDirectory
         from Products.CMFCore.DirectoryView import addDirectoryViews
@@ -24,32 +26,65 @@ class DirectoryViewPathTests( TestCase ):
         self.ob = DummyFolder()
         addDirectoryViews(self.ob, 'fake_skins', _prefix)        
         
+
+    # These, in effect, test the minimalpath and expandpath functions
+    # from CMFCore.utils in combination. See DirectoryView.py for details
+    
     def test_getDirectoryInfo1( self ):
         """ windows INSTANCE_HOME  """
         self.ob.fake_skin.manage_properties(r'Products\CMFCore\tests\fake_skins\fake_skin')        
-        self.failUnless(hasattr(self.ob.fake_skin,'test1'))
+        self.failUnless(hasattr(self.ob.fake_skin,'test1'),self.ob.fake_skin.getDirPath())
 
     def test_getDirectoryInfo2( self ):
         """ windows SOFTWARE_HOME  """
         self.ob.fake_skin.manage_properties(r'C:\Zope\2.5.1\Products\CMFCore\tests\fake_skins\fake_skin')        
-        self.failUnless(hasattr(self.ob.fake_skin,'test1'))
+        self.failUnless(hasattr(self.ob.fake_skin,'test1'),self.ob.fake_skin.getDirPath())
 
     def test_getDirectoryInfo3( self ):
         """ *nix INSTANCE_HOME  """
         self.ob.fake_skin.manage_properties('Products/CMFCore/tests/fake_skins/fake_skin')        
-        self.failUnless(hasattr(self.ob.fake_skin,'test1'))
+        self.failUnless(hasattr(self.ob.fake_skin,'test1'),self.ob.fake_skin.getDirPath())
 
     def test_getDirectoryInfo5( self ):
         """ *nix SOFTWARE_HOME  """
         self.ob.fake_skin.manage_properties('/usr/local/zope/2.5.1/Products/CMFCore/tests/fake_skins/fake_skin')        
-        self.failUnless(hasattr(self.ob.fake_skin,'test1'))
+        self.failUnless(hasattr(self.ob.fake_skin,'test1'),self.ob.fake_skin.getDirPath())
 
+    # These tests cater for the common name scheme for PRODUCTS_PATH of something_PRODUCTS
     def test_getDirectoryInfo5( self ):
-        """ Somewhere we won't be able to find  """
+        """ windows PRODUCTS_PATH  """
         from tempfile import mktemp        
-        self.ob.fake_skin.manage_properties(mktemp()+'/CMFCore/tests/fake_skins/fake_skin')
+        self.ob.fake_skin.manage_properties(mktemp()+r'Products\CMFCore\tests\fake_skins\fake_skin')
+        self.failUnless(hasattr(self.ob.fake_skin,'test1'),self.ob.fake_skin.getDirPath())
+
+    def test_getDirectoryInfo6( self ):
+        """ linux PRODUCTS_PATH  """
+        from tempfile import mktemp        
+        self.ob.fake_skin.manage_properties(mktemp()+'Products/CMFCore/tests/fake_skins/fake_skin')
+        self.failUnless(hasattr(self.ob.fake_skin,'test1'),self.ob.fake_skin.getDirPath())
+
+    # Test we do nothing if given a really wacky path
+    def test_UnhandleableExpandPath( self ):
+        from tempfile import mktemp        
+        self.ob.fake_skin.manage_properties(mktemp())
         self.assertEqual(self.ob.fake_skin.objectIds(),[])
         
+    def test_UnhandleableMinimalPath( self ):
+        from Products.CMFCore.utils import minimalpath,normalize      
+        from tempfile import mktemp        
+        weirdpath = mktemp()
+        # we need to normalize 'cos minimalpath does, btu we're not testing normalize in this unit test.
+        self.assertEqual(normalize(weirdpath),minimalpath(weirdpath))
+
+    # this test tests that registerDirectory calls minimalpath correctly
+    # the only way to test this works under SOFTWARE_HOME,INSTANCE_HOME and PRODUCTS_PATH setups is to
+    # run the test in those environments
+    def test_registerDirectoryMinimalPath(self):
+        from Products.CMFCore.DirectoryView import _dirreg
+        from os.path import join
+        self.failUnless(_dirreg._directories.has_key(join('cmfcore','tests','fake_skins','fake_skin')),_dirreg._directories.keys())
+        self.assertEqual(self.ob.fake_skin.getDirPath(),join('cmfcore','tests','fake_skins','fake_skin'))
+    
 class DirectoryViewTests( FSDVTest ):
 
     def setUp( self ):
@@ -58,7 +93,7 @@ class DirectoryViewTests( FSDVTest ):
 
     def test_addDirectoryViews( self ):
         """ Test addDirectoryViews  """
-        # also test registration of driectory views doesn't barf
+        # also test registration of directory views doesn't barf
         pass
 
     def test_DirectoryViewExists( self ):
