@@ -57,9 +57,9 @@ CMF TODO's
 
     Tasks
 
-      - ( ) FriendlyDateCriterion fixes
+      - (x) FriendlyDateCriterion fixes
 
-        ( ) Tracker #474:  FriendlyDateCriterion can't spell "today".
+        (x) Tracker #474:  FriendlyDateCriterion can't spell "today".
 
         (x) Tracker #475:  FDC has broken ZPT edit form
 

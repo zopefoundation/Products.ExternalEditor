@@ -25,6 +25,11 @@ CMF 1.3 beta2 (2002/06/30)
 
   New Features
 
+    - Enabled "within day" queries for FriendlyDateCriteria E.g.,
+      field="modified", value="Now", operation="within_day",
+      daterange="old" -> content which was modified "today".
+      (Tracker # 474).
+
     - Made the id of the current user available to old action providers
       (DCWorkflow being a prime example) as 'user_id' (Tracker #495,
       thanks to Luca Olivetti for the patch).

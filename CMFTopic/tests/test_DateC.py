@@ -30,6 +30,10 @@ class FriendlyDateCriterionTests( unittest.TestCase ):
                             , 'operation': 'max'
                             , 'daterange': 'ahead'
                             }
+    today = { 'value': 0
+            , 'operation': 'within_day'
+            , 'daterange': 'ahead'
+            }
 
     def test_Interface( self ):
         from Products.CMFTopic.interfaces import Criterion
@@ -104,6 +108,24 @@ class FriendlyDateCriterionTests( unittest.TestCase ):
 
         friendly.edit( '' )
         self.assertEqual( friendly.value, None )
+
+    def test_Today( self ):
+
+        from Products.CMFTopic.DateCriteria import FriendlyDateCriterion
+        friendly = FriendlyDateCriterion( 'foo', 'foofield' )
+
+        friendly.apply( self.today )
+        self.assertEqual( friendly.daterange, 'ahead' )
+
+        now = DateTime()
+        
+        result = friendly.getCriteriaItems()
+        self.assertEqual( len( result ), 2 )
+        self.assertEqual( result[0][0], 'foofield' )
+        self.assertEqual( result[0][1], ( now.earliestTime()
+                                        , now.latestTime() ) )
+        self.assertEqual( result[1][0], 'foofield_usage' )
+        self.assertEqual( result[1][1], 'range:min:max' )
 
     def test_FiveDaysOld( self ):
 

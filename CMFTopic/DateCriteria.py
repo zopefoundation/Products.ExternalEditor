@@ -42,7 +42,8 @@ class FriendlyDateCriterion( AbstractCriterion ):
 
     _editableAttributes = ( 'value', 'operation', 'daterange' )
 
-    _defaultDateOptions = ( (     1, '1 Day'    )
+    _defaultDateOptions = ( (     0, 'Now'      )
+                          , (     1, '1 Day'    )
                           , (     2, '2 Days'   )
                           , (     5, '5 Days'   )
                           , (     7, '1 Week'   )
@@ -94,10 +95,10 @@ class FriendlyDateCriterion( AbstractCriterion ):
             except:
                 raise ValueError, 'Supplied value should be an int'
 
-        if operation in ( 'min','max' ):
+        if operation in ( 'min', 'max', 'within_day' ):
             self.operation = operation
         else:
-            raise ValueError, 'Operation type not in set {min,max}'
+            raise ValueError, 'Operation type not in set {min,max,within_day}'
 
         if daterange in ( 'old', 'ahead' ):
             self.daterange = daterange
@@ -122,11 +123,23 @@ class FriendlyDateCriterion( AbstractCriterion ):
 
             date = DateTime() + value
 
-            result.append( ( field, date ) )
+            operation = self.operation
+            if operation == 'within_day':
 
-            result.append( ( '%s_usage' % field
-                           , 'range:%s' % self.operation
-                           ) )
+                range = ( date.earliestTime(), date.latestTime() )
+                result.append( ( field, range ) )
+
+
+                result.append( ( '%s_usage' % field
+                               , 'range:min:max'
+                               ) )
+            else:
+                result.append( ( field, date ) )
+
+
+                result.append( ( '%s_usage' % field
+                            , 'range:%s' % self.operation
+                            ) )
 
         return result
 
