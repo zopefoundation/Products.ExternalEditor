@@ -7,7 +7,9 @@ import unittest
 
 from OFS.Folder import Folder
 
-from Products.CMFSetup.tests.common import BaseRegistryTests
+from common import BaseRegistryTests
+from common import DummyExportContext
+from common import DummyImportContext
 
 class RolemapConfiguratorTests( BaseRegistryTests ):
 
@@ -338,9 +340,390 @@ _COMBINED_EXPORT = """\
 </rolemap>
 """
 
+class Test_exportRolemap( BaseRegistryTests ):
+
+    def test_unchanged( self ):
+
+        self.root.site = Folder( 'site' )
+        site = self.root.site
+
+        context = DummyExportContext( site )
+
+        from Products.CMFSetup.rolemap import exportRolemap
+        exportRolemap( context )
+
+        self.assertEqual( len( context._wrote ), 1 )
+        filename, text, content_type = context._wrote[ 0 ]
+        self.assertEqual( filename, 'rolemap.xml' )
+        self._compareDOM( text, _EMPTY_EXPORT )
+        self.assertEqual( content_type, 'text/xml' )
+
+    def test_added_role( self ):
+
+        self.root.site = Folder( 'site' )
+        site = self.root.site
+        existing_roles = list( getattr( site, '__ac_roles__', [] ) )[:]
+        existing_roles.append( 'ZZZ' )
+        site.__ac_roles__ = existing_roles
+
+        context = DummyExportContext( site )
+
+        from Products.CMFSetup.rolemap import exportRolemap
+        exportRolemap( context )
+
+        self.assertEqual( len( context._wrote ), 1 )
+        filename, text, content_type = context._wrote[ 0 ]
+        self.assertEqual( filename, 'rolemap.xml' )
+        self._compareDOM( text, _ADDED_ROLE_EXPORT )
+        self.assertEqual( content_type, 'text/xml' )
+
+
+    def test_acquired_perm( self ):
+
+        ACI = 'Access contents information'
+        ROLES = [ 'Manager', 'Owner' ]
+
+        self.root.site = Folder( 'site' )
+        site = self.root.site
+        site.manage_permission( ACI, ROLES, acquire=1 )
+
+        context = DummyExportContext( site )
+
+        from Products.CMFSetup.rolemap import exportRolemap
+        exportRolemap( context )
+
+        self.assertEqual( len( context._wrote ), 1 )
+        filename, text, content_type = context._wrote[ 0 ]
+        self.assertEqual( filename, 'rolemap.xml' )
+        self._compareDOM( text, _ACQUIRED_EXPORT )
+        self.assertEqual( content_type, 'text/xml' )
+
+    def test_unacquired_perm( self ):
+
+        ACI = 'Access contents information'
+        ROLES = [ 'Manager', 'Owner', 'ZZZ' ]
+
+        self.root.site = Folder( 'site' )
+        site = self.root.site
+        existing_roles = list( getattr( site, '__ac_roles__', [] ) )[:]
+        existing_roles.append( 'ZZZ' )
+        site.__ac_roles__ = existing_roles
+        site.manage_permission( ACI, ROLES )
+
+        context = DummyExportContext( site )
+
+        from Products.CMFSetup.rolemap import exportRolemap
+        exportRolemap( context )
+
+        self.assertEqual( len( context._wrote ), 1 )
+        filename, text, content_type = context._wrote[ 0 ]
+        self.assertEqual( filename, 'rolemap.xml' )
+        self._compareDOM( text, _COMBINED_EXPORT )
+        self.assertEqual( content_type, 'text/xml' )
+
+    def test_unacquired_perm_added_role( self ):
+
+        ACI = 'Access contents information'
+        ROLES = [ 'Manager', 'Owner' ]
+
+        self.root.site = Folder( 'site' )
+        site = self.root.site
+        site.manage_permission( ACI, ROLES )
+
+        context = DummyExportContext( site )
+
+        from Products.CMFSetup.rolemap import exportRolemap
+        exportRolemap( context )
+
+        self.assertEqual( len( context._wrote ), 1 )
+        filename, text, content_type = context._wrote[ 0 ]
+        self.assertEqual( filename, 'rolemap.xml' )
+        self._compareDOM( text, _UNACQUIRED_EXPORT )
+        self.assertEqual( content_type, 'text/xml' )
+
+class Test_importRolemap( BaseRegistryTests ):
+
+    def test_empty_default_purge( self ):
+
+        self.root.site = Folder( id='site' )
+        site = self.root.site
+        original_roles = list( getattr( site, '__ac_roles__', [] ) )[:]
+        modified_roles = original_roles[:]
+        modified_roles.append( 'ZZZ' )
+        site.__ac_roles__ = modified_roles
+
+        context = DummyImportContext( site )
+        context._files[ 'rolemap.xml' ] = _EMPTY_EXPORT
+
+        from Products.CMFSetup.rolemap import importRolemap
+        importRolemap( context )
+
+        new_roles = list( getattr( site, '__ac_roles__', [] ) )[:]
+
+        original_roles.sort()
+        new_roles.sort()
+
+        self.assertEqual( original_roles, new_roles )
+
+    def test_empty_explicit_purge( self ):
+
+        self.root.site = Folder( id='site' )
+        site = self.root.site
+        original_roles = list( getattr( site, '__ac_roles__', [] ) )[:]
+        modified_roles = original_roles[:]
+        modified_roles.append( 'ZZZ' )
+        site.__ac_roles__ = modified_roles
+
+        context = DummyImportContext( site, True )
+        context._files[ 'rolemap.xml' ] = _EMPTY_EXPORT
+
+        from Products.CMFSetup.rolemap import importRolemap
+        importRolemap( context )
+
+        new_roles = list( getattr( site, '__ac_roles__', [] ) )[:]
+
+        original_roles.sort()
+        new_roles.sort()
+
+        self.assertEqual( original_roles, new_roles )
+
+    def test_empty_skip_purge( self ):
+
+        self.root.site = Folder( id='site' )
+        site = self.root.site
+        original_roles = list( getattr( site, '__ac_roles__', [] ) )[:]
+        modified_roles = original_roles[:]
+        modified_roles.append( 'ZZZ' )
+        site.__ac_roles__ = modified_roles
+
+        context = DummyImportContext( site, False )
+        context._files[ 'rolemap.xml' ] = _EMPTY_EXPORT
+
+        from Products.CMFSetup.rolemap import importRolemap
+        importRolemap( context )
+
+        new_roles = list( getattr( site, '__ac_roles__', [] ) )[:]
+
+        modified_roles.sort()
+        new_roles.sort()
+
+        self.assertEqual( modified_roles, new_roles )
+
+    def test_acquired_permission_explicit_purge( self ):
+
+        ACI = 'Access contents information'
+        VIEW = 'View'
+
+        self.root.site = Folder( id='site' )
+        site = self.root.site
+        site.manage_permission( ACI, () )
+        site.manage_permission( VIEW, () )
+
+        existing_allowed = [ x[ 'name' ]
+                                for x in site.rolesOfPermission( ACI )
+                                if x[ 'selected' ] ]
+
+        self.assertEqual( existing_allowed, [] )
+    
+        self.failIf( site.acquiredRolesAreUsedBy( ACI ) )
+        self.failIf( site.acquiredRolesAreUsedBy( VIEW ) )
+
+        context = DummyImportContext( site, True )
+        context._files[ 'rolemap.xml' ] = _ACQUIRED_EXPORT
+
+        from Products.CMFSetup.rolemap import importRolemap
+        importRolemap( context )
+
+        new_allowed = [ x[ 'name' ]
+                           for x in site.rolesOfPermission( ACI )
+                           if x[ 'selected' ] ]
+
+        self.assertEqual( new_allowed, [ 'Manager', 'Owner' ] )
+    
+        # ACI is overwritten by XML, but VIEW was purged
+        self.failUnless( site.acquiredRolesAreUsedBy( ACI ) )
+        self.failUnless( site.acquiredRolesAreUsedBy( VIEW ) )
+
+    def test_acquired_permission_no_purge( self ):
+
+        ACI = 'Access contents information'
+        VIEW = 'View'
+
+        self.root.site = Folder( id='site' )
+        site = self.root.site
+        site.manage_permission( ACI, () )
+        site.manage_permission( VIEW, () )
+
+        existing_allowed = [ x[ 'name' ]
+                                for x in site.rolesOfPermission( ACI )
+                                if x[ 'selected' ] ]
+
+        self.assertEqual( existing_allowed, [] )
+    
+        self.failIf( site.acquiredRolesAreUsedBy( ACI ) )
+
+        context = DummyImportContext( site, False )
+        context._files[ 'rolemap.xml' ] = _ACQUIRED_EXPORT
+
+        from Products.CMFSetup.rolemap import importRolemap
+        importRolemap( context )
+
+        new_allowed = [ x[ 'name' ]
+                           for x in site.rolesOfPermission( ACI )
+                           if x[ 'selected' ] ]
+
+        self.assertEqual( new_allowed, [ 'Manager', 'Owner' ] )
+    
+        # ACI is overwritten by XML, but VIEW is not
+        self.failUnless( site.acquiredRolesAreUsedBy( ACI ) )
+        self.failIf( site.acquiredRolesAreUsedBy( VIEW ) )
+
+    def test_unacquired_permission_explicit_purge( self ):
+
+        ACI = 'Access contents information'
+        VIEW = 'View'
+
+        self.root.site = Folder( id='site' )
+        site = self.root.site
+        site.manage_permission( VIEW, () )
+
+        existing_allowed = [ x[ 'name' ]
+                                for x in site.rolesOfPermission( ACI )
+                                if x[ 'selected' ] ]
+
+        self.assertEqual( existing_allowed, [ 'Manager' ] )
+    
+        self.failUnless( site.acquiredRolesAreUsedBy( ACI ) )
+        self.failIf( site.acquiredRolesAreUsedBy( VIEW ) )
+
+        context = DummyImportContext( site, True )
+        context._files[ 'rolemap.xml' ] = _UNACQUIRED_EXPORT
+
+        from Products.CMFSetup.rolemap import importRolemap
+        importRolemap( context )
+
+        new_allowed = [ x[ 'name' ]
+                           for x in site.rolesOfPermission( ACI )
+                           if x[ 'selected' ] ]
+
+        self.assertEqual( new_allowed, [ 'Manager', 'Owner' ] )
+    
+        self.failIf( site.acquiredRolesAreUsedBy( ACI ) )
+        self.failUnless( site.acquiredRolesAreUsedBy( VIEW ) )
+
+    def test_unacquired_permission_skip_purge( self ):
+
+        ACI = 'Access contents information'
+        VIEW = 'View'
+
+        self.root.site = Folder( id='site' )
+        site = self.root.site
+        site.manage_permission( VIEW, () )
+
+        existing_allowed = [ x[ 'name' ]
+                                for x in site.rolesOfPermission( ACI )
+                                if x[ 'selected' ] ]
+
+        self.assertEqual( existing_allowed, [ 'Manager' ] )
+    
+        self.failUnless( site.acquiredRolesAreUsedBy( ACI ) )
+        self.failIf( site.acquiredRolesAreUsedBy( VIEW ) )
+
+        context = DummyImportContext( site, False )
+        context._files[ 'rolemap.xml' ] = _UNACQUIRED_EXPORT
+
+        from Products.CMFSetup.rolemap import importRolemap
+        importRolemap( context )
+
+        new_allowed = [ x[ 'name' ]
+                           for x in site.rolesOfPermission( ACI )
+                           if x[ 'selected' ] ]
+
+        self.assertEqual( new_allowed, [ 'Manager', 'Owner' ] )
+    
+        self.failIf( site.acquiredRolesAreUsedBy( ACI ) )
+        self.failIf( site.acquiredRolesAreUsedBy( VIEW ) )
+
+    def test_unacquired_permission_added_role_explicit_purge( self ):
+
+        ACI = 'Access contents information'
+        VIEW = 'View'
+
+        self.root.site = Folder( id='site' )
+        site = self.root.site
+        site.manage_permission( VIEW, () )
+
+        existing_allowed = [ x[ 'name' ]
+                                for x in site.rolesOfPermission( ACI )
+                                if x[ 'selected' ] ]
+
+        self.assertEqual( existing_allowed, [ 'Manager' ] )
+    
+        self.failUnless( site.acquiredRolesAreUsedBy( ACI ) )
+        self.failIf( site.acquiredRolesAreUsedBy( VIEW ) )
+
+        self.failIf( site._has_user_defined_role( 'ZZZ' ) )
+
+        context = DummyImportContext( site, True )
+        context._files[ 'rolemap.xml' ] = _COMBINED_EXPORT
+
+        from Products.CMFSetup.rolemap import importRolemap
+        importRolemap( context )
+
+        self.failUnless( site._has_user_defined_role( 'ZZZ' ) )
+
+        new_allowed = [ x[ 'name' ]
+                           for x in site.rolesOfPermission( ACI )
+                           if x[ 'selected' ] ]
+
+        self.assertEqual( new_allowed, [ 'Manager', 'Owner', 'ZZZ' ] )
+    
+        self.failIf( site.acquiredRolesAreUsedBy( ACI ) )
+        self.failUnless( site.acquiredRolesAreUsedBy( VIEW ) )
+
+    def test_unacquired_permission_added_role_skip_purge( self ):
+
+        ACI = 'Access contents information'
+        VIEW = 'View'
+
+        self.root.site = Folder( id='site' )
+        site = self.root.site
+        site.manage_permission( VIEW, () )
+
+        existing_allowed = [ x[ 'name' ]
+                                for x in site.rolesOfPermission( ACI )
+                                if x[ 'selected' ] ]
+
+        self.assertEqual( existing_allowed, [ 'Manager' ] )
+    
+        self.failUnless( site.acquiredRolesAreUsedBy( ACI ) )
+        self.failIf( site.acquiredRolesAreUsedBy( VIEW ) )
+
+        self.failIf( site._has_user_defined_role( 'ZZZ' ) )
+
+        context = DummyImportContext( site, False )
+        context._files[ 'rolemap.xml' ] = _COMBINED_EXPORT
+
+        from Products.CMFSetup.rolemap import importRolemap
+        importRolemap( context )
+
+        self.failUnless( site._has_user_defined_role( 'ZZZ' ) )
+
+        new_allowed = [ x[ 'name' ]
+                           for x in site.rolesOfPermission( ACI )
+                           if x[ 'selected' ] ]
+
+        self.assertEqual( new_allowed, [ 'Manager', 'Owner', 'ZZZ' ] )
+    
+        self.failIf( site.acquiredRolesAreUsedBy( ACI ) )
+        self.failIf( site.acquiredRolesAreUsedBy( VIEW ) )
+
+
 def test_suite():
     return unittest.TestSuite((
         unittest.makeSuite( RolemapConfiguratorTests ),
+        unittest.makeSuite( Test_exportRolemap ),
+        unittest.makeSuite( Test_importRolemap ),
         ))
 
 if __name__ == '__main__':

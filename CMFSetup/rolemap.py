@@ -66,9 +66,6 @@ class _RolemapParser( ContentHandler ):
                                         , permission[ 'acquire' ]
                                         )
 
-#
-# Export
-#
 class RolemapConfigurator( Implicit ):
 
     """ Synthesize XML description of sitewide role-permission settings.
@@ -183,7 +180,20 @@ def importRolemap( context ):
 
     """
     site = context.getSite()
-    text = context.readDatafile( FILENAME )
+
+    if context.shouldPurge():
+
+        items = site.__dict__.items()
+
+        for k, v in items: # XXX: WAAA
+
+            if k == '__ac_roles__':
+                delattr( site, k )
+
+            if k.startswith( '_' ) and k.endswith( '_Permission' ):
+                delattr( site, k )
+
+    text = context.readDataFile( _FILENAME )
 
     if text is not None:
 
@@ -220,6 +230,7 @@ def exportRolemap( context ):
       >Export additional roles, and role / permission map.</export-script>
 
     """
+    site = context.getSite()
     rc = RolemapConfigurator( site ).__of__( site )
     text = rc.generateXML()
 

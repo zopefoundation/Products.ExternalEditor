@@ -99,6 +99,40 @@ class TarballTester( DOMComparator ):
         found = extract.read()
         self._compareDOM( found, data )
 
+
+class DummyExportContext:
+
+    def __init__( self, site ):
+        self._site = site
+        self._wrote = []
+
+    def getSite( self ):
+        return self._site
+
+    def writeDataFile( self, filename, text, content_type ):
+        self._wrote.append( ( filename, text, content_type ) )
+
+class DummyImportContext:
+
+    def __init__( self, site, purge=True ):
+        self._site = site
+        self._purge = purge
+        self._files = {}
+
+    def getSite( self ):
+        return self._site
+
+    def readDataFile( self, filename, subdir=None ):
+
+        if subdir is not None:
+            filename = '/'.join( subdir, filename )
+
+        return self._files.get( filename )
+
+    def shouldPurge( self ):
+
+        return self._purge
+
 def dummy_handler( context ):
 
     pass
