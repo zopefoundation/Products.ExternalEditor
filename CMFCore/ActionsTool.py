@@ -301,7 +301,7 @@ class ActionsTool (UniqueObject, SimpleItem):
                 actions.append({
                     'name': 'Folder contents',
                     'url': folder_url + '/folder_contents',
-                    'permissions' : ['Access contents information'],
+                    'permissions' : ['List folder contents'],
                     'category': 'folder',
                     })
             pm = getToolByName(self, 'portal_membership')

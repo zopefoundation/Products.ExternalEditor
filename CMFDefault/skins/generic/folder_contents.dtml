@@ -21,7 +21,7 @@ Folder contents display.
 <dtml-call "REQUEST.set('isDesktop', 1)">
 <dtml-var standard_html_header>
 
-<dtml-if "not portal_membership.checkPermission('Access contents information'
+<dtml-if "not portal_membership.checkPermission('List folder contents'
                                                , this())">
  <dtml-call "RESPONSE.redirect(absolute_url())">
 </dtml-if>
@@ -36,7 +36,7 @@ Folder contents display.
   <tr>
    <td valign="top">
     <table class="ContentsList">
-     <dtml-if "portal_membership.checkPermission( 'Access contents information'
+     <dtml-if "portal_membership.checkPermission( 'List folder contents'
                                                 , this(), 'aq_parent')">
       <dtml-let upNav="_.hasattr(this().aq_parent, 'portal_url')"
                 upID="this().aq_parent.getId()"
@@ -62,8 +62,10 @@ Folder contents display.
      </dtml-if>
 
 
-<dtml-in expr="contentValues(filter=decodeFolderFilter(
-         REQUEST.get('folderfilter', '')))"
+<dtml-let filterString="REQUEST.get( 'folderfilter', '' )"
+          filter="decodeFolderFilter( filterString )"
+>
+<dtml-in expr="listFolderContents( filter=filter )"
          sort="getId" size="19" start=qs skip_unauthorized>
  <dtml-if next-sequence>
   <dtml-call "REQUEST.set('next-sequence'
@@ -117,6 +119,7 @@ Folder contents display.
   </dtml-if>
  </dtml-let>
 </dtml-in>
+</dtml-let>
     </table>
    </td>
   </tr>

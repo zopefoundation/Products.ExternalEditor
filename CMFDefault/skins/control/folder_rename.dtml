@@ -1,2 +1,4 @@
-<dtml-call expr="manage_renameObject(REQUEST['id'], REQUEST['new_id'], REQUEST)">
-<dtml-return expr="folder_contents(_.None, _, portal_status_message='Renamed.')">
+<dtml-call expr="manage_renameObject( REQUEST['id'], REQUEST['new_id'] )">
+<dtml-call expr="REQUEST['RESPONSE'].redirect( absolute_url()
+                     + '/folder_contents'
+                     + '?portal_status_message=Renamed.' )">

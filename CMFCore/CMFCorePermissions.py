@@ -32,6 +32,9 @@ def setDefaultRoles(permission, roles):
 # CMF Base Permissions
 #
 
+ListFolderContents = 'List folder contents'
+setDefaultRoles( ListFolderContents, ( 'Manager', 'Owner' ) )
+
 AccessInactivePortalContent = 'Access inactive portal content'
 setDefaultRoles(AccessInactivePortalContent, ('Manager',))
 

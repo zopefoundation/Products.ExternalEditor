@@ -91,7 +91,7 @@ ADD_CONTENT_PERMISSION = 'Add portal content'
 import Globals, re, base64, marshal, string
 import CMFCorePermissions
 
-from CMFCorePermissions import View, ManageProperties
+from CMFCorePermissions import View, ManageProperties, ListFolderContents
 from CMFCorePermissions import AddPortalFolders, AddPortalContent
 from OFS.Folder import Folder
 from OFS.ObjectManager import REPLACEABLE
@@ -183,7 +183,7 @@ class PortalFolder( Folder, DynamicType ):
         ob=PortalFolder(id, title)
         self._setObject(id, ob)
         if REQUEST is not None:
-            return self.folder_contents(
+            return self.folder_contents( # XXX: ick!
                 self, REQUEST, portal_status_message="Folder added")
     
     def _morphSpec(self, spec):
@@ -259,6 +259,15 @@ class PortalFolder( Folder, DynamicType ):
         ids = self.objectIds( spec )
         return map( lambda item: item[1],
                     self._filteredItems( ids, filter ) )
+
+    security.declareProtected( ListFolderContents
+                             , 'listFolderContents' )
+    def listFolderContents( self, spec=None, filter=None ): # XXX
+        """
+            Hook around 'contentValues' to let 'folder_contents'
+            be protected.
+        """
+        return self.contentValues( filter=filter )
 
     security.declarePublic('contentItems')
     def contentItems( self, spec=None, filter=None ):

@@ -7,5 +7,6 @@ context.edit( title=title,
 
 qst='?portal_status_message=Folder+changed.'
  
-context.REQUEST.RESPONSE.redirect( context.absolute_url() + '/folder_contents' + qst )
+context.REQUEST.RESPONSE.redirect( context.absolute_url()
+                                 + '/folder_contents' + qst )
 
