@@ -66,9 +66,10 @@ The Zope Content Managment Framework
 
     - Discussion 
 
-    - Security - setting roles and local roles
+    - Security - setting roles and local roles - permissions needed to
+    add various types of content and other objects.
 
-    - Syndication XXX fiction ? XXX
+    - Syndication
 
     - Versioning XXX fiction? XXX
 

@@ -18,12 +18,44 @@ Chapter 3: Using the CMF
 
       "A CMF site":img:3-1:imgs/3-1.png
 
-      The box on the left of the page that has the word "Guest" at the
-      top is called the "action box". It contains a list of
-      context-dependent links that give you access to site features.
+      The dark blue bar across the top of the page gives you
+      information the CMF site and links to various site functions as
+      well as a search box. These links are called "Site Actions".
 
-      Click on the "Join" link in the action box. You will be taken to
-      a form as shown in [3-2]:
+      The light blue bar gives you information and links which relate
+      to your user account. The word "Guest" tells you that you are
+      not logged in. The "Log in" and "Join" links let you log in (if
+      you already have an account) or join the site to create a new
+      account. The links in the light blue bar are called "User
+      Actions".
+ 
+      The gray box on the left of the page tells you about the object
+      you are currently visting. In this case the XXX icon and the
+      name "XXX" indicate that you are currently viewing a document
+      named XXX. The "View" link allows you to view to document (which
+      you are currently doing). Depending on your user account and the
+      type of object you are visiting, you may have many different
+      options listed in the gray box. Links in the gray box are called
+      "Current Object Actions".
+
+      To the right of the gray box is an area of the page that tells
+      you the title and description of the object you are currently
+      visiting. There is also a "bread-crumbs" style navigation device
+      here which indicates where you are in the site, and provides
+      links to navigate back up to higher levels of the site. XXX
+      should explain this more?
+
+      Below the current object actions and the description of the
+      current object is the bulk of the page. While the rest of the
+      page will maintain a constant structure, this area will change
+      as you navigate between objects.
+
+      Depending on how your site is configured, things may look a bit
+      different. Nevertheless, you will always have access to site,
+      user, and current object actions on every page.
+
+      Click on the "Join" link to create a new account. You will be
+      taken to a form as shown in [3-2]:
 
       "A join form":img:3-2:imgs/3-2.png
 
@@ -35,8 +67,8 @@ Chapter 3: Using the CMF
 
     Logging In and Out
 
-      To log in, click the "Log in" link in the action box. You will
-      be taken to a log in form as shown in [3-3]:
+      To log in, click the "Log in" link. You will be taken to a log
+      in form as shown in [3-3]:
 
       "A log in form":img:3-3:imgs/3-3.png
 
@@ -46,18 +78,17 @@ Chapter 3: Using the CMF
       your password you can try to log in again, or you can arrange to
       have your password mailed to you.
 
-      Once you've logged in notice how the action box now says your
-      name at the top next to the person icon. This tells you that
-      you're logged in. Also notice that you now have many more
-      options in your action box than you had before. See [3-4] for an
-      example:
+      Once you've logged in notice how light blue bar now says your
+      name. This tells you that you're logged in. Also notice that you
+      now have many more options in the current object actions area
+      than you had before. See [3-4] for an example:
 
       "Logged in as Bob":img:3-4:imgs/3-4.png
 
-      Click the "Log out" in the action box. You should be taken to a
-      confirmation page that tells you that you're successfully logged
-      out. Notice how the action box changes. It now says "Guest" at
-      the top and contains different links.
+      Click the "Log out" link. You should be taken to a confirmation
+      page that tells you that you're successfully logged out. Notice
+      how the user and current object actions change. You are now
+      identified as "Guest", and have few actions available to you.
 
       Now you know how to log in and log out of your site. In general
       you should log in when you want to do some work on the site, and
@@ -66,8 +97,9 @@ Chapter 3: Using the CMF
     Personalizing Your Account
 
       Now log in to your site again. You can personalize the site by
-      clicking the "Preferences" link in the action box. It takes you
-      to a form where you can set your preferences as shown in [3-5]:
+      clicking the "Preferences" link in the user actions area. It
+      takes you to a form where you can set your preferences as shown
+      in [3-5]:
 
       "Preferences form":img:3-5:imgs/3-5.png
 
@@ -86,18 +118,32 @@ Chapter 3: Using the CMF
 
     Using Navigation
 
-      To navigate the CMF site you'll normally use the site's normal
-      navigation controls. As a CMF member you can navigate the site
-      in the same way that anonymous site visitors do. You can use
-      navigational links and search facilities.
+      You can navigate a CMF site using the standard site action
+      links. These are:
 
-      In addition to normal site navigation, you can navigate the site
-      using links in the action box.
+      home -- The home or "root" of the CMF site.
 
+      members -- The members folder of the site. From here you can
+      navigate to individual member folders where site users keep most
+      of their content.
+
+      news -- A listing of recent news items.
+
+      search -- A detailed search form.
+
+      Instead of using the detailed search form, you can also perform
+      a quick search using the search box.
+
+      As previously mentioned there are also "breadcrumb" links above
+      the title of the current object. These links show you where the
+      current object is located in the site, and allow you to navigate
+      up to enclosing folders. The "root" link takes you to the top
+      (or home) of the site.
+      
     Your Member Folder
 
-      Click the "My Stuff" link in the action box. You will be taken
-      to your member area as shown in [3-6]:
+      Click the "My Stuff" user action link. You will be taken to your
+      member area as shown in [3-6]:
 
         "Member area":img:3-6:imgs/3-6.png
 
@@ -230,7 +276,7 @@ Chapter 3: Using the CMF
       chapter. Then enter the contained "anotherFolder" folder. Now
       click the "Add to Favorites" link. You just created a shortcut
       to this folder. Notice that you now have a "My Favorites" link
-      in the action box. Return to your member folder by clicking the
+      your user actions. Return to your member folder by clicking the
       "My Stuff" link. Notice that you now have a "Favorites" folder
       in your member folder. This folder holds your book marks.
 
@@ -247,10 +293,10 @@ Chapter 3: Using the CMF
     Other Actions
     
       Depending on how your site is configured you may have a number
-      of links in your action box that haven't been discussed so
+      of links in your current object actions that haven't been discussed so
       far. Here's a quick description of them:
 
-      * The "Folder contents" action simple takes you to the "Desktop"
+      * The "Folder contents" action simply takes you to the "Desktop"
         view showing you the contents of the current folder. If you are
         exploring a part of this site other than your member directory,
         you can use the "Folder contents" link to inspect the objects at
@@ -319,10 +365,10 @@ Chapter 3: Using the CMF
       content using the CMF's discussion feature.
 
       To offer a comment or provide feedback on content click the
-      "Reply" link in the action box. This will take you to a form
-      where you can provide your input. Note that depending on how
-      your site is configured you may or may not see a "Reply" link in
-      your action box when viewing content.
+      "Reply" action. This will take you to a form where you can
+      provide your input. Note that depending on how your site is
+      configured you may or may not see a "Reply" link in your current
+      object actions when viewing content.
 
       Give you comment a short title and then type the body of your
       comment in the "Reply body" field. When you're done you can
@@ -347,10 +393,9 @@ Chapter 3: Using the CMF
 
     The CMF is structured around two central ideas: content and
     services. Content consists of objects located in folders. You can
-    perform actions on content using links in your actions box. You
-    can invoke services either through action box links or site likes
-    like search. In the next chapter you'll learn more about content.
-  
-
+    perform actions on content using links in your current object
+    actions. You can invoke services either through site actions, or
+    actions on objects. In the next chapter you'll learn more about
+    content.
 
   XXX how many screen shots should there be in this chapter?  

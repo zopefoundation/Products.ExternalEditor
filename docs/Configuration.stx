@@ -40,19 +40,16 @@ Chapter 5: Configuring and Customizing the CMF
 
   Security
 
-    Setting local roles. Also basic Zope security info.
+    Setting local roles. Also basic Zope security info.  permissions
+    needed to add various types of content and other objects.
 
   Syndication 
 
     XXX It's unclear how this works
 
-  Versioning 
+  Topics
 
-    XXX fiction? XXX
-
-  Personalization 
-
-    XXX fiction? XXX
+    creating and managing topics.
 
   Conclusion
 

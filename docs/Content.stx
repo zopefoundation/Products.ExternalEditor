@@ -52,12 +52,12 @@ Chapter 4: Content
       what your Document looks like.
 
       When viewing your document, notice how there is a document icon
-      and with the ID of your document in your action box. This
-      indicates which object you are currently working on. You can
-      navigate back to the editing form by clicking the "Edit" link in
-      the action box. Likewise, you can change your document's
-      metadata with the "Metadata" link. You can also see what your
-      document looks like with the "View" link.
+      and with the ID of your document in your current object actions
+      area. This indicates which object you are currently working
+      on. You can navigate back to the editing form by clicking the
+      "Edit" link. Likewise, you can change your document's metadata
+      with the "Metadata" link. You can also see what your document
+      looks like with the "View" link.
 
       The "Status", "Publish" and "Status History" links provide
       workflow actions. They are discussed in the "Using Workflow"
@@ -96,7 +96,7 @@ Chapter 4: Content
 
       The "View" link shows you information about your file (filename,
       size, etc.) and allows you to download it. You can also download
-      a file by clicking on its "Download" link in the action box.
+      a file by clicking on its "Download" action.
 
       If you look carefully you'll notice that the URL of the download
       link is simply the URL of the File. This allows you to easily
@@ -156,22 +156,75 @@ Chapter 4: Content
 
     Using News Items
 
-      XXX why don't these appear by default in the add list?
+      News items convey timely information to site visitors. You
+      should use News Items to inform others about events. If you have
+      substantive things to say you should create a document (or other
+      appropriate content object) to hold your information and then
+      create a news item to announce it. Later if you substantially
+      change your document (or other content) you can create another
+      news item to announce the changes.
 
-    Using Topics
+      You can create a News Item in the same way as you create other
+      CMF content types: navigate to the "Desktop" view, click
+      "New..."  select "News Item", provide an ID, and click "Add". As
+      usual, you'll be taken to the metadata editing page. Type in
+      some metadata for your news item and click "Change and Edit".
 
-      XXX why don't these appear by default in the add list?
+      You must provide a lead-in and a body for your news item. The
+      lead-in provides a short summary of the news item. You may
+      notice that the lead-in text is the same as the news items's
+      "Description" metadata. The news item's body is its complete
+      text in HTML format.
 
-    XXX other standard types (event, wiki, etc.?)
+      To view your News Item click the "View" link. News Items look
+      pretty much like Documents. Unlike Documents, however, public
+      News Items automatically appear on the site's news page. You can
+      navigate to this page by clicking the site's "news"
+      action. Later in this chapter you'll learn how to make your News
+      Items and other content public.
+
+    Example Content Types
+
+      The CMF ships with some example content types. Depending on how
+      your site is configured you may or may not have access to these
+      content types. The following is a brief description of example
+      add on packages and their content types:
+
+      CMFCalendar -- This example package adds a calendaring
+      capabilities. It treats events as content objects.
+
+      CMFWiki -- Wikis enable low-tech collaboration. The CMFWiki
+      package treats wiki pages as content objects.
+
+      CMFCollector -- The collector provides issue tracking. It treats
+      issues (such as bug reports) as content objects.
 
     Custom Content Types
 
+      XXX
+
   Content Authoring Formats
+
+    HTML
+
+      XXX
 
     Structured Text
 
+      XXX
+
   Using Metadata
+
+    XXX
 
   Using Workflow
 
+    XXX
+
   Remote Authoring
+
+    XXX
+
+  Conclusion
+
+    XXX
