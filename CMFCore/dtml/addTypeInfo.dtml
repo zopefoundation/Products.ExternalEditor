@@ -9,7 +9,7 @@
 </dtml-if>
 </dtml-let>
 
-<form action="manage_addTypeInformation" method="POST">
+<form action="&dtml.url-portal_types;/manage_addTypeInformation" method="POST">
 <input type="hidden" name="type_type" value="&dtml.missing-type_type;" />
 <table cellspacing="0" cellpadding="2" border="0">
   <tr>
