@@ -302,8 +302,18 @@ class DocumentTests(unittest.TestCase):
                        , subject=( "plain", "STX" )
                        )
 
-        munge = '\n%s' % STX_NO_HEADERS_BUT_COLON
         d.edit(text_format='structured-text', text=STX_NO_HEADERS_BUT_COLON)
+        self.assertEqual( d.EditableBody(), STX_NO_HEADERS_BUT_COLON )
+    
+    def test_ZMI_edit( self ):
+        d = Document('foo')
+        d._editMetadata( title="Plain STX"
+                       , description="Look, Ma, no headers!"
+                       , subject=( "plain", "STX" )
+                       )
+
+        d.manage_editDocument( text_format='structured-text'
+                             , text=STX_NO_HEADERS_BUT_COLON)
         self.assertEqual( d.EditableBody(), STX_NO_HEADERS_BUT_COLON )
 
 
