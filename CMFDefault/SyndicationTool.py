@@ -18,6 +18,7 @@ $Id$
 """
 
 from AccessControl import ClassSecurityInfo
+from AccessControl import Unauthorized
 from Acquisition import aq_base
 from DateTime import DateTime
 from Globals import HTMLFile
