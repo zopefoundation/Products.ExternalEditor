@@ -12,11 +12,11 @@ CMF 1.5.0beta (2004/08/06)
       applications using the CatalogTool.
 
     - CMFCalendar.CalendarTool: Made workflow states configurable TTW.
-      Also see http://www.zope.org/Collectors/CMF/110
+      (http://zope.org/Collectors/CMF/110)
 
     - Minor featurelet: The "Action Providers" ZMI tab on the portal_actions
       tool now links directly to the tools shown
-      http://www.zope.org/Collectors/CMF/181)
+      (http://zope.org/Collectors/CMF/181)
 
     - CMFCore.utils: Introduced contributorsplitter() utility function 
       along the lines of keywordsplitter().
@@ -57,7 +57,7 @@ CMF 1.5.0beta (2004/08/06)
   Bug Fixes
 
     - CMFCore.PortalFolder: Enforce check of "Delete objects" permission
-      during cut + paste. (http://zope.org/Collectors/259)
+      during cut + paste. (http://zope.org/Collectors/CMF/259)
 
       N.B.  This fix depends on an update to the underlying Zope software,
             e.g., Zope 2.7.3 or later.  Two new unit tests fail on
@@ -65,14 +65,14 @@ CMF 1.5.0beta (2004/08/06)
 
     - CMFDefault.MetadataTool: Validation would disallow
       vocabulary-constrained metadata elements to be empty
-      (http://www.zope.org/Collectors/CMF/217)
+      (http://zope.org/Collectors/CMF/217)
 
     - CMFDefault.DiscussionItem: Replies were not sorted chronologically
-      (http://www.zope.org/Collectors/CMF/211)
+      (http://zope.org/Collectors/CMF/211)
 
     - CMFDefault.Image and CMFDefault.File: When copy/pasting Image and File
       objects the review state did not revert to "private".
-      (http://www.zope.org/Collectors/CMF/176)
+      (http://zope.org/Collectors/CMF/176)
 
     - CMFSetup: Refactored rolemap.
       Converted the roles attribute to role sub-elements. Fixed an acquisition
@@ -83,16 +83,16 @@ CMF 1.5.0beta (2004/08/06)
       with the new permissions module.
 
     - CMFTopic: Change topic_view template to show title and ID (it only
-      showed title before; http://www.zope.org/Collectors/CMF/180)
+      showed title before; http://zope.org/Collectors/CMF/180)
 
     - CMFCore.PortalFolder: Unlike other content, only Managers were able
       to create PortalFolders using mkdir in FTP. Fixed by inserting
       missing security declaration for PortalFolder.manage_addFolder
-      (http://www.zope.org/Collectors/CMF/167)
+      (http://zope.org/Collectors/CMF/167)
 
     - Default text format for NewsItems is now structured-text, just like
-      it is for Documents, tuhs removing a spurious difference (see 
-      http://www.zope.org/Collectors/CMF/138).
+      it is for Documents, tuhs removing a spurious difference
+      (http://zope.org/Collectors/CMF/138).
 
     - CMFCalendar.CalendarTool: (Lost) fix for issues 65 and 159.
       The determination of the date/time range constituting a specific month 
@@ -107,17 +107,17 @@ CMF 1.5.0beta (2004/08/06)
 
     - CMFCalendar.Event: Day, month, and year were processed in the wrong
       order by Event.edit().
-      Also see http://collector.zope.org/CMF/202
+      (http://zope.org/Collectors/CMF/202)
 
     - CMFCore.PortalFolder: _verifyObjectPaste() did not check the
       container's allowed content types, enabling users to paste objects
       they were not allowed to add.
-      Also see http://collector.zope.org/CMF/216
+      (http://zope.org/Collectors/CMF/216)
 
     - CMFDefault.File and CMFDefault.Image: setFormat() failed to update
       the content_type property causing index_html() to use a stale mimetype
       when serving the file or image.
-      Also see http://collector.zope.org/CMF/226
+      (http://zope.org/Collectors/CMF/226)
 
     - CMFDefault.Document, CMFDefault.Link, and CMFCalendar.Event: 
       WebDAV PUT() caused improper splitting of 'Contributors' metadata header.
