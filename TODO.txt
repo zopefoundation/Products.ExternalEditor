@@ -95,7 +95,7 @@ CMF TODO's
         (x) Tracker #519:  CMFDefault.MembershipTool always creates
                            member folder
 
-      - ( ) Folder fixes (Florent Guillaume?)
+      - ( ) Folder fixes (Florent Guillaume)
 
         ( ) Tracker #483:  listFolderContents doesn't filter properly
 
@@ -110,9 +110,9 @@ CMF TODO's
         (x) Tracker #465:  Adding title to TypeInfo breaks
                            content_type_registry.
 
-      - ( ) Skin fixes
+      - (x) Skin fixes
 
-        (?) Tracker #500:  Skin cookie for deleted skin causes traceback
+        (/) Tracker #500:  Skin cookie for deleted skin causes traceback
 
         (x) Tracker #506:  Invalid relative URL on metadata_edit_form
 
