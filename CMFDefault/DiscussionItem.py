@@ -1,18 +1,22 @@
 ##############################################################################
 #
-# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+# Copyright (c) 2001-2003 Zope Corporation and Contributors.
+# All Rights Reserved.
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
+""" Discussion item portal type.
 
-import urllib, string
-from Globals import HTMLFile, Persistent, PersistentMapping, InitializeClass
+$Id$
+"""
+
+from Globals import Persistent, PersistentMapping, InitializeClass
 from AccessControl import ClassSecurityInfo
 from Acquisition import Implicit, aq_base, aq_inner, aq_parent
 from OFS.Traversable import Traversable

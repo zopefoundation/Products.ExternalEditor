@@ -1,6 +1,7 @@
 ##############################################################################
 #
-# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
+# Copyright (c) 2001-2003 Zope Corporation and Contributors.
+# All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
@@ -10,7 +11,6 @@
 # FOR A PARTICULAR PURPOSE
 #
 ##############################################################################
-
 """ CMFDefault portal_membership tool.
 
 $Id$
@@ -21,7 +21,6 @@ from AccessControl import ClassSecurityInfo
 
 from Products.CMFCore.MembershipTool import MembershipTool as BaseTool
 from Products.CMFCore.PortalFolder import manage_addPortalFolder
-from Products.CMFCore.utils import _getAuthenticatedUser
 from Products.CMFCore.utils import _checkPermission
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.ActionsTool import ActionInformation as AI

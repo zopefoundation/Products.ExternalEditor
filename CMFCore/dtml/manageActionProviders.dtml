@@ -13,6 +13,10 @@
 </dtml-let>
 <dtml-var manage_tabs>
 
+<p>Content type specific actions of portal_types are always queried by this
+    tool. The usage of other action providers and of portal_types' global
+    actions is configurable here.</p>
+
 <form action="manage_aproviders" method="POST">
 <table>
   <tr>
@@ -24,12 +28,12 @@
         <input type="checkbox" name="chosen:list"
                value="&dtml-sequence-item;">
              &dtml-sequence-item;
-	</td>
-     </tr>
-         </dtml-in>
+      </td>
+    </tr>
+  </dtml-in>
 
          <tr>
-	   <td><input type="text" name="apname" value="" size="20"></td>
+           <td><input type="text" name="apname" value="" size="20"></td>
          </tr>
 
          <tr>
@@ -39,7 +43,7 @@
            </td>
          </tr>
 
-       </table>
+</table>
 </form>
 </body>
 </html>

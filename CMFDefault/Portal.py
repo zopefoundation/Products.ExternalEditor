@@ -1,21 +1,24 @@
 ##############################################################################
 #
-# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+# Copyright (c) 2001-2003 Zope Corporation and Contributors.
+# All Rights Reserved.
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """ Portal class
 
 $Id$
 """
- 
-import Globals
+
+from Globals import HTMLFile
+from Globals import InitializeClass
+
 from Products.CMFCore.PortalObject import PortalObjectBase
 from Products.CMFCore import PortalFolder
 from Products.CMFCore.TypesTool import ContentFactoryMetadata
@@ -107,8 +110,7 @@ class CMFSite ( PortalObjectBase
             visited = []
             migrated = []
             self.__migrate_branches(migrations, self, migrated, visited)
-            from string import join
-            return 'Converted:\n%s\n\nDone.' % join(migrated, '\n')
+            return 'Converted:\n%s\n\nDone.' % '\n'.join(migrated)
 
         def __migrate_branches(self, migrations, branch, migrated, visited):
             base = getattr(branch, 'aq_base', branch)
@@ -150,7 +152,7 @@ class CMFSite ( PortalObjectBase
         def manage_migrate_content( self, REQUEST ):
             pass
 
-Globals.InitializeClass(CMFSite)
+InitializeClass(CMFSite)
 
 
 class PortalGenerator:
@@ -322,7 +324,7 @@ class PortalGenerator:
         p.description = description
 
 
-manage_addCMFSiteForm = Globals.HTMLFile('dtml/addPortal', globals())
+manage_addCMFSiteForm = HTMLFile('dtml/addPortal', globals())
 manage_addCMFSiteForm.__name__ = 'addPortal'
 
 def manage_addCMFSite(self, id, title='Portal', description='',
@@ -334,8 +336,7 @@ def manage_addCMFSite(self, id, title='Portal', description='',
     Adds a portal instance.
     '''
     gen = PortalGenerator()
-    from string import strip
-    id = strip(id)
+    id = id.strip()
     p = gen.create(self, id, create_userfolder)
     gen.setupDefaultProperties(p, title, description,
                                email_from_address, email_from_name,
