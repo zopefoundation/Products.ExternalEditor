@@ -260,11 +260,16 @@ class DiscussionItemContainer( Persistent, Implicit, Traversable ):
         target = getattr(self, name, None)
         if target is not None:
             return target
+
         else:
             try:
                 return self._container.get(name).__of__(self)
             except:
-                REQUEST.RESPONSE.notFoundError("%s\n%s" % (name, ''))
+                parent = aq_parent( aq_inner( self ) )
+                if parent.getId() == name:
+                    return parent
+                else:
+                    REQUEST.RESPONSE.notFoundError("%s\n%s" % (name, ''))
 
     security.declarePrivate( 'manage_beforeDelete' )
     def manage_beforeDelete(self, item, container):
