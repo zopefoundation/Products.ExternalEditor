@@ -200,6 +200,7 @@ class PluggableAuthService( Folder, Cacheable ):
         """
         plugins = self._getOb( 'plugins' )
         user_id = None
+        login = None
 
         try:
             plugin_id, principal_id = self._unmangleId( id )
