@@ -16,6 +16,9 @@ HEAD only (unreleased)
 
   Others
 
+    - CMFDefault: Marked 'manage_addCMFSite' as deprecated.
+      'CMF Site' no longer shows up in the 'Add' list.
+
     - CMFDefault: Cleaned out some super-ancient code for migrating
       or fixing PTK content so it would work with CMF.
 

@@ -15,6 +15,8 @@
 $Id$
 """
 
+from warnings import warn
+
 from Globals import HTMLFile
 from Globals import InitializeClass
 
@@ -294,6 +296,9 @@ def manage_addCMFSite(self, id, title='Portal', description='',
                          RESPONSE=None):
     """ Adds a portal instance.
     """
+    warn('manage_addCMFSite() is deprecated and will be removed in CMF 1.7. '
+         'Please use addConfiguredSite() instead.',
+         DeprecationWarning)
     gen = PortalGenerator()
     id = id.strip()
     p = gen.create(self, id, create_userfolder)
