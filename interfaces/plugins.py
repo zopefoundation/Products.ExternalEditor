@@ -173,7 +173,7 @@ class IPropertiesPlugin( Interface ):
 
         """ user -> {}
 
-        o User will implement IExtensibleUser.
+        o User will implement IPropertiedUser.
 
         o Plugin may scribble on the user, if needed (but must still
           return a mapping, even if empty).
