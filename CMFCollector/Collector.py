@@ -283,10 +283,12 @@ class Collector(SkinnedFolder):
         if state_email is not None:
             changed = 0
             for k, v in state_email.items():
-                if self.state_email[k] != v:
+                current_setting = self.state_email.get(k, None)
+                if ( ((not current_setting) and v)
+                    or (current_setting and (current_setting != v)) ):
                     changed = 1
                     self.state_email[k] = v
-            if changed:
+             if changed:
                 changes.append("State email")
 
         if topics is not None:
