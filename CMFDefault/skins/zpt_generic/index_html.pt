@@ -97,10 +97,10 @@
 
 
   <div tal:define="items python: here.contentValues(
-                                            filter={'Type':( 'Folder', 'CMF Collector') } );
+                            filter={ 'Type': 'Folder' } );
                   ">
   <div tal:condition="items">
-  <h4> Collectors and Folders </h4>
+  <h4> Folders </h4>
 
   <ul>
    <li tal:repeat="item items"> 
