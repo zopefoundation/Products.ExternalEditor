@@ -35,6 +35,9 @@ class FauxHTTPRequest:
             return None
 
         return self._name, self._password
+    
+    def get(self, name, default=None):
+        return getattr(self, name, default)
 
 class FauxHTTPResponse:
 
