@@ -32,16 +32,16 @@
                  pysutil modules/Products.PythonScripts.standard;
                  strmod modules/string;
                  cap nocall: strmod/capitalize;
+                 split nocall: strmod/split;
                  DateTime nocall: modules/DateTime/DateTime;
                  BATCHSIZE python: 10;
-                 TITLELEN python: 35;
+                 TITLELEN python: 45;
                  DESCRLEN python: 120;
                  b_start python: request.get('b_start', 0);
-                 searching python: (request.get('searching') != 'yep'
-                                   and (request.set('status', ['Pending', 
-                                                               'Pending_confidential',
-                                                               'Accepted',
-                                                               'Accepted_confidential'])));
+                 searching
+                    python: (request.get('searching') != 'yep'
+                             and (request.set('status',
+                                              ['Pending', 'Accepted'])));
                  items here/collector_search;
                  batch python: Batch(items, BATCHSIZE, int(b_start), orphan=0);
                  prev batch/previous;
@@ -53,9 +53,11 @@
     </div>
 
     <table class="FormLayout">
+
       <tbody tal:repeat="item batch">
 
-        <tr tal:define="itemattrs python: here.collector_issue_subject_attrs(item);
+        <tr tal:define="global itemattrs python:
+                               here.collector_issue_subject_attrs(item);
                         itemurl item/getURL;
                         itemtype item/Type|nothing;
                         icon item/getIcon|item/icon|nothing">
@@ -76,6 +78,7 @@
             <a href="ITEMURL" tal:attributes="href item/getURL">
               <span tal:replace="item/id">ID</span> </a>
           </td>
+
           <td NOWRAP>
             <a href="ITEMURL" tal:attributes="href item/getURL">
               <b><span tal:condition="item/Title"
@@ -83,43 +86,76 @@
                                      item.Title[:TITLELEN]
                                     + (item.Title[TITLELEN:] and '...')">
               TITLE</span></b></a>
-            <br>
-              <span tal:condition="python: int(itemattrs['security_related'])">
-                <font color="red">Security</font></span>
-              <em><span tal:content="python: cap(item.review_state)">
-                  STATUS</span></em>
-              <span tal:replace="python: '%s/%s'
-                                       % (cap(itemattrs['topic']),
-                                          cap(itemattrs['classification']))">
-                TOPIC/CLASSIFICATION
-              </span>
           </td>
 
-          <td NOWRAP
-              tal:define="numcmts python: int(itemattrs['action_number'])-1;
-                          plrlcmts python: (numcmts != 1) and 's' or '';
-                          numuploads python: int(itemattrs['upload_number']);
-                          plrluploads python: (numuploads != 1) and 's' or ''">
+          <td NOWRAP>
+            <span tal:replace="python: '%s/%s'
+                                       % (cap(itemattrs['topic']),
+                                          cap(itemattrs['classification']))">
+              TOPIC/CLASSIFICATION
+            </span>
+            <span tal:replace="python: '%s/%s'
+                                       % (cap(itemattrs['importance']),
+                                          cap(itemattrs['severity']))">
+              Importance/Severity
+            </span>
+          </td>
+
+        </tr>
+        <tr tal:define="numcmts python: int(itemattrs['action_number'])-1;
+                        plrlcmts python: (numcmts != 1) and 's' or '';
+                        numuploads python: int(itemattrs['upload_number']);
+                        plrluploads python: (numuploads != 1) and 's' or '';
+                        secure python: int(itemattrs['security_related'])">
+          <td> </td>
+          <td> </td>
+
+          <td NOWRAP colspan="2">
+
+            <font color="SECURITY COLOR"
+                  tal:attributes="color python: 
+                                        (secure and 'brown' or 'black')">
+              <em>
+                <span tal:content="python: cap(split(item.review_state,
+                                                     '_')[0])">
+                  STATUS</span>
+              </em>
+            </font>
+              
+
+            From
+            <span tal:replace="item/Creator|nothing">SUBMITTER ID</span>
+            <span tal:condition="not: item/Creator|nothing">
+              <em>???</em></span>
+
             <span tal:condition="numcmts">
               <span tal:replace="numcmts">NUM COMMENTS</span>
               followup<span tal:replace="plrlcmts">S?</span>
             </span>
+
             <span tal:condition="not: numcmts"
                   tal:replace="nothing"></span>
-
-              <div tal:condition="numuploads">
-                <span tal:replace="numuploads">NUM ARTIFACTS</span>
-                upload<span tal:replace="plrluploads">S?</span>
-              </div>
+            <span tal:condition="numuploads">
+              <span tal:replace="numuploads">NUM ARTIFACTS</span>
+              upload<span tal:replace="plrluploads">S?
+            </span></span><span tal:condition="itemattrs/assigned_to|nothing">,
+              Assigned to: 
+              <span tal:content="itemattrs/assigned_to">SUPPORTERS</span>
+            </span>
           </td>
 
-          <td NOWRAP
-              tal:define="crdate python: item.created.aCommon();
-                          moddate python: item.modified.aCommon()">
-            <span tal:replace="crdate">CREATEDATE</span>
-            <div tal:condition="python: crdate != moddate">
+        </tr>
+
+        <tr tal:define="crdate python: item.created.aCommon();
+                        moddate python: item.modified.aCommon()">
+          <td> </td>
+          <td> </td>
+          <td colspan="3">
+            Submitted
+            <span tal:replace="crdate">CREATEDATE
+              </span><span tal:condition="python: crdate != moddate">,
               Last Mod: <span tal:replace="moddate">MODDATE</span>
-            </div>
+            </span>
           </td>
         </tr>
 
@@ -135,6 +171,7 @@
         </tr>
 
       </tbody>
+
     </table>
 
     <div metal:use-macro="here/collector_macros/macros/issue_batch_nav">
@@ -142,8 +179,10 @@
     </div>
 
     <form action="RETURNHERE" method="get"
-          tal:attributes="action python: here.absolute_url() + '/collector_contents'"
-          tal:define="uniqueValuesFor python: here.portal_catalog.uniqueValuesFor">
+          tal:attributes="action python: here.absolute_url()
+                                         + '/collector_contents'"
+          tal:define="uniqueValuesFor python:
+                                      here.portal_catalog.uniqueValuesFor">
       <input type="hidden" name="searching" value="yep">
 
         <table>
@@ -158,8 +197,21 @@
               <input type="text" name="SearchableText" size="40">
             </td>
             <td align="center">
-              <input type="checkbox" name="security_related" value="1">
-                Security Related?
+              Security Related:
+              <table> <tr><td NOWRAP>
+              <input type="radio" name="security_related" value="2"
+                     tal:attributes="checked python:
+                                 request.get('security_related', '2') == '2'">
+                Either
+              <input type="radio" name="security_related" value="0"
+                     tal:attributes="checked python:
+                                 request.get('security_related', 'x') == '0'">
+                No
+              <input type="radio" name="security_related" value="1"
+                     tal:attributes="checked python:
+                                 request.get('security_related', 'x') == '1'">
+                Yes
+                </td></tr></table>
             </td>
           </tr>
           <tr>
@@ -170,14 +222,13 @@
           <tr>
             <td align="center">
               <select name="status:list" multiple size="SIZE"
-                    tal:define="values python: uniqueValuesFor('review_state')"
+                    tal:define="values here/collector_issue_trim_states"
                     tal:attributes="size python: min(max(len(values), 3), 5)">
                 <span tal:repeat="status values">
                   <option value=""
                           tal:attributes="value status;
                                           selected python: status
-                                                           in request.get('status', [])"
-                          tal:condition="python: status not in ['private', 'published']"
+                                                 in request.get('status', [])"
                           tal:content="status">
                   </option>
                 </span>
