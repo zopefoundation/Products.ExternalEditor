@@ -77,7 +77,7 @@ class DirectoryInformation:
         self._filepath = filepath
         self._minimal_fp = minimal_fp
         self.ignore=base_ignore + tuple(ignore)
-        if platform == 'nt':
+        if platform == 'win32':
             self._walker = _walker(self.ignore)
         subdirs = []
         for entry in _filtered_listdir(self._filepath, ignore=self.ignore):
