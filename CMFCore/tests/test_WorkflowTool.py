@@ -83,7 +83,12 @@ class DummyWorkflow( Dummy ):
 class DummyContent( Dummy ):
 
     meta_type = 'DummyContent'
+    portal_type = 'DummyContentPT'
     _isPortalContent = 1
+
+class DummyNotReallyContent( Dummy ):
+
+    meta_type = 'DummyContentPT'
 
 class DummyTypeInfo( Dummy ):
 
@@ -92,11 +97,11 @@ class DummyTypeInfo( Dummy ):
 class DummyTypesTool( SimpleItem ):
 
     def listTypeInfo( self ):
-        return [ DummyTypeInfo( 'DummyContent' ) ]
+        return [ DummyTypeInfo( 'DummyContentPT' ) ]
 
     def getTypeInfo( self, ob ):
         if getattr( ob, 'meta_type', None ) is 'DummyContent':
-            return DummyTypeInfo( 'DummyContent' )
+            return DummyTypeInfo( 'DummyContentPT' )
         return None
         
 
@@ -135,7 +140,7 @@ class WorkflowToolTests( unittest.TestCase ):
     def _makeWithTypesAndChain( self ):
 
         tool = self._makeWithTypes()
-        tool.setChainForPortalTypes( ( 'DummyContent', ), ( 'a', 'b' ) )
+        tool.setChainForPortalTypes( ( 'DummyContentPT', ), ( 'a', 'b' ) )
         return tool
 
     def test_interface( self ):
@@ -186,6 +191,14 @@ class WorkflowToolTests( unittest.TestCase ):
         self.assertEquals( len( tool.getDefaultChainFor( None ) ), 0 )
         self.assertEquals( len( tool.getChainFor( None ) ), 0 )
         self.assertEquals( len( tool.getCatalogVariablesFor( None ) ), 0 )
+
+    def test_notReallyContent( self ):
+
+        tool = self._makeWithTypesAndChain()
+        dummy = DummyNotReallyContent( 'doh' )
+        self.assertEquals( len( tool.getDefaultChainFor( dummy ) ), 0 )
+        self.assertEquals( len( tool.getChainFor( dummy ) ), 0 )
+        self.assertEquals( len( tool.getCatalogVariablesFor( dummy ) ), 0 )
 
     def test_content_default_chain( self ):
 

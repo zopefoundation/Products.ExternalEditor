@@ -533,8 +533,7 @@ class WorkflowTool (UniqueObject, Folder):
         elif hasattr(aq_base(ob), '_getPortalTypeName'):
             pt = ob._getPortalTypeName()
         else:
-            pt = getattr( ob, 'meta_type', None )  # Use a common Zope idiom.
-
+            pt = getattr(ob, 'portal_type', None)
             if pt is None:
                 return ()
 
