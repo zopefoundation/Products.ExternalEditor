@@ -318,6 +318,12 @@ class PortalFolder( Folder, DynamicType ):
             filter.update(marshal.loads(base64.decodestring(encoded)))
         return filter
 
+    def content_type( self ):
+        """
+            WebDAV needs this to do the Right Thing (TM).
+        """
+        return None
+
     def PUT_factory( self, name, typ, body ):
         """
             Dispatcher for PUT requests to non-existent IDs.  Returns

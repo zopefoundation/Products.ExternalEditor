@@ -241,7 +241,11 @@ class DefaultDublinCoreImpl( PropertyManager ):
     #
     #  DublinCore utility methods
     #
-    content_type = Format  # WebDAV needs this to do the Right Thing (TM)
+    def content_type( self ):
+        """
+            WebDAV needs this to do the Right Thing (TM).
+        """
+        return self.Format()
 
     security.declarePublic( 'isEffective' )
     def isEffective( self, date ):
