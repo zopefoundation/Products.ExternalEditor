@@ -1,4 +1,4 @@
-##parameters=type, id=None, title=''
+##parameters=type, id=None, title='', return_object=0
 ##title=Adds an object to a BTreeFolder and makes a link in the workspace
 # Also generates the ID if necessary, assuming that dest is a BTreeFolder2.
 
@@ -24,3 +24,7 @@ if workspace:
 context.portal_lock.lock(ob) # Lock it on creation
 
 # Note that invokeFactory() causes a redirection.
+if return_object:
+    return ob
+else:
+    return ''
