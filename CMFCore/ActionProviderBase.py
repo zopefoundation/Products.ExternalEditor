@@ -21,6 +21,7 @@ from Globals import InitializeClass
 
 from ActionInformation import ActionInfo
 from ActionInformation import ActionInformation
+from exceptions import AccessControl_Unauthorized
 from Expression import getExprContext
 from interfaces.portal_actions import ActionProvider as IActionProvider
 from permissions import ManagePortal
@@ -114,11 +115,16 @@ class ActionProviderBase:
         """ Get an ActionInfo object specified by a chain of actions.
         """
         action_infos = self.listActionInfos(action_chain, object,
-                                       check_visibility=check_visibility,
-                                       check_condition=check_condition, max=1)
+                                            check_visibility=check_visibility,
+                                            check_permissions=False,
+                                            check_condition=check_condition)
         if not action_infos:
             raise ValueError('No Action meets the given specification.')
-        return action_infos[0]
+        for ai in action_infos:
+            if ai['allowed']:
+                return ai
+        raise AccessControl_Unauthorized('You are not allowed to access any '
+                                         'of the specified Actions.')
 
     #
     #   ZMI methods
