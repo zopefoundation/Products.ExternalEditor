@@ -24,7 +24,7 @@ Zope External Editor
     automatically passed down to the helper application. No need to
     reauthenticate.
     
-  - https support (untested)
+  - https support (Openssl required)
   
   Using It
 
