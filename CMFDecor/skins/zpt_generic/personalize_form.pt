@@ -25,14 +25,14 @@
   <tr>
    <th>Email address</th>
    <td><input type="text" name="email" value=""
-              tal:attributes="value member/email">
+              tal:attributes="value member/email|nothing">
    </td>
   </tr>
   <tr>
    <th valign="top">Listed status</th>
    <td>
      <input type="radio" name="listed" 
-	        tal:attributes="checked member/listed"
+	        tal:attributes="checked member/listed|nothing"
             value="on" id="cb_listed" />
      <label for="cb_listed">Listed</label>
 
@@ -41,7 +41,7 @@
      </dl>
 
      <input type="radio" name="listed" 
-	        tal:attributes="checked python: not(member.listed)"
+	        tal:attributes="checked python: hasattr(member,'listed') and not(member.listed)"
             value="" id="cb_unlisted" />
 	<label for="cb_unlisted">Unlisted</label>
      <dl class="FieldHelp">
