@@ -251,14 +251,14 @@ class CachingPolicyManagerTests( unittest.TestCase ):
         self.assertEqual( len( headers ), 0 )
 
         self.assertRaises( KeyError, mgr._updatePolicy
-                         , 'xyzzy', None, None, None, None, None, None )
+                         , 'xyzzy', None, None, None, None, None, None, '' )
         self.assertRaises( KeyError, mgr._removePolicy, 'xyzzy' )
         self.assertRaises( KeyError, mgr._reorderPolicy, 'xyzzy', -1 )
     
     def test_addPolicy( self ):
 
         mgr = self._makeOne()
-        mgr._addPolicy( 'first', 'python:1', None, 0, 0, 0, 0 )
+        mgr._addPolicy( 'first', 'python:1', None, 0, 0, 0, 0, '' )
         headers = mgr.getHTTPCachingHeaders( content=DummyContent(self._epoch)
                                            , view_method='foo_view'
                                            , keywords={}
@@ -283,7 +283,7 @@ class CachingPolicyManagerTests( unittest.TestCase ):
         for policy_id in policy_ids:
             mgr._addPolicy( policy_id
                           , 'python:"%s" in keywords.keys()' % policy_id
-                          , None, 0, 0, 0, 0 )
+                          , None, 0, 0, 0, 0, '' )
 
         ids = tuple( map( lambda x: x[0], mgr.listPolicies() ) )
         self.assertEqual( ids, policy_ids )
@@ -306,7 +306,7 @@ class CachingPolicyManagerTests( unittest.TestCase ):
         for policy_id, max_age_secs in policy_tuples:
             mgr._addPolicy( policy_id
                           , 'python:"%s" in keywords.keys()' % policy_id
-                          , None, max_age_secs, 0, 0, 0 )
+                          , None, max_age_secs, 0, 0, 0, '' )
 
         return mgr
 
