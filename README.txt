@@ -21,7 +21,10 @@ Zope Content Management Framework (CMF) README
 
   Known Issues
 
-    Please see the separate "issues list":ISSUES.txt.
+    * Please search the "CMF Tracker",
+      http://www.zope.org/Products/PTK/Tracker for issues which
+      are open against the CMF.  You can also report issues there
+      (please look for similar ones first!)
 
   Installation
 
