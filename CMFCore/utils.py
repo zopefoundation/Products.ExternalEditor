@@ -89,8 +89,11 @@ from AccessControl.Permission import Permission
 from AccessControl.Role import gather_permissions
 import Globals
 from Acquisition import aq_get, aq_inner, aq_parent
+from string import split
+
 try: from OFS.ObjectManager import UNIQUE
 except ImportError: UNIQUE = 2
+
 
 # Tool for getting at Tools, meant to be modified as policies or Tool
 # implementations change without having to affect the consumer.
@@ -460,7 +463,7 @@ def initializeBasesPhase2(zclasses, context):
 
 def registerIcon(klass, iconspec, _prefix=None):
     modname = klass.__module__
-    pid = modname[1]
+    pid = split(modname, '.')[1]
     name = path.split(iconspec)[1]
     klass.icon = 'misc_/%s/%s' % (pid, name)
     icon = Globals.ImageFile(iconspec, _prefix)
