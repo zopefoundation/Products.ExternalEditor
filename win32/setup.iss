@@ -30,7 +30,7 @@ Root: HKCR; SubKey: "MIME\Database\Content Type\application/x-zope-edit"; ValueT
 Root: HKCR; SubKey: "MIME\Database\Content Type\application/x-zope-edit"; Flags: uninsdeletekeyifempty
 
 [Files]
-Source: "dist\zopeedit\*.*"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\dist\zopeedit\*.*"; DestDir: "{app}"; Flags: ignoreversion
 Source: "*.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "ZopeEdit.ini"; DestDir: "{app}"; Flags: onlyifdoesntexist
 Source: "..\README.txt"; DestDir: "{app}"; Flags: ignoreversion
