@@ -172,6 +172,7 @@ class ActionsTool (UniqueObject, SimpleItem):
                         c_url = info.content_url
                         for d in defs:
                             actions.append({
+                                'id': d.get('id', None),
                                 'name': d['name'],
                                 'url': join((c_url, d['action']), '/'),
                                 'permissions': d['permissions'],
