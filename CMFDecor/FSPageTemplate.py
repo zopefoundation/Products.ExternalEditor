@@ -132,7 +132,7 @@ class FSPageTemplate(FSObject, Script, PageTemplate):
         obj.write(self.read())
         return obj
 
-    def _readFile(self):
+    def _readFile(self, reparse):
         fp = expandpath(self._filepath)
         file = open(fp, 'rb')
         try: data = file.read()
