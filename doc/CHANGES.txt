@@ -43,6 +43,9 @@ PluggableAuthService changelog
 
     Bugs Fixed
 
+      - Make 'getUserById' pass the 'login' to '_findUser', so that
+        the returned user object can answer 'getUserName' sanely.
+
       - Harden 'logout' against missing HTTP_REFERRER.
 
       - Avoid triggering "Emergency user cannot own" when adding a

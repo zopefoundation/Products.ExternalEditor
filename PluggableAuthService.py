@@ -220,11 +220,12 @@ class PluggableAuthService( Folder, Cacheable ):
                 else:
                     if user_info:
                         user_id = id
+                        login = user_info[0].get( 'login' )
 
         if not user_id:
             return default
 
-        return self._findUser( plugins, user_id )
+        return self._findUser( plugins, user_id, login )
 
     security.declarePublic( 'validate' )     # XXX: public?
     def validate( self, request, auth='', roles=_noroles ):
