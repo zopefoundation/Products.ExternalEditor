@@ -158,7 +158,7 @@ SMALL {FONT-FAMILY: Arial,Helvetica; font-size: 2.75mm;}
 <tr><td colspan=4><hr></td></tr>
 <tr>
 <th align=right valign=top >Description</th>
-<TD VALIGN=top NOWRAP>&dtml-Description;</TEXTAREA>
+<TD colspan="3" VALIGN=top NOWRAP>&dtml-Description;</TEXTAREA>
 </td></tr>
 <tr><td height="30" colspan=4>&nbsp;</td></tr>
 </table>
