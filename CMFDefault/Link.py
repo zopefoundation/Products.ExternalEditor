@@ -148,15 +148,19 @@ class Link( PortalContent
             Edit the Link
         """
         tokens = urlparse.urlparse( remote_url, 'http' )
-        if tokens[1]:
-            # We have a nethost. All is well.
-            url = urlparse.urlunparse(tokens)
-        elif tokens[2:] == ('', '', '', ''):
-            # Empty URL
-            url = ''
+        if tokens[0] == 'http':
+            if tokens[1]:
+                # We have a nethost. All is well.
+                url = urlparse.urlunparse(tokens)
+            elif tokens[2:] == ('', '', '', ''):
+                # Empty URL
+                url = ''
+            else:
+                # Relative URL, keep it that way, without http:
+                tokens = ('', '') + tokens[2:]
+                url = urlparse.urlunparse(tokens)
         else:
-            # Relative URL, keep it that way, without http:
-            tokens = ('', '') + tokens[2:]
+            # Other scheme, keep original
             url = urlparse.urlunparse(tokens)
         self.remote_url = url
 

@@ -24,6 +24,16 @@ http://www.zope.org
 
 class LinkTests(TestCase):
 
+    def canonTest(self, table):
+        for orig, wanted in table.items():
+            # test with constructor
+            d = Link('foo', remote_url=orig)
+            self.assertEqual(d.getRemoteUrl(), wanted)
+            # test with edit method too
+            d = Link('bar')
+            d.edit(orig)
+            self.assertEqual(d.getRemoteUrl(), wanted)
+
     def test_Empty( self ):
         d = Link( 'foo' )
         self.assertEqual( d.Title(), '' )
@@ -67,44 +77,36 @@ class LinkTests(TestCase):
         self.assertEqual( len(d.Subject()), 3 )
         self.assertEqual( d.getRemoteUrl(), 'http://www.zope.org' )
 
-    def test_fixupMissingScheme( self ):
-        d = Link( 'foo' )
-        d.edit( 'http://foo.com' )
-        self.assertEqual( d.getRemoteUrl(), 'http://foo.com' )
+    def test_fixupMissingScheme(self):
+        table = {
+            'http://foo.com':      'http://foo.com',
+            '//bar.com':           'http://bar.com',
+            }
+        self.canonTest(table)
 
-        d = Link( 'bar' )
-        d.edit( '//bar.com' )
-        self.assertEqual( d.getRemoteUrl(), 'http://bar.com' )
-
-        d = Link( 'baz' )
-        d.edit( 'baz.com' )
-        self.assertEqual( d.getRemoteUrl(), 'baz.com' )
-
-        d = Link( 'baz2' )
-        d.edit( 'baz2.com/index.html' )
-        self.assertEqual( d.getRemoteUrl(), 'baz2.com/index.html' )
-
-        d = Link( 'zoinx' )
-        d.edit( '/huh/zoinx.html' )
-        self.assertEqual( d.getRemoteUrl(), '/huh/zoinx.html' )
-
-        d = Link( 'lol' )
-        d.edit( 'hmmm.com/lol.txt' )
-        self.assertEqual( d.getRemoteUrl(), 'hmmm.com/lol.txt' )
+    def test_keepRelativeUrl(self):
+        table = {
+            'baz.com':             'baz.com',
+            'baz2.com/index.html': 'baz2.com/index.html',
+            '/huh/zoinx.html':     '/huh/zoinx.html',
+            'hmmm.com/lol.txt':    'hmmm.com/lol.txt',
+            }
+        self.canonTest(table)
 
     def test_trailingSlash(self):
-        d = Link('foo', remote_url='http://foo.com/bar/')
-        self.assertEqual(d.getRemoteUrl(), 'http://foo.com/bar/')
+        table = {
+            'http://foo.com/bar/': 'http://foo.com/bar/',
+            'baz.com/':            'baz.com/',
+            '/baz.org/zoinx/':     '/baz.org/zoinx/',
+            }
+        self.canonTest(table)
 
-        d = Link('foo', remote_url='baz.com/')
-        self.assertEqual(d.getRemoteUrl(), 'baz.com/')
-
-        d = Link('foo', remote_url='/baz.org/zoinx/')
-        self.assertEqual(d.getRemoteUrl(), '/baz.org/zoinx/')
-
-        d = Link('foo')
-        d.edit('/baz.com/foo/')
-        self.assertEqual(d.getRemoteUrl(), '/baz.com/foo/')
+    def test_otherScheme(self):
+        table = {
+            'mailto:user@foo.com':      'mailto:user@foo.com',
+            'https://bank.com/account': 'https://bank.com/account',
+            }
+        self.canonTest(table)
 
 
 def test_suite():
