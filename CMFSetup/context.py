@@ -6,14 +6,15 @@ $Id$
 """
 import os
 import time
+from StringIO import StringIO
 from tarfile import TarFile
 from tarfile import TarInfo
-from StringIO import StringIO
 
 from AccessControl import ClassSecurityInfo
-from Acquisition import Implicit
 from Acquisition import aq_inner
 from Acquisition import aq_parent
+from Acquisition import aq_self
+from Acquisition import Implicit
 from DateTime.DateTime import DateTime
 from Globals import InitializeClass
 from OFS.DTMLDocument import DTMLDocument
@@ -23,9 +24,10 @@ from OFS.Image import Image
 from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
 from Products.PythonScripts.PythonScript import PythonScript
 
-from permissions import ManagePortal
-from interfaces import IImportContext
 from interfaces import IExportContext
+from interfaces import IImportContext
+from permissions import ManagePortal
+
 
 class DirectoryImportContext( Implicit ):
 
@@ -50,7 +52,7 @@ class DirectoryImportContext( Implicit ):
 
         """ See ISetupContext.
         """
-        return self._site
+        return aq_self(self._site)
 
     security.declareProtected( ManagePortal, 'getEncoding' )
     def getEncoding( self ):
@@ -109,7 +111,7 @@ class DirectoryImportContext( Implicit ):
         """
         if path is None:
             path = ''
-            
+
         full_path = os.path.join( self._profile_path, path )
 
         if not os.path.exists( full_path ) or not os.path.isdir( full_path ):
@@ -128,6 +130,7 @@ class DirectoryImportContext( Implicit ):
 
 InitializeClass( DirectoryImportContext )
 
+
 class DirectoryExportContext( Implicit ):
 
     __implements__ = ( IExportContext, )
@@ -144,7 +147,7 @@ class DirectoryExportContext( Implicit ):
 
         """ See ISetupContext.
         """
-        return self._site
+        return aq_self(self._site)
 
     security.declareProtected( ManagePortal, 'writeDataFile' )
     def writeDataFile( self, filename, text, content_type, subdir=None ):
@@ -169,6 +172,7 @@ class DirectoryExportContext( Implicit ):
 
 InitializeClass( DirectoryExportContext )
 
+
 class TarballExportContext( Implicit ):
 
     __implements__ = ( IExportContext, )
@@ -192,7 +196,7 @@ class TarballExportContext( Implicit ):
 
         """ See ISetupContext.
         """
-        return self._site
+        return aq_self(self._site)
 
     security.declareProtected( ManagePortal, 'writeDataFile' )
     def writeDataFile( self, filename, text, content_type, subdir=None ):
@@ -225,6 +229,7 @@ class TarballExportContext( Implicit ):
 
 InitializeClass( TarballExportContext )
 
+
 class SnapshotExportContext( Implicit ):
 
     __implements__ = ( IExportContext, )
@@ -242,7 +247,7 @@ class SnapshotExportContext( Implicit ):
 
         """ See ISetupContext.
         """
-        return self._site
+        return aq_self(self._site)
 
     security.declareProtected( ManagePortal, 'writeDataFile' )
     def writeDataFile( self, filename, text, content_type, subdir=None ):
@@ -348,7 +353,7 @@ class SnapshotImportContext( Implicit ):
 
         """ See ISetupContext.
         """
-        return self._site
+        return aq_self(self._site)
 
     security.declareProtected( ManagePortal, 'getEncoding' )
     def getEncoding( self ):
