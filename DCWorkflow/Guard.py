@@ -1,21 +1,20 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """ Guard conditions in a web-configurable workflow.
 
 $Id$
 """
 
-from string import split, strip, join
 from cgi import escape
 
 import Globals
@@ -24,6 +23,7 @@ from AccessControl import ClassSecurityInfo
 from Acquisition import Explicit, aq_base
 
 from Products.CMFCore.CMFCorePermissions import ManagePortal
+from Products.CMFCore.utils import _checkPermission
 
 from Expression import Expression, StateChangeInfo, createExprContext
 from utils import _dtmldir
@@ -51,7 +51,7 @@ class Guard (Persistent, Explicit):
                 return 1
         if self.permissions:
             for p in self.permissions:
-                if sm.checkPermission(p, ob):
+                if _checkPermission(p, ob):
                     break
             else:
                 return 0
@@ -106,7 +106,7 @@ class Guard (Persistent, Explicit):
                 res.append('<br/>')
             res.append('Requires expr:')
             res.append('<code>' + escape(self.expr.text) + '</code>')
-        return join(res, ' ')
+        return ' '.join(res)
 
     def changeFromProperties(self, props):
         '''
@@ -118,18 +118,18 @@ class Guard (Persistent, Explicit):
         s = props.get('guard_permissions', None)
         if s:
             res = 1
-            p = map(strip, split(s, ';'))
+            p = [ permission.strip() for permission in s.split(';') ]
             self.permissions = tuple(p)
         s = props.get('guard_roles', None)
         if s:
             res = 1
-            r = map(strip, split(s, ';'))
+            r = [ permission.strip() for permission in s.split(';') ]
             self.roles = tuple(r)
         s = props.get('guard_groups', None)
         if s:
             res = 1
-            r = map(strip, split(s, ';'))
-            self.groups = tuple(r)
+            g = [ permission.strip() for permission in s.split(';') ]
+            self.groups = tuple(g)
         s = props.get('guard_expr', None)
         if s:
             res = 1
@@ -140,19 +140,19 @@ class Guard (Persistent, Explicit):
     def getPermissionsText(self):
         if not self.permissions:
             return ''
-        return join(self.permissions, '; ')
+        return '; '.join(self.permissions)
 
     security.declareProtected(ManagePortal, 'getRolesText')
     def getRolesText(self):
         if not self.roles:
             return ''
-        return join(self.roles, '; ')
+        return '; '.join(self.roles)
 
     security.declareProtected(ManagePortal, 'getGroupsText')
     def getGroupsText(self):
         if not self.groups:
             return ''
-        return join(self.groups, '; ')
+        return '; '.join(self.groups)
 
     security.declareProtected(ManagePortal, 'getExprText')
     def getExprText(self):
