@@ -308,7 +308,7 @@ def setupDefaultWorkflowClassic(wf):
         transitions=('reject', 'retract',))
     sdef.setPermission(p_access, 1, (r_anon, r_manager))
     sdef.setPermission(p_view, 1, (r_anon, r_manager))
-    sdef.setPermission(p_modify, 0, (r_manager))
+    sdef.setPermission(p_modify, 0, (r_manager,))
 
     tdef = wf.transitions['publish']
     tdef.setProperties(
