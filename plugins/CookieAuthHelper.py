@@ -21,6 +21,7 @@ from base64 import encodestring, decodestring
 from urllib import quote, unquote
 
 from AccessControl.SecurityInfo import ClassSecurityInfo
+from AccessControl.Permissions import view
 from OFS.Folder import Folder
 from App.class_init import default__class_init__ as InitializeClass
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
@@ -155,7 +156,7 @@ class CookieAuthHelper(Folder, BasePlugin):
                                      , text=BASIC_LOGIN_FORM
                                      )
         login_form.title = 'Login Form'
-        login_form.__roles__ = []
+        login_form.manage_permission(view, roles=['Anonymous'], acquire=1)
         self._setObject( 'login_form', login_form, set_owner=0 )
 
 
