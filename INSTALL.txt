@@ -19,6 +19,12 @@ Installing CMF 1.1beta
         $ cd /usr/local/zope
         $ tar xzf /tmp/CMF-1.1beta.tar.gz
 
+       Note for Windows users:  if you are using WinZip to unpack
+          the file, be *sure* to disable the "TAR file smart CR/LF
+          expansion" option (thanks to Frank McGeough for tracking
+          down this problem!)
+
+
     2. Link (or copy/move) the CMF packages into
        $INSTANCE_HOME/Products.  For instance::
 
