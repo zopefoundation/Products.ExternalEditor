@@ -7,4 +7,7 @@ context.portal_registration.setProperties(REQUEST)
 
 if REQUEST.has_key('portal_skin'):
     context.portal_skins.updateSkinCookie()
-return context.REQUEST.RESPONSE.redirect(context.portal_url() + '/personalize_form?portal_status_message=Member+changed.')
+    
+qs = '/personalize_form?portal_status_message=Member+changed.'
+
+context.REQUEST.RESPONSE.redirect(context.portal_url() + qs)
