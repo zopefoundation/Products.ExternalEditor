@@ -145,17 +145,22 @@ class MemberDataTool (UniqueObject, SimpleItem, PropertyManager, ActionProviderB
         if search_param == 'username':
             search_param = 'id'
 
-        for user_wrapper in self._members.values():
+        mtool   = getToolByName(self, 'portal_membership')
 
-            memberProperty = user_wrapper.getProperty
-            searched = memberProperty( search_param, None )
+        for member_id in self._members.keys():
 
-            if searched is not None and searched.find(search_term) != -1:
+            user_wrapper = mtool.getMemberById( member_id )
 
-                res.append( { 'username': memberProperty( 'id' )
-                            , 'email' : memberProperty( 'email', '' )
-                            }
-                          )
+            if user_wrapper is not None:
+                memberProperty = user_wrapper.getProperty
+                searched = memberProperty( search_param, None )
+
+                if searched is not None and searched.find(search_term) != -1:
+
+                    res.append( { 'username': memberProperty( 'id' )
+                                , 'email' : memberProperty( 'email', '' )
+                                }
+                            )
         return res
 
     security.declarePrivate('pruneMemberDataContents')
