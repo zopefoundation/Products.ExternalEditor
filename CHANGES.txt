@@ -1,5 +1,11 @@
 External Editor Change Log
 
+    - Unix editor command line parsing is much more robust now and properly
+      handles quoted arguments. You can also specify the "$1" placeholder in the
+      editor command to denote where the content file name is inserted. If
+      omitted it is appended to the end of the command line. "%1" continues to
+      work similarly for Windows. Thanks to Marc St-Jean.
+
     - Fixed bug editing large (chunked) files and images. External editor now
       streams their data properly to the client. Thanks to all the users who
       reported various symptoms of this bug.

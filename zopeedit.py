@@ -314,8 +314,14 @@ class ExternalEditor:
         launch_success = 0
         last_mtime = os.path.getmtime(self.content_file)
         command = self.getEditorCommand()
-        if command.find('%1') > -1:
-            command = command.replace('%1', self.content_file)
+        
+        if win32:
+            file_insert = '%1'
+        else:
+            file_insert = '$1'
+            
+        if command.find(file_insert) > -1:
+            command = command.replace(file_insert, self.content_file)
         else:
             command = '%s %s' % (command, self.content_file)
         editor = EditorProcess(command)
@@ -561,6 +567,7 @@ if win32:
 
 else: # Posix platform
     from time import sleep
+    import re
 
     def has_tk():
         """Sets up a suitable tk root window if one has not
@@ -605,8 +612,12 @@ else: # Posix platform
     class EditorProcess:
         def __init__(self, command):
             """Launch editor process"""
-            command = command.split()
-            self.pid = os.spawnvp(os.P_NOWAIT, command[0], command)
+            # Prepare the command arguments, we use this regex to 
+            # split on whitespace and properly handle quoting
+            arg_re = r"""\s*([^'"]\S+)\s+|\s*"([^"]+)"\s*|\s*'([^']+)'\s*"""
+            args = re.split(arg_re, command.strip())
+            args = filter(None, args) # Remove empty elements
+            self.pid = os.spawnvp(os.P_NOWAIT, args[0], args)
         
         def wait(self, timeout):
             """Wait for editor to exit or until timeout"""
