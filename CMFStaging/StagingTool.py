@@ -131,7 +131,7 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
         return res
 
 
-    def _autoCheckin(self, object):
+    def _autoCheckin(self, object, message=''):
         lt = getToolByName(self, 'portal_lock', None)
         if lt is not None:
             if lt.locked(object):
@@ -139,7 +139,7 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
         vt = getToolByName(self, 'portal_versions', None)
         if vt is not None:
             if vt.isCheckedOut(object):
-                vt.checkin(object)
+                vt.checkin(object, message)
 
 
     security.declareProtected(StageObjects, 'isStageable')
@@ -151,7 +151,7 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
 
 
     security.declareProtected(StageObjects, 'updateStages')
-    def updateStages(self, object, from_stage, to_stages):
+    def updateStages(self, object, from_stage, to_stages, message=''):
         """Updates corresponding objects to match the version
         in the specified stage."""
         if from_stage in to_stages or not self._stages.has_key(from_stage):
@@ -162,7 +162,7 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
 
         self._checkContainers(object, to_stages, container_map)
         if self.auto_checkin:
-            self._autoCheckin(object)
+            self._autoCheckin(object, message)
 
         object_map = self._getObjectStages(object)
         dev_object = object_map[from_stage]
