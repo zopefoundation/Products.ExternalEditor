@@ -755,6 +755,8 @@ class TypesTool( UniqueObject, OFS.Folder.Folder ):
         
         ob = apply(info.constructInstance, (container, id) + args, kw)
 
+        ob.reindexObject()
+
         if RESPONSE is not None:
             immediate_url = '%s/%s' % ( ob.absolute_url()
                                       , info.immediate_view )
