@@ -5,10 +5,11 @@ The Zope Content Managment Framework
     - What is content management, what is unique about CMF, what's the
       future for the CMF
 
-    - Content and services, metadata, search, distributed control,
-      workflow, etc.
+    - Content and services. Introduce ideas of core ideas including:
+      metadata, search, distributed control,
+      workflow, security, etc.
 
-  Quickstart
+  Quick Tour
 
     - A quick, hands-on tour of CMF features. 
 
@@ -23,7 +24,8 @@ The Zope Content Managment Framework
   Working with Content
 
     - Overview of content - distributed authorship, distributed
-      through out site, ownership, catalogability, etc.
+      through out site, ownership, access controls (ie public versus
+      private), catalogability, etc.
 
     - Site, Folder, Topic, Document, Image, etc. Desribe what each
       built-in content type is good for, how to create and edit them,
@@ -63,7 +65,7 @@ The Zope Content Managment Framework
 
     - Personalization XXX fiction? XXX
 
-  CMF Interfaces
+  Scripting the CMF
 
     - Overview of scripting CMF
 
