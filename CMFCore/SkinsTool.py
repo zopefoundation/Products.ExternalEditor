@@ -245,7 +245,6 @@ class SkinsTool(UniqueObject, SkinsContainer, PortalFolder):
         '''
         If needed, updates the skin cookie based on the member preference.
         '''
-        import pdb; pdb.set_trace()
         pm = getToolByName(self, 'portal_membership')
         member = pm.getAuthenticatedMember()
         if hasattr(aq_base(member), 'portal_skin'):
