@@ -24,6 +24,7 @@ from Globals import InitializeClass
 
 from Products.CMFCore.MembershipTool import MembershipTool as BaseTool
 from Products.CMFCore.utils import _checkPermission
+from Products.CMFCore.utils import _getAuthenticatedUser
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.ActionProviderBase import ActionProviderBase
 from Products.CMFCore.ActionsTool import ActionInformation as AI
@@ -149,7 +150,7 @@ class MembershipTool( BaseTool ):
     security.declareProtected( ListPortalMembers, 'getRoster' )
     def getRoster(self):
         """ Return a list of mappings for 'listed' members.
-        
+
         If Manager, return a list of all usernames.  The mapping
         contains the id and listed variables.
         """
@@ -175,37 +176,55 @@ class MembershipTool( BaseTool ):
         members = getattr(parent, self.membersfolder_id, None)
         return members
 
-    security.declareProtected(ManagePortal, 'createMemberarea')
-    def createMemberarea(self, member_id):
-        """ Create a member area for 'member_id'.
+    security.declarePublic('createMemberarea')
+    def createMemberarea(self, member_id=''):
+        """ Create a member area for 'member_id' or authenticated user.
         """
+        if not self.getMemberareaCreationFlag():
+            return None
         members = self.getMembersFolder()
-        if members is not None and not hasattr( aq_base(members), member_id ):
-            f_title = "%s's Home" % member_id
-            members.manage_addPortalFolder( id=member_id, title=f_title )
-            f=getattr(members, member_id)
-
-            acl_users = self.__getPUS()
-            user = acl_users.getUser(member_id)
-
-            if user is not None:
-                user= user.__of__(acl_users)
+        if not members:
+            return None
+        if self.isAnonymousUser():
+            return None
+        # Note: We can't use getAuthenticatedMember() and getMemberById()
+        # because they might be wrapped by MemberDataTool.
+        user = _getAuthenticatedUser(self)
+        user_id = user.getId()
+        if member_id in ('', user_id):
+            member = user
+            member_id = user_id
+        else:
+            if _checkPermission(ManagePortal, self):
+                member = self.acl_users.getUserById(member_id, None)
+                if member:
+                    member = member.__of__(self.acl_users)
+                else:
+                    raise ValueError, 'Member %s does not exist' % member_id
             else:
-                from AccessControl import getSecurityManager
-                user= getSecurityManager().getUser()
-                # check that we do not do something wrong
-                if user.getId() != member_id:
-                    raise NotImplementedError, \
-                        'cannot get user for member area creation'
+                return None
+        if hasattr( aq_base(members), member_id ):
+            return None
 
-            # Grant Ownership and Owner role to Member
-            f.changeOwnership(user)
-            f.__ac_local_roles__ = None
-            f.manage_setLocalRoles(member_id, ['Owner'])
+        # Note: We can't use invokeFactory() to add folder and content because
+        # the user might not have the necessary permissions.
 
-            # Create Member's home page.
-            # DEFAULT_MEMBER_CONTENT ought to be configurable per
-            # instance of MembershipTool.
+        # Create Member's home folder.
+        members.manage_addPortalFolder(id=member_id,
+                                       title="%s's Home" % member_id)
+        f = getattr(members, member_id)
+
+        # Grant Ownership and Owner role to Member
+        f.changeOwnership(member)
+        f.__ac_local_roles__ = None
+        f.manage_setLocalRoles(member_id, ['Owner'])
+
+        # Create Member's initial content.
+        if hasattr(self, 'createMemberContent'):
+            self.createMemberContent(member=member,
+                                   member_id=member_id,
+                                   member_folder=f)
+        else:
             addDocument( f
                        , 'index_html'
                        , member_id+"'s Home"
@@ -215,16 +234,14 @@ class MembershipTool( BaseTool ):
                        )
 
             # Grant Ownership and Owner role to Member
-            f.index_html.changeOwnership(user)
+            f.index_html.changeOwnership(member)
             f.index_html.__ac_local_roles__ = None
             f.index_html.manage_setLocalRoles(member_id, ['Owner'])
 
             f.index_html._setPortalTypeName( 'Document' )
-
-            # Overcome an apparent catalog bug.
             f.index_html.reindexObject()
-            wftool = getToolByName( f, 'portal_workflow' )
-            wftool.notifyCreated( f.index_html )
+            f.index_html.notifyWorkflowCreated()
+        return f
 
     def getHomeFolder(self, id=None, verifyPermission=0):
         """ Return a member's home folder object, or None.

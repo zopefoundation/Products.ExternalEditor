@@ -1,8 +1,14 @@
-CMF 1.5alpha
+CMF 1.5alpha (unreleased)
 
   New Features
 
-    - 
+    - MembershipTool (CMFCore and CMFDefault): Changed member area creation.
+      'wrapUser()' does no longer call 'createMemberarea()'.
+      'createMemberarea()' should now be called from the 'logged_in' page.
+
+    - MembershipTool (CMFDefault): Added a customization hook to
+      'createMemberarea()'. A 'createMemberContent' script placed inside the
+      tool overrides default member content creation.
 
   Bug Fixes
 

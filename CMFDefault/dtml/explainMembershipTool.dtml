@@ -8,4 +8,8 @@
     objects from changes or idiosyncracies in the particular member folder.
 </p>
 
+<p>If you want to customize the content created by 'createMemberarea', add a
+  'createMemberContent' script with the parameters "member, member_id,
+  member_folder" to the Contents tab of this tool.</p>
+
 <dtml-var manage_page_footer>

@@ -1,15 +1,19 @@
-import Zope
 from unittest import TestSuite, makeSuite, main
 
-from Products.CMFCore.tests.base.testcase import \
-     TransactionalTest
+import Zope
+try:
+    Zope.startup()
+except AttributeError:
+    # for Zope versions before 2.6.1
+    pass
+
+from Products.CMFCore.tests.base.testcase import TransactionalTest
 
 class MembershipTests( TransactionalTest ):
 
     def test_join( self ):
         self.root.manage_addProduct[ 'CMFDefault' ].manage_addCMFSite( 'site' )
         site = self.root.site
-        site.portal_membership.memberareaCreationFlag = 0
         member_id = 'test_user'
         site.portal_registration.addMember( member_id
                                           , 'zzyyzz'
@@ -19,17 +23,6 @@ class MembershipTests( TransactionalTest ):
                                           )
         u = site.acl_users.getUser(member_id)
         self.failUnless(u)
-        self.assertRaises(AttributeError,
-                          getattr, site.Members, member_id)
-        # test that wrapUser correctly creates member area
-        site.portal_membership.setMemberareaCreationFlag()
-        site.portal_membership.wrapUser(u)
-        memberfolder = getattr(site.Members, member_id)
-        homepage = memberfolder.index_html
-        self.assertEqual( memberfolder.Title(), "test_user's Home" )
-        tool = site.portal_workflow
-        self.assertEqual( tool.getInfoFor( homepage, 'review_state' )
-                        , "private" )
 
     def test_join_without_email( self ):
         self.root.manage_addProduct[ 'CMFDefault' ].manage_addCMFSite( 'site' )

@@ -167,16 +167,41 @@ class DummyFolder( Implicit ):
 
     def _setObject(self,id,object):
         setattr(self,id,object)
+        return getattr(self, id)
 
 
-class DummyUserFolder(DummyFolder):
+class DummyUser(Implicit):
+    """ A dummy User.
+    """
+
+    def __init__(self, id='dummy'):
+        self.id = id
+
+    def getId(self):
+        return self.id
+
+    getUserName = getId
+
+    def allowed(self, object, object_roles=None):
+        if object.getId() == 'portal_membership':
+            return 0
+        return 1
+
+
+class DummyUserFolder(Implicit):
+    """ A dummy User Folder with 2 dummy Users.
+    """
+
     def __init__(self):
-        self._setObject( 'user_foo', DummyObject(id='user_foo') )
-        self._setObject( 'user_bar', DummyObject(id='user_bar') )
+        setattr( self, 'user_foo', DummyUser(id='user_foo') )
+        setattr( self, 'user_bar', DummyUser(id='user_bar') )
+
     def getUsers(self):
         pass
+
     def getUser(self, name):
         return getattr(self, name, None)
+
     def getUserById(self, id, default=None):
         return self.getUser(id)
 
@@ -215,5 +240,7 @@ class DummyTool(Implicit,ActionProviderBase):
         return 'Tool: %s' % relative
 
     # WorkflowTool
+    test_notified = None
+
     def notifyCreated(self, ob):
-        pass
+        self.test_notified = ob

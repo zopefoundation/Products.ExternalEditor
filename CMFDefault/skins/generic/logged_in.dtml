@@ -23,6 +23,7 @@
  </p>
 <dtml-else>
 
+<dtml-call "portal_membership.createMemberarea()">
 <dtml-let member="portal_membership.getAuthenticatedMember()">
 
  <dtml-if "member.login_time == _.DateTime('2000/01/01') and 

@@ -61,7 +61,7 @@ class AnonymousUser( Implicit ):
       Anonymous USer for unit testing purposes.
     """
     def getId( self ):
-        return 'unit_tester'
+        return 'Anonymous User'
     
     getUserName = getId
 

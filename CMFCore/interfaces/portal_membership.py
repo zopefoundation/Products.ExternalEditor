@@ -1,14 +1,14 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """ Membership tool interface.
 
@@ -24,128 +24,146 @@ except ImportError:
 
 
 class portal_membership(Interface):
-    '''Deals with the details of how and where to store and retrieve
+    """ Deals with the details of how and where to store and retrieve
     members and their member folders.
-    '''
+    """
     id = Attribute('id', 'Must be set to "portal_membership"')
 
     def setPassword(password, domains=None):
         """ Allows the authenticated member to set his/her own password.
 
-        Permission -- SetOwnPassword
+        Permission -- Set own password
         """
-            
-    #getAuthenticatedMember__roles__ = None  # Allow all.
+
     def getAuthenticatedMember():
-        '''
+        """
         Returns the currently authenticated member object
         or the Anonymous User.
-        '''
 
-    #isAnonymousUser__roles__ = None  # Allow all.
+        Permission -- Always available
+        """
+
     def isAnonymousUser():
-        '''
+        """
         Returns 1 if the user is not logged in.
-        '''
 
-    #checkPermission__roles__ = None  # Allow all.
+        Permission -- Always available
+        """
+
     def checkPermission(permissionName, object, subobjectName=None):
-        '''
+        """
         Checks whether the current user has the given permission on
         the given object or subobject.
-        '''
 
-    #credentialsChanged__roles__ = None  # Allow all.
+        Permission -- Always available
+        """
+
     def credentialsChanged(password):
-        '''
+        """
         Notifies the authentication mechanism that this user has changed
         passwords.  This can be used to update the authentication cookie.
         Note that this call should *not* cause any change at all to user
         databases.
-        '''
 
-    # getHomeFolder__roles__ = None # Anonymous permission
+        Permission -- Always available
+        """
+
     def getHomeFolder(id=None, verifyPermission=0):
         """Returns a member's home folder object or None.
         Set verifyPermission to 1 to return None when the user
         doesn't have the View permission on the folder.
+
+        Permission -- Always available
         """
-        
-    # getHomeUrl__roles__ = None # Anonymous permission
+
     def getHomeUrl(id=None, verifyPermission=0):
         """Returns the URL to a member's home folder or None.
         Set verifyPermission to 1 to return None when the user
         doesn't have the View permission on the folder.
+
+        Permission -- Always available
         """
 
-    # permission: 'Manage portal'
     def getMemberById(id):
-        '''
+        """
         Returns the given member.
-        '''
 
-    # permission: 'Manage portal'
+        Permission -- Manage portal
+        """
+
     def listMemberIds():
-        '''Lists the ids of all members.  This may eventually be
-        replaced with a set of methods for querying pieces of the
-        list rather than the entire list at once.
-        '''
-    
-    # permission: 'Manage portal'
+        """ Lists the ids of all members.
+
+        This may eventually be replaced with a set of methods for querying
+        pieces of the list rather than the entire list at once.
+
+        Permission -- Manage portal
+        """
+
     def listMembers():
-        '''Gets the list of all members.
-        '''
+        """ Gets the list of all members.
 
-    #addMember__roles__ = ()  # No permission.
+        Permission -- Manage portal
+        """
+
     def addMember(id, password, roles, domains):
-        '''Adds a new member to the user folder.  Security checks will have
-        already been performed.  Called by portal_registration.
-        '''
+        """ Adds a new member to the user folder.
 
-    # getPortalRoles__roles__ = ()  # Private
+        Security checks will have already been performed. Called by
+        portal_registration.
+
+        Permission -- Python only
+        """
+
     def getPortalRoles():
         """
         Return all local roles defined by the portal itself,
         which means roles that are useful and understood
         by the portal object
+
+        Permission -- Manage portal
         """
 
-    # setRoleMapping__roles__ = ()  # Private
     def setRoleMapping(portal_role, userfolder_role):
         """
         set the mapping of roles between roles understood by
         the portal and roles coming from outside user sources
+
+        Permission -- Manage portal
         """
 
-    # getMappedRole__roles__ = ()  # Private
     def getMappedRole(portal_role):
         """
         returns a role name if the portal role is mapped to
         something else or an empty string if it is not
-        """ 
 
-    # getMemberareaCreationFlag__roles__ = ()  # Private
+        Permission -- Manage portal
+        """
+
     def getMemberareaCreationFlag():
         """
         Returns the flag indicating whether the membership tool
         will create a member area if an authenticated user from
         an underlying user folder logs in first without going
         through the join process
-        """ 
 
-    # setMemberareaCreationFlag__roles__ = ()  # Private
+        Permission -- Manage portal
+        """
+
     def setMemberareaCreationFlag():
         """
         sets the flag indicating whether the membership tool
         will create a member area if an authenticated user from
         an underlying user folder logs in first without going
         through the join process
+
+        Permission -- Manage portal
         """
 
-    # createMemberarea__roles__ = ()  # Private
-    def createMemberarea(member_id):
-        """
-        create a member area, only used if members are sourced
-        from an independent underlying user folder and not just 
-        from the join process
+    def createMemberarea(member_id=''):
+        """ Create a member area for 'member_id' or authenticated user.
+
+        Permission -- Always available
+
+        Returns -- created member folder object or None
         """

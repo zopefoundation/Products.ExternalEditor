@@ -41,8 +41,8 @@
   <div tal:condition="not: isAnon"
        tal:define="first_time python:(
                     member.getProperty( 'login_time', None ) == never
-                                       and p_props.validate_email )">
-
+                                       and p_props.validate_email );
+                   dum_home mtool/createMemberarea">
 
    <div tal:condition="first_time">
     <div tal:define="dum_reg python:member.setProperties(
