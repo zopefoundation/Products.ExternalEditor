@@ -44,6 +44,13 @@ class portal_workflow(Base):
         Returns the actions to be displayed to the user.
         '''
 
+    # security.declarePublic('getActionsFor')
+    def getActionsFor(self, ob):
+        '''
+        Return a list of action dictionaries for 'ob', just as though
+        queried via 'ActionsTool.listFilteredActionsFor'.
+        '''
+
     # security.declarePublic('doActionFor')
     def doActionFor(ob, action, wf_id=None, *args, **kw):
         '''
@@ -123,6 +130,13 @@ class WorkflowDefinition(Base):
         queues in a simple way.
         Returns a mapping containing the catalog variables
         that apply to ob.
+        '''
+
+    #security.declarePrivate('updateRoleMappingsFor')
+    def updateRoleMappingsFor(ob):
+        '''
+        Updates the object permissions according to the current
+        workflow state.
         '''
 
     # security.declarePrivate('listObjectActions')
@@ -206,11 +220,4 @@ class WorkflowDefinition(Base):
         '''
         Invoked by the portal_workflow tool.
         Notifies this workflow that an action failed.
-        '''
-
-    #security.declarePrivate('updateRoleMappingsFor')
-    def updateRoleMappingsFor(ob):
-        '''
-        Updates the object permissions according to the current
-        workflow state.
         '''
