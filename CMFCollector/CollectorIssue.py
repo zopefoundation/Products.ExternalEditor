@@ -155,7 +155,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
                                        expiration_date=expiration_date)
 
         if modification_date:
-            self.setModificationDate(DateTime(modification_date))
+            self._setModificationDate(DateTime(modification_date))
 
     def _set_submitter_specs(self, submitter_id,
                              submitter_name, submitter_email):
@@ -300,7 +300,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
             transcript.edit(self.TRANSCRIPT_FORMAT,
                             transcript.EditableBody())            
 
-        self.notifyModified()
+        self._notifyModified()
         self.reindexObject()
         self._send_update_notice('Edit', username)
 
@@ -377,7 +377,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
                             or '')
                          + transcript.EditableBody())
 
-        self.notifyModified()
+        self._notifyModified()
         self.reindexObject()
         got = self._send_update_notice(action, username,
                                        orig_status, additions, removals,
@@ -727,6 +727,24 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
                 self.classification,
                 self.importance,
                 )
+
+    def _setModificationDate(self, date):
+        # Recent versions of CMF (1.3, maybe earlier) DefaultDublinCoreImpl
+        # have .setModificationDate(), older use bobobase_modification_time,
+        # which i don't know how to set, if can should be done - so trying to
+        # set an initial collector issue mod time is a noop when using with
+        # pre-1.3 CMF.
+        if hasattr(self, 'setModificationDate'):
+            self.setModificationDate(DateTime(date))
+        else:
+            pass                        # XXX Sigh - not with
+
+    def _notifyModified(self):
+        # Recent versions of CMF (1.3, maybe earlier) DefaultDublinCoreImpl
+        # have .notifyCreated(), older use bobobase_modification_time,
+        # which automatically tracks.
+        if hasattr(self, 'notifyModified'):
+            self.notifyModified()
 
     def __len__(self):
         """Number of uploaded artifacts (ie, excluding transcript)."""
