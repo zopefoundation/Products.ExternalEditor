@@ -44,10 +44,8 @@ class TestCalendar(unittest.TestCase):
 
         try: app._delObject('CalendarTest')
         except AttributeError: pass
-        app.manage_addProduct['CMFSetup'].addConfiguredSite( 'CalendarTest'
-                                                           , 'default'
-                                                           )
-
+        factory = app.manage_addProduct['CMFSetup'].addConfiguredSite
+        factory('CalendarTest', 'default', snapshot=False)
         self.Site = app.CalendarTest
 
         manage_addExternalMethod(app.CalendarTest,
