@@ -19,6 +19,7 @@ def test_suite():
         'test_FSPageTemplate',
         'test_FSImage',
         'test_CachingPolicyManager',
+        'test_FSSecurity',
         ])
 
 if __name__ == '__main__':

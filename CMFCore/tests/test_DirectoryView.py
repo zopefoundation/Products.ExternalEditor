@@ -25,18 +25,22 @@ else:
 # the path of our fake skin
 skin_path_name = join(_prefix, 'fake_skins', 'fake_skin')
 
+def _registerDirectory(self=None):
+    registerDirectory('fake_skins', _prefix)
+    if self is not None:
+        ob = self.ob = DummyFolder()
+        addDirectoryViews(ob, 'fake_skins', _prefix)
+    
 class DirectoryViewTests1( TestCase ):
 
     def test_registerDirectory( self ):
         """ Test registerDirectory  """
-        registerDirectory('fake_skins', _prefix)
+        _registerDirectory()
 
 class DirectoryViewTests2( TestCase ):
 
     def setUp( self ):
-        registerDirectory('fake_skins', _prefix)
-        ob = self.ob = DummyFolder()
-        addDirectoryViews(ob, 'fake_skins', _prefix)
+        _registerDirectory(self)        
 
     def test_addDirectoryViews( self ):
         """ Test addDirectoryViews  """
@@ -70,9 +74,7 @@ if DevelopmentMode:
     def setUp( self ):
         
         # initialise skins
-        registerDirectory('fake_skins', _prefix)
-        ob = self.ob = DummyFolder()
-        addDirectoryViews(ob, 'fake_skins', _prefix)
+        _registerDirectory(self)
 
         # add a method to the fake skin folder
         f = open(test2path,'w')
@@ -157,7 +159,7 @@ if DevelopmentMode:
         f.close()
         
         # we need to wait a second here or the mtime will actually
-        # have the same value, no human makes two edits un less
+        # have the same value, no human makes two edits in less
         # than a second ;-)
         sleep(1)
         

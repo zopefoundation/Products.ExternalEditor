@@ -115,6 +115,36 @@ class DirectoryInformation:
                     props[strip(key)] = strip(value)
             return props
 
+    def _readSecurity(self, fp):
+        """Reads the security file next to an object.
+        """
+        try:
+            f = open(fp, 'rt')
+        except IOError:
+            return None        
+        else:
+            lines = f.readlines()
+            f.close()
+            prm = {}
+            for line in lines:
+                try:
+                    c1 = line.index(':')+1
+                    c2 = line.index(':',c1)
+                    permission = line[:c1-1]
+                    acquire = not not line[c1:c2] # get boolean                    
+                    proles = line[c2+1:].split(',')
+                    roles=[]
+                    for role in proles:
+                        role = role.strip()
+                        if role:
+                            roles.append(role)
+                except:
+                    LOG('DirectoryView',
+                        ERROR,
+                        'Error reading permission from .security file',
+                        error=exc_info())
+                prm[permission]=(acquire,roles)
+            return prm
 
     if Globals.DevelopmentMode and os.name=='nt':
 
@@ -131,13 +161,11 @@ class DirectoryInformation:
                 path.walk(fp,_walker,filelist)
                 filelist.sort()
             except: 
-                from zLOG import LOG, ERROR
-                import sys
                 LOG('DirectoryView',
                     ERROR,
                     'Error checking for directory modification',
-                    error=sys.exc_info())
-
+                    error=exc_info())
+                
             if mtime != self._v_last_read or filelist != self._v_last_filelist:
                 self._v_last_read = mtime
                 self._v_last_filelist = filelist
@@ -255,6 +283,19 @@ class DirectoryInformation:
                         finally:
                             tb = None   # Avoid leaking frame!
                             
+                    # FS-based security
+                    try:
+                        permissions = self._readSecurity(e_fp + '.security')
+                        if permissions is not None:
+                            for name in permissions.keys():
+                                acquire,roles = permissions[name]
+                                ob.manage_permission(name,roles,acquire)
+                    except:
+                        LOG('DirectoryView',
+                            ERROR,
+                            'Error setting permission from .security file information',
+                            error=exc_info())
+
                     ob_id = ob.getId()
                     data[ob_id] = ob
                     objects.append({'id': ob_id, 'meta_type': ob.meta_type})
