@@ -86,68 +86,18 @@
 
          <tr>
            <td align="right"> Title: </td>
-           <td colspan="3">
+           <td colspan="3" metal:define-slot="issue_title_slot">
              <strong>
                <span tal:replace="python: here.title[:TITLELEN]
                                           + (here.title[TITLELEN+1:]
-                                             and '...')">TITLE</span>
+                                             and '...')">
+                 TITLE
+               </span>
              </strong>
            </td>
          </tr>
 
-         <tr tal:condition="here/security_related">
-           <td align="right"> Security: </td>
-           <td colspan="3"> Security Related -
-             <font color="BROWN or BLACK"
-                   tal:attributes="color python: (here.confidential() and 'red'
-                                                  or 'black')"
-                   tal:content="python: (here.confidential()
-                                         and 'Confidential'
-                                         or 'Public')">CONFIDENTIALITY</font>
-
-           </td>
-         </tr>
-
          <tr>
-           <td align="right"> Description: </td>
-           <td colspan="3">
-             <font color="gray">
-               <span tal:replace="python: here.description[:TRUNCDESCR]
-                                          + (here.description[TRUNCDESCR+1:]
-                                             and '...')">
-                 DESCRIPTION
-               </span>
-             </font>
-           </td>
-         </tr>
-
-         <tr>
-           <td align="right">Topic/Class:</td>
-           <td> <strong>
-              <span tal:content="python: '%s/%s' % (here.topic,
-                                                   here.classification)">
-               TOPIC</span> </strong>
-           </td>
-           <td align="right">From:</td>
-           <td>
-              <span tal:content="here/submitter_name">NAME</span>
-              (<em><span tal:content="here/submitter_id">ID</span></em>)
-         </tr>
-
-         <tr>
-           <td align="right"> Import/Severity: </td>
-           <td>
-             <span tal:replace="python: here.importance.capitalize()">
-               IMPORTANCE
-             </span>/<span tal:replace="here/severity">SEVERITY</span>
-           </td>
-
-           <td align="right"> on: </td>
-           <td tal:content="crdate">CREATIONDATE</td>
-         </tr>
-
-         <tr>
-
            <td align="right">Status:</td>
            <td tal:define="base python: split(here.status(), '_')[0];
                            paren here/confidential">
@@ -161,34 +111,108 @@
               </code>
            </td>
 
+           <td align="right"> Security related: </td>
+           <td metal:define-slot="issue_security_slot">
+             <span tal:condition="not: here/security_related">
+               No
+             </span>
+             <span tal:condition="here/security_related">
+               Yes 
+               <font color="BROWN or BLACK"
+                     tal:attributes="color python:
+                                          (here.confidential() and 'brown')
+                                          or 'black'"
+                     tal:content="python: (here.confidential()
+                                           and '(confidential)'
+                                           or '(public)')">CONFIDENTIALITY
+               </font>
+             </span>
+           </td>
+         </tr>
+
+         <tr>
+           <td align="right"> Description: </td>
+           <td colspan="3" metal:define-slot="issue_description_slot">
+             <font color="gray">
+               <span tal:replace="python: here.description[:TRUNCDESCR]
+                                          + (here.description[TRUNCDESCR+1:]
+                                             and '...')">
+                 DESCRIPTION
+               </span>
+             </font>
+           </td>
+         </tr>
+
+         <tr>
+           <td align="right">Topic/Class:</td>
+           <td> <strong>
+           <span metal:define-slot="issue_topic_slot"
+                 tal:replace="here/topic">
+            TOPIC</span>/<span metal:define-slot="issue_classification_slot"
+                               tal:replace="here/classification"
+            >CLASSIFICATION</span>
+             </strong>
+           </td>
+           <td align="right">From:</td>
+           <td>
+              <span tal:content="here/submitter_name">NAME</span>
+              (<em><span tal:content="here/submitter_id">ID</span></em>)
+         </tr>
+
+         <tr>
+           <td align="right"> Importance: </td>
+           <td metal:define-slot="issue_importance_slot">
+             <span tal:replace="python: here.importance.capitalize()">
+               IMPORTANCE
+             </span>
+           </td>
+
+           <td align="right"> on: </td>
+           <td tal:content="crdate">CREATIONDATE</td>
+         </tr>
+
+         <tr>
+           <td align="right"> Severity: </td>
+           <td metal:define-slot="issue_severity_slot">
+             <span tal:replace="python: here.severity.capitalize()">
+               SEVERITY
+             </span>
+           </td>
+
            <td align="right">Last update:</td>
            <td tal:content="moddate">MODDATE</td>
          </tr>
+
          <tr>
-           <td align="right">This version:</td>
-           <td>
+           <td align="right">Version:</td>
+           <td metal:define-slot="issue_version_slot">
              <code>
                <span tal:content="here/reported_version">VERSION
                </span>
              </code>
            </td>
-           <td tal:condition="here/assigned_to"
-               align="right">Assigned to:</td>
-           <td tal:condition="here/assigned_to">
-              <span tal:content="python: ', '.join(here.assigned_to())">
-                SUPPORTERS</span>
+
+           <td align="right">
+             Related versions:
+           </td>
+           <td metal:define-slot="issue_other_versions_slot"
+               tal:content="here/other_version_info">
+             OTHER_VERSION_INFO
            </td>
          </tr>
 
-         <tr tal:condition="here/other_version_info">
-           <td align="right"> Related versions: </td>
-           <td colspan="2"
-               tal:content="here/other_version_info">OTHER_VERSION_INFO</td>
-        </tr>
+         <tr tal:condition="here/assigned_to">
+           <td>Assigned to:</td>
+           <td colspan="3">
+             <span tal:content="python: ', '.join(here.assigned_to())">
+               SUPPORTERS</span>
+           </td>
+         </tr>
 
         <tr tal:condition="artifacts">
           <td align="right" valign="top"> Uploads: </td>
-          <td colspan="3">
+          <td metal:define-slot="issue_uploads_slot"
+              colspan="3">
             <table>
               <div tal:repeat="item artifacts">
                 <tr>
@@ -214,6 +238,7 @@
                 </td> </tr>
               </div>
             </table>
+          </td>
         </tr>
 
          <tr valign="middle">
@@ -306,7 +331,6 @@
       <table>
 
         <tr>
-          <th align="left" valign="top"> Upload </th>
           <td align="left" NOWRAP>
             <input type=radio name="filetype" value="File" checked> File or
             <br>
