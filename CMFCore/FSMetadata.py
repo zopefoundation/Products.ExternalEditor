@@ -35,8 +35,8 @@ class FSMetadata:
         self._filename = filename
 
     def read(self):
-        """ Find the files to read, either the old security and properties type or
-        the new metadata type """
+        """ Find the files to read, either the old security and
+        properties type or the new metadata type """
         filename = self._filename + '.metadata'
         if exists(filename):
             # found the new type, lets use that
@@ -74,7 +74,8 @@ class FSMetadata:
 
             # the two sections we care about
             self._properties = self._getSectionDict(cfg, 'default')
-            self._security = self._getSectionDict(cfg, 'security', self._securityParser)
+            self._security = self._getSectionDict(cfg, 'security',
+                                                  self._securityParser)
         except:
             LOG('FSMetadata',
                  ERROR,
