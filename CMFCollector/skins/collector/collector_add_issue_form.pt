@@ -110,7 +110,7 @@
             <textarea name="version_info" rows="3" cols="35"></textarea>
         </td>
         <td colspan="2">
-          <font color="gray">
+          <font color="gray" size="-1">
             <span tal:replace="here/version_info_spiel"></span>
           </font>
         </td>
@@ -136,7 +136,7 @@
          </td>
          <td valign="top"
              tal:condition="assigner">
-            Assign to:
+            Assign to: <br>
            <select name="assignees:list" MULTIPLE size="5"
                    tal:attributes="size python:
                                         min(max(len(supporters), 3), 8)">

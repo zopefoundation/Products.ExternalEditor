@@ -59,7 +59,7 @@
   <th align="right"> Description
   </th>
   <td colspan="3">
-   <font size="-1" color="gray"> Will be rendered as HTML </font>
+   <font color="gray" size="-1"> Will be rendered as HTML: </font>
    <br>
    <textarea name="description:text" rows="3"
              cols="50"
@@ -105,10 +105,10 @@
 </textarea>
   </td>
   <td colspan="2">
-          <font size="-1" color="gray">
+          <font color="gray" size="-1">
             Managers configure the collector, and receive request notices.
             Managers can accept issues, but must be on Supporters roster to be
-            assigned.  (Managers cannot remove <em>themselves</em> from
+            assigned.  (Managers cannot remove <em>themselves</em> from the
             management roster.)
           </font>
   </td>
@@ -123,7 +123,7 @@
 </textarea>
   </td>
   <td colspan="2">
-          <font size="-1" color="gray">
+          <font color="gray" size="-1">
             Supporters can be assigned to requests.  They may or may not
             receive initial request notifications, depending on the
             "dispatching" setting below.
@@ -193,7 +193,7 @@
  <tr valign="top">
   <th align="right"> Version Info Spiel </th>
   <td colspan=3>
-          <font size="-1" color="gray" size="-1">
+          <font color="gray" size="-1">
             Something to prompt requesters for useful version info...
           </font>
     <br> 

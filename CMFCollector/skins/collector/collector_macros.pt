@@ -48,7 +48,7 @@
 
     <div metal:define-macro="issue_header"
          tal:define="global collector_issue_header_present python: 1;
-                     TITLELEN python: 45;
+                     TITLELEN python: 150;
                      split nocall: modules/string/split;
                      TRUNCDESCR python: 150;
                      global artifacts
