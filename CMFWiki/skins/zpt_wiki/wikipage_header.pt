@@ -10,7 +10,9 @@
  <small>
  Last 
  <a href="wikipage_history"
-    tal:attributes="href python:here.getTypeInfo().getActionById( 'history' )">edited</a>
+    tal:attributes="href python: here.wiki_page_url() + '/' +
+                         here.getTypeInfo().getActionById( 'history' )">
+ edited</a>
  <span tal:condition="here/last_editor">
   by <b tal:content="here/last_editor">some editor</b>
  </span>
