@@ -1,5 +1,11 @@
 External Editor Change Log
 
+  Next release
+
+    - Fixed bug which happened under Win32 when editing an Excel file
+      using the Excel plugin where the symptom was a "Call was
+      rejected by callee" COM error.
+
   4/23/04 - 0.7.2 Release
 
     - Change default configuration to use .txt extension for text/plain only. 
