@@ -141,7 +141,11 @@ class IUniqueIdUnrestrictedQuery(Interface):
     objects regardless of the roles the caller has.
     
     CAUTION: Care must be taken not to open security holes by exposing 
-    this to non authorized callers!
+    the results of these methods to non authorized callers!
+        
+    If you're in doubth if you should use this method signature or
+    the restricted ones ('IUniqueIdQuery' and 'IUniqueIdBrainQuery') 
+    use the latter!
     
     Returning a brain is more efficient than returning the object.
     A brain usually exposes only parts of the object and should only 
