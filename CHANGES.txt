@@ -1,6 +1,12 @@
 External Editor Change Log
 
-    - Removed stderr writes to cure "Invalid File Descriptor" bugs on
+    - Fixed NameError bug in unlock retry code. Thanks to Federico Sevilla III.
+
+    - Added a workaround for non-compliant SSL servers. The software now
+      silently ignores "EOF occurred in violation of protocol" errors coming
+      from httplib. Thanks to Christopher Deckard.
+
+    - Removed stderr writes to cure "Invalid File Descriptor" errors on
       Windows.
 
     - Added Photoshop plugin (win32)

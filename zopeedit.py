@@ -465,7 +465,7 @@ class ExternalEditor:
         if interactive and response.status / 100 != 2:
             # Captain, she's still locked!
             if self.askRetryAfterError(response, 'Unlock request failed'):
-                self.unlock(token)
+                self.unlock()
             else:
                 self.did_lock = 0
         else:
@@ -516,6 +516,11 @@ class ExternalEditor:
             except ValueError:
                 response.status = 0
             
+            if response.reason == 'EOF occurred in violation of protocol':
+                # Ignore this protocol error as a workaround for
+                # broken ssl server implementations
+                response.status = 200
+                
             return response
             
     def askRetryAfterError(self, response, operation, message=''):
