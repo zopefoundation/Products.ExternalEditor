@@ -48,6 +48,10 @@ CMF 1.3 beta2 (2002/06/30)
 
   Bugs Fixed
 
+    - Fixed handling of discussion items so that they are correctly
+      indexed, unindexed and reinserted into the workflows when copied
+      or moved.
+
     - Correctly reindex the just-reset workflow variables of an object
       in a DCWorkflow after a paste.
 

@@ -208,6 +208,25 @@ class DiscussionItemContainer( Persistent, Implicit, Traversable ):
                 else:
                     REQUEST.RESPONSE.notFoundError("%s\n%s" % (name, ''))
 
+    security.declarePrivate('manage_afterAdd')
+    def manage_afterAdd(self, item, container):
+        """
+            We have juste been added or moved.
+            Add the contained items to the catalog.
+        """
+        if aq_base(container) is not aq_base(self):
+            for obj in self.objectValues():
+                obj.__of__(self).manage_afterAdd(item, container)
+
+    security.declarePrivate('manage_afterClone')
+    def manage_afterClone(self, item):
+        """
+            We have just been cloned.
+            Notify the workflow about the contained items.
+        """
+        for obj in self.objectValues():
+            obj.__of__(self).manage_afterClone(item)
+
     security.declarePrivate( 'manage_beforeDelete' )
     def manage_beforeDelete(self, item, container):
         """
