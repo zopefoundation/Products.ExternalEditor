@@ -23,6 +23,15 @@ class MembershipTests( TransactionalTest ):
         self.assertEqual( tool.getInfoFor( homepage, 'review_state' )
                         , "private" )
 
+    def test_join_without_email( self ):
+        self.root.manage_addProduct[ 'CMFDefault' ].manage_addCMFSite( 'site' )
+        site = self.root.site
+        self.assertRaises(ValueError,
+                          site.portal_registration.addMember,
+                          'test_user',
+                          'zzyyzz',
+                          properties={'username':'test_user', 'email': ''}
+                          )
 
 def test_suite():
     return TestSuite((

@@ -101,18 +101,17 @@ class RegistrationTool (UniqueObject, SimpleItem, ActionProviderBase):
         detected before the fact so that a cleaner message can be printed.
         '''
         if not self.isMemberIdAllowed(id):
-            raise 'Bad Request', 'The login name you selected is already ' \
-                  'in use or is not valid. Please choose another.'
-        
+            raise ValueError('The login name you selected is already '
+                             'in use or is not valid. Please choose another.')
+
         failMessage = self.testPasswordValidity(password)
         if failMessage is not None:
-            raise 'Bad Request', failMessage
+            raise ValueError(failMessage)
 
         if properties is not None:
             failMessage = self.testPropertiesValidity(properties)
-
             if failMessage is not None:
-                raise 'Bad Request', failMessage
+                raise ValueError(failMessage)
 
         # Limit the granted roles.
         # Anyone is always allowed to grant the 'Member' role.

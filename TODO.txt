@@ -90,7 +90,7 @@ CMF TODO's
 
         (x) Tracker #501:  addToFavorites loses if no favorites folder
 
-        ( ) Tracker #508:  logged_in pukes if no email
+        (x) Tracker #508:  logged_in pukes if no email
 
         ( ) Tracker #519:  CMFDefault.MembershipTool always creates
                            member folder

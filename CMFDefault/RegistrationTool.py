@@ -111,11 +111,17 @@ class RegistrationTool (RegistrationTool, ActionProviderBase):
                 return 'You must enter a valid name.'
 
             if not self.isMemberIdAllowed(username):
-                return ( 'The login name you selected is already ' 
-                       + 'in use or is not valid. Please choose another.'
-                       )
-        if not (props.get('email') or member.getProperty('email')):
-            return 'You must enter a valid email address.'
+                raise ('The login name you selected is already '
+                       'in use or is not valid. Please choose another.')
+
+            if not props.get('email'):
+                return 'You must enter a valid email address.'
+
+        else: # Existing member.
+            # Not allowed to clear an existing non-empty email.
+            if (member.getProperty('email') and
+                not props.get('email', 'NoPropIsOk')):
+                return 'You must enter a valid email address.'
 
         return None
 
