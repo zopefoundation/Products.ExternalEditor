@@ -1,5 +1,7 @@
 External Editor Change Log
 
+    - Added --version command line argument
+
     - Made manage_FTPget the default source for the editable content, instead
       of document_src which was broken for CMF Wiki Pages.
 
