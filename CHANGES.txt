@@ -1,4 +1,98 @@
-1.1 beta
+1.1 final
+
+ New features
+
+  - Factored out index and column lists, to ease customization
+    (Tracker #289)
+
+  - Modified DefaultDublinCoreImpl#setContributors() to use new
+    tuplize functionality (the ability to pass in a different
+    splitter function).  If a string is passed in to
+    setContributors(), it gets split on semicolons.  This allows
+    setting of contributor strings to be like
+
+     "Doe, John E (john@doe.a.deer); The Mertz Family Foundation; PBS"
+
+    If one so deeply and dearly desired.  (The above would turn
+    into a three element tuple).
+
+  - Made it possible to map "normal" Zope objects as content
+    (Tracker #283):
+
+    o Skin and tool code which currently queries the object
+      for its Type in order to then ask the types tool for a
+      TypeInfo object should instead just ask the types tool
+      for type TypeInfo object directly.
+   
+    o Modify the TypesTool interface to signal that passing an
+      object to 'getTypeInfo' is acceptable, with the semantic
+      that the tool will attempt to find a TypeInfo object based
+      on the tool's type or metatype.
+
+  - Expanded signature of Document.CookedBody to change the
+    header levels Structured Text starts rendering at, and
+    whether to preserve those changes, following the following
+    logic:
+
+      If the format is html, and 'stx_level' is not passed in or
+      is the same as the object's current settings, return the
+      cached cooked text.  Otherwise, recook.  If we recook and
+      'setlevel' is true, then set the recooked text and
+      stx_level on the object.
+
+ Bug fixes
+
+  - Overrode DublinCore's isEffective in CMFCalendar.Event to
+    always return true;  this change prevents blocking view of
+    the event by standard_html_header.
+
+  - Updated INSTALL.txt to note that:
+
+     o Use with Zope 2.4.0a1 is *not* recommended.
+
+     o CMFDecor requires Zope Page Templates (Tracker #291).
+
+    and to describe upgrade process from CMF 1.0.
+
+  - Fixed typo in 'Unauthorized' exception raised by
+    'PortalContent._getDefaultView'.
+
+  - Made all content types findable by catalog (Tracker #286).
+
+  - Ensured that ContentTypeRegistry's "Test" tab doesn't puke if
+    no MIMEtype is entered, or if one is entered which doesn't
+    have a '/' in it (Tracker #292).
+
+  - Suppressed overwrite of Subject when no 'Subject' or
+    'Keywords' headers were present (Tracker #294).
+
+  - Ensured that 'Type' is indexed in newly-created
+    'portal_catalog'.
+
+  - Fixed acquisition stripping in PortalContent.objectItems().
+
+  - Modified CMFDefault.DublinCore.getMetadataHeaders() to join
+    Subject by commas, instead of spaces.  Since we parse/split
+    Subject on commas or semicolons now when a document is saved
+    by FTP or WebDAV, we need to feed it out in the same format.
+
+  - Fleshed out security declarations for 'portal_metadata' tool.
+
+  - Corrected pathname of 'MemberDataTool.memberdataContents' to
+    account for use of '_dtmldir' (thanks to Ricardo Newbery for
+    the patch!).
+
+  - Fixed buglet resulting from uninitialized local in
+    'PortalContent.objectItems' (thanks to Seb Bacon for the
+    patch).
+
+  - Modified stock 'search_form' to query 'Type' rather than
+    'meta_type'.
+
+  - Removed debugging / "paranoia" print statements (thanks to
+    Chris Withers for the patches).
+
+1.1 beta (2001/06/01)
 
  New features
 
