@@ -13,9 +13,63 @@ from permissions import ManagePortal
 from utils import _xmldir
 
 #
+# Import
+#
+from xml.sax import parseString
+from xml.sax.handler import ContentHandler
+
+class _RolemapParser( ContentHandler ):
+
+    def __init__( self, site, encoding='latin-1' ):
+
+        self._site = site
+        self._encoding = encoding
+        self._roles = []
+        self._permissions = []
+
+    def startElement( self, name, attrs ):
+
+        if name == 'role':
+            self._roles.append( attrs[ 'name' ].encode( self._encoding )  )
+
+        elif name == 'permission':
+            p_name = attrs[ 'name' ].encode( self._encoding )
+            roles = attrs[ 'roles' ].encode( self._encoding ).split()
+            acquire = attrs[ 'acquire' ].encode( self._encoding ).lower()
+            acquire = acquire in ( '1', 'true', 'yes' )
+            info = { 'name' : p_name, 'roles' : roles, 'acquire' : acquire }
+            self._permissions.append( info )
+
+        elif name not in ( 'rolemap', 'permissions', 'roles' ):
+            raise ValueError, 'Unknown element: %s' % name
+
+    def endDocument( self ):
+
+        immediate_roles = list( getattr( self._site, '__ac_roles__', [] ) )[:]
+        already = {}
+        for role in self._site.valid_roles():
+            already[ role ] = 1
+
+        for role in self._roles:
+
+            if already.get( role ) is None:
+                immediate_roles.append( role )
+                already[ role ] = 1
+
+        immediate_roles.sort()
+        self._site.__ac_roles__ = tuple( immediate_roles )
+
+        for permission in self._permissions:
+
+            self._site.manage_permission( permission[ 'name' ]
+                                        , permission[ 'roles' ]
+                                        , permission[ 'acquire' ]
+                                        )
+
+#
 # Export
 #
-class RolemapExporter( Implicit ):
+class RolemapConfigurator( Implicit ):
 
     """ Synthesize XML description of sitewide role-permission settings.
     """
@@ -81,11 +135,23 @@ class RolemapExporter( Implicit ):
         """
         return self._rolemap()
 
-InitializeClass( RolemapExporter )
+    security.declareProtected( ManagePortal, 'parseXML' )
+    def parseXML( self, text ):
+
+        """ Pseudo API.
+        """
+        reader = getattr( text, 'read', None )
+
+        if reader is not None:
+            text = reader()
+
+        parseString( text, _RolemapParser( self.site ) )
+
+InitializeClass( RolemapConfigurator )
 
 def exportRolemap(site):
 
     """ Export roles / permission map as an XML file
     """
-    rpe = RolemapExporter( site ).__of__( site )
+    rpe = RolemapConfigurator( site ).__of__( site )
     return rpe.generateXML(), 'text/xml', 'rolemap.xml'
