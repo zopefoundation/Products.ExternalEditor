@@ -1,49 +1,64 @@
 import Zope
 from unittest import TestCase, TestSuite, makeSuite, main
 
-from Products.CMFCore.tests.base.dummy import \
-     DummyFolder
+from Products.CMFCore.tests.base.dummy import DummyFolder
+from Products.CMFCore.tests.base.testcase import FSDVTest
+from Products.CMFCore.tests.base.testcase import _prefix
 
-from Products.CMFCore.DirectoryView import \
-     registerDirectory,addDirectoryViews,DirectoryViewSurrogate
-from Globals import package_home, DevelopmentMode
+from Globals import DevelopmentMode
 
-from os import remove, mkdir, rmdir, curdir
-from os.path import join, abspath, dirname
-from shutil import copy2
-from time import sleep
+from os import remove, mkdir, rmdir
+from os.path import join
 
-try:
-    __file__
-except NameError:
-    # Test was called directly, so no __file__ global exists.
-    _prefix = abspath(curdir)
-else:
-    # Test was called by another test.
-    _prefix = abspath(dirname(__file__))
+class DirectoryViewPathTests( TestCase ):
+    """
+    These test that, no matter what is stored in their dirpath,
+    FSDV's will do their best to find an appropriate skin
+    and only do nothing in difficult cases (such as where
+    people have chosen to use PRODUCTS_PATH )
+    """
+    def setUp(self):
+        from Products.CMFCore.DirectoryView import registerDirectory
+        from Products.CMFCore.DirectoryView import addDirectoryViews
+        registerDirectory('fake_skins', _prefix)
+        self.ob = DummyFolder()
+        addDirectoryViews(self.ob, 'fake_skins', _prefix)        
+        
+    def test_getDirectoryInfo1( self ):
+        """ windows INSTANCE_HOME  """
+        self.ob.fake_skin.manage_properties(r'Products\CMFCore\tests\fake_skins\fake_skin')        
+        self.failUnless(hasattr(self.ob.fake_skin,'test1'))
 
-# the path of our fake skin
-skin_path_name = join(_prefix, 'fake_skins', 'fake_skin')
+    def test_getDirectoryInfo2( self ):
+        """ windows SOFTWARE_HOME  """
+        self.ob.fake_skin.manage_properties(r'C:\Zope\2.5.1\Products\CMFCore\tests\fake_skins\fake_skin')        
+        self.failUnless(hasattr(self.ob.fake_skin,'test1'))
 
-def _registerDirectory(self=None):
-    registerDirectory('fake_skins', _prefix)
-    if self is not None:
-        ob = self.ob = DummyFolder()
-        addDirectoryViews(ob, 'fake_skins', _prefix)
-    
-class DirectoryViewTests1( TestCase ):
+    def test_getDirectoryInfo3( self ):
+        """ *nix INSTANCE_HOME  """
+        self.ob.fake_skin.manage_properties('Products/CMFCore/tests/fake_skins/fake_skin')        
+        self.failUnless(hasattr(self.ob.fake_skin,'test1'))
 
-    def test_registerDirectory( self ):
-        """ Test registerDirectory  """
-        _registerDirectory()
+    def test_getDirectoryInfo5( self ):
+        """ *nix SOFTWARE_HOME  """
+        self.ob.fake_skin.manage_properties('/usr/local/zope/2.5.1/Products/CMFCore/tests/fake_skins/fake_skin')        
+        self.failUnless(hasattr(self.ob.fake_skin,'test1'))
 
-class DirectoryViewTests2( TestCase ):
+    def test_getDirectoryInfo5( self ):
+        """ Somewhere we won't be able to find  """
+        from tempfile import mktemp        
+        self.ob.fake_skin.manage_properties(mktemp()+'/CMFCore/tests/fake_skins/fake_skin')
+        self.assertEqual(self.ob.fake_skin.objectIds(),[])
+        
+class DirectoryViewTests( FSDVTest ):
 
     def setUp( self ):
-        _registerDirectory(self)        
+        FSDVTest.setUp(self)
+        self._registerDirectory(self)        
 
     def test_addDirectoryViews( self ):
         """ Test addDirectoryViews  """
+        # also test registration of driectory views doesn't barf
         pass
 
     def test_DirectoryViewExists( self ):
@@ -52,6 +67,7 @@ class DirectoryViewTests2( TestCase ):
         appears as a DirectoryViewSurrogate due
         to Acquisition hackery.
         """
+        from Products.CMFCore.DirectoryView import DirectoryViewSurrogate
         self.failUnless(isinstance(self.ob.fake_skin,DirectoryViewSurrogate))
 
     def test_DirectoryViewMethod( self ):
@@ -62,51 +78,28 @@ class DirectoryViewTests2( TestCase ):
         """Make sure the directory view is reading properties"""
         self.assertEqual(self.ob.fake_skin.testPT.title, 'Zope Pope')
 
-
-test1path = join(skin_path_name,'test1.py')
-test2path = join(skin_path_name,'test2.py')
-test3path = join(skin_path_name,'test3')
-
 if DevelopmentMode:
 
-  class DebugModeTests( TestCase ):
+  class DebugModeTests( FSDVTest ):
 
     def setUp( self ):
+        FSDVTest.setUp(self)
+        self.test1path = join(self.skin_path_name,'test1.py')
+        self.test2path = join(self.skin_path_name,'test2.py')
+        self.test3path = join(self.skin_path_name,'test3')
         
         # initialise skins
-        _registerDirectory(self)
+        self._registerDirectory(self)
 
         # add a method to the fake skin folder
-        f = open(test2path,'w')
-        f.write("return 'test2'")
-        f.close()
+        self._writeFile(self.test2path, "return 'test2'")
 
         # edit the test1 method
-        copy2(test1path,test1path+'.bak')
-        f = open(test1path,'w')
-        f.write("return 'new test1'")
-        f.close()
+        self._writeFile(self.test1path, "return 'new test1'")
 
         # add a new folder
-        mkdir(test3path)
+        mkdir(self.test3path)
         
-    def tearDown( self ):
-        
-        # undo FS changes
-        remove(test1path)
-        copy2(test1path+'.bak',test1path)
-        remove(test1path+'.bak')
-        try:        
-            remove(test2path)
-        except (IOError,OSError):
-            # it might be gone already
-            pass
-        try:
-            rmdir(test3path)
-        except (IOError,OSError):
-            # it might be gone already
-            pass
-
     def test_AddNewMethod( self ):
         """
         See if a method added to the skin folder can be found
@@ -123,6 +116,7 @@ if DevelopmentMode:
         """
         See if a new folder shows up
         """
+        from Products.CMFCore.DirectoryView import DirectoryViewSurrogate
         self.failUnless(isinstance(self.ob.fake_skin.test3,DirectoryViewSurrogate))
         self.ob.fake_skin.test3.objectIds()
 
@@ -130,13 +124,8 @@ if DevelopmentMode:
         """
         Make sure a deleted method goes away
         """
-        remove(test2path)
-        try:
-            self.ob.fake_skin.test2
-        except AttributeError:
-            pass
-        else:
-            self.fail('test2 still exists')
+        remove(self.test2path)
+        self.failIf(hasattr(self.ob.fake_skin,'test2'))
 
     def test_DeleteAddEditMethod( self ):
         """
@@ -145,32 +134,18 @@ if DevelopmentMode:
 
         This excecises yet another Win32 mtime weirdity.
         """
-        remove(test2path)
-        try:
-            self.ob.fake_skin.test2
-        except AttributeError:
-            pass
-        else:
-            self.fail('test2 still exists')
+        remove(self.test2path)
+        self.failIf(hasattr(self.ob.fake_skin,'test2'))
             
         # add method back to the fake skin folder
-        f = open(test2path,'w')
-        f.write("return 'test2.2'")
-        f.close()
-        
-        # we need to wait a second here or the mtime will actually
-        # have the same value, no human makes two edits in less
-        # than a second ;-)
-        sleep(1)
+        self._writeFile(self.test2path, "return 'test2.2'")
         
         # check
         self.assertEqual(self.ob.fake_skin.test2(),'test2.2')
 
         
         # edit method
-        f = open(test2path,'w')
-        f.write("return 'test2.3'")
-        f.close()
+        self._writeFile(self.test2path, "return 'test2.3'")
 
         # check
         self.assertEqual(self.ob.fake_skin.test2(),'test2.3')
@@ -179,13 +154,8 @@ if DevelopmentMode:
         """
         Make sure a deleted folder goes away
         """
-        rmdir(test3path)
-        try:
-            self.ob.fake_skin.test3
-        except AttributeError:
-            pass
-        else:
-            self.fail('test3 still exists')
+        rmdir(self.test3path)
+        self.failIf(hasattr(self.ob.fake_skin,'test3'))
 
 else:
 
@@ -194,8 +164,8 @@ else:
 
 def test_suite():
     return TestSuite((
-        # makeSuite(DirectoryViewTests1),
-        # makeSuite(DirectoryViewTests2),
+        makeSuite(DirectoryViewPathTests),
+        makeSuite(DirectoryViewTests),
         makeSuite(DebugModeTests),
         ))
 

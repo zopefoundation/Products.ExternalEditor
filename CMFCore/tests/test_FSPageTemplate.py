@@ -5,19 +5,26 @@ class DummyCachingManager:
     def getHTTPCachingHeaders( self, content, view_name, keywords, time=None ):
         return ( ( 'foo', 'Foo' ), ( 'bar', 'Bar' ) )
 
-from Products.CMFCore.tests.base.testcase import RequestTest, SecurityTest
+from Products.CMFCore.tests.base.testcase import RequestTest, SecurityTest, FSDVTest
 
-class FSPTMaker:
+class FSPTMaker(FSDVTest):
 
     def _makeOne( self, id, filename ):
 
         from Products.CMFCore.FSPageTemplate import FSPageTemplate
-        from Products.CMFCore.tests.test_DirectoryView import skin_path_name
         from os.path import join
 
-        return FSPageTemplate( id, join( skin_path_name, filename ) )
+        return FSPageTemplate( id, join( self.skin_path_name, filename ) )
 
 class FSPageTemplateTests( RequestTest, FSPTMaker ):
+
+    def setUp(self):
+        FSPTMaker.setUp(self)
+        RequestTest.setUp(self)
+    
+    def tearDown(self):
+        RequestTest.tearDown(self)
+        FSPTMaker.tearDown(self)
 
     def test_Call( self ):
 
@@ -69,6 +76,7 @@ class FSPageTemplateCustomizationTests( SecurityTest, FSPTMaker ):
 
         from OFS.Folder import Folder
 
+        FSPTMaker.setUp(self)
         SecurityTest.setUp( self )
 
         self.root._setObject( 'portal_skins', Folder( 'portal_skins' ) )
@@ -99,6 +107,9 @@ class FSPageTemplateCustomizationTests( SecurityTest, FSPTMaker ):
         customized = self.custom.testPT
         self.failIf( customized.expand )
 
+    def tearDown(self):
+        SecurityTest.tearDown(self)
+        FSPTMaker.tearDown(self)
 
 def test_suite():
     return unittest.TestSuite((

@@ -47,7 +47,6 @@ def _filtered_listdir(path):
              in listdir(path)
              if name not in ignore ]
 
-# This walker is only used on the Win32 version of _changed
 def _walker (listdir, dirname, names):
     names = [ (name, stat(path.join(dirname,name))[8])
               for name
@@ -150,7 +149,7 @@ class DirectoryInformation:
                 prm[permission]=(acquire,roles)
             return prm
 
-    if Globals.DevelopmentMode and os.name=='nt':
+    if Globals.DevelopmentMode:
 
         def _changed(self):
             mtime=0
@@ -176,16 +175,6 @@ class DirectoryInformation:
                 
                 return 1
 
-            return 0
-        
-    elif Globals.DevelopmentMode:
-        
-        def _changed(self):
-            try: mtime = stat(expandpath(self.filepath))[8]
-            except: mtime = 0
-            if mtime != self._v_last_read:
-                self._v_last_read = mtime
-                return 1
             return 0
         
     else:
@@ -348,7 +337,7 @@ class DirectoryRegistry:
 
     def getDirectoryInfo(self, filepath):
         # Can return None.
-        return self._directories.get(os.path.normpath(filepath), None)
+        return self._directories.get(minimalpath(filepath), None)
 
     def listDirectories(self):
         dirs = self._directories.keys()

@@ -607,7 +607,7 @@ def keywordsplitter( headers
 #
 security.declarePublic('normalize')
 def normalize(p):
-    return os_path.abspath(os_path.normcase(os_path.normpath(p)))
+    return os_path.abspath(os_path.normcase(os_path.normpath(p.replace('\\','/'))))
 
 normINSTANCE_HOME = normalize(INSTANCE_HOME)
 normSOFTWARE_HOME = normalize(SOFTWARE_HOME)
@@ -627,16 +627,16 @@ def expandpath(p):
 
 security.declarePublic('minimalpath')
 def minimalpath(p):
-    # Trims INSTANCE_HOME or SOFTWARE_HOME from a path.
-    p = os_path.abspath(p)
-    abs = normalize(p)
-    l = len(normINSTANCE_HOME)
-    if abs[:l] != normINSTANCE_HOME:
-        l = len(normSOFTWARE_HOME)
-        if abs[:l] != normSOFTWARE_HOME:
-            # Can't minimize.
-            return p
-    p = p[l:]
+    # This trims down to a 'Products' root if it can.
+    # otherwise, it returns what it was given.
+    # In either case, the path is normalized.
+    p = normalize(p)
+    index = p.find('Products')
+    if index == -1:
+        index = p.find('products')
+    if index == -1:
+        return p
+    p = p[index:]
     while p[:1] in separators:
         p = p[1:]
     return p

@@ -1,28 +1,32 @@
 import unittest
 import Zope
+import os.path
 
 class DummyCachingManager:
     def getHTTPCachingHeaders( self, content, view_name, keywords, time=None ):
         return ( ( 'foo', 'Foo' ), ( 'bar', 'Bar' ) )
 
-from Products.CMFCore.tests.base.testcase import RequestTest, SecurityTest
+from Products.CMFCore.tests.base.testcase import RequestTest, FSDVTest
 
-class FSImageTests( RequestTest ):
+class FSImageTests( RequestTest, FSDVTest):
+
+    def setUp(self):
+        FSDVTest.setUp(self)
+        RequestTest.setUp(self)
+
+    def tearDown(self):
+        RequestTest.tearDown(self)
+        FSDVTest.tearDown(self)
 
     def _makeOne( self, id, filename ):
 
         from Products.CMFCore.FSImage import FSImage
-        from Products.CMFCore.tests.test_DirectoryView import skin_path_name
-        import os.path
-
-        return FSImage( id, os.path.join( skin_path_name, filename ) )
+        
+        return FSImage( id, os.path.join( self.skin_path_name, filename ) )
 
     def _extractFile( self ):
 
-        from Products.CMFCore.tests.test_DirectoryView import skin_path_name
-        import os.path
-
-        path = os.path.join( skin_path_name, 'test_image.gif' )
+        path = os.path.join( self.skin_path_name, 'test_image.gif' )
         f = open( path, 'rb' )
         try:
             data = f.read()

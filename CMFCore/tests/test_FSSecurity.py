@@ -8,10 +8,11 @@ from time import sleep
 
 from AccessControl.Permission import Permission
 from Products.CMFCore.tests.base.testcase import RequestTest
-from test_DirectoryView import _registerDirectory, _prefix
+from Products.CMFCore.tests.base.testcase import FSDVTest
+
 from Globals import DevelopmentMode
 
-class FSSecurityBase( RequestTest ):
+class FSSecurityBase( RequestTest, FSDVTest ):
 
     def _checkSettings(self,object,permissionname,acquire=0,roles=[]):
         # check the roles and acquire settings for a permission on an
@@ -33,23 +34,11 @@ class FSSecurityBase( RequestTest ):
                 happy=1
         if not happy:
             raise ValueError,"'%s' not found in permissions: %s" % (permissionname,all_names)
-            
-    _path = join(_prefix,'fake_skins','fake_skin')
-    
-    def _writeFile(self, filename, stuff):
-        # write some stuff to a file on disk
-        thePath = join(self._path,filename)
-        f = open(thePath,'w')
-        f.write(stuff)
-        f.close()
-        
-    def _deleteFile(self,filename):
-        # nuke it
-        remove(join(self._path,filename))
-        
+
     def setUp( self ):
         # initialise skins
-        _registerDirectory(self)
+        FSDVTest.setUp(self)
+        self._registerDirectory(self)
         # set up ZODB
         RequestTest.setUp(self)
         # put object in ZODB
@@ -59,11 +48,8 @@ class FSSecurityBase( RequestTest ):
         root._setObject( 'fake_skin', self.ob.fake_skin )
 
     def tearDown( self ):
-        try:
-            self._deleteFile('test5.py.security')
-        except:
-            pass
         RequestTest.tearDown(self)
+        FSDVTest.tearDown(self)
         
 class FSSecurityTests( FSSecurityBase ):
 
@@ -127,10 +113,7 @@ if DevelopmentMode:
             
             # baseline
             self._writeFile('test5.py.security','View::Manager,Anonymous')
-            self._checkSettings(self.ob.fake_skin.test5,'View',0,['Manager','Anonymous'])
-            
-            
-
+            self._checkSettings(self.ob.fake_skin.test5,'View',0,['Manager','Anonymous'])           
             # edit
             self._writeFile('test5.py.security','View:acquire:Manager')
             # test
@@ -141,7 +124,6 @@ if DevelopmentMode:
             """ Test deleting, then adding, then editing a .security file """
             # baseline
             self._writeFile('test5.py.security','View::Manager')
-
             # delete
             self._deleteFile('test5.py.security')
             self._checkSettings(self.ob.fake_skin.test5,'View',1,[])
@@ -157,7 +139,6 @@ if DevelopmentMode:
 
             # edit
             self._writeFile('test5.py.security','View:acquire:Manager')
-
             # test
             self._checkSettings(self.ob.fake_skin.test5,'View',1,['Manager'])
 

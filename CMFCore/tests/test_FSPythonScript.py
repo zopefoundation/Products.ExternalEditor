@@ -3,18 +3,16 @@ import Zope
 from OFS.Folder import Folder
 from unittest import TestCase, TestSuite, makeSuite, main
 from Products.CMFCore.FSPythonScript import FSPythonScript
-from test_DirectoryView import skin_path_name
+from Products.CMFCore.tests.base.testcase import FSDVTest
 from os.path import join
 import sys, time
 from thread import start_new_thread
 
-script_path = join(skin_path_name,'test1.py')
+class FSPythonScriptTests( FSDVTest ):
 
-class FSPythonScriptTests( TestCase ):
-
-    def testGetSize(self):
-        # Test get_size returns correct value
-        script = FSPythonScript('test1', script_path)
+    def test_GetSize( self ):
+        """ Test get_size returns correct value """
+        script = FSPythonScript('test1', join(self.skin_path_name,'test1.py'))
         self.assertEqual(len(script.read()),script.get_size())
 
     def testInitializationRaceCondition(self):
@@ -23,7 +21,7 @@ class FSPythonScriptTests( TestCase ):
         # object was really parsed.
         for n in range(10):
             f = Folder()
-            script = FSPythonScript('test1', script_path).__of__(f)
+            script = FSPythonScript('test1', join(self.skin_path_name,'test1.py')).__of__(f)
             res = []
 
             def call_script(script=script, res=res):
