@@ -47,7 +47,6 @@ def install(self):
     # Borrowed from CMFDefault.Portal.PortalGenerator.setupTypes()
     # We loop through anything defined in the factory type information
     # and configure it in the types tool if it doesn't already exist
-    import pdb; pdb.set_trace()
     for t in CMFCollector.factory_type_information:
         if t['id'] not in types_tool.objectIds():
             cfm = apply(ContentFactoryMetadata, (), t)
