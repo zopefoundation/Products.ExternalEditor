@@ -3,10 +3,14 @@ from AccessControl import ModuleSecurityInfo
 security = ModuleSecurityInfo('Products.CMFStaging.permissions')
 
 security.declarePublic('ManagePortal')
-from Products.CMFCore.permissions import ManagePortal
-
 security.declarePublic('ModifyPortalContent')
-from Products.CMFCore.permissions import ModifyPortalContent
+
+try:
+    from Products.CMFCore.permissions import ManagePortal
+    from Products.CMFCore.permissions import ModifyPortalContent
+except ImportError:
+    from Products.CMFCore.CMFCorePermissions import ManagePortal
+    from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
 
 security.declarePublic('StageObjects')
 StageObjects = 'Use version control'
