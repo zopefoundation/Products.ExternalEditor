@@ -53,7 +53,7 @@ class ActionProviderBase:
 
         """ Return all the actions defined by a provider.
         """
-        return self._actions or None
+        return self._actions or []
 
     #
     #   ZMI methods
