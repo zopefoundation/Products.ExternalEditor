@@ -118,7 +118,10 @@ def install(self):
         if dir_view in skinstool.objectIds():
             skinstool._delObject( dir_view )
 
-    addDirectoryViews( skinstool, 'skins', cmfdecor_globals )
+    try:
+        addDirectoryViews( skinstool, 'skins', cmfdecor_globals )
+    except:
+        pass
     out.write( "Added CMFDecor directory views to portal_skins\n" )
 
     #
