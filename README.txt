@@ -41,11 +41,11 @@ Zope Content Management Framework (CMF) README
 
     Procedure
 
-      1. Unpack the 'CMF-1.0beta.tar.gz' tarball into a working
+      1. Unpack the 'CMF-1.0.tar.gz' tarball into a working
          directory.  For instance:
 
            $ cd /usr/local/zope
-           $ tar xzf /tmp/CMF-1.0beta.tar.gz
+           $ tar xzf /tmp/CMF-1.0.tar.gz
 
       2. Link (or copy/move) the three CMF packages into
          '$INSTANCE_HOME/Products'.  For instance:

@@ -60,3 +60,5 @@ CMF 1.0beta:  Known Issues
     We will provide a script shortly to aid this migration (in
     fact, it will be the script which we use to migrate the
     "dogbowl" site this week.
+    
+    N.B.:  This script is 'CMFDefault.migrate_ptk.py'.

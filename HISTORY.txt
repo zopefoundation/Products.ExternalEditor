@@ -1,9 +1,92 @@
-1.0 xxx (2001/xx/xx)
+1.0 final (2001/03/29)
 
- * Removed references to 'Images/' in skin DTML, adding an extra item
-   to the default skins' lookup path. In CMFDefault/scripts you will find
-   'addImagesToSkinPaths.pys', a Python Script that adds the extra name to
-   all your skin paths.
+ - Removed embedded spaces in 'portal_status_message' strings
+   (thanks to Dieter Maurer for pointing this out)
+
+ - Added 'index_html' (copy/paste from CMFCore.PortalContent?!?) so
+   that topics become directly publishable (thanks to Dieter
+   Maurer for pointing this out).
+
+ - Removed references to 'Images/' in skin DTML, adding an extra
+   item to the default skins' lookup path. In CMFDefault/scripts
+   you will find 'addImagesToSkinPaths.pys', a Python Script that
+   adds the extra name to all your skin paths. (Tracker issue
+   #205).
+
+ - Added FSPythonScripts, allowing filesystem-based skins to
+   expose customizable PythonScripts.
+
+ - Fixed CMF Tracker item (207), "HTML test when editing a Portal
+   Document is ambiguous".  Now, the same regular expression used
+   to scoop out the contents of the <body> tags, which is case
+   insensitive, is also used to detect whether the document may
+   be HTML.
+
+ - Converted physical path to string (Tracker #224).
+
+ - Fixed 'Creator' metadata for DiscussionItems (tracker issue
+   #206, thanks to Jeff Sasmor for the patch!).
+
+ - Added simple search field for 'Subject' (Tracker #213).
+
+ - Fixed CMF Tracker issue 211, "Topics have Folder icon" by
+   finally moving the Topic icon into the skins, and writing a
+   custom icon() method that uses getIcon (Subclassing from
+   PortalFolder made this behavior strange).
+
+ - Changed CMFDefault.Document__init__ to call self.edit at the
+   end, instead of self._parse, which means that HTML can finally
+   be passed into the constructor.  Unit tests verify that
+   initializing with just the 'id' gives the proper results.
+
+ - Added installation script (external method) for CMFTopic.
+
+ - Ensured that content metatypes show up in the types list of the
+   portal_catalog tool (Tracker issue #209, thanks to Jeff
+   Sasmor).
+
+ - Fixed unwanted multiple font reductions on 'recent_news'
+   (Tracker issue #215).
+
+ - Changed visited link color to enhance readability.
+
+ - Fixed PNG transparency of logo (for NS 4.7).
+
+ - Allowed Contributors to publish content directly (Tracker
+   issue #216).
+
+ - Gave more real estate to skin path fields (Tracker issue
+   #226).
+
+ - Added simple listing of subtopics to the default view (Tracker
+   issue #214).
+
+ - Regularized DiscussionItem.absolute_url (further work on
+   Tracker issues #203 & #206).
+
+ - Made 'addToFavorites' work as skinned method of target, and
+   work for DiscussionItems (Tracker issue #227).
+
+ - Moved actual mail sending into CMFDefault.RegistrationTool, to
+   avoid having to give proxy roles to the skin methods involved
+   (Tracker issue #160).
+
+ - Add member count to roster display.
+
+ - Made 'review_state' workflow info publically visible.
+
+ - Made DiscussionItem.getReplies() and
+   DiscussionItemContainter.getReplies() show only 'published'
+   replies (allows retraction, for now).
+
+ - Fixed WorkflowAction.__call__ to use the correct method name
+   for exception notification (Tracker issue #232).
+
+ - Ensure that reply's Creator propagates through preview (thanks
+   to Jeff Sasmor for reporting that our fix to Tracker issue
+   #206 missed the "Preview" case).
+
+ - Removed crufty calls to registerPortalContent.
 
 1.0 beta (2001/03/05)
 
