@@ -35,6 +35,9 @@
 
   - (__future__) Merged Chris Withers' FSSQLMethod into CMFCore.
 
+  - Made validation methods of 'portal_metadata' available to
+    scripts.
+
   - Made skinned 'index_html' reflect generic view on folder
     content, rather than simple title/description of the portal.
 

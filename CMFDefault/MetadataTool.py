@@ -567,7 +567,8 @@ class MetadataTool( UniqueObject, SimpleItem ):
         """
         return self.listAllowedVocabulary( 'Rights', content )
 
-    security.declarePrivate( 'setInitialMetadata' )
+    security.declareProtected( CMFCorePermissions.ModifyPortalContent
+                             , 'setInitialMetadata' )
     def setInitialMetadata( self, content ):
         """
             Set initial values for content metatdata, supplying
@@ -587,7 +588,8 @@ class MetadataTool( UniqueObject, SimpleItem ):
         # TODO:  Call initial_values_hook, if present
 
 
-    security.declarePrivate( 'validateMetadata' )
+    security.declareProtected( CMFCorePermissions.ModifyPortalContent
+                             , 'validateMetadata' )
     def validateMetadata( self, content ):
         """
             Enforce portal-wide policies about DCI, e.g.,
