@@ -98,7 +98,7 @@ def format_webtext(text,
                    urlexpsub=urlexp.sub):
     """Transform web text for browser presentation.
 
-    - HTML quote everything
+    - HTML quote everything except URLs (which can't contain '<', so are safe)
     - Terminate all lines with <br>s.
     - Whitespace-quote indented and '>' cited lines
     - Whitespace-quote lines within <pre>/</pre> pairs
