@@ -1052,7 +1052,7 @@ class PluggableAuthServiceTests( unittest.TestCase ):
         object = FauxObject( 'object' )
         object.__roles__ = ( 'Anonymous', )
 
-        self.failUnless( zcuf._authorizeUser( faux 
+        self.failUnless( zcuf._authorizeUser( faux
                                             , accessed=FauxObject('a')
                                             , container=FauxObject('c')
                                             , name='name'
@@ -1066,7 +1066,7 @@ class PluggableAuthServiceTests( unittest.TestCase ):
         object = FauxObject( 'object' )
         object.__roles__ = ( 'Manager', )
 
-        self.failIf( zcuf._authorizeUser( faux 
+        self.failIf( zcuf._authorizeUser( faux
                                         , accessed=FauxObject('a')
                                         , container=FauxObject('c')
                                         , name='name'
@@ -1080,7 +1080,7 @@ class PluggableAuthServiceTests( unittest.TestCase ):
         object = FauxObject( 'object' )
         object.__roles__ = ( 'Manager', )
 
-        self.failUnless( zcuf._authorizeUser( mgr 
+        self.failUnless( zcuf._authorizeUser( mgr
                                             , accessed=FauxObject('a')
                                             , container=FauxObject('c')
                                             , name='name'
