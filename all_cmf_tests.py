@@ -37,6 +37,9 @@ CMF_PACKAGES = [ ( 'CMFCore',        1 )
                , ( 'CMFSetup',       1 )
                , ( 'CMFUid',         1 )
                , ( 'CMFCalendar',    0 )
+               , ( 'CMFCollector',   0 )
+               , ( 'CMFStaging',     0 )
+               , ( 'CMFWorkspaces',  0 )
                ]
 
 PACKAGES_UNDER_TEST = []

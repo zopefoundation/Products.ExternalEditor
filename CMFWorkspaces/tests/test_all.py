@@ -1,7 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2001, 2002 Zope Corporation and Contributors.
-# All Rights Reserved.
+# Copyright (c) 2004 Zope Corporation and Contributors. All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
@@ -11,30 +10,27 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-"""Tests for CMFStaging.
+""" CMFWorkspaces tests.
 
 $Id$
 """
 
-import unittest
+from unittest import main
 import Testing
 import Zope
 Zope.startup()
 
-from Products.CMFStaging.tests.testLockTool import test_suite as lock_tests
-from Products.CMFStaging.tests.testVersions import test_suite as version_tests
-from Products.CMFStaging.tests.testStaging import test_suite as staging_tests
+from Products.CMFCore.tests.base.utils import build_test_suite
+
 
 def suite():
-    suite = unittest.TestSuite()
-    suite.addTest(lock_tests())
-    suite.addTest(version_tests())
-    suite.addTest(staging_tests())
-    return suite
+    return build_test_suite('Products.CMFWorkspaces.tests',[
+        'testReferences',
+        ])
 
 def test_suite():
     # Just to silence the top-level test.py
     return None
 
 if __name__ == '__main__':
-    unittest.main(defaultTest='suite')
+    main(defaultTest='suite')
