@@ -25,7 +25,7 @@ from Products.CMFCore.tests.base.dummy import DummyContent
 
 from Products.CMFCore.tests.base.testcase import SecurityTest
 
-from Products.CMFUid.interfaces import IAnnotatedUniqueId
+from Products.CMFUid.interfaces import IUniqueIdAnnotation
 from Products.CMFUid.UniqueIdAnnotationTool import UniqueIdAnnotationTool
 
 
@@ -42,7 +42,7 @@ class UniqueIdGeneratorTests(SecurityTest):
         dummy = self.root.dummy
         annotation = self.root.portal_uidannotation(dummy, UID_ATTRNAME)
         
-        IAnnotatedUniqueId.isImplementedBy(annotation)
+        IUniqueIdAnnotation.isImplementedBy(annotation)
         
     def test_setAndGetUid(self):
         dummy = self.root.dummy

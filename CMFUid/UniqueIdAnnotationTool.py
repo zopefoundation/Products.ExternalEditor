@@ -28,40 +28,40 @@ from Products.CMFCore.utils import getToolByName, UniqueObject
 from Products.CMFCore.ActionProviderBase import ActionProviderBase
 from Products.CMFCore.permissions import ManagePortal
 
-from Products.CMFUid.interfaces import IAnnotatedUniqueId
+from Products.CMFUid.interfaces import IUniqueIdAnnotation
 
-class AnnotatedUniqueId(Persistent, Implicit):
+class UniqueIdAnnotation(Persistent, Implicit):
     """Unique id object used as annotation on (content) objects.
     """
     
     __implements__ = (
-        IAnnotatedUniqueId,
+        IUniqueIdAnnotation,
     )
     
     def __init__(self, obj, id):
-        """See IAnnotatedUniqueId.
+        """See IUniqueIdAnnotation.
         """
         self._uid = None
         self.id = id
         setattr(obj, id, self)
     
     def __call__(self):
-        """See IAnnotatedUniqueId.
+        """See IUniqueIdAnnotation.
         """
         return self._uid
         
     def getId(self):
-        """See IAnnotatedUniqueId.
+        """See IUniqueIdAnnotation.
         """
         return self.id
     
     def setUid(self, uid):
-        """See IAnnotatedUniqueId.
+        """See IUniqueIdAnnotation.
         """
         self._uid = uid
         
     def manage_afterClone(self, item):
-        """See IAnnotatedUniqueId.
+        """See IUniqueIdAnnotation.
         """
         # Duplicated unique ids on the copied object have to be avoided.
         # the uid object may already be removed by the 'manage_afterAdd'.
@@ -75,7 +75,7 @@ class AnnotatedUniqueId(Persistent, Implicit):
                 pass
     
     def manage_beforeDelete(self, item, container):
-        """See IAnnotatedUniqueId.
+        """See IUniqueIdAnnotation.
         """
         # This helps in distinguishing renaming from copying/adding and
         # importing in 'manage_afterAdd' (see below)
@@ -84,7 +84,7 @@ class AnnotatedUniqueId(Persistent, Implicit):
             self._cmf_uid_is_rename = True
     
     def manage_afterAdd(self, item, container):
-        """See IAnnotatedUniqueId.
+        """See IUniqueIdAnnotation.
         """
         # 'is_rename' is set if deletion was caused by a rename/move.
         # The unique id is deleted only if the call is not part of 
@@ -101,7 +101,7 @@ class AnnotatedUniqueId(Persistent, Implicit):
         if _is_rename is not None:
             del self._cmf_uid_is_rename
 
-InitializeClass(AnnotatedUniqueId)
+InitializeClass(UniqueIdAnnotation)
 
 
 class UniqueIdAnnotationTool(UniqueObject, SimpleItem, ActionProviderBase):
@@ -122,4 +122,4 @@ class UniqueIdAnnotationTool(UniqueObject, SimpleItem, ActionProviderBase):
     def __call__(self, obj, id):
         """return an empty unique id annotation
         """
-        return AnnotatedUniqueId(obj, id)
+        return UniqueIdAnnotation(obj, id)

@@ -121,8 +121,8 @@ class IUniqueIdGenerator(Interface):
         """
 
 
-class IAnnotatedUniqueId(ICallableOpaqueItem, ICallableOpaqueItemEvents):
-    """Unique id handling adding, copying, and deletion events.
+class IUniqueIdAnnotation(ICallableOpaqueItem, ICallableOpaqueItemEvents):
+    """Opaque unique id item handling adding, copying, and deletion events.
     """
     
     def __init__(uid):
