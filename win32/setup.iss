@@ -3,10 +3,10 @@
 [Setup]
 DisableStartupPrompt=yes
 AppName=Zope External Editor Helper Application
-AppVerName=Zope External Editor 0.7.2
+AppVerName=Zope External Editor 0.8a1
 AppPublisher=Casey Duncan, Zope Corporation
 AppPublisherURL=http://www.zope.com
-AppVersion=0.7.2
+AppVersion=0.8a1
 AppSupportURL=http://www.zope.org/Members/Caseman/ExternalEditor/
 AppUpdatesURL=http://www.zope.org/Members/Caseman/ExternalEditor/
 DefaultDirName={pf}\ZopeExternalEditor
@@ -30,7 +30,7 @@ Root: HKCR; SubKey: "MIME\Database\Content Type\application/x-zope-edit"; ValueT
 Root: HKCR; SubKey: "MIME\Database\Content Type\application/x-zope-edit"; Flags: uninsdeletekeyifempty
 
 [Files]
-Source: "..\dist\zopeedit\*.*"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\dist\*.*"; DestDir: "{app}"; Flags: ignoreversion
 Source: "*.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "ZopeEdit.ini"; DestDir: "{app}"; Flags: onlyifdoesntexist
 Source: "..\README.txt"; DestDir: "{app}"; Flags: ignoreversion
