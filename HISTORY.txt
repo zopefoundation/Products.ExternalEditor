@@ -88,6 +88,9 @@
 
  - Removed crufty calls to registerPortalContent.
 
+ - Trimmed over-long item IDs in actions box (Tracker issue #
+   234;  thanks to Jeff Sasmor and Steve Alexandar for the patch).
+
 1.0 beta (2001/03/05)
 
  * Migrated from old PTK repository on cvs.zope.org.

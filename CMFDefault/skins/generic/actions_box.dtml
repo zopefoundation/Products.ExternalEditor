@@ -45,7 +45,7 @@
      <dtml-if icon>
      <img src="&dtml-BASEPATH1;/&dtml-icon;" align="left" alt="&dtml-typ;" />
      </dtml-if>
-     &dtml-objID;
+     <dtml-var objID size=15 html_quote>
     </dtml-let>
   </td>
  </tr>
