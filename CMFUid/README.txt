@@ -29,7 +29,7 @@ CMFUid Readme
     Dependencies
     
         Object lookup by unique id depends on CMFCore (especially on 
-        portal_catalog. 
+        portal_catalog). 
     
     Usage
     
