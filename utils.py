@@ -15,6 +15,8 @@
 import os
 import unittest
 
+from Globals import package_home
+
 try:
     from zope.interface import directlyProvides
 except ImportError:
@@ -23,14 +25,9 @@ except ImportError:
                                tuple( interfaces )
                              )
 
-product_dir, utils_module_file = os.path.split( __file__ )
 
-product_prefix = product_dir
-while product_prefix:
-    product_prefix, module = os.path.split( product_prefix )
-    if module == 'Products':
-        break
-
+product_dir = package_home( globals() )
+product_prefix = os.path.join( os.path.split(product_dir)[:-1] )
 
 _wwwdir = os.path.join( product_dir, 'www' )
 
