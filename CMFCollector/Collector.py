@@ -174,22 +174,22 @@ class Collector(SkinnedFolder):
         id = self.new_issue_id()
         submitter_id = str(getSecurityManager().getUser())
         
-        addCollectorIssue(self,
-                          id,
-                          title=title,
-                          description=description,
-                          submitter_id=submitter_id,
-                          submitter_name=submitter_name,
-                          submitter_email=submitter_email,
-                          kibitzers=kibitzers,
-                          topic=topic,
-                          classification=classification,
-                          security_related=security_related,
-                          importance=importance,
-                          version_info=version_info,
-                          assignees=assignees,
-                          file=file, fileid=fileid, filetype=filetype)
-        return id
+        err = addCollectorIssue(self,
+                                id,
+                                title=title,
+                                description=description,
+                                submitter_id=submitter_id,
+                                submitter_name=submitter_name,
+                                submitter_email=submitter_email,
+                                kibitzers=kibitzers,
+                                topic=topic,
+                                classification=classification,
+                                security_related=security_related,
+                                importance=importance,
+                                version_info=version_info,
+                                assignees=assignees,
+                                file=file, fileid=fileid, filetype=filetype)
+        return id, err
 
 
     security.declareProtected(ManageCollector, 'edit')
@@ -216,6 +216,13 @@ class Collector(SkinnedFolder):
         if email is not None and self.email != email:
             self.email = email
             changes.append("Email")
+        if not self.email:
+            raise ValueError, ('<strong>'
+                               '<font color="red">'
+                               'The collector <em>must</em>'
+                               ' have an email address'
+                               '</font>'
+                               '</strong>')
         if managers is not None or not self.managers:
             # XXX Vette managers - they must exist, etc.
             x = filter(None, managers)
