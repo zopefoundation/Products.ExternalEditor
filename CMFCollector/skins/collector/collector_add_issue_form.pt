@@ -23,7 +23,9 @@
   <div tal:define="member python:
                           here.portal_membership.getAuthenticatedMember()">
 
-    <form action="collector_add_issue" method="post">
+  <form method="POST" enctype="multipart/form-data"
+        action="collector_add_issue">
+
       <table class="FormLayout">
 
        <tr valign="top">
@@ -155,6 +157,17 @@
         </td>
        </tr>
 
+       <tr>
+         <th> Attachment </th>
+         <td colspan="3">
+
+    <div metal:use-macro="here/collector_macros/macros/add_artifacts_table">
+       add_artifacts_table_row
+    </div>
+
+        </td>
+       </tr>
+
        <tr valign="top">
         <td> <br> </td>
         <td>
@@ -163,7 +176,9 @@
        </tr>
 
       </table>
+
     </form>
+
   </div>
 
 </div>
