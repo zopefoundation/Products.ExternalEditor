@@ -262,11 +262,7 @@
 
   </div>
 
- <!-- end forematter -->
-
- </td>
- </tr>
- </table>
+ <!-- end formatter -->
 
  <div id="Desktop">
 
@@ -284,6 +280,10 @@
 
  <!-- end Desktop -->
  </div>
+
+ </td>
+ </tr>
+ </table>
 
 </div>
 
