@@ -16,7 +16,9 @@ The Zope Content Managment Framework
 
     - Accounts - how to create an account, preferences, log in, log out, etc.
 
-    - Getting around - how to use navigation, member folder, actions box, etc.
+    - Getting around - how to use navigation, favorites, member
+      folder, actions box, folder contents, cutting and pasting, undo,
+      etc.
 
     - Using Services - use of pubic services: search, discussion, etc.
 
@@ -62,9 +64,11 @@ The Zope Content Managment Framework
     - Membership (using various authentication sources, managing users
       and their preferences, user data schemas)
 
-    - Syndication XXX fiction ? XXX
+    - Discussion 
 
-    - Discussion XXX fiction ? XXX
+    - Security - setting roles and local roles
+
+    - Syndication XXX fiction ? XXX
 
     - Versioning XXX fiction? XXX
 
