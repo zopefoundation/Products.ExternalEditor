@@ -2,6 +2,7 @@
 
 $Id$
 """
+import re
 from xml.sax import parseString
 from xml.dom.minidom import parseString as domParseString
 
@@ -1023,6 +1024,8 @@ def _extractDefaultNode( parent, encoding=None ):
            , 'expression' : expr_text
            }
 
+_SEMICOLON_LIST_SPLITTER = re.compile( r';[ ]*' )
+
 def _extractMatchNode( parent, encoding=None ):
 
     nodes = parent.getElementsByTagName( 'match' )
@@ -1033,7 +1036,7 @@ def _extractMatchNode( parent, encoding=None ):
 
         name = _getNodeAttribute( node, 'name', encoding )
         values = _getNodeAttribute( node, 'values', encoding )
-        result[ name ] = values.split()
+        result[ name ] = _SEMICOLON_LIST_SPLITTER.split( values )
 
     return result
 
@@ -1132,6 +1135,7 @@ def _initDCWorkflow( workflow
     _initDCWorkflowVariables( workflow, variables )
     _initDCWorkflowStates( workflow, states )
     _initDCWorkflowTransitions( workflow, transitions )
+    _initDCWorkflowWorklists( workflow, worklists )
 
 
 def _initDCWorkflowVariables( workflow, variables ):
@@ -1144,6 +1148,8 @@ def _initDCWorkflowVariables( workflow, variables ):
 
         id = str( v_info[ 'variable_id' ] ) # no unicode!
         v = VariableDefinition( id )
+        workflow.variables._setObject( id, v )
+        v = workflow.variables._getOb( id )
 
         guard = v_info[ 'guard' ]
         props = { 'guard_roles' : ';'.join( guard[ 'roles' ] )
@@ -1165,8 +1171,6 @@ def _initDCWorkflowVariables( workflow, variables ):
                        , props = props
                        )
 
-        workflow.variables._setObject( id, v )
-
 
 def _initDCWorkflowStates( workflow, states ):
 
@@ -1179,6 +1183,8 @@ def _initDCWorkflowStates( workflow, states ):
 
         id = str( s_info[ 'state_id' ] ) # no unicode!
         s = StateDefinition( id )
+        workflow.states._setObject( id, s )
+        s = workflow.states._getOb( id )
 
         s.setProperties( title = s_info[ 'title' ]
                        , description = s_info[ 'description' ]
@@ -1202,8 +1208,6 @@ def _initDCWorkflowStates( workflow, states ):
 
             vmap[ name ] = value
 
-        workflow.states._setObject( id, s )
-
 
 def _initDCWorkflowTransitions( workflow, transitions ):
 
@@ -1216,6 +1220,8 @@ def _initDCWorkflowTransitions( workflow, transitions ):
 
         id = str( t_info[ 'transition_id' ] ) # no unicode!
         t = TransitionDefinition( id )
+        workflow.transitions._setObject( id, t )
+        t = workflow.transitions._getOb( id )
 
         trigger_type = list( TRIGGER_TYPES ).index( t_info[ 'trigger' ] )
 
@@ -1242,4 +1248,35 @@ def _initDCWorkflowTransitions( workflow, transitions ):
 
         t.var_exprs = PersistentMapping( t_info[ 'variables' ].items() )
 
-        workflow.transitions._setObject( id, t )
+def _initDCWorkflowWorklists( workflow, worklists ):
+
+    """ Initialize DCWorkflow worklists
+    """
+    from Globals import PersistentMapping
+    from Products.DCWorkflow.Worklists import WorklistDefinition
+
+    for w_info in worklists:
+
+        id = str( w_info[ 'worklist_id' ] ) # no unicode!
+        w = WorklistDefinition( id )
+        workflow.worklists._setObject( id, w )
+
+        w = workflow.worklists._getOb( id )
+
+        action = w_info[ 'action' ]
+
+        guard = w_info[ 'guard' ]
+        props = { 'guard_roles' : ';'.join( guard[ 'roles' ] )
+                , 'guard_permissions' : ';'.join( guard[ 'permissions' ] )
+                , 'guard_groups' : ';'.join( guard[ 'groups' ] )
+                , 'guard_expr' : guard[ 'expression' ]
+                }
+
+        w.setProperties( description = w_info[ 'description' ]
+                       , actbox_name = action[ 'name' ]
+                       , actbox_url = action[ 'url' ]
+                       , actbox_category = action[ 'category' ]
+                       , props = props
+                       )
+
+        w.var_matches = PersistentMapping( w_info[ 'match' ].items() )

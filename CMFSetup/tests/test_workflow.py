@@ -2190,6 +2190,48 @@ class Test_importWorkflow( _WorkflowSetup
             self.assertEqual( guard.groups, expected[ 12 ] )
             self.assertEqual( guard.getExprText(), expected[ 13 ] )
 
+    def test_from_empty_dcworkflow_workflow_worklists( self ):
+
+        WF_ID = 'dcworkflow_worklists'
+        WF_TITLE = 'DC Workflow testing worklists'
+        WF_INITIAL_STATE = 'closed'
+
+        tool = self._importNormalWorkflow( WF_ID, WF_TITLE, WF_INITIAL_STATE )
+
+        workflow = tool.objectValues()[ 0 ]
+
+        worklists = workflow.worklists
+
+        self.assertEqual( len( worklists.objectItems() )
+                        , len( _WF_WORKLISTS ) )
+
+        for id, worklist in worklists.objectItems():
+
+            expected = _WF_WORKLISTS[ worklist.getId() ]
+            self.failUnless( expected[ 1 ] in worklist.description )
+
+            var_matches = worklist.var_matches
+
+            self.assertEqual( len( var_matches ), len( expected[ 2 ] ) )
+
+            for var_id, values in var_matches.items():
+                exp_values = expected[ 2 ][ var_id ]
+                self.assertEqual( len( values ), len( exp_values ) )
+
+                for value in values:
+                    self.failUnless( value in exp_values, values )
+
+            self.assertEqual( worklist.actbox_name, expected[ 3 ] )
+            self.assertEqual( worklist.actbox_url, expected[ 4 ] )
+            self.assertEqual( worklist.actbox_category, expected[ 5 ] )
+
+            guard = worklist.getGuard()
+
+            self.assertEqual( guard.permissions, expected[ 6 ] )
+            self.assertEqual( guard.roles, expected[ 7 ] )
+            self.assertEqual( guard.groups, expected[ 8 ] )
+            self.assertEqual( guard.getExprText(), expected[ 9 ] )
+
 def test_suite():
     return unittest.TestSuite((
         unittest.makeSuite( WorkflowToolConfiguratorTests ),
