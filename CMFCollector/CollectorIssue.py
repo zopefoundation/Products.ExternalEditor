@@ -25,13 +25,13 @@ from Products.CMFCore.WorkflowCore import WorkflowAction
 from Products.CMFCore.utils import getToolByName
 
 from Products.CMFDefault.SkinnedFolder import SkinnedFolder
-from Products.CMFDefault.Document import addDocument
+from WebTextDocument import addWebTextDocument
 
 # Import permission names
 from Products.CMFCore import CMFCorePermissions
 from CollectorPermissions import *
 
-RULE = '_' * 50
+RULE = '_' * 40
 
 UPLOAD_PREFIX = "Uploaded: "
 uploadexp = re.compile('(%s)([^<,\n]*)([<,\n])' % UPLOAD_PREFIX, re.MULTILINE)
@@ -77,7 +77,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
 
     meta_type = 'CMF Collector Issue'
     effective_date = expiration_date = None
-    TRANSCRIPT_FORMAT = 'html'
+    TRANSCRIPT_FORMAT = 'webtext'
     
     security = ClassSecurityInfo()
 
@@ -210,11 +210,9 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
     def CookedBody(self):
         """Rendered content."""
         body = self.get_transcript().CookedBody()
-        body = util.format_webtext(body)
-        body = uploadexp.sub(r'\1 <a href="%s/\2/view">\2</a>\3'
+        return uploadexp.sub(r'\1 <a href="%s/\2/view">\2</a>\3'
                              % self.absolute_url(),
                              body)
-        return body
 
 
     security.declareProtected(EditCollectorIssue, 'edit')
@@ -551,8 +549,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         """Create events and comments transcript, with initial entry."""
 
         user = getSecurityManager().getUser()
-        addDocument(self, TRANSCRIPT_NAME, description=description,
-                    text_format=self.TRANSCRIPT_FORMAT)
+        addWebTextDocument(self, TRANSCRIPT_NAME, description=description)
         it = self.get_transcript()
         it._setPortalTypeName('Collector Issue Transcript')
         it.title = self.title
