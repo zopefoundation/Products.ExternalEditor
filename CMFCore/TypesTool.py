@@ -16,6 +16,7 @@ $Id$
 """
 
 from sys import exc_info
+from warnings import warn
 
 from AccessControl import ClassSecurityInfo
 from AccessControl import getSecurityManager
@@ -268,6 +269,9 @@ class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
         """
             Return the URL of the action whose ID is id.
         """
+        warn('getActionById() is deprecated and will be removed in CMF 1.6. '
+             'In most cases getActionInfo() will be the right replacement.',
+             DeprecationWarning)
         context = getActionContext( self )
         for action in self.listActions():
 
