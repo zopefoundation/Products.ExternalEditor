@@ -4,19 +4,27 @@ Installing CMFCollector
 
   Prerequisites:
 
-   - Zope, 2.4 or better (with page templates, Python 2.x)
+   - Zope, 2.4 or better (Python 2.x) and the following addons.
 
-   - The CMF ( http://cmf.zope.org ), recent (as of 10/10/2001) CVS
-     checkout, or (not yet released) 1.2 or better.
+   - The CMF
 
-   - Zope Page templates (ZPT, http://www.zope.org/Wikis/DevSite/Projects/ZPT )
+     http://cmf.zope.org - recent (as of 10/10/2001) CVS HEAD
+     checkout, or 1.2 or better (not yet released as of Oct 15, 2001).
+
+   - Zope Page templates
+
+     "ZPT", http://www.zope.org/Wikis/DevSite/Projects/ZPT - ZPT is
+     integrated in the Zope HEAD checkout, and will be part of the
+     distribution as of Zope 2.5.
 
    - CMF/CMFDecor provisions for ZPT, including use of the ZPT skin as the
      default skin (settable from the portal_skins 'Properties' tab).
 
-   - CMF/DCWorkflow (this is probably temporary - we'll probably move
-     to script-based specification of the workflow, once it's further
-     developed, for easier updating)
+   - CMF/DCWorkflow
+
+     Proper operation depends on a patch to DCWorkflow as of Oct 15,
+     2001.  The patch is in the CVS version (it's DCWorkflow.py, rev
+     1.8), and will be in CMF 1.2.
 
   To install CMFCollector, uncompress the CMFCollector product into
   your zope/Products directory or link it there, e.g.::
