@@ -505,8 +505,14 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
         automatic transitions.  tdef set to None means the object
         was just created.
         '''
+        moved = 0
         while 1:
-            sdef = self._executeTransition(ob, tdef, kwargs)
+            try:
+                sdef = self._executeTransition(ob, tdef, kwargs)
+            except ObjectMoved, ex:
+                moved = 1
+                ob = ex.getNewObject()
+                sdef = self._getWorkflowStateOf(ob)
             if sdef is None:
                 break
             tdef = None
@@ -520,6 +526,9 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
                 # No more automatic transitions.
                 break
             # Else continue.
+        if moved:
+            # Re-raise.
+            raise ObjectMoved(ob)
 
     def _executeTransition(self, ob, tdef=None, kwargs=None):
         '''
