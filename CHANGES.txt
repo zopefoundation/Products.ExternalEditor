@@ -48,6 +48,9 @@ CMF 1.3 beta2 (2002/06/30)
 
   Bugs Fixed
 
+    - Made the Link objects deal correctly with empty remote urls
+      (Tracker #507) and not strip trailing slashes (Tracker #451).
+
     - Made content_type_registry deal correctly with TypeInfos that have
       a title (Tracker #465, thanks to Juan Antonio Valiño García for
       the patch).

@@ -118,7 +118,7 @@ CMF TODO's
 
       - ( ) Content fixes
 
-        ( ) Tracker #507:  Link inconsistent on empty remote_url
+        (x) Tracker #507:  Link inconsistent on empty remote_url
 
         ( ) Tracker #513:  deleteReply is genocidal
 

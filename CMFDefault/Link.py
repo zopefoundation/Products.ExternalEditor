@@ -104,8 +104,8 @@ class Link( PortalContent
         DefaultDublinCoreImpl.__init__(self)
         self.id=id
         self.title=title
-        self.remote_url=remote_url
         self.description=description
+        self._edit(remote_url)
         self.format=self.URL_FORMAT
 
     security.declareProtected( CMFCorePermissions.ModifyPortalContent
@@ -148,12 +148,10 @@ class Link( PortalContent
             Edit the Link
         """
         tokens = urlparse.urlparse( remote_url, 'http' )
-        if tokens[0] and tokens[1]:
-            self.remote_url = urlparse.urlunparse( tokens )
-        else:
-            self.remote_url = 'http://' + remote_url
-        if self.remote_url[-1] == '/':
-            self.remote_url = self.remote_url[:-1]
+        url = urlparse.urlunparse( tokens )
+        if url == 'http:':
+            url = ''
+        self.remote_url = url
 
     security.declareProtected( CMFCorePermissions.ModifyPortalContent, 'edit' )
     edit = WorkflowAction( _edit )
