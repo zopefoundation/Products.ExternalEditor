@@ -187,7 +187,8 @@
 
       </tbody>
 
-      <tr bgcolor="#ccffcc">
+      <tr bgcolor="#ccffcc"
+          tal:condition="batch">
         <td colspan="3">
           <div metal:use-macro="here/collector_macros/macros/issue_batch_nav">
             ISSUE-BATCH NAVIGATION
