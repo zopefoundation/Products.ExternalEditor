@@ -20,6 +20,10 @@ Installing CMFCollector
    - CMF/CMFDecor provisions for ZPT, including use of the ZPT skin as the
      default skin (settable from the portal_skins 'Properties' tab).
 
+     That's last bit deserves emphasis - anyone using the collector
+     must be using the ZPT skin (or have the 'collector' and
+     'zpt_generic' layers included on the one you're using).
+
    - CMF/DCWorkflow
 
      Proper operation depends on a patch to DCWorkflow as of Oct 15,
