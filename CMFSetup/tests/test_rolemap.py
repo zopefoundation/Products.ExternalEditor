@@ -23,9 +23,9 @@ class RolemapConfiguratorTests( BaseRegistryTests ):
         EXPECTED = [ 'Anonymous', 'Authenticated', 'Manager', 'Owner' ]
         self.root.site = Folder( id='site' )
         site = self.root.site
-        exporter = self._makeOne( site )
+        configurator = self._makeOne( site )
 
-        roles = list( exporter.listRoles() )
+        roles = list( configurator.listRoles() )
         self.assertEqual( len( roles ), len( EXPECTED ) )
 
         roles.sort()
@@ -42,9 +42,9 @@ class RolemapConfiguratorTests( BaseRegistryTests ):
         existing_roles.append( 'ZZZ' )
         site.__ac_roles__ = existing_roles
 
-        exporter = self._makeOne( site )
+        configurator = self._makeOne( site )
 
-        roles = list( exporter.listRoles() )
+        roles = list( configurator.listRoles() )
         self.assertEqual( len( roles ), len( EXPECTED ) )
 
         roles.sort()
@@ -56,16 +56,16 @@ class RolemapConfiguratorTests( BaseRegistryTests ):
 
         self.root.site = Folder( id='site' )
         site = self.root.site
-        exporter = self._makeOne( site )
+        configurator = self._makeOne( site )
 
-        self.assertEqual( len( exporter.listPermissions() ), 0 )
+        self.assertEqual( len( configurator.listPermissions() ), 0 )
 
     def test_listPermissions_nooverrides( self ):
 
         site = Folder( id='site' ).__of__( self.root )
-        exporter = self._makeOne( site )
+        configurator = self._makeOne( site )
 
-        self.assertEqual( len( exporter.listPermissions() ), 0 )
+        self.assertEqual( len( configurator.listPermissions() ), 0 )
 
     def test_listPermissions_acquire( self ):
 
@@ -74,10 +74,10 @@ class RolemapConfiguratorTests( BaseRegistryTests ):
 
         site = Folder( id='site' ).__of__( self.root )
         site.manage_permission( ACI, ROLES, acquire=1 )
-        exporter = self._makeOne( site )
+        configurator = self._makeOne( site )
 
-        self.assertEqual( len( exporter.listPermissions() ), 1 )
-        info = exporter.listPermissions()[ 0 ]
+        self.assertEqual( len( configurator.listPermissions() ), 1 )
+        info = configurator.listPermissions()[ 0 ]
         self.assertEqual( info[ 'name' ], ACI )
         self.assertEqual( info[ 'roles' ], ROLES )
         self.failUnless( info[ 'acquire' ] )
@@ -89,10 +89,10 @@ class RolemapConfiguratorTests( BaseRegistryTests ):
 
         site = Folder( id='site' ).__of__( self.root )
         site.manage_permission( ACI, ROLES )
-        exporter = self._makeOne( site )
+        configurator = self._makeOne( site )
 
-        self.assertEqual( len( exporter.listPermissions() ), 1 )
-        info = exporter.listPermissions()[ 0 ]
+        self.assertEqual( len( configurator.listPermissions() ), 1 )
+        info = configurator.listPermissions()[ 0 ]
         self.assertEqual( info[ 'name' ], ACI )
         self.assertEqual( info[ 'roles' ], ROLES )
         self.failIf( info[ 'acquire' ] )
@@ -101,9 +101,9 @@ class RolemapConfiguratorTests( BaseRegistryTests ):
 
         self.root.site = Folder( id='site' )
         site = self.root.site
-        exporter = self._makeOne( site ).__of__( site )
+        configurator = self._makeOne( site ).__of__( site )
 
-        self._compareDOM( exporter.generateXML(), _EMPTY_EXPORT )
+        self._compareDOM( configurator.generateXML(), _EMPTY_EXPORT )
 
     def test_generateXML_added_role( self ):
 
@@ -112,9 +112,9 @@ class RolemapConfiguratorTests( BaseRegistryTests ):
         existing_roles = list( getattr( site, '__ac_roles__', [] ) )[:]
         existing_roles.append( 'ZZZ' )
         site.__ac_roles__ = existing_roles
-        exporter = self._makeOne( site ).__of__( site )
+        configurator = self._makeOne( site ).__of__( site )
 
-        self._compareDOM( exporter.generateXML(), _ADDED_ROLE_EXPORT )
+        self._compareDOM( configurator.generateXML(), _ADDED_ROLE_EXPORT )
 
     def test_generateEXML_acquired_perm( self ):
 
@@ -123,9 +123,9 @@ class RolemapConfiguratorTests( BaseRegistryTests ):
 
         site = Folder( id='site' ).__of__( self.root )
         site.manage_permission( ACI, ROLES, acquire=1 )
-        exporter = self._makeOne( site ).__of__( site )
+        configurator = self._makeOne( site ).__of__( site )
 
-        self._compareDOM( exporter.generateXML(), _ACQUIRED_EXPORT )
+        self._compareDOM( configurator.generateXML(), _ACQUIRED_EXPORT )
 
     def test_generateEXML_unacquired_perm( self ):
 
@@ -137,9 +137,9 @@ class RolemapConfiguratorTests( BaseRegistryTests ):
         existing_roles.append( 'ZZZ' )
         site.__ac_roles__ = existing_roles
         site.manage_permission( ACI, ROLES )
-        exporter = self._makeOne( site ).__of__( site )
+        configurator = self._makeOne( site ).__of__( site )
 
-        self._compareDOM( exporter.generateXML(), _COMBINED_EXPORT )
+        self._compareDOM( configurator.generateXML(), _COMBINED_EXPORT )
 
     def test_generateEXML_unacquired_perm_added_role( self ):
 
@@ -148,35 +148,36 @@ class RolemapConfiguratorTests( BaseRegistryTests ):
 
         site = Folder( id='site' ).__of__( self.root )
         site.manage_permission( ACI, ROLES )
-        exporter = self._makeOne( site ).__of__( site )
+        configurator = self._makeOne( site ).__of__( site )
 
-        self._compareDOM( exporter.generateXML(), _UNACQUIRED_EXPORT )
+        self._compareDOM( configurator.generateXML(), _UNACQUIRED_EXPORT )
 
     def test_parseXML_empty( self ):
 
         self.root.site = Folder( id='site' )
         site = self.root.site
         existing_roles = list( getattr( site, '__ac_roles__', [] ) )[:]
-        exporter = self._makeOne( site )
+        configurator = self._makeOne( site )
 
-        exporter.parseXML( _EMPTY_EXPORT )
+        roles, permissions = configurator.parseXML( _EMPTY_EXPORT )
 
-        new_roles = list( getattr( site, '__ac_roles__', [] ) )[:]
-
-        existing_roles.sort()
-        new_roles.sort()
-
-        self.assertEqual( existing_roles, new_roles )
+        self.assertEqual( len( roles ), 4 )
+        self.assertEqual( len( permissions ), 0 )
 
     def test_parseXML_added_role( self ):
 
         self.root.site = Folder( id='site' )
         site = self.root.site
-        exporter = self._makeOne( site )
+        configurator = self._makeOne( site )
 
-        self.failIf( site._has_user_defined_role( 'ZZZ' ) )
-        exporter.parseXML( _ADDED_ROLE_EXPORT )
-        self.failUnless( site._has_user_defined_role( 'ZZZ' ) )
+        roles, permissions = configurator.parseXML( _ADDED_ROLE_EXPORT )
+
+        self.assertEqual( len( roles ), 5 )
+        self.failUnless( 'Anonymous' in roles )
+        self.failUnless( 'Authenticated' in roles )
+        self.failUnless( 'Manager' in roles )
+        self.failUnless( 'Owner' in roles )
+        self.failUnless( 'ZZZ' in roles )
 
     def test_parseXML_acquired_permission( self ):
 
@@ -184,25 +185,20 @@ class RolemapConfiguratorTests( BaseRegistryTests ):
 
         self.root.site = Folder( id='site' )
         site = self.root.site
-        exporter = self._makeOne( site )
+        configurator = self._makeOne( site )
 
-        existing_allowed = [ x[ 'name' ]
-                                for x in site.rolesOfPermission( ACI )
-                                if x[ 'selected' ] ]
+        roles, permissions = configurator.parseXML( _ACQUIRED_EXPORT )
 
-        self.assertEqual( existing_allowed, [ 'Manager' ] )
-    
-        self.failUnless( site.acquiredRolesAreUsedBy( ACI ) )
+        self.assertEqual( len( permissions ), 1 )
+        permission = permissions[ 0 ]
 
-        exporter.parseXML( _ACQUIRED_EXPORT )
+        self.assertEqual( permission[ 'name' ], ACI )
+        self.failUnless( permission[ 'acquire' ] )
 
-        new_allowed = [ x[ 'name' ]
-                           for x in site.rolesOfPermission( ACI )
-                           if x[ 'selected' ] ]
-
-        self.assertEqual( new_allowed, [ 'Manager', 'Owner' ] )
-    
-        self.failUnless( site.acquiredRolesAreUsedBy( ACI ) )
+        p_roles = permission[ 'roles' ]
+        self.assertEqual( len( p_roles ), 2 )
+        self.failUnless( 'Manager' in p_roles )
+        self.failUnless( 'Owner' in p_roles )
 
     def test_parseXML_unacquired_permission( self ):
 
@@ -210,25 +206,20 @@ class RolemapConfiguratorTests( BaseRegistryTests ):
 
         self.root.site = Folder( id='site' )
         site = self.root.site
-        exporter = self._makeOne( site )
+        configurator = self._makeOne( site )
 
-        existing_allowed = [ x[ 'name' ]
-                                for x in site.rolesOfPermission( ACI )
-                                if x[ 'selected' ] ]
+        roles, permissions = configurator.parseXML( _UNACQUIRED_EXPORT )
 
-        self.assertEqual( existing_allowed, [ 'Manager' ] )
-    
-        self.failUnless( site.acquiredRolesAreUsedBy( ACI ) )
+        self.assertEqual( len( permissions ), 1 )
+        permission = permissions[ 0 ]
 
-        exporter.parseXML( _UNACQUIRED_EXPORT )
+        self.assertEqual( permission[ 'name' ], ACI )
+        self.failIf( permission[ 'acquire' ] )
 
-        new_allowed = [ x[ 'name' ]
-                           for x in site.rolesOfPermission( ACI )
-                           if x[ 'selected' ] ]
-
-        self.assertEqual( new_allowed, [ 'Manager', 'Owner' ] )
-    
-        self.failIf( site.acquiredRolesAreUsedBy( ACI ) )
+        p_roles = permission[ 'roles' ]
+        self.assertEqual( len( p_roles ), 2 )
+        self.failUnless( 'Manager' in p_roles )
+        self.failUnless( 'Owner' in p_roles )
 
     def test_parseXML_unacquired_permission_added_role( self ):
 
@@ -236,27 +227,29 @@ class RolemapConfiguratorTests( BaseRegistryTests ):
 
         self.root.site = Folder( id='site' )
         site = self.root.site
-        exporter = self._makeOne( site )
+        configurator = self._makeOne( site )
 
-        existing_allowed = [ x[ 'name' ]
-                                for x in site.rolesOfPermission( ACI )
-                                if x[ 'selected' ] ]
+        roles, permissions = configurator.parseXML( _COMBINED_EXPORT )
 
-        self.assertEqual( existing_allowed, [ 'Manager' ] )
-    
-        self.failUnless( site.acquiredRolesAreUsedBy( ACI ) )
+        self.assertEqual( len( roles ), 5 )
+        self.failUnless( 'Anonymous' in roles )
+        self.failUnless( 'Authenticated' in roles )
+        self.failUnless( 'Manager' in roles )
+        self.failUnless( 'Owner' in roles )
+        self.failUnless( 'ZZZ' in roles )
 
-        self.failIf( site._has_user_defined_role( 'ZZZ' ) )
-        exporter.parseXML( _COMBINED_EXPORT )
-        self.failUnless( site._has_user_defined_role( 'ZZZ' ) )
+        self.assertEqual( len( permissions ), 1 )
+        permission = permissions[ 0 ]
 
-        new_allowed = [ x[ 'name' ]
-                           for x in site.rolesOfPermission( ACI )
-                           if x[ 'selected' ] ]
+        self.assertEqual( permission[ 'name' ], ACI )
+        self.failIf( permission[ 'acquire' ] )
 
-        self.assertEqual( new_allowed, [ 'Manager', 'Owner', 'ZZZ' ] )
-    
-        self.failIf( site.acquiredRolesAreUsedBy( ACI ) )
+        p_roles = permission[ 'roles' ]
+        self.assertEqual( len( p_roles ), 3 )
+        self.failUnless( 'Manager' in p_roles )
+        self.failUnless( 'Owner' in p_roles )
+        self.failUnless( 'ZZZ' in p_roles )
+
 
 
 _EMPTY_EXPORT = """\

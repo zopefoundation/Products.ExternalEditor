@@ -65,7 +65,29 @@ def importRolemap( context ):
     if text is not None:
 
         rc = RolemapConfigurator( site ).__of__( site )
-        rc.parseXML( text )
+        roles, permissions = rc.parseXML( text )
+
+        immediate_roles = list( getattr( site, '__ac_roles__', [] ) )[:]
+        already = {}
+
+        for role in site.valid_roles():
+            already[ role ] = 1
+
+        for role in roles:
+
+            if already.get( role ) is None:
+                immediate_roles.append( role )
+                already[ role ] = 1
+
+        immediate_roles.sort()
+        site.__ac_roles__ = tuple( immediate_roles )
+
+        for permission in permissions:
+
+            site.manage_permission( permission[ 'name' ]
+                                  , permission[ 'roles' ]
+                                  , permission[ 'acquire' ]
+                                  )
 
     return 'Role / permission map imported.'
 
@@ -183,26 +205,7 @@ class RolemapConfigurator( Implicit ):
         parser = _RolemapParser()
         parseString( text, parser )
 
-        immediate_roles = list( getattr( self._site, '__ac_roles__', [] ) )[:]
-        already = {}
-        for role in self._site.valid_roles():
-            already[ role ] = 1
-
-        for role in parser._roles:
-
-            if already.get( role ) is None:
-                immediate_roles.append( role )
-                already[ role ] = 1
-
-        immediate_roles.sort()
-        self._site.__ac_roles__ = tuple( immediate_roles )
-
-        for permission in parser._permissions:
-
-            self._site.manage_permission( permission[ 'name' ]
-                                        , permission[ 'roles' ]
-                                        , permission[ 'acquire' ]
-                                        )
+        return parser._roles, parser._permissions
 
 InitializeClass( RolemapConfigurator )
 
