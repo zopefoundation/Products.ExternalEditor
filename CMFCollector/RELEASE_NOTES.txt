@@ -9,6 +9,9 @@ CMF Collector Update Notes
   the collector version as indicated by the VERSION.text file in the
   same directory.
 
+  See KNOWN_PROBLEMS.txt for currently obtaining bugs and problems to
+  be aware of.
+
   Version 0.9a, Oct 25, 2001
 
     - This version requires two installation changes.
