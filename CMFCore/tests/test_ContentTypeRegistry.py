@@ -1,5 +1,6 @@
 import Zope
 import unittest
+import re
 from Products.CMFCore.ContentTypeRegistry import *
 
 class MimeTypePredicateTests( unittest.TestCase ):
@@ -23,7 +24,7 @@ class MimeTypePredicateTests( unittest.TestCase ):
         assert pred( 'foo', 'text/plain', 'asdfljksadf' )
         assert pred( 'foo', 'text/html', 'asdfljksadf' )
         assert not pred( 'foo', 'image/png', 'asdfljksadf' )
-
+    
 class NamePredicateTests( unittest.TestCase ):
 
     def test_empty( self ):
@@ -46,12 +47,42 @@ class NamePredicateTests( unittest.TestCase ):
         assert pred( 'foo', 'text/plain', 'asdfljksadf' )
         assert pred( 'fargo', 'text/plain', 'asdfljksadf' )
         assert not pred( 'bar', 'text/plain', 'asdfljksadf' )
-        
+    
+class ContentTypeRegistryTests( unittest.TestCase ):
+
+    def test_empty( self ):
+        reg = ContentTypeRegistry()
+        assert reg.findTypeName( 'foo', 'text/plain', 'asdfljksadf' ) is None
+        assert reg.findTypeName( 'fargo', 'text/plain', 'asdfljksadf' ) is None
+        assert reg.findTypeName( 'bar', 'text/plain', 'asdfljksadf' ) is None
+        assert not reg.listPredicates()
+        self.assertRaises( KeyError, reg.removePredicate, 'xyzzy' )
+    
+    def test_reorder( self ):
+        reg = ContentTypeRegistry()
+        predIDs = ( 'foo', 'bar', 'baz', 'qux' )
+        for predID in predIDs:
+            reg.addPredicate( predID, 'name' )
+        ids = tuple( map( lambda x: x[0], reg.listPredicates() ) )
+        assert ids == predIDs
+        reg.reorderPredicate( 'bar', 3 )
+        ids = tuple( map( lambda x: x[0], reg.listPredicates() ) )
+        assert ids == ( 'foo', 'baz', 'qux', 'bar' )
+
+    def test_lookup( self ):
+        reg = ContentTypeRegistry()
+        reg.addPredicate( 'onlyfoo', 'name' )
+        reg.getPredicate( 'onlyfoo' ).edit( 'foo' )
+        reg.assignTypeName( 'onlyfoo', 'Foo' )
+        assert reg.findTypeName( 'foo', 'text/plain', 'asdfljksadf' ) == 'Foo'
+        assert not reg.findTypeName( 'fargo', 'text/plain', 'asdfljksadf' )
+        assert not reg.findTypeName( 'bar', 'text/plain', 'asdfljksadf' )
 
 def test_suite():
     suite = unittest.TestSuite()
     suite.addTest( unittest.makeSuite( MimeTypePredicateTests ) )
     suite.addTest( unittest.makeSuite( NamePredicateTests ) )
+    suite.addTest( unittest.makeSuite( ContentTypeRegistryTests ) )
     return suite
 
 def run():

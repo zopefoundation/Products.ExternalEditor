@@ -92,6 +92,7 @@ import ActionsTool, UndoTool, RegistrationTool, SkinsTool
 import MemberDataTool, TypesTool
 import DirectoryView, FSDTMLMethod, FSImage, FSPropertiesObject, FSPythonScript
 import CookieCrumbler
+import ContentTypeRegistry
 import utils
 
 ADD_FOLDERS_PERMISSION = 'Add portal folders'
@@ -146,6 +147,12 @@ def initialize(context):
         constructors=(CookieCrumbler.manage_addCCForm,
                       CookieCrumbler.manage_addCC),
         icon = 'images/cookie.gif'
+        )
+
+    context.registerClass(
+        ContentTypeRegistry.ContentTypeRegistry,
+        constructors=( ContentTypeRegistry.manage_addRegistry, ),
+        icon = 'images/registry.gif'
         )
 
     utils.registerIcon(FSDTMLMethod.FSDTMLMethod,

@@ -102,6 +102,27 @@ class ContentTypeRegistryPredicate( Base ):
             Return true if the rule matches, else false.
         """
 
+    def getTypeLabel( self ):
+        """
+            Return a human-readable label for the predicate type.
+        """
+    
+    def edit( self, **kw ):
+        """
+            Update the predicate.
+        """
+
+    def predicateWidget( self ):
+        """
+            Return a snipped of HTML suitable for editing the
+            predicate;  the snippet should arrange for values
+            to be marshalled by ZPublisher as a ':record', with
+            the ID of the predicate as the name of the record.
+
+            The registry will call the predictate's 'edit' method,
+            passing the fields of the record.
+        """
+
 class ContentTypeRegistry( Base ):
     """
         Registry for rules which map PUT args to a CMF Type Object.
