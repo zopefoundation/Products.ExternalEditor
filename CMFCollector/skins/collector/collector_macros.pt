@@ -142,8 +142,8 @@
          <tr>
            <td> </td>
            <td>
-             (<em><span metal:define-slot="issue_submitter_id_slot"
-                        tal:content="here/submitter_id">ID</span></em>)
+             <em><span metal:define-slot="issue_submitter_id_slot"
+                        tal:content="here/submitter_id">ID</span></em>
            </td>
            <td tal:define="actions here/action_number" align="right">
              Last update:
@@ -183,7 +183,8 @@
            <td align="right"> Version info: </td>
            <td metal:define-slot="issue_version_info_slot"
                colspan="3"
-               tal:content="here/version_info">
+               tal:content="python: here.version_info[:120]
+                              + ((here.version_info[121:] and '...') or '')">
              VERSION_INFO
            </td>
          </tr>
