@@ -127,6 +127,13 @@ class PortalContent(DynamicType, SimpleItem):
 
     security.declareObjectProtected(CMFCorePermissions.View)
 
+    # The security for FTP methods aren't set up by default in our
+    # superclasses...  :(
+    security.declareProtected(CMFCorePermissions.FTPAccess,
+                              'manage_FTPstat',
+                              'manage_FTPget',
+                              'manage_FTPlist',)
+
     # indexed methods
     # ---------------
     
