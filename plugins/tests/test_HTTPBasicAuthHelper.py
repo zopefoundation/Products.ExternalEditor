@@ -50,7 +50,6 @@ class FauxHTTPResponse:
 class HTTPBasicAuthHelperTests( unittest.TestCase
                               , ILoginPasswordHostExtractionPlugin_conformance
                               , IChallengePlugin_conformance
-                              , ICredentialsUpdatePlugin_conformance
                               , ICredentialsResetPlugin_conformance
                               ):
 
