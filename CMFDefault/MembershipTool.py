@@ -79,7 +79,7 @@ class MembershipTool ( Products.CMFCore.MembershipTool.MembershipTool ):
                             , title='Add to favorites'
                             , description='Add this item to your favorites'
                             , action=Expression(
-            text='string: ${portal_url}/addtoFavorites')
+            text='string: ${object_url}/addtoFavorites')
                             , permissions=(View,)
                             , category='user'
                             , condition=Expression(
