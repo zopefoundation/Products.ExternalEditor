@@ -17,6 +17,7 @@ $Id$
 
 import Globals
 from AccessControl import ClassSecurityInfo
+from StructuredText.StructuredText import HTML
 
 from permissions import FTPAccess
 from permissions import View
@@ -26,7 +27,6 @@ from DirectoryView import registerMetaType
 from FSObject import FSObject
 from utils import _dtmldir
 from utils import expandpath
-from utils import format_stx
 
 
 class FSSTXMethod( FSObject ):
@@ -98,7 +98,7 @@ class FSSTXMethod( FSObject ):
 
     def cook( self ):
         if not hasattr( self, '_v_cooked' ):
-            self._v_cooked = format_stx( text=self.raw )
+            self._v_cooked = HTML(self.raw, level=1, header=0)
         return self._v_cooked
 
     _default_template = Globals.HTML( """\

@@ -47,6 +47,7 @@ from OFS.PropertySheets import PropertySheets
 from OFS.SimpleItem import SimpleItem
 from Products.PageTemplates.Expressions import getEngine
 from Products.PageTemplates.Expressions import SecureModuleImporter
+from StructuredText.StructuredText import HTML
 
 from exceptions import AccessControl_Unauthorized
 from exceptions import NotFound
@@ -605,45 +606,14 @@ def registerIcon(klass, iconspec, _prefix=None):
         setattr(misc_images, pid, MiscImage(pid, {}))
     getattr(misc_images, pid)[name]=icon
 
-#
-#   StructuredText handling.
-#
-#   XXX:    This section is mostly workarounds for things fixed in the
-#           core, and should go away soon.
-#
-from StructuredText import Basic as STXBasic
-from StructuredText import DocumentWithImages
-from StructuredText.HTMLClass import HTMLClass
-from StructuredText.HTMLWithImages import HTMLWithImages
-
-class _CMFHtmlWithImages( HTMLWithImages ):
-    """ Special subclass of HTMLWithImages, overriding document() """
-
-    def document(self, doc, level, output):
-        """\
-        HTMLWithImages.document renders full HTML (head, title, body).  For
-        CMF Purposes, we don't want that.  We just want those nice juicy
-        body parts perfectly rendered.
-        """
-        for c in doc.getChildNodes():
-           getattr(self, self.element_types[c.getNodeName()])(c, level, output)
-
-CMFHtmlWithImages = _CMFHtmlWithImages()
-
 security.declarePublic('format_stx')
 def format_stx( text, level=1 ):
+    """ Render STX to HTML.
     """
-        Render STX to HTML.
-    """
-    st = STXBasic( text )   # Creates the basic DOM
-    if not st:              # If it's an empty object
-        return ""           # return now or have errors!
-
-    doc = DocumentWithImages( st )
-    html = CMFHtmlWithImages( doc, level )
-    return html
-
-_format_stx = format_stx    # XXX: Deprecated spelling
+    warn('format_stx() will be removed in CMF 1.6. Please use '
+         'StructuredText.StructuredText.HTML instead.',
+         DeprecationWarning)
+    return HTML(text, level=level, header=0)
 
 #
 #   Metadata Keyword splitter utilities

@@ -21,10 +21,9 @@ from AccessControl import ClassSecurityInfo
 from AccessControl import getSecurityManager
 from Acquisition import aq_base
 from DocumentTemplate.DT_Util import html_quote
-from StructuredText.HTMLWithImages import HTMLWithImages
+from StructuredText.StructuredText import HTML
 
 from Products.CMFCore.PortalContent import PortalContent
-from Products.CMFCore.utils import format_stx
 from Products.CMFCore.utils import keywordsplitter
 
 from DublinCore import DefaultDublinCoreImpl
@@ -78,20 +77,6 @@ def addDocument(self, id, title='', description='', text_format='',
     """ Add a Document """
     o = Document(id, title, description, text_format, text)
     self._setObject(id,o)
-
-
-class CMFHtmlWithImages(HTMLWithImages):
-    """ Special subclass of HTMLWithImages, overriding document() """
-    def document(self, doc, level, output):
-        """\
-        HTMLWithImages.document renders full HTML (head, title, body).  For
-        CMF Purposes, we don't want that.  We just want those nice juicy
-        body parts perfectly rendered.
-        """
-        for c in doc.getChildNodes():
-           getattr(self, self.element_types[c.getNodeName()])(c, level, output)
-
-CMFHtmlWithImages = CMFHtmlWithImages()
 
 
 class Document(PortalContent, DefaultDublinCoreImpl):
@@ -156,7 +141,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
         elif text_format == 'plain':
             self.cooked_text = html_quote(text).replace('\n', '<br />')
         else:
-            self.cooked_text = format_stx(text=text, level=self._stx_level)
+            self.cooked_text = HTML(text, level=self._stx_level, header=0)
 
     security.declareProtected(ModifyPortalContent, 'edit')
     def edit( self
@@ -308,7 +293,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
             or (stx_level == self._stx_level)):
             return self.cooked_text
         else:
-            cooked = format_stx(self.text, stx_level)
+            cooked = HTML(self.text, level=stx_level, header=0)
             if setlevel:
                 self._stx_level = stx_level
                 self.cooked_text = cooked

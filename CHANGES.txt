@@ -179,6 +179,9 @@ CMF 1.5alpha (unreleased)
 
   Bug Fixes
 
+    - CMFCore utils: Marked 'format_stx' function as deprecated.
+      It's no longer necessary to work around default STX handling.
+
     - DirectoryView: Refactored path handling.
       Should now work with any products path setup. (Collector #210)
 
