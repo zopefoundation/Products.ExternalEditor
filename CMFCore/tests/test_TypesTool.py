@@ -75,6 +75,10 @@ class UnitTestUser( Acquisition.Implicit ):
     
     getUserName = getId
 
+    def has_permission(self, permission, obj):
+        # For types tool tests dealing with filtered_meta_types
+        return 1
+
     def allowed( self, object, object_roles=None ):
         # for testing permissions on actions
         if object.getId() == 'actions_dummy':
@@ -104,6 +108,10 @@ def addDummy( self, id ):
 
 def extra_meta_types():
     return (  { 'name' : 'Dummy', 'action' : 'manage_addFolder' }, )
+
+class DummyTypeInfo(TypeInformation):
+    """ new class of type info object """
+    meta_type = "Dummy Test Type Info"
 
 class TypesToolTests( unittest.TestCase ):
 
@@ -182,10 +190,34 @@ class TypesToolTests( unittest.TestCase ):
         custom_view = utils._getViewFor( dummy, view='view2' )()
         unpermitted_view = utils._getViewFor( dummy, view='edit' )()
 
-        assert default_view == 'view'
-        assert custom_view == 'view2'
-        assert unpermitted_view != 'edit'
-        assert unpermitted_view == 'view'
+        self.failUnlessEqual(default_view, 'view')
+        self.failUnlessEqual(custom_view, 'view2')
+        self.failIf(unpermitted_view == 'edit')
+        self.failUnlessEqual(unpermitted_view, 'view')
+
+    def test_AddingOtherTypeInfos(self):
+        addTypeFactory(DummyTypeInfo)
+        tool = self.root.portal_types
+        type_type = DummyTypeInfo.meta_type
+
+        fmt = [ mt['name'] for mt in tool.filtered_meta_types() ]
+        self.failUnless(DummyTypeInfo.meta_type in fmt,
+                        "Subfactory meta type not registered")
+
+        atif = tool.manage_addTypeInfoForm(self.root.REQUEST,
+                                           type_type=type_type)
+        self.failUnless(atif.find(type_type) > -1,
+                        "'%s' not found in type info form" % type_type)
+
+        tool.manage_addTypeInformation(id='foo_default', type_type=None)
+        fd = tool.foo_default
+        self.failUnless(isinstance(fd, FactoryTypeInformation))
+        self.failIf(isinstance(fd, DummyTypeInfo))
+
+        tool.manage_addTypeInformation(id='foo_sub', type_type=type_type)
+        fs = tool.foo_sub
+        self.failUnless(isinstance(fs, DummyTypeInfo), fs.__class__)
+        
 
 class TypeInfoTests( unittest.TestCase ):
     
@@ -539,6 +571,8 @@ class FTIConstructionTests_w_Roles( unittest.TestCase ):
         ti.constructInstance( folder, 'dust' )
         majyk_dust = folder._getOb( 'majyk_dust' )
         self.assertEqual( majyk_dust.id, 'majyk_dust' )
+
+
 
 def test_suite():
     suite = unittest.TestSuite()

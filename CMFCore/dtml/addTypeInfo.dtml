@@ -1,5 +1,4 @@
-<dtml-let form_title="scriptable and 'Add Scriptable Type Information'
-                      or 'Add Factory-based Type Information'">
+<dtml-let form_title="'Add %s' % type_type or 'Factory-based Type Information'">
 <dtml-if manage_page_header>
   <dtml-var manage_page_header>
   <dtml-var manage_form_title>
@@ -11,7 +10,7 @@
 </dtml-let>
 
 <form action="manage_addTypeInformation" method="POST">
-<input type="hidden" name="scriptable" value="&dtml-scriptable;" />
+<input type="hidden" name="type_type" value="&dtml.missing-type_type;" />
 <table cellspacing="0" cellpadding="2" border="0">
   <tr>
     <td align="left" valign="top">

@@ -21,6 +21,7 @@ import OFS
 from Globals import InitializeClass, DTMLFile
 from utils import UniqueObject, SimpleItemWithProperties, tuplize
 from utils import _dtmldir, _checkPermission, cookString
+import urllib
 import string
 from AccessControl import getSecurityManager, ClassSecurityInfo
 from Acquisition import aq_base
@@ -32,6 +33,22 @@ from Expression import Expression
 from CMFCorePermissions import View, ManagePortal, AccessContentsInformation
 
 _marker = []  # Create a new marker.
+
+
+_type_factories = {}
+allowedTypes = ( 'Script (Python)'
+               , 'Python Method'
+               , 'DTML Method'
+               , 'External Method'
+               )
+
+def addTypeFactory(factory, id=None):
+    # modeled after WorkflowTool.addWorkflowFactory()
+    global allowedTypes
+    if id is None:
+        id = getattr(factory, 'id', '') or getattr(factory, 'meta_type', '')
+    _type_factories[id] = factory
+    allowedTypes = allowedTypes + (factory.meta_type,)
 
 class TypeInformation (SimpleItemWithProperties):
     """
@@ -434,7 +451,7 @@ class FactoryTypeInformation (TypeInformation):
         return ob
 
 InitializeClass( FactoryTypeInformation )
-
+addTypeFactory(FactoryTypeInformation)
 
 class ScriptableTypeInformation( TypeInformation ):
     """
@@ -489,20 +506,13 @@ class ScriptableTypeInformation( TypeInformation ):
         return ob
 
 InitializeClass( ScriptableTypeInformation )
-
+addTypeFactory(ScriptableTypeInformation)
 
 # Provide aliases for backward compatibility.
 ContentFactoryMetadata = FactoryTypeInformation
 ContentTypeInformation = ScriptableTypeInformation
 
 
-allowedTypes = ( 'Script (Python)'
-               , 'Python Method'
-               , 'DTML Method'
-               , 'External Method'
-               , FactoryTypeInformation.meta_type
-               , ScriptableTypeInformation.meta_type
-               )
 
 class TypesTool( UniqueObject, OFS.Folder.Folder, ActionProviderBase ):
     """
@@ -537,14 +547,16 @@ class TypesTool( UniqueObject, OFS.Folder.Folder, ActionProviderBase ):
 
     def all_meta_types(self):
         all = TypesTool.inheritedAttribute('all_meta_types')(self)
-        return (
-            {'name':FactoryTypeInformation.meta_type,
-             'action':'manage_addFactoryTIForm',
-             'permission':'Manage portal'},
-            {'name':ScriptableTypeInformation.meta_type,
-             'action':'manage_addScriptableTIForm',
-             'permission':'Manage portal'},
-            ) + tuple(all)
+        factypes = []
+        for name, fac in _type_factories.items():
+            query = urllib.urlencode({'type_type': name})
+            factypes.append({
+                'name': fac.meta_type,
+                'action': 'manage_addTypeInfoForm?%s' % query,
+                'permission': CMFCorePermissions.ManagePortal,
+                })
+        factypes.extend(all)
+        return factypes
 
     def filtered_meta_types(self, user=None):
         # Filters the list of available meta types.
@@ -579,24 +591,17 @@ class TypesTool( UniqueObject, OFS.Folder.Folder, ActionProviderBase ):
 
     _addTIForm = DTMLFile( 'addTypeInfo', _dtmldir )
 
-    security.declareProtected(ManagePortal, 'manage_addFactoryTIForm')
-    def manage_addFactoryTIForm(self, REQUEST):
-        ' '
-        return self._addTIForm(self, REQUEST, scriptable='',
-                               types=self.listDefaultTypeInformation())
-
-    security.declareProtected(ManagePortal, 'manage_addScriptableTIForm')
-    def manage_addScriptableTIForm(self, REQUEST):
-        ' '
-        return self._addTIForm(self, REQUEST, scriptable='1',
+    security.declareProtected(ManagePortal, 'manage_addTypeInfoForm')
+    def manage_addTypeInfoForm(self, REQUEST={}, type_type=''):
+        """ Return the type info form while keeping the list of
+        prefab type information up to date """
+        return self._addTIForm(self, REQUEST, type_type=type_type,
                                types=self.listDefaultTypeInformation())
 
     security.declareProtected(ManagePortal, 'manage_addTypeInformation')
-    def manage_addTypeInformation(self, id=None, scriptable='',
+    def manage_addTypeInformation(self, id=None, type_type=None,
                                   typeinfo_name=None, RESPONSE=None):
-        """
-        Create a TypeInformation in self.
-        """
+        """ Create a TypeInformation in self. """
         fti = None
         if typeinfo_name:
             info = self.listDefaultTypeInformation()
@@ -610,8 +615,9 @@ class TypesTool( UniqueObject, OFS.Folder.Folder, ActionProviderBase ):
                 id = fti.get('id', None)
         if not id:
             raise 'Bad Request', 'An id is required.'
-        if scriptable:
-            klass = ScriptableTypeInformation
+
+        if type_type in _type_factories.keys():
+            klass = _type_factories[type_type]
         else:
             klass = FactoryTypeInformation
         id = str(id)
