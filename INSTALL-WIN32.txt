@@ -117,3 +117,10 @@ Zope External Editor Installation
       it does not do this. Unfortunately, many MDI applications do this and
       cannot be configured otherwise. To solve this problem, a plug-in must
       be developed for the application. See the README file for more details.
+      
+    - If you are using IE connecting to Zope over SSL (HTTPS), and you receive
+      errors that the file could not be opened or downloaded, or you receive
+      errors from External Editor that the file was not found. Have a look
+      at the following MS support article::
+      
+        http://support.microsoft.com/default.aspx?scid=kb;en-us;302109

@@ -1,5 +1,10 @@
 External Editor Change Log
 
+  0.8 Release
+  
+    - Added tip for configuring IE to save files over SSL. Thanks to
+      Jonah Bossewitch.
+
   4/1/03 - 0.7 Release
 
     - Added working distutils setup for Unix.
