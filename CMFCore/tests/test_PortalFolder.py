@@ -19,6 +19,7 @@ from Products.CMFCore.tests.base.tidata import FTIDATA_DUMMY
 from Products.CMFCore.tests.base.utils import has_path
 from Products.CMFCore.TypesTool import FactoryTypeInformation as FTI
 from Products.CMFCore.TypesTool import TypesTool
+from Products.CMFCore.exceptions import BadRequest
 
 
 def extra_meta_types():
@@ -367,6 +368,31 @@ class PortalFolderTests( SecurityTest ):
         assert not has_path( catalog._catalog, '/test/sub1/dummy' )
         assert has_path( catalog._catalog, '/test/sub2/dummy' )
         assert has_path( catalog._catalog, '/test/sub3/dummy' )
+
+    def test_setObjectRaisesBadRequest(self):
+        #
+        #   _setObject() should raise BadRequest on duplicate id
+        #
+        test = self.root.test
+        test._setObject('foo', DummyContent('foo'))
+        self.assertRaises(BadRequest, test._setObject, 'foo', 
+                                      DummyContent('foo'))
+
+    def test_checkIdRaisesBadRequest(self):
+        #
+        #   _checkId() should raise BadRequest on duplicate id
+        #
+        test = self.root.test
+        test._setObject('foo', DummyContent('foo'))
+        self.assertRaises(BadRequest, test._checkId, 'foo')
+
+    def test_checkIdAvailableCatchesBadRequest(self):
+        #
+        #   checkIdAvailable() should catch BadRequest
+        #
+        test = self.root.test
+        test._setObject('foo', DummyContent('foo'))
+        self.failIf(test.checkIdAvailable('foo'))
 
 
 class ContentFilterTests( TestCase ):

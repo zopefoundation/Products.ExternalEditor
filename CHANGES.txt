@@ -29,6 +29,8 @@ CMF 1.5.0-beta (unreleased)
       
   Bug Fixes
 
+    - CMFCore.PortalFolder: Fixed missing import of BadRequest exception.
+
     - DCWorkflow DefaultWorkflowClassic: Fixed 'pending' state permissions.
 
     - CMFSetup: Refactored actions, type-infos and workflow definition.

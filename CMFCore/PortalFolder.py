@@ -31,6 +31,7 @@ from CMFCatalogAware import CMFCatalogAware
 from DynamicType import DynamicType
 from exceptions import AccessControl_Unauthorized
 from exceptions import zExceptions_Unauthorized
+from exceptions import BadRequest
 from permissions import AddPortalContent
 from permissions import AddPortalFolders
 from permissions import ChangeLocalRoles
