@@ -85,29 +85,23 @@
 """Customizable Python scripts that come from the filesystem."""
 __version__='$Revision$'[11:-2]
 
-import Globals
-from Globals import DTMLFile
-import Acquisition
-from AccessControl import getSecurityManager
-from OFS.SimpleItem import Item
-from DirectoryView import registerFileExtension, registerMetaType, expandpath
 from string import split
 from os import path, stat
-from DateTime import DateTime
-from AccessControl import ClassSecurityInfo
-from CMFCorePermissions import ViewManagementScreens
-import CMFCorePermissions
 
+import Globals
+from AccessControl import ClassSecurityInfo, getSecurityManager
 from Products.PythonScripts.PythonScript import PythonScript
 from Shared.DC.Scripts.Script import Script, defaultBindings
 
+from CMFCorePermissions import ViewManagementScreens, View, FTPAccess
+from DirectoryView import registerFileExtension, registerMetaType, expandpath
+from FSObject import FSObject
 
-class FSPythonScript (Script, Acquisition.Implicit, Item):
+class FSPythonScript (FSObject, Script):
     """FSPythonScripts act like Python Scripts but are not directly
     modifiable from the management interface."""
 
     meta_type = 'Filesystem Script (Python)'
-    title = ''
     _params = _body = ''
 
     manage_options=(
@@ -121,65 +115,34 @@ class FSPythonScript (Script, Acquisition.Implicit, Item):
 
     # Use declarative security
     security = ClassSecurityInfo()
-    security.declareObjectProtected(CMFCorePermissions.View)
-    security.declareProtected(CMFCorePermissions.View, 'index_html',)
-
-    _file_mod_time = 0
+    security.declareObjectProtected(View)
+    security.declareProtected(View, 'index_html',)
 
     def __init__(self, id, filepath, fullname=None, properties=None):
-        self.id = id
-        if properties:
-            # Since props come from the filesystem, this should be
-            # safe.
-            self.__dict__.update(properties)
-        self._filepath = filepath
+        FSObject.__init__(self, id, filepath, fullname, properties)
         self.ZBindings_edit(defaultBindings)
-        self._updateFromFS(1)
 
     security.declareProtected(ViewManagementScreens, 'manage_main')
-    manage_main = DTMLFile('dtml/custpy', globals())
+    manage_main = Globals.DTMLFile('dtml/custpy', globals())
 
-    security.declareProtected(ViewManagementScreens, 'manage_doCustomize')
-    def manage_doCustomize(self, folder_path, body=None, RESPONSE=None):
-        '''
-        Makes a PythonScript with the same code.
-        '''
-        custFolder = self.getCustomizableObject()
-        fpath = tuple(split(folder_path, '/'))
-        folder = self.restrictedTraverse(fpath)
-        if body is None:
-            body = self.read()
-        id = self.getId()
-        obj = PythonScript(id)
-        folder._verifyObjectPaste(obj, validate_src=0)
-        folder._setObject(id, obj)
-        obj = folder._getOb(id)
-        obj.write(body)
-        if RESPONSE is not None:
-            RESPONSE.redirect('%s/%s/manage_main' % (
-                folder.absolute_url(), id))
+    def _createZODBClone(self):
+        """Create a ZODB (editable) equivalent of this object."""
+        obj = PythonScript(self.getId())
+        obj.write(self.read())
+        return obj
 
-    security.declareProtected(ViewManagementScreens, 'getMethodFSPath')
-    def getMethodFSPath(self):
-        return self._filepath
-
-    def _updateFromFS(self, force=0):
-        if force or Globals.DevelopmentMode:
-            fp = expandpath(self._filepath)
-            try:    mtime=stat(fp)[8]
-            except: mtime=0
-            if force or mtime != self._file_mod_time:
-                self._file_mod_time = mtime
-                fp = expandpath(self._filepath)
-                file = open(fp, 'rb')
-                try: data = file.read()
-                finally: file.close()
-                self._write(data)
-                self._makeFunction(1)
-
-    def getId(self):
-        self._updateFromFS()
-        return self.id
+    def _readFile(self):
+        """Read the data from the filesystem.
+        
+        Read the file (indicated by exandpath(self._filepath), and parse the
+        data if necessary.
+        """
+        fp = expandpath(self._filepath)
+        file = open(fp, 'rb')
+        try: data = file.read()
+        finally: file.close()
+        self._write(data)
+        self._makeFunction(1)
 
     def _validateProxy(self, roles=None):
         pass
@@ -227,17 +190,14 @@ class FSPythonScript (Script, Acquisition.Implicit, Item):
     read = PythonScript.read
     document_src = PythonScript.document_src
     PrincipiaSearchSource = PythonScript.PrincipiaSearchSource
-    manage_FTPget = PythonScript.manage_FTPget
     params = PythonScript.params
     body = PythonScript.body
     get_size = PythonScript.get_size
 
-    _write = PythonScript.write
+    security.declareProtected(FTPAccess, 'manage_FTPget')
+    manage_FTPget = PythonScript.manage_FTPget
 
-    def getModTime(self):
-        '''
-        '''
-        return DateTime(self._file_mod_time)
+    _write = PythonScript.write
 
     def ZCacheable_invalidate(self):
         # Waaa

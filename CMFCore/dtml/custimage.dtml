@@ -33,7 +33,7 @@
         <em>Source file</em>
         </th>
 	<td align="left" valign="top">
-        &dtml-getImageFSPath;
+        &dtml-getObjectFSPath;
 	</td>
       </tr>
       <tr>

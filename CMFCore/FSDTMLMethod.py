@@ -85,27 +85,23 @@
 """Customizable DTML methods that come from the filesystem."""
 __version__='$Revision$'[11:-2]
 
-import Globals
-from Globals import HTML, HTMLFile
-from OFS.DTMLMethod import DTMLMethod, decapitate, guess_content_type
-import Acquisition
-from AccessControl import getSecurityManager
-from OFS.SimpleItem import Item_w__name__
-from DirectoryView import registerFileExtension, registerMetaType, expandpath
 from string import split
 from os import path, stat
-from DateTime import DateTime
-from AccessControl import ClassSecurityInfo
-from CMFCorePermissions import View, ViewManagementScreens
-import CMFCorePermissions
+
+import Globals
+from AccessControl import ClassSecurityInfo, getSecurityManager, Permissions
+from OFS.DTMLMethod import DTMLMethod, decapitate, guess_content_type
+
+from CMFCorePermissions import View, ViewManagementScreens, FTPAccess
+from DirectoryView import registerFileExtension, registerMetaType, expandpath
+from FSObject import FSObject
 
 
-class FSDTMLMethod (HTML, Acquisition.Implicit, Item_w__name__):
+class FSDTMLMethod(FSObject, Globals.HTML):
     """FSDTMLMethods act like DTML methods but are not directly
     modifiable from the management interface."""
 
     meta_type = 'Filesystem DTML Method'
-    title = ''
 
     manage_options=(
         (
@@ -117,83 +113,44 @@ class FSDTMLMethod (HTML, Acquisition.Implicit, Item_w__name__):
 
     # Use declarative security
     security = ClassSecurityInfo()
-    security.declareObjectProtected(CMFCorePermissions.View)
-    security.declareProtected(CMFCorePermissions.View, 'index_html',)
-
-    file_mod_time = 0
-
-    def __init__(self, id, filepath, fullname=None, properties=None):
-        if properties:
-            # Since props come from the filesystem, this should be
-            # safe.
-            self.__dict__.update(properties)
-        self._filepath = filepath
-        data = self._readFile()
-        fp = expandpath(filepath)
-        try: self.file_mod_time = stat(fp)[8]
-        except: pass
-        HTML.__init__(self, data, __name__=id)
+    security.declareObjectProtected(View)
 
     security.declareProtected(ViewManagementScreens, 'manage_main')
-    manage_main = HTMLFile('dtml/custdtml', globals())
+    manage_main = Globals.HTMLFile('dtml/custdtml', globals())
 
-    security.declareProtected(ViewManagementScreens, 'manage_doCustomize')
-    def manage_doCustomize(self, folder_path, data=None, RESPONSE=None):
-        '''
-        Makes a DTMLMethod with the same code.
-        '''
-        custFolder = self.getCustomizableObject()
-        fpath = tuple(split(folder_path, '/'))
-        folder = self.restrictedTraverse(fpath)
-        if data is None:
-            data = self.read()
-        id = self.getId()
-        obj = DTMLMethod(data, __name__=id)
-        folder._verifyObjectPaste(obj, validate_src=0)
-        folder._setObject(id, obj)
-        if RESPONSE is not None:
-            RESPONSE.redirect('%s/%s/manage_main' % (
-                folder.absolute_url(), id))
+    def __init__(self, id, filepath, fullname=None, properties=None):
+        FSObject.__init__(self, id, filepath, fullname, properties)
+        # Normally called via HTML.__init__ but we don't need the rest that
+        # happens there.
+        self.initvars(None, {})
 
-    security.declareProtected(ViewManagementScreens, 'getMethodFSPath')
-    def getMethodFSPath(self):
-        return self._filepath
+    def _createZODBClone(self):
+        """Create a ZODB (editable) equivalent of this object."""
+        return DTMLMethod(self.read(), __name__=self.getId())
 
     def _readFile(self):
         fp = expandpath(self._filepath)
         file = open(fp, 'rb')
-        try: data = file.read()
+        try:
+            data = file.read()
         finally: file.close()
-        return data
+        self.raw = data
+        self.cook()
 
-    def _updateFromFS(self):
-        if Globals.DevelopmentMode:
-            fp = expandpath(self._filepath)
-            try:    mtime=stat(fp)[8]
-            except: mtime=0
-            if mtime != self.file_mod_time:
-                self.file_mod_time = mtime
-                self.raw = self._readFile()
-                self.cook()
-
-    def __str__(self):
+    # Hook up chances to reload in debug mode
+    security.declarePrivate('read_raw')
+    def read_raw(self):
         self._updateFromFS()
-        return self.read()
-
-    def getId(self):
-        return self.__name__
+        return Globals.HTML.read_raw(self)
 
     #### The following is mainly taken from OFS/DTMLMethod.py ###
         
     index_html=None # Prevent accidental acquisition
 
     # Documents masquerade as functions:
-    class func_code: pass
-    func_code=func_code()
-    func_code.co_varnames='self','REQUEST','RESPONSE'
-    func_code.co_argcount=3
+    func_code = DTMLMethod.func_code
 
-    default_content_type='text/html'
+    default_content_type = 'text/html'
 
     def __call__(self, client=None, REQUEST={}, RESPONSE=None, **kw):
         """Render the document given a client object, REQUEST mapping,
@@ -210,12 +167,12 @@ class FSDTMLMethod (HTML, Acquisition.Implicit, Item_w__name__):
         
             if client is None:
                 # Called as subtemplate, so don't need error propagation!
-                r=apply(HTML.__call__, (self, client, REQUEST), kw)
+                r=apply(Globals.HTML.__call__, (self, client, REQUEST), kw)
                 if RESPONSE is None: result = r
                 else: result = decapitate(r, RESPONSE)
                 return result
 
-            r=apply(HTML.__call__, (self, client, REQUEST), kw)
+            r=apply(Globals.HTML.__call__, (self, client, REQUEST), kw)
             if type(r) is not type('') or RESPONSE is None:
                 return r
 
@@ -231,22 +188,15 @@ class FSDTMLMethod (HTML, Acquisition.Implicit, Item_w__name__):
         result = decapitate(r, RESPONSE)
         return result
 
-    def get_size(self):
-        return len(self.raw)
+    validate = DTMLMethod.validate
 
-    def validate(self, inst, parent, name, value, md):
-        return getSecurityManager().validate(inst, parent, name, value)
+    security.declareProtected(FTPAccess, 'manage_FTPget')
+    security.declareProtected(ViewManagementScreens, 'PrincipiaSearchSource',
+        'document_src')
 
-    security.declareProtected(View, 'manage_FTPget')
-    def manage_FTPget(self):
-        "Get source for FTP download"
-        return self.read()
-
-    security.declareProtected(ViewManagementScreens, 'getModTime')
-    def getModTime(self):
-        '''
-        '''
-        return DateTime(self.file_mod_time)
+    manage_FTPget = DTMLMethod.manage_FTPget
+    PrincipiaSearchSource = DTMLMethod.PrincipiaSearchSource
+    document_src = DTMLMethod.document_src
 
 Globals.InitializeClass(FSDTMLMethod)
 

@@ -33,7 +33,7 @@
         <em>Source file</em>
         </th>
 	<td align="left" valign="top">
-        &dtml-getMethodFSPath;
+        &dtml-getObjectFSPath;
 	</td>
       </tr>
       <tr>
@@ -54,7 +54,7 @@
     </TABLE>
   </FORM>
 <table border="1" bgcolor="#cccccc"><tr><td>
-<code><dtml-var __str__ html_quote newline_to_br></code>
+<code><dtml-var this newline_to_br></code>
 </td></tr></table>
 </BODY>
 </HTML>

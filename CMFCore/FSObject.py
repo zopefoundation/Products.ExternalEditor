@@ -2,7 +2,7 @@
 # 
 # Zope Public License (ZPL) Version 1.0
 # -------------------------------------
-#
+# 
 # Copyright (c) Digital Creations.  All rights reserved.
 # 
 # This license has been certified as Open Source(tm).
@@ -82,75 +82,73 @@
 # attributions are listed in the accompanying credits file.
 # 
 ##############################################################################
-"""Customizable DTML methods that come from the filesystem."""
+"""Customizable objects that come from the filesystem (base class)."""
 __version__='$Revision$'[11:-2]
 
-from string import split, strip
+from string import split
+from os import path, stat
 
-import Globals
-import Acquisition
-from OFS.Folder import Folder
-from OFS.PropertyManager import PropertyManager
-from ZPublisher.Converters import get_converter
+import Acquisition, Globals
 from AccessControl import ClassSecurityInfo
+from OFS.SimpleItem import Item
+from DateTime import DateTime
 
-from DirectoryView import registerFileExtension, registerMetaType, expandpath
-from CMFCorePermissions import ViewManagementScreens
-from FSObject import FSObject
+from DirectoryView import expandpath
+import CMFCorePermissions
 
-class FSPropertiesObject (FSObject, PropertyManager):
-    """FSPropertiesObjects simply hold properties."""
-
-    meta_type = 'Filesystem Properties Object'
-
-    manage_options = ({'label':'Customize', 'action':'manage_main'},)
+class FSObject(Acquisition.Implicit, Item):
+    """FSObject is a base class for all filesystem based look-alikes.
     
+    Subclasses of this class mimic ZODB based objects like Image and DTMLMethod,
+    but are not directly modifiable from the management interface. They provide
+    means to create a TTW editable copy, however.
+    """
+
+    # Always empty for FS based, non-editable objects.
+    title = ''
+
     security = ClassSecurityInfo()
+    security.declareObjectProtected(CMFCorePermissions.View)
 
-    security.declareProtected(ViewManagementScreens, 'manage_main')
-    manage_main = Globals.HTMLFile('dtml/custprops', globals())
+    _file_mod_time = 0
 
-    # Declare all (inherited) mutating methods private.
-    security.declarePrivate('manage_addProperty',
-                            'manage_editProperties',
-                            'manage_delProperties',
-                            'manage_changeProperties',
-                            'manage_propertiesForm',
-                            'manage_propertyTypeForm',
-                            'manage_changePropertyTypes',)
-                               
-    security.declareProtected(ViewManagementScreens, 'manage_doCustomize')
-    def manage_doCustomize(self, folder_path, data=None, RESPONSE=None):
+    def __init__(self, id, filepath, fullname=None, properties=None):
+        if properties:
+            # Since props come from the filesystem, this should be
+            # safe.
+            self.__dict__.update(properties)
+
+        self.id = id
+        self._filepath = filepath
+        fp = expandpath(self._filepath)
+        
+        try: self._file_mod_time = stat(fp)[8]
+        except: pass
+        self._readFile()
+
+    security.declareProtected(CMFCorePermissions.ViewManagementScreens,
+        'manage_doCustomize')
+    def manage_doCustomize(self, folder_path, RESPONSE=None):
         """Makes a ZODB Based clone with the same data.
 
         Calls _createZODBClone for the actual work.
         """
-        # Overridden here to provide a different redirect target.
 
-        FSObject.manage_doCustomize(self, folder_path, data, RESPONSE)
+        obj = self._createZODBClone()
+        
+        id = obj.getId()
+        fpath = tuple(split(folder_path, '/'))
+        folder = self.restrictedTraverse(fpath)
+        folder._verifyObjectPaste(obj, validate_src=0)
+        folder._setObject(id, obj)
 
         if RESPONSE is not None:
-            fpath = tuple(split(folder_path, '/'))
-            folder = self.restrictedTraverse(fpath)
-            RESPONSE.redirect('%s/%s/manage_propertiesForm' % (
-                folder.absolute_url(), self.getId()))
-    
+            RESPONSE.redirect('%s/%s/manage_main' % (
+                folder.absolute_url(), id))
+
     def _createZODBClone(self):
         """Create a ZODB (editable) equivalent of this object."""
-        # Create a Folder to hold the properties.
-        obj = Folder()
-        obj.id = self.getId()
-        map = []
-        for p in self._properties:
-            # This should be secure since the properties come
-            # from the filesystem.
-            setattr(obj, p['id'], getattr(self, p['id']))
-            map.append({'id': p['id'],
-                        'type': p['type'],
-                        'mode': 'wd',})
-        obj._properties = tuple(map)
-
-        return obj
+        raise NotImplemented, "This should be implemented in a subclass."
 
     def _readFile(self):
         """Read the data from the filesystem.
@@ -158,40 +156,39 @@ class FSPropertiesObject (FSObject, PropertyManager):
         Read the file (indicated by exandpath(self._filepath), and parse the
         data if necessary.
         """
+        raise NotImplemented, "This should be implemented in a subclass."
 
+    # Refresh our contents from the filesystem if that is newer and we are
+    # running in debug mode.
+    def _updateFromFS(self):
+        if Globals.DevelopmentMode:
+            fp = expandpath(self._filepath)
+            try:    mtime=stat(fp)[8]
+            except: mtime=0
+            if mtime != self._file_mod_time:
+                self._file_mod_time = mtime
+                self._readFile()
+
+    security.declareProtected(CMFCorePermissions.View, 'get_size')
+    def get_size(self):
+        """Get the size of the underlying file."""
         fp = expandpath(self._filepath)
-        file = open(fp, 'rb')
-        try: lines = file.readlines()
-        finally: file.close()
-        map = []
-        for line in lines:
-            propname, proptv = split( line, ':' )
-            #XXX multi-line properties?
-            proptype, propvstr = split( proptv, '=' )
-            propname = strip(propname)
-            proptv = strip(proptv)
-            propvstr = strip(propvstr)
-            converter = get_converter( proptype, lambda x: x )
-            propvalue = converter( strip( propvstr ) )
-            # Should be safe since we're loading from
-            # the filesystem.
-            setattr(self, propname, propvalue)
-            map.append({'id':propname,
-                        'type':proptype,
-                        'mode':'',
-                        'default_value':propvalue,
-                        })
-        self._properties = tuple(map)            
+        return path.getsize(fp)
 
-    if Globals.DevelopmentMode:
-        # Provide an opportunity to update the properties.
-        def __of__(self, parent):
-            self = Acquisition.ImplicitAcquisitionWrapper(self, parent)
-            self._updateFromFS()
-            return self
+    security.declareProtected(CMFCorePermissions.View, 'getModTime')
+    def getModTime(self):
+        """Return the last_modified date of the file we represent.
 
+        Returns a DateTime instance.
+        """
+        self._updateFromFS()
+        return DateTime(self._file_mod_time)
 
-Globals.InitializeClass(FSPropertiesObject)
+    security.declareProtected(CMFCorePermissions.ViewManagementScreens,
+        'getObjectFSPath')
+    def getObjectFSPath(self):
+        """Return the path of the file we represent"""
+        self._updateFromFS()
+        return self._filepath
 
-registerFileExtension('props', FSPropertiesObject)
-registerMetaType('Properties Object', FSPropertiesObject)
+Globals.InitializeClass(FSObject)

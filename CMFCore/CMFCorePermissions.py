@@ -9,7 +9,7 @@ UndoChanges = Permissions.undo_changes
 ChangePermissions = Permissions.change_permissions
 ViewManagementScreens = Permissions.view_management_screens
 ManageProperties = Permissions.manage_properties
-
+FTPAccess = Permissions.ftp_access
 
 def setDefaultRoles(permission, roles):
     '''

@@ -85,37 +85,26 @@
 """Customizable page templates that come from the filesystem."""
 __version__='$Revision$'[11:-2]
 
-import Globals
-from Globals import DTMLFile
-import Acquisition
-from AccessControl import getSecurityManager
-from OFS.SimpleItem import Item
-from Products.CMFCore.DirectoryView import registerFileExtension, \
-     registerMetaType, expandpath
 from string import split
 from os import stat
-from AccessControl import ClassSecurityInfo
-from Products.CMFCore.CMFCorePermissions import ViewManagementScreens
+
+import Globals, Acquisition
 from DateTime import DateTime
-
-from Products.PageTemplates.PageTemplate import PageTemplate
-from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
+from AccessControl import getSecurityManager, ClassSecurityInfo
 from Shared.DC.Scripts.Script import Script
-from Shared.DC.Scripts.Signature import FuncCode
+from Products.PageTemplates.PageTemplate import PageTemplate
+from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate, Src
 
+from Products.CMFCore.DirectoryView import registerFileExtension
+from Products.CMFCore.DirectoryView import registerMetaType, expandpath
+from Products.CMFCore.CMFCorePermissions import ViewManagementScreens, View
+from Products.CMFCore.CMFCorePermissions import FTPAccess
+from Products.CMFCore.FSObject import FSObject
 
-class FSPageTemplate(Script, PageTemplate):
+class FSPageTemplate(FSObject, Script, PageTemplate):
     "Wrapper for Page Template"
      
     meta_type = 'Filesystem Page Template'
-    title = ''
-    _file_mod_time = 0
-    expand = 0
-
-    func_defaults = None
-    func_code = FuncCode((), 0)
-
-    _default_bindings = {'name_subpath': 'traverse_subpath'}
 
     manage_options=(
         (
@@ -125,147 +114,71 @@ class FSPageTemplate(Script, PageTemplate):
         )
 
     security = ClassSecurityInfo()
+    security.declareObjectProtected(View)
+
+    security.declareProtected(ViewManagementScreens, 'manage_main')
+    manage_main = Globals.DTMLFile('dtml/custpt', globals())
 
     # Declare security for unprotected PageTemplate methods.
     security.declarePrivate('pt_edit', 'write')
 
     def __init__(self, id, filepath, fullname=None, properties=None):
-        self.id = id
-        if properties:
-            # Since props come from the filesystem, this should be
-            # safe.
-            self.__dict__.update(properties)
-        self._filepath = filepath
+        FSObject.__init__(self, id, filepath, fullname, properties)
         self.ZBindings_edit(self._default_bindings)
-        self._updateFromFS(1)
 
-    security.declareProtected(ViewManagementScreens, 'manage_doCustomize')
-    def manage_doCustomize(self, folder_path, body=None, RESPONSE=None):
-        '''
-        Makes a ZopePageTemplate with the same code.
-        '''
-        custFolder = self.getCustomizableObject()
-        fpath = tuple(split(folder_path, '/'))
-        folder = self.restrictedTraverse(fpath)
-        if body is None:
-            body = self.read()
-        id = self.getId()
-        obj = ZopePageTemplate(id, self._text, self.content_type)
-        folder._verifyObjectPaste(obj, validate_src=0)
-        folder._setObject(id, obj)
-        obj = folder._getOb(id)
-        obj.write(body)
-        if RESPONSE is not None:
-            RESPONSE.redirect('%s/%s/manage_main' % (
-                folder.absolute_url(), id))
+    def _createZODBClone(self):
+        """Create a ZODB (editable) equivalent of this object."""
+        obj = ZopePageTemplate(self.getId(), self._text, self.content_type)
+        obj.write(self.read())
+        return obj
 
-    security.declareProtected(ViewManagementScreens, 'getMethodFSPath')
-    def getMethodFSPath(self):
-        return self._filepath
+    def _readFile(self):
+        fp = expandpath(self._filepath)
+        file = open(fp, 'rb')
+        try: data = file.read()
+        finally: file.close()
+        self.write(data)
 
-    def _updateFromFS(self, force=0):
-        if force or Globals.DevelopmentMode:
-            fp = expandpath(self._filepath)
-            try:    mtime=stat(fp)[8]
-            except: mtime=0
-            if force or mtime != self._file_mod_time:
-                self._file_mod_time = mtime
-                fp = expandpath(self._filepath)
-                file = open(fp, 'rb')
-                try: data = file.read()
-                finally: file.close()
-                self.write(data)
-
-    def getId(self):
+    security.declarePrivate('read')
+    def read(self):
+        # Tie in on an opportunity to auto-update
         self._updateFromFS()
-        return self.id
-
-    security.declareProtected(ViewManagementScreens, 'getModTime')
-    def getModTime(self):
-        '''
-        '''
-        return DateTime(self._file_mod_time)
+        return FSPageTemplate.inheritedAttribute('read')(self)
 
     ### The following is mainly taken from ZopePageTemplate.py ###
 
-    security.declareObjectProtected('View')
-    security.declareProtected('View', '__call__')
+    expand = 0
 
-    security.declareProtected(ViewManagementScreens, 'manage_main')
-    manage_main = DTMLFile('dtml/custpt', globals())
+    func_defaults = None
+    func_code = ZopePageTemplate.func_code
+    _default_bindings = ZopePageTemplate._default_bindings
 
-##    pt_diagnostic = DTMLFile('dtml/ptDiagnostic', globals())
+    security.declareProtected(View, '__call__')
 
-    def ZScriptHTML_tryParams(self):
-        """Parameters to test the script with."""
-        return []
-
-    def pt_getContext(self):
+    def pt_render(self, source=0, extra_context={}):
+        # Tie in on an opportunity to auto-reload
         self._updateFromFS()
-        root = self.getPhysicalRoot()
-        c = {'template': self,
-             'here': self._getContext(),
-             'container': self._getContainer(),
-             'nothing': None,
-             'options': {},
-             'root': root,
-             'request': getattr(root, 'REQUEST', None),
-             }
-        return c
+        return FSPageTemplate.inheritedAttribute('pt_render')(self, source,
+            extra_context)
 
-    def _exec(self, bound_names, args, kw):
-        """Call a Page Template"""
-        if not kw.has_key('args'):
-            kw['args'] = args
-        bound_names['options'] = kw
+    # Copy over more mothods
+    security.declareProtected(FTPAccess, 'manage_FTPget')
+    security.declareProtected(View, 'get_size')
+    security.declareProtected(ViewManagementScreens, 'PrincipiaSearchSource',
+        'document_src')
 
-        try:
-            self.REQUEST.RESPONSE.setHeader('content-type',
-                                            self.content_type)
-        except AttributeError: pass
-
-        # Execute the template in a new security context.
-        security=getSecurityManager()
-        security.addContext(self)
-        try:
-            return self.pt_render(extra_context=bound_names)
-        finally:
-            security.removeContext(self)
-
-    def manage_FTPget(self):
-        "Get source for FTP download"
-        self.REQUEST.RESPONSE.setHeader('Content-Type', self.content_type)
-        return self.read()
-
-    def get_size(self):
-        return len(self.read())
+    _exec = ZopePageTemplate._exec
+    pt_getContext = ZopePageTemplate.pt_getContext
+    ZScriptHTML_tryParams = ZopePageTemplate.ZScriptHTML_tryParams
+    manage_FTPget = ZopePageTemplate.manage_FTPget
+    get_size = ZopePageTemplate.get_size
     getSize = get_size
+    PrincipiaSearchSource = ZopePageTemplate.PrincipiaSearchSource
+    document_src = ZopePageTemplate.document_src
 
-    def PrincipiaSearchSource(self):
-        "Support for searching - the document's contents are searched."
-        return self.read()
-
-    def document_src(self, REQUEST=None, RESPONSE=None):
-        """Return expanded document source."""
-
-        if RESPONSE is not None:
-            RESPONSE.setHeader('Content-Type', self.content_type)
-        return self.read()
-
-
-class Src(Acquisition.Explicit):
-    " "
-
-    document_src = Acquisition.Acquired
-    index_html = None
-    
-    def __call__(self, REQUEST, RESPONSE):
-        " "
-        return self.document_src(REQUEST, RESPONSE)
 
 d = FSPageTemplate.__dict__
 d['source.xml'] = d['source.html'] = Src()
-
 
 Globals.InitializeClass(FSPageTemplate)
 

@@ -85,214 +85,70 @@
 """Customizable image objects that come from the filesystem."""
 __version__='$Revision$'[11:-2]
 
+import string, os
+
 import Globals
-from Globals import HTMLFile
 from DateTime import DateTime
-import string
-from os import path, stat
-import Acquisition
-from OFS.SimpleItem import Item_w__name__
-import DirectoryView
-from string import split
-from OFS.Image import Image
-import struct
-from cStringIO import StringIO
-from DirectoryView import registerFileExtension, registerMetaType, expandpath
-from webdav.common import rfc1123_date
 from AccessControl import ClassSecurityInfo
+from webdav.common import rfc1123_date
+from OFS.Image import Image, getImageInfo
+
 from CMFCorePermissions import ViewManagementScreens, View
-import CMFCorePermissions
+from FSObject import FSObject
+from DirectoryView import registerFileExtension, registerMetaType, expandpath
 
-def getImageInfo(data):
-    # This function ought to be in OFS/Image.py or perhaps even
-    # in the Python library, but alas it is not as of January 2001.
-    data = str(data)
-    size = len(data)
-    height = -1
-    width = -1
-    content_type = ''
-
-    # handle GIFs   
-    if (size >= 10) and data[:6] in ('GIF87a', 'GIF89a'):
-        # Check to see if content_type is correct
-        content_type = 'image/gif'
-        w, h = struct.unpack("<HH", data[6:10])
-        width = int(w)
-        height = int(h)
-
-    # See PNG v1.2 spec (http://www.cdrom.com/pub/png/spec/)
-    # Bytes 0-7 are below, 4-byte chunk length, then 'IHDR'
-    # and finally the 4-byte width, height
-    elif ((size >= 24) and (data[:8] == '\211PNG\r\n\032\n')
-          and (data[12:16] == 'IHDR')):
-        content_type = 'image/png'
-        w, h = struct.unpack(">LL", data[16:24])
-        width = int(w)
-        height = int(h)
-            
-    # Maybe this is for an older PNG version.
-    elif (size >= 16) and (data[:8] == '\211PNG\r\n\032\n'):
-        # Check to see if we have the right content type
-        content_type = 'image/png'
-        w, h = struct.unpack(">LL", data[8:16])
-        width = int(w)
-        height = int(h)
-
-    # handle JPEGs
-    elif (size >= 2) and (data[:2] == '\377\330'):
-        content_type = 'image/jpeg'
-        jpeg = StringIO(data)
-        jpeg.read(2)
-        b = jpeg.read(1)
-        try:
-            while (b and ord(b) != 0xDA):
-                while (ord(b) != 0xFF): b = jpeg.read(1)
-                while (ord(b) == 0xFF): b = jpeg.read(1)
-                if (ord(b) >= 0xC0 and ord(b) <= 0xC3):
-                    jpeg.read(3)
-                    h, w = struct.unpack(">HH", jpeg.read(4))
-                    break
-                else:
-                    jpeg.read(int(struct.unpack(">H", jpeg.read(2))[0])-2)
-                b = jpeg.read(1)
-            width = int(w)
-            height = int(h)
-        except: pass
-
-    return content_type, width, height
-
-
-class FSImage (Acquisition.Implicit, Item_w__name__):
+class FSImage(FSObject):
     """FSImages act like images but are not directly
     modifiable from the management interface."""
     # Note that OFS.Image.Image is not a base class because it is mutable.
 
     meta_type = 'Filesystem Image'
-    title = ''
 
     manage_options=(
         {'label':'Customize', 'action':'manage_main'},
-        #{'label':'View', 'action':'view_image_or_file'},
         )
 
     security = ClassSecurityInfo()
-    security.declareObjectProtected(CMFCorePermissions.View)
-
-    file_mod_time = 0
+    security.declareObjectProtected(View)
 
     def __init__(self, id, filepath, fullname=None, properties=None):
-        if properties:
-            # Since props come from the filesystem, this should be
-            # safe.
-            self.__dict__.update(properties)
-        self.__name__ = fullname or id  # Use the whole filename.
-        self.title = ''
-        self._filepath = filepath
-        fp = expandpath(self._filepath)
-        try: self.file_mod_time = stat(fp)[8]
-        except: pass
-        self._readFile()
+        id = fullname or id # Use the whole filename.
+        FSObject.__init__(self, id, filepath, fullname, properties)
 
     security.declareProtected(ViewManagementScreens, 'manage_main')
-    manage_main = HTMLFile('dtml/custimage', globals())
+    manage_main = Globals.HTMLFile('dtml/custimage', globals())
 
-    security.declareProtected(ViewManagementScreens, 'manage_doCustomize')
-    def manage_doCustomize(self, folder_path, data=None, RESPONSE=None):
-        '''
-        Makes an Image with the same data.
-        '''
-        custFolder = self.getCustomizableObject()
-        fpath = tuple(split(folder_path, '/'))
-        folder = self.restrictedTraverse(fpath)
-        if data is None:
-            data = self._readFile()
-        id = self.getId()
-        obj = Image(id, '', data)
-        folder._verifyObjectPaste(obj, validate_src=0)
-        folder._setObject(id, obj)
-        if RESPONSE is not None:
-            RESPONSE.redirect('%s/%s/manage_main' % (
-                folder.absolute_url(), id))
-
-    security.declareProtected(View, 'getImageFSPath')
-    def getImageFSPath(self):
-        '''
-        '''
-        return self._filepath
+    def _createZODBClone(self):
+        return Image(self.getId(), '', self.read())
 
     def _readFile(self):
         fp = expandpath(self._filepath)
         file = open(fp, 'rb')
         try: data = file.read()
         finally: file.close()
-        (self.content_type, self.width, self.height) = getImageInfo(data)
+
+        # Only parse out image info if the file was changed, because this file
+        # is read every time the image is requested.
+        try:    mtime=os.stat(fp)[8]
+        except: mtime=0
+        if mtime != self._file_mod_time:
+            self._file_mod_time = mtime
+            (self.content_type, self.width, self.height) = getImageInfo(data)
+
         return data
-
-    def _updateFromFS(self):
-        if Globals.DevelopmentMode:
-            fp = expandpath(self._filepath)
-            try:    mtime=stat(fp)[8]
-            except: mtime=0
-            if mtime != self.file_mod_time:
-                self.file_mod_time = mtime
-                self._readFile()
-
-    def getId(self):
-        return self.__name__
 
     #### The following is mainly taken from OFS/Image.py ###
         
-    def __str__(self):
-        return self.tag()
+    __str__ = Image.__str__
 
+    _image_tag = Image.tag
     security.declareProtected(View, 'tag')
     def tag(self, height=None, width=None, alt=None,
             scale=0, xscale=0, yscale=0, **args):
-        """
-        Generate an HTML IMG tag for this image, with customization.
-        Arguments to self.tag() can be any valid attributes of an IMG tag.
-        'src' will always be an absolute pathname, to prevent redundant
-        downloading of images. Defaults are applied intelligently for
-        'height', 'width', and 'alt'. If specified, the 'scale', 'xscale',
-        and 'yscale' keyword arguments will be used to automatically adjust
-        the output height and width values of the image tag.
-        """
-        self._updateFromFS()
-        if height is None: height=self.height
-        if width is None:  width=self.width
-
-        # Auto-scaling support
-        xdelta = xscale or scale
-        ydelta = yscale or scale
-
-        if xdelta and width:
-            width = str(int(width) * xdelta)
-        if ydelta and height:
-            height = str(int(height) * ydelta)
-
-        result='<img src="%s"' % (self.absolute_url())
-
-        if alt is None:
-            alt=getattr(self, 'title', '')
-        result = '%s alt="%s"' % (result, alt)
-
-        if height:
-            result = '%s height="%s"' % (result, height)
-
-        if width:
-            result = '%s width="%s"' % (result, width)
-
-        if not 'border' in map(string.lower, args.keys()):
-            result = '%s border="0"' % result
-
-        for key in args.keys():
-            value = args.get(key)
-            result = '%s %s="%s"' % (result, key, value)
-
-        return '%s />' % result
-
-    def id(self):
-        return self.__name__
+        # Hook into an oppertunity to reload metadata.
+        self._readFile()
+        return apply(self._image_tag, (height, width, alt, scale, xscale, 
+            yscale), args)
 
     security.declareProtected(View, 'index_html')
     def index_html(self, REQUEST, RESPONSE):
@@ -302,8 +158,8 @@ class FSImage (Acquisition.Implicit, Item_w__name__):
         Returns the contents of the file or image.  Also, sets the
         Content-Type HTTP header to the objects content type.
         """
-        # HTTP If-Modified-Since header handling.
         data = self._readFile()
+        # HTTP If-Modified-Since header handling.
         header=REQUEST.get_header('If-Modified-Since', None)
         if header is not None:
             header=string.split(header, ';')[0]
@@ -316,32 +172,21 @@ class FSImage (Acquisition.Implicit, Item_w__name__):
             try:    mod_since=long(DateTime(header).timeTime())
             except: mod_since=None
             if mod_since is not None:
-                last_mod = self.file_mod_time
+                last_mod = self._file_mod_time
                 if last_mod > 0 and last_mod <= mod_since:
+                    # Set header values since apache caching will return
+                    # Content-Length of 0 in response if size is not set here
+                    RESPONSE.setHeader('Last-Modified', rfc1123_date(last_mod))
+                    RESPONSE.setHeader('Content-Type', self.content_type)
+                    RESPONSE.setHeader('Content-Length', self.get_size())
                     RESPONSE.setStatus(304)
                     return ''
 
-        RESPONSE.setHeader('Last-Modified', rfc1123_date(self.file_mod_time))
+        RESPONSE.setHeader('Last-Modified', rfc1123_date(self._file_mod_time))
         RESPONSE.setHeader('Content-Type', self.content_type)
         RESPONSE.setHeader('Content-Length', len(data))
 
         return data
-
-    security.declareProtected(View, 'view_image_or_file')
-    def view_image_or_file(self, URL1):
-        """
-        The default view of the contents of the File or Image.
-        """
-        raise 'Redirect', URL1
-
-    security.declareProtected(View, 'get_size')
-    def get_size(self):
-        """Get the size of a file or image.
-
-        Returns the size of the file or image.
-        """
-        fp = expandpath(self._filepath)
-        return path.getsize(fp)
 
     security.declareProtected(View, 'getContentType')
     def getContentType(self):
@@ -349,18 +194,8 @@ class FSImage (Acquisition.Implicit, Item_w__name__):
 
         Returns the content type (MIME type) of a file or image.
         """
-        self._updateFromFS()
+        self._readFile()
         return self.content_type
-
-    security.declareProtected(View, 'getModTime')
-    def getModTime(self):
-        '''
-        '''
-        self._updateFromFS()
-        return DateTime(self.file_mod_time)
-
-    security.declareProtected(View, 'manage_FTPget')
-    manage_FTPget = index_html
 
 Globals.InitializeClass(FSImage)
 

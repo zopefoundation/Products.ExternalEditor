@@ -28,7 +28,7 @@
         <em>Source file</em>
         </th>
 	<td align="left" valign="top">
-        &dtml-getMethodFSPath;
+        &dtml-getObjectFSPath;
 	</td>
       </tr>
       <tr>
