@@ -499,6 +499,7 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
             self.last_log = log
         else:
             self.last_log = None
+        self.title=title
         if text is not None:
             self.username = username
             t = text
@@ -1276,6 +1277,8 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
     
     security.declarePublic('title_or_id')
     def title_or_id(self):
+        if self.title:
+            return self.title
         fid = self._my_folder().getId()
         return "%s of %s" % (self.getId(), fid)
     
@@ -1870,6 +1873,10 @@ class CMFWikiFolder( SkinnedFolder ):
     def PUT_factory(self, name, typ, body):
         if find(typ, 'text') != -1:
             return makeCMFWikiPage(name, '', body)
+
+    def Title(self): # for CMFCatalog
+        fp = getattr( self, 'FrontPage', None )
+        return fp and fp.Title() or self.title_or_id()
 
 def makeCMFWikiPage(id, title, file):
     ob = CMFWikiPage(source_string=file, __name__=id)

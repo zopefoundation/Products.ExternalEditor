@@ -9,7 +9,7 @@
 ##
 text = None
 type = None
-title = ''
+title = None
 mode = None
 comment = None
 log = None
@@ -22,7 +22,8 @@ if REQUEST.has_key('comment'):
     context.comment(comment, ack_requested)
 else:
     text = REQUEST['text']
+    title = REQUEST.get('title',None)
     log = REQUEST.get('log', '')
-    context.edit(text=text,type=type, title=title,log=log,timeStamp=timeStamp)
+    context.edit(text=text,type=type,title=title,log=log,timeStamp=timeStamp)
 
 RESPONSE.redirect('%s' % context.absolute_url())

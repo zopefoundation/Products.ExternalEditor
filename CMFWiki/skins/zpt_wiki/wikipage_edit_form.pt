@@ -41,6 +41,15 @@
     <table width="100%" border="0" cellspacing="0" cellpadding="5">
       <tr bgcolor="eeeeee">
         <td colspan="2" align="center">
+          <textarea wrap="soft" name="title"
+                    rows="1" cols="80"
+                    tal:attributes="cols request/zwiki_width  | default"
+                    tal:content="here/title"
+                  ></textarea>
+        </td>
+      </tr>
+      <tr bgcolor="eeeeee">
+        <td colspan="2" align="center">
           <textarea wrap="soft" name="text"
                     rows="18" cols="80"
                     tal:attributes="rows request/zwiki_height | default;
