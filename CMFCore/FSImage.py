@@ -119,7 +119,7 @@ class FSImage(FSObject):
     manage_main = Globals.HTMLFile('dtml/custimage', globals())
 
     def _createZODBClone(self):
-        return Image(self.getId(), '', self.read())
+        return Image(self.getId(), '', self._readFile())
 
     def _readFile(self):
         fp = expandpath(self._filepath)
