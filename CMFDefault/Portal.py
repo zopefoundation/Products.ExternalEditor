@@ -139,7 +139,7 @@ class CMFSite ( PortalObjectBase
     def reindexObject( self ):
         """
             Override DefaultDublinCoreImpl's method (so that we can play
-            in 'edtiMetadata').
+            in 'editMetadata').
         """
         pass
 
