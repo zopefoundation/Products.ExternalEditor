@@ -1,8 +1,8 @@
-import unittest
-from Products.CMFDefault.utils import parseHeadersBody
-from string import split
+from unittest import TestCase,makeSuite,main
 
-class DefaultUtilsTests(unittest.TestCase):
+from Products.CMFDefault.utils import parseHeadersBody
+
+class DefaultUtilsTests(TestCase):
     COMMON_HEADERS = '''Author: Tres Seaver
 Title: Test Products.PTKDemo.utils.parseHeadersBody'''
 
@@ -15,12 +15,6 @@ lines.  It can even include "headerish" lines, like:
 Header: value
 '''
 
-    def setUp( self ):
-        get_transaction().begin()
-
-    def tearDown( self ):
-        get_transaction().abort()
-    
     def test_NoBody( self ):
         headers, body = parseHeadersBody( '%s\n\n' % self.COMMON_HEADERS )
         assert( len( headers ) == 2, '%d!' % len( headers ) )
@@ -37,7 +31,7 @@ Header: value
                                         )
         assert( len( headers ) == 3, '%d!' % len( headers )  )
         assert( 'Description' in headers.keys() )
-        desc_len = len( split( headers[ 'Description' ], '\n' ) )
+        desc_len = len( headers[ 'Description' ].split('\n') )
         assert( desc_len == 2, '%d!' % desc_len )
         assert( len( body ) == 0, '%d!' % len( body ) )
     
@@ -64,8 +58,8 @@ Header: value
         assert( preloaded[ 'text_format' ] == headers[ 'text_format' ] )
 
 def test_suite():
-    return unittest.makeSuite(DefaultUtilsTests)
+    return makeSuite(DefaultUtilsTests)
 
 if __name__ == '__main__':
-    result = unittest.TextTestRunner().run(test_suite())
+    main(defaultTest='test_suite')
 

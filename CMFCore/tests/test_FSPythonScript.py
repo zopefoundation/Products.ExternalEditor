@@ -18,11 +18,8 @@ def test_suite():
         makeSuite(FSPythonScriptTests),
         ))
 
-def run():
-    main(defaultTest='test_suite')
-
 if __name__ == '__main__':
-    run()
+    main(defaultTest='test_suite')
 
 
 

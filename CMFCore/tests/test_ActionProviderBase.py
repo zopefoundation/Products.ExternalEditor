@@ -1,14 +1,15 @@
-import unittest
+import Zope
+from unittest import TestCase, TestSuite, makeSuite, main
 
-class DummyAction:
-    def __init__( self, **kw ):
-        self.__dict__.update( kw )
+from Products.CMFCore.tests.base.dummy import \
+     DummyTool
 
-class ActionProviderBaseTests(unittest.TestCase):
+from Products.CMFCore.ActionProviderBase import ActionProviderBase
+
+class ActionProviderBaseTests(TestCase):
     
     def _makeProvider( self ):
 
-        from Products.CMFCore.ActionProviderBase import ActionProviderBase
         return ActionProviderBase()
 
     def test_addAction( self ):
@@ -28,12 +29,6 @@ class ActionProviderBaseTests(unittest.TestCase):
 
     def test_changeActions( self ):
 
-        from Products.CMFCore.ActionProviderBase import ActionProviderBase
-
-        class DummyTool( ActionProviderBase ):
-            _actions = [ DummyAction()
-                       , DummyAction()
-                       ]
 
         apb = DummyTool()
         old_actions = apb._actions
@@ -91,12 +86,9 @@ class ActionProviderBaseTests(unittest.TestCase):
         self.assertEqual( apb._actions, ['1'] )
 
 def test_suite():
-    suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(ActionProviderBaseTests))
-    return suite
-
-def run():
-    unittest.TextTestRunner().run(test_suite())
+    return TestSuite((
+        makeSuite(ActionProviderBaseTests),
+        ))
 
 if __name__ == '__main__':
-    run()
+    main(defaultTest='test_suite')

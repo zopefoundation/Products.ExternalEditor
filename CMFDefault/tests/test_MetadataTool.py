@@ -1,20 +1,21 @@
-import ZServer
 import Zope
-import unittest, string
-from Products.CMFDefault.MetadataTool import *
+from unittest import TestCase, TestSuite, makeSuite, main
+
+from Products.CMFDefault.MetadataTool import \
+     MetadataElementPolicy, MetadataTool, ElementSpec, \
+     DEFAULT_ELEMENT_SPECS, MetadataError
+
 from Products.CMFDefault.DublinCore import DefaultDublinCoreImpl
 
-class TestMetadataElementPolicy( unittest.TestCase ):
+class TestMetadataElementPolicy( TestCase ):
 
     def setUp( self ):
-        get_transaction().begin()
         self.sv_policy = MetadataElementPolicy( 0 )
         self.mv_policy = MetadataElementPolicy( 1 )
 
     def tearDown( self ):
         del self.sv_policy
         del self.mv_policy
-        get_transaction().abort()
 
     def test_emptySV( self ):
         assert not self.sv_policy.isMultiValued()
@@ -52,7 +53,7 @@ class TestMetadataElementPolicy( unittest.TestCase ):
         assert 'xxx' in self.mv_policy.allowedVocabulary()
         assert 'yyy' in self.mv_policy.allowedVocabulary()
 
-class TestElementSpec( unittest.TestCase ):
+class TestElementSpec( TestCase ):
 
     def setUp( self ):
         self.sv_spec    = ElementSpec( 0 )
@@ -91,7 +92,7 @@ class Bar( Foo ):
     def Type( self ):
         return 'Bar'
 
-class TestMetadataTool( unittest.TestCase ):
+class TestMetadataTool( TestCase ):
 
     def setUp( self ):
         self.tool = MetadataTool()
@@ -358,13 +359,11 @@ class TestMetadataTool( unittest.TestCase ):
 
 
 def test_suite():
-    suite = unittest.TestSuite()
-    suite.addTest( unittest.makeSuite( TestMetadataElementPolicy ) )
-    suite.addTest( unittest.makeSuite( TestElementSpec ) )
-    suite.addTest( unittest.makeSuite( TestMetadataTool ) )
-    return suite
+    return TestSuite((
+        makeSuite(TestMetadataElementPolicy),
+        makeSuite(TestElementSpec),
+        makeSuite(TestMetadataTool),
+        ))
 
-def main():
-    unittest.TextTestRunner().run(test_suite())
-
-if __name__=='__main__': main()
+if __name__ == '__main__':
+    main(defaultTest='test_suite')

@@ -16,48 +16,22 @@
 $Id$
 """
 __version__ = "$Revision$"[11:-2]
+import Zope
+from unittest import TestCase, TestSuite, makeSuite, main
 
+from Products.CMFCore.tests.base.dummy import \
+     DummyTool as DummyURLTool, \
+     DummyObject as DummySite
 
-import unittest
-import Acquisition
-from Acquisition import aq_inner, aq_parent
+from Products.CMFDefault.Favorite import Favorite
 
-class DummyURLTool( Acquisition.Implicit ):
-
-    root = 'DummyTool'
-
-    def __call__( self ):
-        return self.root
-
-    getPortalPath = __call__
-
-    def getPortalObject( self ):
-        return aq_parent( aq_inner( self ) )
-
-    def getIcon( self, relative=0 ):
-        return 'Tool: %s' % relative
-
-class DummySite( Acquisition.Implicit ):
-
-    def __init__( self, **kw ):
-        self.__dict__.update( kw )
-
-    def restrictedTraverse( self, path ):
-        return path and getattr( self, path ) or self
-
-    def getIcon( self, relative=0 ):
-        return 'Site: %s' % relative
-
-class FavoriteTests( unittest.TestCase ):
+class FavoriteTests( TestCase ):
 
     def setUp( self ):
-
         self.tool = DummyURLTool()
         self.site = DummySite( portal_url=self.tool )
 
     def _makeOne( self, *args, **kw ):
-
-        from Products.CMFDefault.Favorite import Favorite
 
         f = apply( Favorite, args, kw )
         return f.__of__( self.site )
@@ -101,13 +75,9 @@ class FavoriteTests( unittest.TestCase ):
 
 
 def test_suite():
-    suite = unittest.TestSuite()
-    suite.addTest( unittest.makeSuite( FavoriteTests ) )
-    return suite
-
-def run():
-    unittest.TextTestRunner().run(test_suite())
+    return TestSuite((
+        makeSuite( FavoriteTests ),
+        ))
 
 if __name__ == '__main__':
-    run()
-
+    main(defaultTest='test_suite')

@@ -1,60 +1,18 @@
 import Zope
-import unittest
+from unittest import TestSuite,main
+from Products.CMFCore.tests.base.utils import build_test_suite
 
-from Products.CMFCore.tests import test_all
-core_tests = test_all
+def test_suite():    
 
-from Products.CMFDefault.tests import test_all
-default_tests = test_all
-
-from Products.CMFTopic.tests import test_all
-topic_tests = test_all
-
-try:
-    from Products.CMFCalendar.tests import test_all
-    calendar_tests = test_all
-except ImportError:
-    calendar_tests = None
-
-try:
-    from Products.CMFDecor.tests import test_all
-    decor_tests = test_all
-except ImportError:
-    decor_tests = None
-
-try:
-    from Products.DCWorfklow.tests import test_all
-    workflow_tests = test_all
-except ImportError:
-    workflow_tests = None
-
-
-
-def test_suite():
-
-    suite = unittest.TestSuite()
-
-    suite.addTest( core_tests.test_suite() )
-    suite.addTest( default_tests.test_suite() )
-    suite.addTest( topic_tests.test_suite() )
-
-    if calendar_tests:
-        suite.addTest( calendar_tests.test_suite() )
-
-    if decor_tests:
-        suite.addTest( decor_tests.test_suite() )
-
-    if workflow_tests:
-        suite.addTest( workflow_tests.test_suite() )
-
-    return suite
-
-def run():
-    if hasattr( unittest, 'JUnitTextTestRunner' ):
-        unittest.JUnitTextTestRunner().run( test_suite() )
-    else:
-        unittest.TextTestRunner( verbosity=1 ).run( test_suite() )
+    return TestSuite((
+        build_test_suite('Products.CMFCore.tests',['test_all']),
+        build_test_suite('Products.CMFDefault.tests',['test_all']),
+        build_test_suite('Products.CMFTopic.tests',['test_all']),
+        build_test_suite('Products.CMFCalendar.tests',['test_all'],required=0),
+        build_test_suite('Products.CMFDecor.tests',['test_all'],required=0),
+        build_test_suite('Products.DCWorkflow.tests',['test_all'],required=0),
+        ))
 
 if __name__ == '__main__':
-    run()
+    main(defaultTest='test_suite')
 

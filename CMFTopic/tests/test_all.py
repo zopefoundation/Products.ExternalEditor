@@ -1,26 +1,16 @@
 import Zope
-import unittest
-
-from Products.CMFTopic.tests import test_Topic
-from Products.CMFTopic.tests import test_DateC
-from Products.CMFTopic.tests import test_ListC
-from Products.CMFTopic.tests import test_SIC
-from Products.CMFTopic.tests import test_SSC
+from unittest import main
+from Products.CMFCore.tests.base.utils import build_test_suite
 
 def test_suite():
-    suite = unittest.TestSuite()
-    suite.addTest( test_Topic.test_suite() )
-    suite.addTest( test_DateC.test_suite() )
-    suite.addTest( test_ListC.test_suite() )
-    suite.addTest( test_SIC.test_suite() )
-    suite.addTest( test_SSC.test_suite() )
-    return suite
 
-def run():
-    if hasattr( unittest, 'JUnitTextTestRunner' ):
-        unittest.JUnitTextTestRunner().run( test_suite() )
-    else:
-        unittest.TextTestRunner( verbosity=0 ).run( test_suite() )
+    return build_test_suite('Products.CMFTopic.tests',[
+        'test_Topic',
+        'test_DateC',
+        'test_ListC',
+        'test_SIC',
+        'test_SSC',
+        ])
 
 if __name__ == '__main__':
-    run()
+    main(defaultTest='test_suite')

@@ -1,101 +1,34 @@
 import Zope
-import unittest
-import re, new
-import OFS.Folder, OFS.SimpleItem
-from AccessControl import SecurityManager
-from AccessControl.SecurityManagement import newSecurityManager
-import Acquisition
+from unittest import TestCase, TestSuite, makeSuite, main
+
+from Products.CMFCore.tests.base.dummy import \
+     DummyContent, DummyFTI
+
+from Products.CMFCore.tests.base.testcase import \
+     SecurityTest
+
+from Products.CMFCore.tests.base.utils import \
+     has_path
+
 from DateTime import DateTime
-from Products.CMFCore.TypesTool import TypesTool, FactoryTypeInformation
+from Products.CMFCore.TypesTool import\
+     TypesTool,FactoryTypeInformation as FTI
 from Products.CMFCore.CatalogTool import CatalogTool
-from Products.CMFCore.PortalContent import PortalContent
-from Products.CMFCore.PortalFolder import *
-
-class UnitTestSecurityPolicy:
-    """
-        Stub out the existing security policy for unit testing purposes.
-    """
-    #
-    #   Standard SecurityPolicy interface
-    #
-    def validate( self
-                , accessed=None
-                , container=None
-                , name=None
-                , value=None
-                , context=None
-                , roles=None
-                , *args
-                , **kw):
-        return 1
-    
-    def checkPermission( self, permission, object, context) :
-        return 1
-
-class UnitTestUser( Acquisition.Implicit ):
-    """
-        Stubbed out manager for unit testing purposes.
-    """
-    def getId( self ):
-        return 'unit_tester'
-    
-    getUserName = getId
-
-    def allowed( self, object, object_roles=None ):
-        return 1
-
-class DummyContent( PortalContent, OFS.SimpleItem.Item ):
-    """
-    """
-    meta_type = 'Dummy'
-    after_add_called = before_delete_called = 0
-
-    def __init__( self, id, catalog=0 ):
-        self.id = id
-        self.reset()
-        self.catalog = catalog
-
-    def manage_afterAdd( self, item, container ):
-        self.after_add_called = 1
-        if self.catalog:
-            PortalContent.manage_afterAdd( self, item, container )
-
-    def manage_beforeDelete( self, item, container ):
-        self.before_delete_called = 1
-        if self.catalog:
-            PortalContent.manage_beforeDelete( self, item, container )
-    
-    def reset( self ):
-        self.after_add_called = self.before_delete_called = 0
-
-    # WAAAAAAAAA!  we don't want the Database export/import crap in the way.
-    def _getCopy( self, container ):
-        return DummyContent( self.id, self.catalog )
-
-
+from Products.CMFCore.PortalFolder import PortalFolder, ContentFilter
 
 def extra_meta_types():
     return [  { 'name' : 'Dummy', 'action' : 'manage_addFolder' } ]
 
-class PortalFolderTests( unittest.TestCase ):
+class PortalFolderTests( SecurityTest ):
 
     def setUp( self ):
-        get_transaction().begin()
-        self._policy = UnitTestSecurityPolicy()
-        self._oldPolicy = SecurityManager.setSecurityPolicy(self._policy)
-        self.connection = Zope.DB.open()
-        self.root = root = self.connection.root()[ 'Application' ]
-        newSecurityManager( None, UnitTestUser().__of__( self.root ) )
+        SecurityTest.setUp(self)
+
+        root = self.root
         try: root._delObject('test')
         except AttributeError: pass
         root._setObject( 'test', PortalFolder( 'test','' ) )
     
-    def tearDown( self ):
-        get_transaction().abort()
-        self.connection.close()
-        SecurityManager.setSecurityPolicy( self._oldPolicy )
-        
-
     def test_deletePropagation( self ):
 
         test = self.root.test
@@ -144,7 +77,7 @@ class PortalFolderTests( unittest.TestCase ):
         catalog = self.root.portal_catalog
         assert len( catalog ) == 0
 
-        test._setObject( 'foo', DummyContent( 'foo' , 1 ) )
+        test._setObject( 'foo', DummyContent( 'foo' , catalog=1 ) )
         foo = test.foo
         assert foo.after_add_called
         assert not foo.before_delete_called
@@ -175,7 +108,7 @@ class PortalFolderTests( unittest.TestCase ):
         test._setObject( 'sub', PortalFolder( 'sub', '' ) )
         sub = test.sub
 
-        sub._setObject( 'foo', DummyContent( 'foo', 1 ) )
+        sub._setObject( 'foo', DummyContent( 'foo', catalog=1 ) )
         foo = sub.foo
 
         assert foo.after_add_called
@@ -207,7 +140,7 @@ class PortalFolderTests( unittest.TestCase ):
         folder._setObject( 'sub', PortalFolder( 'sub', '' ) )
         sub = folder.sub
 
-        sub._setObject( 'foo', DummyContent( 'foo', 1 ) )
+        sub._setObject( 'foo', DummyContent( 'foo', catalog=1 ) )
         foo = sub.foo
         assert len( catalog ) == 1
         assert 'foo' in catalog.uniqueValuesFor( 'id' )
@@ -218,7 +151,7 @@ class PortalFolderTests( unittest.TestCase ):
         assert len( catalog ) == 1
         assert has_path( catalog._catalog, '/test/folder/new_sub/foo' )
 
-        folder._setObject( 'bar', DummyContent( 'bar', 1 ) )
+        folder._setObject( 'bar', DummyContent( 'bar', catalog=1 ) )
         bar = folder.bar
         assert 'bar' in catalog.uniqueValuesFor( 'id' )
         assert len( catalog ) == 2
@@ -249,7 +182,6 @@ class PortalFolderTests( unittest.TestCase ):
 
         self.root._setObject( 'portal_types', TypesTool() )
         types_tool = self.root.portal_types
-        FTI = FactoryTypeInformation
         types_tool._setObject( 'Folder'
                              , FTI( id='Folder'
                                   , meta_type=PortalFolder.meta_type
@@ -307,14 +239,7 @@ class PortalFolderTests( unittest.TestCase ):
 
         self.root._setObject( 'portal_types', TypesTool() )
         types_tool = self.root.portal_types
-        FTI = FactoryTypeInformation
-        types_tool._setObject( 'Dummy'
-                             , FTI( 'Dummy'
-                                  , meta_type=DummyContent.meta_type
-                                  , product='OFSP'
-                                  , factory='addDTMLDocument'
-                                  )
-                             )
+        types_tool._setObject( 'Dummy', DummyFTI )
 
         self.root._setObject( 'portal_catalog', CatalogTool() )
         catalog = self.root.portal_catalog
@@ -329,7 +254,7 @@ class PortalFolderTests( unittest.TestCase ):
         test._setObject( 'sub3', PortalFolder( 'sub3', '' ) )
         sub3 = test.sub3
 
-        sub1._setObject( 'dummy', DummyContent( 'dummy', 1 ) )
+        sub1._setObject( 'dummy', DummyContent( 'dummy', catalog=1 ) )
         assert 'dummy' in sub1.objectIds()
         assert 'dummy' in sub1.contentIds()
         assert not 'dummy' in sub2.objectIds()
@@ -373,118 +298,43 @@ class PortalFolderTests( unittest.TestCase ):
         assert has_path( catalog._catalog, '/test/sub2/dummy' )
         assert has_path( catalog._catalog, '/test/sub3/dummy' )
 
-
-def has_path( catalog, path ):
-    """
-        Verify that catalog has an object at path.
-    """
-    rids = map( lambda x: x.data_record_id_, catalog.searchResults() )
-    for rid in rids:
-        if catalog.getpath( rid ) == path:
-            return 1
-    return 0
-
-class LimitedUnitTestUser( Acquisition.Implicit ):
-    """
-        Stubbed out mmember for unit testing purposes.
-    """
-    def getId( self ):
-        return 'unit_test_member'
-    
-    getUserName = getId
-
-    def allowed( self, object, object_roles=None ):
-        if object_roles is None:
-            object_roles = ()
-        return 'Member' in object_roles
-
-class PortalFolderPermissionTests( unittest.TestCase ):
+class ContentFilterTests( TestCase ):
 
     def setUp( self ):
-        get_transaction().begin()
-        self._policy = UnitTestSecurityPolicy()
-        self._oldPolicy = SecurityManager.setSecurityPolicy(self._policy)
-        self.connection = Zope.DB.open()
-        self.root = self.connection.root()[ 'Application' ]
-        self.manager = UnitTestUser().__of__( self.root )
-        self.member = LimitedUnitTestUser().__of__( self.root )
-        self.root._setObject( 'folder', PortalFolder( 'folder', '' ) )
-        self.folder = self.root.folder
-        self.folder._setObject( 'doc1', DummyContent( 'doc1' ) )
-        self.folder._setObject( 'doc2', DummyContent( 'doc2' ) )
-        self.folder._setObject( 'doc3', DummyContent( 'doc3' ) )
-    
-    def tearDown( self ):
-        get_transaction().abort()
-        self.connection.close()
-        SecurityManager.setSecurityPolicy( self._oldPolicy )
-
-    def test_listFolderContentsPerms( self ):
-        pass
-
-class DummyContentWithMetadata( DummyContent ):
-
-    def Title( self ):
-        return self.title
-
-    def Creator( self ):
-        return self.creator
-
-    def Subject( self ):
-        return self.subject
-
-    def Description( self ):
-        return self.description
-
-    def created( self ):
-        return self.created_date
-
-    def modified( self ):
-        return self.modified_date
-    
-    def Type( self ):
-        return 'Dummy Content'
-
-class ContentFilterTests( unittest.TestCase ):
-
-    def setUp( self ):
-        get_transaction().begin()
-
-    def tearDown( self ):
-        get_transaction().abort()
+        self.dummy=DummyContent('Dummy')
 
     def test_empty( self ):
         cfilter = ContentFilter()
-        dummy = DummyContentWithMetadata( 'Dummy' )
+        dummy = self.dummy
         assert cfilter( dummy )
         desc = str( cfilter )
-        lines = filter( None, string.split( desc, '; ' ) )
+        lines = filter( None, desc.split('; ') )
         assert not lines
 
     def test_Type( self ):
         cfilter = ContentFilter( Type='foo' )
-        dummy = DummyContentWithMetadata( 'Dummy' )
+        dummy = self.dummy
         assert not cfilter( dummy )
         cfilter = ContentFilter( Type='Dummy Content' )
         assert cfilter( dummy )
         desc = str( cfilter )
-        lines = string.split( desc, '; ' )
+        lines = desc.split('; ')
         assert len( lines ) == 1
         assert lines[0] == 'Type: Dummy Content'
 
         cfilter = ContentFilter( Type=( 'foo', 'bar' ) )
-        dummy = DummyContentWithMetadata( 'Dummy' )
+        dummy = self.dummy
         assert not cfilter( dummy )
         cfilter = ContentFilter( Type=( 'Dummy Content', 'something else' ) )
         assert cfilter( dummy )
         desc = str( cfilter )
-        lines = string.split( desc, '; ' )
+        lines = desc.split('; ')
         assert len( lines ) == 1
         assert lines[0] == 'Type: Dummy Content, something else'
 
     def test_Title( self ):
         cfilter = ContentFilter( Title='foo' )
-        dummy = DummyContentWithMetadata( 'Dummy' )
+        dummy = self.dummy
         assert not cfilter( dummy )
         dummy.title = 'asdf'
         assert not cfilter( dummy )
@@ -493,28 +343,28 @@ class ContentFilterTests( unittest.TestCase ):
         dummy.title = 'ohsofoolish'
         assert cfilter( dummy )
         desc = str( cfilter )
-        lines = string.split( desc, '; ' )
+        lines = desc.split('; ')
         assert len( lines ) == 1
         assert lines[0] == 'Title: foo'
     
     def test_Creator( self ):
         cfilter = ContentFilter( Creator='moe' )
-        dummy = DummyContentWithMetadata( 'Dummy' )
+        dummy = self.dummy
         assert not cfilter( dummy )
         dummy.creator = 'curly'
         assert not cfilter( dummy )
         dummy.creator = 'moe'
-        assert cfilter( dummy )
+        self.failUnless(cfilter( dummy ))
         dummy.creator = 'shmoe'
         assert cfilter( dummy )
         desc = str( cfilter )
-        lines = string.split( desc, '; ' )
-        assert len( lines ) == 1
-        assert lines[0] == 'Creator: moe'
+        lines = desc.split('; ')
+        self.assertEqual(len( lines ),1)
+        self.assertEqual(lines[0],'Creator: moe')
     
     def test_Description( self ):
         cfilter = ContentFilter( Description='funny' )
-        dummy = DummyContentWithMetadata( 'Dummy' )
+        dummy = self.dummy
         assert not cfilter( dummy )
         dummy.description = 'sad'
         assert not cfilter( dummy )
@@ -523,13 +373,13 @@ class ContentFilterTests( unittest.TestCase ):
         dummy.description = 'it is funny you should mention it...'
         assert cfilter( dummy )
         desc = str( cfilter )
-        lines = string.split( desc, '; ' )
+        lines = desc.split('; ')
         assert len( lines ) == 1
         assert lines[0] == 'Description: funny'
     
     def test_Subject( self ):
         cfilter = ContentFilter( Subject=('foo',) )
-        dummy = DummyContentWithMetadata( 'Dummy' )
+        dummy = self.dummy
         assert not cfilter( dummy )
         dummy.subject = ( 'bar', )
         assert not cfilter( dummy )
@@ -538,13 +388,14 @@ class ContentFilterTests( unittest.TestCase ):
         dummy.subject = ( 'foo', 'bar', )
         assert cfilter( dummy )
         desc = str( cfilter )
-        lines = string.split( desc, '; ' )
+        lines = desc.split('; ')
         assert len( lines ) == 1
         assert lines[0] == 'Subject: foo'
 
+    def test_Subject2( self ):
         # Now test with mutli-valued
         cfilter = ContentFilter( Subject=('foo', 'bar' ) )
-        dummy = DummyContentWithMetadata( 'Dummy' )
+        dummy = self.dummy
         assert not cfilter( dummy )
         dummy.subject = ( 'baz', )
         assert not cfilter( dummy )
@@ -555,14 +406,14 @@ class ContentFilterTests( unittest.TestCase ):
         dummy.subject = ( 'foo', 'bar', )
         assert cfilter( dummy )
         desc = str( cfilter )
-        lines = string.split( desc, '; ' )
+        lines = desc.split('; ')
         assert len( lines ) == 1
         assert lines[0] == 'Subject: foo, bar'
     
     def test_created( self ):
         cfilter = ContentFilter( created=DateTime( '2001/01/01' )
                                , created_usage='range:min' )
-        dummy = DummyContentWithMetadata( 'Dummy' )
+        dummy = self.dummy
         assert not cfilter( dummy )
         dummy.created_date = DateTime( '2000/12/31' )
         assert not cfilter( dummy )
@@ -571,14 +422,16 @@ class ContentFilterTests( unittest.TestCase ):
         dummy.created_date = DateTime( '2001/01/01' )
         assert cfilter( dummy )
         desc = str( cfilter )
-        lines = string.split( desc, '; ' )
+        lines = desc.split('; ')
         assert len( lines ) == 1
         assert lines[0] == 'Created since: 2001/01/01'
 
+    def test_created2( self ):
+        
         cfilter = ContentFilter( created=DateTime( '2001/01/01' )
                                , created_usage='range:max' )
 
-        dummy = DummyContentWithMetadata( 'Dummy' )
+        dummy = self.dummy
         assert not cfilter( dummy )
         dummy.created_date = DateTime( '2000/12/31' )
         assert cfilter( dummy )
@@ -587,14 +440,14 @@ class ContentFilterTests( unittest.TestCase ):
         dummy.created_date = DateTime( '2001/01/01' )
         assert cfilter( dummy )
         desc = str( cfilter )
-        lines = string.split( desc, '; ' )
+        lines = desc.split('; ')
         assert len( lines ) == 1
         assert lines[0] == 'Created before: 2001/01/01'
     
     def test_modified( self ):
         cfilter = ContentFilter( modified=DateTime( '2001/01/01' )
                                , modified_usage='range:min' )
-        dummy = DummyContentWithMetadata( 'Dummy' )
+        dummy = self.dummy
         assert not cfilter( dummy )
         dummy.modified_date = DateTime( '2000/12/31' )
         assert not cfilter( dummy )
@@ -603,14 +456,14 @@ class ContentFilterTests( unittest.TestCase ):
         dummy.modified_date = DateTime( '2001/01/01' )
         assert cfilter( dummy )
         desc = str( cfilter )
-        lines = string.split( desc, '; ' )
+        lines = desc.split('; ')
         assert len( lines ) == 1
         assert lines[0] == 'Modified since: 2001/01/01'
 
+    def test_modified2( self ):
         cfilter = ContentFilter( modified=DateTime( '2001/01/01' )
-                               , modified_usage='range:max' )
-
-        dummy = DummyContentWithMetadata( 'Dummy' )
+                               , modified_usage='range:max' )        
+        dummy = self.dummy
         assert not cfilter( dummy )
         dummy.modified_date = DateTime( '2000/12/31' )
         assert cfilter( dummy )
@@ -619,7 +472,7 @@ class ContentFilterTests( unittest.TestCase ):
         dummy.modified_date = DateTime( '2001/01/01' )
         assert cfilter( dummy )
         desc = str( cfilter )
-        lines = string.split( desc, '; ' )
+        lines = desc.split('; ')
         assert len( lines ) == 1
         assert lines[0] == 'Modified before: 2001/01/01'
  
@@ -629,7 +482,7 @@ class ContentFilterTests( unittest.TestCase ):
                                , Title='foo'
                                )
 
-        dummy = DummyContentWithMetadata( 'Dummy' )
+        dummy = self.dummy
         assert not cfilter( dummy )
         dummy.created_date = DateTime( '2000/12/31' )
         assert not cfilter( dummy )
@@ -649,20 +502,16 @@ class ContentFilterTests( unittest.TestCase ):
         assert cfilter( dummy )
 
         desc = str( cfilter )
-        lines = string.split( desc, '; ' )
+        lines = desc.split('; ')
         assert len( lines ) == 2, lines
         assert 'Created before: 2001/01/01' in lines
         assert 'Title: foo' in lines
 
 def test_suite():
-    suite = unittest.TestSuite()
-    suite.addTest( unittest.makeSuite( PortalFolderTests ) )
-    suite.addTest( unittest.makeSuite( PortalFolderPermissionTests ) )
-    suite.addTest( unittest.makeSuite( ContentFilterTests ) )
-    return suite
-
-def run():
-    unittest.TextTestRunner().run(test_suite())
+    return TestSuite((
+        makeSuite( PortalFolderTests ),
+        makeSuite( ContentFilterTests ),
+        ))
 
 if __name__ == '__main__':
-    run()
+    main(defaultTest='test_suite')

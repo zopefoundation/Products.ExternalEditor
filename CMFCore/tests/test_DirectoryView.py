@@ -1,22 +1,25 @@
 import Zope
 from unittest import TestCase, TestSuite, makeSuite, main
+
+from Products.CMFCore.tests.base.dummy import \
+     DummyFolder
+
 from Products.CMFCore.DirectoryView import \
      registerDirectory,addDirectoryViews,DirectoryViewSurrogate
 from Globals import package_home, DevelopmentMode
-from Acquisition import Implicit
-import os
-from os import remove, mkdir, rmdir
-from os.path import join
+
+from os import remove, mkdir, rmdir, curdir
+from os.path import join, abspath, dirname
 from shutil import copy2
 
 try:
     __file__
 except NameError:
     # Test was called directly, so no __file__ global exists.
-    _prefix = os.path.abspath(os.curdir)
+    _prefix = abspath(curdir)
 else:
     # Test was called by another test.
-    _prefix = os.path.abspath(os.path.dirname(__file__))
+    _prefix = abspath(dirname(__file__))
 
 # the path of our fake skin
 skin_path_name = join(_prefix, 'fake_skins', 'fake_skin')
@@ -27,20 +30,11 @@ class DirectoryViewTests1( TestCase ):
         """ Test registerDirectory  """
         registerDirectory('fake_skins', _prefix)
 
-class Dummy(Implicit):
-    """
-    A Dummy object to use in place of the skins tool
-    """
-
-    def _setObject(self,id,object):
-        """ Dummy _setObject method """
-        setattr(self,id,object)
-
 class DirectoryViewTests2( TestCase ):
 
     def setUp( self ):
         registerDirectory('fake_skins', _prefix)
-        ob = self.ob = Dummy()
+        ob = self.ob = DummyFolder()
         addDirectoryViews(ob, 'fake_skins', _prefix)
 
     def test_addDirectoryViews( self ):
@@ -71,7 +65,7 @@ if DevelopmentMode:
         
         # initialise skins
         registerDirectory('fake_skins', _prefix)
-        ob = self.ob = Dummy()
+        ob = self.ob = DummyFolder()
         addDirectoryViews(ob, 'fake_skins', _prefix)
 
         # add a method to the fake skin folder
@@ -121,7 +115,6 @@ if DevelopmentMode:
         """
         See if a new folder shows up
         """
-        # This fails for some bizarre reason :-( - CW
         self.failUnless(isinstance(self.ob.fake_skin.test3,DirectoryViewSurrogate))
         self.ob.fake_skin.test3.objectIds()
 
@@ -161,11 +154,8 @@ def test_suite():
         makeSuite(DebugModeTests),
         ))
 
-def run():
-    main(defaultTest='test_suite')
-
 if __name__ == '__main__':
-    run()
+    main(defaultTest='test_suite')
 
 
 

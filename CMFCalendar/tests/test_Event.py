@@ -1,16 +1,9 @@
-import ZServer
 import Zope
-import unittest, string
-from Products.CMFCalendar.Event import *
+from unittest import TestCase, TestSuite, main, makeSuite
+from Products.CMFCalendar.Event import Event
 from DateTime import DateTime
 
-class TestEvent(unittest.TestCase):
-
-    def setUp( self ):
-        get_transaction().begin()
-
-    def tearDown( self ):
-        get_transaction().abort()
+class TestEvent(TestCase):
 
     def test_new(self):
         event = Event('test')
@@ -54,12 +47,9 @@ class TestEvent(unittest.TestCase):
                          )
 
 def test_suite():
-    suite = unittest.TestSuite()
-    suite.addTest( unittest.makeSuite( TestEvent ) )
-    return suite
-
-def run():
-    unittest.TextTestRunner().run(test_suite())
+    return TestSuite((
+        makeSuite( TestEvent ),
+        ))
 
 if __name__ == '__main__':
-    run()
+    main(defaultTest='test_suite')

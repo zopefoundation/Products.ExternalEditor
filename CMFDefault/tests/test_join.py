@@ -1,18 +1,10 @@
 import Zope
-import unittest
-import Products.CMFCore
-import Products.CMFDefault
+from unittest import TestSuite, makeSuite, main
 
-class MembershipTests( unittest.TestCase ):
+from Products.CMFCore.tests.base.testcase import \
+     TransactionalTest
 
-    def setUp( self ):
-        get_transaction().begin()
-        self.connection = Zope.DB.open()
-        self.root = self.connection.root()[ 'Application' ]
-
-    def tearDown( self ):
-        get_transaction().abort()
-        self.connection.close()
+class MembershipTests( TransactionalTest ):
 
     def test_join( self ):
         self.root.manage_addProduct[ 'CMFDefault' ].manage_addCMFSite( 'site' )
@@ -27,12 +19,9 @@ class MembershipTests( unittest.TestCase ):
 
 
 def test_suite():
-    suite = unittest.TestSuite()
-    suite.addTest( unittest.makeSuite( MembershipTests ) )
-    return suite
-
-def run():
-    unittest.TextTestRunner().run(test_suite())
+    return TestSuite((
+        makeSuite(MembershipTests),
+        ))
 
 if __name__ == '__main__':
-    run()
+    main(defaultTest='test_suite')

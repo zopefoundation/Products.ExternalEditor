@@ -1,69 +1,46 @@
 import Zope
-import unittest, string
+from unittest import TestSuite, makeSuite, main
 
-from AccessControl import SecurityManager
-from Acquisition import aq_base, aq_inner
+from Products.CMFCore.tests.base.testcase import \
+     SecurityTest
+
+from Products.CMFCore.tests.base.utils import \
+     has_path
+
+from Products.CMFCore.tests.base.dummy import \
+     DummyFTI
 
 from Products.CMFCore.CatalogTool import CatalogTool
-from Products.CMFCore.TypesTool import TypesTool, FactoryTypeInformation
+from Products.CMFCore.TypesTool import TypesTool
 from Products.CMFCore.WorkflowTool import WorkflowTool
 
-from Products.CMFDefault.DiscussionTool import DiscussionTool\
-                                             , DiscussionNotAllowed
+from Products.CMFDefault.DiscussionTool import \
+     DiscussionTool, DiscussionNotAllowed
 
 from Products.CMFDefault.Document import Document
 from Products.CMFDefault.URLTool import URLTool
 
-class UnitTestSecurityPolicy:
-    """
-        Stub out the existing security policy for unit testing purposes.
-    """
-    #
-    #   Standard SecurityPolicy interface
-    #
-    def validate( self, accessed, container, name, value, context, roles,
-                 *args, **kw ):
-        return 1
-    
-    def checkPermission( self, permission, object, context ) :
-        return 1
-
-
-class DiscussionTests( unittest.TestCase ):
+class DiscussionTests( SecurityTest ):
 
     def setUp( self ):
-        get_transaction().begin()
-        self._policy = UnitTestSecurityPolicy()
-        self._oldPolicy = SecurityManager.setSecurityPolicy(self._policy)
-        self.connection = Zope.DB.open()
-        self.root = root = self.connection.root()[ 'Application' ]
-        self.root._setObject( 'portal_discussion', DiscussionTool() )
-        self.discussion_tool = self.root.portal_discussion
-        self.root._setObject( 'portal_catalog', CatalogTool() )
-        self.catalog_tool = self.root.portal_catalog
-        self.root._setObject( 'portal_url', URLTool() )
-        self.url_tool = self.root.portal_url
-        self.root._setObject( 'portal_workflow', WorkflowTool() ) 
-        self.workflow_tool = self.root.portal_workflow
-        self.root._setObject( 'portal_types', TypesTool() )
-        types_tool = self.types_tool = self.root.portal_types
+        
+        SecurityTest.setUp(self)
+        
+        root = self.root
+        root._setObject( 'portal_discussion', DiscussionTool() )
+        self.discussion_tool = root.portal_discussion
+        root._setObject( 'portal_catalog', CatalogTool() )
+        self.catalog_tool = root.portal_catalog
+        root._setObject( 'portal_url', URLTool() )
+        self.url_tool = root.portal_url
+        root._setObject( 'portal_workflow', WorkflowTool() ) 
+        self.workflow_tool = root.portal_workflow
+        root._setObject( 'portal_types', TypesTool() )
+        types_tool = self.types_tool = root.portal_types
         try: root._delObject('test')
         except AttributeError: pass
         root._setObject( 'test', Document( 'test' ) )
             
-    
-    def tearDown( self ):
-        del self.types_tool
-        del self.workflow_tool
-        del self.url_tool
-        del self.discussion_tool
-        del self.catalog_tool
-        del self.root
-        del self._policy
-        get_transaction().abort()
-        self.connection.close()
-        SecurityManager.setSecurityPolicy( self._oldPolicy )
-
     def test_policy( self ):
 
         test = self.root.test
@@ -79,14 +56,7 @@ class DiscussionTests( unittest.TestCase ):
 
         del test.talkback
         del test.allow_discussion
-        FTI = FactoryTypeInformation
-        self.types_tool._setObject( 'Document'
-                                  , FTI( 'Document'
-                                       , meta_type=Document.meta_type
-                                       , product='CMFDefault'
-                                       , factory='addDocument'
-                                       )
-                                  )
+        self.types_tool._setObject( 'Document', DummyFTI )
         self.assertRaises( DiscussionNotAllowed
                          , self.discussion_tool.getDiscussionFor
                          , test
@@ -202,25 +172,10 @@ class DiscussionTests( unittest.TestCase ):
         self.root._delObject( 'test' )
         assert len( self.catalog_tool ) == 0
 
-def has_path( catalog, path ):
-    """
-        Verify that catalog has an object at path.
-    """
-    if type( path ) is type( () ):
-        path = string.join( path, '/' )
-    rids = map( lambda x: x.data_record_id_, catalog.searchResults() )
-    for rid in rids:
-        if catalog.getpath( rid ) == path:
-            return 1
-    return 0
-
 def test_suite():
-    suite = unittest.TestSuite()
-    suite.addTest( unittest.makeSuite( DiscussionTests ) )
-    return suite
-
-def run():
-    unittest.TextTestRunner().run( test_suite() )
+    return TestSuite((
+        makeSuite( DiscussionTests ),
+        ))
 
 if __name__ == '__main__':
-    run()
+    main(defaultTest='test_suite')

@@ -1,180 +1,40 @@
 import Zope
-import OFS.Folder, OFS.SimpleItem
 from unittest import TestCase, TestSuite, makeSuite, main
-from Acquisition import Implicit
+
+from Products.CMFCore.TypesTool import\
+     FactoryTypeInformation as FTI,\
+     ScriptableTypeInformation as STI,\
+     TypesTool,addTypeFactory,Unauthorized
+
+from Products.CMFCore.PortalFolder import PortalFolder
+from Products.CMFCore.utils import _getViewFor
+
+from Products.CMFCore.tests.base.testcase import \
+     SecurityRequestTest
+from Products.CMFCore.tests.base.security import \
+     OmnipotentUser, UserWithRoles
+from Products.CMFCore.tests.base.dummy import \
+     DummyObject, addDummy, DummyTypeInfo,\
+     DummyFolder, DummyFTI
+
 from AccessControl.SecurityManagement import newSecurityManager
 from AccessControl.SecurityManagement import noSecurityManager
-from AccessControl import SecurityManager
-from Products.CMFCore.TypesTool import *
-from Products.CMFCore.PortalContent import PortalContent
-from Products.CMFCore.CMFCorePermissions import AddPortalContent
-from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
-from Products.CMFCore.PortalFolder import *
-from Products.CMFCore import utils
-import ZPublisher.HTTPRequest
+
 from Products.PythonScripts.standard import url_quote
 from webdav.NullResource import NullResource
 from Acquisition import aq_base
 
-class PermissiveSecurityPolicy:
-    """
-        Stub out the existing security policy for unit testing purposes.
-    """
-    #
-    #   Standard SecurityPolicy interface
-    #
-    def validate( self
-                , accessed=None
-                , container=None
-                , name=None
-                , value=None
-                , context=None
-                , roles=None
-                , *args
-                , **kw):
-        return 1
-    
-    def checkPermission( self, permission, object, context) :
-        if permission == 'forbidden permission':
-            return 0
-        return 1
-
-class OmnipotentUser( Implicit ):
-    """
-        Stubbed out manager for unit testing purposes.
-    """
-    def getId( self ):
-        return 'all_powerful_Oz'
-    
-    getUserName = getId
-
-    def allowed( self, object, object_roles=None ):
-        return 1
-
-class UserWithRoles( Implicit ):
-    """
-        Stubbed out manager for unit testing purposes.
-    """
-    def __init__( self, *roles ):
-        self._roles = roles
-
-    def getId( self ):
-        return 'high_roller'
-    
-    getUserName = getId
-
-    def allowed( self, object, object_roles=None ):
-        for orole in object_roles:
-            if orole in self._roles:
-                return 1
-        return 0
-
-class UnitTestUser( Implicit ):
-    """
-        Stubbed out manager for unit testing purposes.
-    """
-    def getId( self ):
-        return 'unit_tester'
-    
-    getUserName = getId
-
-    def has_permission(self, permission, obj):
-        # For types tool tests dealing with filtered_meta_types
-        return 1
-
-    def allowed( self, object, object_roles=None ):
-        # for testing permissions on actions
-        if object.getId() == 'actions_dummy':
-            if 'Anonymous' in object_roles:
-                return 1
-            else:
-                return 0
-        return 1
-
-class DummyMethod:
-    def __init__(self, name):
-        self.name = name
-    def __str__(self):
-        return self.name
-    def __call__(self):
-        return self.name
-
-class DummyContent( PortalContent, OFS.SimpleItem.Item ):
-    """
-    """
-    meta_type = 'Dummy'
-
-def addDummy( self, id ):
-    """
-    """
-    self._setObject( id, DummyContent() )
-
-def extra_meta_types():
-    return (  { 'name' : 'Dummy', 'action' : 'manage_addFolder' }, )
-
-class DummyTypeInfo(TypeInformation):
-    """ new class of type info object """
-    meta_type = "Dummy Test Type Info"
-
-class TypesToolTests( TestCase ):
+class TypesToolTests( SecurityRequestTest ):
 
     def setUp( self ):
-        get_transaction().begin()
-        self._policy = PermissiveSecurityPolicy()
-        self._oldPolicy = SecurityManager.setSecurityPolicy(self._policy)
-        self.connection = Zope.DB.open()
-        root = self.root = self.connection.root()[ 'Application' ]
-        newSecurityManager( None, UnitTestUser().__of__( self.root ) )
-
-        env = { 'SERVER_NAME' : 'http://localhost'
-              , 'SERVER_PORT' : '80'
-              }
-        root.REQUEST = ZPublisher.HTTPRequest.HTTPRequest( None, env, None )
-        
+        SecurityRequestTest.setUp(self)
+        root = self.root
         root.addDummy = addDummy
 
         root._setObject( 'portal_types', TypesTool() )
         tool = root.portal_types
-        FTI = FactoryTypeInformation
-        tool._setObject( 'Dummy'
-                       , FTI( 'Dummy'
-                            , meta_type=DummyContent.meta_type
-                            , product='CMFDefault'
-                            , factory='addDocument'
-                            , actions= ( { 'name'          : 'View'
-                                           , 'action'        : 'view'
-                                           , 'permissions'   : ('View', ) },
-                                         { 'name'          : 'View2'
-                                           , 'action'        : 'view2'
-                                           , 'permissions'   : ('View', ) },
-                                         { 'name'          : 'Edit'
-                                           , 'action'        : 'edit'
-                                           , 'permissions'   : ('forbidden permission',)
-                                           }
-                                         )
-                              )
-                         )
+        tool._setObject( 'Dummy', DummyFTI ) 
     
-    def tearDown( self ):
-        get_transaction().abort()
-        self.connection.close()
-        noSecurityManager()
-        SecurityManager.setSecurityPolicy(self._oldPolicy)
-
-    def off_test_otherFolderTypes( self ):
-        """
-            Does 'invokeFactory' work when invoked from non-PortalFolder?
-            Currently tests a bug which hasn't been fixed (remove 'off_'
-            from name to activate)            
-        """
-        self.root._setObject( 'portal', PortalFolder( 'portal', '' ) )
-        portal = self.root.portal
-        portal._setObject( 'normal', OFS.Folder.Folder( 'normal', '' ) )
-        normal = portal.normal
-        normal.invokeFactory( 'Dummy', 'dummy' )
-        assert 'dummy' not in portal.objectIds()
-        assert 'dummy' in normal.objectIds()
-
     def test_processActions( self ):
         """
         Are the correct, permitted methods returned for actions?
@@ -185,13 +45,13 @@ class TypesToolTests( TestCase ):
         dummy = portal._getOb( 'actions_dummy' )
 
         # so we can traverse to it:
-        dummy.view = DummyMethod("view")
-        dummy.view2 = DummyMethod("view2")
-        dummy.edit = DummyMethod("edit")
+        dummy.view = DummyObject("view")
+        dummy.view2 = DummyObject("view2")
+        dummy.edit = DummyObject("edit")
 
         default_view = dummy()
-        custom_view = utils._getViewFor( dummy, view='view2' )()
-        unpermitted_view = utils._getViewFor( dummy, view='edit' )()
+        custom_view = _getViewFor( dummy, view='view2' )()
+        unpermitted_view = _getViewFor( dummy, view='edit' )()
 
         self.failUnlessEqual(default_view, 'view')
         self.failUnlessEqual(custom_view, 'view2')
@@ -214,7 +74,7 @@ class TypesToolTests( TestCase ):
 
         tool.manage_addTypeInformation(id='foo_default', type_type=None)
         fd = tool.foo_default
-        self.failUnless(isinstance(fd, FactoryTypeInformation))
+        self.failUnless(isinstance(fd, FTI))
         self.failIf(isinstance(fd, DummyTypeInfo))
 
         tool.manage_addTypeInformation(id='foo_sub', type_type=type_type)
@@ -400,7 +260,7 @@ class TypeInfoTests( TestCase ):
 class FTIDataTests( TypeInfoTests ):
 
     def _makeInstance( self, id, **kw ):
-        return apply( FactoryTypeInformation, ( id, ), kw )
+        return apply( FTI, ( id, ), kw )
 
     def test_properties( self ):
         ti = self._makeInstance( 'Foo' )
@@ -418,7 +278,7 @@ class FTIDataTests( TypeInfoTests ):
 class STIDataTests( TypeInfoTests ):
 
     def _makeInstance( self, id, **kw ):
-        return apply( ScriptableTypeInformation, ( id, ), kw )
+        return apply( STI, ( id, ), kw )
 
     def test_properties( self ):
         ti = self._makeInstance( 'Foo' )
@@ -432,63 +292,16 @@ class STIDataTests( TypeInfoTests ):
         self.assertEqual( ti.permission, 'Add Foos' )
         self.assertEqual( ti.constructor_path, 'foo_add' )
 
-
-class Foo:
-    """
-        Shim content object.
-    """
-    def __init__( self, id, *args, **kw ):
-        self.id = id
-        self._args = args
-        self._kw = {}
-        self._kw.update( kw )
-
-class FauxFactory:
-    """
-        Shim product factory.
-    """
-    def __init__( self, folder ):
-        self._folder = folder
-
-    def addFoo( self, id, *args, **kw ):
-        if self._folder._prefix:
-            id = '%s_%s' % ( self._folder._prefix, id )
-        foo = apply( Foo, ( id, ) + args, kw )
-        self._folder._setOb( id, foo )
-        if self._folder._prefix:
-            return id
-
-    __roles__ = ( 'FooAdder', )
-    __allow_access_to_unprotected_subobjects__ = { 'addFoo' : 1 }
-
-class FauxFolder( Implicit ):
-    """
-        Shim container
-    """
-    def __init__( self, fake_product=0, prefix='' ):
-        self._prefix = prefix
-
-        if fake_product:
-            self.manage_addProduct = { 'FooProduct' : FauxFactory( self ) }
-
-        self._objects = {}
-
-    def _setOb( self, id, obj ):
-        self._objects[id] = obj
-
-    def _getOb( self, id ):
-        return self._objects[id]
-
 class FTIConstructionTests( TestCase ):
 
     def setUp( self ):
         noSecurityManager()
 
     def _makeInstance( self, id, **kw ):
-        return apply( FactoryTypeInformation, ( id, ), kw )
+        return apply( FTI, ( id, ), kw )
 
     def _makeFolder( self, fake_product=0 ):
-        return FauxFolder( fake_product )
+        return DummyFolder( fake_product )
 
     def test_isConstructionAllowed_wo_Container( self ):
 
@@ -537,11 +350,11 @@ class FTIConstructionTests_w_Roles( TestCase ):
 
     def _makeStuff( self, prefix='' ):
 
-        ti = FactoryTypeInformation( 'Foo'
-                                   , product='FooProduct'
-                                   , factory='addFoo'
-                                   )
-        folder = FauxFolder( fake_product=1, prefix=prefix )
+        ti = FTI( 'Foo'
+                  , product='FooProduct'
+                  , factory='addFoo'
+                  )
+        folder = DummyFolder( fake_product=1,prefix=prefix )
         
         return ti, folder
 
@@ -634,8 +447,5 @@ def test_suite():
         makeSuite(FTIConstructionTests_w_Roles),
         ))
 
-def run():
-    main(defaultTest='test_suite')
-
 if __name__ == '__main__':
-    run()
+    main(defaultTest='test_suite')

@@ -1,55 +1,18 @@
-import unittest, string
-from utils import fakeRequest, fakeResponse
+from unittest import makeSuite, main
+
 from Products.CMFDefault.NewsItem import NewsItem
-#" 
-DOCTYPE = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">'''
 
-BASIC_HTML = '''\
-<html>
- <head>
-  <title>Title in tag</title>
-  <meta name="description" content="Describe me">
-  <meta name="contributors" content="foo@bar.com; baz@bam.net">
- </head>
- <body bgcolor="#ffffff">
-  <h1>Not a lot here</h1>
- </body>
-</html>
-'''
+from Products.CMFCore.tests.base.testcase import \
+     RequestTest
 
-ENTITY_IN_TITLE = '''\
-<html>
- <head>
-  <title>&Auuml;rger</title>
- </head>
- <bOdY>
-  <h2>Not a lot here either</h2>
- </bodY>
-</html>
-'''
+from Products.CMFCore.tests.base.content import \
+     DOCTYPE, BASIC_HTML, ENTITY_IN_TITLE, BASIC_STRUCTUREDTEXT
 
-BASIC_STRUCTUREDTEXT = '''\
-Title: My NewsItem
-Description: A news item by me
-Contributors: foo@bar.com; baz@bam.net; no@yes.maybe
+class NewsItemTests(RequestTest):
 
-This is the header and it supercedes the title
-
-  Body body body body body
-  body body body.
-
-   o What does this do
-   
-   o if it happens to you?
-'''
-
-class NewsItemTests(unittest.TestCase):
-
-    def setUp( self ):
-        get_transaction().begin()
-
-    def tearDown( self ):
-        get_transaction().abort()
+    def setUp(self):
+        RequestTest.setUp(self)
+        self.d = NewsItem('foo')
 
     def test_Empty(self):
         d = NewsItem('foo', text_format='structured-text')
@@ -59,91 +22,80 @@ class NewsItemTests(unittest.TestCase):
         assert d.text_format == 'structured-text'
 
     def test_BasicHtml(self):
-        REQUEST = fakeRequest()
-        REQUEST['BODY']=BASIC_HTML
-        d = NewsItem('foo')
-        d.PUT(REQUEST, RESPONSE=fakeResponse())
+        self.REQUEST['BODY']=BASIC_HTML
+        d = self.d
+        d.PUT(self.REQUEST, self.RESPONSE)
         assert d.Format() == 'text/html', d.Format()
         assert d.title == 'Title in tag'
-        assert string.find(d.text, '</body>') == -1
+        self.assertEqual(d.text.find('</body>'),-1)
         assert d.Description() == 'Describe me'
-        assert len(d.Contributors()) == 2
+        self.assertEqual(len(d.Contributors()),3)
 
     def test_UpperedHtml(self):
-        REQUEST = fakeRequest()
-        REQUEST['BODY'] = string.upper(BASIC_HTML)
-        d = NewsItem('foo')
-        d.PUT(REQUEST, RESPONSE=fakeResponse())
+        self.REQUEST['BODY'] = BASIC_HTML.upper()
+        d = self.d
+        d.PUT(self.REQUEST, self.RESPONSE)
         assert d.Format() == 'text/html'
         assert d.title == 'TITLE IN TAG'
-        assert string.find(d.text, '</BODY') == -1
+        self.assertEqual( d.text.find('</BODY'),-1)
         assert d.Description() == 'DESCRIBE ME'
-        assert len(d.Contributors()) == 2
+        assert len(d.Contributors()) == 3
 
     def test_EntityInTitle(self):
-        REQUEST = fakeRequest()
-        REQUEST['BODY'] = ENTITY_IN_TITLE
-        d = NewsItem('foo')
-        d.PUT(REQUEST, RESPONSE=fakeResponse())
+        self.REQUEST['BODY'] = ENTITY_IN_TITLE
+        d = self.d
+        d.PUT(self.REQUEST, self.RESPONSE)
         assert d.title == '&Auuml;rger', "Title '%s' being lost" % (
             d.title )
 
     def test_HtmlWithDoctype(self):
-        REQUEST = fakeRequest()
-        d = NewsItem('foo')
-        REQUEST['BODY'] = '%s\n%s' % (DOCTYPE, BASIC_HTML)
-        d.PUT(REQUEST, RESPONSE=fakeResponse())
+        d = self.d
+        self.REQUEST['BODY'] = '%s\n%s' % (DOCTYPE, BASIC_HTML)
+        d.PUT(self.REQUEST, self.RESPONSE)
         assert d.Description() == 'Describe me'
 
     def test_HtmlWithoutNewlines(self):
-        REQUEST = fakeRequest()
-        d = NewsItem('foo')
-        REQUEST['BODY'] = string.join(string.split(BASIC_HTML, '\n'), '')
-        d.PUT(REQUEST, RESPONSE=fakeResponse())
+        d = self.d
+        self.REQUEST['BODY'] = ''.join(BASIC_HTML.split('\n'))
+        d.PUT(self.REQUEST, self.RESPONSE)
         assert d.Format() == 'text/html'
         assert d.Description() == 'Describe me'
 
     def test_StructuredText(self):
-        REQUEST = fakeRequest()
-        REQUEST['BODY'] = BASIC_STRUCTUREDTEXT
-        d = NewsItem('foo')
-        d.PUT(REQUEST, RESPONSE=fakeResponse())
+        self.REQUEST['BODY'] = BASIC_STRUCTUREDTEXT
+        d = self.d
+        d.PUT(self.REQUEST, self.RESPONSE)
         
         assert d.Format() == 'text/plain'
-        assert d.Title() == 'My NewsItem'
-        assert d.Description() == 'A news item by me'
+        self.assertEqual(d.Title(),'My Document')
+        self.assertEqual(d.Description(),'A document by me')
         assert len(d.Contributors()) == 3
-        assert string.find(d.cooked_text, '<p>') >= 0
+        self.failUnless(d.cooked_text.find('<p>') >= 0)
 
     def test_Init(self):
-        REQUEST = fakeRequest()
-        REQUEST['BODY'] = BASIC_STRUCTUREDTEXT
+        self.REQUEST['BODY'] = BASIC_STRUCTUREDTEXT
         d = NewsItem('foo', text='')
-        d.PUT(REQUEST, RESPONSE=fakeResponse())
+        d.PUT(self.REQUEST, self.RESPONSE)
         assert d.Format() == 'text/plain'
-        assert d.Title() == 'My NewsItem', d.Title()
-        assert d.Description() == 'A news item by me'
+        self.assertEqual(d.Title(),'My Document')
+        self.assertEqual(d.Description(),'A document by me')
         assert len(d.Contributors()) == 3
-        assert string.find(d.cooked_text, '<p>') >= 0
+        self.failUnless(d.cooked_text.find('<p>') >= 0)
 
         d = NewsItem('foo', text='')
-        REQUEST['BODY'] = BASIC_HTML
-        d.PUT(REQUEST, RESPONSE=fakeResponse())
+        self.REQUEST['BODY'] = BASIC_HTML
+        d.PUT(self.REQUEST, self.RESPONSE)
         assert d.Format() == 'text/html'
         assert d.Title() == 'Title in tag'
-        assert len(d.Contributors()) == 2
+        assert len(d.Contributors()) == 3
 
         d = NewsItem('foo', text_format='structured-text', title='Foodoc')
         assert d.text == ''
         assert d.title == 'Foodoc'
         assert d.Format() == 'text/plain'
 
-
-
 def test_suite():
-    return unittest.makeSuite(NewsItemTests)
+    return makeSuite(NewsItemTests)
 
-def main():
-    unittest.TextTestRunner().run(test_suite())
-
-if __name__=='__main__': main()
+if __name__=='__main__':
+    main(defaultTest='test_suite')

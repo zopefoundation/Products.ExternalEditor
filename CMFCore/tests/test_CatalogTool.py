@@ -1,23 +1,12 @@
 import Zope
-import unittest
-import OFS.Folder, OFS.SimpleItem
-import Acquisition
-from Products.CMFCore.CatalogTool import *
-from Products.CMFCore.PortalContent import PortalContent
+from unittest import TestCase, TestSuite, makeSuite, main
 
+from Products.CMFCore.tests.base.dummy import \
+     DummyContent
 
-class DummyContent( PortalContent, OFS.SimpleItem.Item ):
-    """
-    """
-    meta_type = 'Dummy'
+from Products.CMFCore.CatalogTool import CatalogTool
 
-class CatalogToolTests( unittest.TestCase ):
-
-    def setUp( self ):
-        get_transaction().begin()
-    
-    def tearDown( self ):
-        get_transaction().abort()
+class CatalogToolTests( TestCase ):
 
     def test_processActions( self ):
         """
@@ -25,18 +14,15 @@ class CatalogToolTests( unittest.TestCase ):
             argument, 'idxs', to 'catalog_object'.
         """
         tool = CatalogTool()
-        dummy = DummyContent()
+        dummy = DummyContent(catalog=1)
 
         tool.catalog_object( dummy, '/dummy' )
         tool.catalog_object( dummy, '/dummy', [ 'SearchableText' ] )
 
 def test_suite():
-    suite = unittest.TestSuite()
-    suite.addTest( unittest.makeSuite( CatalogToolTests ) )
-    return suite
-
-def run():
-    unittest.TextTestRunner().run(test_suite())
+    return TestSuite((
+        makeSuite( CatalogToolTests ),
+        ))
 
 if __name__ == '__main__':
-    run()
+    main(defaultTest='test_suite')

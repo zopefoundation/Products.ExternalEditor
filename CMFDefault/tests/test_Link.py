@@ -1,4 +1,8 @@
-import unittest, string, re
+import Zope
+from unittest import TestCase, TestSuite, makeSuite, main
+
+from re import compile
+
 from Products.CMFDefault.Link import Link
 
 BASIC_STRUCTUREDTEXT = '''\
@@ -18,7 +22,7 @@ Subject: open source; Zope; community
 http://www.zope.org
 '''
 
-class LinkTests(unittest.TestCase):
+class LinkTests(TestCase):
 
     def test_Empty( self ):
         d = Link( 'foo' )
@@ -42,7 +46,7 @@ class LinkTests(unittest.TestCase):
 
         d = Link('foo')
         d._writeFromPUT( body=STX_W_CONTINUATION )
-        rnlinesplit = re.compile( r'\r?\n?' )
+        rnlinesplit = compile( r'\r?\n?' )
         desc_lines = rnlinesplit.split( d.Description() )
         
         self.assertEqual( d.Title(), 'Zope Community' )
@@ -67,11 +71,10 @@ class LinkTests(unittest.TestCase):
         self.assertEqual( d.getRemoteUrl(), 'http://baz.com' )
 
 
-
 def test_suite():
-    return unittest.makeSuite(LinkTests)
+    return TestSuite((
+        makeSuite(LinkTests),
+        ))
 
-def main():
-    unittest.TextTestRunner().run(test_suite())
-
-if __name__=='__main__': main()
+if __name__ == '__main__':
+    main(defaultTest='test_suite')

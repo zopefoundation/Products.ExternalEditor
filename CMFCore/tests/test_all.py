@@ -1,9 +1,10 @@
 import Zope
-from unittest import TestSuite, main
-from sys import modules
+from unittest import main
+from Products.CMFCore.tests.base.utils import build_test_suite
+
 def test_suite():
-    suite = TestSuite()
-    for name in [
+
+    return build_test_suite('Products.CMFCore.tests',[
         'test_ContentTypeRegistry',
         'test_PortalFolder',
         'test_TypesTool',
@@ -15,15 +16,7 @@ def test_suite():
         'test_DirectoryView',
         'test_FSPythonScript',
         'test_FSPageTemplate'
-        ]:
-        __import__('Products.CMFCore.tests.'+name,globals(),locals())
-        suite.addTest(
-            modules['Products.CMFCore.tests.'+name].test_suite()
-            )
-    return suite
-
-def run():
-    main(defaultTest='test_suite')
+        ])
 
 if __name__ == '__main__':
-    run()
+    main(defaultTest='test_suite')

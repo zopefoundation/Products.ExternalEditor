@@ -1,15 +1,11 @@
 import Zope
-import unittest
-import re
-from Products.CMFCore.ContentTypeRegistry import *
+from unittest import TestCase, TestSuite, makeSuite, main
 
-class MajorMinorPredicateTests( unittest.TestCase ):
+from Products.CMFCore.ContentTypeRegistry import \
+     ContentTypeRegistry,MajorMinorPredicate,ExtensionPredicate, \
+     NameRegexPredicate, MimeTypeRegexPredicate
 
-    def setUp( self ):
-        get_transaction().begin()
-
-    def tearDown( self ):
-        get_transaction().abort()
+class MajorMinorPredicateTests( TestCase ):
 
     def test_empty( self ):
         pred = MajorMinorPredicate( 'empty' )
@@ -43,13 +39,7 @@ class MajorMinorPredicateTests( unittest.TestCase ):
         assert pred( 'foo', 'text/html', 'asdfljksadf' )
         assert not pred( 'foo', 'image/png', 'asdfljksadf' )
 
-class ExtensionPredicateTests( unittest.TestCase ):
-
-    def setUp( self ):
-        get_transaction().begin()
-
-    def tearDown( self ):
-        get_transaction().abort()
+class ExtensionPredicateTests( TestCase ):
 
     def test_empty( self ):
         pred = ExtensionPredicate( 'empty' )
@@ -77,13 +67,7 @@ class ExtensionPredicateTests( unittest.TestCase ):
         assert pred( 'foo.htm', 'text/plain', 'asdfljksadf' )
         assert not pred( 'foo.bar', 'text/html', 'asdfljksadf' )
 
-class MimeTypeRegexPredicateTests( unittest.TestCase ):
-
-    def setUp( self ):
-        get_transaction().begin()
-
-    def tearDown( self ):
-        get_transaction().abort()
+class MimeTypeRegexPredicateTests( TestCase ):
 
     def test_empty( self ):
         pred = MimeTypeRegexPredicate( 'empty' )
@@ -105,13 +89,7 @@ class MimeTypeRegexPredicateTests( unittest.TestCase ):
         assert pred( 'foo', 'text/html', 'asdfljksadf' )
         assert not pred( 'foo', 'image/png', 'asdfljksadf' )
     
-class NameRegexPredicateTests( unittest.TestCase ):
-
-    def setUp( self ):
-        get_transaction().begin()
-
-    def tearDown( self ):
-        get_transaction().abort()
+class NameRegexPredicateTests( TestCase ):
 
     def test_empty( self ):
         pred = NameRegexPredicate( 'empty' )
@@ -134,16 +112,13 @@ class NameRegexPredicateTests( unittest.TestCase ):
         assert pred( 'fargo', 'text/plain', 'asdfljksadf' )
         assert not pred( 'bar', 'text/plain', 'asdfljksadf' )
     
-class ContentTypeRegistryTests( unittest.TestCase ):
+class ContentTypeRegistryTests( TestCase ):
 
     def setUp( self ):
-        get_transaction().begin()
-
-    def tearDown( self ):
-        get_transaction().abort()
+        self.reg = ContentTypeRegistry()
 
     def test_empty( self ):
-        reg = ContentTypeRegistry()
+        reg=self.reg
         assert reg.findTypeName( 'foo', 'text/plain', 'asdfljksadf' ) is None
         assert reg.findTypeName( 'fargo', 'text/plain', 'asdfljksadf' ) is None
         assert reg.findTypeName( 'bar', 'text/plain', 'asdfljksadf' ) is None
@@ -151,7 +126,7 @@ class ContentTypeRegistryTests( unittest.TestCase ):
         self.assertRaises( KeyError, reg.removePredicate, 'xyzzy' )
     
     def test_reorder( self ):
-        reg = ContentTypeRegistry()
+        reg=self.reg
         predIDs = ( 'foo', 'bar', 'baz', 'qux' )
         for predID in predIDs:
             reg.addPredicate( predID, 'name_regex' )
@@ -162,7 +137,7 @@ class ContentTypeRegistryTests( unittest.TestCase ):
         assert ids == ( 'foo', 'baz', 'qux', 'bar' )
 
     def test_lookup( self ):
-        reg = ContentTypeRegistry()
+        reg=self.reg
         reg.addPredicate( 'image', 'major_minor' )
         reg.getPredicate( 'image' ).edit( 'image', '' )
         reg.addPredicate( 'onlyfoo', 'name_regex' )
@@ -175,16 +150,13 @@ class ContentTypeRegistryTests( unittest.TestCase ):
         assert reg.findTypeName( 'foo', None, None ) == 'Foo'
 
 def test_suite():
-    suite = unittest.TestSuite()
-    suite.addTest( unittest.makeSuite( MajorMinorPredicateTests ) )
-    suite.addTest( unittest.makeSuite( ExtensionPredicateTests ) )
-    suite.addTest( unittest.makeSuite( MimeTypeRegexPredicateTests ) )
-    suite.addTest( unittest.makeSuite( NameRegexPredicateTests ) )
-    suite.addTest( unittest.makeSuite( ContentTypeRegistryTests ) )
-    return suite
-
-def run():
-    unittest.TextTestRunner().run(test_suite())
+    return TestSuite((
+        makeSuite( MajorMinorPredicateTests ),
+        makeSuite( ExtensionPredicateTests ),
+        makeSuite( MimeTypeRegexPredicateTests ),
+        makeSuite( NameRegexPredicateTests ),
+        makeSuite( ContentTypeRegistryTests ),
+        ))
 
 if __name__ == '__main__':
-    run()
+    main(defaultTest='test_suite')
