@@ -57,7 +57,7 @@
                                        if i.portal_type
                                           != 'Collector Issue Transcript']">
 
-       <table summary="Issue Characteristics">
+       <table summary="Issue Characteristics" cellspacing="4">
 
          <tr>
            <td colspan="4">
@@ -114,7 +114,7 @@
            <td align="right">Status:</td>
            <td>
               <code>
-                <span tal:content="here/current_status">CURRENT_STATUS</span>
+                <span tal:content="here/status">STATUS</span>
               </code>
            </td>
            <td align="right"> on: </td>
@@ -124,7 +124,7 @@
          <tr tal:condition="here/edited">
 
            <td tal:condition="here/comment_number"
-               align="right"> Comments: </td>
+               align="right"> Entries: </td>
            <td tal:condition="here/comment_number"
                tal:content="here/comment_number"> NUMBER </td>
 
@@ -135,25 +135,32 @@
            <td tal:condition="datesdiff"
                tal:content="moddate">MODDATE</td>
          </tr>
-
          <tr>
-           <td align="right">Version:</td>
+           <td align="right">This version:</td>
            <td>
              <code>
                <span tal:content="here/reported_version">VERSION
                </span>
              </code>
            </td>
-           <td align="right"> Other sys: </td>
-           <td tal:condition="here/other_version_info"
+           <td tal:condition="here/assigned_to"
+               align="right">Assigned to:</td>
+           <td tal:condition="here/assigned_to">
+              <span tal:content="python: ', '.join(here.assigned_to())">
+                SUPPORTERS</span>
+           </td>
+         </tr>
+
+         <tr tal:condition="here/other_version_info">
+           <td align="right"> Related versions: </td>
+           <td colspan="2"
                tal:content="here/other_version_info">OTHER_VERSION_INFO</td>
-           <td tal:condition="not:here/other_version_info"> ~ </td>
         </tr>
-        <tr>
+
+        <tr tal:condition="artifacts">
           <td align="right" valign="top"> Artifacts: </td>
           <td colspan="3">
-            <span tal:condition="not: artifacts"> ~ </span>
-            <table tal:condition="artifacts">
+            <table>
               <div tal:repeat="item artifacts">
                 <tr> <td>
                   <a href="ITEM URL"
