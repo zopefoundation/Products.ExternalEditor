@@ -67,18 +67,12 @@ class Guard (Persistent, Explicit):
         if self.groups:
             # Require at least one of the specified groups.
             u = sm.getUser()
-            b = aq_base( u )
-            if hasattr( b, 'getContextualGroupMonikers' ):
-                u_groups = u.getContextualGroupMonikers( ob )
-            elif hasattr( b, 'getGroupsInContext' ):
-                u_groups = u.getGroupsInContext( ob )
-            elif hasattr( b, 'getGroups' ):
-                u_groups = u.getGroups()
+            if hasattr(aq_base(u), 'getContextualGroupMonikers'):
+                u_groups = u.getContextualGroupMonikers(ob)
             else:
                 u_groups = ()
             for group in self.groups:
-                if ( group in u_groups
-                  or '(Group) %s' % group in u_groups ):
+                if ('(Group) %s' % group) in u_groups:
                     break
             else:
                 return 0
