@@ -15,6 +15,7 @@ def suite():
     return build_test_suite( 'Products.CMFSetup.tests'
                            , [ 'test_actions'
                              , 'test_context'
+                             , 'test_differ'
                              , 'test_registry'
                              , 'test_rolemap'
                              , 'test_skins'
