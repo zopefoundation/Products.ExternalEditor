@@ -27,14 +27,7 @@ import ContentTypeRegistry
 import CachingPolicyManager
 import utils
 
-from AccessControl import ModuleSecurityInfo
 from CMFCorePermissions import AddPortalFolders
-
-prod_security = ModuleSecurityInfo( 'Products' )
-prod_security.declarePublic( 'CMFCore' )
-
-security = ModuleSecurityInfo( 'Products.CMFCore' )
-security.declarePublic( 'utils' )
 
 try:
     import FSPageTemplate

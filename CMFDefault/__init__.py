@@ -14,8 +14,6 @@
 
 $Id$
 """
-from AccessControl import ModuleSecurityInfo
-
 from Products import CMFCore
 
 from Products.CMFCore.CMFCorePermissions import AddPortalContent
@@ -162,10 +160,3 @@ def initialize( context ):
 
     context.registerHelp()
     context.registerHelpTitle('CMF Default Help')
-
-
-prod_security = ModuleSecurityInfo( 'Products' )
-prod_security.declarePublic( 'CMFDefault' )
-
-security = ModuleSecurityInfo( 'Products.CMFDefault' )
-security.declarePublic( 'utils' )
