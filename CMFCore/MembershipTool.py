@@ -263,11 +263,10 @@ class MembershipTool (UniqueObject, SimpleItem, ActionProviderBase):
             f.manage_permission(AccessContentsInformation,
                                 ['Owner','Manager','Reviewer'], 0)  
 
-            # Grant ownership to Member
-            try: f.changeOwnership(user)
-            except AttributeError: pass  # Zope 2.1.x compatibility
+            # Grant Ownership and Owner role to Member
+            f.changeOwnership(user)
+            f.__ac_local_roles__ = None
             f.manage_setLocalRoles(member_id, ['Owner'])
-
 
     security.declarePublic('isAnonymousUser')
     def isAnonymousUser(self):

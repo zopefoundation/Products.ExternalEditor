@@ -23,7 +23,6 @@ from Globals import DTMLFile
 from Globals import InitializeClass
 
 from Products.CMFCore.MembershipTool import MembershipTool as BaseTool
-from Products.CMFCore.PortalFolder import manage_addPortalFolder
 from Products.CMFCore.utils import _checkPermission
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.ActionProviderBase import ActionProviderBase
@@ -186,7 +185,6 @@ class MembershipTool( BaseTool ):
             members.manage_addPortalFolder( id=member_id, title=f_title )
             f=getattr(members, member_id)
 
-            # Grant ownership to Member
             acl_users = self.__getPUS()
             user = acl_users.getUser(member_id)
 
@@ -200,7 +198,9 @@ class MembershipTool( BaseTool ):
                     raise NotImplementedError, \
                         'cannot get user for member area creation'
 
+            # Grant Ownership and Owner role to Member
             f.changeOwnership(user)
+            f.__ac_local_roles__ = None
             f.manage_setLocalRoles(member_id, ['Owner'])
 
             # Create Member's home page.
@@ -213,6 +213,11 @@ class MembershipTool( BaseTool ):
                        , "structured-text"
                        , (DEFAULT_MEMBER_CONTENT % member_id)
                        )
+
+            # Grant Ownership and Owner role to Member
+            f.index_html.changeOwnership(user)
+            f.index_html.__ac_local_roles__ = None
+            f.index_html.manage_setLocalRoles(member_id, ['Owner'])
 
             f.index_html._setPortalTypeName( 'Document' )
 

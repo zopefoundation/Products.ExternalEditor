@@ -5,27 +5,32 @@ from Products.CMFCore.TypesTool import TypeInformation
 from Products.CMFCore.TypesTool import FactoryTypeInformation as FTI
 from Products.CMFCore.ActionProviderBase import ActionProviderBase
 
+
 class DummyObject(Implicit):
     """
     A dummy callable object.
     Comes with getIcon and restrictedTraverse
     methods.
     """
-    def __init__(self, name='dummy',**kw):
-        self.name = name
+    def __init__(self, id='dummy',**kw):
+        self.id = id
         self.__dict__.update( kw )
         
     def __str__(self):
-        return self.name
+        return self.id
     
     def __call__(self):
-        return self.name
+        return self.id
 
     def restrictedTraverse( self, path ):
         return path and getattr( self, path ) or self
 
     def getIcon( self, relative=0 ):
         return 'Site: %s' % relative
+    
+    def getId(self):
+        return self.id
+
 
 class DummyContent( PortalContent, Item ):
     """
@@ -163,6 +168,19 @@ class DummyFolder( Implicit ):
     def _setObject(self,id,object):
         setattr(self,id,object)
 
+
+class DummyUserFolder(DummyFolder):
+    def __init__(self):
+        self._setObject( 'user_foo', DummyObject(id='user_foo') )
+        self._setObject( 'user_bar', DummyObject(id='user_bar') )
+    def getUsers(self):
+        pass
+    def getUser(self, name):
+        return getattr(self, name, None)
+    def getUserById(self, id, default=None):
+        return self.getUser(id)
+
+
 class DummyTool(Implicit,ActionProviderBase):
     """
     This is a Dummy Tool that behaves as a
@@ -195,3 +213,7 @@ class DummyTool(Implicit,ActionProviderBase):
 
     def getIcon( self, relative=0 ):
         return 'Tool: %s' % relative
+
+    # WorkflowTool
+    def notifyCreated(self, ob):
+        pass
