@@ -148,6 +148,11 @@ class ContentTypeInformation( Base ):
             Return the URL of the action whose ID is id.
         """
 
+    def getIcon(self):
+        """
+            Returns the portal-relative icon for this type.
+        """
+
 class portal_types( Base ):
     """
         Provides a configurable registry of portal content types.
