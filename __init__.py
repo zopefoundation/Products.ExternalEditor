@@ -17,6 +17,7 @@
 from Globals import ImageFile, DTMLFile
 from OFS.ObjectManager import ObjectManager
 from OFS.FindSupport import FindSupport
+from App.Management import Tabs
 from ExternalEditor import ExternalEditor, EditLink
 
 # Add the icon and the edit method to the misc_ namespace
@@ -33,3 +34,6 @@ ObjectManager.manage_main = DTMLFile('manage_main', globals())
 # Add our patch for the find results template
 FindSupport.manage_findResult=DTMLFile('findResult', globals(),
                                        management_view='Find')
+
+# Add external editor icon in breadcrumbs under tabs
+Tabs.manage_tabs = DTMLFile('manage_tabs', globals())

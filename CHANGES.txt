@@ -1,6 +1,8 @@
 External Editor Change Log
 
-  0.8 release
+  7/13/04 - 0.8 release
+  
+    - Add external editor icon to ZMI breadcrumbs for editable objects.
 
     - Compiled windows helper app binary using Python 2.3.4, Pythonwin build
       163 and py2exe 0.5.
