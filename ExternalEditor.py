@@ -93,7 +93,8 @@ class ExternalEditor(Acquisition.Implicit):
             # We have a File instance with chunked data, lets stream it
             metadata = join(r, '\n')
             RESPONSE.setHeader('Content-Type', 'application/x-zope-edit')
-            RESPONSE.setHeader('Content-Length', len(metadata) + ob.get_size())
+            RESPONSE.setHeader('Content-Length', 
+                               len(metadata) + ob.get_size() + 1)
             RESPONSE.write(metadata)
             RESPONSE.write('\n')
             data = ob.data
