@@ -1,0 +1,34 @@
+CMF Collector Update Notes
+
+  This file is for notes about crucial considerations for updating
+  preexisting collectors to the current release.  You should always
+  check here when doing updates for instructions about accommodating
+  changes, when necessary.
+
+  The file is ordered most recent items first, and the items refer to
+  the collector version as indicated by the VERSION.text file in the
+  same directory.
+
+  Version 0.9, Oct 25, 2001
+
+    - With this version owners of previously existing collectors will
+      have to sneak a visit to the configure page for previously
+      existing collectors before anyone can browse and search them.
+
+      To do so, after putting the new Product code in place (and
+      restarting your site, if you don't have auto-refresh going)
+      collector owners should go to the URL produced by appending
+      "/collector_edit_form" to the URL of the collectors - eg::
+
+        http://new.zope.org/Members/klm/ColDev/collector_edit_form
+
+      for the example collector at http://new.zope.org/Members/klm/ColDev.
+
+      Check the box by "Reinstate internal catalog?", to the right of
+      the submit and reset buttons at the bottom of the form, and then
+      submit them.  This will establish a new, internal catalog as
+      well as indexing all the items against it and the site catalog
+      (using changed schemas).
+
+      These changes solve the issue discussed at
+      http://new.zope.org/Members/klm/ColDev/25 - see there for details.
