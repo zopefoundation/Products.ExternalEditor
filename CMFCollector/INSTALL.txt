@@ -57,3 +57,11 @@ Installing CMFCollector
         o fill in Import File Name: collector_issue_workflow.zexp
 
         o hit 'import'
+
+     3. Within the portal_workflow 'Workflows' tab, fill in:
+
+        Collector Issue: collector_issue_workflow
+
+        ... and hit the "Change" button.
+
+   Then the workflow will be associated with any new issues you create.
