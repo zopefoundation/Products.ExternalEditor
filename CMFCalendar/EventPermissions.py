@@ -10,7 +10,6 @@
 # FOR A PARTICULAR PURPOSE
 #
 ##############################################################################
-
 """EventPermissions: Permissions used in the CMF Events class
 $Id$
 """

@@ -10,7 +10,6 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-
 """Event: A CMF-enabled Event object.
 $Id$
 """

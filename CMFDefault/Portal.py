@@ -151,7 +151,7 @@ class CMFSite ( PortalObjectBase
         def manage_migrate_content( self, REQUEST ):
             pass
 
-Globals.default__class_init__(CMFSite)
+Globals.InitializeClass(CMFSite)
 
 
 class PortalGenerator:

@@ -14,7 +14,6 @@
 A simple submit/review/publish workflow.
 $Id$
 '''
-
 __version__='$Revision$'[11:-2]
 
 import sys
