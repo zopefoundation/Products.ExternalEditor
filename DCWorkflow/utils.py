@@ -99,8 +99,8 @@ def modifyRolesForGroup(ob, group, grant_roles, managed_roles):
 def modifyExpandedGroups(ob, group, grant_roles, managed_roles):
     """Modifies local roles for a group.
 
-    The group may expand into multiple groups as defined by an
-    aggregated group mapping.
+    The group may expand into multiple groups as defined by a
+    context-sensitive aggregated group mapping.
     """
     groups = [group]
     if hasattr(ob, "__group_mapping__"):
