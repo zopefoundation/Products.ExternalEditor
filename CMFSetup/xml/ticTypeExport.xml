@@ -30,6 +30,12 @@
   <allowed_content_type
      tal:repeat="act info/allowed_content_types"
      tal:content="act">foo</allowed_content_type></tal:case>
+  <aliases>
+   <alias from="(Default)" to="foo_view"
+          tal:repeat="item info/aliases/items"
+          tal:attributes="from python: item[ 0 ]; to python: item[ 1 ];"
+   />
+  </aliases>
   <action
      action_id="view"
      title="View"

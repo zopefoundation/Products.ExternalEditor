@@ -40,6 +40,15 @@
         tal:repeat="role perm/roles"
         tal:content="role">ROLE</permission-role>
   </permission-map>
+  <group-map
+        name=""
+        tal:repeat="group state/groups"
+        tal:attributes="name python: group[ 0 ];
+                       ">
+   <group-role
+        tal:repeat="role python: group[ 1 ]"
+        tal:content="role">ROLE</group-role>
+  </group-map>
   <assignment
         name="VAR_NAME"
         type="VAR_TYPE"
@@ -84,6 +93,10 @@
    <guard-role
        tal:repeat="role transition/guard_roles"
        tal:content="role">ROLE</guard-role></tal:case
+  ><tal:case tal:condition="transition/guard_groups">
+   <guard-group
+       tal:repeat="group transition/guard_groups"
+       tal:content="group">GROUP</guard-group></tal:case
   ><tal:case tal:condition="transition/guard_expr">
    <guard-expression
        tal:content="transition/guard_expr">EXPRESSION</guard-expression
@@ -122,6 +135,10 @@
    <guard-role
        tal:repeat="role worklist/guard_roles"
        tal:content="role">ROLE</guard-role></tal:case
+  ><tal:case tal:condition="worklist/guard_groups">
+   <guard-group
+       tal:repeat="group worklist/guard_groups"
+       tal:content="group">GROUP</guard-group></tal:case
   ><tal:case tal:condition="worklist/guard_expr">
    <guard-expression
        tal:content="worklist/guard_expr">EXPRESSION</guard-expression
@@ -169,6 +186,10 @@
    <guard-role
        tal:repeat="role variable/guard_roles"
        tal:content="role">ROLE</guard-role></tal:case
+  ><tal:case tal:condition="variable/guard_groups">
+   <guard-group
+       tal:repeat="group variable/guard_groups"
+       tal:content="group">GROUP</guard-group></tal:case
   ><tal:case tal:condition="variable/guard_expr">
    <guard-expression
        tal:content="variable/guard_expr">EXPRESSION</guard-expression

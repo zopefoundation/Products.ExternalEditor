@@ -9,6 +9,11 @@
            product="CMFDefault" factory="addDocument">
   <description>Documents contain text that can be formatted using 'Structured Text.'
 They may also contain HTML, or "plain" text.</description>
+  <aliases>
+   <alias from="gethtml" to="source_html"/>
+   <alias from="(Default)" to="document_view"/>
+   <alias from="view" to="document_view"/>
+  </aliases>
   <action action_id="view" title="View" condition_expr=""
           url_expr="string:${object_url}/document_view"
           category="object" visible="True">

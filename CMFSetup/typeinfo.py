@@ -217,6 +217,7 @@ class TypeInfoConfigurator( Implicit ):
                  , 'filter_content_types'   : bool(ti.filter_content_types)
                  , 'allowed_content_types'  : ti.allowed_content_types
                  , 'allow_discussion'       : bool(ti.allow_discussion)
+                 , 'aliases'                : ti.getMethodAliases()
                  }
 
         if ' ' in ti.getId():
@@ -236,25 +237,10 @@ class TypeInfoConfigurator( Implicit ):
             result[ 'constructor_path' ] = ti.constructor_path
 
         actions = ti.listActions()
-        result['actions'] = [ self._makeActionMapping(ai) for ai in actions ]
+        result['actions'] = [ ai.getMapping() for ai in actions ]
 
         return result
 
-    security.declarePrivate( '_makeActionMapping' )
-    def _makeActionMapping( self, ai ):
-        
-        """ Convert a ActionInformation object into the appropriate mapping.
-        """
-        return  { 'id'         : ai.id
-                , 'title'      : ai.title or ai.id
-                , 'description': ai.description
-                , 'category'   : ai.category or 'object'
-                , 'condition'  : getattr(ai, 'condition', None) 
-                                     and ai.condition.text or ''
-                , 'permissions': ai.permissions
-                , 'visible'    : bool(ai.visible)
-                , 'action'     : ai.getActionExpression()
-                }
 
 InitializeClass( TypeInfoConfigurator )
 
@@ -312,6 +298,7 @@ def _extractTypeInfoNode(parent, encoding=None):
     filter_content_types  = _qb('filter_content_types', False)
     allowed_content_types = _extractAllowedContentTypeNodes(ti_node, encoding)
     allow_discussion      = _qb('allow_discussion', False)
+    aliases               = _extractAliasesNode(ti_node, encoding)
     actions               = _extractActionNodes(ti_node, encoding)
 
     info = { 'id': type_id,
@@ -325,6 +312,7 @@ def _extractTypeInfoNode(parent, encoding=None):
              'filter_content_types': filter_content_types,
              'allowed_content_types': allowed_content_types,
              'allow_discussion': allow_discussion,
+             'aliases': aliases,
              'actions': actions }
 
     if kind == FactoryTypeInformation.meta_type:
@@ -347,6 +335,20 @@ def _extractAllowedContentTypeNodes(parent, encoding=None):
         result.append(value)
 
     return tuple(result)
+
+def _extractAliasesNode(parent, encoding=None):
+
+    result = {}
+
+    aliases = parent.getElementsByTagName('aliases')[0]
+    for alias in aliases.getElementsByTagName('alias'):
+
+        alias_from = _getNodeAttribute(alias, 'from', encoding)
+        alias_to = _getNodeAttribute(alias, 'to', encoding)
+
+        result[alias_from] = alias_to
+
+    return result
 
 def _getTypeFilename( type_id ):
 

@@ -7,6 +7,11 @@
            allow_discussion="False" global_allow="True"
            product="CMFTopic" factory="addTopic">
   <description>Topics are canned queries for organizing content with up to date queries into the catalog.</description>
+  <allowed_content_type>Topic</allowed_content_type>
+  <aliases>
+   <alias from="(Default)" to="topic_view"/>
+   <alias from="view" to="topic_view"/>
+  </aliases>
   <action action_id="view" title="View" condition_expr=""
           url_expr="string:${object_url}/topic_view"
           category="object" visible="True">
@@ -23,10 +28,21 @@
           category="object" visible="True">
    <permission>Change portal topics</permission>
   </action>
-  <action action_id="subtopics" title="Subtopics"
+  <action action_id="folderContents" title="Subtopics"
           condition_expr=""
-          url_expr="string:${object_url}/topic_subtopics_form"
+          url_expr="string:${object_url}/folder_contents"
           category="object" visible="True">
-   <permission>Change portal topics</permission>
+   <permission>List folder contents</permission>
+  </action>
+  <action action_id="new" title="New..." condition_expr=""
+          url_expr="string:${object_url}/folder_factories"
+          category="object" visible="False">
+   <permission>Add portal topics</permission>
+  </action>
+  <action action_id="rename_items" title="Rename items"
+          condition_expr=""
+          url_expr="string:${object_url}/folder_rename_form"
+          category="object" visible="False">
+   <permission>Add portal topics</permission>
   </action>
 </type-info>

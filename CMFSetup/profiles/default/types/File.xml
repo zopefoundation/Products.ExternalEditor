@@ -7,6 +7,10 @@
            allow_discussion="False" global_allow="True"
            product="CMFDefault" factory="addFile">
   <description>File objects can contain arbitrary downloadable files.</description>
+  <aliases>
+   <alias from="(Default)" to="index_html"/>
+   <alias from="view" to="file_view"/>
+  </aliases>
   <action action_id="view" title="View" condition_expr=""
           url_expr="string:${object_url}/file_view"
           category="object" visible="True">

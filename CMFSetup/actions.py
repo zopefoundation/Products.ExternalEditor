@@ -168,8 +168,7 @@ class ActionProvidersConfigurator( Implicit ):
             if actions and isinstance(actions[0], dict):
                 continue
 
-            provider_info['actions'] = [ self._makeActionMapping(ai) 
-                                         for ai in actions ]
+            provider_info['actions'] = [ ai.getMapping() for ai in actions ]
 
         return result
 
@@ -194,22 +193,6 @@ class ActionProvidersConfigurator( Implicit ):
 
         root = dom.getElementsByTagName('actions-tool')[0]
         return _extractActionProviderNodes(root, encoding)
-
-    security.declarePrivate( '_makeActionMapping' )
-    def _makeActionMapping( self, ai ):
-        
-        """ Convert a ActionInformation object into the appropriate mapping.
-        """
-        return  { 'id'         : ai.id
-                , 'title'      : ai.title or ai.id
-                , 'description': ai.description
-                , 'category'   : ai.category or 'object'
-                , 'condition'  : getattr(ai, 'condition', None) 
-                                     and ai.condition.text or ''
-                , 'permissions': ai.permissions
-                , 'visible'    : bool(ai.visible)
-                , 'action'     : ai.getActionExpression()
-                }
 
 InitializeClass( ActionProvidersConfigurator )
 
