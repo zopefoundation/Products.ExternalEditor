@@ -52,6 +52,8 @@
 
  - Extend TypesTool to deal appropriately with DTML factory methods
    (e.g., for ZClasses).
+ 
+ - Made FSDTMLMethods searchable from the ZMI (Issue PTK(251)[]).
 
 1.0 final (2001/03/29)
 
