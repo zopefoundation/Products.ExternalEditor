@@ -432,6 +432,7 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
                 "exists": revisions.get(stage_name) is not None,
                 "revision": revisions.get(stage_name),
                 "stageable": stageable,
+                "is_source": (stage_name == source_stage),
                 }
             res.append(stats)
         return res
