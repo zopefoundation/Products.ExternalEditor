@@ -15,64 +15,60 @@
 
 $Id$
 """
-__version__='$Revision$'[11:-2]
 
+from Globals import InitializeClass, DTMLFile
+from AccessControl import ClassSecurityInfo
 
+from Products.CMFCore.interfaces.portal_registration import portal_registration
 from Products.CMFCore.utils import UniqueObject
-from Products.CMFCore.utils import _checkPermission, getToolByName
+from Products.CMFCore.utils import _checkPermission
+from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.ActionInformation import ActionInformation
 from Products.CMFCore.Expression import Expression
 from Products.CMFCore.ActionProviderBase import ActionProviderBase
 from Products.CMFCore.RegistrationTool import RegistrationTool
+from Products.CMFCore.CMFCorePermissions import AddPortalMember
+from Products.CMFCore.CMFCorePermissions import ManagePortal
 
-from Globals import InitializeClass, DTMLFile
-from AccessControl import ClassSecurityInfo
-from Products.CMFCore import CMFCorePermissions
 from utils import _dtmldir
 
 class RegistrationTool (RegistrationTool, ActionProviderBase):
+
+    """ Manage through-the-web signup policies.
+    """
+    __implements__ = ( portal_registration, )
     meta_type = 'Default Registration Tool'
 
-    _actions = [ActionInformation(id='join'
-                            , title='Join'
-                            , description='Click here to Join'
-                            , action=Expression(
-            text='string: ${portal_url}/join_form')
-                            , permissions=(CMFCorePermissions.View,)
-                            , category='user'
-                            , condition=Expression(text='not: member')
-                            , visible=1
-                             )]
+    _actions = [ ActionInformation( id='join'
+                                  , title='Join'
+                                  , description='Click here to Join'
+                                  , action=Expression(
+                                     text='string: ${portal_url}/join_form')
+                                  , permissions=(AddPortalMember,)
+                                  , category='user'
+                                  , condition=Expression(text='not: member')
+                                  , visible=1
+                                  ) ]
 
     security = ClassSecurityInfo()
 
     #
     #   ZMI methods
     #
-    security.declareProtected( CMFCorePermissions.ManagePortal
-                             , 'manage_overview' )
+    security.declareProtected( ManagePortal, 'manage_overview' )
 
-    manage_options = ( ActionProviderBase.manage_options +
-                       ({ 'label' : 'Overview', 'action' : 'manage_overview' }
-                     , 
-                     ))
+    manage_options = ( ActionProviderBase.manage_options
+                     + ( { 'label' : 'Overview'
+                         , 'action' : 'manage_overview'
+                         }
+                       , 
+                       )
+                     )
     manage_overview = DTMLFile( 'explainRegistrationTool', _dtmldir )
 
     #
-    #   'portal_registration' interface methods
+    #   ActionProvider interface
     #
-    security.declarePublic( 'testPasswordValidity' )
-    def testPasswordValidity(self, password, confirm=None):
-        '''If the password is valid, returns None.  If not, returns
-        a string explaining why.
-        '''
-        if len(password) < 5 and not _checkPermission('Manage portal', self):
-            return 'Your password must contain at least 5 characters.'
-        if confirm is not None and confirm != password:
-            return 'Your password and confirmation did not match. ' \
-                   'Please try again.'
-        return None
-
     security.declarePublic('listActions')
     def listActions(self, info=None):
         """
@@ -80,30 +76,59 @@ class RegistrationTool (RegistrationTool, ActionProviderBase):
         """
         return self._actions 
 
+    #
+    #   'portal_registration' interface
+    #
+    security.declarePublic( 'testPasswordValidity' )
+    def testPasswordValidity(self, password, confirm=None):
+
+        """ Verify that the password satisfies the portal's requirements.
+        
+        o If the password is valid, return None.
+        o If not, return a string explaining why.
+        """
+        if len(password) < 5 and not _checkPermission('Manage portal', self):
+            return 'Your password must contain at least 5 characters.'
+
+        if confirm is not None and confirm != password:
+            return ( 'Your password and confirmation did not match. ' 
+                   + 'Please try again.' )
+
+        return None
+
     security.declarePublic( 'testPropertiesValidity' )
     def testPropertiesValidity(self, props, member=None):
-        '''If the properties are valid, returns None.  If not, returns
-        a string explaining why.
-        '''
-        if member is None:
-            # New member.
+
+        """ Verify that the properties supplied satisfy portal's requirements.
+
+        o If the properties are valid, return None.
+        o If not, return a string explaining why.
+        """
+        if member is None: # New member.
+
             username = props.get('username', '')
             if not username:
                 return 'You must enter a valid name.'
+
             if not self.isMemberIdAllowed(username):
-                return 'The login name you selected is already ' \
-                       'in use or is not valid. Please choose another.'
+                return ( 'The login name you selected is already ' 
+                       + 'in use or is not valid. Please choose another.'
+                       )
         if not (props.get('email') or member.getProperty('email')):
             return 'You must enter a valid email address.'
+
         return None
 
     security.declarePublic( 'mailPassword' )
     def mailPassword(self, forgotten_userid, REQUEST):
-        '''Email a forgotten password to a member.  Raises an exception
-        if user ID is not found.
-        '''
+
+        """ Email a forgotten password to a member.
+        
+        o Raise an exception if user ID is not found.
+        """
         membership = getToolByName(self, 'portal_membership')
         member = membership.getMemberById(forgotten_userid)
+
         if member is None:
             raise 'NotFound', 'The username you entered could not be found.'
     
@@ -123,8 +148,8 @@ class RegistrationTool (RegistrationTool, ActionProviderBase):
 
     security.declarePublic( 'registeredNotify' )
     def registeredNotify( self, new_member_id ):
-        """
-            Handle mailing the registration / welcome message.
+
+        """ Handle mailing the registration / welcome message.
         """
         membership = getToolByName( self, 'portal_membership' )
         member = membership.getMemberById( new_member_id )
@@ -148,17 +173,25 @@ class RegistrationTool (RegistrationTool, ActionProviderBase):
 
         return self.mail_password_response( self, self.REQUEST )
 
-    security.declareProtected(CMFCorePermissions.ManagePortal, 'editMember')
-    def editMember(self,member_id,properties=None,password=None,roles=None,domains=None):
-        """Edit a users properties, and security settings
-        Checks should be done before this method is called using
-        testPropertiesValidity and testPasswordValidity"""
+    security.declareProtected(ManagePortal, 'editMember')
+    def editMember( self
+                  , member_id
+                  , properties=None
+                  , password=None
+                  , roles=None
+                  , domains=None
+                  ):
+        """ Edit a user's properties and security settings
+
+        o Checks should be done before this method is called using
+          testPropertiesValidity and testPasswordValidity
+        """
         
-        member = getToolByName(self, 'portal_membership').getMemberById(member_id)
+        mtool = getToolByName(self, 'portal_membership')
+        member = mtool.getMemberById(member_id)
         member.setMemberProperties(properties)
         member.setSecurityProfile(password,roles,domains)
 
         return member
-        
 
 InitializeClass(RegistrationTool)

@@ -80,7 +80,7 @@ CMF TODO's
         ( ) Tracker #496:  Allow string: expressions in DCWorkflow
                            actions
 
-        ( ) Tracker #509:  "Join" action not protected by right
+        (x) Tracker #509:  "Join" action not protected by right
                            permission
 
       - ( ) Membership fixes

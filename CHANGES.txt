@@ -44,6 +44,10 @@ CMF 1.3 beta2 (2002/06/30)
 
   Bugs Fixed
 
+    - Changed the permission protecting the "Join" action provided by
+      the default registration tool from "View" to "Add portal member"
+      (Tracker #509).
+
     - Removed redundant "Syndication" action from SkinnedFolder; the
       SyndicationTool provides this aciton. (Tracker #481)
 
