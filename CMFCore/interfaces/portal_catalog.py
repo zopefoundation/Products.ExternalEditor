@@ -45,8 +45,10 @@ class portal_catalog(Base):
         '''
 
     # reindexObject__roles__ = ()
-    def reindexObject(object):
+    def reindexObject(object, idxs=[]):
         '''Update entry in catalog.
+        The optional idxs argument is a list of specific indexes
+        to update (all of them by default).
         '''
 
     # getpath inherits security assertions from ZCatalog.

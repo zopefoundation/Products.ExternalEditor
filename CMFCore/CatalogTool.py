@@ -245,13 +245,15 @@ class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
         self.uncatalog_object(url)
 
     security.declarePrivate('reindexObject')
-    def reindexObject(self, object):
+    def reindexObject(self, object, idxs=[]):
         '''Update catalog after object data has changed.
+        The optional idxs argument is a list of specific indexes
+        to update (all of them by default).
         '''
         url = self.__url(object)
         ## Zope 2.3 ZCatalog is supposed to work better if
         ## you don't uncatalog_object() when reindexing.
         # self.uncatalog_object(url)
-        self.catalog_object(object, url)
+        self.catalog_object(object, url, idxs=idxs)
 
 InitializeClass(CatalogTool)

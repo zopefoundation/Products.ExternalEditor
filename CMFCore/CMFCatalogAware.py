@@ -41,11 +41,11 @@ class CMFCatalogAware:
             catalog.unindexObject(self)
 
     security.declareProtected(ModifyPortalContent, 'reindexObject')
-    def reindexObject(self):
+    def reindexObject(self, idxs=[]):
         catalog = getToolByName(self, 'portal_catalog', None)
         if catalog is not None:
-            catalog.reindexObject(self)
-        
+            catalog.reindexObject(self, idxs=idxs)
+
     def manage_afterAdd(self, item, container):
         """
             Add self to the workflow and catalog.
