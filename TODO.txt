@@ -107,7 +107,7 @@ CMF TODO's
 
       - ( ) Tool fixes
 
-        ( ) Tracker #465:  Adding title to TypeInfo breaks
+        (x) Tracker #465:  Adding title to TypeInfo breaks
                            content_type_registry.
 
       - ( ) Skin fixes

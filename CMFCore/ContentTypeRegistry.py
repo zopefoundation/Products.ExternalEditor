@@ -23,7 +23,7 @@ from Globals import DTMLFile, InitializeClass, PersistentMapping
 from ZPublisher.mapply import mapply
 
 from CMFCorePermissions import ManagePortal
-from utils import _dtmldir
+from utils import _dtmldir, getToolByName
 
 import re, os, string, urllib
 
@@ -406,9 +406,12 @@ class ContentTypeRegistry( SimpleItem ):
         typeName = self.findTypeName( name, content_type, body )
         if typeName is None:
             typeName = '<unknown>'
+        else:
+            types_tool = getToolByName(self, 'portal_types')
+            typeName = types_tool.getTypeInfo(typeName).Type()
         REQUEST[ 'RESPONSE' ].redirect( self.absolute_url()
                                + '/manage_testRegistry'
-                               + '?testResults=Type:%s'
+                               + '?testResults=Type:+%s'
                                        % urllib.quote( typeName )
                                )
 

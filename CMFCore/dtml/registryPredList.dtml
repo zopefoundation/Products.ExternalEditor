@@ -23,11 +23,11 @@
    <br>
      <dtml-with portal_types>
      <select name="typeObjectName">
-      <dtml-in listContentTypes>
+      <dtml-in allowedContentTypes>
         <dtml-let item=sequence-item
-                  sel="item == typName and 'selected' or ''"
+                  sel="item.getId() == typName and 'selected' or ''"
         >
-         <option &dtml-sel;> &dtml-sequence-item; </option>
+         <option value="&dtml-getId;" &dtml-sel;> &dtml-Type; </option>
         </dtml-let>
       </dtml-in>
      </select>
