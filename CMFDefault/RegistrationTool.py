@@ -169,7 +169,7 @@ class RegistrationTool(BaseTool):
         return self.mail_password_response( self, REQUEST )
 
     security.declarePublic( 'registeredNotify' )
-    def registeredNotify( self, new_member_id ):
+    def registeredNotify( self, new_member_id, password=None ):
         """ Handle mailing the registration / welcome message.
         """
         membership = getToolByName( self, 'portal_membership' )
@@ -178,7 +178,8 @@ class RegistrationTool(BaseTool):
         if member is None:
             raise ValueError('The username you entered could not be found.')
 
-        password = member.getPassword()
+        if password is None:
+            password = member.getPassword()
 
         email = member.getProperty( 'email' )
 
