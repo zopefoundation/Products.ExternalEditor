@@ -136,7 +136,8 @@
       ISSUE-BATCH NAVIGATION
     </div>
 
-  <form action="collector_search" method="get">
+  <form action="ME" method="get"
+        tal:attributes="action python: here.absolute_url() + '/collector_contents'">
   Fulltext Search:  <input type="text" name="SearchableText" size="40">
   <div>
     Requestor:  <select name="Creator:list" multiple size="5">
