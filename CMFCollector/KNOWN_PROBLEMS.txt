@@ -17,3 +17,6 @@ CMFCollector Known Problems
     you want it to - within the collector.  I'll be revisiting this
     workaround when i know more about how to solve the actual problem.
     
+  Oct, 2001 Must add collectors via the CMF (folder-view "New") interface --
+    You cannot add collector instances via the Zope management
+    interface.  This may or may not be a difficult thing to solve.
