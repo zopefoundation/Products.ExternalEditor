@@ -677,19 +677,27 @@ class TypesTool(UniqueObject, Folder, ActionProviderBase):
         res = []
         products = self.aq_acquire('_getProducts')()
         for product in products.objectValues():
+            product_id = product.getId()
+
             if hasattr(aq_base(product), 'factory_type_information'):
                 ftis = product.factory_type_information
             else:
-                package = getattr(Products, product.getId(), None)
+                package = getattr(Products, product_id, None)
                 dispatcher = getattr(package, '__FactoryDispatcher__', None)
                 ftis = getattr(dispatcher, 'factory_type_information', None)
+
             if ftis is not None:
                 if callable(ftis):
                     ftis = ftis()
+
                 for fti in ftis:
                     mt = fti.get('meta_type', None)
+                    id = fti.get('id', '')
+
                     if mt:
-                        res.append((product.getId() + ': ' + mt, fti))
+                        p_id = '%s: %s (%s)' % (product_id, id, mt)
+                        res.append( (p_id, fti) )
+
         return res
 
     _addTIForm = DTMLFile( 'addTypeInfo', _dtmldir )

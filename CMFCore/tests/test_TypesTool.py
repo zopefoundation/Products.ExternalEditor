@@ -96,6 +96,37 @@ class TypesToolTests(SecurityTest):
             self.fail('CMF Collector issue #165 (Ownership bug): '
                       'Unauthorized raised' )
 
+    def test_CMFCollector_49(self):
+        """http://www.zope.org/Collectors/CMF/49
+
+        If you have two FTIs on the file system, both with the same meta_type
+        but with different id values, the way listDefaultTypeInformation 
+        listed them in the dropdown list made it impossible to distinguish
+        the two because the identifier string only contained the CMF package
+        name and the meta_type
+        """
+        import copy
+        # Extreme nastiness: Fake out a /Control_Panel/Products registry
+        # inside the fake site by putting dummy objects with a
+        # factory_type_information attribute on them...
+        fti1 = copy.deepcopy(FTIDATA_DUMMY)
+        fti2 = copy.deepcopy(FTIDATA_DUMMY)
+        fti2[0]['id'] = 'Other Content'
+        product1 = DummyObject('product1')
+        product1.factory_type_information = fti1 + fti2
+        self.site._setObject('product1', product1)
+        def fakeGetProducts(*ign, **igntoo):
+            return self.site
+        def fakeObjectValues(*ign, **igntoo):
+            return (self.site.product1,)
+        self.ttool._getProducts = fakeGetProducts
+        self.site.objectValues = fakeObjectValues
+
+        types = self.ttool.listDefaultTypeInformation()
+        dropdown_representation = [x[0] for x in types]
+        self.failIf(dropdown_representation[0]==dropdown_representation[1])
+
+
 def test_interface(self):
         from Products.CMFCore.interfaces.portal_types \
                 import portal_types as ITypesTool
