@@ -2,7 +2,8 @@
       tal:define="lt here/portal_lock|nothing;
                   locker python: lt and lt.locker(here);
                   username python: user.getUserName();
-                  versions python: here.portal_staging.getVersionIds(here);"
+                  versions python: here.portal_staging.getVersionIds(here);
+                  stage python: here.portal_staging.getStageOf(here);"
       tal:attributes="action here/absolute_url">
 <!--
   allow_submit python: (locker == username) or (
@@ -15,7 +16,11 @@
    <img src="status_synced.gif"
         tal:replace="structure python: here.get_status_image('dev')" />
   </td>
-  <td>Development</td>
+  <td>
+    <a href="#" tal:omit-tag="python: stage == 'dev'" tal:attributes="href
+       python:here.portal_staging.getURLForStage(here, 'dev')"
+       >Development</a>
+  </td>
 
   <td width="90%"> &nbsp;
     <span tal:content="python: versions['dev'] and (
@@ -30,10 +35,9 @@
   <td></td>
   <td colspan="2">
     <input type="submit" name="object_lock:method"
-           value="Lock" tal:condition="not:locker" />
+           value="Lock" tal:condition="python: lt and lt.canLock(here)" />
     <input type="submit" name="object_unlock:method"
-           value="Unlock"
-           tal:condition="python: locker == username" />
+           value="Unlock" tal:condition="python: lt and lt.canUnlock(here)" />
 <!--
     <input type="submit" name="content_submit_form:method"
            value="Submit for review..." tal:condition="allow_submit" />
@@ -46,7 +50,11 @@
    <img src="status_synced.gif"
         tal:replace="structure python: here.get_status_image('review')" />
   </td>
-  <td>Review</td>
+  <td>
+    <a href="#" tal:omit-tag="python: stage == 'review'" tal:attributes="href
+       python: here.portal_staging.getURLForStage(here, 'review')"
+       >Review</a>
+  </td>
   <td> &nbsp;
     <span tal:content="python: versions['review'] and (
                        'rev %s' % versions['review']) or '--'">rev 1</span>
@@ -68,7 +76,11 @@
    <img src="status_synced.gif"
         tal:replace="structure python: here.get_status_image('prod')" />
   </td>
-  <td>Production</td>
+  <td>
+    <a href="#" tal:omit-tag="python: stage == 'prod'" tal:attributes="href
+       python: here.portal_staging.getURLForStage(here, 'prod')"
+       >Production</a>
+  </td>
   <td> &nbsp;
     <span tal:content="python: versions['prod'] and (
                        'rev %s' % versions['prod']) or '--'">rev 1</span>
