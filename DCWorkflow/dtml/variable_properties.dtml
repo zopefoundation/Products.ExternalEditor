@@ -48,6 +48,26 @@
 <tr>
 <th align="left">
   <div class="form-label">
+  Variable update mode
+  </div>
+</th>
+<td>
+  <div class="form-element">
+   <select name="update_always">
+   <dtml-let checked="update_always and ' ' or 'selected'">
+    <option value="" &dtml-checked;>Update only when the transition or
+     new state specifies a new value</option>
+   </dtml-let>
+   <dtml-let checked="update_always and 'selected' or ' '">
+    <option value="1" &dtml-checked;>Update on every transition</option>
+   </dtml-let>
+  </div>
+</td>
+</tr>
+
+<tr>
+<th align="left">
+  <div class="form-label">
   Default value
   </div>
 </th>

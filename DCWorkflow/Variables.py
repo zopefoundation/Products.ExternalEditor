@@ -116,6 +116,7 @@ class VariableDefinition (SimpleItem):
     default_value = ''
     default_expr = None  # Overrides default_value if set
     info_guard = None
+    update_always = 1
 
     manage_options = (
         {'label': 'Properties', 'action': 'manage_properties'},
@@ -155,6 +156,7 @@ class VariableDefinition (SimpleItem):
     def setProperties(self, description,
                       default_value='', default_expr='',
                       for_catalog=0, for_status=0,
+                      update_always=0,
                       props=None, REQUEST=None):
         '''
         '''
@@ -172,6 +174,7 @@ class VariableDefinition (SimpleItem):
             self.info_guard = None
         self.for_catalog = not not for_catalog  # Pure boolean value
         self.for_status = not not for_status
+        self.update_always = not not update_always
         if REQUEST is not None:
             return self.manage_properties(REQUEST, 'Properties changed.')
 
