@@ -15,24 +15,18 @@
 $Id$
 """
 
-from warnings import warn
-
 from AccessControl import ClassSecurityInfo
-from Acquisition import aq_base
 from Globals import DTMLFile
 from Globals import InitializeClass
 from OFS.Folder import Folder
 
 from ActionInformation import ActionInformation
-from ActionInformation import getOAI
 from ActionProviderBase import ActionProviderBase
 from Expression import Expression
-from Expression import getExprContext
 from interfaces.portal_actions import ActionProvider as IActionProvider
 from interfaces.portal_actions import portal_actions as IActionsTool
 from permissions import ListFolderContents
 from permissions import ManagePortal
-from utils import _checkPermission
 from utils import _dtmldir
 from utils import SimpleItemWithProperties
 from utils import UniqueObject
