@@ -9,8 +9,18 @@ CMF Collector Update Notes
   the collector version as indicated by the VERSION.text file in the
   same directory.
 
-  See KNOWN_PROBLEMS.txt for currently obtaining bugs and problems to
-  be aware of.
+  See KNOWN_PROBLEMS.txt for pending bugs and problems to beware.
+
+  Version 0.9b, Nov 7, 2001
+
+    - Packaged transcript webtext in a Document derivative
+      ("WebTextDocument"), to take advantage of the CookedBody
+      caching.
+
+      Pre-existing issues using the old Document transcript will lose
+      proper formatting.  To fix that, migrate them to the new document
+      type using an external method, Extensions/webtext_migration.py.
+      See the notes at the top of that file for migration instructions.
 
   Version 0.9b, Nov 1, 2001
 
