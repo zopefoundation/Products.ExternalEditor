@@ -214,7 +214,7 @@ class DefaultDublinCoreImpl( PropertyManager ):
             WebDAV needs this to do the Right Thing (TM).
         """
         return self.Format()
-    __FLOOR_DATE = DateTime( 1000, 0 ) # alwasy effective
+    __FLOOR_DATE = DateTime( 1970, 0 ) # alwasy effective
 
 
     security.declarePublic( 'isEffective' )
