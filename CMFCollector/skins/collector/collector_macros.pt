@@ -22,7 +22,11 @@
           <th align="left">
             <div class="DesktopTitle">
               <font size="+1">
-                <em><span tal:replace="here/Title">Title</span></em>
+                <em tal:condition="here/Title"
+                    tal:content="here/Title">TITLE</em>
+                <span tal:condition="here/abbrev">
+                    [<em tal:replace="here/abbrev|nothing"></em>]
+                </span>
                 Issue Collector
               </font>
             </div>
@@ -71,10 +75,10 @@
              <font size="+1">
                Issue <span tal:replace="here/id">ID</span> of
                <a href=""
-                  tal:attributes="href python:here.aq_parent.absolute_url()">
-                 <span tal:replace="container/Title">COLLECTOR TITLE</span>
+                 tal:attributes="href python:here.aq_parent.absolute_url()">
+                <span tal:replace="here/aq_parent/Title">COLLECTOR TITLE</span>
+                [<em><span tal:replace="here/abbrev|nothing"/></em>]
                </a>
-               Collector
              </font>
            </td>
          </tr>
@@ -89,7 +93,14 @@
              </strong>
            </td>
            <td tal:condition="here/security_related">
-             <font color="red"> Security Related </font>
+             <font color="RED or BLACK"
+                   tal:attributes="color python: (here.confidential() and 'red'
+                                                  or 'black')">
+                Security Related </font>
+             (<span tal:replace="python: (here.confidential()
+                                          and 'Confidential'
+                                          or 'Public')">CONFIDENTIALITY</span>)
+
            </td>
          </tr>
 
@@ -130,19 +141,13 @@
            <td tal:content="crdate">CREATIONDATE</td>
          </tr>
 
-         <tr tal:condition="here/edited">
+         <tr tal:condition="python: here.action_number > 1">
 
-           <td tal:condition="here/comment_number"
-               align="right"> Entries: </td>
-           <td tal:condition="here/comment_number"
-               tal:content="here/comment_number"> NUMBER </td>
+           <td align="right"> Entries: </td>
+           <td tal:content="here/action_number"> NUMBER </td>
 
-           <td tal:condition="not:here/comment_number"> </td>
-           <td tal:condition="not:here/comment_number"> </td>
-
-           <td tal:condition="datesdiff" align="right">Last update:</td>
-           <td tal:condition="datesdiff"
-               tal:content="moddate">MODDATE</td>
+           <td align="right">Last update:</td>
+           <td tal:content="moddate">MODDATE</td>
          </tr>
          <tr>
            <td align="right">This version:</td>
@@ -171,11 +176,20 @@
           <td colspan="3">
             <table>
               <div tal:repeat="item artifacts">
-                <tr> <td>
-                  <a href="ITEM URL"
-                     tal:attributes="href python: item.absolute_url()
-                                                  + '/view'"
-                     tal:content="item/id">ITEM ID</a>
+                <tr>
+                  <td tal:define="icon item/getIcon|item/icon|nothing;
+                                  item_url python: item.absolute_url()
+                                                   + '/view'">
+                    <span tal:condition="icon">
+                      <a href=""
+		         tal:attributes="href item_url">
+                        <img src="" alt="" border="0"
+                             tal:attributes="src python: here.portal_url()
+                                                         + '/' + icon;
+                                             alt item/Type|nothing"></a>
+                    </span>                
+                    <a href="ITEM URL" tal:attributes="href item_url"
+                       tal:content="item/id">ITEM ID</a>
                   <font color="gray">
                     <span tal:replace="python: item.description[:45]
                                                + (item.description[46:]
