@@ -2,6 +2,9 @@ HEAD only (unreleased)
 
   New Features
 
+    - DirectoryView and derived classes can now have metadata associated with
+      them just like regular FSObject-derived objects can.
+
     - DirectoryView and derived classes: It is now possible to customize what 
       gets created to represent directories inside the directory view.
       Previously, the code had a fixed assumption that all directories on the 

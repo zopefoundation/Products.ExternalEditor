@@ -190,7 +190,12 @@ class DirectoryInformation:
                     t = registry.getTypeByMetaType(mt)
                     if t is None:
                         t = DirectoryView
-                    ob = t(entry, entry_minimal_fp)
+                    metadata = FSMetadata(entry_filepath)
+                    metadata.read()
+                    ob = t( entry
+                          , entry_minimal_fp
+                          , properties=metadata.getProperties()
+                          )
                     ob_id = ob.getId()
                     data[ob_id] = ob
                     objects.append({'id': ob_id, 'meta_type': ob.meta_type})
@@ -374,11 +379,18 @@ class DirectoryView (Persistent):
     """
     meta_type = 'Filesystem Directory View'
     _dirpath = None
+    _properties = None
     _objects = ()
 
-    def __init__(self, id, dirpath, fullname=None):
+    def __init__(self, id, dirpath, fullname=None, properties=None):
+        if properties:
+            # Since props come from the filesystem, this should be
+            # safe.
+            self.__dict__.update(properties)
+
         self.id = id
         self._dirpath = dirpath
+        self._properties = properties
 
     def __of__(self, parent):
         info = _dirreg.getDirectoryInfo(self._dirpath)
