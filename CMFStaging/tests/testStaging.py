@@ -36,6 +36,7 @@ class Tests(unittest.TestCase):
         # Note that you don't actually need a CMF site to use staging! ;-)
         app = Zope.app()
         self.app = app
+        self.conn = app._p_jar
         if hasattr(app, 'testroot'):
             app._delObject('testroot')
         app.manage_addProduct['OFSP'].manage_addFolder('testroot')
@@ -66,7 +67,7 @@ class Tests(unittest.TestCase):
         app = self.app
         if hasattr(app, 'testroot'):
             app._delObject('testroot')
-        self.app._p_jar.close()
+        self.conn.close()
         noSecurityManager()
 
 
