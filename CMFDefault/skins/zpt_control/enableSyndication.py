@@ -3,8 +3,12 @@
 ##parameters=
 
 if context.portal_syndication.isSiteSyndicationAllowed():
-  context.portal_syndication.enableSyndication(context)
-  return context.REQUEST.RESPONSE.redirect(context.absolute_url() + '/synPropertiesForm?portal_status_message=Syndication+Enabled')
+    context.portal_syndication.enableSyndication(context)
+    msg = 'Syndication+Enabled'
 else:
-  return context.REQUEST.RESPONSE.redirect(context.absolute_url() + '/synPropertiesForm?portal_status_message=Syndication+Not+Allowed')
+    msg = 'Syndication+Not+Allowed'
 
+target = '%s/synPropertiesForm' % context.absolute_url()
+qs = 'portal_status_message=%s' % msg
+
+return context.REQUEST.RESPONSE.redirect('%s?%s' % (target, qs))
