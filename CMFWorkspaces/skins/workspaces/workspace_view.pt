@@ -7,7 +7,7 @@
 <div metal:fill-slot="main">
 
   <form name="addform" action="" method="POST" tal:attributes="action
-        string:${here/absolute_url}/workspace_add">
+        string:${here/absolute_url}/workspace_add_object">
     <p>
     <select name="type_name" size="1" onChange="
         if (document.addform.type_name.selectedIndex > 0)

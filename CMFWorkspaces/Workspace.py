@@ -90,7 +90,7 @@ class Workspace (PortalContent.PortalContent,
                  webdav.Collection.Collection):
     __doc__ = __doc__                   # Use the module docstring.
 
-    meta_type = 'Workspace'
+    meta_type = portal_type = 'Workspace'
 
     security = ClassSecurityInfo()
     security.setPermissionDefault(ManageWorkspaces, ('Manager', 'Owner'))
