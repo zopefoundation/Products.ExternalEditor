@@ -1,5 +1,12 @@
+CMFStaging Changelog
 
-Unreleased version
+ CMFStaging 0.9.1 (2005/10/19)
+
+  - Release management file updates only
+
+ CMFStaging 0.9 (2004/10/27)
+
+  - CVS-only, tag: CMFStaging-0_9
 
   - Staging and versioning of reference objects now works.
 
