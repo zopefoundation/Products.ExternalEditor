@@ -143,6 +143,13 @@ class SetupTool( UniqueObject, Folder ):
     #
     #   ISetupTool API
     #
+    security.declareProtected( ManagePortal, 'getEncoding' )
+    def getEncoding( self ):
+
+        """ See ISetupTool.
+        """
+        return 'ascii'
+
     security.declareProtected( ManagePortal, 'getProfileProduct' )
     def getProfileProduct( self ):
 
@@ -212,7 +219,9 @@ class SetupTool( UniqueObject, Folder ):
         """ See ISetupTool.
         """
         profile_path = self._getFullyQualifiedProfileDirectory()
-        context = DirectoryImportContext( self, profile_path, purge_old )
+        encoding = self.getEncoding()
+        context = DirectoryImportContext( self, profile_path, purge_old,
+                                          encoding )
 
         info = self._import_registry.getStepMetadata( step_id )
 
@@ -243,7 +252,9 @@ class SetupTool( UniqueObject, Folder ):
         """ See ISetupTool.
         """
         profile_path = self._getFullyQualifiedProfileDirectory()
-        context = DirectoryImportContext( self, profile_path, purge_old )
+        encoding = self.getEncoding()
+        context = DirectoryImportContext( self, profile_path, purge_old,
+                                          encoding )
 
         steps = self._import_registry.sortSteps()
         messages = {}

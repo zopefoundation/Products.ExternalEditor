@@ -35,7 +35,7 @@ class IImportContext( ISetupContext ):
 
     def getEncoding():
 
-        """ Return the encoding used in data files.
+        """ Get the encoding used for configuration data within the site.
 
         o Return None if the data should not be encoded.
         """
@@ -377,6 +377,13 @@ class ISetupTool( Interface ):
 
     """ API for SetupTool.
     """
+
+    def getEncoding():
+
+        """ Get the encoding used for configuration data within the site.
+
+        o Return None if the data should not be encoded.
+        """
 
     def getProfileProduct():
 
