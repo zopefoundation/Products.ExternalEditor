@@ -1,14 +1,14 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """ List Criterion: A criterion that is a list
 
@@ -25,7 +25,6 @@ from Products.CMFCore.CMFCorePermissions import View
 from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
 
-import string
 
 class ListCriterion( AbstractCriterion ):
     """
@@ -72,7 +71,7 @@ class ListCriterion( AbstractCriterion ):
             self._clear()
         else:
             if type( value ) == type( '' ):
-                value = string.split( value, '\n' )
+                value = value.split('\n')
             self.value = tuple( value )
 
         if not operator:
@@ -89,7 +88,7 @@ class ListCriterion( AbstractCriterion ):
         # filter out empty strings
         result = []
 
-        value = tuple( filter( None, self.value ) ) 
+        value = tuple( filter( None, self.value ) )
         if not value:
             return ()
         result.append( ( self.field, self.value ), )

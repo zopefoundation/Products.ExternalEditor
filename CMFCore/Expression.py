@@ -15,15 +15,14 @@
 $Id$
 """
 
-import Globals
-from Globals import Persistent
+from AccessControl import ClassSecurityInfo
 from Acquisition import aq_base, aq_inner, aq_parent
-from AccessControl import getSecurityManager, ClassSecurityInfo
+from Globals import InitializeClass
+from Globals import Persistent
+from Products.PageTemplates.Expressions import getEngine
+from Products.PageTemplates.Expressions import SecureModuleImporter
 
 from utils import getToolByName
-from Products.PageTemplates.Expressions import getEngine
-from Products.PageTemplates.TALES import SafeMapping
-from Products.PageTemplates.Expressions import SecureModuleImporter
 
 
 class Expression (Persistent):
@@ -48,7 +47,7 @@ class Expression (Persistent):
         #print 'returning %s from %s' % (`res`, self.text)
         return res
 
-Globals.InitializeClass(Expression)
+InitializeClass(Expression)
 
 
 def getExprContext(context, object=None):

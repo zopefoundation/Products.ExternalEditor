@@ -6,9 +6,10 @@
 ##bind script=script
 ##bind subpath=traverse_subpath
 ##title=Browser detection for stylesheet handling
-
-import string
-
+##
+from Products.CMFCore.utils import getToolByName
+utool = getToolByName(script, 'portal_url')
+portal_url = utool()
 stylesheet_code = ''
 
 if hasattr(context, 'stylesheet_properties'):
@@ -17,11 +18,11 @@ if hasattr(context, 'stylesheet_properties'):
     sheet = context.stylesheet_properties.select_stylesheet_id
 
     if sheet:
-        if ag[:9] == 'Mozilla/4' and string.find(ag, 'MSIE') < 0:
+        if ag[:9] == 'Mozilla/4' and ag.find('MSIE') < 0:
             s_obj = getattr(context, sheet)
             s_content = s_obj(None, _, do_inline_css=1)
             stylesheet_code = '<style type="text/css">\n<!--\n %s\n -->\n</style>' % s_content
         else:
-            s_url = '%s/%s' % (context.portal_url(), sheet)
+            s_url = '%s/%s' % (portal_url, sheet)
             stylesheet_code = '<link rel="stylesheet" href="%s" type="text/css" />' % s_url
 return stylesheet_code

@@ -1,9 +1,7 @@
-import string
-
 from Products.CMFCore.TypesTool import FactoryTypeInformation
 from Products.CMFDefault import DiscussionItem
 
-def update_discussion( self, split=string.split ):
+def update_discussion(self):
     """
      1. Install (if it isn't there already) a type information
         object for DiscussionItems, so that they can get actions,
@@ -18,7 +16,7 @@ def update_discussion( self, split=string.split ):
 
           - Items which are replies to sibling items have the sibling's
             ID as their 'in_reply_to'.
-        
+
         The representation we are converting from was:
 
           - Items which are replies to the containing content object
@@ -34,10 +32,8 @@ def update_discussion( self, split=string.split ):
     types_tool = self.portal_types
     if not getattr( types_tool, 'Discussion Item', None ):
 
-        fti = apply( FactoryTypeInformation
-                   , ()
-                   , DiscussionItem.factory_type_information[0]
-                   )
+        fti = FactoryTypeInformation(
+                                **DiscussionItem.factory_type_information[0] )
         types_tool._setObject( 'Discussion Item', fti )
         a( 'Added type object for DiscussionItem' )
 
@@ -54,11 +50,11 @@ def update_discussion( self, split=string.split ):
         talkback = object.aq_parent
         path = item.getPath()
         in_reply_to = object.in_reply_to
-        
+
         if in_reply_to is None: # we've been here already
             continue
 
-        irt_elements = split( in_reply_to, '/' )
+        irt_elements = in_reply_to.split('/')
 
         if len( irt_elements ) == 1:
             if talkback._container.get( irt_elements[0] ):
@@ -79,6 +75,6 @@ def update_discussion( self, split=string.split ):
         object.reindexObject()
 
         a( path )
-    
-    return string.join( log, '\n' )
+
+    return '\n'.join(log)
 

@@ -257,9 +257,9 @@ class PortalGenerator:
         if tool is None:
             return
         for t in initial_types:
-            cfm = apply(ContentFactoryMetadata, (), t)
+            cfm = ContentFactoryMetadata(**t)
             tool._setObject(t['id'], cfm)
-        
+
     def setupMimetypes(self, p):
         p.manage_addProduct[ 'CMFCore' ].manage_addRegistry()
         reg = p.content_type_registry

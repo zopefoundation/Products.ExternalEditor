@@ -1,8 +1,5 @@
-
-
 from Acquisition import aq_base, aq_inner, aq_parent
-from ZODB.PersistentMapping import PersistentMapping
-from string import join
+from Globals import PersistentMapping
 import sys
 
 
@@ -28,7 +25,7 @@ class Migrator:
         self.skipped = []
 
     def migrateObjectManager(self, src_folder, dst_folder, place=()):
-        self.visited_folders.append(join(place, '/'))
+        self.visited_folders.append( '/'.join(place) )
         for id, s_ob in src_folder.objectItems():
             d_ob = getattr(dst_folder, id, None)
             to_store = self.migrateObject(id, s_ob, d_ob, dst_folder,
@@ -44,7 +41,7 @@ class Migrator:
                     to_store._owner = owner
 
     def migrateDiscussionContainer(self, src_folder, dst_folder, place=()):
-        self.visited_folders.append(join(place, '/'))
+        self.visited_folders.append( '/'.join(place) )
         dst_container = getattr(dst_folder, '_container', None)
         if dst_container is None:
             dst_container = dst_folder._container = PersistentMapping()
@@ -70,7 +67,7 @@ class Migrator:
         descend_ok = 1
         base_ob = aq_base(s_ob)
         to_store = None
-        pathname = join(place, '/')
+        pathname = '/'.join(place)
         if self.skip.has_key(id):
             # Don't migrate objects by this name, but we can still
             # migrate subobjects.
@@ -118,7 +115,7 @@ class SimpleClassConverter (Converter):
         self._klass = to_class
         self._descend = descend
         self._show_dup = show_dup
-    
+
     def allowDescendChildren(self):
         return self._descend
 
@@ -148,7 +145,7 @@ class SimpleClassConverter (Converter):
             # Clear the children.
             newob._container = PersistentMapping()
         return newob
-        
+
 TupleType = type(())
 
 def setupDirectConversion(old_prod, new_prod, modname, classname,
@@ -190,7 +187,7 @@ def _cleanupOwnership(ob, res, cleanup_children):
     if owner:
         udb, uid = owner
         #res.append('Owner of %s is %s!%s' % (
-        #    join(ob.getPhysicalPath(), '/'), join(udb, '/'), uid,))
+        #    '/'.join( ob.getPhysicalPath() ), '/'.join(udb), uid,))
         root = ob.getPhysicalRoot()
         try:
             db = root.unrestrictedTraverse(udb, None)
@@ -222,15 +219,15 @@ def _cleanupOwnership(ob, res, cleanup_children):
             if udb is not None:
                 ob._owner = udb, uid
                 res.append('Changed ownership of %s from %s!%s to %s!%s' %
-                           (join(ob.getPhysicalPath(), '/'),
-                            join(old_udb, '/'), uid,
-                            join(udb, '/'), uid,))
+                           ('/'.join( ob.getPhysicalPath() ),
+                            '/'.join(old_udb), uid,
+                            '/'.join(udb), uid,))
             else:
                 res.append('Could not fix the ownership of %s, '
                            'which is set to %s!%s' %
-                           (join(ob.getPhysicalPath(), '/'),
-                            join(old_udb, '/'), uid,))
-                
+                           ('/'.join( ob.getPhysicalPath() ),
+                            '/'.join(old_udb), uid,))
+
     if cleanup_children:
         if hasattr(ob, 'objectValues'):
             for subob in ob.objectValues():
@@ -238,7 +235,7 @@ def _cleanupOwnership(ob, res, cleanup_children):
 
     # Deactivate object if possible.
     if changed is None: ob._p_deactivate()
-    
+
     return res
 
 def _copyUsers(src_folder, dst_folder):
@@ -287,11 +284,11 @@ def migrate(self, src_path='', dest_path='', copy_users=0, ownership_only=0):
         <p>Converted content:</p><pre>%s</pre>
         <p>Fixed up ownership:</p><pre>%s</pre>
         </body></html>
-        ''' % (join(m.warnings, '</li>\n<li>'),
-               join(m.visited_folders, '</li>\n<li>'),
-               join(m.skipped, '</li>\n<li>'),
-               join(m.copied, '\n'),
-               join(ownership_res, '\n'),
+        ''' % ('</li>\n<li>'.join(m.warnings),
+               '</li>\n<li>'.join(m.visited_folders),
+               '</li>\n<li>'.join(m.skipped),
+               '\n'.join(m.copied),
+               '\n'.join(ownership_res),
                )
 
 migrate_ptk = migrate
@@ -338,7 +335,7 @@ if BEFORE_CONTENT_MOVE:
     content_product = 'PTKBase'
 else:
     content_product = 'PTKDemo'
-    
+
 
 setupDirectConversions(content_product, 'CMFDefault', demo_conversions,
                        ptk2cmf_conversions)

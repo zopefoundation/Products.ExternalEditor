@@ -1,14 +1,14 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """ Base class for object managers which can be "skinned".
 
@@ -18,11 +18,11 @@ the browser request.  Skins are stored in a fixed-name subobject.
 $Id$
 """
 
-import Globals
-from OFS.ObjectManager import ObjectManager
-from Acquisition import ImplicitAcquisitionWrapper, aq_base, aq_inner
-from ExtensionClass import Base
 from AccessControl import ClassSecurityInfo
+from Acquisition import aq_base
+from Acquisition import ImplicitAcquisitionWrapper
+from Globals import InitializeClass
+from OFS.ObjectManager import ObjectManager
 
 
 # superGetAttr is assigned to whatever ObjectManager.__getattr__
@@ -52,8 +52,8 @@ class SkinnableObjectManager (ObjectManager):
     def __getattr__(self, name):
         '''
         Looks for the name in an object with wrappers that only reach
-        up to the root skins folder.  
-        
+        up to the root skins folder.
+
         This should be fast, flexible, and predictable.
         '''
         if not name.startswith('_') and not name.startswith('aq_'):
@@ -104,7 +104,7 @@ class SkinnableObjectManager (ObjectManager):
     security.declarePublic('changeSkin')
     def changeSkin(self, skinname):
         '''Change the current skin.
-        
+
         Can be called manually, allowing the user to change
         skins in the middle of a request.
         '''
@@ -118,7 +118,7 @@ class SkinnableObjectManager (ObjectManager):
         '''
         Sets up _v_skindata so that __getattr__ can find it.
 
-        Can NOT be called manually to change skins in the middle of a 
+        Can NOT be called manually to change skins in the middle of a
         request! Use changeSkin for that.
         '''
         if REQUEST is None:
@@ -152,9 +152,9 @@ class SkinnableObjectManager (ObjectManager):
 
     def _checkId(self, id, allow_dup=0):
         '''
-        Override of ObjectManager._checkId().  
-        
-        Allows the user to create objects with IDs that match the ID of 
+        Override of ObjectManager._checkId().
+
+        Allows the user to create objects with IDs that match the ID of
         a skin object.
         '''
         superCheckId = SkinnableObjectManager.inheritedAttribute('_checkId')
@@ -173,4 +173,4 @@ class SkinnableObjectManager (ObjectManager):
                 self._v_skindata = sd
         return superCheckId(self, id, allow_dup)
 
-Globals.InitializeClass(SkinnableObjectManager)
+InitializeClass(SkinnableObjectManager)

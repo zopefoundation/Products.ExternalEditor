@@ -1,21 +1,21 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """
     Utility functions for upgrading CMFDefault-based sites.
 """
 
 from Acquisition import aq_inner
-import string
+
 
 def upgrade_decor_skins( self ):
     """
@@ -38,10 +38,10 @@ def upgrade_decor_skins( self ):
         try:
 
             skins_tool._delObject( deleted )
-        
+
         except AttributeError:
             pass
-        
+
         else:
             log.append( 'Deleted CMFDecor skin directory: %s' % deleted )
 
@@ -56,4 +56,4 @@ def upgrade_decor_skins( self ):
             log.append( 'Updated CMFDecor skin directory to CMFDefault: %s'
                       % moved )
 
-    return string.join( log, '\n' )
+    return '\n'.join(log)

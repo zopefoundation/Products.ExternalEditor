@@ -1,28 +1,34 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """ Unit tests for Favorites.
 
 $Id$
 """
 
-import Zope
 from unittest import TestCase, TestSuite, makeSuite, main
 
-from Products.CMFCore.tests.base.dummy import \
-     DummyTool as DummyURLTool, \
-     DummyObject as DummySite
+import Testing
+import Zope
+try:
+    Zope.startup()
+except AttributeError:
+    # for Zope versions before 2.6.1
+    pass
 
+from Products.CMFCore.tests.base.dummy import DummyObject as DummySite
+from Products.CMFCore.tests.base.dummy import DummyTool as DummyURLTool
 from Products.CMFDefault.Favorite import Favorite
+
 
 class FavoriteTests( TestCase ):
 
@@ -30,9 +36,8 @@ class FavoriteTests( TestCase ):
         self.tool = DummyURLTool()
         self.site = DummySite( portal_url=self.tool )
 
-    def _makeOne( self, *args, **kw ):
-
-        f = apply( Favorite, args, kw )
+    def _makeOne(self, *args, **kw):
+        f = Favorite(*args, **kw)
         return f.__of__( self.site )
 
     def test_Empty( self ):

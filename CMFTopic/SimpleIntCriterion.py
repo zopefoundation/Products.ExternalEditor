@@ -1,14 +1,14 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """ Simple int-matching criterion
 
@@ -25,10 +25,11 @@ from Products.CMFCore.CMFCorePermissions import View
 from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
 
+
 class SimpleIntCriterion( AbstractCriterion ):
     """
         Represent a simple field-match for an integer value, including
-        catalog range searches.    
+        catalog range searches.
     """
     __implements__ = ( Criterion, )
 
@@ -79,10 +80,9 @@ class SimpleIntCriterion( AbstractCriterion ):
         """
             Update the value to be filtered, and the "direction" qualifier.
         """
-        from string import strip, split # XXX: WAAAA! 2.3 compatibility
 
         if type( value ) == type( '' ):
-           value = strip( value )
+           value = value.strip()
 
         if not value:
             # An empty string was passed in, which evals to None
@@ -93,7 +93,7 @@ class SimpleIntCriterion( AbstractCriterion ):
             if direction == self.MINMAX:
 
                 if type( value ) == type( '' ):
-                    minimum, maximum = split( value, ' ' )
+                    minimum, maximum = value.split(' ')
                 else:
                     minimum, maximum = value
 
@@ -126,9 +126,8 @@ class SimpleIntCriterion( AbstractCriterion ):
 
         return tuple( result )
 
-
-
 InitializeClass( SimpleIntCriterion )
+
 
 # Register as a criteria type with the Topic class
 Topic._criteriaTypes.append( SimpleIntCriterion )

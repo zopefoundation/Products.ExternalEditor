@@ -10,22 +10,28 @@
 # FOR A PARTICULAR PURPOSE
 #
 ##############################################################################
+""" Dublin Core support for content types.
 
-import string, re
-from OFS.PropertyManager import PropertyManager
-from DateTime.DateTime import DateTime
+$Id$
+"""
+
+from AccessControl import ClassSecurityInfo
 from Acquisition import aq_base
-from Products.CMFCore.WorkflowCore import WorkflowAction
-from Products.CMFCore.interfaces.DublinCore import DublinCore
+from DateTime.DateTime import DateTime
+from Globals import DTMLFile
+from Globals import InitializeClass
+from OFS.PropertyManager import PropertyManager
+
+from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
 from Products.CMFCore.interfaces.DublinCore import CatalogableDublinCore
+from Products.CMFCore.interfaces.DublinCore import DublinCore
 from Products.CMFCore.interfaces.DublinCore import MutableDublinCore
+from Products.CMFCore.WorkflowCore import WorkflowAction
 
 from utils import tuplize, _dtmldir, semi_split
-from Globals import InitializeClass, DTMLFile
-from AccessControl import ClassSecurityInfo
-from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
 
 _marker=[]
+
 
 class DefaultDublinCoreImpl( PropertyManager ):
     """
@@ -284,11 +290,10 @@ class DefaultDublinCoreImpl( PropertyManager ):
         """
         hdrlist = []
         hdrlist.append( ( 'Title', self.Title() ) )
-        hdrlist.append( ( 'Subject', string.join( self.Subject(), ', ' ) ) )
+        hdrlist.append( ( 'Subject', ', '.join( self.Subject() ) ) )
         hdrlist.append( ( 'Publisher', self.Publisher() ) )
         hdrlist.append( ( 'Description', self.Description() ) )
-        hdrlist.append( ( 'Contributors', string.join(
-            self.Contributors(), '; ' ) ) )
+        hdrlist.append( ( 'Contributors', '; '.join( self.Contributors() ) ) )
         hdrlist.append( ( 'Effective_date', self.EffectiveDate() ) )
         hdrlist.append( ( 'Expiration_date', self.ExpirationDate() ) )
         hdrlist.append( ( 'Type', self.Type() ) )
@@ -450,7 +455,7 @@ class DefaultDublinCoreImpl( PropertyManager ):
         # locking interface, and fail gracefully if they dont
         if hasattr(self, 'failIfLocked'):
             self.failIfLocked()
-            
+
         self._editMetadata(title=title
                      , subject=subject
                      , description=description

@@ -2,20 +2,21 @@
 ##parameters=include_root=1
 ##title=Return breadcrumbs
 ##
-from string import join
-
+from Products.CMFCore.utils import getToolByName
+ptool = getToolByName(script, 'portal_properties')
+utool = getToolByName(script, 'portal_url')
+portal_url = utool()
 result = []
-portal_url = context.portal_url()
 
 if include_root:
     result.append( { 'id'      : 'root'
-                   , 'title'   : context.portal_properties.title()
+                   , 'title'   : ptool.title()
                    , 'url'     : portal_url
                    }
                  )
 
-relative = context.portal_url.getRelativeContentPath( context )
-portal = context.portal_url.getPortalObject()
+relative = utool.getRelativeContentPath(context)
+portal = utool.getPortalObject()
 
 for i in range( len( relative ) ):
     now = relative[ :i+1 ]
@@ -23,7 +24,7 @@ for i in range( len( relative ) ):
     if not now[ -1 ] == 'talkback':
         result.append( { 'id'      : now[ -1 ]
                        , 'title'   : obj.Title()
-                       , 'url'     : portal_url + '/' + join( now, '/' )
+                       , 'url'     : portal_url + '/' + '/'.join(now)
                        }
                     )
 

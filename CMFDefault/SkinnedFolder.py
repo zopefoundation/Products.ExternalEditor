@@ -15,15 +15,16 @@
 $Id$
 """
 
-from Products.CMFCore.PortalFolder import PortalFolder
-from Products.CMFCore.CMFCorePermissions import View
-from Products.CMFCore.CMFCorePermissions import ManageProperties
-from Products.CMFCore.CMFCorePermissions import ListFolderContents
 from AccessControl import ClassSecurityInfo
-from Globals import InitializeClass
-from Products.CMFCore.utils import _getViewFor
-from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
 from Acquisition import aq_base
+from Globals import InitializeClass
+
+from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
+from Products.CMFCore.CMFCorePermissions import ListFolderContents
+from Products.CMFCore.CMFCorePermissions import ManageProperties
+from Products.CMFCore.CMFCorePermissions import View
+from Products.CMFCore.PortalFolder import PortalFolder
+from Products.CMFCore.utils import _getViewFor
 
 factory_type_information = (
   { 'id'             : 'Skinned Folder'
@@ -38,7 +39,7 @@ Skinned folders can define custom 'view' actions.
   , 'immediate_view' : 'folder_edit_form'
   , 'aliases'        : {'(Default)':'folder_view',
                         'view':'folder_view'}
-  , 'actions'        : ( { 'id'            : 'view' 
+  , 'actions'        : ( { 'id'            : 'view'
                          , 'name'          : 'View'
                          , 'action': 'string:${object_url}/folder_view'
                          , 'permissions'   : (View,)
@@ -77,7 +78,7 @@ class SkinnedFolder(CMFCatalogAware, PortalFolder):
         '''
         view = _getViewFor(self)
         if getattr(aq_base(view), 'isDocTemp', 0):
-            return apply(view, (self, self.REQUEST))
+            return view(self, self.REQUEST)
         else:
             return view()
 
