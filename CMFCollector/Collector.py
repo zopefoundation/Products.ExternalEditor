@@ -286,13 +286,21 @@ class Collector(SkinnedFolder):
 
         if state_email is not None:
             changed = 0
+            # Use a new dict, to ensure it's divorced from shared class
+            # variable hood.
+            se = {}
+            se.update(self.state_email)
             for k, v in state_email.items():
-                current_setting = self.state_email.get(k, None)
+                current_setting = se.get(k, None)
                 if ( ((not current_setting) and v)
                     or (current_setting and (current_setting != v)) ):
                     changed = 1
-                    self.state_email[k] = v
+                    if not v:
+                        del se[k]
+                    else:
+                        se[k] = v
             if changed:
+                self.state_email = se
                 changes.append("State email")
 
         if topics is not None:
@@ -525,4 +533,3 @@ def addCollector(self, id, title='', description='', abbrev='',
         except: url=REQUEST['URL1']
         REQUEST.RESPONSE.redirect('%s/manage_main' % url)
     return id
-        
