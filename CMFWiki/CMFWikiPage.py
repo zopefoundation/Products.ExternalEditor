@@ -1685,6 +1685,8 @@ def unravel_nesting(nesting, curdepth=0, list_type=type([])):
 
         [(pagename, depth, offspring_suppressed?)]"""
 
+    if type(nesting) == type(''):
+        return [(nesting, curdepth, 0)]
     if len(nesting) == 1:
         return [(nesting[0], curdepth, 1)]
     got = []
