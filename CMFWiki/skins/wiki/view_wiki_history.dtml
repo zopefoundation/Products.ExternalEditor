@@ -92,11 +92,11 @@ versions out of the past to serve as the current one.</dtml-if>
       <td> &nbsp; </td>
       <td> &nbsp; </td>
       <td>
-        <input type="submit" name="history_compare_versions:method"
+        <input type="submit" name="wiki_compare_versions:method"
                value="Compare">
        <dtml-if "not noedit">
          &nbsp; &nbsp;
-         <input type="submit" name="history_copy_page_to_present:method"
+         <input type="submit" name="wiki_copy_page_to_present_handler:method"
                 value="Copy to present">
        </dtml-if>
       </td>

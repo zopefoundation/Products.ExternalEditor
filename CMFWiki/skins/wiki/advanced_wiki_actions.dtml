@@ -1,10 +1,7 @@
-<dtml-let creating="_.has_key('action') and action == 'Create'"
-         regulator="isRegSetter(new=creating)">
-
 <dtml-var standard_wiki_header>
 
     <FORM METHOD="POST"
-          ACTION="&dtml-wiki_base_url;/<dtml-var id url_quote>/wiki_deleterename_handler"
+          ACTION="&dtml-wiki_base_url;/&dtml-id;/wiki_deleterename_handler"
           ENCTYPE="multipart/form-data">
 
 <table border=1>
@@ -45,7 +42,7 @@
        <font color="gray"> No Delete or Rename forms for FrontPage - it
                            can not be removed.
        </font>
-     <dtml-elif "not isAllowed('move', REQUEST=REQUEST)">
+     <dtml-elif "not isAllowed('move')">
         You can not rename or delete this page.
         <dtml-var "whichWho[opCategory('move')]"> do so.
      <dtml-else>
@@ -54,7 +51,7 @@
           <td width="50%" nowrap bgcolor="eeeeee">
             Rename <strong><dtml-var id></strong> to:
             <br>
-              <INPUT TYPE="TEXT" NAME="new_id" SIZE="25" value="<dtml-var id>">
+              <INPUT TYPE="TEXT" NAME="new_id" SIZE="25" value="&dtml-id;">
               &nbsp; <input type="SUBMIT" NAME="Rename" VALUE="Rename">
           </td>
           <td align="center" width="50%" nowrap bgcolor="eeeeee">
@@ -81,7 +78,7 @@
   the common wiki operations on the page.  The operations include
   editing the page, creating new pages from it, commenting on it, and
   resituating it (renaming it, deleting, or changing its designated
-  parents).   You can <dtml-if regulator> set <dtml-else> see </dtml-if>
+  parents).   You can <dtml-if isRegSetter> set <dtml-else> see </dtml-if>
   the page regulations below.
 
   <p>
@@ -91,7 +88,7 @@
   -->
   </p>
     <FORM METHOD="POST"
-          ACTION="&dtml-wiki_base_url;/<dtml-var id url_quote>/wiki_advanced_handler"
+          ACTION="&dtml-wiki_base_url;/&dtml-id;/wiki_advanced_handler"
           ENCTYPE="multipart/form-data">
     <table width="100%" border="0" cellspacing="0" cellpadding="5"
            bgcolor="eeeeee">
@@ -126,7 +123,7 @@
                opcat="opCategory(op)">
         <td align="center" valign="middle">
           <select name="&dtml-op;-category:string" size="1"
-             <dtml-if "not creating and not regulator"> DISABLED </dtml-if> >
+             <dtml-unless isRegSetter> DISABLED </dtml-unless> >
           <dtml-in regCategories>
            <dtml-let cat="_['sequence-item']"
                      cur="opcat == cat">
@@ -152,10 +149,10 @@
         <td align="center">
           <textarea rows=2 cols=8
                     name="&dtml-op;-usernames:lines"
-               <dtml-if "not regulator">
+               <dtml-unless isRegSetter>
                  readonly
                  onkeydown="this.blur(); return false;"
-               </dtml-if>
+               </dtml-unless>
             >&dtml-usernames;</textarea>
         </td>
         </dtml-let>
@@ -170,10 +167,10 @@
         <td align="center">
             <input type="hidden" name="&dtml-propop;:default" value="off">
             <input type="checkbox" name="&dtml-propop;" value="ON"
-               <dtml-if "not regulator">
+               <dtml-unless isRegSetter>
                  readonly
                  onkeydown="this.blur(); return false;"
-               </dtml-if> >
+               </dtml-unless> >
         </td>
         </dtml-let>
        </dtml-in>
@@ -189,22 +186,22 @@
         </th>
         <td colspan=4>
           <input type="radio" name="who_owns_subs" value="creator"
-                 <dtml-if "not regulator"> DISABLED </dtml-if>
+                 <dtml-unless isRegSetter> DISABLED </dtml-unless>
                  <dtml-if "subOwner()=='creator'"> CHECKED </dtml-if>>
               Only creator of new page
           <br>
           <input type="radio" name="who_owns_subs" value="original_owner"
-                 <dtml-if "not regulator"> DISABLED </dtml-if>
+                 <dtml-unless isRegSetter> DISABLED </dtml-unless>
                  <dtml-if "subOwner()=='original_owner'">CHECKED</dtml-if>>
               Only original page owner(s)
           <br>
           <input type="radio" name="who_owns_subs" value="both"
-                 <dtml-if "not regulator"> DISABLED </dtml-if>
+                 <dtml-unless isRegSetter> DISABLED </dtml-unless>
                  <dtml-if "subOwner()=='both'">CHECKED</dtml-if>>
               Both original page owner(s) and sub-page creators
         </td>
       </tr>
-     <dtml-if "regulator"> 
+     <dtml-if isRegSetter>
       <tr>
         <td colspan=5> <hr>
         </td>
@@ -223,5 +220,3 @@
 </form>
 
 <dtml-var standard_wiki_footer>
-</dtml-let>
-

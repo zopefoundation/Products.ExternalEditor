@@ -8,6 +8,8 @@
 ##title=
 ##
 
-context.setRegulations(REQUEST)
+context.setRegulations(d=REQUEST)
 
 REQUEST.RESPONSE.redirect('%s' % context.wiki_page_url())
+
+
