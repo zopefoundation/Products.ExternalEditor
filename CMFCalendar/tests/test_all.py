@@ -1,5 +1,5 @@
+import unittest
 import Zope
-from unittest import main
 from Products.CMFCore.tests.base.utils import build_test_suite
 
 def test_suite():
@@ -8,4 +8,4 @@ def test_suite():
                              'test_Calendar'])
 
 if __name__ == '__main__':
-    main(defaultTest='test_suite')
+    unittest.main(defaultTest='test_suite')

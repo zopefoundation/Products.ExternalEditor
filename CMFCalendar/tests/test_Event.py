@@ -1,9 +1,9 @@
+import unittest
 import Zope
-from unittest import TestCase, TestSuite, main, makeSuite
 from Products.CMFCalendar.Event import Event
 from DateTime import DateTime
 
-class TestEvent(TestCase):
+class TestEvent(unittest.TestCase):
 
     def test_new(self):
         event = Event('test')
@@ -47,9 +47,9 @@ class TestEvent(TestCase):
                          )
 
 def test_suite():
-    return TestSuite((
-        makeSuite( TestEvent ),
+    return unittest.TestSuite((
+        unittest.makeSuite( TestEvent ),
         ))
 
 if __name__ == '__main__':
-    main(defaultTest='test_suite')
+    unittest.main(defaultTest='test_suite')
