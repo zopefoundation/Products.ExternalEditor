@@ -128,13 +128,13 @@ def initialize( context ):
     initializeBasesPhase2( z_bases, context )
     initializeBasesPhase2( z_tool_bases, context )
 
-    ToolInit( 'CMFDefault Tool'
+    ToolInit( 'CMF Default Tool'
             , tools=tools
             , product_name='CMFDefault'
             , icon='tool.gif'
             ).initialize( context )
 
-    ContentInit( 'CMFDefault Content'
+    ContentInit( 'CMF Default Content'
                , content_types=contentClasses
                , permission=AddPortalContent
                , extra_constructors=contentConstructors

@@ -29,7 +29,7 @@ def initialize( context ):
     from tool import SetupTool
 
 
-    ToolInit( 'CMFSetup Tools'
+    ToolInit( 'CMF Setup Tool'
             , tools=[ SetupTool ]
             , product_name='Setup'
             , icon=None

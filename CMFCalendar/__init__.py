@@ -42,7 +42,7 @@ event_globals=globals()
 registerDirectory('skins', globals())
 
 def initialize( context ):
-    utils.ToolInit('CMFCalendar Tool', tools=tools,
+    utils.ToolInit('CMF Calendar Tool', tools=tools,
                    product_name='CMFCalendar', icon='tool.gif',
                    ).initialize( context )
 
