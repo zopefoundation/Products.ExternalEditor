@@ -165,6 +165,10 @@ factory_type_information = (
        'action': 'folder_edit_form',
        'permissions': ('Manage properties',),
        'category': 'folder'},
+      {'name': 'Syndication',
+       'action': 'synPropertiesForm',
+       'permissions': ('Manage properties'),
+       'category': 'folder'},
       ),
      },
 
@@ -332,6 +336,7 @@ class PortalGenerator:
         addCMFDefaultTool('Default URL Tool', None)
         addCMFDefaultTool('Default Properties Tool', None)
         addCMFDefaultTool('Default Metadata Tool', None)
+        addCMFDefaultTool('Default Syndication Tool', None)
 
     def setupMailHost(self, p):
         p.manage_addProduct['MailHost'].manage_addMailHost(

@@ -1,0 +1,129 @@
+<dtml-var standard_html_header>
+<body bgcolor="#ffffff">
+<h2>Default Syndication Properties</h2>
+<dtml-if expr="portal_syndication.isSiteSyndicationAllowed()">
+    <dtml-if expr="portal_syndication.isSyndicationAllowed(this())">
+        <form action="editSynProperties" method="post">
+        <table width="100%" border="0">
+        <tr>
+            <th colspan="2" valign="top" align="left">Channel Properties</th>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <table width="90%" border="1">
+                    <tr>
+                        <td>
+                          <table>
+                             <tr>
+                               <td valign="top" height="30">Channel Title:  </td>
+                               <td valign="top" height="30">
+                               <dtml-let title="this().Title">
+                                   &dtml-title;
+                               </dtml-let>
+                               </td>
+                            </tr>
+                            <tr>
+                              <td valign="top" height="30">Channel Description:  </td>
+                              <td valign="top" height="30">
+                              <dtml-let description="this().Description">
+                                &dtml-description;
+                              </dtml-let>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+<table width="100%" border="0">
+  <tr>
+     <th valign="top" align="left">Sy Module Properties</th>
+  </tr>
+  <tr>
+     <td colspan="2">
+       <table width="90%" border="1"><tr><td>
+       <table>
+         <tr>
+           <th align="left">Element</th>
+           <th align="left">Default Value</th>
+         </tr>
+	<dtml-with portal_syndication>
+         <tr>
+           <td>
+             UpdatePeriod
+           </td>
+           <td>
+		 <select name="updatePeriod">
+			<dtml-in buildUpdatePeriods>
+				<option value="&dtml-sequence-key;"
+				<dtml-if expr="_['sequence-key'] ==
+                getUpdatePeriod(this())">
+				selected="selected"</dtml-if>>&dtml-sequence-item;
+				</option>
+			</dtml-in>
+		</select>
+           </td>
+         </tr>
+         <tr>
+           <td>
+             UpdateFrequency
+           </td>
+           <td>
+             <input type="text" name="updateFrequency"
+              value="<dtml-let
+              updateFrequency="getUpdateFrequency(this())">&dtml-updateFrequency;"</dtml-let> size="3">
+           </td>
+         </tr>
+		 <tr>
+           <td>
+             UpdateBase
+           </td>
+           <td>
+            <dtml-let updateBase="getUpdateBase(this())">
+             <input type="text" name="updateBase:date"
+              value="&dtml-updateBase;" size="25">
+           </dtml-let>
+           </td>
+         </tr>
+           <tr>
+           <td>
+             Max Syndicated Items
+           </td>
+           <td>
+             <input type="text" name="max_items"
+              value="<dtml-let
+              max_items="getMaxItems(this())">&dtml-max_items;"</dtml-let> size="3">
+           </td>
+         </tr>
+	</dtml-with>
+         <tr>
+           <td colspan="2">
+             <input type="submit" name="edit" value=" Save ">
+           </td>
+         </tr>
+
+       </table>
+       </td></tr></table>
+     </td>
+  </tr>
+  <tr>
+   <td> <br /> </td>
+  </tr>
+</table>
+</form>
+<form action="disableSyndication" method="post">
+<input type="submit" value="Disable Syndication"></input>
+<input type="hidden" name="isAllowed:int" value="0"></input>
+</form>
+<dtml-else>
+<form action="enableSyndication" method="post">
+<input type="hidden" name="isAllowed:int" value="1"> 
+<input type="submit" value="Enable Syndication">
+</form>
+</dtml-if>
+<dtml-else>
+<h4>Syndication is Disabled</h4>
+</dtml-if>
+<dtml-var standard_html_footer>

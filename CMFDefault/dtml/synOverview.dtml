@@ -1,0 +1,14 @@
+<html><head><title>portal_syndication overview</title></head>
+<body bgcolor="#ffffff">
+<dtml-var manage_tabs>
+
+<h4>Syndication Tool Overview</h4>
+
+    See the online help by clicking the 'Help' link on the Management Forms.
+    To turn on syndication, visit the Properties Tab in the management interface.
+    <br>
+    More online documentation is available at:  
+    <a href="http://cmf.zope.org/doc/admin/syndication/">Syndication Administration</a>
+
+</body>
+</html>

@@ -1,0 +1,12 @@
+<dtml-with portal_syndication>
+<dtml-call
+expr="editSyInformationProperties(this()
+                    , REQUEST['updatePeriod']
+                    , REQUEST['updateFrequency']
+                    , REQUEST['updateBase']
+                    , REQUEST['max_items']
+                    , REQUEST)">
+</dtml-with>
+<dtml-call expr="REQUEST['RESPONSE'].redirect(absolute_url() +
+'/synPropertiesForm' + 
+'?portal_status_message=Syndication+Properties+Updated.')">

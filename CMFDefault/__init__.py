@@ -92,6 +92,7 @@ import Document, Link, NewsItem, File, Image, Favorite
 import Discussions, DiscussionItem
 import PropertiesTool, MembershipTool, MetadataTool
 import RegistrationTool, URLTool, DublinCore, DiscussionTool
+import SyndicationTool
 from Products.CMFCore import utils
 import Products.CMFCore
 from Products.CMFCore.DirectoryView import registerDirectory
@@ -157,6 +158,7 @@ tools = ( DiscussionTool.DiscussionTool
         , PropertiesTool.PropertiesTool
         , URLTool.URLTool
         , MetadataTool.MetadataTool
+        , SyndicationTool.SyndicationTool
         )
 
 import sys
@@ -198,3 +200,6 @@ def initialize( context ):
     reg( 'image/gif', Image.Image )
     reg( 'image/jpeg', Image.Image )
     reg( 'image/unknown', Image.Image )
+
+    context.registerHelp()
+    context.registerHelpTitle('CMF Default Help')
