@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<export-scripts xmlns:tal="http://xml.zope.org/namespaces/tal">
+ <export-script id="STEP_ID"
+                callable="DOTTED.NAME"
+                title="TITLE"
+                tal:repeat="script here/listScriptMetadata"
+                tal:attributes="id script/id;
+                                callable script/callable;
+                                title script/title
+                               ">
+  <span tal:replace="script/description">DESCRIPTION</span>
+ </export-script>
+</export-scripts>
