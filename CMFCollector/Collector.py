@@ -220,7 +220,8 @@ class Collector(SkinnedFolder):
             # XXX Vette managers - they must exist, etc.
             x = filter(None, managers)
             if not self.managers:
-                changes.append("(Managers set must be non-empty)")
+                changes.append("Managers can't be empty - including initial"
+                               " owner")
                 # Somehow we arrived here with self.managers empty - reinstate
                 # at least the owner, if any found, else the current manager.
                 owners = self.users_with_local_role('Owner')
@@ -230,15 +231,17 @@ class Collector(SkinnedFolder):
                     x.append(userid)
             elif ((userid in self.managers)
                   and (userid not in x)):
-                changes.append("(Managers may not deenlist themselves)")
+                changes.append("Managers cannot de-enlist themselves")
                 x.append(userid)
             if util.sorted(self.managers) != util.sorted(x):
+                changes.append("Managers")
                 self.managers = x
                 staff_changed = 1
         if supporters is not None:
             # XXX Vette supporters - they must exist, etc.
             x = filter(None, supporters)
             if util.sorted(self.supporters) != util.sorted(x):
+                changes.append("Supporters")
                 self.supporters = x
                 staff_changed = 1
         if staff_changed:
@@ -283,27 +286,27 @@ class Collector(SkinnedFolder):
 
         managers = self.managers
         supporters = self.supporters
-        changes = []
+        change_notes = []
+        changed = 0
 
         if not managers:
-            # Something is awry.  Manager are not allowed to remove themselves
-            # from the managers roster, and only managers should be able to
-            # adjust the roles, so:
-            changes.append("Populated empty managers roster")
+            # Something is awry.  Managers are not allowed to remove
+            # themselves from the managers roster, and only managers should be
+            # able to adjust the roles, so:
+            change_notes.append("Populated empty managers roster")
+            changed = 1
             self.managers = managers = [str(getSecurityManager().getUser())]
         if util.users_for_local_role(self, managers, 'Manager'):
-            changes.append("Managers")
-
+            changed = 1
         if util.users_for_local_role(self, managers + supporters, 'Reviewer'):
-            changes.append("Supporters")
-
-        if changes and not no_reindex:
+            changed = 1
+        if changed and not no_reindex:
             self._reindex_issues()
 
-        return changes
+        return change_notes
 
     security.declareProtected(ManageCollector, 'reinstate_catalog')
-    def reinstate_catalog(self, internal_only=0):
+    def reinstate_catalog(self, internal_only=1):
         """Recreate and reload internal catalog, to accommodate drastic
         changes."""
         try:
@@ -311,13 +314,9 @@ class Collector(SkinnedFolder):
         except AttributeError:
             pass
         self._setup_internal_catalog()
-        for i in self.objectValues(spec='CMF Collector Issue'):
-            # Normalize security_related setting
-            if i.security_related not in [0, 1]:
-                i.security_related = (i.security_related and 1) or 0
         self._reindex_issues(internal_only=internal_only)
 
-    def _reindex_issues(self, internal_only=0):
+    def _reindex_issues(self, internal_only=1):
         """For, eg, allowedRolesAndUsers recompute after local_role changes."""
         for i in self.objectValues(spec='CMF Collector Issue'):
             i.reindexObject(internal_only=internal_only)
