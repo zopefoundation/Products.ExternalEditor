@@ -97,6 +97,9 @@
 
  Bug fixes
 
+  - Made 'Document.manage_FTPget' use EditableBody, rather than
+    accessing 'text' attribute directly (improves reusability).
+
   - Merged Seb Bacon's refactoring of getDefaultView into
     CMFCoreutils._getView; clients can now specify a view by name,
     as well.

@@ -1,4 +1,4 @@
-import unittest, string
+import unittest, string, re
 from Products.CMFDefault.Document import Document
 #" 
 DOCTYPE = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">'''
@@ -28,6 +28,22 @@ BASIC_HTML = '''\
 </html>
 '''
 
+SIMPLE_HTML = '''\
+<html>
+ <head>
+  <title>Title in tag</title>
+  <meta name="description" content="Describe me">
+  <meta name="contributors" content="foo@bar.com; baz@bam.net;
+    Benotz, Larry J (larry@benotz.stuff)">
+  <meta name="title" content="Title in meta">
+  <meta name="subject" content="content management">
+ </head>
+ <body bgcolor="#ffffff">
+  <h1>Not a lot here</h1>
+ </body>
+</html>
+'''
+
 ENTITY_IN_TITLE = '''\
 <html>
  <head>
@@ -45,6 +61,22 @@ Description: A document by me
 Contributors: foo@bar.com; baz@bam.net; no@yes.maybe
 Subject: content management, zope
 Keywords: unit tests; , framework
+
+This is the header
+
+  Body body body body body
+  body body body.
+
+   o A list item
+   
+   o And another thing...
+'''
+
+SIMPLE_STRUCTUREDTEXT = '''\
+Title: My Document
+Description: A document by me
+Contributors: foo@bar.com; baz@bam.net; no@yes.maybe
+Subject: content management, zope
 
 This is the header
 
@@ -256,8 +288,76 @@ class DocumentTests(unittest.TestCase):
         assert 'plain' in d.Subject()
         assert 'STX' in d.Subject()
 
-    
 
+class TestFTPGet( unittest.TestCase ):
+
+    def testHTML( self ):
+        d = Document( 'foo' )
+        d._edit( text_format="html", text=SIMPLE_HTML )
+
+        simple_lines = string.split( SIMPLE_HTML, '\n' )
+        get_lines = string.split( d.manage_FTPget(), '\n' )
+
+        # strip off headers
+        meta_pattern = re.compile( r'meta name="([a-z]*)" '
+                                 + r'content="([a-z]*)"'
+                                 )
+        title_pattern = re.compile( r'<title>(.*)</title>' )
+        simple_headers = []
+        while simple_lines and simple_lines[0] != '<BODY>':
+            header = string.lower( string.strip( simple_lines[0] ) ) 
+            match = meta_pattern.search( header )
+            if match:
+                simple_headers.append( match.groups() )
+            else:
+                match = title_pattern.search( header )
+                if match:
+                    simple_headers.append( ( 'title', match.group(1) ) )
+            simple_lines = simple_lines[1:]
+
+        get_headers = []
+        while get_lines and get_lines[0] != '<BODY>':
+            header = string.lower( string.strip( get_lines[0] ) ) 
+            match = meta_pattern.search( header )
+            if match:
+                get_headers.append( match.groups() )
+            else:
+                match = title_pattern.search( header )
+                if match:
+                    get_headers.append( ( 'title', match.group(1) ) )
+            get_lines = get_lines[1:]
+
+        assert get_lines == simple_lines
+
+        assert get_headers
+        assert simple_headers
+        assert len( get_headers ) >= len( simple_headers )
+
+        for header in simple_headers:
+            assert header in get_headers, [header, get_headers]
+
+    def testSTX( self ):
+        d = Document( 'foo' )
+        d._edit( text_format="structured-text", text=SIMPLE_STRUCTUREDTEXT )
+
+        simple_lines = string.split( SIMPLE_STRUCTUREDTEXT, '\n' )
+        get_lines = string.split( d.manage_FTPget(), '\n' )
+
+        # strip off headers
+        simple_headers = []
+        while simple_lines and simple_lines[0]:
+            simple_headers.append( simple_lines[0] )
+            simple_lines = simple_lines[1:]
+
+        get_headers = []
+        while get_lines and get_lines[0]:
+            get_headers.append( get_lines[0] )
+            get_lines = get_lines[1:]
+
+        assert get_lines == simple_lines
+
+        for header in simple_headers:
+            assert header in get_headers, [header, get_headers]
 
 class TestDocumentPUT(unittest.TestCase):
     def setUp(self):
@@ -318,6 +418,7 @@ class TestDocumentPUT(unittest.TestCase):
 def test_suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(DocumentTests))
+    suite.addTest(unittest.makeSuite(TestFTPGet))
     suite.addTest(unittest.makeSuite(TestDocumentPUT))
     return suite
 

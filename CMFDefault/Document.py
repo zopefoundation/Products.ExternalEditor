@@ -438,7 +438,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
             bodytext = self._htmlsrc % {
                 'title': self.Title(),
                 'metatags': hdrtext,
-                'body': self.text,
+                'body': self.EditableBody(),
                 }
         else:
             hdrtext = join(map(lambda x: '%s: %s' % (
