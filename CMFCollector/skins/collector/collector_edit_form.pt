@@ -97,10 +97,11 @@
 </textarea>
   </td>
   <td colspan="2">
-          <font color="gray"> Managers configure, and may handle requests.
-            They receive new requests regardless of the "dispatching" setting.
-            Managers cannot remove <em>themselves</em> from management
-            - another manager must do so.
+          <font color="gray"> Managers configure the collector, and receive
+            new requests.  Managers can accept issues, but must be on
+            Supporters roster to be assigned.  (Managers may remove
+            <em>themselves</em> from management roster - they must have
+            another manager do so.)
           </font>
   </td>
  </tr>
@@ -114,33 +115,28 @@
 </textarea>
   </td>
   <td colspan="2">
-          <font color="gray"> Supporters just handle requests.  They may
-            or may not receive initial request notifications, depending on the
-            "dispatching" setting below.
+          <font color="gray"> Supporters can be assigned to requests.  They
+            may or may not receive initial request notifications, depending on
+            the "dispatching" setting below.
           </font>
   </td>
  </tr>
 
  <tr valign="top">
-  <th align="right"> Dispatching
+  <th align="right"> Dispatcher Mode
   </th>
   <td colspan="3">
     <input type="radio" name="dispatching:int" value="0"
            tal:attributes="checked not: here/dispatching|nothing">
           Off
             <font color="gray">
-              Managers and supporters receive initial notices </font>
-  </td>
- </tr>
-
- <tr>
-  <td> </td>
-  <td colspan="3">
+              Managers and supporters receive pending-issue notices </font>
+    <br>
     <input type="radio" name="dispatching:int" value="1"
            tal:attributes="checked here/dispatching|nothing">
           On
             <font color="gray">
-              Only managers recieve initial notices </font>
+              Only managers recieve pending-issue notices </font>
   </td>
  </tr>
   
@@ -183,15 +179,30 @@
  </tr>
 
  <tr valign="top">
+  <th> Reinstate catalog </th>
+  <td colspan="4">
+    <font color="gray">
+      Some product updates require reinstating the catalog and reindexing
+      issues - rare!  Collector product RELEASE_NOTES.txt will advise when
+      necessary.
+    </font>
+    <br>
+    <input type="radio" name="recatalog:int" value="0" CHECKED>No
+    <input type="radio" name="recatalog:int" value="1">Internal only
+    <input type="radio" name="recatalog:int" value="2">Internal & Site-wide
+    (<em>slow</em>)
+  </td>
+ </tr>
+
+ <tr valign="top">
+  <td> &nbsp; </td>
+ </tr>
+
+ <tr valign="top">
   <td> <br> </td>
   <td>
    <input type="submit" value=" Submit ">
    <input type="reset" value=" Reset ">
-  </td>
-  <td colspan="2">
-    <input type="checkbox" name="recatalog" value="1">
-    Reinstate internal catalog and reindex all?  (Reindexes in central catalog
-    too - slow!)
   </td>
  </tr>
 
