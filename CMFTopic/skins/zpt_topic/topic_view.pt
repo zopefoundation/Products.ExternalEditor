@@ -1,11 +1,13 @@
 <html xmlns:tal="http://xml.zope.org/namespaces/tal"
-    xmlns:metal="http://xml.zope.org/namespaces/metal"
-    metal:use-macro="container/main_template/macros/master">
-    <metal:block fill-slot="base">
-            <base href=""
-                  tal:attributes="href python: here.absolute_url() + '/'">
-    </metal:block>
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="here/main_template/macros/master">
+<head>
+ <metal:block fill-slot="base"
+ ><tal:span tal:replace="structure here/getBaseTag"
+/></metal:block>
+</head>
 <body>
+
 <div metal:fill-slot="main">
 
 <div class="Desktop">
@@ -14,7 +16,8 @@
 
 <h2><span tal:replace="here/title">title</span> </h2>
 
-<span tal:define="topics python:here.objectValues( [ 'Portal Topic' ] )" tal:condition="topics">
+<span tal:define="topics python:here.objectValues( [ 'Portal Topic' ] )"
+      tal:condition="topics">
     <h4>Subtopics: </h4>
     <div tal:repeat="topic topics">
         <a href=""
@@ -55,7 +58,8 @@
     <ul tal:define="queries here/buildQuery; items python:queries.items()"
         tal:condition="queries">
     <span tal:repeat="item items">
-    <li tal:define="key python:item[0]; value python:item[1]" tal:content="string:${key} : ${value}">item</li>
+    <li tal:define="key python:item[0]; value python:item[1]"
+        tal:content="string:${key} : ${value}">item</li>
     </span>
     </ul>
 </span>
@@ -64,5 +68,6 @@
 
 </div>
 </div>
+
 </body>
 </html>

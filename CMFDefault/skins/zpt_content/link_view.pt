@@ -1,10 +1,11 @@
 <html xmlns:tal="http://xml.zope.org/namespaces/tal"
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       metal:use-macro="here/main_template/macros/master">
-    <metal:block fill-slot="base">
-            <base href=""
-                  tal:attributes="href python: here.absolute_url() + '/'">
-    </metal:block>
+<head>
+ <metal:block fill-slot="base"
+ ><tal:span tal:replace="structure here/getBaseTag"
+/></metal:block>
+</head>
 <body>
 
 <div metal:fill-slot="header">

@@ -169,6 +169,11 @@ CMF 1.5alpha (unreleased)
 
   Bug Fixes
 
+    - zpt skin: Switched base tag policy back to that of dtml skin.
+      This makes the use of relative URLs in content easier. If you have
+      content that depends on the old policy you can customize getBaseTag.pt
+      and add a slash. (Collector #66)
+
     - Actions of folderish types: Fixed some inconsistencies.
       Whatever the old CMFDefault policy was - this is the current policy:
       "object" is used for Actions related to the object itself, "folder" is
