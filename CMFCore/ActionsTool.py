@@ -121,6 +121,14 @@ class ActionInformation:
         else:
             self.content_url = None
 
+    def __getitem__(self, name):
+        # Mapping interface for easy string formatting.
+        if name[:1] == '_':
+            raise KeyError, name
+        if hasattr(self, name):
+            return getattr(self, name)
+        raise KeyError, name
+
 
 class ActionsTool (UniqueObject, SimpleItem):
     id = 'portal_actions'
