@@ -126,10 +126,15 @@ class ExternalEditor:
                                             self.host)
 
             # Write the body of the input file to a separate file
-            content_file = urllib.unquote('-%s%s' % (self.host, self.path))\
-                           .replace('/', ',').replace(':',',').replace(' ','_')
+            if int(self.options.get('long_file_name', 1)):
+                sep = self.options.get('file_name_separator', ',')
+                content_file = urllib.unquote('-%s%s' % (self.host, self.path))
+                content_file = content_file.replace(
+                    '/', sep).replace(':',sep).replace(' ','_')
+            else:
+                content_file = '-' + urllib.unquote(self.path.split('/')[-1])
+                
             extension = self.options.get('extension')
-            
             if extension and not content_file.endswith(extension):
                 content_file = content_file + extension
             

@@ -167,7 +167,19 @@ Zope External Editor
       better handling of images and can improve syntax highlighting.
 
       temp_dir -- (path) Path to store local copies of object data being
-      edited. Defaults to operating system temp directory.
+      edited. Defaults to operating system temp directory. *Note: this setting
+      has no apparent effect on Windows* 8^(
+      
+      long_file_name -- (1 or 0) Whether to include the whole path to the 
+      object including the hostname in the file name (the default) or just the
+      id of the object being edited. Turn this option off for shorter file
+      names in your editors, and for editors that don't like long names.
+
+      file_name_separator -- (string) Character or characters used to separate
+      path elements in long files names used by external editor. Defaults to
+      a comma (,). This must be a legal character for use in file names on
+      your platorm (i.e., don't use a path separator character!). This option
+      is ignored if 'long_file_name' is set to 0.
 
     Sections
     
