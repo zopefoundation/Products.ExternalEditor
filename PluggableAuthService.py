@@ -142,7 +142,7 @@ class EmergencyUserAuthenticator( Implicit ):
                 if eu.authenticate( password, {} ):
                     return (eu_name, None)
 
-        return None
+        return (None, None)
 
 InitializeClass( EmergencyUserAuthenticator )
 

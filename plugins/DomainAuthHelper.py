@@ -103,7 +103,7 @@ class DomainAuthHelper(BasePlugin):
                        , u_name
                        )
 
-        return None
+        return (None, None)
 
 
     security.declarePrivate( 'getRolesForPrincipal' )

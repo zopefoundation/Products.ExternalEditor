@@ -8,6 +8,9 @@ PluggableAuthService changelog
         plugin exceptions, so that you notice that there is something
         wrong with the plugins.
 
+      - All authenticateCredentials() returned a single None when they
+        could not authenticate, although all calls expected a tuple.
+        
   Version 1.0.2 (2004/07/15)
 
     Bugs Fixed

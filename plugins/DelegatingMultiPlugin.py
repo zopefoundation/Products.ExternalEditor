@@ -109,18 +109,18 @@ class DelegatingMultiPlugin(Folder, BasePlugin):
         password = credentials.get('password', '')
 
         if not acl or not login or not password:
-            return None
+            return (None, None)
 
         if login == emergency_user.getUserName():
             return ( login, login )
 
         user = acl.getUser(login)
         if user is None:
-            return None
+            return (None, None)
         elif user and user._getPassword() == password:
             return ( user.getId(), login )
             
-        return None
+        return (None, None)
 
 
     security.declarePrivate('updateCredentials')
