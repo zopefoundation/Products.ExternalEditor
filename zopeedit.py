@@ -12,10 +12,12 @@
 # FOR A PARTICULAR PURPOSE.
 # 
 ##############################################################################
+"""$Id$
+"""
 
 # Zope External Editor Helper Application by Casey Duncan
 
-__version__ = '0.1'
+__version__ = '0.3'
 
 import sys, os, stat
 from time import sleep
@@ -49,19 +51,31 @@ class Configuration:
         # Delegate to the ConfigParser instance
         return getattr(self.config, name)
         
-    def getAllOptions(self, meta_type, content_type):
+    def getAllOptions(self, meta_type, content_type, host_domain):
         """Return a dict of all applicable options for the
-           given meta_type and content_type
+           given meta_type, content_type and host_domain
         """
         opt = {}
         sep = content_type.find('/')
         general_type = '%s/*' % content_type[:sep]
+        
+        # Divide up the domains segments and create a
+        # list of domains from the bottom up
+        host_domain = host_domain.split('.')
+        domains = []
+        for i in range(len(host_domain)):
+            domains.append('domain:%s' % '.'.join(host_domain[i:]))
+        domains.reverse()
+        
         sections = ('general', 
                     'meta-type:%s' % meta_type,
                     'content-type:%s' % general_type,
-                    'content-type:%s' % content_type)
+                    'content-type:%s' % content_type,
+                   ) + tuple(domains)
+                   
         for section in sections:
             if self.config.has_section(section):
+                print 'found section:', section
                 for option in self.config.options(section):
                     opt[option] = self.config.get(section, option)
         return opt
@@ -89,13 +103,16 @@ class ExternalEditor:
                 val = line[sep+1:]
                 metadata[key] = val
             self.metadata = metadata
-
-            self.options = self.config.getAllOptions(metadata['meta_type'],
-                               metadata.get('content_type',''))
                                
             # parse the incoming url
             scheme, self.host, self.path = urlparse(metadata['url'])[:3]
             self.ssl = scheme == 'https'
+            
+            # Get all configuration options
+            self.options = self.config.getAllOptions(
+                                            metadata['meta_type'],
+                                            metadata.get('content_type',''),
+                                            self.host)
 
             # Write the body of the input file to a separate file
             body_file = (self.host + self.path).replace('/', ',')
@@ -145,7 +162,6 @@ class ExternalEditor:
         editor = self.getEditor().split()
         file = self.body_file
         editor.append(file)
-        print editor
         last_fstat = os.stat(file)
         pid = os.spawnvp(os.P_NOWAIT, editor[0], editor) # Note: Unix only
         use_locks = int(self.options.get('use_locks'))
@@ -313,7 +329,6 @@ class ExternalEditor:
                 h = HTTPConnection(self.host)
 
             h.putrequest(method, self.path)
-            #h.putheader("Host", self.host)  # required by HTTP/1.1
             h.putheader('User-Agent', 'Zope External Editor/%s' % __version__)
             h.putheader('Connection', 'close')
 
@@ -326,7 +341,7 @@ class ExternalEditor:
                 h.putheader("Authorization", self.metadata['auth'])
 
             if self.metadata.get('cookie'):
-                h.putheader("Cookie", self.metadata['cookie'])
+                h.putheader("Cookie", self.metadata['cookie']+'\n')
 
             h.endheaders()
             h.send(body)
@@ -335,7 +350,8 @@ class ExternalEditor:
             # On error return a null response with error info
             class NullResponse:
                 def getheader(n,d): return d
-                def read(self): return '(No Response From Server)'
+                def read(self): return '(No Response From Server)\n\n%s' \
+                                       % sys.exc_info[2]
             
             response = NullResponse()
             response.reason = sys.exc_info()[1]

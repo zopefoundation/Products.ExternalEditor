@@ -1,5 +1,15 @@
 External Editor Change Log
 
+    - Added support for domain specific configuration options.
+
+    - Fixed trailing newline bug in encoded auth data coming from
+      CookieCrumbler. Thanks to Harald Koschinski.
+
+    - You can now pass command line arguments to the editor in the config file,
+      or wrap the editor in an xterm without using a shell script.
+      
+    - Rewrote "Editor did not launch" error message so it makes more sense.
+
     - Fixed https detection bug. External editor is now tested and working with
       https. Many thanks to Hans-Dieter Stich and Martin Grönemeyer for their 
       assistance and ideas.
@@ -19,7 +29,7 @@ External Editor Change Log
     - Added improved support for editing CMF documents
 
     - Eliminated spurious "Editor did not launch" errors on short sessions
-      os when other errors occurred.
+      or when other errors occurred.
 
   5/16/02 - 0.2 Release
 
