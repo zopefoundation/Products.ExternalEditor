@@ -9,7 +9,7 @@ from Products.CMFCore.tests.base.testcase import SecurityRequestTest
 
 class DOMComparator:
 
-    def _compareDOM( self, found_text, expected_text ):
+    def _compareDOM( self, found_text, expected_text, debug=False ):
 
         from xml.dom.minidom import parseString
         found = parseString( found_text )
@@ -18,6 +18,15 @@ class DOMComparator:
         exml = expected.toxml()
 
         if fxml != exml:
+
+            if debug:
+                zipped = zip( fxml, exml )
+                diff = [ ( i, zipped[i][0], zipped[i][1] )
+                        for i in range( len( zipped ) )
+                        if zipped[i][0] != zipped[i][1]
+                    ]
+                import pdb; pdb.set_trace()
+
             print 'Found:'
             print fxml
             print
