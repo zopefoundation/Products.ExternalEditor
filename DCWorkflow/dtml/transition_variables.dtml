@@ -2,7 +2,7 @@
 <dtml-var manage_tabs>
 
 <p class="form-help">
-When the transistion is executed, the workflow variables are
+When the transition is executed, the workflow variables are
 updated according to the expressions below.
 </p>
 

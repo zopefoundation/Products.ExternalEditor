@@ -3,6 +3,10 @@ Version 0.4.2
 
 - Fixed getInfoFor() using patch from Sebastien.Bigaret@inqual.com.  Thanks!
 
+- executeTransition(): Preserve (by copying) any existing, unchanged
+state vars, rather than setting them to default value or just omitting
+them, if there's no default.
+
 Version 0.4.1
 
 - Corrected an expression in the classic workflow implementation.
