@@ -146,10 +146,10 @@ _endbodyre = re.compile(r'</body', re.DOTALL|re.I)
 
 def bodyfinder(text):
     bod = _bodyre.search(text)
-    if not bod: return ''
+    if not bod: return text
 
     end = _endbodyre.search(text)
-    if not end: return ''
+    if not end: return text
     else: return text[bod.end():end.start()]
 
 htfinder = re.compile(r'<html', re.DOTALL|re.I)
