@@ -163,6 +163,7 @@ class Image( OFS.Image.Image
     meta_type='Portal Image'
     effective_date = expiration_date = None
     _isDiscussable = 1
+    icon = PortalContent.icon
 
     __ac_permissions__ = (
         (CMFCorePermissions.ModifyPortalContent, ('edit',)),

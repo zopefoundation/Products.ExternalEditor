@@ -138,15 +138,15 @@ class Favorite( Link ):
         else:
             return portal_url.getPortalPath()
 
-    def getIcon(self):
+    def getIcon(self, relative_to_portal=0):
         """
         Instead of a static icon, like for Link objects, we want
         to display an icon based on what the Favorite links to.
         """
         try:
-            return self.getObject().getIcon()
+            return self.getObject().getIcon(relative_to_portal)
         except:
-            return '/p_/broken'
+            return 'p_/broken'
 
     def getObject(self):
         """

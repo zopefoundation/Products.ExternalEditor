@@ -165,6 +165,7 @@ class File( OFS.Image.File
     meta_type='Portal File'
     effective_date = expiration_date = None
     _isDiscussable = 1
+    icon = PortalContent.icon
 
     __ac_permissions__ = (
         (CMFCorePermissions.View, ('download',)),
