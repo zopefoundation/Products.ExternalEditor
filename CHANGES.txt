@@ -1,5 +1,8 @@
 External Editor Change Log
 
+    - Added the man page from the Debian distro. Thanks go out to
+      Federico Sevilla III and Andreas Tille
+
   11/02/02 - 0.6 Release
 
     - Built Windows helper app using Python 2.2.2 and PythonWin 148.
