@@ -185,8 +185,9 @@ class ActionProviderBaseTests(SecurityRequestTest):
         self.assertEqual( rval, wanted )
         rval = apb.getActionInfo('object/an_id')
         self.assertEqual( rval, wanted )
-        rval = apb.getActionInfo('object/an_id', check_visibility=1)
-        self.assertEqual( rval, None )
+        self.assertRaises( ValueError,
+                           apb.getActionInfo,
+                           'object/an_id', check_visibility=1 )
 
     def test_interface(self):
         from Products.CMFCore.interfaces.portal_actions \

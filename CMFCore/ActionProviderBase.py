@@ -119,7 +119,9 @@ class ActionProviderBase:
         action_infos = self.listActionInfos(action_chain, object,
                                        check_visibility=check_visibility,
                                        check_condition=check_condition, max=1)
-        return action_infos and action_infos[0] or None
+        if not action_infos:
+            raise ValueError('No Action meets the given specification.')
+        return action_infos[0]
 
     #
     #   ZMI methods
@@ -423,6 +425,8 @@ class OldstyleActionProviderBase:
         action_infos = self.listActionInfos(action_chain, object,
                                        check_visibility=check_visibility,
                                        check_condition=check_condition, max=1)
-        return action_infos and action_infos[0] or None
+        if not action_infos:
+            raise ValueError('No Action meets the given specification.')
+        return action_infos[0]
 
 InitializeClass(OldstyleActionProviderBase)

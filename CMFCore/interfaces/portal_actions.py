@@ -122,7 +122,7 @@ class ActionProvider(Interface):
 
         Permission -- Always available
 
-        Returns -- Action info mapping or None
+        Returns -- Action info mapping
         """
 
 
