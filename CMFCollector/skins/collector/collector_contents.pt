@@ -67,7 +67,7 @@
           <br>
             <span tal:condition="item/security_related">
               <font color="red">Security</font></span>
-            <span tal:content="python: cap(item.current_status)">
+            <span tal:content="python: cap(item.status())">
             STATUS</span>
             <span tal:replace="python: '%s/%s'
                                        % (cap(item.topic),
