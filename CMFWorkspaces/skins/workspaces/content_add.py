@@ -1,4 +1,4 @@
-##parameters=type, id=None, title='', return_object=0
+##parameters=type, id=None, title='', return_object=0, lock_object=1
 ##title=Adds an object to a BTreeFolder and makes a link in the workspace
 # Also generates the ID if necessary, assuming that dest is a BTreeFolder2.
 
@@ -21,7 +21,7 @@ workspace = REQUEST.get('workspace')
 if workspace:
     ws = context.restrictedTraverse(workspace)
     ws.addReference(ob)
-context.portal_lock.lock(ob) # Lock it on creation
+if lock_object: context.portal_lock.lock(ob) # Lock it on creation
 
 # Note that invokeFactory() causes a redirection.
 if return_object:
