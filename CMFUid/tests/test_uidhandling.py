@@ -31,17 +31,14 @@ from Products.CMFCore.CatalogTool import CatalogTool
 
 from Products.CMFUid.interfaces import IUniqueIdHandler
 from Products.CMFUid.UniqueIdGeneratorTool import UniqueIdGeneratorTool
+from Products.CMFUid.UniqueIdAnnotationTool import UniqueIdAnnotationTool
 from Products.CMFUid.UniqueIdHandlerTool import UniqueIdHandlerTool
 
-def setupIndexes(catalog, uid_attr_name):
+def removeUnnecessaryIndexes(catalog):
     indexes = [id[0] for id in catalog.enumerateIndexes()]
     columns = catalog.enumerateColumns()
     catalog.manage_delIndex(indexes)
     catalog.manage_delColumn(columns)
-    
-    catalog.addIndex(uid_attr_name, 'FieldIndex')
-    catalog.addColumn(uid_attr_name)
-
 
 class UniqueIdHandlerTests(SecurityTest):
 
@@ -49,10 +46,11 @@ class UniqueIdHandlerTests(SecurityTest):
         SecurityTest.setUp(self)
         self.root._setObject('portal_catalog', CatalogTool())
         self.root._setObject('portal_uidgenerator', UniqueIdGeneratorTool())
+        self.root._setObject('portal_uidannotation', UniqueIdAnnotationTool())
         self.root._setObject('portal_uidhandler', UniqueIdHandlerTool())
         self.root._setObject('dummy', DummyContent(id='dummy'))
-        self.uid_attr_name = self.root.portal_uidhandler.UID_ATTRIBUTE_NAME
-        setupIndexes(self.root.portal_catalog, self.uid_attr_name)
+        
+        removeUnnecessaryIndexes(self.root.portal_catalog)
     
     def test_interface(self):
         handler = self.root.portal_uidhandler
