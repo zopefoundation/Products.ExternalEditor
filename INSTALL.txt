@@ -1,11 +1,8 @@
-Installing CMF 1.4x
+Installing CMF 1.5x
 
   Requirements
 
     - Zope v. 2.5 and later
-      
-      o Note:  Zope v. 2.4.3 *may* work, but is no longer a supported
-        version.
 
   Assumptions
 
@@ -16,11 +13,11 @@ Installing CMF 1.4x
 
   Procedure
 
-    1. Unpack the CMF-1.4x.tar.gz tarball into a working
+    1. Unpack the CMF-1.5x.tar.gz tarball into a working
        directory. For instance::
 
         $ cd /usr/local/zope
-        $ tar xzf /tmp/CMF-1.4x.tar.gz
+        $ tar xzf /tmp/CMF-1.5x.tar.gz
 
        Note for Windows users:  if you are using WinZip to unpack
           the file, be *sure* to disable the "TAR file smart CR/LF
@@ -33,16 +30,16 @@ Installing CMF 1.4x
        For instance::
 
         $ cd /var/zope/Products  # /var/zope is INSTANCE_HOME
-        $ ln -s /usr/local/zope/CMF-1.4x/CMFCore .
-        $ ln -s /usr/local/zope/CMF-1.4x/CMFDefault .
-        $ ln -s /usr/local/zope/CMF-1.4x/CMFTopic .
-        $ ln -s /usr/local/zope/CMF-1.4x/CMFCalendar .
-        $ ln -s /usr/local/zope/CMF-1.4x/DCWorkflow .
+        $ ln -s /usr/local/zope/CMF-1.5x/CMFCore .
+        $ ln -s /usr/local/zope/CMF-1.5x/CMFDefault .
+        $ ln -s /usr/local/zope/CMF-1.5x/CMFTopic .
+        $ ln -s /usr/local/zope/CMF-1.5x/CMFCalendar .
+        $ ln -s /usr/local/zope/CMF-1.5x/DCWorkflow .
         
        or, as a shortcut::
 
-        $ ln -s /usr/local/zope/CMF-1.4x/CMF* .
-        $ ln -s /usr/local/zope/CMF-1.4x/DCWorkflow .
+        $ ln -s /usr/local/zope/CMF-1.5x/CMF* .
+        $ ln -s /usr/local/zope/CMF-1.5x/DCWorkflow .
 
        Since linking doesn't apply on Windows, you will need
        to cut or copy the files from the place where you unpacked
@@ -97,7 +94,7 @@ Upgrading from Earlier Versions
 
   Install the New Software.
 
-    0. "Download":CMF-1.4x.tar.gz the tarball.
+    0. "Download":CMF-1.5x.tar.gz the tarball.
 
     1. Copy your "working" products off to one side (in case
        you need / choose to revert).
@@ -110,7 +107,7 @@ Upgrading from Earlier Versions
 
   Follow additionnal version-specific information below.
 
-Upgrading from versions earlier than CMF 1.4x
+Upgrading from versions earlier than CMF 1.3
 
   Add New Metadata: "portal_type"
 
