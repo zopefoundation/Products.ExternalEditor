@@ -126,7 +126,8 @@
          <tr>
            <td align="right">From:</td>
            <td NOWRAP>
-              <span tal:content="here/submitter_name">NAME</span>
+              <span metal:define-slot="issue_from_slot"
+                    tal:content="here/submitter_name">NAME</span>
            </td>
            <td align="right"> on: </td>
            <td NOWRAP>
@@ -141,7 +142,8 @@
          <tr>
            <td> </td>
            <td>
-             (<em><span tal:content="here/submitter_id">ID</span></em>)
+             (<em><span metal:define-slot="issue_submitter_id_slot"
+                        tal:content="here/submitter_id">ID</span></em>)
            </td>
            <td tal:define="actions here/action_number" align="right">
              Last update:
