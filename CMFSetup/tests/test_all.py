@@ -21,6 +21,7 @@ def suite():
                              , 'test_tool'
                              , 'test_typeinfo'
                              , 'test_utils'
+                             , 'test_workflow'
                              ]
                            )
 
