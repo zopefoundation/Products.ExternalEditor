@@ -56,14 +56,8 @@ def get_email_fullname(self, userid):
     mbrtool = getToolByName(self, 'portal_membership')
     user = mbrtool.getMemberById(userid)
     if user is not None:
-        if not user.hasProperty('email'):
-            return (None, None)         # Not worth bothering.
-        email = None
-        name = userid
-        email = user.getProperty('email')
-        name = ((user.hasProperty('full_name') 
-                 and user.getProperty('full_name'))
-                or str(user))
+        email = user.getProperty('email', None)
+        name = user.getProperty('full_name', str(user))
         if '.' in name or ',' in name:
             name = '"%s"' % name
         return (name, email)
