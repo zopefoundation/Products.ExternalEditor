@@ -1,0 +1,570 @@
+##############################################################################
+# 
+# Zope Public License (ZPL) Version 1.0
+# -------------------------------------
+# 
+# Copyright (c) Digital Creations.  All rights reserved.
+# 
+# This license has been certified as Open Source(tm).
+# 
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+# 
+# 1. Redistributions in source code must retain the above copyright
+#    notice, this list of conditions, and the following disclaimer.
+# 
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions, and the following disclaimer in
+#    the documentation and/or other materials provided with the
+#    distribution.
+# 
+# 3. Digital Creations requests that attribution be given to Zope
+#    in any manner possible. Zope includes a "Powered by Zope"
+#    button that is installed by default. While it is not a license
+#    violation to remove this button, it is requested that the
+#    attribution remain. A significant investment has been put
+#    into Zope, and this effort will continue if the Zope community
+#    continues to grow. This is one way to assure that growth.
+# 
+# 4. All advertising materials and documentation mentioning
+#    features derived from or use of this software must display
+#    the following acknowledgement:
+# 
+#      "This product includes software developed by Digital Creations
+#      for use in the Z Object Publishing Environment
+#      (http://www.zope.org/)."
+# 
+#    In the event that the product being advertised includes an
+#    intact Zope distribution (with copyright and license included)
+#    then this clause is waived.
+# 
+# 5. Names associated with Zope or Digital Creations must not be used to
+#    endorse or promote products derived from this software without
+#    prior written permission from Digital Creations.
+# 
+# 6. Modified redistributions of any form whatsoever must retain
+#    the following acknowledgment:
+# 
+#      "This product includes software developed by Digital Creations
+#      for use in the Z Object Publishing Environment
+#      (http://www.zope.org/)."
+# 
+#    Intact (re-)distributions of any official Zope release do not
+#    require an external acknowledgement.
+# 
+# 7. Modifications are encouraged but must be packaged separately as
+#    patches to official Zope releases.  Distributions that do not
+#    clearly separate the patches from the original work must be clearly
+#    labeled as unofficial distributions.  Modifications which do not
+#    carry the name Zope may be packaged in any form, as long as they
+#    conform to all of the clauses above.
+# 
+# 
+# Disclaimer
+# 
+#   THIS SOFTWARE IS PROVIDED BY DIGITAL CREATIONS ``AS IS'' AND ANY
+#   EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+#   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+#   PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL DIGITAL CREATIONS OR ITS
+#   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+#   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+#   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+#   USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+#   ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+#   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+#   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+#   SUCH DAMAGE.
+# 
+# 
+# This software consists of contributions made by Digital Creations and
+# many individuals on behalf of Digital Creations.  Specific
+# attributions are listed in the accompanying credits file.
+# 
+##############################################################################
+
+"""\
+CMFDefault portal_metadata tool.
+"""
+
+import os
+from OFS.SimpleItem import SimpleItem
+from Globals import InitializeClass, HTMLFile, package_home
+from AccessControl import getSecurityManager, ClassSecurityInfo
+from Products.CMFCore.CMFCorePermissions import View, ManagePortal
+from Products.CMFCore.utils import UniqueObject
+
+_dtmldir = os.path.join( package_home( globals() ), 'dtml' )
+
+class MetadataElementPolicy:
+    """
+        Represent a type-specific policy about a particular DCMI element.
+    """
+    #
+    #   Default values.
+    #
+    is_required         = 0
+    supply_default      = 0
+    default_value       = ''
+    enforce_vocabulary  = 0
+    allowed_vocabulary  = ()
+
+    def __init__( self, is_multi_valued=0 ):
+        self.is_multi_valued    = not not is_multi_valued
+
+    #
+    #   Mutator.
+    #
+    def edit( self
+            , is_required
+            , supply_default
+            , default_value
+            , enforce_vocabulary
+            , allowed_vocabulary
+            ):
+        self.is_required        = not not is_required
+        self.supply_default     = not not supply_default
+        self.default_value      = default_value
+        self.enforce_vocabulary = not not enforce_vocabulary
+        self.allowed_vocabulary = tuple( allowed_vocabulary )
+
+    #
+    #   Query interface
+    #
+    def isMultiValued( self ):
+        """
+            Can this element hold multiple values?
+        """
+        return self.is_multi_valued
+
+    def isRequired( self ):
+        """
+            Must this element be supplied?
+        """
+        return self.is_required
+    
+    def supplyDefault( self ):
+        """
+            Should the tool supply a default?
+        """
+        return self.supply_default
+
+    def defaultValue( self ):
+        """
+            If so, what is the default?
+        """
+        return self.default_value
+
+    def enforceVocabulary( self ):
+        """
+        """
+        return self.enforce_vocabulary
+
+    def allowedVocabulary( self ):
+        """
+        """
+        return self.allowed_vocabulary
+
+
+DEFAULT_ELEMENT_SPECS = ( ( 'Title', 0 )
+                        , ( 'Description', 0 )
+                        , ( 'Subject', 1 )
+                        , ( 'Format', 0 )
+                        , ( 'Language', 0 )
+                        , ( 'Rights', 0 )
+                        )
+
+class ElementSpec:
+    """
+        Represent all the tool knows about a single metadata element.
+    """
+    #
+    #   Default values.
+    #
+    is_multi_valued = 0
+
+    def __init__( self, is_multi_valued ):
+        self.is_multi_valued  = is_multi_valued
+        self.policies         = {}                  # XXX: use PersistentDict?
+        self.policies[ None ] = self._makePolicy()  # set default policy
+        
+    
+    def _makePolicy( self ):
+        return MetadataElementPolicy( self.is_multi_valued )
+
+    def isMultiValued( self ):
+        """
+            Is this element multi-valued?
+        """
+        return self.is_multi_valued
+
+    def getPolicy( self, typ=None ):
+        """
+            Find the policy this element for objects whose type
+            object name is 'typ';  return a default, if none found.
+        """
+        try:
+            return self.policies[ typ ]
+        except KeyError:
+            return self.policies[ None ]
+
+    def listPolicies( self ):
+        """
+            Return a list of all policies for this element.
+        """
+        return self.policies.items()
+
+    def addPolicy( self, typ ):
+        """
+            Add a policy to this element for objects whose type
+            object name is 'typ'.
+        """
+        if typ is None:
+            raise MetadataError, "Can't replace default policy."
+
+        if self.policies.has_key( typ ):
+            raise MetadataError, "Existing policy for content type:" + typ
+
+        self.policies[ typ ] = self._makePolicy()
+
+    def removePolicy( self, typ ):
+        """
+            Remove the policy from this element for objects whose type
+            object name is 'typ' (*not* the default, however).
+        """
+        if typ is None:
+            raise MetadataError, "Can't remove default policy."
+        del self.policies[ typ ]
+
+class MetadataError( Exception ):
+    pass
+
+class MetadataTool( UniqueObject, SimpleItem ):
+
+    id              = 'portal_metadata'
+    meta_type       = 'Default Metadata Tool'
+
+    security = ClassSecurityInfo()
+
+    #
+    #   Default values.
+    #
+    publisher           = ''
+    element_specs       = None
+    #initial_values_hook = None
+    #validation_hook     = None
+
+    def __init__( self
+                , publisher=None
+               #, initial_values_hook=None
+               #, validation_hook=None
+                , element_specs=DEFAULT_ELEMENT_SPECS
+                ):
+
+        self.editProperties( publisher
+                          #, initial_values_hook
+                          #, validation_hook
+                           )
+
+        self.element_specs = {}     # XXX: use PersistentDict?
+
+        for name, is_multi_valued in element_specs:
+            self.element_specs[ name ] = ElementSpec( is_multi_valued )
+
+    #
+    #   ZMI methods
+    #
+    manage_options = ( ( { 'label'      : 'Properties'
+                         , 'action'     : 'propertiesForm'
+                         }
+                       , { 'label'      : 'Elements'
+                         , 'action'     : 'elementPoliciesForm'
+                         }
+            # TODO     , { 'label'      : 'Types'
+            #            , 'action'     : 'typesForm'
+            #            }
+                       )
+                     + SimpleItem.manage_options
+                     )
+
+    security.declareProtected( ManagePortal , 'propertiesForm' )
+    propertiesForm = HTMLFile( 'metadataProperties', _dtmldir )
+
+    security.declareProtected( ManagePortal , 'editProperties' )
+    def editProperties( self
+                      , publisher=None
+               # TODO , initial_values_hook=None
+               # TODO , validation_hook=None
+                      , REQUEST=None
+                      ):
+        """
+            Form handler for "tool-wide" properties (including list of
+            metadata elements).
+        """
+        if publisher is not None:
+            self.publisher = publisher
+
+        # TODO self.initial_values_hook = initial_values_hook
+        # TODO self.validation_hook = validation_hook
+
+        if REQUEST is not None:
+            REQUEST[ 'RESPONSE' ].redirect( self.absolute_url()
+                                        + '/propertiesForm'
+                                        + '?manage_tabs_message=Tool+updated.'
+                                        )
+
+    security.declareProtected( ManagePortal , 'elementPoliciesForm' )
+    elementPoliciesForm = HTMLFile( 'metadataElementPolicies', _dtmldir )
+
+    security.declareProtected( ManagePortal , 'addElementPolicy' )
+    def addElementPolicy( self
+                        , element
+                        , content_type
+                        , is_required
+                        , supply_default
+                        , default_value
+                        , enforce_vocabulary
+                        , allowed_vocabulary
+                        , REQUEST
+                        ):
+        """
+            Add a type-specific policy for one of our elements.
+        """
+        if content_type == '<default>':
+            content_type = None
+
+        spec = self.getElementSpec( element )
+        spec.addPolicy( content_type )
+        policy = spec.getPolicy( content_type )
+        policy.edit( is_required
+                   , supply_default
+                   , default_value
+                   , enforce_vocabulary
+                   , allowed_vocabulary
+                   )
+        if REQUEST is not None:
+            REQUEST[ 'RESPONSE' ].redirect( self.absolute_url()
+               + '/elementPoliciesForm'
+               + '?element=' + element
+               + '&manage_tabs_message=Policy+added.'
+               )
+
+    security.declareProtected( ManagePortal , 'removeElementPolicy' )
+    def removeElementPolicy( self
+                           , element
+                           , content_type
+                           , REQUEST
+                           ):
+        """
+            Remvoe a type-specific policy for one of our elements.
+        """
+        if content_type == '<default>':
+            content_type = None
+
+        spec = self.getElementSpec( element )
+        spec.removePolicy( content_type )
+        if REQUEST is not None:
+            REQUEST[ 'RESPONSE' ].redirect( self.absolute_url()
+               + '/elementPoliciesForm'
+               + '?element=' + element
+               + '&manage_tabs_message=Policy+removed.'
+               )
+
+    security.declareProtected( ManagePortal , 'updateElementPolicy' )
+    def updateElementPolicy( self
+                           , element
+                           , content_type
+                           , is_required
+                           , supply_default
+                           , default_value
+                           , enforce_vocabulary
+                           , allowed_vocabulary
+                           , REQUEST=None
+                           ):
+        """
+            Update a policy for one of our elements ('content_type'
+            will be '<default>' when we edit the default).
+        """
+        if content_type == '<default>':
+            content_type = None
+        spec = self.getElementSpec( element )
+        policy = spec.getPolicy( content_type )
+        policy.edit( is_required
+                   , supply_default
+                   , default_value
+                   , enforce_vocabulary
+                   , allowed_vocabulary
+                   )
+        if REQUEST is not None:
+            REQUEST[ 'RESPONSE' ].redirect( self.absolute_url()
+               + '/elementPoliciesForm'
+               + '?element=' + element
+               + '&manage_tabs_message=Policy+updated.'
+               )
+
+
+    #
+    #   Element spec manipulation.
+    #
+    security.declareProtected( ManagePortal , 'listElementSpecs' )
+    def listElementSpecs( self ):
+        """
+            Return a list of ElementSpecs representing
+            the elements managed by the tool.
+        """
+        return tuple( self.element_specs.items() )
+
+    security.declareProtected( ManagePortal , 'getElementSpec' )
+    def getElementSpec( self, element ):
+        """
+            Return an ElementSpec representing the tool's knowledge
+            of 'element'.
+        """
+        return self.element_specs[ element ]
+
+    security.declareProtected( ManagePortal , 'addElementSpec' )
+    def addElementSpec( self, element, is_multi_valued ):
+        """
+            Add 'element' to our list of managed elements.
+        """
+        # Don't replace.
+        if self.element_specs.has_key( element ):
+           return
+
+        self.element_specs[ element ] = ElementSpec( is_multi_valued )
+
+    security.declareProtected( ManagePortal , 'removeElementSpec' )
+    def removeElementSpec( self, element ):
+        """
+            Remove 'element' from our list of managed elements.
+        """
+        del self.element_specs[ element ]
+
+    security.declareProtected( 'listPolicies' )
+    def listPolicies( self, typ=None ):
+        """
+            Show all policies for a given content type, or the default
+            if None.
+        """
+        result = []
+        for element, spec in self.listElementSpecs():
+            result.append( ( element, spec.getPolicy( typ ) ) )
+        return result
+
+    #
+    #   Site-wide queries.
+    #
+    security.declarePrivate( 'getFullName' )
+    def getFullName( self, userid ):
+        """
+            Convert an internal userid to a "formal" name, if
+            possible, perhaps using the 'portal_membership' tool.
+
+            Used to map userid's for Creator, Contributor DCMI
+            queries.
+        """
+        return userid   # TODO: do lookup here
+
+    security.declarePublic( 'getPublisher' )
+    def getPublisher( self ):
+        """
+            Return the "formal" name of the publisher of the
+            portal.
+        """
+        return self.publisher
+
+    #
+    #   Content-specific queries.
+    #
+    security.declarePrivate( '_listAllowedVocabulary' )
+    def _listAllowedVocabulary( self, element, content=None ):
+        """
+            List allowed keywords for a given meta_type, or all
+            possible keywords if none supplied.
+        """
+        spec = self.getElementSpec( element )
+        typ  = content and content.Type() or None
+        return spec.getPolicy( typ ).allowedVocabulary()
+
+    security.declarePublic( 'listAllowedSubjects' )
+    def listAllowedSubjects( self, content=None ):
+        """
+            List allowed keywords for a given meta_type, or all
+            possible keywords if none supplied.
+        """
+        return self._listAllowedVocabulary( 'Subject', content )
+
+    security.declarePublic( 'listAllowedFormats' )
+    def listAllowedFormats( self, content=None ):
+        """
+            List the allowed 'Content-type' values for a particular
+            meta_type, or all possible formats if none supplied.
+        """
+        return self._listAllowedVocabulary( 'Format', content )
+
+    security.declarePublic( 'listAllowedLanguages' )
+    def listAllowedLanguages( self, content=None ):
+        """
+            List the allowed language values.
+        """
+        return self._listAllowedVocabulary( 'Language', content )
+
+    security.declarePublic( 'listAllowedRights' )
+    def listAllowedRights( self, content=None ):
+        """
+            List the allowed values for a "Rights"
+            selection list;  this gets especially important where
+            syndication is involved.
+        """
+        return self._listAllowedVocabulary( 'Rights', content )
+
+
+    #
+    #   Validation policy hooks.
+    #
+    security.declarePrivate( 'setInitialMetadata' )
+    def setInitialMetadata( self, content ):
+        """
+            Set initial values for content metatdata, supplying
+            any site-specific defaults.
+        """
+        for element, policy in self.listPolicies( content.Type() ):
+
+            if not getattr( content, element )():
+
+                if policy.supplyDefault():
+                    setter = getattr( content, 'set%s' % element )
+                    setter( policy.defaultValue() )
+                elif policy.isRequired():
+                    raise MetadataError, \
+                          'Metadata element %s is required.' % element
+
+        # TODO:  Call initial_values_hook, if present
+
+
+    security.declarePrivate( 'validateMetadata' )
+    def validateMetadata( self, content ):
+        """
+            Enforce portal-wide policies about DCI, e.g.,
+            requiring non-empty title/description, etc.  Called
+            by the CMF immediately before saving changes to the
+            metadata of an object.
+        """
+        for element, policy in self.listPolicies( content.Type() ):
+
+            value = getattr( content, element )()
+            if not value and policy.isRequired():
+                raise MetadataError, \
+                        'Metadata element %s is required.' % element
+
+            if policy.enforceVocabulary():
+                values = policy.isMultiValued() and value or [ value ]
+                for value in values:
+                    if not value in policy.allowedValues():
+                        raise MetadataError, \
+                        'Value %s is not in allowed vocabulary for' \
+                        'metadata element %s.' % ( value, element )
+
+        # TODO:  Call validation_hook, if present
+
+InitializeClass( MetadataTool )

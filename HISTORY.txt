@@ -55,6 +55,8 @@
  
  - Made FSDTMLMethods searchable from the ZMI (Issue PTK(251)[]).
 
+ - Implemented 'portal_metadata' tool (dogbowl proposal).
+
 1.0 final (2001/03/29)
 
  - Removed embedded spaces in 'portal_status_message' strings

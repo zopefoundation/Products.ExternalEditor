@@ -90,7 +90,7 @@ ADD_CONTENT_PERMISSION = 'Add portal content'
 import Portal
 import Document, Link, NewsItem, File, Image, Favorite
 import Discussions, DiscussionItem
-import PropertiesTool, MembershipTool
+import PropertiesTool, MembershipTool, MetadataTool
 import RegistrationTool, URLTool, DublinCore, DiscussionTool
 from Products.CMFCore import utils
 import Products.CMFCore
@@ -156,6 +156,7 @@ tools = ( DiscussionTool.DiscussionTool
         , RegistrationTool.RegistrationTool
         , PropertiesTool.PropertiesTool
         , URLTool.URLTool
+        , MetadataTool.MetadataTool
         )
 
 import sys

@@ -1,0 +1,163 @@
+<dtml-var manage_page_header>
+<dtml-var manage_tabs>
+
+<dtml-unless expr="REQUEST.has_key( 'element' )">
+<dtml-call expr="REQUEST.set( 'element', listElementSpecs()[0][0] )">
+</dtml-unless>
+
+<h3> Update Element Metadata Policies </h3>
+
+<table class="FormLayout">
+
+ <tr>
+  <th> Element: </th>
+  <td colspan="3"> 
+   <dtml-in listElementSpecs>
+    <dtml-let key=sequence-key>
+     <dtml-if expr="key == REQUEST[ 'element' ]">
+     &dtml-key;  &nbsp;
+     <dtml-else>
+      <a href="&dtml-URL;?element=&dtml-key;"> &dtml-key; </a> &nbsp;
+     </dtml-if>
+    </dtml-let>
+   </dtml-in>
+  </td>
+ </tr>
+
+ <dtml-let spec="getElementSpec( element=REQUEST[ 'element' ] )"
+           tokenz="spec.isMultiValued() and ':tokens' or ''"
+ >
+
+ <dtml-in expr="spec.listPolicies()" sort>
+ <dtml-let element="REQUEST[ 'element']"
+           key=sequence-key
+           typ="key or '<default>'"
+           policy=sequence-item
+           rqd="policy.isRequired() and 'checked' or ''"
+           canRemove="key is not _.None"
+           supply="policy.supplyDefault() and 'checked' or ''"
+           defval="policy.defaultValue()"
+           enforce="policy.enforceVocabulary() and 'checked' or ''"
+           vocab="_.string.join( policy.allowedVocabulary(), '\n' )"
+ >
+
+ <form action="&dtml-absolute_url;" method="POST">
+ <input type="hidden" name="element" value="&dtml-element;"> 
+ <input type="hidden" name="content_type" value="&dtml-typ;"> 
+
+ <tr style="background-color: DarkGray; color: DarkBlue">
+  <th colspan="4"> <br> </th>
+ </tr>
+
+ <tr valign="top">
+  <th> Content type </th>
+  <td> &dtml-typ;</td>
+  <th> Required? </th>
+  <td>
+    <input type="checkbox" name="is_required:boolean" &dtml-rqd;>
+    <input type="hidden" name="is_required:int:default" value="0">
+  </td>
+ </tr>
+ 
+ <tr valign="top">
+  <th> Supply default? </th>
+  <td>
+    <input type="checkbox" name="supply_default:boolean" &dtml-supply;>
+    <input type="hidden" name="supply_default:int:default" value="0">
+  </td>
+  <th> Default </th>
+  <td> <input type="text" name="default_value&dtml-tokenz;"
+              value="&dtml-defval;" size="40"> </td>
+ </tr>
+ 
+ <tr valign="top">
+  <th> Enforce vocabulary? </th>
+  <td>
+    <input type="checkbox" name="enforce_vocabulary:boolean" &dtml-enforce;>
+    <input type="hidden" name="enforce_vocabulary:int:default" value="0">
+  </td>
+  <th> Vocabulary </th>
+  <td> <textarea name="allowed_vocabulary:lines"
+                 rows="5" cols="20">&dtml-vocab;</textarea>
+ </tr>
+ 
+ <tr valign="top">
+  <td> <br> </td>
+  <td colspan="3">
+   <input type="submit" name="updateElementPolicy:method" value=" Update ">
+   <dtml-if canRemove>
+    <input type="submit" name="removeElementPolicy:method" value=" Remove ">
+   </dtml-if>
+  </td>
+ </tr>
+
+ </form>
+ </dtml-let>
+ </dtml-in>
+
+ <form action="&dtml-absolute_url;" method="POST">
+ <input type="hidden" name="element" value="&dtml-element;"> 
+
+ <tr style="background-color: DarkGray; color: DarkBlue">
+  <th colspan="4"> &lt;new type&gt; </th>
+ </tr>
+
+ <tr valign="top">
+  <th> Content type </th>
+
+  <dtml-let types="portal_types.listContentTypes()"
+  >
+  <td>
+   <select name="content_type">
+    <dtml-in types>
+     <option value="&dtml-sequence-item;"> &dtml-sequence-item; </option>
+    </dtml-in>
+   </select>
+  </td>
+  </dtml-let>
+
+  <th> Required? </th>
+  <td>
+    <input type="checkbox" name="is_required:boolean">
+    <input type="hidden" name="is_required:int:default" value="0">
+  </td>
+ </tr>
+ 
+ <tr valign="top">
+  <th> Supply default? </th>
+  <td>
+    <input type="checkbox" name="supply_default:boolean">
+    <input type="hidden" name="supply_default:int:default" value="0">
+  </td>
+  <th> Default </th>
+  <td> <input type="text" name="default_value&dtml-tokenz;" size="40"> </td>
+ </tr>
+ 
+ <tr valign="top">
+  <th> Enforce vocabulary? </th>
+  <td>
+    <input type="checkbox" name="enforce_vocabulary:boolean">
+    <input type="hidden" name="enforce_vocabulary:int:default" value="0">
+  </td>
+  <th> Vocabulary </th>
+  <td> <textarea name="allowed_vocabulary:lines"
+                 rows="5" cols="20"></textarea>
+ </tr>
+ 
+ <tr valign="top">
+  <td> <br> </td>
+  <td>
+   <input type="submit" name="addElementPolicy:method" value=" Add ">
+  </td>
+ </tr>
+
+ </form>
+
+ <tr style="background-color: DarkGray; color: DarkBlue">
+  <th colspan="4"> <br> </th>
+ </tr>
+
+ </dtml-let>
+</table>
+
+<dtml-var manage_page_footer>
