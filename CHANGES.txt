@@ -44,6 +44,9 @@ New Features
 
 Bugs Fixed
 
+  - Added forwared-compatibility for "old" content (pre CMF 1.0!;
+    Tracker #454, thanks to Lucas Hofman for the patch).
+
   - Made 'PortalFolder.invokeFactory' enforce the 'filter_content_types'
     property of the folder's type information object.
 

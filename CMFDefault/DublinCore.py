@@ -78,7 +78,7 @@ class DefaultDublinCoreImpl( PropertyManager ):
     security.declarePublic( 'Subject' )
     def Subject( self ):
         "Dublin Core element - resource keywords"
-        return self.subject
+        return getattr( self, 'subject', () ) # compensate for *old* content
 
     security.declarePublic( 'Publisher' )
     def Publisher( self ):
@@ -111,7 +111,8 @@ class DefaultDublinCoreImpl( PropertyManager ):
         """
             Dublin Core element - date resource created.
         """
-        return self.creation_date.ISO()
+        # return unknown if never set properly
+        return self.creation_date and self.creation_date.ISO() or 'Unknown'
     
     security.declarePublic( 'EffectiveDate' )
     def EffectiveDate( self ):
@@ -179,6 +180,8 @@ class DefaultDublinCoreImpl( PropertyManager ):
             WebDAV needs this to do the Right Thing (TM).
         """
         return self.Format()
+    __FLOOR_DATE = DateTime( 1000, 0 ) # alwasy effective
+
 
     security.declarePublic( 'isEffective' )
     def isEffective( self, date ):
@@ -200,10 +203,10 @@ class DefaultDublinCoreImpl( PropertyManager ):
             Dublin Core element - date resource created,
               returned as DateTime.
         """
-        return self.creation_date
+        # allow for non-existent creation_date, existed always
+        date = getattr( self, 'creation_date', None )
+        return date is None and self.__FLOOR_DATE or date
     
-    __FLOOR_DATE = DateTime( 1000, 0 ) # alwasy effective
-
     security.declarePublic( 'effective' )
     def effective( self ):
         """
