@@ -1,0 +1,59 @@
+Chapter 5: Configuring and Customizing the CMF
+
+  Services
+
+    - Overview of services - they are customizable and
+      configurable. 
+
+      The following sections describe each service, including it
+      purpose and use.
+
+  Site Configuration
+
+    XXX Portal configuration stuff
+
+  Controlling Look and Feel
+
+    Skins (how to configure skins and override look and feel
+    elements), DTML, Page Templates, etc.
+
+  Workflow
+
+    Configuring workflow states, transitions, actions using
+    DCWorkflow. This section should be large and should show example
+    workflows.
+
+  Search
+
+    cataloging, building search forms, searching public and private
+    content
+
+  Membership
+
+    (using various authentication sources, managing users and their
+    preferences, user data schemas)
+
+  Discussion 
+
+    XXX It's unclear how to configure this, the tool has no controls
+    and there are no permissions related to discussion.
+
+  Security
+
+    Setting local roles. Also basic Zope security info.
+
+  Syndication 
+
+    XXX It's unclear how this works
+
+  Versioning 
+
+    XXX fiction? XXX
+
+  Personalization 
+
+    XXX fiction? XXX
+
+  Conclusion
+
+    XXX

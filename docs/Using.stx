@@ -47,9 +47,10 @@ Chapter 3: Using the CMF
       have your password mailed to you.
 
       Once you've logged in notice how the action box now says your
-      name at the top. This tells you that you're logged in. Also
-      notice that you now have many more options in your action box
-      than you had before. See [3-4] for an example:
+      name at the top next to the person icon. This tells you that
+      you're logged in. Also notice that you now have many more
+      options in your action box than you had before. See [3-4] for an
+      example:
 
       "Logged in as Bob":img:3-4:imgs/3-4.png
 
@@ -102,13 +103,17 @@ Chapter 3: Using the CMF
 
       This is the part of the site where you can create your own
       content. Your content is shown on this screen. Here you can
-      create new content and modify existing content.  Creating and
+      create new content and modify existing content. Creating and
       editing content is covered in the next chapter.
 
       Content is arranged in folders. The objects you see in your
       member area are contained in your member folder. You can create
       sub-folders inside your member folder. In fact you can think of
       the entire site as a collection of objects within folders. 
+
+      The word "Desktop" at the top of the screen indicates that you
+      are in the "Desktop" view. This view is similar to your
+      computer's file manager in that it displays folders and objects.
 
     Using Folders
 
@@ -147,7 +152,7 @@ Chapter 3: Using the CMF
       When you copy and paste objects you get a complete copy of the
       object including it's properties and sub-objects. For example,
       notice that the copied folder has the same title as the
-      orginal. If the original folder had contained other objects, the
+      original. If the original folder had contained other objects, the
       copy would have had copies of them as well.
 
       The "Cut" button lets you copy an object and delete it from its
@@ -181,6 +186,40 @@ Chapter 3: Using the CMF
       the news item's status as well as removing it from the home
       page) at once.
 
+    View Filters
+
+      Sometimes it can get tedious looking through folders for things
+      you're interested in. To help you manage folder contents you can
+      use view filters. A view filter hides objects that you're not
+      interested in.
+
+      To create a view filter click the "Set View Filter" button in
+      the "Desktop" view. You'll be taken to a form where you can
+      specify what types of objects you want to see. You can filter
+      objects by subject and/or by type. To filter objects by subject
+      type a keyword in the "Subject" field. (See Chapter 4. for more
+      information on metadata and subject keywords.) To filter by type
+      select the content types that you want to see in the "Content
+      Type" multiple selection list. If you specify a subject as well
+      as content types, you will only see objects that match both
+      criteria.  After you can selected your subject and/or content
+      type click the "Set Filter" button. 
+
+      After you set the view filter notice that your folder contents
+      are changed to take the filter into account. Also notice how the
+      filter stays visible at the bottom of the "Desktop" view. If you
+      wish to hide the filter details click the "Close View Filter"
+      button. The view filter will still be active, but it's details
+      will be hidden. To show the view filter details click the "Set
+      View Filter" button. You can get rid of the filter by clicking
+      the "Clear View Filter" button. You can change the view filter
+      by selecting new filtering criteria and clicking the "Set View
+      Filter" button.
+
+      If you don't have many objects in your folders then the view
+      filter won't be much use to you. However, if you're managing a
+      lot of objects, it can be a great boon.
+
     Favorites
 
       The "Favorites" feature lets you manage personal bookmarks for
@@ -206,11 +245,40 @@ Chapter 3: Using the CMF
       home page.
 
     Other Actions
+    
+      Depending on how your site is configured you may have a number
+      of links in your action box that haven't been discussed so
+      far. Here's a quick description of them:
 
-      In the next chapter you'll learn about the other actions that
-      you see in your action box.
+      * The "Folder contents" action simple takes you to the "Desktop"
+        view showing you the contents of the current folder. If you are
+        exploring a part of this site other than your member directory,
+        you can use the "Folder contents" link to inspect the objects at
+        this location.
 
-      XXX does more need to be elaborated here?
+      * The "View" link shows you the public view of content or
+        folders. A folder's public view is provided by an object named
+        "index_html". Notice how there is an "index_html" document in
+        your member directory. 
+
+        If you click "View" in your member folder you will see the
+        public view of the "index_html" document. If a folder has no
+        "index_html" object, Zope looks in its parent folder for an
+        "index_html" object. Zope continues to look in parent folders
+        until it finds an "index_html".
+
+      * The "Local Roles" link provides security controls that are
+        discussed in the Chapter 5.
+
+      * The "Syndication" link allows you to control content
+        syndication. Syndication is covered in Chapter 5.
+
+      * The "Edit", "Metadata", "Publish", and "Status history" links
+        let you edit content. Content editing is discussed in the
+        Chapter 4.
+
+      * The "Reconfigure portal" links allows you to set site
+        preferences. It is discussed in Chapter 5.
 
   Using Services
 
@@ -237,12 +305,12 @@ Chapter 3: Using the CMF
       very precise searches.
 
       The search service won't return content that you aren't
-      priveledged to see. In the next chapter you'll learn about how
+      privileged to see. In the next chapter you'll learn about how
       access to content protected. The search results are tailored to
       the user doing the search to ensure that security settings are
       respected.
 
-      XXX is this true, or are private items simply not catalogged?
+      XXX is this true, or are private items simply not cataloged?
 
     Using Discussion
 
