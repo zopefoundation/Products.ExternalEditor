@@ -22,7 +22,7 @@
   <br> 
   </p>
  
-  <hr noshade>
+  <hr noshade />
  
   <p>Troubleshooting Suggestions</p>
 
@@ -47,6 +47,13 @@
   Thank you for your patience.
   </p>
 
+</div>
+
+<div tal:condition="options/errors_log_url | nothing">
+  <hr noshade />
+  <a href="error_log_url" tal:attributes="href options/error_log_url">
+    Show Error Log Entry
+  </a>
 </div>
 </div>
 </div>
