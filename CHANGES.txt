@@ -18,6 +18,12 @@ HEAD only (unreleased)
       document content if the format has been changed (arising from
       discussion about http://www.zope.org/Collectors/CMF/214)
 
+  Features:
+
+    - RegistrationTool: The regular expression that limits what people 
+      can put in as a valid member ID is now configurable TTW in the 
+      portal_registration tool (http://www.zope.org/Collectors/CMF/117)
+
   Removed Features
 
     - CatalogTool: Removed deprecated indexes and metadata.

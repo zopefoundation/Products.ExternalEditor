@@ -15,6 +15,8 @@
 $Id$
 """
 
+import re
+
 from Globals import InitializeClass
 from Globals import DTMLFile
 from OFS.SimpleItem import SimpleItem
@@ -44,12 +46,15 @@ class RegistrationTool(UniqueObject, SimpleItem, ActionProviderBase):
 
     id = 'portal_registration'
     meta_type = 'CMF Registration Tool'
+    member_id_pattern = ''
+    default_member_id_pattern = "^[A-Za-z][A-Za-z0-9_]*$"
+    _ALLOWED_MEMBER_ID_PATTERN = re.compile(default_member_id_pattern)
 
     security = ClassSecurityInfo()
 
     manage_options = (ActionProviderBase.manage_options +
                      ({ 'label' : 'Overview', 'action' : 'manage_overview' }
-                     , 
+                     ,{ 'label' : 'Configure', 'action' : 'manage_configuration' } 
                      ) + SimpleItem.manage_options)
 
     #
@@ -57,6 +62,37 @@ class RegistrationTool(UniqueObject, SimpleItem, ActionProviderBase):
     #
     security.declareProtected(ManagePortal, 'manage_overview')
     manage_overview = DTMLFile( 'explainRegistrationTool', _dtmldir )
+
+    security.declareProtected(ManagePortal, 'manage_configuration')
+    manage_configuration = DTMLFile('configureRegistrationTool', _dtmldir)
+
+    security.declareProtected(ManagePortal, 'manage_editIDPattern')
+    def manage_editIDPattern(self, pattern, REQUEST=None):
+        """Edit the allowable member ID pattern TTW"""
+        pattern.strip()
+
+        if len(pattern) > 0:
+            self.member_id_pattern = pattern
+            self._ALLOWED_MEMBER_ID_PATTERN = re.compile(pattern)
+        else:
+            self.member_id_pattern = ''
+            self._ALLOWED_MEMBER_ID_PATTERN = re.compile(
+                                                self.default_member_id_pattern)
+
+        if REQUEST is not None:
+            msg = 'Member ID Pattern changed'
+            return self.manage_configuration(manage_tabs_message=msg)
+
+    security.declareProtected(ManagePortal, 'getIDPattern')
+    def getIDPattern(self):
+        """ Return the currently-used member ID pattern """
+        return self.member_id_pattern
+
+    security.declareProtected(ManagePortal, 'getDefaultIDPattern')
+    def getDefaultIDPattern(self):
+        """ Return the currently-used member ID pattern """
+        return self.default_member_id_pattern
+
 
     #
     #   'portal_registration' interface methods
@@ -125,15 +161,13 @@ class RegistrationTool(UniqueObject, SimpleItem, ActionProviderBase):
         self.afterAdd(member, id, password, properties)
         return member
 
-    import re
-    __ALLOWED_MEMBER_ID_PATTERN = re.compile( "^[A-Za-z][A-Za-z0-9_]*$" )
     security.declareProtected(AddPortalMember, 'isMemberIdAllowed')
     def isMemberIdAllowed(self, id):
         '''Returns 1 if the ID is not in use and is not reserved.
         '''
         if len(id) < 1 or id == 'Anonymous User':
             return 0
-        if not self.__ALLOWED_MEMBER_ID_PATTERN.match( id ):
+        if not self._ALLOWED_MEMBER_ID_PATTERN.match( id ):
             return 0
         membership = getToolByName(self, 'portal_membership')
         if membership.getMemberById(id) is not None:
