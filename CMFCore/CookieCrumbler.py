@@ -183,6 +183,10 @@ class CookieCrumbler (SimpleItemWithProperties):
                         req._auth = 'Basic %s' % ac
                         resp._auth = 1
                         self.delRequestVar(req, self.auth_cookie)
+                        method = self.getCookieMethod(
+                            'twiddleAuthCookie', None)
+                        if method is not None:
+                            method(resp, self.auth_cookie, quote(ac))
 
         req._cookie_auth = attempt
         return attempt

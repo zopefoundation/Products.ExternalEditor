@@ -1,6 +1,14 @@
 CMF 1.5alpha (unreleased)
 
   New Features
+  
+    - Added new hook to CookieCrumbler "twiddleAuthCookie". The
+      twiddleAuthCookie skin script, if present is called on each request
+      where a cookie authentication token is present. It is passed the auth
+      cookie name and value so that it can perform such functions as
+      extending the expiration of the cookie. A twiddleAuthCookie script
+      along with a setAuthCookie script could create login sessions that
+      timeout after a period of inactivity for example.
 
     - Refactored ActionsTool and Action providers:
 
