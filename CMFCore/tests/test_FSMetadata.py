@@ -42,6 +42,36 @@ class FSMetadata(FSSecurityBase):
             self.ob.fake_skin.test6,
             ['Manager', 'Anonymous'])
 
+    def test_basicPermissionsOnImage(self):
+        # Test basic FS permissions on Image
+        test_image = getattr(self.ob.fake_skin, 'test_image.gif')
+        assert(test_image.title == 'Test image')
+        self._checkSettings(
+            test_image,
+            'Access contents information',
+            1,
+            ['Manager','Anonymous'])
+        self._checkSettings(
+            test_image,
+            'View management screens',
+            0,
+            ['Manager'])
+
+    def test_basicPermissionsOnFile(self):
+        # Test basic FS permissions on File
+        test_file = getattr(self.ob.fake_skin, 'test_file.swf')
+        assert(test_file.title == 'Test file')
+        self._checkSettings(
+            test_file,
+            'Access contents information',
+            1,
+            ['Manager','Anonymous'])
+        self._checkSettings(
+            test_file,
+            'View management screens',
+            0,
+            ['Manager'])
+
     def test_proxy(self):
         # Test roles
         ob = self.ob.fake_skin.test_dtml

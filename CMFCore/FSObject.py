@@ -19,6 +19,7 @@ from os import path, stat
 
 import Globals
 from AccessControl import ClassSecurityInfo
+from AccessControl.Role import RoleManager
 from Acquisition import Implicit
 from OFS.Cache import Cacheable
 from OFS.SimpleItem import Item
@@ -32,7 +33,7 @@ from utils import expandpath
 from utils import getToolByName
 
 
-class FSObject(Implicit, Item, Cacheable):
+class FSObject(Implicit, Item, RoleManager, Cacheable):
     """FSObject is a base class for all filesystem based look-alikes.
 
     Subclasses of this class mimic ZODB based objects like Image and
