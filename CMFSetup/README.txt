@@ -21,7 +21,7 @@ CMFSetup Product README
 
       - (x) 'portal_actions'
             (Products.CMFCore.ActionsTool.ActionsTool)
- 
+
             o action providers, and their actions; note that this removes
               the requirement to have individual tools configure their own
               actions
@@ -48,7 +48,7 @@ CMFSetup Product README
             (Products.CMFCore.CatalogTool.CatalogTool)
 
             o index names / types
-        
+
             o metadata column names
 
       - (_) 'portal_membership'
@@ -65,7 +65,7 @@ CMFSetup Product README
 
       - (_) 'caching_policy_manager'
 
-            o policy settins
+            o policy settings
 
       - (_) 'portal_metadata'
 
@@ -109,7 +109,7 @@ CMFSetup Product README
 
   Glossary
 
-    Site -- 
+    Site --
       The instance in the Zope URL space which defines a "zone of service"
       for a set of CMF tools.
 
