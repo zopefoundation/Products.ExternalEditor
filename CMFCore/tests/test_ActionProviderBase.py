@@ -1,4 +1,4 @@
-from unittest import TestCase, TestSuite, makeSuite, main
+from unittest import TestSuite, makeSuite, main
 
 import Testing
 import Zope
