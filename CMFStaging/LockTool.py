@@ -98,7 +98,7 @@ class LockTool(UniqueObject, SimpleItemWithProperties):
 
 
     security.declareProtected(UnlockObjects, 'unlock')
-    def unlock(self, object):
+    def unlock(self, object, message=''):
         '''Unlocks an object'''
         locker = self.locker(object)
         if not locker:
@@ -117,7 +117,7 @@ class LockTool(UniqueObject, SimpleItemWithProperties):
         if self.auto_version:
             vt = getToolByName(self, 'portal_versions', None)
             if vt is not None:
-                vt.checkin(object)
+                vt.checkin(object, message)
 
 
     security.declarePublic('locker')
