@@ -8,12 +8,11 @@
     format=REQUEST.get('format', 'text/html'),
     language=REQUEST.get('language', 'en-US'),
     rights=REQUEST.get('rights', ''))">
-<dtml-if change_and_edit>
- <dtml-call "REQUEST.set( 'next_action', 'Edit' )">
+<dtml-if expr="REQUEST.get('change_and_edit', 0)">
+  <dtml-let method="restrictedTraverse(getTypeInfo().getActionById('edit'))"
+            portal_status_message="'Metadata changed.'">
+    <dtml-return method>
+  </dtml-let>
 <dtml-else>
- <dtml-call "REQUEST.set( 'next_action', 'View' )">
+  <dtml-return view>
 </dtml-if>
-<dtml-call "REQUEST['RESPONSE'].redirect( absolute_url()
-                        + '/' +  getTypeInfo().actionByName( next_action )
-                        + '?portal_status_message=Metadata+changed.'
-                        )">
