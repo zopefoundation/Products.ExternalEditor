@@ -15,6 +15,7 @@
 $Id$
 """
 
+from types import TupleType, ListType
 from AccessControl import ClassSecurityInfo
 from AccessControl.PermissionRole import rolesForPermissionOn
 from DateTime import DateTime
@@ -179,6 +180,18 @@ class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
         result.append( 'user:%s' % user.getId() )
         return result
 
+    def _convertQuery(self, kw):
+        # Convert query to modern syntax
+        for k in 'effective', 'expires':
+            kusage = k+'_usage'
+            if not kw.has_key(kusage):
+                continue
+            usage = kw[kusage]
+            if not usage.startswith('range:'):
+                raise ValueError("Incorrect usage %s" % `usage`)
+            kw[k] = {'query': kw[k], 'range': usage[6:]}
+            del kw[kusage]
+
     # searchResults has inherited security assertions.
     def searchResults(self, REQUEST=None, **kw):
         """
@@ -190,8 +203,49 @@ class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
 
         if not _checkPermission( AccessInactivePortalContent, self ):
             now = DateTime()
-            kw['effective'] = {'query': now, 'range': 'max'}
-            kw['expires'] = {'query': now, 'range': 'min'}
+
+            self._convertQuery(kw)
+
+            # Intersect query restrictions with those implicit to the tool
+            for k in 'effective', 'expires':
+                if kw.has_key(k):
+                    range = kw[k]['range'].split(':')
+                    query = kw[k]['query']
+                    if (not isinstance(query, TupleType) and
+                        not isinstance(query, ListType)):
+                        query = (query,)
+                else:
+                    range = []
+                    query = None
+                if 'min' in range:
+                    lo = min(query)
+                else:
+                    lo = None
+                if 'max' in range:
+                    hi = max(query)
+                else:
+                    hi = None
+                if k == 'effective':
+                    if hi is None or hi > now:
+                        hi = now
+                    if lo is not None and hi < lo:
+                        return ()
+                else: # 'expires':
+                    if lo is None or lo < now:
+                        lo = now
+                    if hi is not None and hi < lo:
+                        return ()
+                # Rebuild a query
+                if lo is None:
+                    query = hi
+                    range = 'max'
+                elif hi is None:
+                    query = lo
+                    range = 'min'
+                else:
+                    query = (lo, hi)
+                    range = 'min:max'
+                kw[k] = {'query': query, 'range': range}
 
         return ZCatalog.searchResults(self, REQUEST, **kw)
 
