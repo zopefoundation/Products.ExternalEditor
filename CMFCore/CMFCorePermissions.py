@@ -37,7 +37,7 @@ def setDefaultRoles(permission, roles):
     '''
     Sets the defaults roles for a permission.
     '''
-    # XXX This ought to be in SecurityInfo.
+    # XXX This ought to be in AccessControl.SecurityInfo.
     registered = AccessControl.Permission._registeredPermissions
     if not registered.has_key(permission):
         registered[permission] = 1
@@ -48,4 +48,4 @@ def setDefaultRoles(permission, roles):
 
 
 setDefaultRoles(ManagePortal, ('Manager',))
-setDefaultRoles(ModifyPortalContent, ('Owner', 'Manager'))
+setDefaultRoles(ModifyPortalContent, ('Manager',))
