@@ -3,7 +3,7 @@ folderfilter cookie maintenance.
 </dtml-comment>
 
 <dtml-if expr="REQUEST.get('clear_view_filter', 0)">
- <dtml-call expr="RESPONSE.expireCookie('folderfilter', path='/')">
+ <dtml-call clearCookie>
  <dtml-call expr="REQUEST.set('folderfilter', '')">
  <dtml-call expr="REQUEST.set('close_filter_form', '1')">
 <dtml-elif expr="REQUEST.get('set_view_filter', 0)">
