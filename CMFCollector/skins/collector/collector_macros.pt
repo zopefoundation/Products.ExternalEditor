@@ -1,0 +1,248 @@
+<html xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal">
+  <body>
+
+    <span tal:replace="nothing">
+      Comment: Collector issue macros: collector_header, issue_header.
+    </span>
+
+    <!-- This is the desktop area -->
+
+    <div metal:define-macro="collector_header"
+         tal:define="upNav python: hasattr(here.aq_parent, 'portal_url');
+                     upID python: here.aq_parent.getId()">
+
+      <table>
+        <tr>
+          <th align="left">
+            <div class="DesktopTitle">
+              <font size="+1">
+                <em><span tal:replace="here/Title">Title</span></em>
+                Issue Collector
+              </font>
+            </div>
+          </th>
+          <td tal:condition="upNav|nothing" align="center">
+            <a href="folder_contents"
+               tal:attributes="href python: here.aq_parent.absolute_url()
+                                            + '/folder_contents'">
+              <img src="" alt="[Link]" border="0"
+                   tal:attributes="src python: here.portal_url()
+                                               + '/UpFolder_icon.gif'"></a>
+            &nbsp;&nbsp;
+            Out to <a href="CONTAINER"
+                      tal:attributes="href here/aq_parent/absolute_url"
+                      tal:content="upID">Up ID</a>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <div id="DesktopDescription"
+                 tal:content="here/description">DESCRIPTION</div>
+          </td>
+        </tr>
+      </table>
+
+    </div>
+
+    <div metal:define-macro="issue_header"
+         tal:define="crdate python: here.creation_date.aCommon();
+                     DateTime nocall: modules/DateTime/DateTime;
+                     moddate python:
+                                DateTime(here.ModificationDate()).aCommon();
+                     datesdiff python: crdate != moddate;
+                     TRUNCDESCR python: 150;
+                     global artifacts
+                            python: [i for i in here.objectValues()
+                                       if i.portal_type
+                                          != 'Collector Issue Transcript']">
+
+       <table summary="Issue Characteristics">
+
+         <tr>
+           <td colspan="4">
+             <font size="+1">
+               Issue <span tal:replace="here/id">ID</span> of
+               <a href=""
+                  tal:attributes="href python:here.aq_parent.absolute_url()">
+                 <span tal:replace="container/Title">COLLECTOR TITLE</span>
+               </a>
+               Collector
+             </font>
+           </td>
+         </tr>
+
+         <tr>
+           <td align="right"> Title: </td>
+           <td colspan="2">
+             <strong>
+               <span tal:replace="here/Title">TITLE</span>
+             </strong>
+           </td>
+           <td tal:condition="here/security_related">
+             <font color="red"> Security Related </font>
+           </td>
+         </tr>
+
+         <tr>
+           <td align="right"> Description: </td>
+           <td colspan="3">
+             <font color="gray">
+               <span tal:replace="python: here.description[:TRUNCDESCR]
+                                          + (here.description[TRUNCDESCR+1:]
+                                             and '...')">
+                 DESCRIPTION
+               </span>
+             </font>
+           </td>
+         </tr>
+
+         <tr>
+           <td align="right">Topic/Class:</td>
+           <td> <strong>
+              <span tal:content="python: '%s/%s' % (here.topic,
+                                                   here.classification)">
+               TOPIC</span> </strong>
+           </td>
+           <td align="right">From:</td>
+           <td>
+              <span tal:content="here/submitter_name">NAME</span>
+              (<em><span tal:content="here/submitter_id">ID</span></em>)
+         </tr>
+
+         <tr>
+           <td align="right">Status:</td>
+           <td>
+              <code>
+                <span tal:content="here/current_status">CURRENT_STATUS</span>
+              </code>
+           </td>
+           <td align="right"> on: </td>
+           <td tal:content="crdate">CREATIONDATE</td>
+         </tr>
+
+         <tr tal:condition="here/edited">
+
+           <td tal:condition="here/comment_number"
+               align="right"> Comments: </td>
+           <td tal:condition="here/comment_number"
+               tal:content="here/comment_number"> NUMBER </td>
+
+           <td tal:condition="not:here/comment_number"> </td>
+           <td tal:condition="not:here/comment_number"> </td>
+
+           <td tal:condition="datesdiff" align="right">Last update:</td>
+           <td tal:condition="datesdiff"
+               tal:content="moddate">MODDATE</td>
+         </tr>
+
+         <tr>
+           <td align="right">Version:</td>
+           <td>
+             <code>
+               <span tal:content="here/reported_version">VERSION
+               </span>
+             </code>
+           </td>
+           <td align="right"> Other sys: </td>
+           <td tal:condition="here/other_version_info"
+               tal:content="here/other_version_info">OTHER_VERSION_INFO</td>
+           <td tal:condition="not:here/other_version_info"> ~ </td>
+        </tr>
+        <tr>
+          <td align="right" valign="top"> Artifacts: </td>
+          <td colspan="3">
+            <span tal:condition="not: artifacts"> ~ </span>
+            <table tal:condition="artifacts">
+              <div tal:repeat="item artifacts">
+                <tr> <td>
+                  <a href="ITEM URL"
+                     tal:attributes="href python: item.absolute_url()
+                                                  + '/view'"
+                     tal:content="item/id">ITEM ID</a>
+                  <font color="gray">
+                    <span tal:replace="python: item.description[:45]
+                                               + (item.description[46:]
+                                                  and '...')">
+                    DESCRIPTION</span>
+                  </font>
+                </td> </tr>
+              </div>
+            </table>
+        </tr>
+
+         <tr valign="middle">
+         </tr>
+
+       </table>
+
+    </div>
+
+    <div metal:define-macro="issue_batch_nav">
+
+      <span tal:condition="nothing">
+        This macros depends on a number of batch parameters being defined in
+        the invoking template:
+          - BATCHSIZE
+          - batch
+          - prev (may be undefined)
+          - next (may be undefined)
+          - last_batch
+      </span>
+
+      <table bgcolor="#eeeeee">
+
+        <tr>
+          <td align="right" width="10%">
+           <strong>
+            <span tal:condition="prev">
+              <a href="FIRST BATCH"
+                 tal:attributes="href here/absolute_url">
+              &lt;&lt; </a>
+            </span>
+           </strong>
+          </td>
+
+          <th align="center" width="30%">
+            <span tal:condition="prev">
+              <a href="PREVIOUS BATCH"
+                tal:attributes="href python: '%s/collector_contents?b_start=%s'
+                                             % (here.absolute_url(),
+                                                prev.first)">
+               Previous batch</a>
+             </span>
+          </th>
+
+          <td align="center" NOWRAP>
+            <b>
+              <span tal:replace="python: 'Issues %s to %s of %s'
+                                   % (batch.start, batch.end, here.length())"/>
+            </b>
+          </td>
+
+          <th align="center" width="30%">
+            <span tal:condition="next">
+              <a href=""
+                tal:attributes="href python: '%s/collector_contents?b_start=%s'
+                                             % (here.absolute_url(),
+                                                next.first)">
+              Next batch</a>
+            </span>
+          </th>
+
+          <td align="left" width="10%">
+            <strong>
+            <span tal:condition="next">
+              <a href="LAST BATCH"
+                tal:attributes="href python: '%s/collector_contents?b_start=%s'
+                                             % (here.absolute_url(),
+                                                last_batch)">
+               &gt;&gt; </a>
+            </span>
+            </strong>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

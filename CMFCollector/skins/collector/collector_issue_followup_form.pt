@@ -1,0 +1,104 @@
+<html xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="here/main_template/macros/master">
+<body>
+
+<span tal:replace="nothing">
+  Template description: Form for entering new issue actions.
+</span>
+
+<div metal:fill-slot="header">
+
+  <div metal:use-macro="here/collector_macros/macros/issue_header">
+
+    ISSUE HEADER
+
+  </div>
+
+</div>
+
+<div metal:fill-slot="main">
+
+  <form method="POST" enctype="multipart/form-data"
+        action="collector_issue_followup"
+        tal:define="actionsd python:
+                             here.portal_actions.listFilteredActionsFor(here);
+                    wf_actions python:
+                               [i['name'] for i in actionsd['workflow']]">
+
+    <table>
+
+      <tr>
+        <th align="left">
+          Followup
+        </th>
+        <td align="center">
+          Click <a href="QUALIFIED" 
+                   tal:attributes="href python: request.URL + '?do_cite=1'">
+                here</a> for a copy of the transcript as cited text.
+        </td>
+      </tr>
+
+      <tr>
+        <td colspan="2">
+          <strong> Action: </strong>
+          <input type="radio" name="action" value="comment" CHECKED>
+          Comment &nbsp;
+          <span tal:repeat="action python:
+                                  ['Accept', 'Resolve', 'Reject', 'Defer',
+                                   'Declassify', 'Classify']">
+            <input type="radio" name="action" value="VALUE"
+                   tal:attributes="value action"
+                   tal:condition="python: action in wf_actions"
+            ><span tal:replace="action"
+                   tal:condition="python: action in wf_actions">
+            ACTION</span>&nbsp;
+          </span>
+        </td>
+      </tr>
+
+      <tr>
+         <td colspan="2">
+           <textarea name="comment" rows="10" cols="74" wrap="soft"
+                     tal:content="python: (request.get('do_cite')
+                                           and here.cited_text()) or ''">
+</textarea>
+        </td>
+      </tr>
+
+      <span tal:replace="nothing">
+         (Comment: 'artifacts' is global in issue_header macro)
+      </span>
+
+      <tr tal:condition="artifacts">
+        <td colspan="2">
+          Check the artifacts whose URLs you want included in the change
+          notice:
+        </td>
+      </tr>
+
+      <tr tal:condition="artifacts">
+        <td colspan="2">
+          <span tal:repeat="item artifacts">
+            <input type="checkbox" name="attachments:list" value="ID"
+                   tal:attributes="value item/id">
+            <a href="ITEM URL"
+               tal:attributes="href python:item.absolute_url() + '/view'"
+               tal:content="item/id">ITEM ID</a>&nbsp;&nbsp;
+          </span>
+        </td>
+      </tr>
+
+      <tr>
+        <td align="center" colspan=2>
+          <input type="submit" name="submit" value="Submit">
+        </td>
+      </tr>
+
+    </table>
+
+  </form>
+
+</div>
+</body>
+</html>

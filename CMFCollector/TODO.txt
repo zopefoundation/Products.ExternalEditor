@@ -1,0 +1,9 @@
+To-do:
+
+ o 10/10/2001 klm: Basic content types implemented.  Working on
+   workflow (prototyping with through-the-web DCWorkflow, but not yet
+   packaging that), searching, email, and assignment, but checking in
+   the base pieces.
+
+ o 09/24/2001 klm: Implementation.  (Designs at
+   http://dev.zope.org/Wikis/DevSite/Projects/CollectorReplacement/FrontPage .)

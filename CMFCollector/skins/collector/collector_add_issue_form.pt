@@ -1,0 +1,171 @@
+<html xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="here/main_template/macros/master">
+
+<span tal:replace="nothing">
+  Template description: Form for submitting new collector issues.
+</span>
+
+<body>
+
+<div metal:fill-slot="header">
+
+  <div metal:use-macro="here/collector_macros/macros/collector_header">
+    COLLECTOR HEADER
+  </div>
+
+</div>
+
+<div metal:fill-slot="main">	  
+
+  <h2> Submit New Issue </h2>
+ 
+  <div tal:define="member python:
+                          here.portal_membership.getAuthenticatedMember()">
+
+    <form action="collector_add_issue" method="post">
+      <table class="FormLayout">
+
+       <tr valign="top">
+        <th align="right"> Issue Title </th>
+        <td>
+         <input type="text" name="title" value="" size="40">
+        </td>
+        <th valign="top"> Security Related? </th>
+        <td valign="top">
+          <table>
+            <tr>
+              <td>
+              <input type=hidden name="security_related:boolean" value=""/>
+              <input type=checkbox name="security_related:boolean"/>
+              </td>
+              <td>
+                <font size="-1" color="gray">
+                  If checked, will <em>not</em> be publicly visible until
+                  vetted. 
+                </font>
+              </td>
+            </tr>
+          </table>
+        </td>
+       </tr>
+
+       <tr>
+        <th valign="middle" align="right"> Submitter </th>
+        <td>
+         <input type="text" name="submitter" value=""
+           tal:attributes="value python: getattr(member, 'full_name', '')"
+                size="20">
+        </td>
+        <th valign="middle" align="right"> Email
+        </th>
+        <td>
+         <input type="text" name="email" value=""
+           tal:attributes="value python: getattr(member, 'email', '')"
+                size="20">
+        </td>
+       </tr>
+       <tr>
+        <td> &nbsp;
+        </td>
+       </tr>
+
+       <tr valign="top">
+        <th align="right"> Topic </th>
+        <td>
+          <table>
+            <tr>
+              <td>
+                <select name="topic">
+                  <option value=""
+                          tal:repeat="it here/topics"
+                          tal:attributes="value it"
+                          tal:content="it"></option>
+                </select>
+                <th align="right"> Version </th>
+                <td>
+                 <select name="reported_version">
+                   <option value=""
+                           tal:repeat="it here/versions"
+                           tal:attributes="value it"
+                           tal:content="it"></option>
+                 </select>
+                </td>
+              </tr>
+            </table>
+        </td>
+        <th align="right"> Importance </th>
+        <td>
+         <select name="importance">
+           <option value=""
+                   tal:repeat="it here/importances"
+                   tal:attributes="value it"
+                   tal:content="it"></option>
+         </select>
+        </td>
+       </tr>
+
+       <tr valign="top">
+        <th align="right"> Classification </th>
+        <td>
+         <select name="classification">
+           <option value=""
+                   tal:repeat="it here/classifications"
+                   tal:attributes="value it"
+                   tal:content="it"></option>
+         </select>
+        </td>
+        <th align="right"> Severity </th>
+        <td>
+         <select name="severity">
+           <option value=""
+                   tal:repeat="it here/severities"
+                   tal:attributes="value it"
+                   tal:content="it"></option>
+         </select>
+        </td>
+       </tr>
+
+       <tr valign="top">
+        <th align="right"> </th>
+        <td colspan=3>
+          <font color="gray" size="-1">
+            Provide enough pertinent details so the supporters can pinpoint
+            your problem.  You'll be able to upload related files and images
+            once the issue is submitted.
+          </font>
+        </td>
+
+       <tr valign="top">
+          <th align="right"> Description </th>
+          <td colspan="3">
+            <textarea name="description:text" rows="8" cols="60"></textarea>
+          </td>
+       </tr>
+
+       <tr>
+        <th > Other Version Info </th>
+        <td>
+            <textarea name="other_version_info" rows="3" cols="30"></textarea>
+        </td>
+        <td colspan="2">
+          <font color="gray">
+            <span tal:replace="here/other_versions_spiel"></span>
+          </font>
+        </td>
+       </tr>
+
+       <tr valign="top">
+        <td> <br> </td>
+        <td>
+         <input type="submit" value=" Submit ">
+        </td>
+       </tr>
+
+      </table>
+    </form>
+  </div>
+
+</div>
+</body>
+</html>

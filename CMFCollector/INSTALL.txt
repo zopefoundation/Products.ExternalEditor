@@ -1,0 +1,42 @@
+Installing CMFCollector
+
+  The CMFCollector is an issue collector for Zope.
+
+  Prerequisites:
+
+   - Zope, 2.4 or better (with page templates, Python 2.x)
+
+   - The CMF ( http://cmf.zope.org ), recent (as of 10/10/2001) CVS
+     checkout, or (not yet released) 1.2 or better.
+
+   - Zope Page templates (ZPT, http://www.zope.org/Wikis/DevSite/Projects/ZPT )
+
+   - CMFDecor provisions for ZPT, including use of the ZPT skin as the
+     default skin (settable from the portal_skins 'Properties' tab).
+
+  To install CMFCollector, uncompress the CMFCollector product into
+  your zope/Products directory or link it there, e.g.::
+
+    ln -s /path/to/installation /path/to/zope/Products
+
+  In the root of your CMFSite installation (within the ZMI):
+
+      1.  Add an external method to the root of the CMF Site.
+
+      2.  Use the following configuration values for the external
+          method:
+
+          o id: install_collector
+
+          o title (optional): Install Collector Content Types
+
+          o module name: CMFCollector.InstallCollector
+
+          o function name: install_collector
+
+      3. Go to the management screen for the newly added external
+         method and click the 'Try it' tab.  
+
+  The install function will execute and give information about the
+  steps it took to register and install the CMF Events into the CMF
+  Site instance.

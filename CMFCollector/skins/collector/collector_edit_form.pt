@@ -1,0 +1,121 @@
+<html xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="here/main_template/macros/master">
+
+<span tal:replace="nothing">
+  Template description: Form for configuring the collector.
+</span>
+
+<body>
+
+<div metal:fill-slot="header">
+
+  <div metal:use-macro="here/collector_macros/macros/collector_header">
+    COLLECTOR HEADER
+  </div>
+
+</div>
+
+<div metal:fill-slot="main">	  
+<h2> Configure Collector </h2>
+ 
+<form action="collector_edit" method="post">
+<table class="FormLayout">
+ 
+ <tr valign="top">
+  <th align="right"> Title
+  </th>
+  <td colspan="3">
+   <input type="text"
+          name="title"
+          value=""
+     tal:attributes="value here/title"
+          size="65">
+  </td>
+  
+ <tr valign="top">
+  <th align="right"> Description
+  </th>
+  <td colspan="3">
+   <textarea name="description:text" rows="3"
+             cols="50"
+       tal:content="here/description">
+   </textarea>
+  </td>
+ </tr>
+  
+ <tr valign="top">
+  <th align="right"> Supporters
+  </th>
+  <td colspan="3">
+<!-- If there's no 'supporters' attribute, we're creating the collector,
+     so include the creator as the default set of supporters -->
+   <textarea name="supporters:lines" rows="5" cols="15">
+<span tal:repeat="it here/supporters" tal:replace="it"></span>
+</textarea>
+  </td>
+ </tr>
+  
+ <tr valign="top">
+  <th align="right"> Issue Topics
+  </th>
+  <td>
+   <textarea name="topics:lines" rows="5" cols="15">
+<span tal:repeat="it here/topics|nothing" tal:replace="it"></span></textarea>
+  </td>
+  <th align="right"> Issue Classifications
+  </th>
+  <td>
+   <textarea name="classifications:lines" rows="5" cols="15">
+<span tal:repeat="it here/classifications|nothing" tal:replace="it">
+</span></textarea>
+  </td>
+ </tr>
+  
+ <tr valign="top">
+  <th align="right"> Issue Importances
+  </th>
+  <td>
+   <textarea name="importances:lines" rows="5" cols="15">
+<span tal:repeat="it here/importances|nothing" tal:replace="it">
+</span></textarea>
+  </td>
+  <th align="right"> Issue Severities
+  </th>
+  <td>
+   <textarea name="severities:lines" rows="5" cols="15">
+<span tal:repeat="it here/severities|nothing" tal:replace="it">
+</span></textarea>
+  </td>
+ </tr>
+  
+ <tr valign="top">
+  <th align="right"> Product Versions
+  </th>
+  <td>
+   <textarea name="versions:lines" rows="5" cols="15">
+<span tal:repeat="it here/versions|nothing" tal:replace="it">
+</span></textarea>
+  </td>
+  <td colspan=2>
+    <b> Other Versions Spiel </b>
+    <font size="-1" color="gray"> Prompt text for new-issue form... </font>
+    <br> 
+   <textarea name="other_versions_spiel:text" rows="4" cols="33">
+<span tal:replace="here/other_versions_spiel|nothing">
+</span></textarea>
+  </td>
+ </tr>
+
+ <tr valign="top">
+  <td> <br> </td>
+  <td>
+   <input type="submit" value=" Change ">
+  </td>
+ </tr>
+ 
+</table>
+</form>
+</div>
+</body>
+</html>

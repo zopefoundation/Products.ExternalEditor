@@ -1,0 +1,127 @@
+<html xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="here/main_template/macros/master">
+
+<span tal:replace="nothing">
+  Template description: Batching view of the collector issues.
+</span>
+
+<body>
+
+<div metal:fill-slot="header">
+
+  <div metal:use-macro="here/collector_macros/macros/collector_header">
+    COLLECTOR HEADER
+  </div>
+
+</div>
+
+<div metal:fill-slot="main">
+
+<!-- This is the desktop area -->
+<div class="Desktop"
+     tal:define="Batch python:modules['ZTUtils'].Batch;
+                 pysutil modules/Products.PythonScripts.standard;
+                 strmod modules/string;
+                 cap nocall: strmod/capitalize;
+                 DateTime nocall: modules/DateTime/DateTime;
+                 BATCHSIZE python: 10;
+                 TITLELEN python: 35;
+                 DESCRLEN python: 120;
+                 b_start python: request.get('b_start', 0);
+                 items python: here.listFolderContents();
+                 batch python:
+                    Batch(items, BATCHSIZE, int(b_start), orphan=0);
+                 prev batch/previous;
+                 next batch/next|nothing;
+                 last_batch python: max(int(here.length()) - BATCHSIZE, 1)">
+
+  <form action="" METHOD="POST"
+        tal:attributes="action here/absolute_url">
+
+    <div metal:use-macro="here/collector_macros/macros/issue_batch_nav">
+      ISSUE-BATCH NAVIGATION
+    </div>
+
+    <table class="FormLayout">
+      <tbody tal:repeat="item batch">
+        <tr valign="top">
+          <td tal:define="icon item/getIcon|item/icon|nothing">
+             <a href=""
+                tal:attributes="href python: item.absolute_url()">
+                <img src="" alt="" border="0"
+                     tal:condition="icon"
+                     tal:attributes="src python: here.portal_url()
+                                                 + '/' + icon;
+                                     alt item/Type|nothing"></a>
+          </td>
+          <td NOWRAP>
+            <a href=""
+               tal:attributes="href python: item.absolute_url()">
+              <span tal:replace="item/getId">ID</span>
+              <b><span tal:condition="item/Title"
+                       tal:replace="python:
+                                     item.Title()[:TITLELEN]
+                                    + (item.Title()[TITLELEN:] and '...')">
+              TITLE</span></b></a>
+          <br>
+            <span tal:condition="item/security_related">
+              <font color="red">Security</font></span>
+            <span tal:content="python: cap(item.current_status)">
+            STATUS</span>
+            <span tal:replace="python: '%s/%s'
+                                       % (cap(item.topic),
+                                          cap(item.classification))">
+             TOPIC/CLASSIFICATION</span>
+          </td>
+          <td NOWRAP
+              tal:define="numcmts python: item.comment_number;
+                          plrlcmts python: (numcmts != 1) and 's' or '';
+                          numarts python: len(item.objectIds())-1;
+                          plrlarts python: (numarts != 1) and 's' or ''">
+            <span tal:condition="numcmts">
+              <span tal:replace="numcmts">NUM COMMENTS</span>
+              followup<span tal:replace="plrlcmts">S?</span>
+            </span>
+            <span tal:condition="not: numcmts"
+                  tal:replace="nothing"></span>
+
+              <div tal:condition="numarts">
+                <span tal:replace="numarts">NUM ARTIFACTS</span>
+                upload<span tal:replace="plrlarts">S?</span>
+              </div>
+          </td>
+          <td NOWRAP
+              tal:define="crdate python: item.creation_date.aCommon();
+                       moddate python:
+                            DateTime(item.ModificationDate()).aCommon()">
+            <span tal:replace="crdate">CREATEDATE</span>
+            <div tal:condition="python: crdate != moddate">
+              Last Mod: <span tal:replace="moddate">MODDATE</span>
+            </div>
+          </td>
+        </tr>
+
+        <tr tal:condition="item/description">
+          <td>
+          </td>
+          <td colspan="6">
+            <font color="gray"
+                  tal:content="python: item.description[:DESCRLEN]
+                               + (item.description[DESCRLEN:] and '...')">
+            DESCRIPTION</font>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div metal:use-macro="here/collector_macros/macros/issue_batch_nav">
+      ISSUE-BATCH NAVIGATION
+    </div>
+
+  </form>
+</div>
+</div>
+</body>
+</html>
+

@@ -1,0 +1,53 @@
+<html xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="here/main_template/macros/master">
+<body>
+
+<span tal:replace="nothing">
+  Template description: Basic view of issue characteristics and transcript.
+</span>
+
+<div metal:fill-slot="header">
+
+  <div metal:use-macro="here/collector_macros/macros/issue_header">
+
+    ISSUE HEADER
+
+  </div>
+
+</div>
+
+<div metal:fill-slot="main"
+     tal:define="transcript here/get_transcript">
+
+  <!-- lotsa stuff will appear here -->
+
+  <div metal:fill-slot="content">
+
+    <table>
+      <tr>
+        <th colspan="2" align="left">
+           Transcript of Issue
+             <span tal:replace="here/id">ID</span>
+             (<em><span tal:replace="here/Title">TITLE</span></em>)
+        </th>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <table border="1">
+            <tr> <td>
+           <span tal:replace="structure
+                     python: transcript.CookedBody(stx_level=3)">TRANSCRIPT
+           </span>
+            </td> </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+
+  </div>
+
+</div>
+
+</body>
+</html>
