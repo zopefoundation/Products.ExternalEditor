@@ -2,6 +2,11 @@ External Editor Change Log
 
   Next Release
 
+    - When using the Excel plugin, errors were intermittently raised to the
+      user in the form "Fatal error: <unknown>.Path" and the user could
+      subsequently not save the document back to Zope because the
+      external editor process had quit.
+
     - Changes to documents intermittently may not have been saved back to Zope
       when using any plugin that involved COM (Word, Excel, Powerpoint, etc).
 
