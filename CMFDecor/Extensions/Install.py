@@ -107,10 +107,16 @@ from Acquisition import aq_base
 from cStringIO import StringIO
 import string
 
+ZPT_SKINS_DIRS = ( 'zpt_content', 'zpt_control', 'zpt_generic', 'zpt_images' )
+
 def install(self):
     " Register the ZPT Skins with portal_skins and friends "
     out = StringIO()
     skinstool = getToolByName(self, 'portal_skins')
+
+    for dir_view in ZPT_SKINS_DIRS:
+        if dir_view in skinstool.objectIds():
+            skinstool._delObject( dir_view )
 
     addDirectoryViews( skinstool, 'skins', cmfdecor_globals )
     out.write( "Added CMFDecor directory views to portal_skins\n" )
@@ -123,11 +129,7 @@ def install(self):
 
         path = skinstool.getSkinPath( skinstool.getDefaultSkin() )
         path = map( string.strip, string.split( path,',' ) )
-        for zptdir in ( 'zpt_content'
-                      , 'zpt_control'
-                      , 'zpt_generic'
-                      , 'zpt_images'
-                      ):
+        for zptdir in ZPT_SKINS_DIRS:
             try:
                 path.insert( path.index( 'content' ), zptdir )
             except ValueError:
