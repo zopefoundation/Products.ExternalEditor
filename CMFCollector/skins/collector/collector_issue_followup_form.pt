@@ -29,14 +29,19 @@
   <form method="POST" enctype="multipart/form-data"
         action="collector_issue_followup">
 
-    <table>
+    <table tal:define="actions_pairs here/valid_actions_pairs">
 
       <tr>
-        <th align="left">
+        <th align="left" NOWRAP>
           <font size="+1">
-            Issue <span tal:replace="here/id">ID</span> Entry
-            # <span tal:replace="python: here.action_number + 1"></span>
+            Issue <span tal:replace="here/id">ID</span>
           </font>
+        </th>
+      </tr>
+
+      <tr>
+        <th align="left" NOWRAP>
+          Entry <span tal:replace="python: here.action_number + 1"></span>
         </th>
         <td align="center">
           Click <a href="QUALIFIED" 
@@ -50,31 +55,49 @@
         <td>
           <input type="radio"
                  name="action" value="comment" CHECKED>Comment&nbsp;
-          <span tal:repeat="pair here/valid_actions_pairs">
-            <input type="radio" name="action" value="VALUE"
-                   tal:attributes="value python: pair[0]"
-            ><span tal:replace="python: pair[1]">ACTION</span
-            ><span tal:condition="python: pair[1] == 'Assign'">:
-             <select name="assignees:list" MULTIPLE size="1">
-                <span tal:repeat="supporter python: here.aq_parent.supporters">
-                  <option tal:content="supporter"
-                          tal:attributes="selected python:
-                                          supporter in here.assigned_to()">
-                  SUPPORTER</option>
-               </span>
-             </select>
-             </span>&nbsp;
+          <span tal:repeat="pair actions_pairs">
+            <span tal:condition="python: pair[1] != 'Assign'">
+                <input type="radio" name="action" value="VALUE"
+                       tal:attributes="value python: pair[0]"
+                  ><span tal:replace="python: pair[1]">ACTION</span>
+            </span>&nbsp;
           </span>
+        </td>
+
+        <td align="center"
+            tal:define="assigning python: [i[0] for i in actions_pairs
+                                             if i[1] == 'Assign']"
+            tal:condition="assigning">
+          <input type="radio" name="action" value="Assign"
+                 tal:attributes="value python: assigning[0]">Assign:
         </td>
       </tr>
 
       <tr>
-         <td colspan="2">
-           <textarea name="comment" rows="10" cols="74" wrap="soft"
-                     tal:content="python: (request.get('do_cite')
-                                           and here.cited_text()) or ''">
+        <td colspan="2">
+          <textarea name="comment" rows="10" cols="60" wrap="soft"
+                    tal:content="python: (request.get('do_cite')
+                                          and here.cited_text()) or ''">
 </textarea>
         </td>
+
+
+        <td tal:define="assigning python: [1 for i in actions_pairs
+                                             if i[1] == 'Assign'];
+                        supporters here/aq_parent/supporters"
+            tal:condition="assigning">
+          <select name="assignees:list" MULTIPLE size="5"
+                  tal:attributes="size python:
+                                       min(max(len(supporters), 3), 9)">
+            <span tal:repeat="supporter supporters">
+              <option tal:content="supporter"
+                      tal:attributes="selected python:
+                      supporter in here.assigned_to()">
+                SUPPORTER</option>
+            </span>
+          </select>
+        </td>
+
       </tr>
 
     </table>
