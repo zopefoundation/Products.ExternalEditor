@@ -146,6 +146,10 @@ CMF 1.5alpha (unreleased)
 
   Bug Fixes
 
+    - SkinsTool: Fixed cookie paths.
+      clearSkinCookie() now uses the same cookie path as updateSkinCookie()
+      which is now "inside-out" hosting safe.
+
     - DefaultDublinCoreImpl: Changed accessor permissions.
       As defined in the interface accessors are now protected by 'View'.
 

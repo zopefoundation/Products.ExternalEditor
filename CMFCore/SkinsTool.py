@@ -17,7 +17,6 @@ $Id$
 
 from types import ListType
 
-from utils import UniqueObject, getToolByName, _dtmldir
 from Globals import DTMLFile
 from Globals import InitializeClass
 from Globals import PersistentMapping
@@ -25,25 +24,21 @@ from SkinsContainer import SkinsContainer
 from Acquisition import aq_base
 from DateTime import DateTime
 from AccessControl import ClassSecurityInfo
+from OFS.DTMLMethod import DTMLMethod
+from OFS.Folder import Folder
+from OFS.Image import Image
+from OFS.ObjectManager import REPLACEABLE
+from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
+from Products.PythonScripts.PythonScript import PythonScript
 
+from ActionProviderBase import ActionProviderBase
 from CMFCorePermissions import AccessContentsInformation
 from CMFCorePermissions import ManagePortal
 from CMFCorePermissions import View
-from ActionProviderBase import ActionProviderBase
-
-from OFS.Folder import Folder
-from OFS.Image import Image
-from OFS.DTMLMethod import DTMLMethod
-from OFS.ObjectManager import REPLACEABLE
-from Products.PythonScripts.PythonScript import PythonScript
-
-try:
-    from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
-    SUPPORTS_PAGE_TEMPLATES=1
-except ImportError:
-    SUPPORTS_PAGE_TEMPLATES=0
-
 from interfaces.portal_skins import portal_skins as ISkinsTool
+from utils import _dtmldir
+from utils import getToolByName
+from utils import UniqueObject
 
 
 def modifiedOptions():
@@ -68,13 +63,17 @@ class SkinsTool(UniqueObject, SkinsContainer, Folder, ActionProviderBase):
     meta_type = 'CMF Skins Tool'
     _actions = ()
 
+    allow_any = 0
     cookie_persistence = 0
+    default_skin = ''
+    request_varname = 'portal_skin'
+    selections = None
 
     security = ClassSecurityInfo()
 
     manage_options = ( modifiedOptions() +
                       ({ 'label' : 'Overview', 'action' : 'manage_overview' }
-                     , 
+                     ,
                      ) + ActionProviderBase.manage_options
                      )
 
@@ -94,18 +93,14 @@ class SkinsTool(UniqueObject, SkinsContainer, Folder, ActionProviderBase):
     security.declareProtected(ManagePortal, 'manage_overview')
     manage_overview = DTMLFile( 'explainSkinsTool', _dtmldir )
 
-    default_skin = ''
-    request_varname = 'portal_skin'
-    allow_any = 0
-    selections = None
-
     security.declareProtected(ManagePortal, 'manage_propertiesForm')
     manage_propertiesForm = DTMLFile('dtml/skinProps', globals())
 
     security.declareProtected(ManagePortal, 'manage_skinLayers')
     def manage_skinLayers(self, chosen=(), add_skin=0, del_skin=0,
                           skinname='', skinpath='', REQUEST=None):
-        """ Change the skinLayers """                          
+        """ Change the skinLayers.
+        """
         sels = self._getSelections()
         if del_skin:
             for name in chosen:
@@ -121,7 +116,7 @@ class SkinsTool(UniqueObject, SkinsContainer, Folder, ActionProviderBase):
                 # for hysterical reasons
                 if isinstance(val, ListType):
                     val = ','.join([layer.strip() for layer in val])
-                                        
+
                 if sels[key] != val:
                     self.testSkinPath(val)
                     sels[key] = val
@@ -134,7 +129,6 @@ class SkinsTool(UniqueObject, SkinsContainer, Folder, ActionProviderBase):
         if REQUEST is not None:
             return self.manage_propertiesForm(
                 self, REQUEST, management_view='Properties', manage_tabs_message='Skins changed.')
-
 
     security.declareProtected(ManagePortal, 'manage_properties')
     def manage_properties(self, default_skin='', request_varname='',
@@ -172,13 +166,13 @@ class SkinsTool(UniqueObject, SkinsContainer, Folder, ActionProviderBase):
             if minor == 'x-python':
                 return PythonScript( id=name )
 
-            if minor in ( 'html', 'xml' ) and SUPPORTS_PAGE_TEMPLATES:
+            if minor in ('html', 'xml'):
                 return ZopePageTemplate( name )
 
             return DTMLMethod( __name__=name )
 
         return None
-    
+
     # Make the PUT_factory replaceable
     PUT_factory__replaceable__ = REPLACEABLE
 
@@ -260,12 +254,11 @@ class SkinsTool(UniqueObject, SkinsContainer, Folder, ActionProviderBase):
 
     security.declareProtected(View, 'updateSkinCookie')
     def updateSkinCookie(self):
-        '''
-        If needed, updates the skin cookie based on the member preference.
-        '''
-        pm = getToolByName(self, 'portal_membership')
-        pu = getToolByName(self, 'portal_url')
-        member = pm.getAuthenticatedMember()
+        """ If needed, updates the skin cookie based on the member preference.
+        """
+        mtool = getToolByName(self, 'portal_membership')
+        utool = getToolByName(self, 'portal_url')
+        member = mtool.getAuthenticatedMember()
         if hasattr(aq_base(member), 'portal_skin'):
             mskin = member.portal_skin
             if mskin:
@@ -273,17 +266,17 @@ class SkinsTool(UniqueObject, SkinsContainer, Folder, ActionProviderBase):
                 cookie = req.cookies.get(self.request_varname, None)
                 if cookie != mskin:
                     resp = req.RESPONSE
-                    
-                    portalPath = '/' + pu.getPortalObject().absolute_url(1)
-                        
+                    portal_path = req['BASEPATH1'] + '/' + utool(1)
+
                     if not self.cookie_persistence:
                         # *Don't* make the cookie persistent!
-                        resp.setCookie( self.request_varname, mskin, path=portalPath )
+                        resp.setCookie(self.request_varname, mskin,
+                                       path=portal_path)
                     else:
                         expires = ( DateTime( 'GMT' ) + 365 ).rfc822()
                         resp.setCookie( self.request_varname
                                       , mskin
-                                      , path=portalPath
+                                      , path=portal_path
                                       , expires=expires
                                       )
                     # Ensure updateSkinCookie() doesn't try again
@@ -295,9 +288,13 @@ class SkinsTool(UniqueObject, SkinsContainer, Folder, ActionProviderBase):
 
     security.declareProtected(View, 'clearSkinCookie')
     def clearSkinCookie(self):
+        """ Expire the skin cookie.
+        """
         req = self.REQUEST
         resp = req.RESPONSE
-        resp.expireCookie( self.request_varname, path='/' )
+        utool = getToolByName(self, 'portal_url')
+        portal_path = req['BASEPATH1'] + '/' + utool(1)
+        resp.expireCookie(self.request_varname, path=portal_path)
 
     security.declareProtected(ManagePortal, 'addSkinSelection')
     def addSkinSelection(self, skinname, skinpath, test=0, make_default=0):
