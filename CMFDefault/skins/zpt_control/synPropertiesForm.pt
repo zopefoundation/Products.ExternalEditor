@@ -63,7 +63,7 @@
   <table width="100%" border="0">
 
    <tr>
-    <th valign="top" align="left" i18n:translate="">Sy Module Properties</th>
+    <th valign="top" align="left" i18n:translate="">Syndication Module Properties</th>
    </tr>
 
    <tr>
@@ -99,7 +99,7 @@
          <tr>
           <td i18n:translate="">UpdateFrequency</td>
           <td>
-           <input type="text" name="updateFrequency" size="3" value=""
+           <input type="text" name="updateFrequency:int" size="3" value=""
                   tal:attributes="value python:s_tool.getUpdateFrequency(here)"
            >
           </td>
@@ -116,7 +116,7 @@
          <tr>
           <td i18n:translate="">Max Syndicated Items</td>
           <td>
-           <input type="text" name="max_items" value=""  size="3"
+           <input type="text" name="max_items:int" value=""  size="3"
                   tal:attributes="value python:s_tool.getMaxItems(here)">
           </td>
          </tr>
