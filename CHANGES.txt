@@ -164,6 +164,9 @@ CMF 1.5alpha (unreleased)
 
   Bug Fixes
 
+    - Skins: Fixed a DateTime related issue in search_form and doFormSearch.
+      Added one second to epoch to work around the problem that the timezone
+      gets lost if time is 00:00:00.
 
     - CMFCore.PortalFolder: Explicitly declare base interfaces.
 

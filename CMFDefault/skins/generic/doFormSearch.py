@@ -11,7 +11,7 @@ select_vars = ( 'review_state'
               )
 date_vars = ('created',
              )
-epoch = DateTime("1970/01/01 00:00:00 GMT")
+epoch = DateTime('1970/01/01 00:00:01 GMT')
 
 for k, v in vars.items():
 

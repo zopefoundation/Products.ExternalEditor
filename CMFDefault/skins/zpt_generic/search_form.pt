@@ -15,7 +15,6 @@
 
 <table class="FormLayout">
 
-
  <tr tal:condition="python: here.portal_membership.checkPermission('Review portal content', here)">
   <th i18n:translate="">Review Status</th>
   <td>
@@ -94,7 +93,7 @@
                   lastMth python:(today-31).Date();
                  ">
    <select name="created:date">
-    <option value="1970/01/02"
+    <option value="1970/01/01 00:00:01 GMT"
             i18n:translate="">Ever</option>
     <option value=""
             tal:condition="python:not(here.portal_membership.isAnonymousUser())"
@@ -166,4 +165,3 @@
 </div>
 </body>
 </html>
-
