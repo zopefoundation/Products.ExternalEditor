@@ -187,6 +187,15 @@ class VersionsTool(UniqueObject, SimpleItemWithProperties):
         else:
             return ''
 
+    security.declareProtected(UseVersionControl, 'getVersionIds')
+    def getVersionIds(self, object):
+        """Return the available version ids for an object."""
+        # yuck :(
+        repo = self._getVersionRepository()
+        ids = repo.getVersionIds(object)
+        ids = map(int, ids)
+        ids.sort()
+        return map(str, ids)
 
     security.declareProtected(UseVersionControl, 'getHistoryId')
     def getHistoryId(self, object):
