@@ -24,6 +24,7 @@ from Interface.Verify import verifyClass
 import cStringIO
 
 from AccessControl import SecurityManager
+from AccessControl import Unauthorized
 from Acquisition import aq_base
 from Acquisition import Implicit
 from DateTime import DateTime
@@ -764,7 +765,9 @@ class _SensitiveSecurityPolicy:
         self._lambdas = ( validate_lambda, checkPermission_lambda )
 
     def validate( self, *args, **kw ):
-        return self._lambdas[ 0 ]( *args, **kw )
+        if self._lambdas[ 0 ]( *args, **kw ):
+            return True
+        raise Unauthorized
 
     def checkPermission( self, *args, **kw ) :
         return self._lambdas[ 1 ]( *args, **kw )
