@@ -18,9 +18,14 @@ changed = context.edit(title=reqget('title'),
                        text=reqget('text'))
 
 if context.security_related != was_security_related:
-    # Do first available restrict/unrestrict action:
+    # We're toggling security_related - we have to do the corresponding
+    # restrict/unrestrict if available in the current state:
+    if context.security_related:
+        seeking_pretty = 'Restrict'
+    else:
+        seeking_pretty = 'Unrestrict'
     for action, pretty in context.valid_actions_pairs():
-        if pretty in ['Restrict', 'Unrestrict']:
+        if pretty == seeking_pretty:
             context.do_action(action, ' Triggered by security_related toggle.')
             changed = changed + ", " + pretty.lower() + 'ed'
             break
