@@ -259,9 +259,13 @@ class ActionsTool(UniqueObject, OFS.Folder.Folder, ActionProviderBase):
                 catlist = filtered_actions.get(category, None)
                 if catlist is None:
                     filtered_actions[category] = catlist = []
-                # Filter out duplicate actions
+                # Filter out duplicate actions by identity...
                 if not action in catlist:
                     catlist.append(action)
+                # ...should you need it, here's some code that filters
+                # by equality (use instead of the two lines above)
+                #if not [a for a in catlist if a==action]:
+                #    catlist.append(action)
         return filtered_actions
 
     # listFilteredActions() is an alias.
