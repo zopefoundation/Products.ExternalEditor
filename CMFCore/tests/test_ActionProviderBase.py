@@ -5,6 +5,19 @@ from Products.CMFCore.tests.base.dummy import \
      DummyTool
 
 from Products.CMFCore.ActionProviderBase import ActionProviderBase
+from Products.CMFCore.ActionInformation import ActionInformation
+
+class DummyProvider( ActionProviderBase ):
+
+    _actions = [ ActionInformation( id='an_id'
+                                  , title='A Title'
+                                  , action=''
+                                  , condition=''
+                                  , permissions=''
+                                  , category=''
+                                  , visible=0
+                                  )
+               ]
 
 class ActionProviderBaseTests(TestCase):
     
@@ -86,6 +99,32 @@ class ActionProviderBaseTests(TestCase):
         apb._actions = [ '0', '1', '2' ]  # fake out for testing
         apb.deleteActions( selections=(0,2) )
         self.assertEqual( apb._actions, ['1'] )
+
+    def test_DietersNastySharingBug( self ):
+
+        one = DummyProvider()
+        another = DummyProvider()
+
+        def idify( x ): return id( x )
+
+        old_ids = one_ids = map( idify, one.listActions() )
+        another_ids = map( idify, another.listActions() )
+
+        self.assertEqual( one_ids, another_ids )
+
+        one.changeActions( { 'id_0'            : 'different_id'
+                           , 'name_0'          : 'A Different Title'
+                           , 'action_0'        : 'arise_shine'
+                           , 'condition_0'     : 'always'
+                           , 'permissions_0'   : 'granted'
+                           , 'category_0'      : 'quality'
+                           , 'visible_0'       : 1
+                           } )
+
+        one_ids = map( idify, one.listActions() )
+        another_ids = map( idify, another.listActions() )
+        self.failIf( one_ids == another_ids )
+        self.assertEqual( old_ids, another_ids )
 
 def test_suite():
     return TestSuite((

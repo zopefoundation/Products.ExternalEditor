@@ -147,7 +147,12 @@ class ActionProviderBase:
                 }
             if not action['name']:
                 raise ValueError('A name is required.')
-            a = actions[idx]
+
+	    # DM: do not override shared element!
+            # a = actions[idx]
+	    class Empty: pass
+	    a= Empty()
+
             a.id = action['id']
             a.title = action['name']
             if action['action'] is not '':
@@ -161,6 +166,18 @@ class ActionProviderBase:
             a.permissions = action['permissions']
             a.category = action['category']
             a.visible = action['visible']
+
+	    # DM - unshare! severe sharing bug via class variable "_actions"
+	    actions[idx]= ActionInformation(
+	       id= a.id,
+	       title= a.title,
+	       action= a._action,
+	       condition= a.condition,
+	       permissions= a.permissions,
+	       category= a.category,
+	       visible= a.visible,
+	       )
+ 
         self._actions = actions
         if REQUEST is not None:
             return self.manage_editActionsForm(REQUEST, manage_tabs_message=

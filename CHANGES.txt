@@ -48,6 +48,9 @@ New Features
 
 Bugs Fixed
 
+  - Fix sharing bug pointed out by Dieter Maurer (Tracker #484)
+    in ActionProviderBase.  Thanks for the patch!
+
   - Added forwared-compatibility for "old" content (pre CMF 1.0!;
     Tracker #454, thanks to Lucas Hofman for the patch).
 
