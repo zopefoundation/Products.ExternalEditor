@@ -13,10 +13,14 @@
 #
 ##############################################################################
 import unittest
-from conformance import ILoginPasswordHostExtractionPlugin_conformance
-from conformance import IChallengePlugin_conformance
-from conformance import ICredentialsUpdatePlugin_conformance
-from conformance import ICredentialsResetPlugin_conformance
+from Products.PluggableAuthService.tests.conformance \
+     import ILoginPasswordHostExtractionPlugin_conformance
+from Products.PluggableAuthService.tests.conformance \
+     import IChallengePlugin_conformance
+from Products.PluggableAuthService.tests.conformance \
+     import ICredentialsUpdatePlugin_conformance
+from Products.PluggableAuthService.tests.conformance \
+     import ICredentialsResetPlugin_conformance
 
 class FauxHTTPRequest:
 
