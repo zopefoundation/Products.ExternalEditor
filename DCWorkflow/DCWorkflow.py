@@ -212,11 +212,12 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
                 guard = qdef.guard
                 if guard is None or guard.check(sm, self, portal):
                     searchres = None
-                    if qdef.var_matches:
+                    var_match_keys = qdef.getVarMatchKeys()
+                    if var_match_keys:
                         # Check the catalog for items in the worklist.
                         catalog = getToolByName(self, 'portal_catalog')
                         dict = {}
-                        for k in qdef.var_matches.keys():
+                        for k in var_match_keys:
                             v = qdef.getVarMatch(k)
                             v_fmt = map(lambda x, info=info: x%info, v)
                             dict[k] = v_fmt

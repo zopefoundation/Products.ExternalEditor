@@ -73,6 +73,12 @@ class WorklistDefinition (SimpleItem):
         res.sort()
         return res
 
+    def getVarMatchKeys(self):
+        if self.var_matches:
+            return self.var_matches.keys()
+        else:
+            return ()
+
     def getVarMatch(self, id):
         if self.var_matches:
             matches = self.var_matches.get(id, ())
