@@ -207,6 +207,7 @@ def createExprContext(sci):
         'state_change': sci,
         'transition':   sci.transition,
         'status':       sci.status,
+        'kwargs':       sci.kwargs,
         'workflow':     wf,
         'scripts':      wf.scripts,
         }
