@@ -271,7 +271,7 @@ class ActionsTool (UniqueObject, SimpleItem):
                  'category': 'user'},
                 {'name': 'Join',
                  'url': portal_url + '/join_form',
-                 'permissions': [],
+                 'permissions': [CMFCorePermissions.AddPortalMember],
                  'category': 'user'},
                 ]
         else:
