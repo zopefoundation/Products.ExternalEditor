@@ -436,6 +436,13 @@ class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
         else:
             dict['(Default)'] = viewmethod
 
+        # correct guessed values if we know better
+        if self.content_meta_type in ('Portal File', 'Portal Folder',
+                                      'Portal Image'):
+            dict['(Default)'] = 'index_html'
+            if viewmethod == '(Default)':
+                dict['view'] = 'index_html'
+
         self.setMethodAliases(dict)
         return 1
 
