@@ -156,7 +156,7 @@ class Image( OFS.Image.Image
         """
         return "%s %s" % (self.title, self.description)
 
-    security.declarePrivate('manage_beforeDelete')
+    security.declarePrivate('manage_afterAdd')
     def manage_afterAdd(self, item, container):
         """Both of my parents have an afterAdd method"""
         OFS.Image.Image.manage_afterAdd(self, item, container)
