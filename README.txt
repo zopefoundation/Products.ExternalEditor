@@ -229,9 +229,9 @@ Zope External Editor
       http://zopeserver/my_stuff/externalEdit_/document
       
     Now, this may look a bit odd to you if you are used to tacking views on to
-    the end of the URL. Because externalEdit_ is required to work on Python
+    the end of the URL. Because 'externalEdit_' is required to work on Python
     Scripts and Page Templates, which swallow the remaining path segments on
-    the URL following themselves, you must put the call to externalEdit_
+    the URL following themselves, you must put the call to 'externalEdit_'
     *directly before* the object to be edited. You could do this in ZPT using
     some TAL in a Page Template like::
 
@@ -257,7 +257,7 @@ Zope External Editor
         <a href="#" 
            tal:attributes="href object/absolute_url"
            tal:content="object/title_or_id">Object Title</a>
-        <span tal:replace="structure python:here.externalEditorLink_(object)" />
+        <span tal:replace="structure python:here.externalEditLink_(object)" />
       </div>       
 
   Conclusion
