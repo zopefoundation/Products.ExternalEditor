@@ -10,8 +10,10 @@ hdrlist.append( ( 'keywords', ', '.join( context.Subject() ) ) )
 
 hdrlist.append( ( 'DC.description', context.Description() ) )
 hdrlist.append( ( 'DC.subject', ', '.join( context.Subject() ) ) )
-hdrlist.append( ( 'DC.creator', context.Creator() ) )
-hdrlist.append( ( 'DC.contributors', ', '.join( context.Contributors() ) ) )
+for creator in context.listCreators():
+    hdrlist.append( ( 'DC.creator', creator ) )
+for contributor in context.listContributors():
+    hdrlist.append( ( 'DC.contributor', contributor ) )
 
 if context.Publisher() != 'No publisher':
     hdrlist.append( ( 'DC.publisher', context.Publisher() ) )
@@ -39,4 +41,4 @@ hdrlist.append( ( 'DC.language', context.Language() ) )
 hdrlist.append( ( 'DC.rights', context.Rights() ) )
 
 # Strip empty values
-return filter( lambda x: x[1], hdrlist ) 
+return filter( lambda x: x[1], hdrlist )

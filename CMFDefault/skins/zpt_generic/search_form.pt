@@ -62,11 +62,11 @@
    <select name="Subject:list" multiple size="5">
     <option value="" selected i18n:translate="">-- any --</option>
     <option value=""
-		    tal:repeat="item items"
-		    tal:attributes="value item"
-		    tal:content="item">
-      </option>
-    </select>
+       tal:repeat="item items"
+       tal:attributes="value item"
+       tal:content="item">
+    </option>
+   </select>
   </td>
  </tr>
 
@@ -86,12 +86,12 @@
  <tr>
   <th i18n:translate="">Find new items since...</th>
   <td tal:define="today python: here.ZopeTime().earliestTime();
-			      mtool here/portal_membership;
+                  mtool here/portal_membership;
                   member python:mtool.getAuthenticatedMember();
                   lastLogin member/last_login_time|nothing;
-	              yesterday python:(today-1).Date();
-	              lastWeek python:(today-7).Date();
-	              lastMth python:(today-31).Date();
+                  yesterday python:(today-1).Date();
+                  lastWeek python:(today-7).Date();
+                  lastMth python:(today-31).Date();
                  ">
    <select name="created:date">
     <option value="1970/01/02"
@@ -142,7 +142,7 @@
  <tr>
   <th i18n:translate="">Creator</th>
   <td>
-   <input name="Creator" size="20" />
+   <input name="listCreators" size="20" />
 
    <dl class="FieldHelp">
     <dd i18n:translate="">To find items by a particular user only, enter
@@ -166,6 +166,4 @@
 </div>
 </body>
 </html>
-
-
 

@@ -34,10 +34,21 @@ class DublinCore(Interface):
         Returns -- String
         """
 
-    def Creator():
-        """ Dublin Core Creator element - resource creator.
+    def listCreators():
+        """ List Dublin Core Creator elements - resource authors.
 
-        Return the full name(s) of the author(s) of the content object.
+        Depending on the implementation, this returns the full name(s) of the
+        author(s) of the content object or their ids.
+
+        Permission -- View
+
+        Returns -- Sequence of strings
+        """
+
+    def Creator():
+        """ Dublin Core Creator element - resource author.
+
+        The first Dublin Core Creator element or an empty string.
 
         Permission -- View
 
@@ -75,7 +86,7 @@ class DublinCore(Interface):
         Returns -- String
         """
 
-    def Contributors():
+    def listContributors():
         """ Dublin Core Contributor elements - resource collaborators.
 
         Return zero or additional collaborators.
@@ -83,6 +94,12 @@ class DublinCore(Interface):
         Permission -- View
 
         Returns -- Sequence of strings
+        """
+
+    def Contributors():
+        """ Deprecated alias of listContributors.
+
+        'initial caps' names are reserved for strings.
         """
 
     def Date():

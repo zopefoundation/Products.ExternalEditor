@@ -5,7 +5,9 @@
 <dtml-var Description>
 </description>
 <dc:publisher><dtml-var Publisher></dc:publisher>
-<dc:creator><dtml-var Creator></dc:creator>
+<dtml-in listCreators>
+<dc:creator><dtml-var sequence-item></dc:creator>
+</dtml-in>
 <dc:rights><dtml-var Rights></dc:rights>
 <dtml-in Subject>
 <dc:subject>

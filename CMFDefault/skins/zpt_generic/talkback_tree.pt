@@ -4,7 +4,7 @@
 <table cellspacing="0" border="0"
        metal:define-macro="tree"
        tal:define="t python:here.setup_talkback_tree(here);
-				   height t/root/height;">
+                   height t/root/height;">
  <tr tal:repeat="row t/rows">
   <td colspan="1"
       tal:define="indent python: row.depth - 1"
@@ -25,11 +25,19 @@
    <a href=""
       tal:attributes="href url"
    ><img border="0" src=""
-         tal:attributes="src string:${obj/portal_url}/${obj/getIcon}" /></a> 
+         tal:attributes="src string:${obj/portal_url}/${obj/getIcon}" /></a>
    <a href=""
        tal:attributes="href url"
        tal:content="obj/Title">Title</a>,
-   by <span tal:replace="obj/Creator">Me</span>
+   by <tal:case tal:condition="obj/listCreators"
+  ><tal:loop tal:repeat="creator obj/listCreators"
+   ><tal:case tal:condition="not: repeat/creator/start"
+    ><tal:case tal:condition="not: repeat/creator/end">, </tal:case
+    ><tal:case tal:condition="repeat/creator/end"
+     > <tal:span i18n:translate="">and</tal:span> </tal:case></tal:case
+   ><tal:span tal:content="creator">creator</tal:span></tal:loop></tal:case
+ ><tal:case tal:condition="not: obj/listCreators" i18n:translate=""
+  >unknown</tal:case>
    on <span tal:replace="obj/CreationDate">Today</span>
   </td>
  </tr>

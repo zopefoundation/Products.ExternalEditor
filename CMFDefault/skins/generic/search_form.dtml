@@ -28,7 +28,7 @@
   </td>
  </tr>
 </dtml-if>
- 
+
  <tr valign="top">
   <th> Full Text
   </th>
@@ -135,7 +135,7 @@
   <th> Creator
   </th>
   <td>
-   <input name="Creator" size="20">
+   <input name="listCreators" size="20">
 
    <dl class="FieldHelp">
     <dd> To find items by a particular user only, enter
@@ -158,4 +158,3 @@
 </div>
 
 <dtml-var standard_html_footer>
-

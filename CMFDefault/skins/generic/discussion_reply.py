@@ -2,10 +2,8 @@
 ##parameters=title,text
 ##title=Reply to content
 
-Creator = context.portal_membership.getAuthenticatedMember().getId()
 replyID = context.createReply( title = title
                              , text = text
-                             , Creator = Creator
                              )
 
 target = '%s/%s' % (context.absolute_url(), replyID)

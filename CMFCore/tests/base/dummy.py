@@ -1,4 +1,4 @@
-from Acquisition import Implicit, aq_inner, aq_parent
+from Acquisition import Implicit, aq_base, aq_inner, aq_parent
 from OFS.SimpleItem import Item
 from Products.CMFCore.PortalContent import PortalContent
 from Products.CMFCore.TypesTool import FactoryTypeInformation as FTI
@@ -15,10 +15,10 @@ class DummyObject(Implicit):
     def __init__(self, id='dummy',**kw):
         self._id = id
         self.__dict__.update( kw )
-        
+
     def __str__(self):
         return self._id
-    
+
     def __call__(self):
         return self._id
 
@@ -27,7 +27,7 @@ class DummyObject(Implicit):
 
     def getIcon( self, relative=0 ):
         return 'Site: %s' % relative
-    
+
     def getId(self):
         return self._id
 
@@ -60,7 +60,7 @@ class DummyContent( PortalContent, Item ):
         self.before_delete_called = 1
         if self.catalog:
             PortalContent.manage_beforeDelete( self, item, container )
-    
+
     def absolute_url(self):
        return self.url
 
@@ -68,7 +68,7 @@ class DummyContent( PortalContent, Item ):
         self.after_add_called = self.before_delete_called = 0
 
     # Make sure normal Database export/import stuff doesn't trip us up.
-    def _getCopy( self, container ):        
+    def _getCopy(self, container):
         return DummyContent( self.id, catalog=self.catalog )
 
     def _safe_get(self,attr):
@@ -80,8 +80,8 @@ class DummyContent( PortalContent, Item ):
     def Title( self ):
         return self.title
 
-    def Creator( self ):
-        return self._safe_get('creator')
+    def listCreators(self):
+        return self._safe_get('creators')
 
     def Subject( self ):
         return self._safe_get('subject')
@@ -94,7 +94,7 @@ class DummyContent( PortalContent, Item ):
 
     def modified( self ):
         return self._safe_get('modified_date')
-    
+
     def Type( self ):
         return 'Dummy Content Title'
 
@@ -142,7 +142,7 @@ DummyFTI = FTI( 'Dummy Content'
               )
 
 
-class DummyFolder( Implicit ):
+class DummyFolder(DummyObject):
     """
         Dummy Container for testing
     """
@@ -152,15 +152,28 @@ class DummyFolder( Implicit ):
 
         if fake_product:
             self.manage_addProduct = { 'FooProduct' : DummyFactory( self ) }
-    
+
     def _setOb(self, id, object):
         setattr(self, id, object)
-        return self._getOb(id)
+
+    def _delOb(self, id):
+        delattr(self, id)
 
     def _getOb( self, id ):
         return getattr(self, id)
 
-    _setObject = _setOb
+    def _setObject(self, id, object):
+        self._setOb(id, object)
+        object = self._getOb(id)
+        if hasattr(aq_base(object), 'manage_afterAdd'):
+            object.manage_afterAdd(object, self)
+        return object
+
+    def _delObject(self, id):
+        object = self._getOb(id)
+        if hasattr(aq_base(object), 'manage_beforeDelete'):
+            object.manage_beforeDelete(object, self)
+        self._delOb(id)
 
     def getPhysicalPath(self):
         return self.aq_inner.aq_parent.getPhysicalPath() + ( self._id, )
@@ -254,16 +267,16 @@ class DummyTool(Implicit,ActionProviderBase):
                )
 
     root = 'DummyTool'
-    
+
     def __init__(self, anon=1):
-        self.anon = anon 
+        self.anon = anon
 
     def isAnonymousUser(self):
-        return self.anon 
+        return self.anon
 
     def getAuthenticatedMember(self):
-        return "member"
-  
+        return DummyUser()
+
     def __call__( self ):
         return self.root
 

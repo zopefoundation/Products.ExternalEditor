@@ -1,5 +1,6 @@
 from unittest import TestSuite, makeSuite, main
 
+import Testing
 import Zope
 try:
     Zope.startup()
@@ -40,12 +41,11 @@ class ExpressionTests( SecurityTest ):
         member = ec.global_vars['member']
         self.failIf(member)
 
-
     def test_authenticatedUser_ec(self):
         self.portal.portal_membership = DummyMembershipTool(anon=0)
         ec = createExprContext(self.folder, self.portal, self.object)
         member = ec.global_vars['member']
-        self.assertEqual(member, 'member')
+        self.assertEqual(member.getId(), 'dummy')
 
     def test_ec_context(self):
         self.portal.portal_membership = DummyMembershipTool()

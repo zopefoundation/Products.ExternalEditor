@@ -13,7 +13,17 @@
  <a href="&dtml-absolute_url;"
  ><img border=0 src="&dtml-portal_url;/&dtml-getIcon;"></a>
  <a href="&dtml-absolute_url;">&dtml-Title;</a>,
- by <dtml-var Creator>
+ by <dtml-if listCreators>
+ <dtml-in listCreators
+ ><dtml-unless sequence-start
+  ><dtml-if sequence-end> and
+   <dtml-else>,
+   </dtml-if
+ ></dtml-unless>
+  <dtml-var sequence-item></dtml-in>
+ <dtml-else>
+  unknown
+ </dtml-if>
  on <dtml-var CreationDate>
 </dtml-tree>
 </dtml-let>

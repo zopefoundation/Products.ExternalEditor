@@ -24,7 +24,6 @@ from webdav.Lockable import ResourceLockedError
 from Products.CMFCore.PortalContent import PortalContent
 from Products.CMFCore.CMFCorePermissions import View
 from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
-from Products.CMFCore.WorkflowCore import WorkflowAction
 from Products.CMFCore.utils import format_stx, keywordsplitter
 from DublinCore import DefaultDublinCoreImpl
 from utils import parseHeadersBody, formatRFC822Headers
@@ -46,7 +45,7 @@ They may also contain HTML, or "plain" text.
   , 'aliases'        : {'(Default)':'document_view',
                         'view':'document_view',
                         'gethtml':'source_html'}
-  , 'actions'        : ( { 'id'            : 'view' 
+  , 'actions'        : ( { 'id'            : 'view'
                          , 'name'          : 'View'
                          , 'action': 'string:${object_url}/document_view'
                          , 'permissions'   : (View,)
@@ -338,7 +337,6 @@ class Document(PortalContent, DefaultDublinCoreImpl):
             self.text_format = 'plain'
         else:
             self.text_format = 'structured-text'
-    setFormat = WorkflowAction(setFormat)
 
     ## FTP handlers
     security.declareProtected(ModifyPortalContent, 'PUT')

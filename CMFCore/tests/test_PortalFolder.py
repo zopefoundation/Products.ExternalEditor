@@ -448,13 +448,13 @@ class ContentFilterTests( TestCase ):
     def test_Creator( self ):
         cfilter = ContentFilter( Creator='moe' )
         dummy = self.dummy
-        assert not cfilter( dummy )
-        dummy.creator = 'curly'
-        assert not cfilter( dummy )
-        dummy.creator = 'moe'
-        self.failUnless(cfilter( dummy ))
-        dummy.creator = 'shmoe'
-        assert cfilter( dummy )
+        self.failIf( cfilter(dummy) )
+        dummy.creators = ('curly',)
+        self.failIf( cfilter(dummy) )
+        dummy.creators = ('moe',)
+        self.failUnless( cfilter(dummy) )
+        dummy.creators = ('moe', 'curly')
+        self.failUnless( cfilter(dummy) )
         desc = str( cfilter )
         lines = desc.split('; ')
         self.assertEqual(len( lines ),1)

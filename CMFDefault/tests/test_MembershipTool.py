@@ -1,5 +1,6 @@
 from unittest import TestCase, TestSuite, makeSuite, main
 
+import Testing
 import Zope
 try:
     Zope.startup()
@@ -33,6 +34,7 @@ class DummyFolder(DummyFolderBase):
         return self
     def unrestrictedTraverse(self, path, default=None, restricted=0):
         return self.acl_users
+
 
 class MembershipToolTests(TestCase):
 
@@ -68,10 +70,10 @@ class MembershipToolSecurityTests(SecurityTest):
         SecurityTest.setUp(self)
         self.site = DummyFolder()
         self.site.id = 'testSite'
-        self.mtool = MembershipTool().__of__(self.site)
+        self.site._setObject( 'portal_membership', MembershipTool() )
 
     def test_createMemberArea(self):
-        mtool = self.mtool
+        mtool = self.site.portal_membership
         members = self.site._setObject( 'Members', PortalFolder('Members') )
         acl_users = self.site._setObject( 'acl_users', DummyUserFolder() )
         wtool = self.site._setObject( 'portal_workflow', DummyTool() )

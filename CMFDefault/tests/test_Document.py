@@ -34,6 +34,7 @@ from Products.CMFCore.tests.base.content import STX_NO_HEADERS
 from Products.CMFCore.tests.base.content import STX_NO_HEADERS_BUT_COLON
 from Products.CMFCore.tests.base.content import STX_WITH_HTML
 from Products.CMFCore.tests.base.dummy import DummySite
+from Products.CMFCore.tests.base.dummy import DummyTool
 from Products.CMFCore.tests.base.testcase import RequestTest
 from Products.CMFCore.tests.base.tidata import FTIDATA_CMF15
 from Products.CMFCore.TypesTool import FactoryTypeInformation as FTI
@@ -42,14 +43,21 @@ from Products.CMFDefault import utils
 from Products.CMFDefault.Document import Document
 
 
-class DocumentTests(RequestTest):
+class RequestTestBase(RequestTest):
 
     def setUp(self):
         RequestTest.setUp(self)
-        self.d = Document('foo')
+        self.site = DummySite('site').__of__(self.root)
+        self.site._setObject( 'portal_membership', DummyTool() )
+
+    def _makeOne(self, id, *args, **kw):
+        return self.site._setObject( id, Document(id, *args, **kw) )
+
+
+class DocumentTests(RequestTestBase):
 
     def test_Empty(self):
-        d = Document('foo', text_format='structured-text')
+        d = self._makeOne('foo', text_format='structured-text')
         self.assertEqual( d.title, '' )
         self.assertEqual( d.description, '' )
         self.assertEqual( d.text, '' )
@@ -57,7 +65,7 @@ class DocumentTests(RequestTest):
         self.assertEqual( d._stx_level, 1 )
 
     def test_editBasicHTML(self):
-        d = self.d
+        d = self._makeOne('foo')
         d.edit('html', BASIC_HTML)
         self.failUnless( hasattr(d, 'cooked_text') )
         self.assertEqual( d.Format(), 'text/html' )
@@ -70,7 +78,7 @@ class DocumentTests(RequestTest):
         self.assertEqual( d._stx_level, 1 )
 
     def test_editSimpleXHTML(self):
-        d = self.d
+        d = self._makeOne('foo')
         d.edit('html', SIMPLE_XHTML)
         self.failUnless( hasattr(d, 'cooked_text') )
         self.assertEqual( d.Format(), 'text/html' )
@@ -78,7 +86,7 @@ class DocumentTests(RequestTest):
 
     def test_UpperedHtml(self):
         self.REQUEST['BODY'] = BASIC_HTML.upper()
-        d = self.d
+        d = self._makeOne('foo')
         d.PUT(self.REQUEST, self.RESPONSE)
         self.assertEqual( d.Format(), 'text/html' )
         self.assertEqual( d.title, 'TITLE IN TAG' )
@@ -88,25 +96,25 @@ class DocumentTests(RequestTest):
 
     def test_EntityInTitle(self):
         self.REQUEST['BODY'] = ENTITY_IN_TITLE
-        d = self.d
+        d = self._makeOne('foo')
         d.PUT(self.REQUEST, self.RESPONSE)
         self.assertEqual( d.title, '&Auuml;rger' )
 
     def test_HtmlWithDoctype(self):
-        d = self.d
         self.REQUEST['BODY'] = '%s\n%s' % (DOCTYPE, BASIC_HTML)
+        d = self._makeOne('foo')
         d.PUT(self.REQUEST, self.RESPONSE)
         self.assertEqual( d.Description(), 'Describe me' )
 
     def test_HtmlWithoutNewlines(self):
-        d = self.d
         self.REQUEST['BODY'] = ''.join((BASIC_HTML.split('\n')))
+        d = self._makeOne('foo')
         d.PUT(self.REQUEST, self.RESPONSE)
         self.assertEqual( d.Format(), 'text/html' )
         self.assertEqual( d.Description(), 'Describe me' )
 
     def test_EditPlainDocumentWithEmbeddedHTML(self):
-        d = self.d
+        d = self._makeOne('foo')
         d.edit('structured-text', FAUX_HTML_LEADING_TEXT)
         fully_edited = d.cooked_text
         d._edit(FAUX_HTML_LEADING_TEXT, 'structured-text')
@@ -114,7 +122,7 @@ class DocumentTests(RequestTest):
         self.assertEquals(fully_edited, partly_edited)
 
     def test_BigHtml(self):
-        d = self.d
+        d = self._makeOne('foo')
         s = []
         looper = '<li> number %s</li>'
         for i in range(12000): s.append(looper % i)
@@ -125,7 +133,7 @@ class DocumentTests(RequestTest):
         self.assertEqual( d.CookedBody(), body )
 
     def test_BigHtml_via_upload(self):
-        d = self.d
+        d = self._makeOne('foo')
         s = []
         looper = '<li> number %s</li>'
         for i in range(12000): s.append(looper % i)
@@ -138,19 +146,19 @@ class DocumentTests(RequestTest):
 
     def test_plain_text(self):
         """test that plain text forrmat works"""
-        d = self.d
+        d = self._makeOne('foo')
         d.edit(text_format='plain', text='*some plain text*\nwith a newline')
         self.assertEqual( d.CookedBody(), '*some plain text*<br />with a newline')
 
     def test_EditStructuredTextWithHTML(self):
-        d = self.d
+        d = self._makeOne('foo')
         d.edit(text_format='structured-text', text=STX_WITH_HTML)
 
         self.assertEqual( d.Format(), 'text/plain' )
 
     def test_StructuredText(self):
         self.REQUEST['BODY'] = BASIC_STRUCTUREDTEXT
-        d = self.d
+        d = self._makeOne('foo')
         d.PUT(self.REQUEST, self.RESPONSE)
         self.failUnless( hasattr(d, 'cooked_text') )
         self.assertEqual( d.Format(), 'text/plain' )
@@ -175,7 +183,7 @@ class DocumentTests(RequestTest):
                                 ] )
 
     def test_STX_Levels(self):
-        d = self.d
+        d = self._makeOne('foo')
         d.edit(text_format='structured-text', text=BASIC_STRUCTUREDTEXT)
         self.assertEqual( d._stx_level, 1 )
 
@@ -200,7 +208,7 @@ class DocumentTests(RequestTest):
 
     def test_Init(self):
         self.REQUEST['BODY']=BASIC_STRUCTUREDTEXT
-        d = self.d
+        d = self._makeOne('foo')
         d.PUT(self.REQUEST, self.RESPONSE)
         self.assertEqual( d.Format(), 'text/plain' )
         self.assertEqual( d.Title(), 'My Document' )
@@ -208,28 +216,30 @@ class DocumentTests(RequestTest):
         self.assertEqual( len(d.Contributors()), 3 )
         self.failUnless( d.cooked_text.find('<p>') >= 0 )
 
-        d = Document('foo', text='')
+        d = self._makeOne('foo', text='')
         self.REQUEST['BODY']=BASIC_HTML
         d.PUT(self.REQUEST, self.RESPONSE)
         self.assertEqual( d.Format(), 'text/html' )
         self.assertEqual( d.Title(), 'Title in tag' )
         self.assertEqual( len(d.Contributors()), 3 )
 
-        d = Document('foo', text_format='structured-text', title='Foodoc')
+        d = self._makeOne('foo', text_format='structured-text',
+                          title='Foodoc')
         self.assertEqual( d.text, '' )
         self.failIf( d.CookedBody() )
         self.assertEqual( d.title, 'Foodoc' )
         self.assertEqual( d.Format(), 'text/plain' )
 
         # Tracker issue 435:  initial text is not cooked.
-        d = Document('foo', text_format='structured-text', text=STX_NO_HEADERS)
+        d = self._makeOne('foo', text_format='structured-text',
+                          text=STX_NO_HEADERS)
         self.assertEqual( d.EditableBody(), STX_NO_HEADERS )
         self.failUnless( d.CookedBody() )
         self.assertEqual( d.Format(), 'text/plain' )
 
     def test_STX_NoHeaders( self ):
         self.REQUEST['BODY']=STX_NO_HEADERS
-        d = self.d
+        d = self._makeOne('foo')
         d.editMetadata( title="Plain STX"
                        , description="Look, Ma, no headers!"
                        , subject=( "plain", "STX" )
@@ -251,7 +261,7 @@ class DocumentTests(RequestTest):
         self.failUnless( 'STX' in d.Subject() )
 
     def test_STX_NoHeaders_but_colon( self ):
-        d = self.d
+        d = self._makeOne('foo')
         d.editMetadata( title="Plain STX"
                        , description="Look, Ma, no headers!"
                        , subject=( "plain", "STX" )
@@ -261,7 +271,7 @@ class DocumentTests(RequestTest):
         self.assertEqual( d.EditableBody(), STX_NO_HEADERS_BUT_COLON )
 
     def test_ZMI_edit( self ):
-        d = self.d
+        d = self._makeOne('foo')
         d.editMetadata( title="Plain STX"
                        , description="Look, Ma, no headers!"
                        , subject=( "plain", "STX" )
@@ -272,7 +282,7 @@ class DocumentTests(RequestTest):
         self.assertEqual( d.EditableBody(), STX_NO_HEADERS_BUT_COLON )
 
     def test_Format_methods(self):
-        d = self.d
+        d = self._makeOne('foo')
         d.setFormat('plain')
         self.assertEqual( d.text_format, 'plain' )
         self.assertEqual( d.Format(), 'text/plain' )
@@ -310,29 +320,27 @@ class DocumentTests(RequestTest):
         verifyClass(IContentish, Document)
         verifyClass(IDublinCore, Document)
         verifyClass(ICatalogableDublinCore, Document)
-        # XXX: verifyClass doesn't work with WorkflowMethod wrappers.
-        # verifyClass(IMutableDublinCore, Document)
+        verifyClass(IMutableDublinCore, Document)
 
 
-class DocumentFTPGetTests(RequestTest):
+class DocumentFTPGetTests(RequestTestBase):
 
     def testHTML( self ):
         self.REQUEST['BODY']=BASIC_HTML
 
-        site = DummySite('site').__of__(self.root)
-        ttool = site._setObject( 'portal_types', TypesTool() )
+        ttool = self.site._setObject( 'portal_types', TypesTool() )
         fti = FTIDATA_CMF15[0].copy()
         del fti['id']
         ttool._setObject( 'Document', FTI('Document', **fti) )
 
-        zpt = site._setObject( 'source_html',
-                               ZopePageTemplate('source_html') )
+        zpt = self.site._setObject( 'source_html',
+                                    ZopePageTemplate('source_html') )
         dir = abspath( dirname(utils.__file__) )
         _file = path_join(dir, 'skins', 'zpt_content', 'source_html.pt')
         data = open(_file, 'r').read()
         zpt.write(data)
 
-        d = site._setObject( 'foo', Document('foo') )
+        d = self._makeOne('foo')
         d._setPortalTypeName('Document')
         d.PUT(self.REQUEST, self.RESPONSE)
 
@@ -385,7 +393,7 @@ class DocumentFTPGetTests(RequestTest):
 
     def testSTX( self ):
         self.REQUEST['BODY']=SIMPLE_STRUCTUREDTEXT
-        d = Document( 'foo' )
+        d = self._makeOne('foo')
         d.PUT(self.REQUEST, self.RESPONSE)
 
         rnlinesplit = compile( r'\r?\n?' )
@@ -411,15 +419,11 @@ class DocumentFTPGetTests(RequestTest):
             self.failUnless( header in get_headers )
 
 
-class DocumentPUTTests(RequestTest):
-
-    def setUp(self):
-        RequestTest.setUp(self)
-        self.d = Document('foo')
+class DocumentPUTTests(RequestTestBase):
 
     def test_PUTBasicHTML(self):
         self.REQUEST['BODY'] = BASIC_HTML
-        d = self.d
+        d = self._makeOne('foo')
         r = d.PUT(self.REQUEST, self.RESPONSE)
         self.failUnless( hasattr(d, 'cooked_text') )
         self.assertEqual( d.Format(), 'text/html' )
@@ -443,7 +447,7 @@ class DocumentPUTTests(RequestTest):
 
     def test_PUTSimpleXHTML(self):
         self.REQUEST['BODY'] = SIMPLE_XHTML
-        d = self.d
+        d = self._makeOne('foo')
         r = d.PUT(self.REQUEST, self.RESPONSE)
         self.failUnless( hasattr(d, 'cooked_text') )
         self.assertEqual( d.Format(), 'text/html' )
@@ -452,29 +456,26 @@ class DocumentPUTTests(RequestTest):
         self.assertEqual( r.status, 204 )
 
     def test_PutStructuredTextWithHTML(self):
-
         self.REQUEST['BODY'] = STX_WITH_HTML
-
-        r = self.d.PUT(self.REQUEST, self.RESPONSE)
-        self.assertEqual( self.d.Format(), 'text/plain' )
+        d = self._makeOne('foo')
+        r = d.PUT(self.REQUEST, self.RESPONSE)
+        self.assertEqual( d.Format(), 'text/plain' )
         self.assertEqual( r.status, 204 )
 
     def test_PutStructuredText(self):
-
         self.REQUEST['BODY'] = BASIC_STRUCTUREDTEXT
-
-        r = self.d.PUT(self.REQUEST, self.RESPONSE)
-        self.assertEqual( self.d.Format(), 'text/plain' )
+        d = self._makeOne('foo')
+        r = d.PUT(self.REQUEST, self.RESPONSE)
+        self.assertEqual( d.Format(), 'text/plain' )
         self.assertEqual( r.status, 204 )
 
     def test_PutHtmlWithDoctype(self):
-
         html = '%s\n\n  \n   %s' % (DOCTYPE, BASIC_HTML)
         self.REQUEST['BODY'] = html
-
-        r = self.d.PUT(self.REQUEST, self.RESPONSE)
-        self.assertEqual( self.d.Format(), 'text/html' )
-        self.assertEqual( self.d.Description(), 'Describe me' )
+        d = self._makeOne('foo')
+        r = d.PUT(self.REQUEST, self.RESPONSE)
+        self.assertEqual( d.Format(), 'text/html' )
+        self.assertEqual( d.Description(), 'Describe me' )
         self.assertEqual( r.status, 204 )
 
 

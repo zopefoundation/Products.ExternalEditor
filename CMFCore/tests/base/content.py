@@ -104,7 +104,7 @@ This is the header
   body body body.
 
    o A list item
-   
+
    o And another thing...
 '''
 
@@ -121,7 +121,7 @@ This is the header
   body body body.
 
    o A list item
-   
+
    o And another thing...
 '''
 
@@ -154,4 +154,21 @@ Plain STX:  No magic!
 
     This is a "plain" STX file, with no headers.  Saving with
     it shouldn't overwrite any metadata.
+"""
+
+BASIC_RFC822 = """\
+Title: Zope Community
+Description: Link to the Zope Community website.
+Subject: open source; Zope; community
+
+http://www.zope.org
+"""
+
+RFC822_W_CONTINUATION = """\
+Title: Zope Community
+Description: Link to the Zope Community website,
+  including hundreds of contributed Zope products.
+Subject: open source; Zope; community
+
+http://www.zope.org
 """

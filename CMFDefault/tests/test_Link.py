@@ -1,36 +1,38 @@
-import Zope
 from unittest import TestCase, TestSuite, makeSuite, main
+
+import Testing
+import Zope
+try:
+    Zope.startup()
+except AttributeError:
+    # for Zope versions before 2.6.1
+    pass
 
 from re import compile
 
+from Products.CMFCore.tests.base.content import BASIC_RFC822
+from Products.CMFCore.tests.base.content import RFC822_W_CONTINUATION
+from Products.CMFCore.tests.base.dummy import DummySite
+from Products.CMFCore.tests.base.dummy import DummyTool
 from Products.CMFDefault.Link import Link
 
-BASIC_STRUCTUREDTEXT = '''\
-Title: Zope Community
-Description: Link to the Zope Community website.
-Subject: open source; Zope; community
-
-http://www.zope.org
-'''
-
-STX_W_CONTINUATION = '''\
-Title: Zope Community
-Description: Link to the Zope Community website,
-  including hundreds of contributed Zope products.
-Subject: open source; Zope; community
-
-http://www.zope.org
-'''
 
 class LinkTests(TestCase):
+
+    def setUp(self):
+        self.site = DummySite('site')
+        mtool = self.site._setObject( 'portal_membership', DummyTool() )
+
+    def _makeOne(self, id, *args, **kw):
+        return self.site._setObject( id, Link(id, *args, **kw) )
 
     def canonTest(self, table):
         for orig, wanted in table.items():
             # test with constructor
-            d = Link('foo', remote_url=orig)
+            d = self._makeOne('foo', remote_url=orig)
             self.assertEqual(d.getRemoteUrl(), wanted)
             # test with edit method too
-            d = Link('bar')
+            d = self._makeOne('bar')
             d.edit(orig)
             self.assertEqual(d.getRemoteUrl(), wanted)
 
@@ -42,33 +44,32 @@ class LinkTests(TestCase):
         self.assertEqual( d.format, 'text/url' )
         self.assertEqual( d.URL_FORMAT, 'text/url')
 
-        d = Link('foo', remote_url='bar')
+        d = self._makeOne('foo', remote_url='bar')
         d.edit('')
         self.assertEqual(d.getRemoteUrl(), '')
 
-        d = Link('foo', remote_url='http://')
+        d = self._makeOne('foo', remote_url='http://')
         self.assertEqual(d.getRemoteUrl(), '')
 
-        d = Link('foo', remote_url='http:')
+        d = self._makeOne('foo', remote_url='http:')
         self.assertEqual(d.getRemoteUrl(), '')
 
-    def test_StructuredText( self ):
-        d = Link('foo')
-        d._writeFromPUT( body=BASIC_STRUCTUREDTEXT )
-        
+    def test_RFC822(self):
+        d = self._makeOne('foo')
+        d._writeFromPUT( body=BASIC_RFC822 )
+
         self.assertEqual( d.Title(), 'Zope Community' )
         self.assertEqual( d.Description()
                         , 'Link to the Zope Community website.' )
         self.assertEqual( len(d.Subject()), 3 )
         self.assertEqual( d.getRemoteUrl(), 'http://www.zope.org' )
 
-    def test_StructuredText_w_Continuation( self ):
-
-        d = Link('foo')
-        d._writeFromPUT( body=STX_W_CONTINUATION )
+    def test_RFC822_w_Continuation(self):
+        d = self._makeOne('foo')
+        d._writeFromPUT( body=RFC822_W_CONTINUATION )
         rnlinesplit = compile( r'\r?\n?' )
         desc_lines = rnlinesplit.split( d.Description() )
-        
+
         self.assertEqual( d.Title(), 'Zope Community' )
         self.assertEqual( desc_lines[0]
                         , 'Link to the Zope Community website,' )

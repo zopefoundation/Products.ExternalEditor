@@ -21,18 +21,15 @@ from Acquisition import Implicit, aq_base, aq_inner, aq_parent
 from OFS.Traversable import Traversable
 from DateTime import DateTime
 
-from Products.CMFCore.CMFCorePermissions import View
 from Products.CMFCore.CMFCorePermissions import AccessContentsInformation
-from Products.CMFCore.CMFCorePermissions import ReplyToItem
 from Products.CMFCore.CMFCorePermissions import ManagePortal
+from Products.CMFCore.CMFCorePermissions import ReplyToItem
+from Products.CMFCore.CMFCorePermissions import View
+from Products.CMFCore.interfaces.Discussions import Discussable
+from Products.CMFCore.interfaces.Discussions import DiscussionResponse
 from Products.CMFCore.utils import getToolByName
-from Products.CMFCore.PortalContent import PortalContent
 
 from Document import Document
-from DublinCore import DefaultDublinCoreImpl
-
-from Products.CMFCore.interfaces.Discussions import DiscussionResponse
-from Products.CMFCore.interfaces.Discussions import Discussable
 
 
 factory_type_information = (
@@ -73,9 +70,9 @@ def addDiscussionItem(self, id, title, description, text_format, text,
 
     Otherwise, same as addDocument
     """
-    
+
     if not description: description = title
-    text = scrubHTML(text) 
+    text = scrubHTML(text)
     item = DiscussionItem( id )
     item.title = title
     item.description = description
@@ -89,38 +86,36 @@ def addDiscussionItem(self, id, title, description, text_format, text,
     if RESPONSE is not None:
         RESPONSE.redirect(self.absolute_url())
 
-    
-class DiscussionItem( Document
-                    , DefaultDublinCoreImpl
-                    ):
+
+class DiscussionItem(Document):
     """
         Class for content which is a response to other content.
     """
 
-    __implements__ = ( DiscussionResponse
-                     , PortalContent.__implements__
-                     , DefaultDublinCoreImpl.__implements__
-                     )
+    __implements__ = (DiscussionResponse, Document.__implements__)
 
     meta_type           = 'Discussion Item'
     portal_type         = 'Discussion Item'
     allow_discussion    = 1
-    creator             = 'unknown'
     in_reply_to         = None
     # XXX this is wrong, it precludes the use of a normal workflow.
     review_state        ='published'
 
     security = ClassSecurityInfo()
 
-    security.declareProtected(View, 'Creator')
-    def Creator( self ):
+    security.declareProtected(View, 'listCreators')
+    def listCreators(self):
+        """ List Dublin Core Creator elements - resource authors.
         """
-            We need to return user who replied, rather than executable
-            owner.
-        """
-        #   XXX:  revisit if Creator becomes "real" attribute for stock DC.
-        return self.creator
-    
+        if not hasattr(self, 'creators'):
+            # for content created with CMF versions before 1.5
+            owner = self.getOwner()
+            if self.creator and self.creator != 'unknown':
+                self.creators = ( self.creator, )
+            else:
+                self.creators = ()
+        return self.creators
+
     #
     #   DiscussionResponse interface
     #
@@ -134,7 +129,7 @@ class DiscussionItem( Document
               - We are a "top-level" reply to a non-DiscussionItem piece
                 of content;  in this case, our 'in_reply_to' field will
                 be None.
-            
+
               - We are a nested reply;  in this case, our 'in_reply_to'
                 field will be the ID of the parent DiscussionItem.
         """
@@ -151,7 +146,7 @@ class DiscussionItem( Document
             self.in_reply_to = reply_to.getId()
         else:
             self.in_reply_to = None
-    
+
     security.declareProtected(View, 'parentsInThread')
     def parentsInThread( self, size=0 ):
         """
@@ -173,6 +168,7 @@ class DiscussionItem( Document
         return parents
 
 InitializeClass( DiscussionItem )
+
 
 class DiscussionItemContainer( Persistent, Implicit, Traversable ):
     """
@@ -305,12 +301,12 @@ class DiscussionItemContainer( Persistent, Implicit, Traversable ):
         item._edit( text_format=text_format, text=text )
 
         if Creator:
-            item.creator = Creator
+            item.__of__(self).addCreator(Creator)
 
         item.__of__( self ).indexObject()
 
         item.setReplyTo( self._getDiscussable() )
- 
+
         self._container[ id ] = item
 
         return id
@@ -340,10 +336,10 @@ class DiscussionItemContainer( Persistent, Implicit, Traversable ):
             Test to see if there are any dicussion items
         """
         outer = self._getDiscussable( outer=1 )
-        if content_obj == outer: 
+        if content_obj == outer:
             return not not len( self._container )
         else:
-            return not not len( content_obj.talkback._getReplyResults() ) 
+            return not not len( content_obj.talkback._getReplyResults() )
 
     security.declareProtected(View, 'replyCount')
     def replyCount( self, content_obj ):
@@ -392,9 +388,9 @@ class DiscussionItemContainer( Persistent, Implicit, Traversable ):
             Return this object's contents in a form suitable for inclusion
             as a quote in a response.
         """
- 
+
         return ""
-    
+
     #
     #   Utility methods
     #
@@ -409,7 +405,6 @@ class DiscussionItemContainer( Persistent, Implicit, Traversable ):
             return outer
         parent = self._container[ in_reply_to ].__of__( aq_inner( self ) )
         return parent.__of__( outer )
-        
 
     security.declarePrivate( '_getDiscussable' )
     def _getDiscussable( self, outer=0 ):
@@ -441,5 +436,3 @@ class DiscussionItemContainer( Persistent, Implicit, Traversable ):
         return result
 
 InitializeClass( DiscussionItemContainer )
-
-

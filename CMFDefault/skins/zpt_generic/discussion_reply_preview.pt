@@ -15,8 +15,6 @@
         tal:attributes="value request/form/title" />
  <input type="hidden" name="text" value=""
         tal:attributes="value request/form/text" />
- <input type="hidden" name="Creator" value=""
-        tal:attributes="value here/portal_membership/getAuthenticatedMember" />
  <table><tr>
   <td width="15%"></td>
   <td>
@@ -31,5 +29,3 @@
 </div>
 </body>
 </html>
-
-

@@ -1,17 +1,32 @@
-import unittest
+from unittest import TestCase, TestSuite, makeSuite, main
+
 import Zope
-from Products.CMFCalendar.Event import Event
+try:
+    Zope.startup()
+except AttributeError:
+    # for Zope versions before 2.6.1
+    pass
+
 from DateTime import DateTime
 
-class TestEvent(unittest.TestCase):
+from Products.CMFCalendar.Event import Event
+from Products.CMFCore.tests.base.dummy import DummySite
+from Products.CMFCore.tests.base.dummy import DummyTool
+
+
+class TestEvent(TestCase):
+
+    def setUp(self):
+        self.site = DummySite('site')
+        self.site._setObject( 'portal_membership', DummyTool() )
 
     def test_new(self):
         event = Event('test')
         assert event.getId() == 'test'
         assert not event.Title()
-    
+
     def test_edit(self):
-        event = Event('editing')
+        event = self.site._setObject( 'testimage', Event('editing') )
         event.edit( title='title'
                   , description='description'
                   , eventType=( 'eventType', )
@@ -29,8 +44,8 @@ class TestEvent(unittest.TestCase):
         assert event.Title() == 'title'
         assert event.Description() == 'description'
         assert event.Subject() == ( 'eventType', ), event.Subject()
-        assert event.effective_date == None 
-        assert event.expiration_date == None 
+        assert event.effective_date == None
+        assert event.expiration_date == None
         assert event.end() == DateTime('1999/12/31 23:59')
         assert event.start() == DateTime('1999/01/01 00:00')
         assert not event.contact_name
@@ -46,10 +61,11 @@ class TestEvent(unittest.TestCase):
                          , startAMPM="AM"
                          )
 
+
 def test_suite():
-    return unittest.TestSuite((
-        unittest.makeSuite( TestEvent ),
+    return TestSuite((
+        makeSuite(TestEvent),
         ))
 
 if __name__ == '__main__':
-    unittest.main(defaultTest='test_suite')
+    main(defaultTest='test_suite')

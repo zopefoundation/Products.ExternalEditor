@@ -25,35 +25,35 @@ except AttributeError:
     # for Zope versions before 2.6.1
     pass
 
-from Products.CMFCore.tests.base.dummy import DummyObject as DummySite
-from Products.CMFCore.tests.base.dummy import DummyTool as DummyURLTool
+from Products.CMFCore.tests.base.dummy import DummySite
+from Products.CMFCore.tests.base.dummy import DummyTool
 from Products.CMFDefault.Favorite import Favorite
 
 
 class FavoriteTests( TestCase ):
 
     def setUp( self ):
-        self.tool = DummyURLTool()
-        self.site = DummySite( portal_url=self.tool )
+        self.site = DummySite('site')
+        self.site._setObject( 'portal_membership', DummyTool() )
+        self.site._setObject( 'portal_url', DummyTool() )
 
-    def _makeOne(self, *args, **kw):
-        f = Favorite(*args, **kw)
-        return f.__of__( self.site )
+    def _makeOne(self, id, *args, **kw):
+        return self.site._setObject( id, Favorite(id, *args, **kw) )
 
     def test_Empty( self ):
-
+        utool = self.site.portal_url
         f = self._makeOne( 'foo' )
 
         self.assertEqual( f.getId(), 'foo' )
         self.assertEqual( f.Title(), '' )
         self.assertEqual( f.Description(), '' )
-        self.assertEqual( f.getRemoteUrl(), self.tool.root )
+        self.assertEqual( f.getRemoteUrl(), utool.root )
         self.assertEqual( f.getObject(), self.site )
         self.assertEqual( f.getIcon(), self.site.getIcon() )
         self.assertEqual( f.getIcon(1), self.site.getIcon(1) )
 
     def test_CtorArgs( self ):
-
+        utool = self.site.portal_url
         self.assertEqual( self._makeOne( 'foo'
                                        , title='Title'
                                        ).Title(), 'Title' )
@@ -63,26 +63,26 @@ class FavoriteTests( TestCase ):
                                        ).Description(), 'Description' )
 
         baz = self._makeOne( 'baz', remote_url='portal_url' )
-        self.assertEqual( baz.getObject(), self.tool )
+        self.assertEqual( baz.getObject(), utool )
         self.assertEqual( baz.getRemoteUrl()
-                        , '%s/portal_url' % self.tool.root )
-        self.assertEqual( baz.getIcon(), self.tool.getIcon() )
+                        , '%s/portal_url' % utool.root )
+        self.assertEqual( baz.getIcon(), utool.getIcon() )
 
     def test_edit( self ):
-
+        utool = self.site.portal_url
         f = self._makeOne( 'foo' )
         f.edit( 'portal_url' )
-        self.assertEqual( f.getObject(), self.tool )
+        self.assertEqual( f.getObject(), utool )
         self.assertEqual( f.getRemoteUrl()
-                        , '%s/portal_url' % self.tool.root )
-        self.assertEqual( f.getIcon(), self.tool.getIcon() )
+                        , '%s/portal_url' % utool.root )
+        self.assertEqual( f.getIcon(), utool.getIcon() )
 
     def test_editEmpty( self ):
-
+        utool = self.site.portal_url
         f = self._makeOne( 'gnnn' )
         f.edit( '' )
         self.assertEqual( f.getObject(), self.site )
-        self.assertEqual( f.getRemoteUrl(), self.tool.root )
+        self.assertEqual( f.getRemoteUrl(), utool.root )
         self.assertEqual( f.getIcon(), self.site.getIcon() )
 
 

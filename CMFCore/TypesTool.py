@@ -327,11 +327,11 @@ class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
         """
         if hasattr(ob, '_setPortalTypeName'):
             ob._setPortalTypeName(self.getId())
-            ob.reindexObject(idxs=['portal_type', 'Type'])
 
         if hasattr(aq_base(ob), 'notifyWorkflowCreated'):
             ob.notifyWorkflowCreated()
 
+        ob.reindexObject()
         return ob
 
     security.declareProtected(ManagePortal, 'getMethodAliases')

@@ -22,9 +22,12 @@ from Globals import InitializeClass
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
 from Products.CMFCore.CMFCorePermissions import ListFolderContents
 from Products.CMFCore.CMFCorePermissions import ManageProperties
+from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
 from Products.CMFCore.CMFCorePermissions import View
 from Products.CMFCore.PortalFolder import PortalFolder
 from Products.CMFCore.utils import _getViewFor
+
+from DublinCore import DefaultDublinCoreImpl
 
 factory_type_information = (
   { 'id'             : 'Skinned Folder'
@@ -64,7 +67,7 @@ Skinned folders can define custom 'view' actions.
 
 
 class SkinnedFolder(CMFCatalogAware, PortalFolder):
-    """
+    """ Skinned Folder class. 
     """
     meta_type = 'Skinned Folder'
 
@@ -87,16 +90,29 @@ class SkinnedFolder(CMFCatalogAware, PortalFolder):
 
     index_html = None  # This special value informs ZPublisher to use __call__
 
+    # XXX: maybe we should subclass from DefaultDublinCoreImpl or refactor it
+
+    security.declarePrivate('notifyModified')
+    def notifyModified(self):
+        """ Take appropriate action after the resource has been modified.
+
+        Update creators.
+        """
+        self.addCreator()
+
+    security.declareProtected(ModifyPortalContent, 'addCreator')
+    addCreator = DefaultDublinCoreImpl.addCreator.im_func
+
+    security.declareProtected(View, 'listCreators')
+    listCreators = DefaultDublinCoreImpl.listCreators.im_func
+
     security.declareProtected(View, 'Creator')
-    def Creator( self ):
-        """
-            Return the ID of our owner.
-        """
-        return self.getOwner( info=1 )[1]
+    Creator = DefaultDublinCoreImpl.Creator.im_func
 
     # We derive from CMFCatalogAware first, so we are cataloged too.
 
 InitializeClass( SkinnedFolder )
+
 
 def addSkinnedFolder( self, id, title='', description='', REQUEST=None ):
     """

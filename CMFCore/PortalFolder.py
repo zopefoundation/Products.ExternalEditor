@@ -492,6 +492,7 @@ class ContentFilter:
         Represent a predicate against a content object's metadata.
     """
     MARKER = []
+    filterCreator = []
     filterSubject = []
     def __init__( self
                 , Title=MARKER
@@ -515,9 +516,10 @@ class ContentFilter:
                                       pat.search( x.Title() ) )
             self.description.append( 'Title: %s' % Title )
 
-        if Creator is not self.MARKER:
-            self.predicates.append( lambda x, pat=re.compile( Creator ):
-                                      pat.search( x.Creator() ) )
+        if Creator and Creator is not self.MARKER:
+            self.filterCreator = Creator
+            self.predicates.append( lambda x, creator=self.filterCreator:
+                                    creator in x.listCreators() )
             self.description.append( 'Creator: %s' % Creator )
 
         if Subject and Subject is not self.MARKER:

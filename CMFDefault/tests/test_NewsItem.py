@@ -1,19 +1,35 @@
-from unittest import makeSuite, main
+from unittest import TestSuite, makeSuite, main
 
-from Products.CMFDefault.NewsItem import NewsItem
-
-from Products.CMFCore.tests.base.testcase import RequestTest
+import Testing
+import Zope
+try:
+    Zope.startup()
+except AttributeError:
+    # for Zope versions before 2.6.1
+    pass
 
 from Products.CMFCore.tests.base.content import DOCTYPE
 from Products.CMFCore.tests.base.content import BASIC_HTML
 from Products.CMFCore.tests.base.content import ENTITY_IN_TITLE
 from Products.CMFCore.tests.base.content import BASIC_STRUCTUREDTEXT
+from Products.CMFCore.tests.base.dummy import DummySite
+from Products.CMFCore.tests.base.dummy import DummyTool
+from Products.CMFCore.tests.base.testcase import RequestTest
+from Products.CMFDefault.NewsItem import NewsItem
+
 
 class NewsItemTests(RequestTest):
 
-    def test_Empty_html(self):
+    def setUp(self):
+        RequestTest.setUp(self)
+        self.site = DummySite('site').__of__(self.root)
+        self.site._setObject( 'portal_membership', DummyTool() )
 
-        d = NewsItem( 'empty', text_format='html' )
+    def _makeOne(self, id, *args, **kw):
+        return self.site._setObject( id, NewsItem(id, *args, **kw) )
+
+    def test_Empty_html(self):
+        d = self._makeOne('empty', text_format='html')
 
         self.assertEqual( d.Title(), '' )
         self.assertEqual( d.Description(), '' )
@@ -22,8 +38,7 @@ class NewsItemTests(RequestTest):
         self.assertEqual( d.text, '' )
 
     def test_Empty_stx(self):
-
-        d = NewsItem('foo', text_format='structured-text')
+        d = self._makeOne('foo', text_format='structured-text')
 
         self.assertEqual( d.Title(), '' )
         self.assertEqual( d.Description(), '' )
@@ -32,9 +47,8 @@ class NewsItemTests(RequestTest):
         self.assertEqual( d.text, '' )
 
     def test_PUT_basic_html(self):
-
         self.REQUEST['BODY']=BASIC_HTML
-        d = NewsItem('foo')
+        d = self._makeOne('foo')
         d.PUT(self.REQUEST, self.RESPONSE)
 
         self.assertEqual( d.Title(), 'Title in tag' )
@@ -45,9 +59,8 @@ class NewsItemTests(RequestTest):
         self.assertEqual( len(d.Contributors()), 3 )
 
     def test_PUT_uppered_html(self):
-
         self.REQUEST['BODY'] = BASIC_HTML.upper()
-        d = NewsItem('foo')
+        d = self._makeOne('foo')
         d.PUT(self.REQUEST, self.RESPONSE)
 
         self.assertEqual( d.Title(), 'TITLE IN TAG' )
@@ -58,25 +71,22 @@ class NewsItemTests(RequestTest):
         self.assertEqual( len(d.Contributors()), 3 )
 
     def test_PUT_entity_in_title(self):
-
         self.REQUEST['BODY'] = ENTITY_IN_TITLE
-        d = NewsItem('foo')
+        d = self._makeOne('foo')
         d.PUT(self.REQUEST, self.RESPONSE)
 
         self.assertEqual( d.Title(), '&Auuml;rger' )
 
     def test_PUT_html_with_doctype(self):
-
-        d = NewsItem('foo')
         self.REQUEST['BODY'] = '%s\n%s' % (DOCTYPE, BASIC_HTML)
+        d = self._makeOne('foo')
         d.PUT(self.REQUEST, self.RESPONSE)
 
         self.assertEqual( d.Description(), 'Describe me' )
 
     def test_PUT_html_without_newlines(self):
-
-        d = NewsItem('foo')
         self.REQUEST['BODY'] = ''.join(BASIC_HTML.split('\n'))
+        d = self._makeOne('foo')
         d.PUT(self.REQUEST, self.RESPONSE)
 
         self.assertEqual( d.Title(), 'Title in tag' )
@@ -87,11 +97,10 @@ class NewsItemTests(RequestTest):
         self.assertEqual( len(d.Contributors()), 3 )
 
     def test_PUT_structured_text(self):
-
         self.REQUEST['BODY'] = BASIC_STRUCTUREDTEXT
-        d = NewsItem('foo')
+        d = self._makeOne('foo')
         d.PUT( self.REQUEST, self.RESPONSE )
-        
+
         self.assertEqual( d.Title(), 'My Document')
         self.assertEqual( d.Description(), 'A document by me')
         self.assertEqual( d.Format(), 'text/plain' )
@@ -100,9 +109,8 @@ class NewsItemTests(RequestTest):
         self.failUnless( d.cooked_text.find('<p>') >= 0 )
 
     def test_Init(self):
-
         self.REQUEST['BODY'] = BASIC_STRUCTUREDTEXT
-        d = NewsItem('foo', text='')
+        d = self._makeOne('foo', text='')
         d.PUT(self.REQUEST, self.RESPONSE)
 
         self.assertEqual( d.Title(), 'My Document' )
@@ -113,8 +121,8 @@ class NewsItemTests(RequestTest):
         self.failUnless( d.cooked_text.find('<p>') >= 0 )
 
     def test_Init_with_stx( self ):
-
-        d = NewsItem('foo', text_format='structured-text', title='Foodoc')
+        d = self._makeOne('foo', text_format='structured-text',
+                          title='Foodoc')
 
         self.assertEqual( d.Title(), 'Foodoc' )
         self.assertEqual( d.Description(), '' )
@@ -122,8 +130,11 @@ class NewsItemTests(RequestTest):
         self.assertEqual( d.text_format, 'structured-text' )
         self.assertEqual( d.text, '' )
 
-def test_suite():
-    return makeSuite(NewsItemTests)
 
-if __name__=='__main__':
+def test_suite():
+    return TestSuite((
+        makeSuite(NewsItemTests),
+        ))
+
+if __name__ == '__main__':
     main(defaultTest='test_suite')

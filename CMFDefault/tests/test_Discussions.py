@@ -1,30 +1,30 @@
 from unittest import TestCase, TestSuite, makeSuite, main
 
+import Testing
 import Zope
+try:
+    Zope.startup()
+except AttributeError:
+    # for Zope versions before 2.6.1
+    pass
 try:
     from Interface.Verify import verifyClass
 except ImportError:
     # for Zope versions before 2.6.0
     from Interface import verify_class_implementation as verifyClass
 
-from Products.CMFCore.tests.base.testcase import \
-     SecurityTest
-
-from Products.CMFCore.tests.base.utils import \
-     has_path
-
-from Products.CMFCore.tests.base.dummy import DummyFTI
-from Products.CMFCore.tests.base.dummy import DummyContent
-
 from Products.CMFCore.CatalogTool import CatalogTool
+from Products.CMFCore.tests.base.dummy import DummyContent
+from Products.CMFCore.tests.base.dummy import DummyFTI
+from Products.CMFCore.tests.base.dummy import DummySite
+from Products.CMFCore.tests.base.dummy import DummyTool
+from Products.CMFCore.tests.base.testcase import SecurityTest
+from Products.CMFCore.tests.base.utils import has_path
 from Products.CMFCore.TypesTool import TypesTool
-from Products.CMFCore.URLTool import URLTool
-from Products.CMFCore.WorkflowTool import WorkflowTool
-
-from Products.CMFDefault.DiscussionTool import DiscussionTool
-from Products.CMFDefault.DiscussionTool import DiscussionNotAllowed
 from Products.CMFDefault.DiscussionItem import DiscussionItem
 from Products.CMFDefault.DiscussionItem import DiscussionItemContainer
+from Products.CMFDefault.DiscussionTool import DiscussionNotAllowed
+from Products.CMFDefault.DiscussionTool import DiscussionTool
 
 
 class DiscussionItemTests(TestCase):
@@ -36,9 +36,18 @@ class DiscussionItemTests(TestCase):
                 import Contentish as IContentish
         from Products.CMFCore.interfaces.Discussions \
                 import DiscussionResponse as IDiscussionResponse
+        from Products.CMFCore.interfaces.DublinCore \
+                import DublinCore as IDublinCore
+        from Products.CMFCore.interfaces.DublinCore \
+                import CatalogableDublinCore as ICatalogableDublinCore
+        from Products.CMFCore.interfaces.DublinCore \
+                import MutableDublinCore as IMutableDublinCore
 
         verifyClass(IDynamicType, DiscussionItem)
         verifyClass(IContentish, DiscussionItem)
+        verifyClass(IDublinCore, DiscussionItem)
+        verifyClass(ICatalogableDublinCore, DiscussionItem)
+        verifyClass(IMutableDublinCore, DiscussionItem)
         verifyClass(IDiscussionResponse, DiscussionItem)
 
 
@@ -54,67 +63,51 @@ class DiscussionItemContainerTests(TestCase):
 class DiscussionTests( SecurityTest ):
 
     def setUp( self ):
-        
         SecurityTest.setUp(self)
-        
-        root = self.root
-        root._setObject( 'portal_discussion', DiscussionTool() )
-        self.discussion_tool = root.portal_discussion
-        root._setObject( 'portal_catalog', CatalogTool() )
-        self.catalog_tool = root.portal_catalog
-        root._setObject( 'portal_url', URLTool() )
-        self.url_tool = root.portal_url
-        root._setObject( 'portal_workflow', WorkflowTool() ) 
-        self.workflow_tool = root.portal_workflow
-        root._setObject( 'portal_types', TypesTool() )
-        types_tool = self.types_tool = root.portal_types
-        try: root._delObject('test')
-        except AttributeError: pass
-        root._setObject( 'test', DummyContent( 'test', catalog=1 ) )
-            
-    def test_policy( self ):
+        self.site = DummySite('site').__of__(self.root)
+        self.site._setObject( 'portal_discussion', DiscussionTool() )
+        self.site._setObject( 'portal_membership', DummyTool() )
+        self.site._setObject( 'portal_types', TypesTool() )
 
-        test = self.root.test
-        self.assertRaises( DiscussionNotAllowed
-                         , self.discussion_tool.getDiscussionFor
-                         , test
-                         )
+    def _makeDummyContent(self, id, *args, **kw):
+        return self.site._setObject( id, DummyContent(id, *args, **kw) )
+
+    def test_policy( self ):
+        dtool = self.site.portal_discussion
+        ttool = self.site.portal_types
+        test = self._makeDummyContent('test')
+        self.assertRaises(DiscussionNotAllowed, dtool.getDiscussionFor, test)
         assert getattr( test, 'talkback', None ) is None
 
         test.allow_discussion = 1
-        assert self.discussion_tool.getDiscussionFor( test )
+        assert dtool.getDiscussionFor(test)
         assert test.talkback
 
         del test.talkback
         del test.allow_discussion
-        self.types_tool._setObject( 'Dummy Content', DummyFTI )
-        self.assertRaises( DiscussionNotAllowed
-                         , self.discussion_tool.getDiscussionFor
-                         , test
-                         )
+        ttool._setObject( 'Dummy Content', DummyFTI )
+        self.assertRaises(DiscussionNotAllowed, dtool.getDiscussionFor, test)
         assert getattr( test, 'talkback', None ) is None
 
-        ti = getattr(self.types_tool, 'Dummy Content')
+        ti = getattr(ttool, 'Dummy Content')
         ti.allow_discussion = 1
-        assert self.discussion_tool.getDiscussionFor( test )
+        assert dtool.getDiscussionFor(test)
         assert test.talkback
 
         del test.talkback
         ti.allow_discussion = 0
-        self.assertRaises( DiscussionNotAllowed
-                         , self.discussion_tool.getDiscussionFor
-                         , test
-                         )
+        self.assertRaises(DiscussionNotAllowed, dtool.getDiscussionFor, test)
         assert getattr( test, 'talkback', None ) is None
 
         test.allow_discussion = 1
-        assert self.discussion_tool.getDiscussionFor( test )
+        assert dtool.getDiscussionFor(test)
         assert test.talkback
-    
+
     def test_nestedReplies( self ):
-        test = self.root.test
+        dtool = self.site.portal_discussion
+        test = self._makeDummyContent('test')
         test.allow_discussion = 1
-        talkback = self.discussion_tool.getDiscussionFor( test )
+        talkback = dtool.getDiscussionFor(test)
         assert talkback._getDiscussable() == test
         assert talkback._getDiscussable( outer=1 ) == test
         assert not talkback.hasReplies( test )
@@ -134,7 +127,7 @@ class DiscussionTests( SecurityTest ):
         assert len( parents ) == 1
         assert test in parents
 
-        talkback1 = self.discussion_tool.getDiscussionFor( reply1 )
+        talkback1 = dtool.getDiscussionFor(reply1)
         assert talkback == talkback1
         assert len( talkback1.getReplies() ) == 0
         assert len( talkback.getReplies() ) == 1
@@ -160,64 +153,69 @@ class DiscussionTests( SecurityTest ):
         assert parents[ 0 ] == reply1
 
     def test_itemCataloguing( self ):
-
-        test = self.root.test
-        catalog = self.catalog_tool._catalog
+        ctool = self.site._setObject( 'portal_catalog', CatalogTool() )
+        dtool = self.site.portal_discussion
+        catalog = ctool._catalog
+        test = self._makeDummyContent('test', catalog=1)
         test.allow_discussion = 1
-        assert len( self.catalog_tool ) == 1
-        assert has_path( catalog, test.getPhysicalPath() )
-        talkback = self.discussion_tool.getDiscussionFor( test )
-        assert talkback.getPhysicalPath() == ( '', 'test', 'talkback' ), \
-            talkback.getPhysicalPath()
+
+        self.assertEqual( len(ctool), 1 )
+        self.failUnless( has_path( catalog, test.getPhysicalPath() ) )
+        talkback = dtool.getDiscussionFor(test)
+        self.assertEqual( talkback.getPhysicalPath(),
+                          ('', 'bar', 'site', 'test', 'talkback') )
         talkback.createReply( title='test'
                             , text='blah'
                             )
-        assert len( self.catalog_tool ) == 2
+        self.assertEqual( len(ctool), 2 )
         for reply in talkback.getReplies():
-            assert has_path( catalog, reply.getPhysicalPath() )
-            assert has_path( catalog
-                           , '/test/talkback/%s' % reply.getId() )
+            self.failUnless( has_path( catalog, reply.getPhysicalPath() ) )
+            self.failUnless( has_path( catalog,
+                              '/bar/site/test/talkback/%s' % reply.getId() ) )
 
         reply1 = talkback.getReplies()[0]
-        talkback1 = self.discussion_tool.getDiscussionFor( reply1 )
+        talkback1 = dtool.getDiscussionFor(reply1)
         talkback1.createReply( title='test2'
                              , text='blah2'
                              )
         for reply in talkback.getReplies():
-            assert has_path( catalog, reply.getPhysicalPath() )
-            assert has_path( catalog
-                           , '/test/talkback/%s' % reply.getId() )
+            self.failUnless( has_path( catalog, reply.getPhysicalPath() ) )
+            self.failUnless( has_path( catalog,
+                              '/bar/site/test/talkback/%s' % reply.getId() ) )
         for reply in talkback1.getReplies():
-            assert has_path( catalog, reply.getPhysicalPath() )
-            assert has_path( catalog
-                           , '/test/talkback/%s' % reply.getId() )
+            self.failUnless( has_path( catalog, reply.getPhysicalPath() ) )
+            self.failUnless( has_path( catalog,
+                              '/bar/site/test/talkback/%s' % reply.getId() ) )
 
     def test_deletePropagation( self ):
-
-        test = self.root.test
-
+        ctool = self.site._setObject( 'portal_catalog', CatalogTool() )
+        dtool = self.site.portal_discussion
+        test = self._makeDummyContent('test', catalog=1)
         test.allow_discussion = 1
-        talkback = self.discussion_tool.getDiscussionFor( test )
+
+        talkback = dtool.getDiscussionFor(test)
         talkback.createReply( title='test'
                             , text='blah'
                             )
-        self.root._delObject( 'test' )
-        assert len( self.catalog_tool ) == 0
+        self.assertEqual( len(ctool), 2 )
+        self.site._delObject('test')
+        self.assertEqual( len(ctool), 0 )
 
     def test_deleteReplies(self):
-        test = self.root.test
+        dtool = self.site.portal_discussion
+        test = self._makeDummyContent('test')
         test.allow_discussion = 1
 
-        talkback = self.discussion_tool.getDiscussionFor(test)
+        talkback = dtool.getDiscussionFor(test)
         id1 = talkback.createReply(title='test1', text='blah')
         reply1 = talkback.getReply(id1)
-        talkback1 = self.discussion_tool.getDiscussionFor(reply1)
+        talkback1 = dtool.getDiscussionFor(reply1)
         id2 = talkback1.createReply(title='test2', text='blah')
         reply2 = talkback1.getReply(id2)
-        talkback2 = self.discussion_tool.getDiscussionFor(reply2)
+        talkback2 = dtool.getDiscussionFor(reply2)
         id3 = talkback2.createReply(title='test3', text='blah')
         reply3 = talkback.getReply(id3)
-        talkback3 = self.discussion_tool.getDiscussionFor(reply3)
+        talkback3 = dtool.getDiscussionFor(reply3)
         self.assertEqual(len(talkback.getReplies()), 1)
         self.assertEqual(len(talkback1.getReplies()), 1)
         self.assertEqual(len(talkback2.getReplies()), 1)
@@ -226,9 +224,10 @@ class DiscussionTests( SecurityTest ):
         talkback.deleteReply(id2)
         self.assertEqual(len(talkback.getReplies()), 1)
         reply1 = talkback.getReply(id1)
-        talkback1 = self.discussion_tool.getDiscussionFor(reply1)
+        talkback1 = dtool.getDiscussionFor(reply1)
         self.assertEqual(len(talkback.getReplies()), 1)
         self.assertEqual(len(talkback1.getReplies()), 0)
+
 
 def test_suite():
     return TestSuite((

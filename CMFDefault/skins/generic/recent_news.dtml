@@ -18,7 +18,17 @@
  <tr>
   <td class="NewsListing" align="left" valign="top">
       <a href="&dtml-getURL;"> &dtml-Title; </a>
-   <br> By &dtml-Creator;
+   <br> By <dtml-if listCreators>
+    <dtml-in listCreators
+    ><dtml-unless sequence-start
+     ><dtml-if sequence-end> and
+      <dtml-else>,
+      </dtml-if
+    ></dtml-unless>
+     <dtml-var sequence-item></dtml-in>
+    <dtml-else>
+     unknown
+    </dtml-if>
   </td>
   <td class="NewsListing" align="right" valign="top">
     <dtml-var Date>

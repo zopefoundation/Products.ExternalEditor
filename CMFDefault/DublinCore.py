@@ -27,6 +27,7 @@ from Products.CMFCore.CMFCorePermissions import View
 from Products.CMFCore.interfaces.DublinCore import CatalogableDublinCore
 from Products.CMFCore.interfaces.DublinCore import DublinCore
 from Products.CMFCore.interfaces.DublinCore import MutableDublinCore
+from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.WorkflowCore import WorkflowAction
 
 from utils import tuplize, _dtmldir, semi_split
@@ -56,6 +57,7 @@ class DefaultDublinCoreImpl( PropertyManager ):
         now = DateTime()
         self.creation_date = now
         self.modification_date = now
+        self.creators = ()
         self._editMetadata( title
                           , subject
                           , description
@@ -77,12 +79,24 @@ class DefaultDublinCoreImpl( PropertyManager ):
 
     security.declarePrivate('notifyModified')
     def notifyModified(self):
+        """ Take appropriate action after the resource has been modified.
+
+        Update creators and modification_date.
         """
-        Take appropriate action after the resource has been modified.
-        For now, change the modification_date.
-        """
-        # XXX This could also store the id of the user doing modifications.
+        self.addCreator()
         self.setModificationDate()
+
+    security.declareProtected(ModifyPortalContent, 'addCreator')
+    def addCreator(self, creator=None):
+        """ Add creator to Dublin Core creators.
+        """
+        if creator is None:
+            mtool = getToolByName(self, 'portal_membership')
+            creator = mtool.getAuthenticatedMember().getId()
+
+        # call self.listCreators() to make sure self.creators exists
+        if creator and not creator in self.listCreators():
+            self.creators = self.creators + (creator, )
 
     # XXX Could this be simply protected by ModifyPortalContent ?
     security.declarePrivate('setModificationDate')
@@ -105,16 +119,25 @@ class DefaultDublinCoreImpl( PropertyManager ):
         """
         return self.title
 
-    security.declareProtected(View, 'Creator')
-    def Creator( self ):
-        """ Dublin Core Creator element - resource creator.
+    security.declareProtected(View, 'listCreators')
+    def listCreators(self):
+        """ List Dublin Core Creator elements - resource authors.
         """
-        # XXX: fixme using 'portal_membership' -- should iterate over
-        #       *all* owners
-        owner = self.getOwner()
-        if hasattr( owner, 'getId' ):
-            return owner.getId()
-        return 'No owner'
+        if not hasattr(self, 'creators'):
+            # for content created with CMF versions before 1.5
+            owner = self.getOwner()
+            if hasattr(owner, 'getId'):
+                self.creators = ( owner.getId(), )
+            else:
+                self.creators = ()
+        return self.creators
+
+    security.declareProtected(View, 'Creator')
+    def Creator(self):
+        """ Dublin Core Creator element - resource author.
+        """
+        creators = self.listCreators()
+        return creators and creators[0] or ''
 
     security.declareProtected(View, 'Subject')
     def Subject( self ):
@@ -135,12 +158,17 @@ class DefaultDublinCoreImpl( PropertyManager ):
         # XXX: fixme using 'portal_metadata'
         return 'No publisher'
 
-    security.declareProtected(View, 'Contributors')
-    def Contributors( self ):
+    security.declareProtected(View, 'listContributors')
+    def listContributors(self):
         """ Dublin Core Contributor elements - resource collaborators.
         """
-        # XXX: fixme
         return self.contributors
+
+    security.declareProtected(View, 'Contributors')
+    def Contributors(self):
+        """ Deprecated alias of listContributors.
+        """
+        return self.listContributors()
 
     security.declareProtected(View, 'Date')
     def Date( self ):

@@ -9,9 +9,6 @@
       tal:attributes="action string:${here/absolute_url}/talkback">
 <input type="hidden" name=":default_method" value="discussion_reply" />
 
-<input type="hidden" name="Creator" value=""
-       tal:attributes="value here/portal_membership/getAuthenticatedMember" />
-
 <table class="FormLayout">
  <tr>
   <th align="left" i18n:translate="">Subject (Title)</th>
@@ -42,5 +39,3 @@
 </div>
 </body>
 </html>
-
-

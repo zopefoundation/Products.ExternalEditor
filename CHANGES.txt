@@ -2,6 +2,34 @@ CMF 1.5alpha (unreleased)
 
   New Features
 
+    - DublinCore: Creator element no longer depends on Ownership.
+      (Collector #25)
+
+      o Added listCreators() and listContributors() to the DublinCore
+        Interface. Creator() now returns the first element of listCreators().
+        Contributors() is now a deprecated alias of listContributors() and
+        might change in a future version.
+
+      o Updated DublinCore implementation in DefaultDublinCoreImpl and
+        DiscussionItem. Added new addCreator() method that is called by
+        notifyModified(). SkinnedFolder also uses the new methods.
+
+      o Updated ContentFilter to work with listCreators().
+
+      o Updated CatalogTool to index listCreators. Creator index and metadata
+        are deprecated and might be removed in a future version.
+
+      o Updated skins to search listCreators() and show all creators.
+
+    - TypeInfos: _finishConstruction() now calls reindexObject().
+      This makes sure changes made by ScriptableTypeInformation scripts are
+      indexed and notifyModified() is called after content creation.
+
+    - Document: Removed WorkflowMethod wrapper of setFormat().
+      This was the only wrapped MutableDublinCore method and caused an ugly
+      second reindexObject() / notifyModified() call in the middle of
+      _editMetadata().
+
     - CatalogTool: Updated to post Zope 2.6.2 ZCatalog interface.
       'catalog_object()' and 'reindexObject()' now support the new
       'update_metadata' argument. 'reindexObjectSecurity()' doesn't update
