@@ -20,7 +20,7 @@ from Products.CMFCore.utils import UniqueObject, _checkPermission
 from OFS.SimpleItem import SimpleItem
 from Globals import HTMLFile, package_home, InitializeClass 
 import string
-from Acquisition import aq_inner, aq_parent
+from Acquisition import aq_base, aq_inner, aq_parent
 from DateTime import DateTime
 from AccessControl import ClassSecurityInfo, SecurityManagement
 from Products.CMFCore.CMFCorePermissions import ManagePortal
@@ -177,7 +177,7 @@ class SyndicationTool (UniqueObject, SimpleItem, ActionProviderBase):
         if not self.isSiteSyndicationAllowed():
             raise 'Syndication is Disabled'
         else:
-            if hasattr(obj, 'syndication_information'):
+            if hasattr(aq_base(obj), 'syndication_information'):
              raise 'Syndication Information Exists'
             syInfo = SyndicationInformation()
             obj._setObject('syndication_information', syInfo)
@@ -235,8 +235,7 @@ class SyndicationTool (UniqueObject, SimpleItem, ActionProviderBase):
         particular obj is enabled, allowing for turning on only
         specific folders for syndication.
         """
-        #import pdb; pdb.set_trace()
-        syInfo = getattr(obj, 'syndication_information',
+        syInfo = getattr(aq_base(obj), 'syndication_information',
                          None)
         if syInfo is None:
             return 0
