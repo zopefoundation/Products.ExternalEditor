@@ -122,7 +122,7 @@ class CookieCrumbler (SimpleItemWithProperties):
                 name = req[self.name_cookie]
                 pw = req[self.pw_cookie]
                 ac = encodestring('%s:%s' % (name, pw))
-                req._auth = 'basic %s' % ac
+                req._auth = 'Basic %s' % ac
                 req._cookie_auth = 1
                 resp._auth = 1
                 if req.get(self.persist_cookie, 0):
@@ -142,7 +142,7 @@ class CookieCrumbler (SimpleItemWithProperties):
             elif req.has_key(self.auth_cookie):
                 # Copy __ac to the auth header.
                 ac = unquote(req[self.auth_cookie])
-                req._auth = 'basic %s' % ac
+                req._auth = 'Basic %s' % ac
                 req._cookie_auth = 1
                 resp._auth = 1
                 self.delRequestVar(req, self.auth_cookie)
