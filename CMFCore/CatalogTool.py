@@ -165,21 +165,21 @@ class CatalogTool (UniqueObject, ZCatalog):
         else:
             # Zope 2.3 and below
             addColumn = self._catalog.addColumn
-        # Reviewing indexes
-        addIndex('review_state', 'FieldIndex')
         # Content indexes
-        addIndex('Date', 'FieldIndex')
-        addIndex('allowedRolesAndUsers', 'KeywordIndex')
-        addIndex('Creator', 'FieldIndex')
         addIndex('Title', 'TextIndex')
-        addIndex('Description', 'TextIndex')
-        addIndex('SearchableText', 'TextIndex')
         addIndex('Subject', 'KeywordIndex')
-        addIndex('in_reply_to', 'FieldIndex')
+        addIndex('Description', 'TextIndex')
+        addIndex('Creator', 'FieldIndex')
+        addIndex('SearchableText', 'TextIndex')
+        addIndex('Date', 'FieldIndex')
+        addIndex('Type', 'FieldIndex')
         addIndex('created', 'FieldIndex')
         addIndex('effective', 'FieldIndex')
         addIndex('expires', 'FieldIndex')
         addIndex('modified', 'FieldIndex')
+        addIndex('allowedRolesAndUsers', 'KeywordIndex')
+        addIndex('review_state', 'FieldIndex')
+        addIndex('in_reply_to', 'FieldIndex')
         # Catalog meta-data
         addColumn('Subject')
         addColumn('Title')
