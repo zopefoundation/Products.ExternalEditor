@@ -221,7 +221,7 @@
     <br>
     <input type="radio" name="recatalog:int" value="0" CHECKED>No
     <input type="radio" name="recatalog:int" value="1">Internal only
-    <input type="radio" name="recatalog:int" value="2">Internal & Site-wide
+    <input type="radio" name="recatalog:int" value="2">Internal &amp; Site-wide
     (<em>slow</em>)
   </td>
  </tr>
@@ -237,10 +237,36 @@
    <input type="reset" value=" Reset ">
   </td>
  </tr>
-
- 
 </table>
 </form>
 </div>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
