@@ -145,7 +145,8 @@ class Collector(SkinnedFolder):
                   classification=None,
                   severity=None,
                   reported_version=None,
-                  other_version_info=None):
+                  other_version_info=None,
+                  file=None, fileid=None, filetype=None):
         """Instigate a new collector issue."""
         id = self.new_issue_id()
         submitter_id = str(getSecurityManager().getUser())
@@ -164,7 +165,8 @@ class Collector(SkinnedFolder):
                           importance=importance,
                           severity=severity,
                           reported_version=reported_version,
-                          other_version_info=other_version_info)
+                          other_version_info=other_version_info,
+                          file=file, fileid=fileid, filetype=filetype)
         return id
 
 
