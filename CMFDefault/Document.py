@@ -259,7 +259,8 @@ class Document(PortalContent, DefaultDublinCoreImpl):
         self.dav__init(REQUEST, RESPONSE)
         body = REQUEST.get('BODY', '')
         bodyfound = bodyfinder.search(body)
-        ishtml = (text_format == 'html') or (bodyfound is not None)
+        guessedformat = REQUEST.get_header('Content-Type', 'text/plain')
+        ishtml = (guessedformat == 'text/html') or (bodyfound is not None)
 
         if ishtml: self.setFormat('text/html')
         else: self.setFormat('text/plain')
