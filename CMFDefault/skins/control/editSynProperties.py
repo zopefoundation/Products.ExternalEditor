@@ -1,4 +1,4 @@
-## Script (Python) "enableSyndication"
+## Script (Python) "editSynProperties"
 ##title=Enable Syndication for a resource
 ##parameters=
 REQUEST=context.REQUEST
