@@ -1,0 +1,17 @@
+<dtml-comment>
+  Form an email message for issue events.
+</dtml-comment>
+From: <dtml-var sender>
+To: <dtml-var recipients>
+Subject: <dtml-var subject>
+X-Recipients-debug: <dtml-var candidates>
+
+Collector Issue <dtml-var issue_id> <dtml-var action>
+Title: <dtml-var title>
+<dtml-if security_related> - Security Related (<dtml-if confidential>Confidential<dtml-else>Public</dtml-if>)
+</dtml-if> Status <dtml-var status>, <dtml-var klass>/<dtml-var topic> <dtml-var importance>/<dtml-var severity>
+Visit the issue online at:
+  <dtml-var issue_url>
+                  -=-             -=-             -=-
+<dtml-var body>
+                  -=-             -=-             -=-
