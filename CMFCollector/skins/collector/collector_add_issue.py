@@ -1,21 +1,22 @@
 ## Script (Python) "collector_add_issue.py"
-##parameters=submitter, title, security_related, topic, importance, classification, description, version_info
+##parameters=title, security_related, submitter_email, topic, importance, classification, description, version_info
 ##title=Submit a Request
 
-REQUEST = context.REQUEST
+REQGET = context.REQUEST.get
 
-id = context.add_issue(submitter=submitter,
-                       title=title,
-                       description=description,
+id = context.add_issue(title=title,
                        security_related=security_related,
+                       submitter_name=REQGET('submitter_name'),
+                       submitter_email=submitter_email,
+                       description=description,
                        topic=topic,
                        classification=classification,
                        importance=importance,
                        version_info=version_info,
-                       assignees=REQUEST.get('assignees', []),
-                       file=REQUEST.get('file'),
-                       fileid=REQUEST.get('fileid', ''),
-                       filetype=REQUEST.get('filetype', 'file'))
+                       assignees=REQGET('assignees', []),
+                       file=REQGET('file'),
+                       fileid=REQGET('fileid', ''),
+                       filetype=REQGET('filetype', 'file'))
 
 context.REQUEST.RESPONSE.redirect("%s/%s" % (context.absolute_url(), id))
 
