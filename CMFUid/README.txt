@@ -11,17 +11,25 @@ CMFUid Readme
         object of a given unique id. The interfaces do not imply the use
         of the catalog (except the IUniqueIdBrainQuery).
         
-        The 'portal_uidgenerator' tools responsibility is to generate unique
-        ids. The 'portal_uidannotation' tool is responsible to attach unique
-        ids to a content object. The 'portal_uidhandler' manages registering 
-        and accessing unique ids. 
+        Which Tool does What?
         
-        'portal_uidhandler' implements 'IUniqueIdHandler' and represents the
-        hook through which applications are playing with unique ids.
+            The 'portal_uidgenerator' tools responsibility is to generate 
+            unique ids. The 'portal_uidannotation' tool is responsible to 
+            attach unique ids to a content object. The 'portal_uidhandler' 
+            manages registering and accessing unique ids. 
+            
+            This design was chosen to allow users replacing only parts of
+            the functionality without having to understand the whole thing.
+        
+        Unique Id API
+        
+            'portal_uidhandler' implementing 'IUniqueIdHandler' is the main 
+            API for playing with unique ids.
         
     Dependencies
     
-        Object lookup by unique id depends on the portal_catalog
+        Object lookup by unique id depends on CMFCore (especially on 
+        portal_catalog. 
     
     Usage
     
@@ -32,4 +40,10 @@ CMFUid Readme
         
         Have a look at the interfaces.
         
-        An example usage can be found in 'CMFDefault.Favorite.Favorite'.
+        CMFUid's functionality is used by CMFDefault's favorite content type 
+        to follow linked objects. The favorite content type works as before if 
+        CMFUid is not installed. 
+        
+        See 'CMFDefault.Favorite.Favorite'.
+    
+    gregweb/2004-08-05
