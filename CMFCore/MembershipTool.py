@@ -290,7 +290,9 @@ class MembershipTool (UniqueObject, SimpleItem):
         """
         parent = self.aq_inner.aq_parent
         members =  getattr(parent, 'Members', None)
-        if members is not None:
+        user = self.acl_users.getUser( member_id ).__of__( self.acl_users )
+        
+        if members is not None and user is not None:
             f_title = "%s's Home" % member_id
             members.manage_addPortalFolder( id=member_id, title=f_title )
             f=getattr(members, member_id)
@@ -299,12 +301,6 @@ class MembershipTool (UniqueObject, SimpleItem):
                                 ['Owner','Manager','Reviewer'], 0)
             f.manage_permission(CMFCorePermissions.AccessContentsInformation,
                                 ['Owner','Manager','Reviewer'], 0)  
-
-            member = self.getMemberById(member_id)
-            if hasattr(getattr(member, 'aq_base', member), 'getUser'):
-                user = member.getUser()
-            else:
-                user = member
 
             # Grant ownership to Member
             try: f.changeOwnership(user)
