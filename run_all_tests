@@ -1,0 +1,5 @@
+#! /bin/sh
+for d in Products/{CMF,DC}*; do
+    echo Testing package $d
+    ./zctl.py test $d/tests/test_all.py
+done
