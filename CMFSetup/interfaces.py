@@ -16,7 +16,7 @@ class ISetupContext( Interface ):
 
 class IImportContext( ISetupContext ):
 
-    def readDatafile( filename, subdir=None ):
+    def readDataFile( filename, subdir=None ):
 
         """ Search the current configuration for the requested file.
 
@@ -40,7 +40,7 @@ class IImportContext( ISetupContext ):
         o If the profile is filesystem based, return the 'stat' timestamp
           of the file / directory to which 'path' points.
 
-        o If the profile is ZODB-based, return the Zopd modification time
+        o If the profile is ZODB-based, return the Zope modification time
           of the object to which 'path' points.
 
         o Return None if 'path' does not point to any object in any profile.
@@ -55,6 +55,9 @@ class IImportContext( ISetupContext ):
 
         o If the profile is ZODB-based, check that 'path' points to a
           "container" under the profile.
+
+        o Return None if 'path' does not resolve;  otherwise, return a
+          bool.
         """
 
     def listDirectory( path, skip=('CVS',) ):
@@ -62,6 +65,8 @@ class IImportContext( ISetupContext ):
         """ List IDs of the contents of a profile directory / folder.
 
         o Omit names in 'skip'.
+
+        o If 'path' does not point to a directory / folder, return None.
         """
 
     def shouldPurge():
@@ -69,7 +74,7 @@ class IImportContext( ISetupContext ):
         """ When installing, should the existing setup be purged?
         """
 
-def IExportContext( ISetupContext ):
+class IExportContext( ISetupContext ):
 
     def writeDataFile( filename, text, content_type, subdir=None ):
 
