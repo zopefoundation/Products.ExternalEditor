@@ -88,27 +88,33 @@ class IAuthenticationPlugin( Interface ):
 class IChallengePlugin( Interface ):
 
     """ Initiate a challenge to the user to provide credentials.
+
+        Challenge plugins have an attribute 'protocol' representing
+        the protocol the plugin operates under, defaulting to None.
+
+        Plugins operating under the same protocol will all be given an
+        attempt to fire. The first plugin of a protocol group that
+        successfully fires establishes the protocol of the overall
+        challenge.
     """
 
-    def challenge( request, response, **kw ):
+    def challenge( request, response ):
 
-        """ Raise an exception
-        
-        With Zope 2 there are only two ways to initiate a challenge.
-        
-        o raise Unauthorized, message
-        
-        o raise Redirect, url
-        
-        The default challenge response is the raise Unauthorized. 
-        A challenge plugin is therefore only needed if a Redirect 
-        (for example to a login-form) is desired. 
-        
-        The plugin gets request and response so that it can choose to
-        only challenge during certain circumstances. If the plugin
-        does not raise an exception, the next challenge plugin will 
-        be called. If no plugins raise the exception, Unauthorized
-        will be raised.
+        """ Assert via the response that credentials will be gathered.
+
+        Takes a REQUEST object and a RESPONSE object.
+
+        Returns True if it fired, False otherwise.
+
+        Two common ways to initiate a challenge:
+
+          - Add a 'WWW-Authenticate' header to the response object.
+
+            NOTE: add, since the HTTP spec specifically allows for
+            more than one challenge in a given response.
+
+          - Cause the response object to redirect to another URL (a
+            login form page, for instance)
         """
 
 class ICredentialsUpdatePlugin( Interface ):
