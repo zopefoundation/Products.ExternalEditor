@@ -227,12 +227,19 @@ class PortalContent(SimpleItem, DynamicType):
         Invokes the first customizable action.
         '''
         ti = self.getTypeInfo()
-        actions = ti.getActions()
-        if actions:
-            path = actions[0]['action']
-            return self.restrictedTraverse(path)
-        raise 'Not Found', ('No default view defined for %s' %
-                            self.getPhysicalPath())
+        if ti is not None:
+            path = ti.getActionById('view', None)
+            if path is not None:
+                return self.restrictedTraverse(path)
+            actions = ti.getActions()
+            if actions:
+                path = actions[0]['action']
+                return self.restrictedTraverse(path)
+            raise 'Not Found', ('No default view defined for type "%s"'
+                                % ti.id)
+        else:
+            raise 'Not Found', ('Cannot find default view for "%s"'
+                                % self.getPhysicalPath())
 
     security.declareProtected(CMFCorePermissions.View, 'index_html')
     index_html = ComputedAttribute(_index_html, 1)
