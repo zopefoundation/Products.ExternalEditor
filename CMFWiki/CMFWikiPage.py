@@ -268,7 +268,7 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
               or '%s<sup><a href="%s/%s?page=%s">x</a></sup>'
                )
         return fmt % ( wiki_name
-                     , quote( self.getId() )
+                     , quote( self.wiki_page_url() )
                      , action
                      , quote( wiki_name )
                      )
@@ -297,7 +297,8 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
         # otherwise, provide a "?" creation link
         if hasattr(aq_base(folder), m): 
             # Actually contained within the folder:
-            return '<a href="%s">%s</a>' % (quote(m), m)
+            return '<a href="%s/%s">%s</a>' % (self.wiki_base_url(),
+                                               quote(m), m)
         elif hasattr(folder, m):
             obj = getattr(folder, m)
             if not hasattr(obj, 'absolute_url'):
@@ -355,7 +356,8 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
         # it.
         elif hasattr(aq_base(folder), m):
             # Actually contained wihtin the folder:
-            return '<a href="%s">%s</a>' % (quote(m), m) + e
+            return '<a href="%s/%s">%s</a>' % (self.wiki_base_url(),
+                                               quote(m), m) + e
         elif hasattr(folder, m):
             # Obtained by acquisition - make sure to use the real URL:
             obj = getattr(folder, m)
