@@ -45,7 +45,7 @@ class TestImageElement(TestCase):
         assert image.get_size() == testfilesize
 
     def test_File_setFormat(self):
-        """ Setting the DC.format must also set the content_type property """
+        # Setting the DC.format must also set the content_type property
         file = File('testfile', format='image/jpeg')
         self.assertEqual(file.Format(), 'image/jpeg')
         self.assertEqual(file.content_type, 'image/jpeg')
@@ -54,7 +54,7 @@ class TestImageElement(TestCase):
         self.assertEqual(file.content_type, 'image/gif')
  
     def test_Image_setFormat(self):
-        """ Setting the DC.format must also set the content_type property """
+        # Setting the DC.format must also set the content_type property
         image = Image('testimage', format='image/jpeg')
         self.assertEqual(image.Format(), 'image/jpeg')
         self.assertEqual(image.content_type, 'image/jpeg')

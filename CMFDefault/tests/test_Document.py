@@ -163,7 +163,7 @@ class DocumentTests(RequestTestBase):
         self.assertEqual( d.CookedBody(), body )
 
     def test_Htmltag_removal_and_formatchange(self):
-        """ Test for http://www.zope.org/Collectors/CMF/214 """
+        # Test for http://www.zope.org/Collectors/CMF/214
         d = self._makeOne('foo')
         quoted_html = html_quote(BASIC_HTML)
 
@@ -182,7 +182,7 @@ class DocumentTests(RequestTestBase):
         self.failIf(new_body==BASIC_HTML)
 
     def test_Html_Fragment(self):
-        """test that edits with HTML fragments behave nicely"""
+        # Test that edits with HTML fragments behave nicely
         FRAGMENT = '<div id="placeholder">CONTENT</div>'
         d = self._makeOne('foo')
         d.edit(text_format='html', text=FRAGMENT)
@@ -190,7 +190,7 @@ class DocumentTests(RequestTestBase):
         self.assertEqual( d.get_size(), len(FRAGMENT) )
 
     def test_plain_text(self):
-        """test that plain text forrmat works"""
+        # test that plain text forrmat works
         PLAIN_TEXT = '*some plain text*\nwith a newline'
         d = self._makeOne('foo')
         d.edit(text_format='plain', text=PLAIN_TEXT)

@@ -125,29 +125,27 @@ class DirectoryViewTests( FSDVTest ):
         self._registerDirectory(self)
 
     def test_addDirectoryViews( self ):
-        """ Test addDirectoryViews  """
+        # Test addDirectoryViews
         # also test registration of directory views doesn't barf
         pass
 
     def test_DirectoryViewExists( self ):
-        """
-        Check DirectoryView added by addDirectoryViews
-        appears as a DirectoryViewSurrogate due
-        to Acquisition hackery.
-        """
+        # Check DirectoryView added by addDirectoryViews
+        # appears as a DirectoryViewSurrogate due
+        # to Acquisition hackery.
         from Products.CMFCore.DirectoryView import DirectoryViewSurrogate
         self.failUnless(isinstance(self.ob.fake_skin,DirectoryViewSurrogate))
 
     def test_DirectoryViewMethod( self ):
-        """ Check if DirectoryView method works """
+        # Check if DirectoryView method works
         self.assertEqual(self.ob.fake_skin.test1(),'test1')
 
     def test_properties(self):
-        """Make sure the directory view is reading properties"""
+        # Make sure the directory view is reading properties
         self.assertEqual(self.ob.fake_skin.testPT.title, 'Zope Pope')
 
     def test_ignored(self):
-        """ Test that the .test1.py is ignored """
+        # Test that the .test1.py is ignored
         assert('#test1' not in self.ob.fake_skin.objectIds())
 
 if DevelopmentMode:
@@ -173,39 +171,28 @@ if DevelopmentMode:
         mkdir(self.test3path)
 
     def test_AddNewMethod( self ):
-        """
-        See if a method added to the skin folder can be found
-        """
+        # See if a method added to the skin folder can be found
         self.assertEqual(self.ob.fake_skin.test2(),'test2')
 
     def test_EditMethod( self ):
-        """
-        See if an edited method exhibits its new behaviour
-        """
+        # See if an edited method exhibits its new behaviour
         self.assertEqual(self.ob.fake_skin.test1(),'new test1')
 
     def test_NewFolder( self ):
-        """
-        See if a new folder shows up
-        """
+        # See if a new folder shows up
         from Products.CMFCore.DirectoryView import DirectoryViewSurrogate
         self.failUnless(isinstance(self.ob.fake_skin.test3,DirectoryViewSurrogate))
         self.ob.fake_skin.test3.objectIds()
 
     def test_DeleteMethod( self ):
-        """
-        Make sure a deleted method goes away
-        """
+        # Make sure a deleted method goes away
         remove(self.test2path)
         self.failIf(hasattr(self.ob.fake_skin,'test2'))
 
     def test_DeleteAddEditMethod( self ):
-        """
-        Check that if we delete a method, then add it back,
-        then edit it, the DirectoryView notices.
-
-        This excecises yet another Win32 mtime weirdity.
-        """
+        # Check that if we delete a method, then add it back,
+        # then edit it, the DirectoryView notices.
+        # This exercises yet another Win32 mtime weirdity.
         remove(self.test2path)
         self.failIf(hasattr(self.ob.fake_skin,'test2'))
 
@@ -222,9 +209,7 @@ if DevelopmentMode:
         self.assertEqual(self.ob.fake_skin.test2(),'test2.3')
 
     def test_DeleteFolder( self ):
-        """
-        Make sure a deleted folder goes away
-        """
+        # Make sure a deleted folder goes away
         rmdir(self.test3path)
         self.failIf(hasattr(self.ob.fake_skin,'test3'))
 

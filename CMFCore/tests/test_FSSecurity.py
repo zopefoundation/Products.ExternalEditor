@@ -58,7 +58,7 @@ class FSSecurityBase( RequestTest, FSDVTest ):
 class FSSecurityTests( FSSecurityBase ):
 
     def test_basicPermissions( self ):
-        """ Test basic FS permissions """
+        # Test basic FS permissions
         # check a normal method is as we'd expect
         self._checkSettings(self.ob.fake_skin.test1,'View',1,[])
         # now do some checks on the method with FS permissions
@@ -66,7 +66,7 @@ class FSSecurityTests( FSSecurityBase ):
         self._checkSettings(self.ob.fake_skin.test4,'Access contents information',0,[])
 
     def test_invalidPermissionNames( self ):
-        """ Test for an invalid permission name """
+        # Test for an invalid permission name
         # baseline
         self._checkSettings(self.ob.fake_skin.test5,'View',1,[])
         # add .rpm with dodgy permission name
@@ -75,7 +75,7 @@ class FSSecurityTests( FSSecurityBase ):
         self._checkSettings(self.ob.fake_skin.test5,'View',1,[])
 
     def test_invalidAcquireNames( self ):
-        """ Test for an invalid spelling of acquire """
+        # Test for an invalid spelling of acquire
         # baseline
         self._checkSettings(self.ob.fake_skin.test5,'View',1,[])
         # add dodgy .rpm
@@ -88,7 +88,7 @@ if DevelopmentMode:
     class DebugModeTests( FSSecurityBase ):
 
         def test_addPRM( self ):
-            """ Test adding of a .security """
+            # Test adding of a .security
             # baseline
             self._checkSettings(self.ob.fake_skin.test5,'View',1,[])
             # add
@@ -97,7 +97,7 @@ if DevelopmentMode:
             self._checkSettings(self.ob.fake_skin.test5,'View',1,['Manager'])
 
         def test_delPRM( self ):
-            """ Test deleting of a .security """
+            # Test deleting of a .security
             # baseline
             self._checkSettings(self.ob.fake_skin.test5,'View',1,[])
             self._writeFile('test5.py.security','View:acquire:Manager')
@@ -108,7 +108,7 @@ if DevelopmentMode:
             self._checkSettings(self.ob.fake_skin.test5,'View',1,[])
 
         def test_editPRM( self ):
-            """ Test editing a .security """
+            # Test editing a .security
             # we need to wait a second here or the mtime will actually
             # have the same value as set in the last test.
             # Maybe someone brainier than me can figure out a way to make this
@@ -124,7 +124,7 @@ if DevelopmentMode:
             self._checkSettings(self.ob.fake_skin.test5,'View',1,['Manager'])
 
         def test_DelAddEditPRM( self ):
-            """ Test deleting, then adding, then editing a .security file """
+            # Test deleting, then adding, then editing a .security file
             # baseline
             self._writeFile('test5.py.security','View::Manager')
             # delete
