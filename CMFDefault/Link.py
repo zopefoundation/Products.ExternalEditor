@@ -87,7 +87,7 @@
 
 ADD_CONTENT_PERMISSION = 'Add portal content'
 
-import Globals, string
+import Globals, string, urlparse
 from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
 from Products.CMFCore.PortalContent import PortalContent
@@ -180,7 +180,12 @@ class Link( PortalContent
         """
             Edit the Link
         """
-        self.remote_url=remote_url
+        tokens = urlparse.urlparse( remote_url, 'http' )
+        if tokens[0] and tokens[1]:
+            self.remote_url = urlparse.urlunparse( tokens )
+        else:
+            self.remote_url = 'http://' + remote_url
+
     edit = WorkflowAction(edit)
 
     security.declareProtected( CMFCorePermissions.View, 'SearchableText' )
@@ -201,7 +206,8 @@ class Link( PortalContent
 
         headers = {}
         headers, body = parseHeadersBody(body, headers)
-        self.edit(body)
+        lines = string.split( body, '\n' )
+        self.edit( lines[0] )
 
         headers['Format'] = 'text/url'
         new_subject = keywordsplitter(headers)

@@ -6,7 +6,7 @@ Title: Zope Community
 Description: Link to the Zope Community website.
 Subject: open source; Zope; community
 
-http://ww.zope.org
+http://www.zope.org
 '''
 
 class LinkTests(unittest.TestCase):
@@ -17,19 +17,35 @@ class LinkTests(unittest.TestCase):
     def tearDown( self ):
         get_transaction().abort()
 
-    def test_Empty(self):
-        d = Link('foo')
-        assert d.Title() == ''
-        assert d.Description() == ''
-        assert d.getRemoteUrl() == ''
+    def test_Empty( self ):
+        d = Link( 'foo' )
+        self.failUnless( d.Title() == '' )
+        self.failUnless( d.Description() == '' )
+        self.failUnless( d.getRemoteUrl() == '' )
 
-    def test_StructuredText(self):
+    def test_StructuredText( self ):
         d = Link('foo')
         d._writeFromPUT( body=BASIC_STRUCTUREDTEXT )
         
-        assert d.Title() == 'Zope Community'
-        assert d.Description() == 'Link to the Zope Community website.'
-        assert len(d.Subject()) == 3
+        self.failUnless( d.Title() == 'Zope Community' )
+        self.failUnless(
+                d.Description() == 'Link to the Zope Community website.' )
+        self.failUnless( len(d.Subject()) == 3 )
+        self.failUnless( d.getRemoteUrl() == 'http://www.zope.org' )
+
+    def test_fixupMissingScheme( self ):
+        d = Link( 'foo' )
+        d.edit( 'http://foo.com' )
+        self.failUnless( d.getRemoteUrl() == 'http://foo.com' )
+
+        d = Link( 'bar' )
+        d.edit( '//bar.com' )
+        self.failUnless( d.getRemoteUrl() == 'http://bar.com' )
+
+        d = Link( 'baz' )
+        d.edit( 'baz.com' )
+        self.failUnless( d.getRemoteUrl() == 'http://baz.com' )
+
 
 
 def test_suite():

@@ -104,6 +104,10 @@
 
  Bug fixes
 
+  - Added fixup to Link objects for user-entered URLs which don't
+    supply scheme:  for example, fix up 'www.zope.com' to
+    'http://www.zope.com'.  (tracker #361)
+
   - Updated CMFCore.CatalogTool to allow new, optional 'idxs'
     argument to 'catalog_object' (tracker #405).
 
