@@ -83,6 +83,7 @@ class NewsItem( Document ):
     __implements__ = Document.__implements__  # redundant, but explicit
 
     meta_type='News Item'
+    text_format = 'html'
 
     security = ClassSecurityInfo()
 

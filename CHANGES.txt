@@ -52,6 +52,8 @@ New Features
 
 Bugs Fixed
 
+  - Make ZMI editing of NewsItems safe (Tracker #472).
+
   - Made generated home pages for new members participate fully in
     workflow (Tracker #467).
 

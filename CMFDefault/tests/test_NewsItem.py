@@ -11,89 +11,116 @@ from Products.CMFCore.tests.base.content import BASIC_STRUCTUREDTEXT
 
 class NewsItemTests(RequestTest):
 
-    def setUp(self):
-        RequestTest.setUp(self)
-        self.d = NewsItem('foo')
+    def test_Empty_html(self):
 
-    def test_Empty(self):
+        d = NewsItem( 'empty', text_format='html' )
+
+        self.assertEqual( d.Title(), '' )
+        self.assertEqual( d.Description(), '' )
+        self.assertEqual( d.Format(), 'text/html' )
+        self.assertEqual( d.text_format, 'html' )
+        self.assertEqual( d.text, '' )
+
+    def test_Empty_stx(self):
+
         d = NewsItem('foo', text_format='structured-text')
-        assert d.title == ''
-        assert d.description == ''
-        assert d.text == ''
-        assert d.text_format == 'structured-text'
 
-    def test_BasicHtml(self):
+        self.assertEqual( d.Title(), '' )
+        self.assertEqual( d.Description(), '' )
+        self.assertEqual( d.Format(), 'text/plain' )
+        self.assertEqual( d.text_format, 'structured-text' )
+        self.assertEqual( d.text, '' )
+
+    def test_PUT_basic_html(self):
+
         self.REQUEST['BODY']=BASIC_HTML
-        d = self.d
+        d = NewsItem('foo')
         d.PUT(self.REQUEST, self.RESPONSE)
-        assert d.Format() == 'text/html', d.Format()
-        assert d.title == 'Title in tag'
-        self.assertEqual(d.text.find('</body>'),-1)
-        assert d.Description() == 'Describe me'
-        self.assertEqual(len(d.Contributors()),3)
 
-    def test_UpperedHtml(self):
+        self.assertEqual( d.Title(), 'Title in tag' )
+        self.assertEqual( d.Description(), 'Describe me' )
+        self.assertEqual( d.Format(), 'text/html' )
+        self.assertEqual( d.text_format, 'html' )
+        self.assertEqual( d.text.find('</body>'), -1 )
+        self.assertEqual( len(d.Contributors()), 3 )
+
+    def test_PUT_uppered_html(self):
+
         self.REQUEST['BODY'] = BASIC_HTML.upper()
-        d = self.d
+        d = NewsItem('foo')
         d.PUT(self.REQUEST, self.RESPONSE)
-        assert d.Format() == 'text/html'
-        assert d.title == 'TITLE IN TAG'
-        self.assertEqual( d.text.find('</BODY'),-1)
-        assert d.Description() == 'DESCRIBE ME'
-        assert len(d.Contributors()) == 3
 
-    def test_EntityInTitle(self):
+        self.assertEqual( d.Title(), 'TITLE IN TAG' )
+        self.assertEqual( d.Description(), 'DESCRIBE ME' )
+        self.assertEqual( d.Format(), 'text/html' )
+        self.assertEqual( d.text_format, 'html' )
+        self.assertEqual( d.text.find('</BODY'), -1 )
+        self.assertEqual( len(d.Contributors()), 3 )
+
+    def test_PUT_entity_in_title(self):
+
         self.REQUEST['BODY'] = ENTITY_IN_TITLE
-        d = self.d
+        d = NewsItem('foo')
         d.PUT(self.REQUEST, self.RESPONSE)
-        assert d.title == '&Auuml;rger', "Title '%s' being lost" % (
-            d.title )
 
-    def test_HtmlWithDoctype(self):
-        d = self.d
+        self.assertEqual( d.Title(), '&Auuml;rger' )
+
+    def test_PUT_html_with_doctype(self):
+
+        d = NewsItem('foo')
         self.REQUEST['BODY'] = '%s\n%s' % (DOCTYPE, BASIC_HTML)
         d.PUT(self.REQUEST, self.RESPONSE)
-        assert d.Description() == 'Describe me'
 
-    def test_HtmlWithoutNewlines(self):
-        d = self.d
+        self.assertEqual( d.Description(), 'Describe me' )
+
+    def test_PUT_html_without_newlines(self):
+
+        d = NewsItem('foo')
         self.REQUEST['BODY'] = ''.join(BASIC_HTML.split('\n'))
         d.PUT(self.REQUEST, self.RESPONSE)
-        assert d.Format() == 'text/html'
-        assert d.Description() == 'Describe me'
 
-    def test_StructuredText(self):
+        self.assertEqual( d.Title(), 'Title in tag' )
+        self.assertEqual( d.Description(), 'Describe me' )
+        self.assertEqual( d.Format(), 'text/html' )
+        self.assertEqual( d.text_format, 'html' )
+        self.assertEqual( d.text.find('</body>'), -1 )
+        self.assertEqual( len(d.Contributors()), 3 )
+
+    def test_PUT_structured_text(self):
+
         self.REQUEST['BODY'] = BASIC_STRUCTUREDTEXT
-        d = self.d
-        d.PUT(self.REQUEST, self.RESPONSE)
+        d = NewsItem('foo')
+        d.PUT( self.REQUEST, self.RESPONSE )
         
-        assert d.Format() == 'text/plain'
-        self.assertEqual(d.Title(),'My Document')
-        self.assertEqual(d.Description(),'A document by me')
-        assert len(d.Contributors()) == 3
-        self.failUnless(d.cooked_text.find('<p>') >= 0)
+        self.assertEqual( d.Title(), 'My Document')
+        self.assertEqual( d.Description(), 'A document by me')
+        self.assertEqual( d.Format(), 'text/plain' )
+        self.assertEqual( d.text_format, 'structured-text' )
+        self.assertEqual( len(d.Contributors()), 3 )
+        self.failUnless( d.cooked_text.find('<p>') >= 0 )
 
     def test_Init(self):
+
         self.REQUEST['BODY'] = BASIC_STRUCTUREDTEXT
         d = NewsItem('foo', text='')
         d.PUT(self.REQUEST, self.RESPONSE)
-        assert d.Format() == 'text/plain'
-        self.assertEqual(d.Title(),'My Document')
-        self.assertEqual(d.Description(),'A document by me')
-        assert len(d.Contributors()) == 3
-        self.failUnless(d.cooked_text.find('<p>') >= 0)
 
-        d = NewsItem('foo', text='')
-        self.REQUEST['BODY'] = BASIC_HTML
-        d.PUT(self.REQUEST, self.RESPONSE)
-        assert d.Format() == 'text/html'
-        assert d.Title() == 'Title in tag'
-        assert len(d.Contributors()) == 3
+        self.assertEqual( d.Title(), 'My Document' )
+        self.assertEqual( d.Description(), 'A document by me' )
+        self.assertEqual( d.Format(), 'text/plain' )
+        self.assertEqual( d.text_format, 'structured-text' )
+        self.assertEqual( len(d.Contributors()), 3 )
+        self.failUnless( d.cooked_text.find('<p>') >= 0 )
+
+    def test_Init_with_stx( self ):
 
         d = NewsItem('foo', text_format='structured-text', title='Foodoc')
-        assert d.text == ''
-        assert d.title == 'Foodoc'
-        assert d.Format() == 'text/plain'
+
+        self.assertEqual( d.Title(), 'Foodoc' )
+        self.assertEqual( d.Description(), '' )
+        self.assertEqual( d.Format(), 'text/plain' )
+        self.assertEqual( d.text_format, 'structured-text' )
+        self.assertEqual( d.text, '' )
 
 def test_suite():
     return makeSuite(NewsItemTests)
