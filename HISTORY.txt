@@ -1,5 +1,8 @@
 1.1 beta
 
+ - Make sure that we update the catalog after editing metadata
+   (thanks to robert@rocad.ch for pointing this out).
+
  - Remove ugly '_mimetype_registry' hack for 'PUT_factory'.
 
  - Make 'PUT_factory' use new 'content_type_registry' tool.
