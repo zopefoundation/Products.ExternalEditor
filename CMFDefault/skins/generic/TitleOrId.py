@@ -1,8 +1,8 @@
 ## Script (Python) "TitleOrId"
-##parameters=dontCall=1
+##parameters=dontCall=0
 ##bind namespace=_
 ##title=Return Title or getId
-if not dontCall:
+if dontCall:
     title = context.Title
     id = context.id
 else:
