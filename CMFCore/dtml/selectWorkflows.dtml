@@ -23,7 +23,7 @@
 <tr>
 <td class="form-label">
  <a href="../portal_types/&dtml.url_quote-id;/manage_workspace"
-  >&dtml-id;<dtml-if title>(&dtml-title;)</dtml-if></a>
+  >&dtml-id;<dtml-if title> (&dtml-title;)</dtml-if></a>
 </td>
 <td class="form-element">
  <input type="text" name="chain_&dtml-id;" value="&dtml-chain;" size="70" />
