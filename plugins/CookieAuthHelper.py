@@ -18,7 +18,7 @@ $Id$
 """
 
 from base64 import encodestring, decodestring
-from urllib import quote
+from urllib import quote, unquote
 
 from AccessControl.SecurityInfo import ClassSecurityInfo
 from OFS.Folder import Folder
@@ -103,7 +103,7 @@ class CookieAuthHelper(Folder, BasePlugin):
         cookie = request.get(self.cookie_name, '')
 
         if cookie:
-            cookie_val = decodestring(cookie)
+            cookie_val = decodestring(unquote(cookie))
             login, password = cookie_val.split(':')
 
             creds['login'] = login
@@ -138,8 +138,8 @@ class CookieAuthHelper(Folder, BasePlugin):
     def updateCredentials(self, request, response, login, new_password):
         """ Respond to change of credentials (NOOP for basic auth). """
         cookie_val = encodestring('%s:%s' % (login, new_password))
-        cookie_val = cookie_val.replace( '\n', '' )
-        response.setCookie(self.cookie_name, cookie_val, path='/')
+        cookie_val = cookie_val.rstrip()
+        response.setCookie(self.cookie_name, quote(cookie_val), path='/')
 
 
     security.declarePrivate('resetCredentials')
