@@ -18,6 +18,7 @@ the browser request.  Skins are stored in a fixed-name subobject.
 $Id$
 """
 
+from thread import get_ident
 from AccessControl import ClassSecurityInfo
 from Acquisition import aq_base
 from Acquisition import ImplicitAcquisitionWrapper
@@ -38,9 +39,19 @@ except AttributeError:
 _marker = []  # Create a new marker object.
 
 
-class SkinnableObjectManager (ObjectManager):
+SKINDATA = {} # mapping thread-id -> (skinobj, ignore, resolve)
 
-    _v_skindata = None
+class SkinDataCleanup:
+    """Cleanup at the end of the request."""
+    def __init__(self, tid):
+        self.tid = tid
+    def __del__(self):
+        tid = self.tid
+        if SKINDATA.has_key(tid):
+            del SKINDATA[tid]
+
+
+class SkinnableObjectManager(ObjectManager):
 
     security = ClassSecurityInfo()
 
@@ -57,16 +68,20 @@ class SkinnableObjectManager (ObjectManager):
         This should be fast, flexible, and predictable.
         '''
         if not name.startswith('_') and not name.startswith('aq_'):
-            sd = self._v_skindata
+            sd = SKINDATA.get(get_ident())
             if sd is not None:
-                request, ob, ignore = sd
+                ob, ignore, resolve = sd
                 if not ignore.has_key(name):
+                    if resolve.has_key(name):
+                        return resolve[name]
                     subob = getattr(ob, name, _marker)
                     if subob is not _marker:
                         # Return it in context of self, forgetting
                         # its location and acting as if it were located
                         # in self.
-                        return aq_base(subob)
+                        retval = aq_base(subob)
+                        resolve[name] = retval
+                        return retval
                     else:
                         ignore[name] = 1
         if superGetAttr is None:
@@ -107,15 +122,18 @@ class SkinnableObjectManager (ObjectManager):
         Can be called manually, allowing the user to change
         skins in the middle of a request.
         '''
-        self._v_skindata = None
         skinobj = self.getSkin(skinname)
         if skinobj is not None:
-            self._v_skindata = (self.REQUEST, skinobj, {})
+            tid = get_ident()
+            SKINDATA[tid] = (skinobj, {}, {})
+            REQUEST = getattr(self, 'REQUEST', None)
+            if REQUEST is not None:
+                REQUEST._hold(SkinDataCleanup(tid))
 
     security.declarePublic('setupCurrentSkin')
     def setupCurrentSkin(self, REQUEST=None):
         '''
-        Sets up _v_skindata so that __getattr__ can find it.
+        Sets up skindata so that __getattr__ can find it.
 
         Can NOT be called manually to change skins in the middle of a
         request! Use changeSkin for that.
@@ -126,7 +144,7 @@ class SkinnableObjectManager (ObjectManager):
             # self is not fully wrapped at the moment.  Don't
             # change anything.
             return
-        if self._v_skindata is not None and self._v_skindata[0] is REQUEST:
+        if SKINDATA.has_key(get_ident()):
             # Already set up for this request.
             return
         skinname = self.getSkinNameFromRequest(REQUEST)
@@ -158,18 +176,21 @@ class SkinnableObjectManager (ObjectManager):
         '''
         superCheckId = SkinnableObjectManager.inheritedAttribute('_checkId')
         if not allow_dup:
-            # Temporarily disable _v_skindata.
+            # Temporarily disable skindata.
             # Note that this depends heavily on Zope's current thread
             # behavior.
-            sd = self._v_skindata
-            self._v_skindata = None
+            tid = get_ident()
+            sd = SKINDATA.get(tid)
+            if sd is not None:
+                del SKINDATA[tid]
             try:
                 base = getattr(self,  'aq_base', self)
                 if not hasattr(base, id):
                     # Cause _checkId to not check for duplication.
                     return superCheckId(self, id, allow_dup=1)
             finally:
-                self._v_skindata = sd
+                if sd is not None:
+                    SKINDATA[tid] = sd
         return superCheckId(self, id, allow_dup)
 
 InitializeClass(SkinnableObjectManager)
