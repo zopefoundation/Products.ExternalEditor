@@ -263,6 +263,20 @@ class WorkflowTool (UniqueObject, Folder):
             return self.manage_selectWorkflows(REQUEST, manage_tabs_message=
                                                'Changed.')
 
+    security.declareProtected( CMFCorePermissions.ManagePortal
+                             , 'setDefaultChain')
+    def setDefaultChain(self, default_chain):
+        """ Set the default chain """
+        default_chain = replace(default_chain, ',', ' ')
+        ids = []
+        for wf_id in split(default_chain, ' '):
+            if wf_id:
+                if not self.getWorkflowById(wf_id):
+                    raise ValueError, ( '"%s" is not a workflow ID.' % wf_id)
+                ids.append(wf_id)
+
+        self._default_chain = tuple(ids)
+
     security.declareProtected(CMFCorePermissions.ManagePortal,
                               'setChainForPortalTypes')
     def setChainForPortalTypes(self, pt_names, chain):
@@ -279,7 +293,7 @@ class WorkflowTool (UniqueObject, Folder):
             id = t.getId()
             if id in pt_names:
                 cbt[id] = tuple(chain)
-                
+
 
     security.declareProtected(CMFCorePermissions.ManagePortal,
                               'updateRoleMappings')
