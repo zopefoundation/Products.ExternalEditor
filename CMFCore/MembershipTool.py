@@ -216,6 +216,7 @@ class MembershipTool (UniqueObject, SimpleItem):
 
         # This is *not* a local role in the portal but used by it
         roles.append('Manager')
+        roles.append('Owner')
 
         return roles
 
