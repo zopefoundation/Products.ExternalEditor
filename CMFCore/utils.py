@@ -88,7 +88,7 @@ from AccessControl import ClassSecurityInfo
 from AccessControl.Permission import Permission
 from AccessControl.Role import gather_permissions
 import Globals
-from Acquisition import aq_get
+from Acquisition import aq_get, aq_inner, aq_parent
 try: from OFS.ObjectManager import UNIQUE
 except ImportError: UNIQUE = 2
 
@@ -96,6 +96,13 @@ except ImportError: UNIQUE = 2
 # implementations change without having to affect the consumer.
 
 _marker = []  # Create a new marker object.
+
+def getPortal(ob):
+    # This isn't as efficient as it could be.
+    while ob is not None:
+        if getattr(ob, '_isPortalRoot', 0):
+            return ob
+        ob = aq_parent(aq_inner(ob))
 
 def getToolByName(obj, name, default=_marker):
     " Get the tool, 'toolname', by acquiring it. "
