@@ -103,7 +103,7 @@ class ExternalEditor:
             self.config = Configuration(config_path)
 
             # Open the input file and read the metadata headers
-            in_f = open(input_file)
+            in_f = open(input_file, 'rb')
             metadata = {}
 
             while 1:

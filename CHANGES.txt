@@ -1,5 +1,7 @@
 External Editor Change Log
 
+    - Fixed bug with editing binary data on Windows. Thanks to Eric Kamm.
+
     - Fixed bug setting the editor on Posix platforms.
 
   6/24/02 - 0.4 Release
