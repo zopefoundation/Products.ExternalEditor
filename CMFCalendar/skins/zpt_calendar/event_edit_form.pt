@@ -1,0 +1,257 @@
+<html metal:use-macro="container/main_template/macros/master">
+    <body>
+    <div metal:fill-slot="main">
+    <style type="text/css">
+    <!--
+    td { font-size: 80%; font-family: Verdana, Helvetica, sans-serif; }
+    th { font-size: 80%; font-weight:  bold; font-family: Verdana, Helvetica, sans-serif; }
+	td.EventBackground { background: #DDDDDD; font-size: 80%; font-family: Verdana, Helvetica, sans-serif; }
+    td.EventHorizon { background: #818384; font-size: 80%; font-family: Verdana, Helvetica, sans-serif; }
+    #nav td {PADDING-LEFT: 2px;}
+    -->
+    </style>
+
+    <form method="post" action="event_edit"
+        tal:attributes="action python:here.absolute_url() + '/event_edit'">
+    <div class="Desktop">
+    <table class="FormLayout" border="0" bordercolor="bronze" width="100%" height="100%">
+    <tr>
+        <td align="center" valign="top">
+        <table border="0" bordercolor="grey" width="100%" height="100%" cellspacing="0" cellpadding="0">
+        <tr height="2%">
+            <td colspan="5">
+            <table border="0" cellpadding="0" cellspacing="0">
+            <tr>
+                <td><img src="../calendar/event_info_tab.gif" height="21" width="90" border="0"
+				           tal:attributes="src string:event_info_tab.gif"></td>
+                      <td><img src="../calendar/space.gif" width="1" height="1"
+					           tal:attributes="src string:space.gif"></td>
+                <td></td>
+                      <td><img src="../calendar/space.gif" width="1" height="1"
+					           tal:attributes="src string:space.gif"></td>
+                <td></td>
+                <td><img src="../calendar/space.gif" width="1" height="1"
+					           tal:attributes="src string:space.gif"></td>
+                <td></td>
+                <td><img src="../calendar/space.gif" width="1" height="1"
+					           tal:attributes="src string:space.gif"></td>
+            </tr>
+            </table>
+            </td>
+        </tr>
+        <tr height="2%">
+            <td class="EventHorizon" width="15%" colspan="4">&nbsp;</td>
+            <td width="85%" class="EventHorizon" align="right" nowrap>
+            <table border="0" cellpadding="6" cellspacing="0">
+            <tr>
+                <td align="Right" nowrap>
+                <nobr>
+                <input type="submit" value="Save" style="font-size:9pt">&nbsp;
+                <input type="reset" value="Reset" style="font-size:9pt">&nbsp;
+                </nobr>
+                </td>
+            </tr>
+            </table>
+            </td>
+        </tr>
+        <tr height="1">
+            <td colspan="5" bgcolor="#FFFFFF"><img src="../calendar/space.gif" width="1" height="1"
+					           tal:attributes="src string:space.gif"></td>
+        </tr>
+            <tr height="96%">
+                <td colspan="5" class="EventBackground" valign="top">
+                <table border="0" cellpadding="5" width="100%" cellspacing="3">
+                <tr>
+                    <td class="EventBackground">
+                    <table border="0" width="100%">
+                    <tr>
+                        <th align="right" nowrap>Event Name</th>
+                        <td nowrap><input type="text"
+        name="title" maxlength="100" size="35" value="Title"
+        tal:attributes="value here/Title"></td>
+                        <th align="right" nowrap>Contact Name</th>
+                        <td nowrap><input type="text"
+        name="contact_name" maxlength="100" size="35"
+        value="contact_name"
+        tal:attributes="value here/contact_name"></td>
+                    </tr>
+                    <tr>
+                        <th align="right">Location</th>
+                        <td nowrap><input type="text"
+        name="location" maxlength="100" size="35"
+        value="location" tal:attributes="value here/location"></td>
+                        <th align="right" nowrap>Contact Email</th>
+                        <td nowrap><input type="text"
+        name="contact_email" maxlength="100" size="35"
+        value="contact_email"
+        tal:attributes="value here/contact_email"></td>
+                    </tr>
+                    <tr>
+                        <th align="right" valign="top">Event type</th>
+                        <td valign="top">
+                        <select name="event_type:list" multiple
+                                tal:define="contentSubject here/Subject; allowedSubjects python:here.portal_metadata.listAllowedSubjects(here)">
+                        <option tal:replace="nothing">Event Type 1</option>
+                        <option tal:replace="nothing">Event Type 2</option>
+                        <option tal:replace="nothing">...</option>
+                        <option value="subj"
+                                tal:repeat="subj allowedSubjects"
+                                tal:attributes="value subj; selected python:subj in contentSubject and 1 or 0"
+                                tal:content="subj">Event Type N</option>
+                        </select>
+
+                        </td>
+                        <th align="right" nowrap>Contact Phone</th>
+                        <td nowrap>
+                            <input type="text"
+        name="contact_phone" maxlength="100" size="35"
+        value="contact_phone" id="cb_contact_phone"
+        tal:attributes="value here/contact_phone" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th align="right">Event URL</th>
+                        <td colspan="3">
+                            <input type="text" name="event_url"
+        size="55" maxlength="100" value="event_url"
+        tal:attributes="value here/event_url" />
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="4">
+                        <table border="0" width="100%" cellpadding="2" cellspacing="3">
+                        <tr>
+                            <td colspan="4">
+                                <hr>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th valign="middle" align="right">Start Date</th>
+                            <td tal:define="startstrings here/getStartStrings">
+                                <select name="effectiveYear">
+                                <option value=""
+        tal:define="years here/buildYears"
+        tal:repeat="year years"
+        tal:attributes="value year; selected python:year == startstrings['year']"
+        tal:content="year">Year
+                                </option>
+                                </select>
+                                &nbsp;
+
+                                <select name="effectiveMo">
+                                <option value=""
+        tal:define="months here/buildMonths"
+        tal:repeat="month months"
+        tal:attributes="value month; selected python:month == startstrings['month']"
+        tal:content="month">Month
+                                </option>
+                                </select>
+                                &nbsp;
+
+                                <select name="effectiveDay">
+                                <option value=""
+        tal:define="days here/buildDays" tal:repeat="day days"
+        tal:attributes="value day; selected python:day == startstrings['day']"
+        tal:content="day">Day
+                                </option>
+                                </select>
+                            </td>
+                            <th valign="middle" align="right"> Stop Date </th>
+                            <td tal:define="endstrings here/getEndStrings">
+                                <select name="expirationYear">
+                                <option value=""
+        tal:define="years here/buildYears"
+        tal:repeat="year years"
+        tal:attributes="value year; selected python:year == endstrings['year']"
+        tal:content="year">Day
+                                </option>
+                                </select>
+                                &nbsp;
+
+                                <select name="expirationMo">
+                                <option value=""
+        tal:define="months here/buildMonths"
+        tal:repeat="month months"
+        tal:attributes="value month; selected python:month == endstrings['month']"
+        tal:content="month">Month
+                                </option>
+                                </select>
+                                &nbsp;
+
+                                <select name="expirationDay">
+                                <option value=""
+        tal:define="days here/buildDays" tal:repeat="day days"
+        tal:attributes="value day; selected python:day == endstrings['day']"
+        tal:content="day">Day
+                                </option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th valign="middle" align="right">Start Time</th>
+                            <td tal:define="stTimeString python:modules['string'].split(here.getStartTimeString());
+                                amSel python:(len(stTimeString) == 2 and stTimeString[1] == 'am') and 1 or 0;
+                                pmSel python:(len(stTimeString) == 2 and stTimeString[1] == 'pm') and 1 or 0">
+                                <select name="start_time">
+                                <option value=""
+        tal:repeat="bt here/buildTimes"
+        tal:attributes="value bt; selected python:bt == stTimeString[0]"
+        tal:content="bt">start time</option>
+                                </select>&nbsp;
+                                <input type="radio"
+        name="startAMPM" value="am"
+        tal:attributes="checked amSel" /> am
+                                <input type="radio"
+        name="startAMPM" value="pm"
+        tal:attributes="checked pmSel" /> pm
+                                <input type="hidden" name="startAMPM:default" value="pm">
+                            </td>
+                            <th valign="middle" align="right">Stop Time</th>
+                            <td tal:define="stTimeString python:modules['string'].split(here.getStopTimeString());
+                                amSel python:(len(stTimeString) == 2 and stTimeString[1] == 'am') and 1 or 0;
+                                pmSel python:(len(stTimeString) == 2 and stTimeString[1] == 'pm') and 1 or 0">
+                                <select name="stop_time">
+                                <option value=""
+        tal:repeat="bt here/buildTimes"
+        tal:attributes="value bt; selected python:bt == stTimeString[0]"
+        tal:content="bt">end time</option>
+                                </select>&nbsp;
+                                <input type="radio"
+        name="stopAMPM" value="am"
+        tal:attributes="checked amSel" /> am
+                                <input type="radio"
+        name="stopAMPM" value="pm"
+        tal:attributes="checked pmSel" /> pm
+                                <input type="hidden" name="stopAMPM:default" value="pm">
+                            </td>
+                        </tr>
+                        </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4"><hr></td>
+                    </tr>
+                    <tr>
+                        <th align="right" valign="top">Description</th>
+                        <td colspan="3" valign="top" nowrap>
+                        <textarea name="description"
+        wrap="virtual" rows="6" cols="55"
+        tal:content="here/Description">Description</textarea>
+                        </td>
+                    </tr>
+                    </table>
+                    </td>
+                </tr>
+                </table>
+                </td>
+            </tr>
+        </table>
+        </td>
+    </tr>
+    </table>
+    </div>
+	</form>
+	</div>
+    </body>
+    </html>

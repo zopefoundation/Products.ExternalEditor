@@ -1,0 +1,137 @@
+<html metal:use-macro="container/main_template/macros/master">
+    <body>
+    <div metal:fill-slot="main">
+    <style type="text/css">
+    <!--
+    td { font-size: 80%; font-family: Verdana, Helvetica, sans-serif; }
+    th { font-size: 80%; font-weight:  bold; font-family: Verdana, Helvetica, sans-serif; }
+	td.EventBackground { background: #DDDDDD; font-size: 80%; font-family: Verdana, Helvetica, sans-serif; }
+    td.EventHorizon { background: #818384; font-size: 80%; font-family: Verdana, Helvetica, sans-serif; }
+    -->
+    </style>
+    <div class="Desktop">
+    <table border="0" bordercolor="bronze" width="100%" height="100%">
+    <tr>
+        <td align="center" valign="top">
+        <table border="0" bordercolor="grey" width="100%" height="100%" cellspacing="0" cellpadding="0">
+        <tr height="2%">
+            <td colspan="5">
+            <table border="0" cellpadding="0" cellspacing="0">
+            <tr>
+                    <td><img src="../calendar/event_info_tab.gif" height="21" width="90" border="0"
+				         tal:attributes="src string:event_info_tab.gif"></td>
+                <td><img src="../calendar/space.gif" width="1" height="1"
+					           tal:attributes="src string:space.gif"></td>
+                <td></td>
+                <td><img src="../calendar/space.gif" width="1" height="1"
+					           tal:attributes="src string:space.gif"></td>
+                <td></td>
+                <td><img src="../calendar/space.gif" width="1" height="1"
+					           tal:attributes="src string:space.gif"></td>
+                <td></td>
+                <td><img src="../calendar/space.gif" width="1" height="1"
+					           tal:attributes="src string:space.gif"></td>
+            </tr>
+            </table>
+            </td>
+        </tr>
+        <tr height="2%">
+            <td class="EventHorizon" width="15%" colspan="4">&nbsp;</td>
+            <td width="85%" class="EventHorizon" align="right" nowrap>
+            <table border="0" cellpadding="6" cellspacing="0">
+            <tr>
+                <td align="left" nowrap>&nbsp;
+                
+                </td>
+            </tr>
+            </table>
+            </td>
+        </tr>
+        <tr height="1">
+            <td colspan="5" bgcolor="#FFFFFF"><img src="../calendar/space.gif" width="1" height="1"
+					           tal:attributes="src string:space.gif"></td>
+        </tr>
+        <tr height="96%">
+            <td colspan="5" class="EventBackground" valign="top">
+            <table border="0" cellpadding="5" width="100%" cellspacing="3">
+            <tr>
+                <td class="EventBackground">
+                <table border="0" width="100%">
+                <tr>
+                    <th width="10%" align="left" npwrap>Event Name</th>
+                    <td nowrap tal:content="here/Title">Title</td>
+                    <th width="10%" align="left" nowrap>Contact Name</th>
+                    <td nowrap tal:content="here/contact_name">contact_name</td>
+                </tr>
+                <tr>
+                    <th width="10%" align="left" nowrap>Location</th>
+                    <td nowrap tal:content="here/location">location</td>
+                    <th width="10%" align="left" nowrap>Contact Email</th>
+                    <td nowrap
+                        tal:condition="here/contact_email">
+                        <a tal:attributes="href python:'mailto:' + here.contact_email"
+                        tal:content="here/contact_email"
+                        href="mailto:contact_email">contact_email</a>
+                    </td>
+                </tr>
+                <tr>
+                    <th width="10%" align="left" nowrap>Event type</th>
+                    <td valign="top" nowrap
+                        tal:content="python:modules['string'].join(here.Subject(), ' ')"></td>
+                    <th width="10%" align="left" nowrap>Contact Phone</th>
+                    <td nowrap tal:content="here/contact_phone">contact_phone</td>
+                </tr>
+                <tr tal:condition="here/event_url|nothing">
+                    <th align="left" width="10%" nowrap>Event URL</th>
+                    <td colspan="3" nowrap><a href="event_url"
+        tal:attributes="href here/event_url"
+        tal:content="here/event_url">event_url</a></td>
+                </tr>
+                <tr>
+                    <td colspan="4">
+                    <hr>
+                    </td>
+                </tr>
+                <tr>
+                    <th valign="middle" align="left" width="10%" nowrap>Start Date</th>
+                    <td tal:content="python:DateTime.Date(here.start())">
+                    start
+                    </td>
+
+                    <th valign="middle" align="left" width="10%" nowrap> Stop Date </th>
+                    <td tal:content="python:DateTime.Date(here.end())">
+                    end
+                    </td>
+                </tr>
+                <tr>
+                    <th valign="Middle" align="left" width="10%" nowrap>Start Time</th>
+                    <td tal:content="python:DateTime.Time(here.start())">
+                    </td>
+                    <th valign="middle" align="left" width="10%" nowrap>Stop Time</th>
+                    <td tal:content="python:DateTime.Time(here.end())">
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4"><hr></td></tr>
+                <tr>
+                    <th align="right" valign="top">Description</th>
+                    <td colspan="3" valign="top" nowrap
+                        tal:content="here/Description">Description</td>
+                </tr>
+                <tr>
+                    <td height="30" colspan="4">&nbsp;</td>
+                </tr>
+                </table>
+                </td>
+            </tr>
+            </table>
+            </td>
+        </tr>
+        </table>
+        </td>
+    </tr>
+    </table>
+    </div>
+	</div>
+    </body>
+    </html>

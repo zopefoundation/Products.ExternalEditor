@@ -26,3 +26,7 @@ Installing CMFCalendar
   The install function will execute and give information about the
   steps it took to register and install the CMF Events into the CMF
   Site instance.
+
+  If you wish to use the zpt_calendar skins, you will need to
+  have PageTemplates installed, and the CMFDecor product
+  installed.
