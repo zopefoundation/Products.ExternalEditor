@@ -1,5 +1,10 @@
 External Editor Change Log
 
+  6/30/02 - 0.4.2 Release (affects win32 binary only)
+
+    - Added SSL support to Windows binary package. Thanks to Federico 
+      Sevilla III
+
   6/29/02 - 0.4.1 Release
 
     - Fixed dangling dav lock bug on fatal errors. Thanks to Marc St-Jean.

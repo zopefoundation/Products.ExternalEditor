@@ -17,7 +17,7 @@
 
 # Zope External Editor Helper Application by Casey Duncan
 
-__version__ = '0.4'
+__version__ = '0.4.2'
 
 import sys, os
 import traceback

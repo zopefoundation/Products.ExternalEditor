@@ -40,6 +40,22 @@ Zope External Editor Installation
     
     - for Application, select the helper application python file
 
+    Here are instructions for Konqueror (provided by Mark Bucciarelii)
+
+    - Settings -> Configure Konqueror
+    
+    - Select the File Associations icon
+    
+    - Add a new File Assocation: group = application, type = x-zope-edit
+    
+    - This association should now be currently selected in the Known Types 
+      tree control
+      
+    - Add a description, if you like
+
+    - Click the Add button in the Application Preference Order section.  
+      Browse to select /usr/local/bin/zopeedit.py
+
   Tips
   
     The helper application can run any editor program that does not detach
