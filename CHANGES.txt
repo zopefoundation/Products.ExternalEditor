@@ -81,6 +81,9 @@ CMF 1.4 alpha
 
   Bug Fixes
 
+    - Fixed editSyInformationProperties in SyndicationTool to ensure
+      that updateBase is saved as a DateTime instance.
+
     - Action providers: Default _actions' are now tuples, not lists.
       (Collector #123)
 
