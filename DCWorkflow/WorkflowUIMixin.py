@@ -43,10 +43,11 @@ class WorkflowUIMixin:
     manage_groups = PageTemplateFile('workflow_groups.pt', _dtmldir)
 
     security.declareProtected(ManagePortal, 'setProperties')
-    def setProperties(self, title, REQUEST=None):
-        '''
-        '''
+    def setProperties(self, title, manager_bypass=0, REQUEST=None):
+        """Sets basic properties.
+        """
         self.title = str(title)
+        self.manager_bypass = manager_bypass and 1 or 0
         if REQUEST is not None:
             return self.manage_properties(
                 REQUEST, manage_tabs_message='Properties changed.')
@@ -55,8 +56,8 @@ class WorkflowUIMixin:
 
     security.declareProtected(ManagePortal, 'manage_permissions')
     def manage_permissions(self, REQUEST, manage_tabs_message=None):
-        '''
-        '''
+        """Displays the form for choosing which permissions to manage.
+        """
         return self._permissions_form(REQUEST,
                                       management_view='Permissions',
                                       manage_tabs_message=manage_tabs_message,
@@ -64,8 +65,8 @@ class WorkflowUIMixin:
 
     security.declareProtected(ManagePortal, 'addManagedPermission')
     def addManagedPermission(self, p, REQUEST=None):
-        '''
-        '''
+        """Adds to the list of permissions to manage.
+        """
         if p in self.permissions:
             raise ValueError, 'Already a managed permission: ' + p
         if REQUEST is not None and p not in self.getPossiblePermissions():
@@ -77,8 +78,8 @@ class WorkflowUIMixin:
 
     security.declareProtected(ManagePortal, 'delManagedPermissions')
     def delManagedPermissions(self, ps, REQUEST=None):
-        '''
-        '''
+        """Removes from the list of permissions to manage.
+        """
         if ps:
             l = list(self.permissions)
             for p in ps:
@@ -90,8 +91,8 @@ class WorkflowUIMixin:
 
     security.declareProtected(ManagePortal, 'getPossiblePermissions')
     def getPossiblePermissions(self):
-        '''
-        '''
+        """Returns the list of all permissions that can be managed.
+        """
         # possible_permissions is in AccessControl.Role.RoleManager.
         return list(self.possible_permissions())
 

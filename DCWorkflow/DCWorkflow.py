@@ -78,6 +78,8 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
     roles = None  # The role names managed by this workflow.
     # If roles is None, listRoles() provides a default.
 
+    manager_bypass = 0  # Boolean: 'Manager' role bypasses guards
+
     manage_options = (
         {'label': 'Properties', 'action': 'manage_properties'},
         {'label': 'States', 'action': 'states/manage_main'},

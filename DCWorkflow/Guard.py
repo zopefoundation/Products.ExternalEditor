@@ -41,9 +41,14 @@ class Guard (Persistent, Explicit):
     guardForm = DTMLFile('guard', _dtmldir)
 
     def check(self, sm, wf_def, ob):
-        '''
-        Checks conditions in this guard.
-        '''
+        """Checks conditions in this guard.
+        """
+        u_roles = None
+        if wf_def.manager_bypass:
+            # Possibly bypass.
+            u_roles = sm.getUser().getRolesInContext(ob)
+            if 'Manager' in u_roles:
+                return 1
         if self.permissions:
             for p in self.permissions:
                 if sm.checkPermission(p, ob):
@@ -52,7 +57,8 @@ class Guard (Persistent, Explicit):
                 return 0
         if self.roles:
             # Require at least one of the given roles.
-            u_roles = sm.getUser().getRolesInContext(ob)
+            if u_roles is None:
+                u_roles = sm.getUser().getRolesInContext(ob)
             for role in self.roles:
                 if role in u_roles:
                     break
