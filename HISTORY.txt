@@ -29,6 +29,9 @@
    Script that will convert your existing Catalog to use 'getIcon' instead of
    'icon' (Issue PTK(244)[]). 
 
+ - Filter type objects using 'isConstructionAllowed' in
+   'PortalFolder.allowedContentTypes' (Tracker issue #249).
+
 1.0 final (2001/03/29)
 
  - Removed embedded spaces in 'portal_status_message' strings

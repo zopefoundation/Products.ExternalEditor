@@ -183,12 +183,14 @@ class PortalFolder( Folder, DynamicType ):
 
         if myType is not None:
             for contentType in portal_types.listTypeInfo():
-                if myType.allowType(contentType.Type()):
-                    result.append(contentType)
+                if myType.allowType( contentType.Type() ):
+                    result.append( contentType )
         else:
             result = portal_types.listTypeInfo()
 
-        return result
+        return filter( lambda typ, container=self:
+                          typ.isConstructionAllowed( container )
+                     , result )
     
     security.declareProtected(AddPortalFolders, 'manage_addPortalFolder')
     def manage_addPortalFolder(self, id, title='', REQUEST=None):
