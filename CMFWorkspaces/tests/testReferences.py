@@ -19,6 +19,7 @@ $Id$
 import unittest
 import Testing
 import Zope
+Zope.startup()
 from Products.CMFWorkspaces.References import ReferenceCollection
 from OFS.Folder import Folder
 from Acquisition import aq_base, aq_inner, aq_parent

@@ -20,6 +20,7 @@ import unittest
 import Testing
 from Acquisition import aq_base
 import Zope
+Zope.startup()
 from OFS.Folder import Folder
 from AccessControl.User import SimpleUser
 

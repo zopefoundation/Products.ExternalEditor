@@ -19,6 +19,7 @@ $Id$
 import unittest
 import Testing
 import Zope
+Zope.startup()
 from Acquisition import aq_base
 from OFS.Folder import Folder
 from AccessControl.SecurityManagement import newSecurityManager, \
