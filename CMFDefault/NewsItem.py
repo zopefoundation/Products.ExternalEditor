@@ -90,7 +90,6 @@ ADD_CONTENT_PERMISSION = 'Add portal content'
  
 import Globals
 from Globals import HTMLFile, HTML
-from Discussions import Discussable
 from Document import Document
 from utils import parseHeadersBody
 

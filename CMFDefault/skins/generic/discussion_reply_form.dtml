@@ -27,7 +27,7 @@
   <td></td>
   <td>
    <input type="submit" value="Preview" name="&dtml-getId;/discussion_reply_preview:method">
-   <input type="submit" value="Reply" name="createReply:method">
+   <input type="submit" value="Reply" name="discussion_reply:method">
   </td>
  </tr>
 </table>

@@ -2,33 +2,18 @@
  showThreads.dtml 
  Generate a simple tree view of message threads to include on a page.
 </dtml-comment>
+<!-- showThreads -->
 
-<dtml-if "_.hasattr(this().talkback, 'parentsInThread') and talkback.parentsInThread(1)">
- Above in thread:
- <dtml-if "_.len(this().talkback.parentsInThread()) > 5">... :</dtml-if>
- <dtml-in "talkback.parentsInThread(5)">
-  <a href="&dtml-absolute_url;">&dtml-title;</a>
-  <dtml-unless sequence-end>:</dtml-unless>
- </dtml-in>
- <p>
-</dtml-if>
-
+<dtml-comment>
+  The following lamosity brought to you courtesy of the tree tag,
+  which has to use the 'URL' value from the MD.
+</dtml-comment>
 <dtml-let URL=absolute_url>
-<dtml-if expr="PARENTS[0].meta_type == 'Discussion Item'">
- Replies:
-  <dtml-tree branches="getReplies">
-   <a href="&dtml-absolute_url;"><img border=0 src="<dtml-var SCRIPT_NAME><dtml-var getIcon>"></a>
-   <a href="&dtml-absolute_url;">&dtml-title;</a>,
-   by <dtml-var Creator>
-   on <dtml-var Date>
-  </dtml-tree>
-<dtml-else>
-  <dtml-tree name="talkback" branches="getReplies">
-   <a href="&dtml-absolute_url;"><img border=0 src="<dtml-var SCRIPT_NAME><dtml-var getIcon>"></a>
-   <a href="&dtml-absolute_url;">&dtml-title;</a>,
-   by <dtml-var Creator>
-   on <dtml-var Date>
-  </dtml-tree>
-</dtml-if>
+<dtml-tree branches_expr="talkback.getReplies()">
+ <a href="&dtml-absolute_url;"
+ ><img border=0 src="&dtml-portal_url;/&dtml-getIcon;"></a>
+ <a href="&dtml-absolute_url;">&dtml-Title;</a>,
+ by <dtml-var Creator>
+ on <dtml-var CreationDate>
+</dtml-tree>
 </dtml-let>
-

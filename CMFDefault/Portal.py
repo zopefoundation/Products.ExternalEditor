@@ -91,7 +91,7 @@ from Products.CMFCore.utils import getToolByName
 from Products.CMFTopic import Topic, topic_globals
 from DublinCore import DefaultDublinCoreImpl
 
-import Document, Image, File, Link, NewsItem, Favorite
+import Document, Image, File, Link, NewsItem, Favorite, DiscussionItem
 
 factory_type_information = ( Document.factory_type_information
                            + Image.factory_type_information
@@ -99,6 +99,7 @@ factory_type_information = ( Document.factory_type_information
                            + Link.factory_type_information
                            + NewsItem.factory_type_information
                            + Favorite.factory_type_information
+                           + DiscussionItem.factory_type_information
                            )
 
 

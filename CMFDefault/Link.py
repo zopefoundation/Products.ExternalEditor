@@ -89,7 +89,6 @@ ADD_CONTENT_PERMISSION = 'Add portal content'
 
 import Globals
 from Globals import HTMLFile, HTML
-from Discussions import Discussable
 from Products.CMFCore.PortalContent import PortalContent
 from DublinCore import DefaultDublinCoreImpl
 

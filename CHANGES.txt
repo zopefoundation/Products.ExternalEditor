@@ -2,6 +2,9 @@
 
  New features
 
+  - Added 'run_all_tests' script, to simplify running all unit
+    tests for CMF-related products.
+
   - Factored out index and column lists, to ease customization
     (Tracker #289)
 
@@ -41,6 +44,14 @@
       stx_level on the object.
 
  Bug fixes
+
+  - *LARGE* patch to CMFDefault.DiscussionItem and
+    CMFDefault.DiscussionTool, plus removal of
+    CMFDefault.Discussions:  changed threading strategy to remove
+    dependency on the path of the "host" content object.  Includes
+    an ExternalMethod, CMFDefault/Extensions/update_discussion.py,
+    which must be run to convert existing content which contains
+    discussion.
 
   - Overrode DublinCore's isEffective in CMFCalendar.Event to
     always return true;  this change prevents blocking view of

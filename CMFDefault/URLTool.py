@@ -135,6 +135,24 @@ class URLTool (UniqueObject, SimpleItem):
         """
         return self.aq_inner.aq_parent
 
+    security.declarePublic( 'getRelativeContentPath' )
+    def getRelativeContentPath( self, content ):
+        """
+            Return the path (sequence of IDs) for an object, relative 
+            to the portal root
+        """
+        portal_path_length = len(self.aq_inner.aq_parent.getPhysicalPath())
+        content_location = content.getPhysicalPath()
+        return content_location[portal_path_length:]
+
+    security.declarePublic( 'getRelativeContentURL' )
+    def getRelativeContentURL( self, content ):
+        """
+            Return the URL (slash-separated string) for an object,
+            relative to the portal root
+        """
+        return string.join( self.getRelativeContentPath( content ), '/' )
+
     security.declarePublic( 'getRelativeUrl' )
     def getRelativeUrl(self, content):
         """

@@ -95,7 +95,7 @@ try:
 except ImportError:
     HAS_SKINNED_FOLDER=0
 
-import Discussions, DiscussionItem
+import DiscussionItem
 import PropertiesTool, MembershipTool, MetadataTool
 import RegistrationTool, URLTool, DublinCore, DiscussionTool
 import SyndicationTool
@@ -123,7 +123,6 @@ if SUPPLY_DEPRECATED_PTK_BASE_ALIASES:
                          , ( 'Products.PTKBase.Image', Image )
                          , ( 'Products.PTKBase.Link', Link )
                          , ( 'Products.PTKBase.NewsItem', NewsItem )
-                         , ( 'Products.PTKBase.Discussions', Discussions )
                          )
 
     #   ...and make sure we can find them in PTKBase when we do
@@ -146,17 +145,16 @@ if HAS_SKINNED_FOLDER:
     contentClasses = contentClasses + ( SkinnedFolder.SkinnedFolder, )
 
 contentConstructors = ( Document.addDocument
-                        , File.addFile
-                        , Image.addImage
-                        , Link.addLink
-                        , Favorite.addFavorite
-                        , NewsItem.addNewsItem
-                        )
+                      , File.addFile
+                      , Image.addImage
+                      , Link.addLink
+                      , Favorite.addFavorite
+                      , NewsItem.addNewsItem
+                      )
 
 bases = ( ( Portal.CMFSite
-          , Discussions.Discussable
-          , Discussions.DiscussionResponse
           , DublinCore.DefaultDublinCoreImpl
+          , DiscussionItem.DiscussionItem
           )
           + contentClasses
         )

@@ -21,7 +21,7 @@
   <td>
    <input type="submit" value="Edit"
           name="&dtml-getId;/discussion_reply_form:method">
-   <input type="submit" value="Reply" name="createReply:method">
+   <input type="submit" value="Reply" name="discussion_reply:method">
   </td>
  </tr></table>
 </form>

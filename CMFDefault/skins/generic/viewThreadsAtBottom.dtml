@@ -4,10 +4,13 @@
  really should be defined by an acquired property or some such...
 </dtml-comment>
 
-<dtml-if expr="_.hasattr(this(), 'talkback')">
-  <dtml-if expr="talkback.hasReplies()">
-    <h4>Comments:</h4>
+<!-- viewThreadsAtBottom -->
 
+<dtml-if talkback>
+
+    <dtml-if expr="talkback.hasReplies()">
+    <h4>Comments:</h4>
     <dtml-var showThreads>
-  </dtml-if>
+    </dtml-if>
+
 </dtml-if>

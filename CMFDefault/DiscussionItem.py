@@ -83,16 +83,43 @@
 # 
 ##############################################################################
 
-import Globals
-from Globals import HTMLFile, Persistent, PersistentMapping
-from Acquisition import Implicit, aq_base
-from Discussions import DiscussionResponse
-from Document import Document
-from DublinCore import DefaultDublinCoreImpl
+import urllib, string
+from Globals import HTMLFile, Persistent, PersistentMapping, InitializeClass
+from AccessControl import ClassSecurityInfo
+from Acquisition import Implicit, aq_base, aq_inner, aq_parent
+from OFS.Traversable import Traversable
 from DateTime import DateTime
+
+from Products.CMFCore import CMFCorePermissions
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.PortalContent import PortalContent
-import urllib, string
+
+from Document import Document
+from DublinCore import DefaultDublinCoreImpl
+
+
+factory_type_information = ( { 'id'             : 'Discussion Item'
+                             , 'meta_type'      : 'Discussion Item'
+                             , 'description'    : """\
+Discussion Items are documents which reply to other content.
+They should *not* be addable through the standard 'folder_factories'
+interface."""
+                             , 'icon'           : 'discussionitem_icon.gif'
+                             , 'product'        : '' # leave blank to suppress
+                             , 'factory'        : ''
+                             , 'immediate_view' : ''
+                             , 'actions'        :
+                                ( { 'name'          : 'View'
+                                  , 'action'        : 'discussionitem_view'
+                                  , 'permissions'   : (
+                                      CMFCorePermissions.View, )
+                                  }
+                                ,
+                                )
+                             }
+                           ,
+                           )
+
 
 def addDiscussionItem(self, id, title, description, text_format, text,
                       reply_to, RESPONSE=None):
@@ -123,131 +150,104 @@ def addDiscussionItem(self, id, title, description, text_format, text,
 
     
 class DiscussionItem( Document
-                    , DiscussionResponse
                     , DefaultDublinCoreImpl
                     ):
     """
-    This is the PortalContent object for content which is a response to other
-    content.
+        Class for content which is a response to other content.
     """
-    meta_type = 'Discussion Item'
-    allow_discussion = 1
-    creator = 'unknown'
+    meta_type           = 'Discussion Item'
+    allow_discussion    = 1
+    creator             = 'unknown'
+    in_reply_to         = None
+    review_state        ='published'
 
-    __ac_permissions__ = (
-        ('Change Discussion Items', ('edit',), ('Owner',)),
-        ('View', ('', 'absolute_url', 'getReplies', 'view')),
-        )
+    security = ClassSecurityInfo()
 
-    view = HTMLFile('dtml/discussionView',globals())
-    index_html = view
-    # Ensure the name of the "view" method isn't ambiguous.
-    view.__name__ = 'view'
-    view._need__name__ = 0
-
-    editForm = HTMLFile('dtml/discussionEdit',globals())
-
-    # Replies should default to published
-    review_state='published'
-
-    def absolute_url(self, relative=0):
-        portal_url = getToolByName(self, 'portal_url')
-        container = self.aq_inner.aq_parent
-        content_item = container.aq_inner.aq_parent
-        parent_rel_url = portal_url.getRelativeUrl(content_item)
-
-        fmt_string = '%s/%s/talkback/%s'
-
-        if relative:
-            prefix = portal_url.getPortalPath()
-        else:
-            prefix = portal_url()
-
-        return fmt_string % ( prefix, parent_rel_url, str( self.getId() ) )
-
-    def getPhysicalPath(self):
-        """
-        Needs to be overridden here because the standard implementation
-        doesn't fit my needs in case i am stored in a DiscussionItemContainer
-        """
-        return tuple(string.split(self.absolute_url(1), '/'))
-
-    def getReplies(self):
-        """
-        Return a list of all objects that have their "in_reply_to"
-        attribute set to my own URL
-        """
-        result = []
-        my_url = urllib.unquote( self.absolute_url(1) )
-        wf = getToolByName( self, 'portal_workflow' )
-        talkback = self.aq_inner.aq_parent
-
-        for item in talkback._container.values():
-            if item.in_reply_to == my_url:
-                #if wf.getInfoFor( item, 'review_state' ) == 'published':
-                    result.append(item.__of__(talkback))
-
-        return result
-
-    def __call__(self, REQUEST, **kw):
-        return apply(self.view, (self, REQUEST), kw)
-
-    def edit(self, text_format, text, file='', REQUEST=None):
-        """
-        Edit the discussion item.
-        """
-
-        Document.edit(self, text_format, text, file)
-        if REQUEST is not None:
-            return self.editForm(self, REQUEST, portal_status_message= \
-                                 'Discussion item changed.')
-
+    security.declareProtected( CMFCorePermissions.View, 'Creator' )
     def Creator( self ):
         """
+            We need to return user who replied, rather than executable
+            owner.
         """
+        #   XXX:  revisit if Creator becomes "real" attribute for stock DC.
         return self.creator
+    
+    #
+    #   DiscussionResponse interface
+    #
+    security.declareProtected( CMFCorePermissions.View, 'inReplyTo' )
+    def inReplyTo( self, REQUEST=None ):
+        """
+            Return the Discussable object to which we are a reply.
 
+            Two cases obtain:
 
-Globals.default__class_init__(DiscussionItem)
+              - We are a "top-level" reply to a non-DiscussionItem piece
+                of content;  in this case, our 'in_reply_to' field will
+                be None.
+            
+              - We are a nested reply;  in this case, our 'in_reply_to'
+                field will be the ID of the parent DiscussionItem.
+        """
+        tool = getToolByName( self, 'portal_discussion' )
+        talkback = tool.getDiscussionFor( self )
+        return talkback._getReplyParent( self.in_reply_to )
 
+    security.declarePrivate( CMFCorePermissions.View, 'setReplyTo' )
+    def setReplyTo( self, reply_to ):
+        """
+            Make this object a response to the passed object.
+        """
+        if getattr( reply_to, 'meta_type', None ) == self.meta_type:
+            self.in_reply_to = reply_to.getId()
+        else:
+            self.in_reply_to = None
+    
+    security.declareProtected( CMFCorePermissions.View, 'parentsInThread' )
+    def parentsInThread( self, size=0 ):
+        """
+            Return the list of items which are "above" this item in
+            the discussion thread.
 
-class DiscussionItemContainer(Persistent, Implicit):
+            If 'size' is not zero, only the closest 'size' parents
+            will be returned.
+        """
+        parents = []
+        current = self
+        while not size or len( parents ) < size:
+            parent = current.inReplyTo()
+            assert not parent in parents  # sanity check
+            parents.insert( 0, parent )
+            if parent.meta_type != self.meta_type:
+                break
+            current = parent
+        return parents
+
+InitializeClass( DiscussionItem )
+
+class DiscussionItemContainer( Persistent, Implicit, Traversable ):
     """
-    This class stores DiscussionItem objects. Discussable 
-    content that has DiscussionItems associated with it 
-    will have an instance of DiscussionItemContainer 
-    injected into it to hold the discussion threads.
+        Store DiscussionItem objects. Discussable content that
+        has DiscussionItems associated with it will have an
+        instance of DiscussionItemContainer injected into it to
+        hold the discussion threads.
     """
 
     # for the security machinery to allow traversal
-    __roles__ = None
-    __allow_access_to_unprotected_subobjects__ = 1   # legacy code
+    #__roles__ = None
 
-
-    __ac_permissions__ = ( ( 'Access contents information'
-                           , ( 'objectIds'
-                             , 'objectValues'
-                             , 'objectItems'
-                             )
-                           )
-                         , ( 'View'
-                           , ( 'hasReplies'
-                             , 'getReplies'
-                             , '__bobo_traverse__'
-                             )
-                           )
-                         , ( 'Reply to item'
-                           , ( 'createReply'
-                             ,
-                             )
-                           )
-                         ) 
+    security = ClassSecurityInfo()
 
     def __init__(self):
         self.id = 'talkback'
         self._container = PersistentMapping()
 
+    security.declareProtected( CMFCorePermissions.View, 'getId' )
+    def getId( self ):
+        return self.id
 
+    # Is this right?
+    security.declareProtected( CMFCorePermissions.View, '__bobo_traverse__' )
     def __bobo_traverse__(self, REQUEST, name):
         """
         This will make this container traversable
@@ -261,103 +261,106 @@ class DiscussionItemContainer(Persistent, Implicit):
             except:
                 REQUEST.RESPONSE.notFoundError("%s\n%s" % (name, ''))
 
+    security.declarePrivate( 'manage_beforeDelete' )
     def manage_beforeDelete(self, item, container):
-        "Remove the contained items from the catalog."
+        """
+            Remove the contained items from the catalog.
+        """
         if aq_base(container) is not aq_base(self):
-            for obj in self.getReplies():
-                obj.manage_beforeDelete(item, container)
+            for obj in self.objectValues():
+                obj.__of__( self ).manage_beforeDelete( item, container )
 
-    def objectIds(self, spec=None):
+    #
+    #   OFS.ObjectManager query interface.
+    #
+    security.declareProtected( CMFCorePermissions.AccessContentsInformation
+                             , 'objectIds' )
+    def objectIds( self, spec=None ):
         """
-        return a list of ids of DiscussionItems in
-        this DiscussionItemContainer
+            Return a list of the ids of our DiscussionItems.
         """
+        if spec and spec is not DiscussionItem.meta_type:
+            return []
         return self._container.keys()
 
+
+    security.declareProtected( CMFCorePermissions.AccessContentsInformation
+                             , 'objectItems' )
     def objectItems(self, spec=None):
         """
-        Returns a list of (id, subobject) tuples of the current object.
-        If 'spec' is specified, returns only objects whose meta_type
-        match 'spec'
+            Return a list of (id, subobject) tuples for our DiscussionItems.
         """
         r=[]
         a=r.append
         g=self._container.get
-        for id in self.objectIds(spec): a((id, g(id)))
+        for id in self.objectIds(spec):
+            a( (id, g( id ) ) )
         return r
 
+
+    security.declareProtected( CMFCorePermissions.AccessContentsInformation
+                             , 'objectValues' )
     def objectValues(self):
         """
-        return the list of objects stored in this
-        DiscussionItemContainer
+            Return a list of our DiscussionItems.
         """
         return self._container.values()
 
-    def createReply(self, title, text, REQUEST={}, RESPONSE=None):
+    #
+    #   Discussable interface
+    #
+    security.declareProtected( CMFCorePermissions.ReplyToItem, 'createReply' )
+    def createReply( self, title, text, Creator=None ):
         """
             Create a reply in the proper place
         """
         container = self._container
 
         id = int(DateTime().timeTime())
-        while getattr(self._container, `id`, None) is not None:
+        while self._container.get( str(id), None ) is not None:
             id = id + 1
+        id = str( id )
 
-        item = DiscussionItem( `id` )
-        item.title = title
-        item.description = title
-        item._edit('structured-text', text)
+        item = DiscussionItem( id, title=title, description=title )
+        item._edit( text_format='structured-text', text=text )
 
-        if REQUEST.has_key( 'Creator' ):
-            item.creator = REQUEST[ 'Creator' ]
+        if Creator:
+            item.creator = Creator
 
-        item.__of__(self).setReplyTo(self.aq_parent)
+        item.__of__( self ).indexObject()
+
+        item.setReplyTo( self._getDiscussable() )
  
-        self._container[`id`] = item
+        self._container[ id ] = item
 
-        if RESPONSE is not None:
-            RESPONSE.redirect( self.aq_inner.aq_parent.absolute_url() + '/view' )
+        return id
 
-    def hasReplies(self):
+    security.declareProtected( CMFCorePermissions.View, 'hasReplies' )
+    def hasReplies( self ):
         """
-        Test to see if there are any dicussion items
+            Test to see if there are any dicussion items
         """
-        if len(self._container) > 0:
-            return 1
-        else:
+        if len(self._container) == 0:
             return 0
 
-    def _getReplyResults(self):
-        """
-           Get a list of ids within the discussion item container that are 
-           in reply to me
-        """
-        result = []
-        portal_url = getToolByName(self, 'portal_url')
-        my_url = urllib.unquote( portal_url.getRelativeUrl( self ) )
-        wf = getToolByName( self, 'portal_workflow' )
+        return len( self._getReplyResults() )
 
-        for item in self._container.values():
-            if item.in_reply_to == my_url:
-                #if wf.getInfoFor( item, 'review_state' ) == 'published':
-                    result.append(item.getId())
-
-        return result
-
-    def getReplies(self):
+    security.declareProtected( CMFCorePermissions.View, 'getReplies' )
+    def getReplies( self ):
         """
             Return a sequence of the DiscussionResponse objects which are
             associated with this Discussable
         """
         objects = []
+        a = objects.append
         result_ids = self._getReplyResults()
 
         for id in result_ids:
-            objects.append(self._container.get(id).__of__(self))
+            a( self._container.get( id ).__of__( self ) )
 
         return objects
 
-
+    security.declareProtected( CMFCorePermissions.View, 'quotedContents' )
     def quotedContents(self):
         """
             Return this object's contents in a form suitable for inclusion
@@ -365,7 +368,52 @@ class DiscussionItemContainer(Persistent, Implicit):
         """
  
         return ""
+    
+    #
+    #   Utility methods
+    #
+    security.declarePrivate( '_getReplyParent' )
+    def _getReplyParent( self, in_reply_to ):
+        """
+            Return the object indicated by the 'in_reply_to', where
+            'None' represents the "outer" content object.
+        """
+        outer = self._getDiscussable( outer=1 )
+        if in_reply_to is None:
+            return outer
+        parent = self._container[ in_reply_to ].__of__( aq_inner( self ) )
+        return parent.__of__( outer )
+        
 
-Globals.default__class_init__(DiscussionItemContainer)
+    security.declarePrivate( '_getDiscussable' )
+    def _getDiscussable( self, outer=0 ):
+        """
+        """
+        tb = outer and aq_inner( self ) or self
+        return getattr( tb, 'aq_parent', None )
+
+    security.declarePrivate( '_getReplyResults' )
+    def _getReplyResults( self ):
+        """
+           Get a list of ids of DiscussionItems which are replies to
+           our Discussable.
+        """
+        discussable = self._getDiscussable()
+        outer = self._getDiscussable( outer=1 )
+
+        if discussable == outer:
+            in_reply_to = None
+        else:
+            in_reply_to = discussable.getId()
+
+        result = []
+        a = result.append
+        for key, value in self._container.items():
+            if value.in_reply_to == in_reply_to:
+                a( key )
+
+        return result
+
+InitializeClass( DiscussionItemContainer )
 
 
