@@ -256,16 +256,14 @@ class FSPythonScript (FSObject, Script):
         # This ensures func_code and func_defaults are
         # set when the code hasn't been compiled yet,
         # just in time for mapply().  Truly odd, but so is mapply(). :P
-        self.func_defaults = None  # Overrides this method.
         self._write(self._source, 1)
-        return self.func_defaults
+        return self.__dict__.get('func_defaults', None)
     func_defaults = ComputedAttribute(func_defaults, 1)
 
     def func_code(self):
         # See func_defaults.
-        self.func_code = None  # Overrides this method.
         self._write(self._source, 1)
-        return self.func_code
+        return self.__dict__.get('func_code', None)
     func_code = ComputedAttribute(func_code, 1)
 
 
