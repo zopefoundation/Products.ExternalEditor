@@ -8,7 +8,7 @@ X-Recipients-debug: <dtml-var candidates>
 
 Issue #<dtml-var issue_id> Update (<dtml-var action>) "<dtml-var title size=50>"
 <dtml-if security_related> ** Security Related ** (<dtml-if confidential>Confidential<dtml-else>Public</dtml-if>)
-</dtml-if> Status <dtml-var status>, <dtml-var klass>/<dtml-var topic> <dtml-var importance>/<dtml-var severity>
+</dtml-if> Status <dtml-var status>, <dtml-var topic>/<dtml-var klass> <dtml-var importance>/<dtml-var severity>
 To followup, visit:
   <dtml-var issue_url>
 
