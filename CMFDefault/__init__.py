@@ -176,6 +176,8 @@ this_module = sys.modules[ __name__ ]
 z_bases = utils.initializeBasesPhase1( bases, this_module )
 z_tool_bases = utils.initializeBasesPhase1( tools, this_module )
 
+cmfdefault_globals=globals()
+
 # Make the skins available as DirectoryViews.
 registerDirectory('skins', globals())
 

@@ -128,6 +128,8 @@ FolderConstructorForm = ( 'manage_addPortalFolderForm'
                         , PortalFolder.manage_addPortalFolderForm
                         )
 
+cmfcore_globals=globals()
+
 def initialize(context):
 
     utils.initializeBasesPhase2(z_bases, context)
