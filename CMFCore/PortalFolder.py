@@ -384,6 +384,16 @@ class PortalFolder( Folder, DynamicType ):
              , kw
              )
 
+    def MKCOL_handler(self,id,REQUEST=None,RESPONSE=None):
+        """
+            Handle WebDAV MKCOL.
+        """
+        type_name = self._getPortalTypeName()
+        self.invokeFactory( type_name=type_name
+                          , id=id
+                          , RESPONSE=RESPONSE
+                          )
+
     def _checkId(self, id, allow_dup=0):
         PortalFolder.inheritedAttribute('_checkId')(self, id, allow_dup)
         
