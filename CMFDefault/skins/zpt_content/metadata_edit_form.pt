@@ -4,11 +4,6 @@
 <body>
 <div metal:fill-slot="main" i18n:domain="cmf_default">
 <div class="Desktop">
-
-
-<span tal:replace="request/message"
-   tal:condition="request/message|nothing"><hr /></span>
-
 <div class="Metadata">
 
 <h2 i18n:translate="">Standard Resource Metadata</h2>
@@ -17,9 +12,7 @@
       tal:attributes="action string:${here/absolute_url}/metadata_edit"
 >
 <table class="FormLayout">
-
- <tr valign="top">
-
+ <tr>
   <th i18n:translate="">Enable Discussion?</th>
   <td>
     <select name="allowDiscussion"
@@ -41,18 +34,13 @@
       i18n:translate=""
      >Edit all metadata</a>
   </td>
-
  </tr>
-
  <tr valign="top">
-
   <th align="right" i18n:translate="">Identifier</th>
-  <td colspan="3"> <span tal:replace="here/Identifier" /> </td>
-
+  <td colspan="3"> <span tal:replace="here/Identifier"></span>
+  </td>
  </tr>
-
  <tr valign="top">
-
   <th align="right" i18n:translate="">Title</th>
   <td colspan="3">
    <input type="text"
@@ -61,62 +49,52 @@
           size="65"
           tal:attributes="value here/Title" />
   </td>
-
  </tr>
-
  <tr valign="top">
-
   <th align="right" i18n:translate="">Description</th>
   <td colspan="3">
    <textarea name="description:text" rows="5"
              cols="65" wrap="soft"
-			 tal:content="here/Description"></textarea>
+             tal:content="here/Description"></textarea>
   </td>
-
  </tr>
-
  <tr valign="top">
-       <th align="right" i18n:translate="">Subject</th>
+  <th align="right" i18n:translate="">Subject</th>
   <td tal:define="subj_lines python: modules['string'].join(
                                          here.subjectsList(), '\n' )">
-     <textarea name="subject:lines" rows="3" cols="20"
-	           tal:content="subj_lines"></textarea>
+   <textarea name="subject:lines" rows="3" cols="20"
+             tal:content="subj_lines"></textarea>
    <br />
    <select name="subject:list" multiple>
-     <option value=""
-		   tal:define="items python: here.portal_metadata.listAllowedSubjects(
-                                              here);
-                       subjects here/Subject;
-                      "
-		   tal:repeat="item items"
-		   tal:attributes="value item; selected python: item in subjects"
-		   tal:content="item">
-      </option>
-    </select>
+    <option value=""
+            tal:define="
+                  items python:here.portal_metadata.listAllowedSubjects(here);
+                  subjects here/Subject"
+            tal:repeat="item items"
+            tal:attributes="value item; selected python: item in subjects"
+            tal:content="item">
+    </option>
+   </select>
   </td>
-
   <th align="right" i18n:translate="">Format</th>
   <td>
    <input type="text" name="format" value=""
           tal:attributes="value here/Format" />
    <br />
-   <input type="submit" name="change" value=" Change "
+   <input type="submit" name="change" value="Change"
           i18n:attributes="value" />
    <br />
-   <input type="submit" name="change_and_edit" value=" Change & Edit "
+   <input type="submit" name="change_and_edit" value="Change & Edit"
           i18n:attributes="value" />
    <br />
-   <input type="submit" name="change_and_view" value=" Change & View "
+   <input type="submit" name="change_and_view" value="Change & View"
           i18n:attributes="value" />
   </td>
  </tr>
-
 </table>
-
 </form>
 
 </div>
-
 </div>
 </div>
 </body>

@@ -1,5 +1,3 @@
-Content-Type: text/css
-
 body {
     background-color: White;
     color: Black;
@@ -68,8 +66,7 @@ td {
     background-color: #336699;
     border: 1pt;
     border-color: #336699;
-    padding: none;
-    cell-spacing: none;
+    padding: 0;
     width: 100%;
 }
 
@@ -133,7 +130,7 @@ td {
 #ContextActionsBox {
     border-color: #AAAAAA;
     background-color: #AAAAAA;
-    padding: none;
+    padding: 0;
 }
 
 .ContextActionsRow {
@@ -363,5 +360,3 @@ td.NewsTitle {
 p.NewsHeadline {
     background-color:  #336699;
 }
-
-<dtml-var CalendarStyle missing>

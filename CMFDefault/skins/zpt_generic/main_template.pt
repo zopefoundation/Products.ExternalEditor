@@ -25,9 +25,11 @@
 
  <metal:block define-slot="base" />
 
- <link rel="stylesheet" href="zpt_stylesheet.css" type="text/css"
+ <link rel="stylesheet" type="text/css" href="zpt_stylesheet.css"
        tal:attributes="href here/zpt_stylesheet.css/absolute_url" />
-
+ <link rel="stylesheet" type="text/css" href="CalendarStyle.css"
+       tal:condition="here/CalendarStyle.css|nothing"
+       tal:attributes="href here/CalendarStyle.css/absolute_url" />
 </head>
 
 <body>
@@ -272,7 +274,8 @@
 
   <p id="DesktopStatusBar"
      tal:condition="request/portal_status_message|nothing"
-     tal:content="request/portal_status_message"> Status message.</p>
+     tal:content="request/portal_status_message"
+     i18n:translate="">Status message.</p>
 
   <div metal:define-slot="header">
 

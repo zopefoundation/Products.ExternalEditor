@@ -4,12 +4,6 @@
 <body>
 <div metal:fill-slot="main" i18n:domain="cmf_default">
 <div class="Desktop">
-
-
-<span tal:replace="request/message"
-   tal:condition="request/message|nothing"><hr /></span>
-
-
 <div class="Metadata">
 
 <h2 i18n:translate="">Resource Metadata</h2>
@@ -55,30 +49,31 @@
   <td colspan="3">
    <textarea name="description:text" rows="5"
              cols="65" wrap="soft"
-			 tal:content="here/Description"></textarea>
+             tal:content="here/Description"></textarea>
   </td>
  </tr>
-
  <tr valign="top">
   <th align="right" i18n:translate="">Subject</th>
   <td tal:define="subj_lines python: modules['string'].join(
                                          here.subjectsList(), '\n' )">
-     <textarea name="subject:lines" rows="3" cols="20"
-	           tal:content="subj_lines"></textarea>
+   <textarea name="subject:lines" rows="3" cols="20"
+             tal:content="subj_lines"></textarea>
    <br />
    <select name="subject:list" multiple>
-     <option value=""
-		   tal:define="items python: here.portal_metadata.listAllowedSubjects(here); subjects here/Subject"
-		   tal:repeat="item items"
-		   tal:attributes="value item; selected python: item in subjects"
-		   tal:content="item">
-      </option>
-    </select>
+    <option value=""
+            tal:define="
+                  items python:here.portal_metadata.listAllowedSubjects(here);
+                  subjects here/Subject"
+            tal:repeat="item items"
+            tal:attributes="value item; selected python: item in subjects"
+            tal:content="item">
+    </option>
+   </select>
   </td>
   <th align="right" i18n:translate="">Contributors</th>
   <td tal:define="contrib_lines python: '\n'.join( here.Contributors() )">
    <textarea name="contributors:lines" rows="5" cols="30"
-			 tal:content="contrib_lines"></textarea>
+             tal:content="contrib_lines"></textarea>
   </td>
  </tr>
  <tr valign="top">
@@ -124,11 +119,13 @@
  <tr valign="top">
   <td> <br /> </td>
   <td>
-   <input type="submit" value=" Change " i18n:attributes="value" />
+   <input type="submit" name="change" value="Change"
+          i18n:attributes="value" />
   </td>
  </tr>
 </table>
 </form>
+
 </div>
 </div>
 </div>

@@ -2,9 +2,7 @@
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       metal:use-macro="here/main_template/macros/master">
 <body>
-
 <div metal:fill-slot="main" i18n:domain="cmf_default">
-
 <div class="Desktop">
 
 <h1 i18n:translate="">Undo Transactions</h1>
@@ -29,7 +27,7 @@
               ">
 
   <form action="undo" method="post"
-        tal:attributes="action_xxx string:${here/absolute_url}/undo"
+        tal:attributes="action string:${here/absolute_url}/undo"
   >
 
    <p i18n:translate="">This application's transactional feature allows you to
@@ -44,19 +42,16 @@
        modified by the transaction. </p>
 
    <table class="FormLayout">
-
     <tr>
      <td colspan="2" align="center">
-      <input type="submit" value=" Undo " i18n:attributes="value" />
+      <input type="submit" value="Undo" i18n:attributes="value" />
      </td>
     </tr>
-
     <tr>
      <td><br /></td>
     </tr>
 
-    <tbody tal:condition="request/first_transaction">
-    <tr>
+    <tr tal:condition="request/first_transaction">
      <td colspan="2" align="center">
       <a href=""
          tal:attributes="href python:b_fmt%(url,e_start,e_end,b_size)"
@@ -64,10 +59,8 @@
       >Later Transactions</a>
      </td>
     </tr>
-    </tbody>
 
-    <tbody tal:repeat="items transactions">
-    <tr>
+    <tr tal:repeat="items transactions">
      <td valign="top">
       <input type="checkbox" name="transaction_info:list" value=""
              tal:attributes="value items/id" />
@@ -79,7 +72,7 @@
        <span tal:condition="items/user_name|nothing">
         <span tal:replace="items/user_name" />
        </span>
-       <span condition="python:not(items.description)">
+       <span tal:condition="not: items/user_name|nothing">
         <em i18n:translate="">Zope</em>
        </span>
       </strong>
@@ -90,7 +83,6 @@
       <span tal:replace="python: items['time'].Time()" />
      </td>
     </tr>
-    </tbody>
 
     <tr>
      <td colspan="2" align="center">
@@ -106,13 +98,11 @@
     <tr>
      <td><br /></td>
     </tr>
-
     <tr>
      <td colspan="2" align="center">
-      <input type="submit" value=" Undo " i18n:attributes="value" />
+      <input type="submit" value="Undo" i18n:attributes="value" />
      </td>
     </tr>
-
    </table>
   </form>
  </div>
@@ -125,6 +115,5 @@
 
 </div><!-- class="Desktop" -->
 </div><!-- metal:fill-slot="main" -->
-
 </body>
 </html>

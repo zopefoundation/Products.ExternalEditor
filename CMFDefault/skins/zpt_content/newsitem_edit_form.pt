@@ -4,11 +4,6 @@
 <body>
 <div metal:fill-slot="main" i18n:domain="cmf_default">
 <div class="Desktop">
-
-
-<span tal:replace="request/message"
-   tal:condition="request/message|nothing"><hr /></span>
-
 <div class="NewsItem">
 
 <h2 i18n:translate="">Edit <span
@@ -18,28 +13,25 @@
       tal:attributes="action string:${here/absolute_url}/newsitem_edit"
 >
 <table class="FormLayout">
-
  <tr>
   <th i18n:translate="">Title</th>
   <td> <span tal:replace="here/Title">My Title</span> </td>
  </tr>
-
  <tr>
   <th i18n:translate="">Format</th>
   <td>
-   <input type="radio" name="text_format"
-                     value="structured-text"
-                     tal:attributes="checked python: path('here/text_format') == 'structured-text'" />
-   <label for="cb_structuredtext" i18n:translate="">structured-text</label>
-   <input type="radio" name="text_format" value="plain"
-          tal:attributes="checked python: path('here/text_format') == 'plain'" />
-   <label for="cb_html" i18n:translate="">plain text</label>
-   <input type="radio" name="text_format" value="html"
-          tal:attributes="checked python: path('here/text_format') == 'html'" />
+   <input type="radio" name="text_format" value="structured-text" id="cb_stx"
+          tal:attributes="
+                checked python:path('here/text_format')=='structured-text'" />
+   <label for="cb_stx" i18n:translate="">structured-text</label>
+   <input type="radio" name="text_format" value="plain" id="cb_plain"
+          tal:attributes="checked python:path('here/text_format')=='plain'" />
+   <label for="cb_plain" i18n:translate="">plain text</label>
+   <input type="radio" name="text_format" value="html" id="cb_html"
+          tal:attributes="checked python:path('here/text_format')=='html'" />
    <label for="cb_html" i18n:translate="">html</label>
   </td>
  </tr>
-
  <tr>
   <th class="TextField" i18n:translate="">Lead-in</th>
   <td class="TextField">
@@ -54,17 +46,15 @@
              tal:content="here/EditableBody"></textarea>
   </td>
  </tr>
-
  <tr>
   <td> <br /> </td>
   <td>
-   <input type="submit" name="change" value=" Change "
+   <input type="submit" name="change" value="Change"
           i18n:attributes="value" />
-   <input type="submit" name="change_and_view" value=" Change and View "
+   <input type="submit" name="change_and_view" value="Change and View"
           i18n:attributes="value" />
   </td>
  </tr>
-
 </table>
 </form>
 

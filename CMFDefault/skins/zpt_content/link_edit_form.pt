@@ -4,11 +4,6 @@
 <body>
 <div metal:fill-slot="main" i18n:domain="cmf_default">
 <div class="Desktop">
-
-
-<span tal:replace="request/message"
-   tal:condition="request/message|nothing"><hr /></span>
-
 <div class="Link">
 
 <h2 i18n:translate="">Edit <span
@@ -25,15 +20,16 @@
  <tr>
   <th i18n:translate="">URL</th>
   <td>
-   <input type="text" name="remote_url" value="" tal:attributes="value here/remote_url" />
+   <input type="text" name="remote_url" value=""
+          tal:attributes="value here/remote_url" />
   </td>
  </tr>
  <tr>
   <td> <br /> </td>
   <td>
-   <input type="submit" name="change" value=" Change "
+   <input type="submit" name="change" value="Change"
           i18n:attributes="value" />
-   <input type="submit" name="change_and_view" value=" Change and View "
+   <input type="submit" name="change_and_view" value="Change and View"
           i18n:attributes="value" />
   </td>
  </tr>
@@ -42,7 +38,6 @@
 
 </div>
 </div>
-
 </div>
 </body>
 </html>
