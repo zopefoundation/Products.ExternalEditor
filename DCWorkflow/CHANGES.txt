@@ -1,4 +1,11 @@
 
+Version 0.4.1
+
+- Corrected an expression in the classic workflow implementation.
+
+- Made expressions work again in scripts by removing the requirement
+  that "REQUEST" exist.
+
 Version 0.4
 
 - Thanks to Ulrich Eck (ueck@net-labs.de), you can now set variables
