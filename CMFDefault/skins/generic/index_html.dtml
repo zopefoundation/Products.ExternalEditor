@@ -71,7 +71,7 @@
   <a href="&dtml-absolute_url;/"
   ><img align="middle" src="&dtml-portal_url;/&dtml-getIcon;"
         alt="&dtml-Type;" title="&dtml-Type;" border="0"></a>
-  <a href="&dtml-absolute_url;/"> <dtml-var Title> </a>
+  <a href="&dtml-absolute_url;/"> <dtml-if Title><dtml-var Title><dtml-else><dtml-var Id></dtml-if Title> </a>
   <dtml-if name="Description">
    <blockquote><dtml-var Description fmt="structured-text"></blockquote>
   </dtml-if>
