@@ -27,6 +27,9 @@ PluggableAuthService changelog
 
     Bugs Fixed
 
+      - Detect and prevent recursive redirecting in the CookieAuthHelper
+        if the login_form cannot be reached by the Anonymous User.
+
       - Made logging when swallowing exceptions much less noisy (they
         *don't* necessarily require attention).
 

@@ -163,6 +163,7 @@ class CookieAuthHelper(Folder, BasePlugin):
     def unauthorized(self):
         req = self.REQUEST
         resp = req['RESPONSE']
+
         # If we set the auth cookie before, delete it now.
         if resp.cookies.has_key(self.cookie_name):
             del resp.cookies[self.cookie_name]
@@ -171,6 +172,7 @@ class CookieAuthHelper(Folder, BasePlugin):
         url = self.getLoginURL()
         if url is not None:
             came_from = req.get('came_from', None)
+            
             if came_from is None:
                 came_from = req.get('URL', '')
                 query = req.get('QUERY_STRING')
@@ -178,6 +180,20 @@ class CookieAuthHelper(Folder, BasePlugin):
                     if not query.startswith('?'):
                         query = '?' + query
                     came_from = came_from + query
+            else:
+                # If came_from contains a value it means the user
+                # must be coming through here a second time
+                # Reasons could be typos when providing credentials
+                # or a redirect loop (see below)
+                req_url = req.get('URL', '')
+
+                if req_url and req_url == url:
+                    # Oops... The login_form cannot be reached by the user -
+                    # it might be protected itself due to misconfiguration -
+                    # the only sane thing to do is to give up because we are
+                    # in an endless redirect loop.
+                    return 0
+                
             url = url + '?came_from=%s' % quote(came_from)
             resp.redirect(url, lock=1)
             return 1
