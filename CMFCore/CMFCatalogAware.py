@@ -56,11 +56,13 @@ class CMFCatalogAware:
             If idxs is present, only those indexes are reindexed.
             The metadata is always updated.
 
-            Also update the modification date of the object.
+            Also update the modification date of the object,
+            unless specific indexes were requested.
         """
-        if hasattr(aq_base(self), 'notifyModified'):
-            # Update modification date.
-            self.notifyModified()
+        if idxs == []:
+            # Update the modification date.
+            if hasattr(aq_base(self), 'notifyModified'):
+                self.notifyModified()
         catalog = getToolByName(self, 'portal_catalog', None)
         if catalog is not None:
             catalog.reindexObject(self, idxs=idxs)
