@@ -1,138 +1,62 @@
 <html metal:use-macro="here/main_template/macros/master" >
-<body>
+<body style="position: relative">
 
- <div metal:fill-slot="header"
-      tal:define="global has_local python: 'local_html' in here.objectIds()"
- >
+<div metal:fill-slot="header"
+     tal:define="global has_local python: 'local_pt' in here.objectIds();
+                 global util_macros here/index_html_utils/macros;
+                " >
 
   <div tal:condition="not: has_local">
 
-     <h1 id="DesktopTitle"
-         tal:content="here/Title">Document Title</h1>
-
-     <div id="DesktopDescription" tal:content="here/Description">
-         Document Description goes here.
-     </div>
+     <div metal:use-macro="util_macros/index_header" />
 
   </div>
 
   <div tal:condition="has_local">
 
-   <div metal:use-macro="here/local_html/macros/header|default">
-     'local_html' body goes here.
-   </div>
+    <div metal:use-macro="here/local_pt/macros/header | default">
+      'local_pt' header goes here.
+    </div>
 
   </div>
 
- </div><!-- header slot -->
+</div><!-- header slot -->
 
- <div metal:fill-slot="main"
- >
+<div metal:fill-slot="main">
 
- <div tal:condition="not: has_local"
-      tal:define="auth_filter nocall: modules/ZTUtils/LazyFilter"
- >
+  <div id="content_well"
+       style="float: left; top: 0; width: 80%;">
 
-  <div tal:define="raw_items python: here.contentValues(
-                                     filter={'portal_type':( 'Document'
-                                                           , 'Image'
-                                                           , 'File'
-                                                           , 'News Item'
-                                                           ) } );
-                   items python: auth_filter( raw_items, skip='View' );
-                  ">
-  <div tal:condition="items">
+    <div tal:condition="not: has_local">
 
-  <h4> Documents, Images, Files, and News Items </h4>
+      <br />
 
-  <ul>
-   <li tal:repeat="item items">
-    <a href="item_url" tal:attributes="href item/absolute_url"><img
-      align="middle" border="0"
-      tal:attributes="src   string:${item/portal_url}/${item/getIcon};
-                      alt   string:${item/Type};
-                      title string:${item/Type}"></a>
-    <a href="item_url" tal:attributes="href item/absolute_url"
-       tal:content="item/Title"> Title </a>
-     <blockquote tal:condition="exists: item/Description"
-                 tal:content="item/Description">
-       Description <!--fmt="structured-text'-->
-     </blockquote>
-   </li>
-  </ul>
+      <div metal:use-macro="util_macros/index_content" />
+  
+      <div metal:use-macro="util_macros/index_links" />
+
+      <div metal:use-macro="util_macros/index_folders" />
+
+    </div>
+
+    <div tal:condition="has_local">
+
+      <div metal:use-macro="here/local_pt/macros/body | default">
+        'local_pt' body goes here.
+      </div>
+
+    </div>
 
   </div>
-  </div>
 
+  <div id="right_sidebar"
+       style="width: 20%">
 
-  <div tal:define="raw_items python: here.contentValues(
-                                     filter={'portal_type':( 'Link'
-                                                           , 'Favorite'
-                                                           , 'Topic'
-                                                           ) } );
-                   items python: auth_filter( raw_items, skip='View' );
-                  ">
-  <div tal:condition="items">
-  <h4> Related Resources </h4>
-
-  <ul>
-   <li tal:repeat="item items">
-    <a href="item_url" tal:attributes="href item/absolute_url"><img
-      align="middle" border="0"
-      tal:attributes="src   string:${item/portal_url}/${item/getIcon};
-                      alt   string:${item/Type};
-                      title string:${item/Type}"></a>
-    <a href="item_url" tal:attributes="href item/absolute_url"
-       tal:content="item/Title"> Title </a>
-     <blockquote tal:condition="exists: item/Description"
-                 tal:content="item/Description">
-       Description <!--fmt="structured-text'-->
-     </blockquote>
-   </li>
-  </ul>
+    <div metal:use-macro="util_macros/news_box" />
 
   </div>
-  </div>
 
-
-  <div tal:define="raw_items python: here.contentValues(
-                            filter={ 'portal_type': 'Folder' } );
-                   items python: auth_filter( raw_items, skip='View' );
-                  ">
-  <div tal:condition="items">
-  <h4> Folders </h4>
-
-  <ul>
-   <li tal:repeat="item items">
-    <a href="item_url" tal:attributes="href item/absolute_url"><img
-      align="middle" border="0"
-      tal:attributes="src   string:${item/portal_url}/${item/getIcon};
-                      alt   string:${item/Type};
-                      title string:${item/Type}"></a>
-    <a href="item_url" tal:attributes="href item/absolute_url"
-       tal:content="item/TitleOrId"> Title </a>
-     <blockquote tal:condition="exists: item/Description"
-                 tal:content="item/Description">
-       Description <!--fmt="structured-text'-->
-     </blockquote>
-   </li>
-  </ul>
-
-  </div>
-  </div>
-
- </div><!-- not: has_local -->
-
-
- <div tal:condition="has_local">
-
-   <div metal:use-macro="here/local_html/macros/body|default">
-     'local_html' body goes here.
-   </div>
-
- </div>
- </div><!-- main slot -->
+</div>
 
 </body>
 </html>
-
