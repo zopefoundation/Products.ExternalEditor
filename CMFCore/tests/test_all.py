@@ -1,6 +1,6 @@
 import Zope
 from unittest import TestSuite, main
-
+from sys import modules
 def test_suite():
     suite = TestSuite()
     for name in [
@@ -16,8 +16,9 @@ def test_suite():
         'test_FSPythonScript',
         'test_FSPageTemplate'
         ]:
+        __import__('Products.CMFCore.tests.'+name,globals(),locals())
         suite.addTest(
-            __import__(name,globals(),locals()).test_suite()
+            modules['Products.CMFCore.tests.'+name].test_suite()
             )
     return suite
 
