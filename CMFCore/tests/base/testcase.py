@@ -1,4 +1,5 @@
 import Zope
+Zope.startup()
 from unittest import TestCase
 from AccessControl.SecurityManagement import newSecurityManager
 from AccessControl.SecurityManagement import noSecurityManager
@@ -10,6 +11,8 @@ from os.path import join, abspath, dirname
 from os import curdir, mkdir, stat, remove
 from shutil import copytree,rmtree
 from tempfile import mktemp
+import os
+import time
 
 class TransactionalTest( TestCase ):
 
@@ -84,7 +87,11 @@ class FSDVTest( TestCase ):
     def _writeFile(self, filename, stuff):
         # write some stuff to a file on disk
         # make sure the file's modification time has changed
-        # also make sure the skin folder mod time ahs changed
+        # also make sure the skin folder mod time has changed
+        try:
+            dir_mtime = stat(self.skin_path_name)[8]
+        except:
+            dir_mtime = 0
         thePath = join(self.skin_path_name,filename)
         try:
             mtime1 = stat(thePath)[8]
@@ -96,9 +103,28 @@ class FSDVTest( TestCase ):
             f.write(stuff)
             f.close()
             mtime2 = stat(thePath)[8]
+        mtime2 = dir_mtime
+        while mtime2 == dir_mtime:
+            # Many systems have a granularity of 1 second.
+            # Wait until the mod time is actually different.
+            time.sleep(0.1)
+            os.utime(self.skin_path_name, None)
+            mtime2 = stat(self.skin_path_name)[8]
+
 
     def _deleteFile(self,filename):
+        try:
+            dir_mtime = stat(self.skin_path_name)[8]
+        except:
+            dir_mtime = 0
         remove(join(self.skin_path_name,filename))
+        mtime2 = dir_mtime
+        while mtime2 == dir_mtime:
+            # Many systems have a granularity of 1 second.
+            # Wait until the mod time is actually different
+            time.sleep(0.1)
+            os.utime(self.skin_path_name, None)
+            mtime2 = stat(self.skin_path_name)[8]
         
     def setUp(self):
         # store the place where the skin copy will be created
