@@ -22,6 +22,7 @@ import Acquisition, Globals
 from AccessControl import ClassSecurityInfo
 from OFS.SimpleItem import Item
 from DateTime import DateTime
+from Products.PythonScripts.standard import html_quote
 
 from utils import expandpath, getToolByName
 from CMFCorePermissions import View
@@ -81,8 +82,21 @@ class FSObject(Acquisition.Implicit, Item, Cacheable):
         fpath = tuple(split(folder_path, '/'))
         portal_skins = getToolByName(self,'portal_skins') 
         folder = portal_skins.restrictedTraverse(fpath)
-        folder._verifyObjectPaste(obj, validate_src=0)
-        folder._setObject(id, obj)
+        if id in folder.objectIds():
+            # we cant catch the badrequest so
+            # we'll that to check before hand
+            obj = folder._getOb(id)
+            if RESPONSE is not None:
+                RESPONSE.redirect('%s/manage_main?manage_tabs_message=%s' % (
+                    obj.absolute_url(), html_quote("An object with this id already exists")
+                    ))
+        else:            
+            folder._verifyObjectPaste(obj, validate_src=0)
+            folder._setObject(id, obj)        
+
+            if RESPONSE is not None:
+                RESPONSE.redirect('%s/%s/manage_main' % (
+                folder.absolute_url(), id))
 
         if RESPONSE is not None:
             RESPONSE.redirect('%s/%s/manage_main' % (
