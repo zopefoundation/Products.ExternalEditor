@@ -99,6 +99,10 @@ class DublinCoreTests(SecurityTest):
         item.addCreator('user_baz')
         self.assertEqual( item.listCreators(),
                           ('user_foo', 'user_bar', 'user_baz') )
+        item.setCreators('user_bar')
+        self.assertEqual( item.listCreators(), ('user_bar',) )
+        item.setCreators( ('user_baz',) )
+        self.assertEqual( item.listCreators(), ('user_baz',) )
 
     def test_ceiling_parsable(self):
         # Test that a None ceiling date will be parsable by a DateIndex

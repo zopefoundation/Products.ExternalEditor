@@ -238,6 +238,12 @@ class MutableDublinCore(Interface):
         Permission -- Modify portal content
         """
 
+    def setCreators(creators):
+        """ Set Dublin Core Creator elements - resource authors.
+
+        Permission -- Modify portal content
+        """
+
     def setSubject(subject):
         """ Set Dublin Core Subject element - resource keywords.
 

@@ -343,6 +343,12 @@ class DefaultDublinCoreImpl( PropertyManager ):
         """
         self.title = title
 
+    security.declareProtected(ModifyPortalContent, 'setCreators')
+    def setCreators(self, creators):
+        """ Set Dublin Core Creator elements - resource authors.
+        """
+        self.creators = tuplize('creators', creators)
+
     security.declareProtected(ModifyPortalContent, 'setSubject')
     def setSubject( self, subject ):
         """ Set Dublin Core Subject element - resource keywords.
