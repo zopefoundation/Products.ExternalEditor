@@ -107,10 +107,10 @@ class DynamicType:
         ti = self.getTypeInfo()
         path = ti and ti.getMethodPath(key) or None
         if path:
-            if key is not '(Default)':
+            if key != '(Default)':
                 stack.pop()
             for id in path:
-                if id is not '(Default)':
+                if id != '(Default)':
                     stack.append(id)
 
 InitializeClass(DynamicType)
