@@ -97,6 +97,7 @@
                                           and here.cited_text()) or ''">
 </textarea>
           <font size="-1">
+            <br>
             Prefix lines with whitespace or '&gt;' to preserve their format.
           </font>
         </td>
