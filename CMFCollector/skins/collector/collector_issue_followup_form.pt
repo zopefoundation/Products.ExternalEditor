@@ -55,7 +55,12 @@
         </td>
       </tr>
 
-      <tr>
+      <tr tal:condition="not: actions_pairs">
+        <td colspan="2">
+          Enter your followup.
+        </td>
+      </tr>
+      <tr tal:condition="actions_pairs">
         <th align="right"> Action: </th>
         <td>
           <input type="radio"
@@ -64,8 +69,8 @@
             <span tal:condition="python: pair[1] != 'Assign'">
                 <input type="radio" name="action" value="VALUE"
                        tal:attributes="value python: pair[0]"
-                  ><span tal:replace="python: pair[1]">ACTION</span>
-            </span>&nbsp;
+                  ><span tal:replace="python: pair[1]">ACTION</span>&nbsp;
+            </span>
           </span>
         </td>
 
