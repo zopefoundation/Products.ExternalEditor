@@ -8,6 +8,7 @@ def test_suite():
         'test_ContentTypeRegistry',
         'test_PortalFolder',
         'test_TypesTool',
+        'test_WorkflowTool',
         'test_ActionsTool',
         'test_ActionInformation',
         'test_ActionProviderBase',

@@ -23,8 +23,10 @@ from Globals import InitializeClass, PersistentMapping, DTMLFile
 from AccessControl import ClassSecurityInfo
 from Acquisition import aq_base, aq_inner, aq_parent
 from WorkflowCore import WorkflowException, ObjectDeleted, ObjectMoved
-import CMFCorePermissions
+from CMFCorePermissions import ManagePortal
 from string import join, split, replace, strip
+
+from interfaces.portal_workflow import portal_workflow
 
 AUTO_MIGRATE_WORKFLOW_TOOLS = 0  # Set to 1 to auto-migrate
 
@@ -55,6 +57,7 @@ class WorkflowTool (UniqueObject, Folder):
     '''
     id = 'portal_workflow'
     meta_type = 'CMF Workflow Tool'
+    __implements__ = portal_workflow
 
     _chains_by_type = None  # PersistentMapping
     _default_chain = ('default_workflow',)
@@ -70,8 +73,7 @@ class WorkflowTool (UniqueObject, Folder):
     #
     #   ZMI methods
     #
-    security.declareProtected( CMFCorePermissions.ManagePortal
-                             , 'manage_overview' )
+    security.declareProtected( ManagePortal, 'manage_overview' )
     manage_overview = DTMLFile( 'explainWorkflowTool', _dtmldir )
 
     if AUTO_MIGRATE_WORKFLOW_TOOLS:
@@ -94,8 +96,7 @@ class WorkflowTool (UniqueObject, Folder):
 
     _manage_addWorkflowForm = DTMLFile('addWorkflow', _dtmldir)
 
-    security.declareProtected( CMFCorePermissions.ManagePortal
-                             , 'manage_addWorkflowForm')
+    security.declareProtected( ManagePortal, 'manage_addWorkflowForm')
     def manage_addWorkflowForm(self, REQUEST):
         '''
         Form for adding workflows.
@@ -106,8 +107,7 @@ class WorkflowTool (UniqueObject, Folder):
         wft.sort()
         return self._manage_addWorkflowForm(REQUEST, workflow_types=wft)
 
-    security.declareProtected( CMFCorePermissions.ManagePortal
-                             , 'manage_addWorkflow')
+    security.declareProtected( ManagePortal, 'manage_addWorkflow')
     def manage_addWorkflow(self, workflow_type, id, RESPONSE=None):
         '''
         Adds a workflow from the registered types.
@@ -123,19 +123,11 @@ class WorkflowTool (UniqueObject, Folder):
         return (
             {'name': 'Workflow',
              'action': 'manage_addWorkflowForm',
-             'permission': CMFCorePermissions.ManagePortal },)
-
-    def _listTypeInfo(self):
-        pt = getToolByName(self, 'portal_types', None)
-        if pt is None:
-            return ()
-        else:
-            return pt.listTypeInfo()
+             'permission': ManagePortal },)
 
     _manage_selectWorkflows = DTMLFile('selectWorkflows', _dtmldir)
 
-    security.declareProtected( CMFCorePermissions.ManagePortal
-                             , 'manage_selectWorkflows')
+    security.declareProtected( ManagePortal, 'manage_selectWorkflows')
     def manage_selectWorkflows(self, REQUEST, manage_tabs_message=None):
         '''
         Shows a management screen for changing type to workflow connections.
@@ -162,8 +154,7 @@ class WorkflowTool (UniqueObject, Folder):
             management_view='Workflows',
             manage_tabs_message=manage_tabs_message)
 
-    security.declareProtected( CMFCorePermissions.ManagePortal
-                             , 'manage_changeWorkflows')
+    security.declareProtected( ManagePortal, 'manage_changeWorkflows')
     def manage_changeWorkflows(self, default_chain, props=None, REQUEST=None):
         '''
         Changes which workflows apply to objects of which type.
@@ -204,143 +195,12 @@ class WorkflowTool (UniqueObject, Folder):
                 ids.append(wf_id)
         self._default_chain = tuple(ids)
         if REQUEST is not None:
-            return self.manage_selectWorkflows(REQUEST, manage_tabs_message=
-                                               'Changed.')
+            return self.manage_selectWorkflows(REQUEST,
+                            manage_tabs_message='Changed.')
 
-    security.declareProtected( CMFCorePermissions.ManagePortal
-                             , 'setDefaultChain')
-    def setDefaultChain(self, default_chain):
-        """ Set the default chain """
-        default_chain = replace(default_chain, ',', ' ')
-        ids = []
-        for wf_id in split(default_chain, ' '):
-            if wf_id:
-                if not self.getWorkflowById(wf_id):
-                    raise ValueError, ( '"%s" is not a workflow ID.' % wf_id)
-                ids.append(wf_id)
-
-        self._default_chain = tuple(ids)
-
-    security.declareProtected(CMFCorePermissions.ManagePortal,
-                              'setChainForPortalTypes')
-    def setChainForPortalTypes(self, pt_names, chain):
-        """ Set a chain for a specific portal type """
-        cbt = self._chains_by_type
-        if cbt is None:
-            self._chains_by_type = cbt = PersistentMapping()
-
-        if type(chain) is type(''):
-            chain = map(strip, split(chain,','))
-
-        ti = self._listTypeInfo()
-        for t in ti:
-            id = t.getId()
-            if id in pt_names:
-                cbt[id] = tuple(chain)
-
-
-    security.declareProtected(CMFCorePermissions.ManagePortal,
-                              'updateRoleMappings')
-    def updateRoleMappings(self, REQUEST=None):
-        '''
-        '''
-        wfs = {}
-        for id in self.objectIds():
-            wf = self.getWorkflowById(id)
-            if hasattr(aq_base(wf), 'updateRoleMappingsFor'):
-                wfs[id] = wf
-        portal = aq_parent(aq_inner(self))
-        count = self._recursiveUpdateRoleMappings(portal, wfs)
-        if REQUEST is not None:
-            return self.manage_selectWorkflows(REQUEST, manage_tabs_message=
-                                               '%d object(s) updated.' % count)
-        else:
-            return count
-
-    def _recursiveUpdateRoleMappings(self, ob, wfs):
-        # Returns a count of updated objects.
-        count = 0
-        wf_ids = self.getChainFor(ob)
-        if wf_ids:
-            changed = 0
-            for wf_id in wf_ids:
-                wf = wfs.get(wf_id, None)
-                if wf is not None:
-                    did = wf.updateRoleMappingsFor(ob)
-                    if did: changed = 1
-            if changed:
-                count = count + 1
-        if hasattr(aq_base(ob), 'objectItems'):
-            obs = ob.objectItems()
-            if obs:
-                for k, v in obs:
-                    changed = getattr(v, '_p_changed', 0)
-                    count = count + self._recursiveUpdateRoleMappings(v, wfs)
-                    if changed is None:
-                        # Re-ghostify.
-                        v._p_deactivate()
-        return count
-
-    security.declarePrivate('getWorkflowById')
-    def getWorkflowById(self, wf_id):
-        wf = getattr(self, wf_id, None)
-        if getattr(wf, '_isAWorkflow', 0):
-            return wf
-        else:
-            return None
-
-    security.declarePrivate('getDefaultChainFor')
-    def getDefaultChainFor(self, ob):
-        if getattr(ob, '_isPortalContent', 0):
-            # Apply a default workflow to portal content.
-            return self._default_chain
-
-    security.declarePrivate('getChainFor')
-    def getChainFor(self, ob):
-        '''
-        Returns the chain that applies to the given object.
-        '''
-        cbt = self._chains_by_type
-        if hasattr(aq_base(ob), '_getPortalTypeName'):
-            pt = ob._getPortalTypeName()
-        else:
-            pt = ob.meta_type  # Use a common Zope idiom.
-        chain = None
-        if cbt is not None:
-            chain = cbt.get(pt, None)
-            # Note that if chain is not in cbt or has a value of
-            # None, we use a default chain.
-        if chain is None:
-            chain = self.getDefaultChainFor(ob)
-            if chain is None:
-                return ()
-        return chain
-
-    security.declarePrivate('getWorkflowIds')
-    def getWorkflowIds(self):
-        '''
-        Returns the list of workflow ids.
-        '''
-        wf_ids = []
-
-        for obj_name, obj in self.objectItems():
-            if getattr(obj, '_isAWorkflow', 0):
-                wf_ids.append(obj_name)
-
-        return tuple(wf_ids)
-
-    security.declarePrivate('getWorkflowsFor')
-    def getWorkflowsFor(self, ob):
-        '''
-        Finds the Workflow objects for the type of the given object.
-        '''
-        res = []
-        for wf_id in self.getChainFor(ob):
-            wf = self.getWorkflowById(wf_id)
-            if wf is not None:
-                res.append(wf)
-        return res
-
+    #
+    #   portal_workflow implementation.
+    #
     security.declarePrivate('getCatalogVariablesFor')
     def getCatalogVariablesFor(self, ob):
         '''
@@ -362,14 +222,6 @@ class WorkflowTool (UniqueObject, Folder):
             if v is not None:
                 vars.update(v)
         return vars
-
-    security.declarePublic('getActionsFor')
-    def getActionsFor(self, ob):
-        '''
-        Return a list of action dictionaries for 'ob', just as though
-        queried via 'ActionsTool.listFilteredActionsFor'.
-        '''
-        return self.listActions( WorkflowInformation( ob ) )
 
     security.declarePrivate('listActions')
     def listActions(self, info):
@@ -405,36 +257,13 @@ class WorkflowTool (UniqueObject, Folder):
                         actions.extend(a)
         return actions
 
-    def _invokeWithNotification(self, wfs, ob, action, func, args, kw):
+    security.declarePublic('getActionsFor')
+    def getActionsFor(self, ob):
         '''
-        Private utility method.
+        Return a list of action dictionaries for 'ob', just as though
+        queried via 'ActionsTool.listFilteredActionsFor'.
         '''
-        reindex = 1
-        for w in wfs:
-            w.notifyBefore(ob, action)
-        try:
-            res = apply(func, args, kw)
-        except ObjectDeleted, ex:
-            res = ex.getResult()
-            reindex = 0
-        except ObjectMoved, ex:
-            res = ex.getResult()
-            ob = ex.getNewObject()
-        except:
-            exc = sys.exc_info()
-            try:
-                for w in wfs:
-                    w.notifyException(ob, action, exc)
-                raise exc[0], exc[1], exc[2]
-            finally:
-                exc = None
-        for w in wfs:
-            w.notifySuccess(ob, action, res)
-        if reindex:
-            catalog = getToolByName(ob, 'portal_catalog', None)
-            if catalog is not None:
-                catalog.reindexObject(ob)
-        return res
+        return self.listActions( WorkflowInformation( ob ) )
 
     security.declarePublic('doActionFor')
     def doActionFor(self, ob, action, wf_id=None, *args, **kw):
@@ -464,29 +293,6 @@ class WorkflowTool (UniqueObject, Folder):
                     'Requested workflow definition not found.')
         return self._invokeWithNotification(
             wfs, ob, action, wf.doActionFor, (ob, action) + args, kw)
-
-    security.declarePrivate('wrapWorkflowMethod')
-    def wrapWorkflowMethod(self, ob, method_id, func, args, kw):
-        '''
-        To be invoked only by WorkflowCore.
-        Allows a workflow definition to wrap a WorkflowMethod.
-        '''
-        wf = None
-        wfs = self.getWorkflowsFor(ob)
-        if wfs:
-            for w in wfs:
-                if (hasattr(w, 'isWorkflowMethodSupported')
-                    and w.isWorkflowMethodSupported(ob, method_id)):
-                    wf = w
-                    break
-        else:
-            wfs = ()
-        if wf is None:
-            # No workflow wraps this method.
-            return apply(func, args, kw)
-        return self._invokeWithNotification(
-            wfs, ob, method_id, wf.wrapWorkflowMethod,
-            (ob, method_id, func, args, kw), {})
 
     security.declarePublic('getInfoFor')
     def getInfoFor(self, ob, name, default=_marker, wf_id=None, *args, **kw):
@@ -609,12 +415,218 @@ class WorkflowTool (UniqueObject, Folder):
             ob.workflow_history = PersistentMapping()
         ob.workflow_history[wf_id] = tuple(wfh)
 
+    #
+    #   Administration methods
+    #
+    security.declareProtected( ManagePortal, 'setDefaultChain')
+    def setDefaultChain(self, default_chain):
+        """ Set the default chain """
+        default_chain = replace(default_chain, ',', ' ')
+        ids = []
+        for wf_id in split(default_chain, ' '):
+            if wf_id:
+                if not self.getWorkflowById(wf_id):
+                    raise ValueError, ( '"%s" is not a workflow ID.' % wf_id)
+                ids.append(wf_id)
+
+        self._default_chain = tuple(ids)
+
+    security.declareProtected( ManagePortal, 'setChainForPortalTypes')
+    def setChainForPortalTypes(self, pt_names, chain):
+        """ Set a chain for a specific portal type """
+        cbt = self._chains_by_type
+        if cbt is None:
+            self._chains_by_type = cbt = PersistentMapping()
+
+        if type(chain) is type(''):
+            chain = map(strip, split(chain,','))
+
+        ti = self._listTypeInfo()
+        for t in ti:
+            id = t.getId()
+            if id in pt_names:
+                cbt[id] = tuple(chain)
+
+
+    security.declareProtected( ManagePortal, 'updateRoleMappings')
+    def updateRoleMappings(self, REQUEST=None):
+        '''
+        '''
+        wfs = {}
+        for id in self.objectIds():
+            wf = self.getWorkflowById(id)
+            if hasattr(aq_base(wf), 'updateRoleMappingsFor'):
+                wfs[id] = wf
+        portal = aq_parent(aq_inner(self))
+        count = self._recursiveUpdateRoleMappings(portal, wfs)
+        if REQUEST is not None:
+            return self.manage_selectWorkflows(REQUEST, manage_tabs_message=
+                                               '%d object(s) updated.' % count)
+        else:
+            return count
+
+    security.declarePrivate('getWorkflowById')
+    def getWorkflowById(self, wf_id):
+        wf = getattr(self, wf_id, None)
+        if getattr(wf, '_isAWorkflow', 0):
+            return wf
+        else:
+            return None
+
+    security.declarePrivate('getDefaultChainFor')
+    def getDefaultChainFor(self, ob):
+        if getattr(ob, '_isPortalContent', 0):
+            # Apply a default workflow to portal content.
+            return self._default_chain
+        return ()
+
+    security.declarePrivate('getChainFor')
+    def getChainFor(self, ob):
+        '''
+        Returns the chain that applies to the given object.
+        '''
+        cbt = self._chains_by_type
+        if hasattr(aq_base(ob), '_getPortalTypeName'):
+            pt = ob._getPortalTypeName()
+        else:
+            pt = getattr( ob, 'meta_type', None )  # Use a common Zope idiom.
+
+            if pt is None:
+                return ()
+
+        chain = None
+        if cbt is not None:
+            chain = cbt.get(pt, None)
+            # Note that if chain is not in cbt or has a value of
+            # None, we use a default chain.
+        if chain is None:
+            chain = self.getDefaultChainFor(ob)
+            if chain is None:
+                return ()
+        return chain
+
+    security.declarePrivate('getWorkflowIds')
+    def getWorkflowIds(self):
+        '''
+        Returns the list of workflow ids.
+        '''
+        wf_ids = []
+
+        for obj_name, obj in self.objectItems():
+            if getattr(obj, '_isAWorkflow', 0):
+                wf_ids.append(obj_name)
+
+        return tuple(wf_ids)
+
+    security.declarePrivate('getWorkflowsFor')
+    def getWorkflowsFor(self, ob):
+        '''
+        Finds the Workflow objects for the type of the given object.
+        '''
+        res = []
+        for wf_id in self.getChainFor(ob):
+            wf = self.getWorkflowById(wf_id)
+            if wf is not None:
+                res.append(wf)
+        return res
+
+    security.declarePrivate('wrapWorkflowMethod')
+    def wrapWorkflowMethod(self, ob, method_id, func, args, kw):
+        '''
+        To be invoked only by WorkflowCore.
+        Allows a workflow definition to wrap a WorkflowMethod.
+        '''
+        wf = None
+        wfs = self.getWorkflowsFor(ob)
+        if wfs:
+            for w in wfs:
+                if (hasattr(w, 'isWorkflowMethodSupported')
+                    and w.isWorkflowMethodSupported(ob, method_id)):
+                    wf = w
+                    break
+        else:
+            wfs = ()
+        if wf is None:
+            # No workflow wraps this method.
+            return apply(func, args, kw)
+        return self._invokeWithNotification(
+            wfs, ob, method_id, wf.wrapWorkflowMethod,
+            (ob, method_id, func, args, kw), {})
+
+    #
+    #   Helper methods
+    #
+    security.declarePrivate( '_listTypeInfo' )
+    def _listTypeInfo(self):
+        pt = getToolByName(self, 'portal_types', None)
+        if pt is None:
+            return ()
+        else:
+            return pt.listTypeInfo()
+
+    security.declarePrivate( '_invokeWithNotification' )
+    def _invokeWithNotification(self, wfs, ob, action, func, args, kw):
+        '''
+        Private utility method.
+        '''
+        reindex = 1
+        for w in wfs:
+            w.notifyBefore(ob, action)
+        try:
+            res = apply(func, args, kw)
+        except ObjectDeleted, ex:
+            res = ex.getResult()
+            reindex = 0
+        except ObjectMoved, ex:
+            res = ex.getResult()
+            ob = ex.getNewObject()
+        except:
+            exc = sys.exc_info()
+            try:
+                for w in wfs:
+                    w.notifyException(ob, action, exc)
+                raise exc[0], exc[1], exc[2]
+            finally:
+                exc = None
+        for w in wfs:
+            w.notifySuccess(ob, action, res)
+        if reindex:
+            catalog = getToolByName(ob, 'portal_catalog', None)
+            if catalog is not None:
+                catalog.reindexObject(ob)
+        return res
+
+    security.declarePrivate( '_recursiveUpdateRoleMappings' )
+    def _recursiveUpdateRoleMappings(self, ob, wfs):
+        # Returns a count of updated objects.
+        count = 0
+        wf_ids = self.getChainFor(ob)
+        if wf_ids:
+            changed = 0
+            for wf_id in wf_ids:
+                wf = wfs.get(wf_id, None)
+                if wf is not None:
+                    did = wf.updateRoleMappingsFor(ob)
+                    if did: changed = 1
+            if changed:
+                count = count + 1
+        if hasattr(aq_base(ob), 'objectItems'):
+            obs = ob.objectItems()
+            if obs:
+                for k, v in obs:
+                    changed = getattr(v, '_p_changed', 0)
+                    count = count + self._recursiveUpdateRoleMappings(v, wfs)
+                    if changed is None:
+                        # Re-ghostify.
+                        v._p_deactivate()
+        return count
+
 InitializeClass(WorkflowTool)
 
 
 _workflow_factories = {}
 
-def addWorkflowFactory(factory, id=None, title=None):
+def _makeWorkflowFactoryKey(factory, id=None, title=None):
     # The factory should take one argument, id.
     if id is None:
         id = getattr(factory, 'id', '') or getattr(factory, 'meta_type', '')
@@ -623,7 +635,19 @@ def addWorkflowFactory(factory, id=None, title=None):
     key = id
     if title:
         key = key + ' (%s)' % title
+    return key
+
+def addWorkflowFactory(factory, id=None, title=None):
+    key = _makeWorkflowFactoryKey( factory, id, title )
     _workflow_factories[key] = factory
 
 addWorkflowClass = addWorkflowFactory  # bw compat.
 
+
+def _removeWorkflowFactory( factory, id=None, title=None ):
+    """ Make teardown in unitcase cleaner. """
+    key = _makeWorkflowFactoryKey( factory, id, title )
+    try:
+        del _workflow_factories[key]
+    except KeyError:
+        pass
