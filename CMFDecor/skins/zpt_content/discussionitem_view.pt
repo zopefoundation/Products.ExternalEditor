@@ -21,7 +21,6 @@
   <span tal:replace="structure here/viewThreadsAtBottom"
        tal:condition="here/viewThreadsAtBottom|nothing">Dicussions</span>
   </div>
-
  </div>
 </div>
 </div>
