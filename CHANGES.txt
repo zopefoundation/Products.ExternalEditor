@@ -41,11 +41,6 @@ HEAD only (unreleased)
       Any class that implements the TypeInformation interface and is
       a registered meta type can now be used in the TypesTool.
 
-  Removed features:
-
-    - The "Access future portal content" was not used anywhere and has been
-      removed. (http://www.zope.org/Collectors/CMF/240)
-
   Bug Fixes
 
     - CMFSetup.skins made the assumption that the CMF site can always
@@ -54,6 +49,12 @@ HEAD only (unreleased)
       sets up the current skin.
 
   Others
+
+    - CMFDefault: Oldstyle DefaultWorkflowDefinition is no longer registered.
+      So you can't accidentally add this deprecated workflow.
+
+    - The "Access future portal content" was not used anywhere and has been
+      removed. (http://www.zope.org/Collectors/CMF/240)
 
     - CMFDefault: Marked 'manage_addCMFSite' as deprecated.
       'CMF Site' no longer shows up in the 'Add' list. To add a new CMF site,

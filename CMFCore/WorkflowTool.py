@@ -708,9 +708,6 @@ def addWorkflowFactory(factory, id=None, title=None):
     key = _makeWorkflowFactoryKey( factory, id, title )
     _workflow_factories[key] = factory
 
-addWorkflowClass = addWorkflowFactory  # bw compat.
-
-
 def _removeWorkflowFactory( factory, id=None, title=None ):
     """ Make teardown in unitcase cleaner. """
     key = _makeWorkflowFactoryKey( factory, id, title )

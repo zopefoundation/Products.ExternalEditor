@@ -28,7 +28,6 @@ from Products.CMFCore.utils import _checkPermission
 from Products.CMFCore.utils import _modifyPermissionMappings
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.utils import SimpleItemWithProperties
-from Products.CMFCore.WorkflowTool import addWorkflowClass
 
 from exceptions import AccessControl_Unauthorized
 from permissions import ModifyPortalContent
@@ -324,5 +323,3 @@ class DefaultWorkflowDefinition (SimpleItemWithProperties):
         return _modifyPermissionMappings(ob, new_map)
 
 InitializeClass(DefaultWorkflowDefinition)
-
-addWorkflowClass(DefaultWorkflowDefinition)
