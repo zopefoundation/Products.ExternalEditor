@@ -1,4 +1,4 @@
-CMF 1.5.0-beta (unreleased)
+CMF 1.5.0beta (2004/08/06)
 
   New Features
 
@@ -121,7 +121,7 @@ CMF 1.5.0-beta (unreleased)
 
     - RSS: Creates correct XML by always quoting arguments (Collector #170).
 
-CMF 1.5.0-alpha (2004/07/09)
+CMF 1.5.0alpha (2004/07/09)
 
   New Features
 
