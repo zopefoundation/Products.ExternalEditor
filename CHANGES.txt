@@ -44,7 +44,10 @@ CMF 1.3 beta2 (2002/06/30)
 
   Bugs Fixed
 
-    - Fix exception handling to not use a string exception in
+    - Fixed index_html to correctly filter out unauthorized subfolders
+      (Tracker #503).
+
+    - Fixed exception handling to not use a string exception in
       PortalFolder (Tracker #512).
 
     - Changed the permission protecting the "Join" action provided by

@@ -99,7 +99,7 @@ CMF TODO's
 
         ( ) Tracker #483:  listFolderContents doesn't filter properly
 
-        ( ) Tracker #503:  index_html/folder_view don't skip unauth
+        (x) Tracker #503:  index_html/folder_view don't skip unauth
                            folders
 
         (x) Tracker #512:  Incorrect use of string exception in

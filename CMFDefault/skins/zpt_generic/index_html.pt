@@ -47,7 +47,7 @@
   <h4> Documents, Images, Files, and News Items </h4>
 
   <ul>
-   <li tal:repeat="item items"> 
+   <li tal:repeat="item items">
     <a href="item_url" tal:attributes="href item/absolute_url"><img
       align="middle" border="0"
       tal:attributes="src   string:${item/portal_url}/${item/getIcon};
@@ -77,7 +77,7 @@
   <h4> Related Resources </h4>
 
   <ul>
-   <li tal:repeat="item items"> 
+   <li tal:repeat="item items">
     <a href="item_url" tal:attributes="href item/absolute_url"><img
       align="middle" border="0"
       tal:attributes="src   string:${item/portal_url}/${item/getIcon};
@@ -96,14 +96,15 @@
   </div>
 
 
-  <div tal:define="items python: here.contentValues(
+  <div tal:define="raw_items python: here.contentValues(
                             filter={ 'Type': 'Folder' } );
+                   items python: auth_filter( raw_items, skip='' );
                   ">
   <div tal:condition="items">
   <h4> Folders </h4>
 
   <ul>
-   <li tal:repeat="item items"> 
+   <li tal:repeat="item items">
     <a href="item_url" tal:attributes="href item/absolute_url"><img
       align="middle" border="0"
       tal:attributes="src   string:${item/portal_url}/${item/getIcon};
