@@ -12,7 +12,7 @@ CMF 1.5alpha (unreleased)
 
   Bug Fixes
 
-    - 
+    - Collector #153: CookieCrumbler didn't preserve query strings.
 
 CMF 1.4x
 
