@@ -928,13 +928,21 @@ class PluggableAuthService( Folder ):
         security = getSecurityManager()
         try:
             try:
-                if security.validate( accessed
-                                    , container
-                                    , name
-                                    , value
-                                    , roles
-                                    ):
-                    return 1
+                if roles is _noroles:
+                    if security.validate( accessed
+                                        , container
+                                        , name
+                                        , value
+                                        ):
+                        return 1
+                else:
+                    if security.validate( accessed
+                                        , container
+                                        , name
+                                        , value
+                                        , roles
+                                        ):
+                        return 1
             except:
                 noSecurityManager()
                 raise
