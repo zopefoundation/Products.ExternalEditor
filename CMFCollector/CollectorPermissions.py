@@ -11,7 +11,8 @@ EditCollectorIssue = 'Edit collector issue'
 SupportIssue = 'Support collector issue'
 
 # Set up default roles for permissions
-setDefaultRoles(AddCollector, CMFCorePermissions.AddPortalContent)
+setDefaultRoles(AddCollector,
+                ('Manager', ))
 setDefaultRoles(ManageCollector,
                 ('Manager', 'Owner'))
 setDefaultRoles(AddCollectorIssue,
