@@ -229,7 +229,7 @@
           </tr>
           <tr>
             <td align="center">
-              <select name="status:list" multiple size="SIZE"
+              <select name="status:list:ignore_empty" multiple size="SIZE"
                     tal:define="values here/collector_issue_trim_states"
                     tal:attributes="size python: min(max(len(values), 3), 5)">
                 <span tal:repeat="status values">
@@ -243,7 +243,7 @@
              </select>
             </td>
             <td align="center">
-              <select name="Creator:list" multiple size="SIZE"
+              <select name="Creator:list:ignore_empty" multiple size="SIZE"
                       tal:define="values python: uniquevals('Creator')"
                       tal:attributes="size python: min(max(len(values), 3), 
                                                        5)">
@@ -259,7 +259,7 @@
               </select>
             </td>
             <td align="center">
-              <select name="supporters:list" multiple size="SIZE"
+              <select name="supporters:list:ignore_empty" multiple size="SIZE"
                       tal:define="values python:
                                          ordered(uniquevals('assigned_to'),
                                                  here.supporters)"
@@ -277,7 +277,7 @@
               </select>
             </td>
             <td align="center">
-              <select name="security_related:list" size="3" multiple
+              <select name="security_related:list:ignore_empty" size="3" multiple
                       tal:define="was python: request.get('security_related',
                                                           [])">
                 <option value="No"
@@ -297,7 +297,7 @@
           </tr>
           <tr>
             <td align="center">
-              <select name="topics:list" multiple size="SIZE"
+              <select name="topics:list:ignore_empty" multiple size="SIZE"
                     tal:define="values python: ordered(uniquevals('topic'),
                                                        here.topics)"
                     tal:attributes="size python: min(max(len(values), 3), 5)">
@@ -313,7 +313,7 @@
              </select>
             </td>
             <td align="center">
-              <select name="classifications:list" multiple size="SIZE"
+              <select name="classifications:list:ignore_empty" multiple size="SIZE"
                       tal:define="values python: 
                                          ordered(uniquevals('classification'),
                                                  here.classifications)"
@@ -332,7 +332,7 @@
               </select>
             </td>
             <td align="center">
-              <select name="importances:list" multiple size="SIZE"
+              <select name="importances:list:ignore_empty" multiple size="SIZE"
                       tal:define="values python: 
                                          ordered(uniquevals('importance'),
                                                  here.importances)"
