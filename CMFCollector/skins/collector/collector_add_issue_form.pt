@@ -137,11 +137,11 @@
        <tr valign="top">
         <th align="right"> </th>
         <td colspan=3>
-            Provide revealing details!
+            Provide details that will help supporters understand the problem.
             <br>
               <font size="-1">
-                Whitespace of lines beginning with whitespace or '&gt;', or
-                between '&lt;pre&gt;'/'&lt;/pre&gt;', will be preserved.
+                Prefix lines with whitespace or '&gt;' to preserve their
+                format.
               </font>
         </td>
        </tr>
