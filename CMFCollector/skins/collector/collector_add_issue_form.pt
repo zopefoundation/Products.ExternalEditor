@@ -50,7 +50,8 @@
         <tr>
           <th valign="middle" align="right"> Submitter </th>
           <td tal:condition="authenticated"
-              tal:content="python: getattr(member, 'full_name', str(member))">
+              tal:content="python: member.getProperty('full_name',
+                                                      str(member))">
           </td>
           <td tal:condition="not: authenticated">
             <input type="text" name="submitter_name" size="30">
