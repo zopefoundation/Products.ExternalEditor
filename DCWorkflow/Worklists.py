@@ -77,7 +77,7 @@ class WorklistDefinition (SimpleItem):
         if self.var_matches:
             return self.var_matches.keys()
         else:
-            return ()
+            return []
 
     def getVarMatch(self, id):
         if self.var_matches:
