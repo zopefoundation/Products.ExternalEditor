@@ -151,6 +151,6 @@ class DynamicType:
         return 'misc_/OFSP/dtmldoc.gif'
 
     security.declarePublic('icon')
-    icon = getIcon  # For the ZMI and the catalog.
+    icon = getIcon  # For the ZMI
 
 Globals.InitializeClass (DynamicType)

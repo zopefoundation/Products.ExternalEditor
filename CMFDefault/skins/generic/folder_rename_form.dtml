@@ -11,9 +11,11 @@
 <TABLE class="FormLayout">
 <TR>
   <TD ALIGN="LEFT" VALIGN="TOP">
+  <dtml-let getIcon="_.hasattr(this(), 'getIcon') and getIcon()"
+            icon="getIcon or _.getattr(this(), 'icon', '')">
   <dtml-if icon>
   <IMG SRC="&dtml-BASEPATH1;/&dtml-icon;" ALT="" BORDER="0">
-  </dtml-if>
+  </dtml-if></dtml-let>
   </TD>
   <TD ALIGN="LEFT" VALIGN="TOP">
   <dtml-var getId>

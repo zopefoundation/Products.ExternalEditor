@@ -79,7 +79,8 @@ Folder contents display.
                      and obj.isPortalContent"
            methodID="folderish and '/folder_contents' or ( portalish
                      and '/view' or '' )"
-           icon="_.getattr(obj, 'icon', 0)"
+           getIcon="_.hasattr(obj, 'getIcon') and obj.getIcon()"
+           icon="getIcon or _.getattr(obj, 'icon', '')"
  >
      <tr valign="top">
       <td>

@@ -38,7 +38,8 @@
 <dtml-if object_actions>
  <tr class="&dtml-AuthClass;">
   <td class="ActionTitle">
-   <dtml-let icon="_.getattr(obj, 'icon', '')"
+   <dtml-let getIcon="_.hasattr(obj, 'getIcon') and obj.getIcon()"
+             icon="getIcon or _.getattr(obj, 'icon', '')"
              typ="_.getattr(obj, 'Type', '')"
              objID="obj.getId()"
    >

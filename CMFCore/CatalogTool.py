@@ -170,7 +170,7 @@ class CatalogTool (UniqueObject, ZCatalog):
         self._catalog.addColumn('review_state')
         self._catalog.addColumn('Creator')
         self._catalog.addColumn('Date')
-        self._catalog.addColumn('icon')
+        self._catalog.addColumn('getIcon')
         self._catalog.addColumn('created')
         self._catalog.addColumn('effective')
         self._catalog.addColumn('expires')

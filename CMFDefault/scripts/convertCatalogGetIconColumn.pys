@@ -1,0 +1,52 @@
+## Script (Python) "convertCatalogGetIconColumn"
+##bind container=container
+##bind context=context
+##bind namespace=
+##bind script=script
+##bind subpath=traverse_subpath
+##parameters=
+##title=Convert portal_catalog to use 'getIcon' instead of 'icon'.
+##
+# Convert the 'icon' metadata column in the portal catalog to a 'getIcon'
+# column. Unfortunately this means we have to drop the 'icon' column, and add
+# the 'getIcon' column, then do a full reindex.
+#
+# To use this script, create it inside the Portal Root Folder and run it.
+# You will need the Manager Role to fully assure correct execution.
+
+catalog = context.portal_catalog
+needReindex = 0
+columns = catalog.schema()
+
+if 'icon' in columns:
+    catalog.manage_delColumns(('icon',))
+    needReindex = 1
+
+if 'getIcon' not in columns:
+    catalog.manage_addColumn('getIcon')
+    needReindex = 1
+
+if needReindex == 1:
+    # We re-create the reindex code here; because we don't want to have to deal
+    # with the redirect that's unavoidable if we call manage_catalogReindex.
+
+    # Get all catalogued data, and extract the paths
+    paths = []
+    add = paths.append
+    for obj in catalog(): add(obj.getPath())
+
+    # Clear the catalog
+    catalog.manage_catalogClear()
+
+    # Index all paths again
+    for p in paths:
+        # I cannot use resolve_path, no access from Python Scripts.
+        # Having Manager access should be enough though.
+        obj = catalog.resolve_url(p, context.REQUEST)
+        if obj is not None:
+            catalog.catalog_object(obj, p)
+
+    return "Updated the catalog, now using 'getIcon' instead of 'icon'."
+
+return 'Nothing done, catalog already tracks getIcon.'
+

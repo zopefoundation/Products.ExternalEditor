@@ -23,6 +23,12 @@
 
  - Render portal description using STX (Tracker issue #246).
 
+ - All CMFDefault skins now use Contentish.getIcon, including the portal
+   catalog. This greatly simplifies using ZClasses as content. In
+   CMFDefault/scripts you will find 'convertCatalogGetIconColumn.pys), a Python
+   Script that will convert your existing Catalog to use 'getIcon' instead of
+   'icon' (Issue PTK(244)[]). 
+
 1.0 final (2001/03/29)
 
  - Removed embedded spaces in 'portal_status_message' strings

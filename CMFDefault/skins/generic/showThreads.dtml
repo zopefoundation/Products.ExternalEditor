@@ -14,14 +14,14 @@
 
 <dtml-if expr="PARENTS[0].meta_type == 'Discussion Item'">
   <dtml-tree name="id" branches="getReplies">
-   <a href="&dtml-absolute_url;"><img border=0 src="<dtml-var SCRIPT_NAME><dtml-var icon>"></a>
+   <a href="&dtml-absolute_url;"><img border=0 src="<dtml-var SCRIPT_NAME><dtml-var getIcon>"></a>
    <a href="&dtml-absolute_url;">&dtml-title;</a>,
    by <dtml-var Creator>
    on <dtml-var Date>
   </dtml-tree>
 <dtml-else>
   <dtml-tree name="talkback" branches="getReplies">
-   <a href="&dtml-absolute_url;"><img border=0 src="<dtml-var SCRIPT_NAME><dtml-var icon>"></a>
+   <a href="&dtml-absolute_url;"><img border=0 src="<dtml-var SCRIPT_NAME><dtml-var getIcon>"></a>
    <a href="&dtml-absolute_url;">&dtml-title;</a>,
    by <dtml-var Creator>
    on <dtml-var Date>

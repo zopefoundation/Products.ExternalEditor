@@ -12,7 +12,7 @@
 </dtml-if>
 
 <dtml-tree branches="getReplies">
- <a href="&dtml-absolute_url;"><img border=0 src="<dtml-var SCRIPT_NAME><dtml-var icon>"></a>
+ <a href="&dtml-absolute_url;"><img border=0 src="<dtml-var SCRIPT_NAME><dtml-var getIcon>"></a>
  <a href="&dtml-absolute_url;">&dtml-title;</a>,
  by <dtml-var Creator>
  on <dtml-var Date>
