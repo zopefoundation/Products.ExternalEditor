@@ -58,7 +58,7 @@
 		    tal:attributes="href python: items.getId() + '/' + methodID">
 	     <img src="" alt="" border="0"
 		      tal:attributes="src python: here.portal_url() + '/' + icon;
-			                  alt items/Type"></a>
+			                  alt items/Type|nothing"></a>
 		 </span>
       </td>
       <td>
@@ -90,7 +90,7 @@
 		    tal:attributes="href python: items.getId() + '/' + methodID">
 	     <img src="" alt="" border="0"
 		      tal:attributes="src python: here.portal_url() + '/' + icon;
-			                  alt items/Type"></a>
+			                  alt items/Type|nothing"></a>
 		 </span>
       </td>
       <td>

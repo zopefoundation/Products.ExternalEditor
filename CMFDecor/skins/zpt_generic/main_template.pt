@@ -17,25 +17,22 @@
             <form action="search" method="GET"
        tal:define="portal_url container/portal_url"
        tal:attributes="action string:${portal_url}/search">
-	          <td class="PortalLogo" align="left" valign="middle" width="1%" height="32"> 
+	          <td class="PortalLogo" align="left" valign="middle" width="7%" height="32"> 
                 <a href="." tal:attributes="href container/portal_url"><img src="../zpt_images/Zope_logo.gif" alt="Zope Logo" border="0" width="87" height="38"
 																																	 tal:attributes="src string:Zope_logo.gif"></a> 
               </td>
 
-            <td class="PortalTitle" width="29%" align="left" valign="middle" height="32"> 
-              <span tal:define="portal_title container/title" tal:content="string:${portal_title}">Site Title</span>
- </td>
+              <td class="PortalTitle" width="43%" align="left" valign="middle" height="32"> 
+                <span tal:define="portal_title container/title" tal:content="string:${portal_title}">Site 
+                Title</span> </td>
 
-            <td class="NavBar" align="right" valign="middle" width="70%" wrap="no" height="32"> 
- <a href="." tal:attributes="href portal_url">home</a>&nbsp;
- <a href="roster"
-    tal:attributes="href string:${portal_url}/Members">members</a>&nbsp;
- <a href="recent_news"
-    tal:attributes="href string:${portal_url}/recent_news">news</a>&nbsp;
- <a href="search_form"
-    tal:attributes="href string:${portal_url}/search_form">search</a>
- <input name="SearchableText" size="16">
-                <input border="0" type="image" name="go" src="../../CMFDefault/skins/Images/go.gif" align="middle" width="20" height="20"
+              <td class="NavBar" align="right" valign="middle" width="50%" wrap="no" height="32" NOWRAP> 
+                <a href="." tal:attributes="href portal_url">home</a>&nbsp; <a href="roster"
+    tal:attributes="href string:${portal_url}/Members">members</a>&nbsp; <a href="recent_news"
+    tal:attributes="href string:${portal_url}/recent_news">news</a>&nbsp; <a href="search_form"
+    tal:attributes="href string:${portal_url}/search_form">search</a> 
+                <input name="SearchableText" size="16">
+                <input border="0" type="image" name="go" src="../../../CMFDefault/skins/Images/go.gif" align="middle" width="20" height="20"
 				       tal:attributes="src string:go.gif">
                  &nbsp;
  </td>
@@ -68,9 +65,8 @@
    <!--everything below here is replaced, just here for view of actions_box -->
    <table class="ActionBox" width="100%">
  <tr class="AuthClass">
-          <td class="ActionTitle">
-		  <img src="../../CMFDefault/skins/Images/UpFolder_icon.gif" align="left" alt="Holder Image" width="16" height="16"> ObjectID 
-          </td>
+          <td class="ActionTitle"> <img src="../../../CMFDefault/skins/Images/UpFolder_icon.gif" align="left" alt="Holder Image" width="16" height="16"> 
+            ObjectID </td>
  </tr>
  <tr class="AuthClass">
   <td> 

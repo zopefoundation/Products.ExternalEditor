@@ -91,8 +91,9 @@ tr.Masthead td.PortalLogo {
 
 table.Masthead tr.Masthead td.PortalTitle {
     text-align: left;
-    color: #000000
+    color: #FFFFFF;
     vertical-align: middle;
+    text-align: center;
     font-size: 120%;
     font-weight: bold;
     margin-left: 1em;
