@@ -8,3 +8,6 @@ completed by Andy Dawkins (New Information Paradigms Ltd)
 Andy originally implemented the Calendar design in plone
 (www.plone.org) with help from the plone development team
 (Alexander Limi, Vidar Andersen and Alan Runyan)
+
+CalendarTool was converted to a CMF Tool by Alan Runyan.
+Additional Modification for the CMFCalendar by Andy Dawkins 29/04/2002

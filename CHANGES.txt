@@ -55,6 +55,8 @@ Future
 
   Bug Fixes
 
+    - Fixed some minor buglets. (Collector #80, #94 and #95)
+
     - Ensure that a couple of calls to string.split only split into a 
       maximum of two parts. 
       (Collector #82)

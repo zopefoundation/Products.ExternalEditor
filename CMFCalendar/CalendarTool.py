@@ -1,21 +1,26 @@
-########################################################################
+##############################################################################
 #
-# Calendar Tool by Andy Dawkins (New Information Paradigms Ltd)
+# Copyright (c) 2002, 2003 Zope Corporation and Contributors.
+# All Rights Reserved.
 #
-# Converted to a CMF Tool by Alan Runyan
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE
 #
-# Additional Modification for the CMFCalendar by Andy Dawkins 29/04/2002
-#
-########################################################################
+##############################################################################
+""" CMFCalendar portal_calendar tool.
 
+$Id$
+"""
 
 import calendar
 calendar.setfirstweekday(6) #start day  Mon(0)-Sun(6)
 from DateTime import DateTime
 
 from Products.CMFCore.utils import UniqueObject
-from Products.CMFCore.utils import _checkPermission, _getAuthenticatedUser
-from Products.CMFCore.utils import getToolByName, _dtmldir
 from OFS.SimpleItem import SimpleItem
 from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
@@ -71,8 +76,7 @@ class CalendarTool (UniqueObject, SimpleItem):
     security.declarePublic('getDays')
     def getDays(self):
         """ Returns a list of days with the correct start day first """        
-        import string
-        return string.split(calendar.weekheader(2),' ')
+        return calendar.weekheader(2).split()
         
     security.declarePublic('getWeeksList')
     def getWeeksList(self, month='1', year='2002'):

@@ -7,27 +7,27 @@
  <dtml-call expr="REQUEST.set('show_filter_form', '1')">
 </dtml-if>
 
-<form ACTION="&dtml-absolute_url;/folder_contents" METHOD="POST">
+<form action="&dtml-absolute_url;/folder_contents" method="POST">
  <dtml-if expr="REQUEST.get('show_filter_form', 0)">
   <dtml-let Subject="''"
             filter="decodeFolderFilter(REQUEST.get('folderfilter', ''))"
             portalType="filter.get('portal_type', ())">
   <dtml-with filter mapping>
-  <TABLE BORDER="0" CELLSPACING="0" CELLPADDING=2>
-   <TR>
+  <table border="0" cellspacing="0" cellpadding="2">
+   <tr>
     <th colspan="2" align="left">Contents View Filter</th>
-   </TR>
-   <TR>
-    <TD ALIGN="left" VALIGN="TOP" WIDTH="*">Subject:</TD>
-    <TD ALIGN="left" VALIGN="TOP">
+   </tr>
+   <tr>
+    <td align="left" valign="TOP" width="*">Subject:</td>
+    <td align="left" valign="TOP">
      <input type="text" name="filter_by_Subject:tokens"
       value="<dtml-if Subject><dtml-var
               expr="_.string.join(Subject, ' ')"></dtml-if>" />
-    </TD>
-   </TR>
-   <TR>
-    <TD ALIGN="left" VALIGN="TOP" WIDTH="*">Content Type:</TD>
-    <TD ALIGN="left" VALIGN="TOP">
+    </td>
+   </tr>
+   <tr>
+    <td align="left" valign="TOP" width="*">Content Type:</td>
+    <td align="left" valign="TOP">
      <select name="filter_by_portal_type:list" multiple size="3">
       <dtml-in expr="portal_types.listTypeInfo( container=this() )" sort>
       <dtml-let typeinfo=sequence-item typeid=getId>
@@ -40,19 +40,19 @@
       </dtml-let>
       </dtml-in>
      </select>
-    </TD>
-   </TR>
-   <TR>
+    </td>
+   </tr>
+   <tr>
     <td colspan="1" align="left">
-     <input type="submit" name="set_view_filter" value="Set Filter">
+     <input type="submit" name="set_view_filter" value="Set Filter" />
     </td>
     <td colspan="1" align="left">
-     <input type="submit" name="close_filter_form" value="Close View Filter">
+     <input type="submit" name="close_filter_form" value="Close View Filter" />
     </td>
     <td colspan="1" align="left">
-     <input type="submit" name="clear_view_filter" value="Clear View Filter">
+     <input type="submit" name="clear_view_filter" value="Clear View Filter" />
     </td>
-   </TR>
+   </tr>
   </table>
   </dtml-with>
   </dtml-let>
@@ -60,6 +60,6 @@
   <dtml-if expr="REQUEST.get('folderfilter', _.None)">
    <em>This is a filtered list.</em>
   </dtml-if>
-  <input type="submit" name="open_filter_form" value="Set View Filter">
+  <input type="submit" name="open_filter_form" value="Set View Filter" />
  </dtml-if>
 </form>
