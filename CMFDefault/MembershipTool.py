@@ -170,7 +170,8 @@ class MembershipTool ( Products.CMFCore.MembershipTool.MembershipTool ):
         members =  getattr(parent, 'Members', None)
 
         if members is not None and not hasattr(members, member_id):
-            members.manage_addPortalFolder(member_id)
+            f_title = "%s's Home" % member_id
+            members.manage_addPortalFolder( id=member_id, title=f_title )
             f=getattr(members, member_id)
  
             # Grant ownership to Member
