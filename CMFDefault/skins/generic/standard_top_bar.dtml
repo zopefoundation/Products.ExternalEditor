@@ -7,7 +7,7 @@
  <tr class="Masthead">
 
   <td class="PortalLogo" align="left" valign="top" width="1%"><a
-    href="&dtml-portal_url;"><img src="logo.png"
+    href="&dtml-portal_url;"><img src="&dtml-portal_url;/logo.png"
     alt="Zope Logo" border="0"></a></td>
 
   <td class="PortalTitle" width="29%" align="left"
@@ -28,7 +28,7 @@
     <a href="&dtml-portal_url;/recent_news">news</a>&nbsp;
     <a href="&dtml-portal_url;/search_form">search</a>
     <input name="SearchableText" size="16">
-    <input border="0" type="image" name="go" src="go.gif"> &nbsp;
+    <input border="0" type="image" name="go" src="&dtml-portal_url;/go.gif"> &nbsp;
    </form>
   </td>
 

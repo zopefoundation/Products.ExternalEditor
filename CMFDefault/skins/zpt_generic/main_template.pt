@@ -70,7 +70,7 @@
     <input name="SearchableText" size="16">
     <input border="0" type="image" name="go" value="go" src="go.gif"
            align="middle" width="20" height="20"
-           tal:attributes="src string:go.gif"> &nbsp;
+           tal:attributes="src string:${portal_url}/go.gif"> &nbsp;
    </td>
 
   </form>
