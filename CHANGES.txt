@@ -2,6 +2,8 @@ External Editor Change Log
 
   Next Release
   
+    - Properly escape hyphens in man page. Thanks to Federico Sevilla III.
+  
     - Check if the editor was launched before locking the file in Zope. This
       prevents errors if the editor is closed before the lock request 
       completes.
