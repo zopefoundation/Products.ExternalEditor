@@ -187,7 +187,7 @@ class MembershipTool ( Products.CMFCore.MembershipTool.MembershipTool ):
                                 , member_id+"'s Home"
                                 , member_id+"'s front page"
                                 , "structured-text"
-                                , (default_member_content % id)
+                                , (default_member_content % member_id)
                                 )
  
             f.index_html._setPortalTypeName( 'Document' )
