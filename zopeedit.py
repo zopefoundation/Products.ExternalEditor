@@ -85,6 +85,8 @@ class Configuration:
         
 class ExternalEditor:
     
+    did_lock = 0
+    
     def __init__(self, input_file):
         try:
             # Read the configuration file
