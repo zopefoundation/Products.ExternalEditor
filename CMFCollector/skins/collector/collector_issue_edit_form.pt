@@ -1,0 +1,34 @@
+<html xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="here/main_template/macros/master">
+<body>
+
+<span tal:replace="nothing">
+  Template description: Basic view of issue characteristics and transcript.
+</span>
+
+<div metal:fill-slot="header">
+
+  <div metal:use-macro="here/collector_macros/macros/issue_header">
+
+    ISSUE HEADER
+
+  </div>
+
+</div>
+
+<div metal:fill-slot="main">
+
+  <div tal:condition="not: collector_issue_header_present|nothing">
+    <span tal:condition="nothing"> When master has no macro "header"... </span>
+    <div metal:use-macro="here/collector_macros/macros/issue_header">
+      ISSUE HEADER
+    </div>
+  </div>
+
+  <h3> Collector Issue Edit - Not yet implemented </h3>
+
+</div>
+
+</body>
+</html>
