@@ -1,0 +1,124 @@
+Introduction
+
+  Zope's Content Management Framework (CMF) allows you to manage your
+  organizations digital assets. The CMF lets you:
+
+  * Create and edit all kinds of content.
+
+  * Manage your content using custom business logic and workflow rules.
+
+  * Deliver your content in a flexible, powerful way.
+
+  Instead of taking a one-size-fits-all approach, the CMF allows you
+  to build your own content management system that meets your
+  needs. You can use the CMF to create all kinds of content management
+  systems including:
+
+  * Intranets - share knowledge and automate business processes within
+    your organization.
+
+  * Portals - deploy personalized content and leverage visitor
+    contributed content. 
+
+  You will learn how to use and customize the CMF in the chapters that
+  follow.
+
+  CMF Content
+
+    A central idea of the CMF is that all kinds of digital assets
+    (including articles, reports, graphics, multi-media, etc.) are
+    treated as "content" objects. Content objects all share certain
+    features including: remote editing, security, workflow, and
+    customizable look and feel.
+
+    The CMF provides standard tools to edit and manage content. You
+    can create content through the web using a standard web browser,
+    or you can edit it remotely with desktop tools.
+
+    You can create custom content types to fit with your
+    organization's needs. For example, you might want to create a
+    custom purchase order content type.
+
+    The CMF promotes distributed authorship. Different categories of
+    users from managers to anonymous site visitors can create and edit
+    content. All content functions are controlled by security and
+    workflow rules. This allows you to construct a content management
+    system that meets your organization's needs. You can delegate some
+    responsibilities while retaining control.
+
+  CMF Services
+
+    In addition to content, the other central idea of the CMF is
+    "services". Services provide centralized management of site
+    features. For example, the workflow service configures business
+    process rules that govern how content is developed and
+    deployed. Here's a brief overview of key CMF services:
+
+    Membership
+
+      The membership service controls how users join your site. For
+      example, some sites allow visitors to become contributing
+      members, while other sites draw authentication information from
+      LDAP databases. The membership service controls both
+      authentication and user data.
+
+    Workflow
+
+      The workflow service lets you configure business rules that
+      govern how content is developed and deployed. You can tailor
+      workflow to control how content is routed between different
+      people as it is developed. For example, a news article might be
+      created by an author, and then submitted to an editor for
+      review. You can configure different workflow rules for different
+      types of content.
+
+    Security 
+
+      Zope provides a unified security architecture that controls all
+      site functions. You can easily tailor the security policy for
+      different content types, and different locations in your
+      site. You can also delegate safely security policy maintenance so
+      that managers can set the security policy in their part of the
+      site.
+
+    Undo
+
+      The Undo service allows you to recover from mistakes. All site
+      changes (including changes to logic, presentation, and content
+      components) can be undone. Zope uses transactions that ensure
+      that the site never gets into an inconsistent state.
+
+    History and Versions
+
+      Zope provides a history and versions facility to content. This
+      allows you to keep track of content versions. You can track
+      changes in content over time and check point different content
+      revisions.
+
+    Look and Feel
+
+      The CMF provides a unified look and feel service. This service
+      allows you to provide a consistent look and feel as well as
+      personalize a site for different users. You can also reuse
+      content with different look and feel.
+
+    Metadata
+
+      The metadata service allows you to configure content
+      metadata. Metadata categorizes content by keeping track of
+      attributes such as title, author, last modified date, key words,
+      etc. By using metadata you can easily categorize and search your
+      content.
+
+    Search
+
+      Zope provides a powerful and fast search services. The search
+      service allows you to locate content based on full text search
+      as well as metadata. The search service can be used to build
+      reports as well as to provide search services to site visitors.
+
+  Conclusion
+  
+    The Zope CMF gives you the tools you need to build a powerful
+    content management system that meets your needs. In the following
+    chapters you'll learn more about CMF content and services.
