@@ -494,15 +494,6 @@ CMFDocumentClass = CMFDocumentClass()
 
 class CMFHtmlWithImages( HTMLWithImages ):
     """ Special subclass of HTMLWithImages, overriding document() """
-    def namedLink(self, doc, level, output):
-        """\
-        XXX Trial subclassed implementation of HTMLClass#namedLink(),
-        as default implementation seems to be broken...
-        """
-        name = doc.getNodeValue()
-        if name[:2] == '..':
-            name = name[2:]
-        output('<a name="%s">[%s]</a>' % (name, name))
 
     def document(self, doc, level, output):
         """\
