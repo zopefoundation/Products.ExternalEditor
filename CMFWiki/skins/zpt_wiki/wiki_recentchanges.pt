@@ -17,7 +17,8 @@
  <tr>
   <th align="left">Page</th>
   <th align="left">Size</th>
-  <th align="left">Last modified</th>
+  <th align="left">Modified</th>
+  <th align="left">Edited By</th>
  </tr>
 
  <tr tal:repeat="page pages">
@@ -33,6 +34,9 @@
   </td>
   <td tal:content="python: page.bobobase_modification_time().aCommon()">
     2001/01/01 08:00:00 CST
+  </td>
+  <td align="right" tal:content="python: page.last_editor or page.Creator()">
+     LAST EDITOR
   </td>
  </tr>
 </table>
