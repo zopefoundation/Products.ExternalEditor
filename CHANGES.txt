@@ -93,6 +93,9 @@ CMF 1.4 alpha
 
   Bug Fixes
 
+    - Document: Ensured that setFormat('text/plain') does not overwrite
+      text_format if text_format is 'plain'. (Collector #140)
+
     - Action providers: Default _actions' are now tuples, not lists.
       (Collector #123)
 
