@@ -2,17 +2,6 @@ HEAD only (unreleased)
 
   New Features
 
-    - CMFCalendar: Added extension profile.
-      You can now set up CMFCalendar in one step together with a new site or
-      add calendar support to an existing site using the portal_setup tool.
-
-    - CMFSetup: Added support for extension profiles.
-      Extension profiles are profile fragments used to modify base profiles.
-      They can be shipped with add-on products or used for customization
-      steps. Importing an extension profile adds or overwrites existing
-      settings in a fine-grained way. You can't export extension profiles.
-      Snapshots and exports always represent the merged settings.
-
     - DirectoryView and derived classes can now have metadata associated with
       them just like regular FSObject-derived objects can.
 
@@ -23,13 +12,6 @@ HEAD only (unreleased)
       CMFCore.DirectoryView.DirectoryView(Surrogate). It is now possible to 
       register a class deriving from DirectoryView and have that be 
       instantiated instead.
-
-    - CMFSetup: Sometimes it is not necessary or desirable to create a 
-      snapshot upon initial site creation. Matter of fact when run in a unit 
-      test situation, addConfiguredSite can throw permission errors during the
-      snapshot-taking because no specific SecurityManager has been set up.
-      Add new flag "snapshot" to factory.addConfiguredSite to turn off
-      snapshotting if desired
 
     - ActionsTool: Added new way to define Actions.
       'CMF Action Category' objects can now be added to the portal_actions
@@ -45,15 +27,6 @@ HEAD only (unreleased)
 
     - CMFCore.PortalContent: Wrong variable name in __call__ would blow up
       if no default view could be found for a piece of content.
-
-    - CMFSetup: Reduced probability of profile ID conflicts.
-      The first argument of 'registerProfile' is now 'name' instead of
-      'profile_id'. The profile ID combines 'name' and 'product'.
-
-    - CMFSetup.skins made the assumption that the CMF site can always
-      acquire REQUEST and would set up the current skin with it. Added a test
-      to see if REQUEST is available and if it is not, skip the step that
-      sets up the current skin.
 
   Others
 
