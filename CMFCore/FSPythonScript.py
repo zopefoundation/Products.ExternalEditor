@@ -87,6 +87,7 @@ __version__='$Revision$'[11:-2]
 
 from string import split
 from os import path, stat
+import new
 
 import Globals
 from AccessControl import ClassSecurityInfo, getSecurityManager
@@ -162,10 +163,19 @@ class FSPythonScript (FSObject, Script):
 
         __traceback_info__ = bound_names, args, kw, self.func_defaults
 
-        if bound_names is not None:
-            # Updating func_globals directly *should* be thread-safe.
-            f.func_globals.update(bound_names)
-    
+        if bound_names:
+            # Updating func_globals directly is not thread safe here.
+            # In normal PythonScripts, every thread has its own
+            # copy of the function.  But in FSPythonScripts
+            # there is only one copy.  So here's another way.
+            new_globals = f.func_globals.copy()
+            new_globals.update(bound_names)
+            if f.func_defaults:
+                f = new.function(f.func_code, new_globals, f.func_name,
+                                 f.func_defaults)
+            else:
+                f = new.function(f.func_code, new_globals, f.func_name)
+
         # Execute the function in a new security context.
         security=getSecurityManager()
         security.addContext(self)
