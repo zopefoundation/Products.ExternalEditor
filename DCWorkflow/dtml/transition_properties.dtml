@@ -52,7 +52,7 @@ Automatic
 <input type="radio" name="trigger_type" value="1" &dtml-checked; />
 Initiated by user action
 </dtml-let>
-</tr>
+</td>
 </tr>
 
 <tr>
@@ -62,7 +62,7 @@ Initiated by user action
 <input type="radio" name="trigger_type" value="2" &dtml-checked; />
 Initiated by WorkflowMethod
 </dtml-let>
-</tr>
+</td>
 </tr>
 
 <tr>
