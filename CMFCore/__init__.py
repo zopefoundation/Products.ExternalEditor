@@ -176,3 +176,4 @@ def initialize(context):
                      , extra_constructors=(
                            PortalFolder.manage_addPortalFolder, )
                      ).initialize( context )
+

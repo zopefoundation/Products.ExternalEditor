@@ -99,48 +99,36 @@ class WorkflowException (Exception):
     '''
 
 
-class WorkflowAction (Method):
+class WorkflowMethod (Method):
     '''
     Wraps a method to workflow-enable it.
     '''
     _need__name__=1
 
-    def __init__(self, method, action=None, reindex=1):
+    def __init__(self, method, id=None, reindex=1):
         self._m = method
-        if action is None:
-            action = method.__name__
-        self._a = action
-        self._reindex = reindex
+        if id is None:
+            id = method.__name__
+        self._id = id
+        # reindex ignored since workflows now perform the reindexing.
 
     def __call__(self, instance, *args, **kw):
         '''
         Invokes the method.
         '''
         wf = getToolByName(instance, 'portal_workflow', None)
-        if wf is None:
+        if wf is None or not hasattr(wf, 'wrapWorkflowMethod'):
             # No workflow found.
-            return apply(self._m, (instance,) + args, kw)
+            res = apply(self._m, (instance,) + args, kw)
         else:
-            action = self._a
-            wf.notifyBefore(instance, action)  # Can throw an exception.
-            try:
-                res = apply(self._m, (instance,) + args, kw)
-            except:
-                wf.notifyException(instance, action, sys.exc_info())
-                raise
-            else:
-                wf.notifySuccess(instance, action, res)
-                if self._reindex:
-                    catalog = getToolByName(instance, 'portal_catalog', None)
-                    if catalog is not None:
-                        catalog.reindexObject(instance)
-                return res
+            res = wf.wrapWorkflowMethod(instance, self._id, self._m,
+                                        (instance,) + args, kw)
+        return res
+
+# Backward compatibility.
+WorkflowAction = WorkflowMethod
 
 
 def afterCreate(ob):
-    wf = getToolByName(ob, 'portal_workflow', None)
-    if wf is not None:
-        wf.notifyCreated(ob)
-        catalog = getToolByName(ob, 'portal_catalog', None)
-        if catalog is not None:
-            catalog.reindexObject(ob)
+    # This functionality is now in PortalContent.py.
+    pass

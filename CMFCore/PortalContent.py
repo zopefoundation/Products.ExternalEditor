@@ -159,8 +159,11 @@ class PortalContent(DynamicType, SimpleItem):
             catalog.reindexObject(self)
         
     def manage_afterAdd(self, item, container):
-        "Add self to the catalog."
+        "Add self to the workflow and catalog."
         if aq_base(item) is aq_base(self):
+            wf = getToolByName(self, 'portal_workflow', None)
+            if wf is not None:
+                wf.notifyCreated(self)
             self.indexObject()
 
     def manage_beforeDelete(self, item, container):

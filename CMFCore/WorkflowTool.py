@@ -376,6 +376,30 @@ class WorkflowTool (UniqueObject, Folder):
                         actions.extend(a)
         return actions
 
+    def _invokeWithNotification(self, wfs, ob, action, func, args, kw):
+        '''
+        Private utility method.
+        '''
+        for w in wfs:
+            w.notifyBefore(ob, action)
+        try:
+            res = apply(func, args, kw)
+        except:
+            exc = sys.exc_info()
+            try:
+                for w in wfs:
+                    w.notifyException(ob, action, exc)
+                raise exc[0], exc[1], exc[2]
+            finally:
+                exc = None
+        else:
+            for w in wfs:
+                w.notifySuccess(ob, action, res)
+            catalog = getToolByName(ob, 'portal_catalog', None)
+            if catalog is not None:
+                catalog.reindexObject(ob)
+            return res
+
     security.declarePublic('doActionFor')
     def doActionFor(self, ob, action, wf_id=None, *args, **kw):
         '''
@@ -383,9 +407,11 @@ class WorkflowTool (UniqueObject, Folder):
         Allows the user to request a workflow action.  The workflow object
         must perform its own security checks.
         '''
+        wfs = self.getWorkflowsFor(ob)
+        if wfs is None:
+            wfs = ()
         if wf_id is None:
-            wfs = self.getWorkflowsFor(ob)
-            if wfs is None:
+            if not wfs:
                 raise WorkflowException('No workflows found.')
             found = 0
             for wf in wfs:
@@ -400,7 +426,31 @@ class WorkflowTool (UniqueObject, Folder):
             if wf is None:
                 raise WorkflowException(
                     'Requested workflow definition not found.')
-        return apply(wf.doActionFor, (ob, action) + args, kw)
+        return self._invokeWithNotification(
+            wfs, ob, action, wf.doActionFor, (ob, action) + args, kw)
+
+    security.declarePrivate('wrapWorkflowMethod')
+    def wrapWorkflowMethod(self, ob, method_id, func, args, kw):
+        '''
+        To be invoked only by WorkflowCore.
+        Allows a workflow definition to wrap a WorkflowMethod.
+        '''
+        wf = None
+        wfs = self.getWorkflowsFor(ob)
+        if wfs:
+            for w in wfs:
+                if (hasattr(w, 'isWorkflowMethodSupported')
+                    and w.isWorkflowMethodSupported(ob, method_id)):
+                    wf = w
+                    break
+        else:
+            wfs = ()
+        if wf is None:
+            # No workflow wraps this method.
+            return apply(func, args, kw)
+        return self._invokeWithNotification(
+            wfs, ob, method_id, wf.wrapWorkflowMethod,
+            (ob, method_id, func, args, kw), {})
 
     security.declarePublic('getInfoFor')
     def getInfoFor(self, ob, name, default=_marker, wf_id=None, *args, **kw):
@@ -531,4 +581,5 @@ _workflow_classes = {}
 def addWorkflowClass(klass):
     # klass is expected to have id, title, and meta_type attributes.
     # Its constructor should take one argument, id.
-    _workflow_classes[klass.meta_type] = klass
+    id = getattr(klass, 'id', None) or klass.meta_type
+    _workflow_classes[id] = klass
