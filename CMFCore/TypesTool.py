@@ -165,10 +165,29 @@ class TypeInformation (SimpleItemWithProperties):
         """
         if not self.filter_content_types:
             ti = self.getTypeInfo( contentType )
-            return ti is None or ti.globalAllow() \
-                   or contentType in self.allowed_content_types
-        return contentType in self.allowed_content_types
-    
+            if ti is None or ti.globalAllow():
+                return 1
+
+        # XXX The whole TypesTool needs to be fixed so that what we pass
+        # around is always a type id, and what we store in
+        # allowed_content_types too.
+
+        # When called from PortalFolder.allowedContentTypes, contentType
+        # is a ti.Type(), which is compatible with what
+        # allowed_content_types contains (human-readable string instead
+        # of type id, unfortunately).
+        if contentType in self.allowed_content_types:
+            return 1
+
+        # When called from PortalFolder.invokeFactory, contentType is a
+        # type id (the portal_type attribute, ti.getId()), which may be
+        # different from ti.Type() if the title is non-empty.
+        for t in self.listTypeInfo():
+            if t.getId() == contentType:
+                return t.Type() in self.allowed_content_types
+
+        return 0
+
     security.declarePublic('getId')
     def getId(self):
         return self.id
