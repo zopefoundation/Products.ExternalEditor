@@ -26,6 +26,7 @@ import DirectoryView, FSImage, FSFile, FSPropertiesObject
 import FSDTMLMethod, FSPythonScript, FSSTXMethod
 import FSPageTemplate
 import FSZSQLMethod
+import ActionInformation
 import CookieCrumbler
 import ContentTypeRegistry
 import CachingPolicyManager
@@ -99,6 +100,22 @@ def initialize(context):
         constructors=( CachingPolicyManager.manage_addCachingPolicyManager, ),
         icon = 'images/registry.gif'
         )
+
+    context.registerClass(
+        ActionInformation.ActionCategory,
+        permission=ManagePortal,
+        constructors=(ActionInformation.manage_addActionCategoryForm,
+                      ActionInformation.manage_addActionCategory),
+        icon='images/cmf_action_category.gif',
+        visibility=None)
+
+    context.registerClass(
+        ActionInformation.Action,
+        permission=ManagePortal,
+        constructors=(ActionInformation.manage_addActionForm,
+                      ActionInformation.manage_addAction),
+        icon='images/cmf_action.gif',
+        visibility=None)
 
     context.registerClass(
         TypesTool.FactoryTypeInformation,

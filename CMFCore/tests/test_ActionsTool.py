@@ -4,11 +4,8 @@ import Zope
 Zope.startup()
 from Interface.Verify import verifyClass
 
-from Products.CMFCore.ActionInformation import ActionInformation
 from Products.CMFCore.ActionsTool import ActionsTool
-from Products.CMFCore.Expression import Expression
 from Products.CMFCore.MembershipTool import MembershipTool
-from Products.CMFCore.PortalFolder import PortalFolder
 from Products.CMFCore.RegistrationTool import RegistrationTool
 from Products.CMFCore.tests.base.testcase import SecurityRequestTest
 from Products.CMFCore.TypesTool import TypesTool
@@ -63,11 +60,10 @@ class ActionsToolTests( SecurityRequestTest ):
                          {'workflow': [],
                           'user': [],
                           'object': [],
-                          'folder': [{'permissions': ('List folder contents',),
-                                      'id': 'folderContents',
+                          'folder': [{'id': 'folderContents',
                                       'url': 'http://foo/folder_contents',
                                       'title': 'Folder contents',
-                                      'name': 'Folder contents',
+                                      'description': '',
                                       'visible': True,
                                       'available': True,
                                       'allowed': True,

@@ -20,69 +20,192 @@ from UserDict import UserDict
 from AccessControl import ClassSecurityInfo
 from Acquisition import aq_base, aq_inner, aq_parent
 from Globals import InitializeClass
+from OFS.ObjectManager import IFAwareObjectManager
+from OFS.OrderedFolder import OrderedFolder
 from OFS.SimpleItem import SimpleItem
+from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
-from interfaces.portal_actions import ActionInfo as IActionInfo
 from Expression import Expression
+from interfaces.portal_actions import Action as IAction
+from interfaces.portal_actions import ActionCategory as IActionCategory
+from interfaces.portal_actions import ActionInfo as IActionInfo
 from permissions import View
 from utils import _checkPermission
+from utils import _wwwdir
 from utils import getToolByName
+from utils import SimpleItemWithProperties
 
 
 _unchanged = [] # marker
 
+class ActionCategory(IFAwareObjectManager, OrderedFolder):
+    """ Group of Action objects.
+    """
+
+    __implements__ = (IActionCategory, OrderedFolder.__implements__)
+
+    meta_type = 'CMF Action Category'
+
+    _product_interfaces = (IActionCategory, IAction)
+
+    security = ClassSecurityInfo()
+
+    security.declarePrivate('listActions')
+    def listActions(self):
+        """ List the actions defined in this category and its subcategories.
+        """
+        actions = []
+
+        for obj in self.objectValues():
+            if IActionCategory.isImplementedBy(obj):
+                actions.extend( obj.listActions() )
+            elif IAction.isImplementedBy(obj):
+                actions.append(obj)
+
+        return tuple(actions)
+
+InitializeClass(ActionCategory)
+
+manage_addActionCategoryForm = PageTemplateFile('addActionCategory.zpt',
+                                                _wwwdir)
+
+def manage_addActionCategory(self, id, REQUEST=None):
+    """Add a new CMF Action Category object with ID *id*.
+    """
+    obj = ActionCategory(id)
+    self._setObject(id, obj)
+
+    if REQUEST:
+        return self.manage_main(self, REQUEST, update_menu=1)
+
+
+class Action(SimpleItemWithProperties):
+    """ Reference to an action.
+    """
+
+    __implements__ = IAction
+
+    meta_type = 'CMF Action'
+
+    security = ClassSecurityInfo()
+
+    _properties = (
+        {'id': 'title', 'type': 'string', 'mode': 'w',
+         'label': 'Title'},
+        {'id': 'description', 'type': 'text', 'mode': 'w',
+         'label': 'Description'},
+        {'id': 'url_expr', 'type': 'string', 'mode': 'w',
+         'label': 'URL (Expression)'},
+        {'id': 'icon_expr', 'type': 'string', 'mode': 'w',
+         'label': 'Icon (Expression)'},
+        {'id': 'available_expr', 'type': 'string', 'mode': 'w',
+         'label': 'Condition (Expression)'},
+        {'id': 'permissions', 'type': 'multiple selection', 'mode': 'w',
+         'label': 'Permissions', 'select_variable': 'possible_permissions'},
+        {'id': 'visible', 'type': 'boolean', 'mode': 'w',
+         'label': 'Visible?'},
+        )
+
+    def __init__(self, id, **kw):
+        self.id = id
+        self._setPropValue( 'title', kw.get('title', '') )
+        self._setPropValue( 'description', kw.get('description', '') )
+        self._setPropValue( 'url_expr', kw.get('url_expr', '') )
+        self._setPropValue( 'icon_expr', kw.get('icon_expr', '') )
+        self._setPropValue( 'available_expr', kw.get('available_expr', '') )
+        self._setPropValue( 'permissions', kw.get('permissions', () ) )
+        self._setPropValue( 'visible', kw.get('visible', True) )
+
+    def _setPropValue(self, id, value):
+        self._wrapperCheck(value)
+        if isinstance(value, list):
+            value = tuple(value)
+        setattr(self, id, value)
+        if id.endswith('_expr'):
+            setattr( self, '%s_object' % id, Expression(value) )
+
+    security.declarePrivate('getInfoData')
+    def getInfoData(self):
+        """ Get the data needed to create an ActionInfo.
+        """
+        category_path = []
+        lazy_keys = []
+        lazy_map = {}
+
+        lazy_map['id'] = self.getId()
+
+        parent = aq_parent(self)
+        while parent is not None and parent.getId() != 'portal_actions':
+            category_path.append( parent.getId() )
+            parent = aq_parent(parent)
+        lazy_map['category'] = '/'.join(category_path[::-1])
+
+        for id, val in self.propertyItems():
+            if id.endswith('_expr'):
+                id = id[:-5]
+                if val:
+                    val = getattr(self, '%s_expr_object' % id)
+                    lazy_keys.append(id)
+                elif id == 'available':
+                    val = True
+            lazy_map[id] = val
+
+        return (lazy_map, lazy_keys)
+
+InitializeClass(Action)
+
+manage_addActionForm = PageTemplateFile( 'addAction.zpt', _wwwdir)
+
+def manage_addAction(self, id, REQUEST=None):
+    """Add a new CMF Action object with ID *id*.
+    """
+    obj = Action(id)
+    self._setObject(id, obj)
+
+    if REQUEST:
+        return self.manage_main(self, REQUEST)
+
+
 class ActionInfo(UserDict):
     """ A lazy dictionary for Action infos.
     """
+
     __implements__ = IActionInfo
+
     __allow_access_to_unprotected_subobjects__ = 1
 
     def __init__(self, action, ec):
-        lazy_keys = []
 
         if isinstance(action, dict):
+            lazy_keys = []
             UserDict.__init__(self, action)
-            self.data.setdefault( 'id', self.data['name'].lower() )
-            self.data.setdefault( 'title', self.data['name'] )
+            if 'name' in self.data:
+                self.data.setdefault( 'id', self.data['name'].lower() )
+                self.data.setdefault( 'title', self.data['name'] )
+                del self.data['name']
             self.data.setdefault( 'url', '' )
-            self.data.setdefault( 'permissions', () )
             self.data.setdefault( 'category', 'object' )
             self.data.setdefault( 'visible', True )
             self.data['available'] = True
-
         else:
-            self._action = action
-            self._ec = ec
-            UserDict.__init__( self, action.getMapping() )
-            self.data['name'] = self.data['title']
-            del self.data['description']
+            # if action isn't a dict, it has to implement IAction
+            (lazy_map, lazy_keys) = action.getInfoData()
+            UserDict.__init__(self, lazy_map)
 
-            if self.data['action']:
-                self.data['url'] = self._getURL
-                lazy_keys.append('url')
-            else:
-                self.data['url'] = ''
-            del self.data['action']
-
-            if self.data['condition']:
-                self.data['available'] = self._checkCondition
-                lazy_keys.append('available')
-            else:
-                self.data['available'] = True
-            del self.data['condition']
-
-        if self.data['permissions']:
+        self.data['allowed'] = True
+        permissions = self.data.pop( 'permissions', () )
+        if permissions:
             self.data['allowed'] = self._checkPermissions
             lazy_keys.append('allowed')
-        else:
-            self.data['allowed'] = True
 
+        self._ec = ec
         self._lazy_keys = lazy_keys
+        self._permissions = permissions
 
     def __getitem__(self, key):
         value = UserDict.__getitem__(self, key)
         if key in self._lazy_keys:
-            value = self.data[key] = value()
+            value = self.data[key] = value(self._ec)
             self._lazy_keys.remove(key)
         return value
 
@@ -98,32 +221,22 @@ class ActionInfo(UserDict):
         else:
             return self.data == other
 
-    def _getURL(self):
-        """ Get the result of the URL expression in the current context.
-        """
-        return self._action._getActionObject()(self._ec)
-
-    def _checkCondition(self):
-        """ Check condition expression in the current context.
-        """
-        return self._action.testCondition(self._ec)
-
-    def _checkPermissions(self):
+    def _checkPermissions(self, ec):
         """ Check permissions in the current context.
         """
         category = self['category']
-        object = self._ec.contexts['object']
+        object = ec.contexts['object']
         if object is not None and ( category.startswith('object') or
                                     category.startswith('workflow') ):
             context = object
         else:
-            folder = self._ec.contexts['folder']
+            folder = ec.contexts['folder']
             if folder is not None and category.startswith('folder'):
                 context = folder
             else:
-                context = self._ec.contexts['portal']
+                context = ec.contexts['portal']
 
-        for permission in self['permissions']:
+        for permission in self._permissions:
             if _checkPermission(permission, context):
                 return True
         return False
@@ -136,6 +249,9 @@ class ActionInformation( SimpleItem ):
     Actions generate links to views of content, or to specific methods
     of the site.  They can be filtered via their conditions.
     """
+
+    __implements__ = IAction
+
     _isActionInformation = 1
     __allow_access_to_unprotected_subobjects__ = 1
 
@@ -322,6 +438,29 @@ class ActionInformation( SimpleItem ):
         """ Get a newly-created AI just like us.
         """
         return self.__class__( priority=self.priority, **self.getMapping() )
+
+    security.declarePrivate('getInfoData')
+    def getInfoData(self):
+        """ Get the data needed to create an ActionInfo.
+        """
+        lazy_keys = []
+        lazy_map = self.getMapping()
+
+        if lazy_map['action']:
+            lazy_map['url'] = self._getActionObject()
+            lazy_keys.append('url')
+        else:
+            lazy_map['url'] = ''
+        del lazy_map['action']
+
+        if lazy_map['condition']:
+            lazy_map['available'] = self.testCondition
+            lazy_keys.append('available')
+        else:
+            lazy_map['available'] = True
+        del lazy_map['condition']
+
+        return (lazy_map, lazy_keys)
 
 InitializeClass( ActionInformation )
 

@@ -3,9 +3,9 @@
 from Products.CMFCore.utils import getToolByName
 from Products.CMFDefault.permissions import ManageUsers
 
+atool = getToolByName(script, 'portal_actions')
 mtool = getToolByName(script, 'portal_membership')
 ptool = getToolByName(script, 'portal_properties')
-rtool = getToolByName(script, 'portal_registration')
 utool = getToolByName(script, 'portal_url')
 portal_url = utool()
 validate_email = ptool.getProperty('validate_email')
@@ -18,10 +18,10 @@ form = context.REQUEST.form
 if add and \
         context.validatePassword(**form) and \
         context.members_add_control(**form) and \
-        context.setRedirect(rtool, 'user/join', b_start=b_start):
+        context.setRedirect(atool, 'user/join', b_start=b_start):
     return
 elif cancel and \
-        context.setRedirect(mtool, 'global/manage_members', b_start=b_start):
+        context.setRedirect(atool, 'global/manage_members', b_start=b_start):
     return
 
 
@@ -45,10 +45,10 @@ options['validate_email'] = validate_email
 
 buttons = []
 if is_newmember:
-    target = mtool.getActionInfo('user/logged_in')['url']
+    target = atool.getActionInfo('user/logged_in')['url']
     buttons.append( {'name': 'login', 'value': 'Log in'} )
 else:
-    target = rtool.getActionInfo('user/join')['url']
+    target = atool.getActionInfo('user/join')['url']
     buttons.append( {'name': 'add', 'value': 'Register'} )
     buttons.append( {'name': 'cancel', 'value': 'Cancel'} )
 options['form'] = { 'action': target,

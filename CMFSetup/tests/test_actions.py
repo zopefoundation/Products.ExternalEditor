@@ -23,6 +23,7 @@ Zope.startup()
 from Acquisition import Implicit
 from Acquisition import aq_parent
 from OFS.Folder import Folder
+from OFS.OrderedFolder import OrderedFolder
 from Products.CMFCore.ActionProviderBase import ActionProviderBase
 from Products.CMFCore.interfaces.portal_actions \
     import ActionProvider as IActionProvider
@@ -32,7 +33,7 @@ from common import DummyExportContext
 from common import DummyImportContext
 
 
-class DummyTool( Folder, ActionProviderBase ):
+class DummyTool( OrderedFolder, ActionProviderBase ):
 
     __implements__ = ( IActionProvider, )
 
@@ -177,6 +178,7 @@ class ActionProvidersConfiguratorTests( _ActionSetup ):
         configurator = self._makeOne( site )
 
         tool_info = configurator.parseXML( _EMPTY_EXPORT )
+        self.assertEqual( len(tool_info), 2 )
 
         self.assertEqual( len( tool_info[ 'providers' ] ), 1 )
 
@@ -190,6 +192,7 @@ class ActionProvidersConfiguratorTests( _ActionSetup ):
 
         configurator = self._makeOne( site )
         tool_info = configurator.parseXML( _NORMAL_EXPORT )
+        self.assertEqual( len(tool_info), 2 )
 
         self.assertEqual( len( tool_info['providers'] ), 3 )
 
@@ -313,6 +316,9 @@ class Test_importActionProviders( _ActionSetup ):
         importActionProviders( context )
 
         self.assertEqual( len( atool.listActionProviders() ), 1 )
+        self.failIf( 'portal_foo' in atool.listActionProviders() )
+        self.failUnless( 'portal_actions' in atool.listActionProviders() )
+        self.assertEqual( len( atool.objectIds() ), 0 )
 
     def test_empty_explicit_purge( self ):
 
@@ -332,6 +338,7 @@ class Test_importActionProviders( _ActionSetup ):
         self.assertEqual( len( atool.listActionProviders() ), 1 )
         self.failIf( 'portal_foo' in atool.listActionProviders() )
         self.failUnless( 'portal_actions' in atool.listActionProviders() )
+        self.assertEqual( len( atool.objectIds() ), 0 )
 
     def test_empty_skip_purge( self ):
 
@@ -372,12 +379,17 @@ class Test_importActionProviders( _ActionSetup ):
         from Products.CMFSetup.actions import importActionProviders
         importActionProviders( context )
 
-        self.assertEqual( len( atool.listActionProviders() ), 3 )
-        self.failUnless( 'portal_foo' in atool.listActionProviders() )
-        self.failUnless( foo.listActions() )
-        self.failUnless( 'portal_bar' in atool.listActionProviders() )
-        self.failUnless( bar.listActions() )
+        self.assertEqual( len( atool.listActionProviders() ), 1 )
+        self.failIf( 'portal_foo' in atool.listActionProviders() )
         self.failUnless( 'portal_actions' in atool.listActionProviders() )
+
+        self.assertEqual( len( atool.objectIds() ), 1 )
+        self.failUnless( 'dummy' in atool.objectIds() )
+        self.assertEqual( len( atool.dummy.objectIds() ) , 2 )
+        self.failUnless( 'foo' in atool.dummy.objectIds() )
+        self.failUnless( 'bar' in atool.dummy.objectIds() )
+        self.failIf( foo.listActions() )
+        self.failIf( bar.listActions() )
 
     def test_normal_encode_as_ascii( self ):
 
@@ -392,12 +404,17 @@ class Test_importActionProviders( _ActionSetup ):
         from Products.CMFSetup.actions import importActionProviders
         importActionProviders( context )
 
-        self.assertEqual( len( atool.listActionProviders() ), 3 )
-        self.failUnless( 'portal_foo' in atool.listActionProviders() )
-        self.failUnless( foo.listActions() )
-        self.failUnless( 'portal_bar' in atool.listActionProviders() )
-        self.failUnless( bar.listActions() )
+        self.assertEqual( len( atool.listActionProviders() ), 1 )
+        self.failIf( 'portal_foo' in atool.listActionProviders() )
         self.failUnless( 'portal_actions' in atool.listActionProviders() )
+
+        self.assertEqual( len( atool.objectIds() ), 1 )
+        self.failUnless( 'dummy' in atool.objectIds() )
+        self.assertEqual( len( atool.dummy.objectIds() ), 2 )
+        self.failUnless( 'foo' in atool.dummy.objectIds() )
+        self.failUnless( 'bar' in atool.dummy.objectIds() )
+        self.failIf( foo.listActions() )
+        self.failIf( bar.listActions() )
 
 
 def test_suite():

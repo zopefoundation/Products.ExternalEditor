@@ -18,30 +18,34 @@ $Id$
 from AccessControl import ClassSecurityInfo
 from Globals import DTMLFile
 from Globals import InitializeClass
-from OFS.Folder import Folder
+from OFS.ObjectManager import IFAwareObjectManager
+from OFS.OrderedFolder import OrderedFolder
 
 from ActionInformation import ActionInformation
 from ActionProviderBase import ActionProviderBase
 from Expression import Expression
+from interfaces.portal_actions import ActionCategory as IActionCategory
 from interfaces.portal_actions import ActionProvider as IActionProvider
 from interfaces.portal_actions import portal_actions as IActionsTool
 from permissions import ListFolderContents
 from permissions import ManagePortal
 from utils import _dtmldir
-from utils import SimpleItemWithProperties
 from utils import UniqueObject
 
 
-class ActionsTool(UniqueObject, Folder, ActionProviderBase):
+class ActionsTool(UniqueObject, IFAwareObjectManager, OrderedFolder,
+                  ActionProviderBase):
     """
         Weave together the various sources of "actions" which are apropos
         to the current user and context.
     """
 
-    __implements__ = (IActionsTool, ActionProviderBase.__implements__)
+    __implements__ = (IActionsTool, OrderedFolder.__implements__,
+                      ActionProviderBase.__implements__)
 
     id = 'portal_actions'
     meta_type = 'CMF Actions Tool'
+    _product_interfaces = (IActionCategory,)
     _actions = (ActionInformation(id='folderContents'
                                 , title='Folder contents'
                                 , action=Expression(
@@ -68,15 +72,13 @@ class ActionsTool(UniqueObject, Folder, ActionProviderBase):
 
     security = ClassSecurityInfo()
 
-    manage_options = ( ActionProviderBase.manage_options
-                     + ( { 'label' : 'Action Providers'
-                         , 'action' : 'manage_actionProviders'
-                         }
-                       , { 'label' : 'Overview'
-                         , 'action' : 'manage_overview'
-                         }
-                     ) + Folder.manage_options
-                     )
+    manage_options = ( ( OrderedFolder.manage_options[0],
+                         ActionProviderBase.manage_options[0],
+                         {'label': 'Action Providers',
+                          'action': 'manage_actionProviders'},
+                         {'label': 'Overview',
+                          'action': 'manage_overview'} ) +
+                       OrderedFolder.manage_options[2:] )
 
     #
     #   ZMI methods
@@ -108,6 +110,34 @@ class ActionsTool(UniqueObject, Folder, ActionProviderBase):
         if REQUEST is not None:
             return self.manage_actionProviders(self , REQUEST
                           , manage_tabs_message='Providers changed.')
+
+    security.declareProtected( ManagePortal, 'manage_editActionsForm' )
+    def manage_editActionsForm( self, REQUEST, manage_tabs_message=None ):
+        """ Show the 'Actions' management tab.
+        """
+        actions = [ ai.getMapping() for ai in self._actions ]
+
+        # possible_permissions is in AccessControl.Role.RoleManager.
+        pp = self.possible_permissions()
+        return self._actions_form( self
+                                 , REQUEST
+                                 , actions=actions
+                                 , possible_permissions=pp
+                                 , management_view='Actions'
+                                 , manage_tabs_message=manage_tabs_message
+                                 )
+
+    #
+    #   ActionProvider interface
+    #
+    security.declarePrivate('listActions')
+    def listActions(self, info=None, object=None):
+        """ List all the actions defined by a provider.
+        """
+        actions = list(self._actions)
+        for category in self.objectValues():
+            actions.extend( category.listActions() )
+        return tuple(actions)
 
     #
     #   Programmatically manipulate the list of action providers

@@ -21,5 +21,7 @@
       tal:repeat="permission action/permissions"
       tal:content="permission">View</permission>
   </action>
- </action-provider></tal:loop>
+ </action-provider></tal:loop
+><tal:span tal:define="sub_infos context/listSubobjectInfos"
+     tal:replace="structure python: context.generateObjectNodes(sub_infos)"/>
 </actions-tool>

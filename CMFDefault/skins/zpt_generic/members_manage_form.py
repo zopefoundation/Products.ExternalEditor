@@ -4,24 +4,24 @@ from ZTUtils import Batch
 from Products.CMFCore.utils import getToolByName
 from Products.CMFDefault.utils import html_marshal
 
+atool = getToolByName(script, 'portal_actions')
 mtool = getToolByName(script, 'portal_membership')
-rtool = getToolByName(script, 'portal_registration')
 
 
 form = context.REQUEST.form
 if members_delete and \
         context.validateMemberIds(**form) and \
         context.members_delete_control(**form) and \
-        context.setRedirect(mtool, 'global/manage_members', b_start=b_start):
+        context.setRedirect(atool, 'global/manage_members', b_start=b_start):
     return
 elif members_new and \
-        context.setRedirect(rtool, 'user/join', b_start=b_start):
+        context.setRedirect(atool, 'user/join', b_start=b_start):
     return
 
 
 options = {}
 
-target = mtool.getActionInfo('global/manage_members')['url']
+target = atool.getActionInfo('global/manage_members')['url']
 
 members = mtool.listMembers()
 batch_obj = Batch(members, 25, b_start, orphan=0)

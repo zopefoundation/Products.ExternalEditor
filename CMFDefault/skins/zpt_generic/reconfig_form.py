@@ -2,19 +2,20 @@
 ##
 from Products.CMFCore.utils import getToolByName
 
+atool = getToolByName(script, 'portal_actions')
 ptool = getToolByName(script, 'portal_properties')
 
 
 form = context.REQUEST.form
 if change and \
         context.portal_config_control(**form) and \
-        context.setRedirect(ptool, 'global/configPortal'):
+        context.setRedirect(atool, 'global/configPortal'):
     return
 
 
 options = {}
 
-target = ptool.getActionInfo('global/configPortal')['url']
+target = atool.getActionInfo('global/configPortal')['url']
 buttons = []
 buttons.append( {'name': 'change', 'value': 'Change'} )
 options['form'] = { 'action': target,

@@ -2,6 +2,12 @@ HEAD only (unreleased)
 
   New Features
 
+    - ActionsTool: Added new way to define Actions.
+      'CMF Action Category' objects can now be added to the portal_actions
+      tool and 'CMF Action' objects to categories or subcategories. To
+      migrate oldstyle Actions (ActionInformation objects) you can create a
+      snapshot and re-import Actions using the portal_setup tool.
+
     - TypesTool: TypeInformation classes are now pluggable.
       Any class that implements the TypeInformation interface and is
       a registered meta type can now be used in the TypesTool.
