@@ -16,6 +16,7 @@ $Id$
 """
 
 from sgmllib import SGMLParser
+from types import ListType, StringType, TupleType, UnicodeType
 import re
 import os
 
@@ -134,27 +135,26 @@ def comma_split(s):
 
 security.declarePublic('seq_strip')
 def seq_strip(seq, stripper=lambda x: x.strip() ):
-
     """ Strip a sequence of strings.
     """
-    if type( seq ) == type( [] ):
+    if isinstance(seq, ListType):
         return map( stripper, seq )
 
-    if type( seq ) == type( () ):
+    if isinstance(seq, TupleType):
         return tuple( map( stripper, seq ) )
 
     raise ValueError, "%s of unsupported sequencetype %s" % ( seq, type( seq ) )
 
 security.declarePublic('tuplize')
-def tuplize( valueName, value, splitter=lambda x: x.strip() ):
+def tuplize( valueName, value, splitter=lambda x: x.split() ):
 
-    if type( value ) == type( () ):
+    if isinstance(value, TupleType):
         return seq_strip( value )
 
-    if type( value ) == type( [] ):
+    if isinstance(value, ListType):
         return seq_strip( tuple( value ) )
 
-    if type( value ) == type( '' ):
+    if isinstance(value, StringType) or isinstance(value, UnicodeType):
         return seq_strip( tuple( splitter( value ) ) )
 
     raise ValueError, "%s of unsupported type" % valueName

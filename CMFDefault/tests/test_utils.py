@@ -1,6 +1,13 @@
 from unittest import TestCase, makeSuite, main
 
+import Testing
 import Zope
+try:
+    Zope.startup()
+except AttributeError:
+    # for Zope versions before 2.6.1
+    pass
+
 from Products.CMFCore.tests.base.content import FAUX_HTML_LEADING_TEXT
 from Products.CMFCore.tests.base.content import SIMPLE_HTML
 from Products.CMFCore.tests.base.content import SIMPLE_STRUCTUREDTEXT
@@ -110,22 +117,25 @@ Header: value
         self.assertEqual( html_headcheck(SIMPLE_XHTML), 1 )
         self.assertEqual( html_headcheck(STX_WITH_HTML), 0 )
 
+    def test_tuplize(self):
+        wanted = ('one','two','three')
+
+        self.assertEqual( tuplize('string', 'one two three'), wanted )
+        self.assertEqual( tuplize('unicode', u'one two three'), wanted )
+        self.assertEqual( tuplize('string', 'one,two,three', comma_split),
+                          wanted )
+        self.assertEqual( tuplize('list', ['one',' two','three ']), wanted )
+        self.assertEqual( tuplize('tuple', ('one','two','three')), wanted )
+
+    def test_seq_strip( self ):
+        self.assertEqual( seq_strip(['one ', ' two', ' three ']),
+                          ['one','two','three'] )
+        self.assertEqual( seq_strip(('one ', ' two', ' three ')),
+                          ('one','two','three') )
+
 
 def test_suite():
     return makeSuite(DefaultUtilsTests)
 
 if __name__ == '__main__':
     main(defaultTest='test_suite')
-
-
-    def test_tuplize( self ):
-        assert( tuplize('string', 'one two three') == ('one','two','three'))
-        assert( tuplize('string', 'one,two,three', comma_split) == ('one','two','three'))
-        assert( tuplize('list', ['one',' two','three ']) == ('one',' two','three '))
-        assert( tuplize('tuple', ('one','two','three')) == ('one','two','three'))
-
-    def test_seq_strip( self ):
-        assert( seq_strip(['one ', ' two', ' three '])
-                == ['one','two','three'])
-        assert( seq_strip(('one ', ' two', ' three '))
-                == ('one','two','three'))
