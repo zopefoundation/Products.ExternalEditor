@@ -48,11 +48,13 @@ class VersionsTool(UniqueObject, SimpleItem):
     # ability to revert to specific revisions.
     auto_copy_forward = 1
 
+    repository_name = 'VersionRepository'
+
     security.declareProtected(ManagePortal, 'manage_overview' )
     #manage_overview = DTMLFile( 'explainVersionsTool', _dtmldir )
 
     def _getVersionRepository(self):
-        repo = aq_acquire(self, 'VersionRepository', containment=1)
+        repo = aq_acquire(self, self.repository_name, containment=1)
         return repo
 
 
@@ -182,7 +184,7 @@ class VersionsTool(UniqueObject, SimpleItem):
         if self.isCheckedOut(object):
             # Save the current data.
             self.checkin(object, 'Auto-saved')
-        repo.updateResource(object, version_id)
+        return repo.updateResource(object, version_id)
 
 InitializeClass(VersionsTool)
 

@@ -49,6 +49,8 @@ class StagingTool(UniqueObject, SimpleItem):
     # lock tool and the versions tool to unlock and check in the object.
     auto_checkin = 1
 
+    repository_name = 'VersionRepository'
+
     # _stages maps stage names to relative paths.
     # This should be configurable TTW.
     _stages = {
@@ -61,7 +63,7 @@ class StagingTool(UniqueObject, SimpleItem):
     #manage_overview = DTMLFile( 'explainStagingTool', _dtmldir )
 
     def _getVersionRepository(self):
-        repo = aq_acquire(self, 'VersionRepository', containment=1)
+        repo = aq_acquire(self, self.repository_name, containment=1)
         return repo
 
 

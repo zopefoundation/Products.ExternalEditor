@@ -21,6 +21,8 @@ import Testing
 import Zope
 from Acquisition import aq_base
 from OFS.Folder import Folder
+from AccessControl.SecurityManagement import newSecurityManager, \
+     noSecurityManager
 
 from Products.CMFStaging.StagingTool import StagingTool, StagingError
 from Products.ZopeVersionControl.Utility import VersionControlError
@@ -65,6 +67,7 @@ class Tests(unittest.TestCase):
         if hasattr(app, 'testroot'):
             app._delObject('testroot')
         self.app._p_jar.close()
+        noSecurityManager()
 
 
     def testStageable(self):
@@ -150,10 +153,63 @@ class Tests(unittest.TestCase):
         self.assertRaises(StagingError, st.checkContainers,
                           self.dev_stage.c1.test, ['review'])
 
+
     def testGetURLForStage(self):
         st = self.root.portal_staging
         url = st.getURLForStage(self.dev_stage.c1, 'dev', 1)
         self.assert_(url.find('/Stages/Development/c1') >= 0)
+
+
+    def testCompleteSetup(self):
+        # Create a lock tool and versions tool then perform
+        # some complete development and staging activities.
+        from Products.CMFStaging.LockTool import LockTool
+        from Products.CMFStaging.VersionsTool import VersionsTool
+
+        self.root.manage_addProduct['CMFStaging'].manage_addTool(
+            LockTool.meta_type)
+        self.root.manage_addProduct['CMFStaging'].manage_addTool(
+            VersionsTool.meta_type)
+
+        lt = self.root.portal_lock
+        vt = self.root.portal_versions
+        st = self.root.portal_staging
+
+        # The automation features need to be turned on.
+        self.assert_(lt.auto_version)
+        self.assert_(st.auto_checkin)
+
+        from testLockTool import TestUser
+
+        user = TestUser('andre')
+        newSecurityManager(None, user.__of__(self.root.acl_users))
+
+        # Put c1 in the review stage.
+        # Lock with auto checkout
+        lt.lock(self.dev_stage.c1)
+        # Update with auto unlock and checkin
+        st.updateStages(self.dev_stage.c1, 'dev', ['review'])
+        versions = st.getVersionIds(self.dev_stage.c1)
+        self.assertEqual(versions['dev'], versions['review'])
+        self.assert_(not versions['prod'])
+
+        # Make a change in the dev stage.
+        # Lock with auto checkout
+        lt.lock(self.dev_stage.c1)
+        # Unlock with auto checkin
+        lt.unlock(self.dev_stage.c1)
+        versions = st.getVersionIds(self.dev_stage.c1)
+        self.assertNotEqual(versions['dev'], versions['review'])
+        wanted_published = versions['dev'] # This version should be published.
+
+        # Publish c1.
+        # Unlocked and checked in already
+        st.updateStages(self.dev_stage.c1, 'dev', ['review', 'prod'])
+        versions = st.getVersionIds(self.dev_stage.c1)
+        self.assertEqual(versions['dev'], wanted_published)
+        self.assertEqual(versions['dev'], versions['review'])
+        self.assertEqual(versions['dev'], versions['prod'])
+
 
 
 def test_suite():
