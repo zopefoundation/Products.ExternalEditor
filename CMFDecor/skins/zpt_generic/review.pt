@@ -6,7 +6,7 @@
 
 <div class="Desktop"
      tal:define="results python: here.portal_catalog( review_state='pending' );
-                 Batch modules/ZTUtils/Batch;
+                 Batch nocall: modules/ZTUtils/Batch;
                  def_start string:0;
                  bstart request/b_start | def_start;
                  batch python: Batch( results, 25, int( bstart ), orphan=0 );
@@ -34,7 +34,8 @@
 
   <tbody tal:repeat="item batch">
   <tr tal:define="objURL string:${item/getURL}/view;
-                  objPath item/getpath;
+                  objPath item/getPath;
+                  title item/Title;
                  ">
   <td>
    <input type="checkbox" name="items:list"
@@ -54,7 +55,7 @@
   <td>
    <a href="url"
       tal:attributes="href objURL"
-      tal:content="python: item.Title() or '(No title)'">Title</a>
+      tal:content="python: title or '(No title)'">Title</a>
   </td>
   <td>
     <span tal:replace="item/Type" />
@@ -64,21 +65,30 @@
   </td>
  </tr>
 
- <tr>
+ <tr tal:define="desc  item/Description">
   <td>&nbsp;</td>
   <td colspan="3"
-      tal:define="desc python: item.Description() or '(No description)'"
+      tal:define="xdesc python: desc or '(No description)'"
   >
-   <em><span tal:replace="python: desc[:100]">Description</span></em>
+   <em><span tal:replace="python: xdesc[:100]">Description</span></em>
   </td>
  </tr>
  </tbody>
 
  <tr>
   <td><br></td>
+ </tr>
+
+ <tr>
   <td><br></td>
-  <td>
+  <td colspan="4">
+   <strong> Comment: </strong> <br>
    <textarea name="comment:text" rows="3" cols="65"></textarea>
+  </td>
+ </tr>
+ <tr>
+  <td><br></td>
+  <td colspan="4">
    <input type="submit" name="publishItems:method" value="Publish">
    <input type="submit" name="rejectItems:method" value="Reject">
   </td>
