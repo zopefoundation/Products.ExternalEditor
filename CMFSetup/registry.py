@@ -202,7 +202,26 @@ class ImportStepRegistry( Implicit ):
         if reader is not None:
             text = reader()
 
-        parseString( text, _ImportStepRegistryParser( self, None ) )
+        parser = _ImportStepRegistryParser( encoding )
+        parseString( text, parser )
+
+        for step_info in parser._parsed:
+
+            id = step_info[ 'id' ]
+            version = step_info[ 'version' ]
+            handler = _resolveDottedName( step_info[ 'handler' ] )
+
+            dependencies = tuple( step_info.get( 'dependencies', () ) )
+            title = step_info.get( 'title', id )
+            description = ''.join( step_info.get( 'description', [] ) )
+
+            self.registerStep( id=id
+                             , version=version
+                             , handler=handler
+                             , dependencies=dependencies
+                             , title=title
+                             , description=description
+                             )
 
     #
     #   Helper methods
@@ -237,82 +256,6 @@ class ImportStepRegistry( Implicit ):
     _exportTemplate = PageTemplateFile( 'isrExport.xml', _xmldir )
 
 InitializeClass( ImportStepRegistry )
-
-class _ImportStepRegistryParser( HandlerBase ):
-
-    security = ClassSecurityInfo()
-    security.declareObjectPrivate()
-    security.setDefaultAccess( 'deny' )
-
-    def __init__( self, registry, encoding ):
-
-        self._registry = registry
-        self._encoding = encoding
-        self._started = False
-        self._pending = None
-
-    def startElement( self, name, attrs ):
-
-        if name == 'import-steps':
-
-            if self._started:
-                raise ValueError, 'Duplicated setup-steps element: %s' % name
-
-            self._started = True
-
-        elif name == 'import-step':
-
-            if self._pending is not None:
-                raise ValueError, 'Cannot nest setup-step elements'
-
-            self._pending = dict( [ ( k, self._extract( attrs, k ) )
-                                    for k in attrs.keys() ] )
-
-        elif name == 'dependency':
-
-            if not self._pending:
-                raise ValueError, 'Dependency outside of step'
-
-            depended = self._extract( attrs, 'step' )
-            self._pending.setdefault( 'dependencies', [] ).append( depended )
-
-        else:
-            raise ValueError, 'Unknown element %s' % name
-
-    def characters( self, content ):
-
-        if self._pending is not None:
-            content = self._encode( content )
-            self._pending.setdefault( 'description', [] ).append( content )
-
-    def endElement(self, name):
-
-        if name == 'import-steps':
-            pass
-
-        elif name == 'import-step':
-
-            if self._pending is None:
-                raise ValueError, 'No pending step!'
-
-            id = self._pending[ 'id' ]
-            version = self._pending[ 'version' ]
-            handler = _resolveDottedName( self._pending[ 'handler' ] )
-
-            dependencies = tuple( self._pending.get( 'dependencies', () ) )
-            title = self._pending.get( 'title', id )
-            description = ''.join( self._pending.get( 'description', [] ) )
-
-            self._registry.registerStep( id=id
-                                       , version=version
-                                       , handler=handler
-                                       , dependencies=dependencies
-                                       , title=title
-                                       , description=description
-                                       )
-            self._pending = None
-
-InitializeClass( _ImportStepRegistryParser )
 
 
 class ExportStepRegistry( Implicit ):
@@ -448,7 +391,23 @@ class ExportStepRegistry( Implicit ):
         if reader is not None:
             text = reader()
 
-        parseString( text, _ExportStepRegistryParser( self, encoding ) )
+        parser = _ExportStepRegistryParser( encoding )
+        parseString( text, parser )
+
+
+        for step_info in parser._parsed:
+
+            id = step_info[ 'id' ]
+            handler = _resolveDottedName( step_info[ 'handler' ] )
+
+            title = step_info.get( 'title', id )
+            description = ''.join( step_info.get( 'description', [] ) )
+
+            self.registerStep( id=id
+                             , handler=handler
+                             , title=title
+                             , description=description
+                             )
 
     #
     #   Helper methods
@@ -463,18 +422,81 @@ class ExportStepRegistry( Implicit ):
 
 InitializeClass( ExportStepRegistry )
 
+
+class _ImportStepRegistryParser( HandlerBase ):
+
+    security = ClassSecurityInfo()
+    security.declareObjectPrivate()
+    security.setDefaultAccess( 'deny' )
+
+    def __init__( self, encoding ):
+
+        self._encoding = encoding
+        self._started = False
+        self._pending = None
+        self._parsed = []
+
+    def startElement( self, name, attrs ):
+
+        if name == 'import-steps':
+
+            if self._started:
+                raise ValueError, 'Duplicated setup-steps element: %s' % name
+
+            self._started = True
+
+        elif name == 'import-step':
+
+            if self._pending is not None:
+                raise ValueError, 'Cannot nest setup-step elements'
+
+            self._pending = dict( [ ( k, self._extract( attrs, k ) )
+                                    for k in attrs.keys() ] )
+
+        elif name == 'dependency':
+
+            if not self._pending:
+                raise ValueError, 'Dependency outside of step'
+
+            depended = self._extract( attrs, 'step' )
+            self._pending.setdefault( 'dependencies', [] ).append( depended )
+
+        else:
+            raise ValueError, 'Unknown element %s' % name
+
+    def characters( self, content ):
+
+        if self._pending is not None:
+            content = self._encode( content )
+            self._pending.setdefault( 'description', [] ).append( content )
+
+    def endElement(self, name):
+
+        if name == 'import-steps':
+            pass
+
+        elif name == 'import-step':
+
+            if self._pending is None:
+                raise ValueError, 'No pending step!'
+
+            self._parsed.append( self._pending )
+            self._pending = None
+
+InitializeClass( _ImportStepRegistryParser )
+
 class _ExportStepRegistryParser( HandlerBase ):
 
     security = ClassSecurityInfo()
     security.declareObjectPrivate()
     security.setDefaultAccess( 'deny' )
 
-    def __init__( self, registry, encoding ):
+    def __init__( self, encoding ):
 
-        self._registry = registry
         self._encoding = encoding
         self._started = False
         self._pending = None
+        self._parsed = []
 
     def startElement( self, name, attrs ):
 
@@ -512,17 +534,7 @@ class _ExportStepRegistryParser( HandlerBase ):
             if self._pending is None:
                 raise ValueError, 'No pending step!'
 
-            id = self._pending[ 'id' ]
-            handler = _resolveDottedName( self._pending[ 'handler' ] )
-
-            title = self._pending.get( 'title', id )
-            description = ''.join( self._pending.get( 'description', [] ) )
-
-            self._registry.registerStep( id=id
-                                       , handler=handler
-                                       , title=title
-                                       , description=description
-                                       )
+            self._parsed.append( self._pending )
             self._pending = None
 
 InitializeClass( _ExportStepRegistryParser )

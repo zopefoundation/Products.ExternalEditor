@@ -14,139 +14,6 @@ from permissions import ManagePortal
 from utils import HandlerBase
 from utils import _xmldir
 
-class _RolemapParser( HandlerBase ):
-
-    def __init__( self, site, encoding='latin-1' ):
-
-        self._site = site
-        self._encoding = encoding
-        self._roles = []
-        self._permissions = []
-
-    def startElement( self, name, attrs ):
-
-        if name == 'role':
-            self._roles.append( self._extract( attrs, 'name' )  )
-
-        elif name == 'permission':
-
-            acquire = self._extract( attrs, 'acquire' ).lower()
-            acquire = acquire in ( '1', 'true', 'yes' )
-
-            info = { 'name'     : self._extract( attrs, 'name' )
-                   , 'roles'    : self._extract( attrs, 'roles' ).split()
-                   , 'acquire'  : acquire
-                   }
-
-            self._permissions.append( info )
-
-        elif name not in ( 'rolemap', 'permissions', 'roles' ):
-            raise ValueError, 'Unknown element: %s' % name
-
-    def endDocument( self ):
-
-        immediate_roles = list( getattr( self._site, '__ac_roles__', [] ) )[:]
-        already = {}
-        for role in self._site.valid_roles():
-            already[ role ] = 1
-
-        for role in self._roles:
-
-            if already.get( role ) is None:
-                immediate_roles.append( role )
-                already[ role ] = 1
-
-        immediate_roles.sort()
-        self._site.__ac_roles__ = tuple( immediate_roles )
-
-        for permission in self._permissions:
-
-            self._site.manage_permission( permission[ 'name' ]
-                                        , permission[ 'roles' ]
-                                        , permission[ 'acquire' ]
-                                        )
-
-class RolemapConfigurator( Implicit ):
-
-    """ Synthesize XML description of sitewide role-permission settings.
-    """
-    security = ClassSecurityInfo()   
-    security.setDefaultAccess( 'allow' )
-    
-    def __init__( self, site ):
-        self._site = site
-
-    _rolemap = PageTemplateFile( 'rmeExport.xml'
-                               , _xmldir
-                               , __name__='_rolemap'
-                               )
-
-    security.declareProtected( ManagePortal, 'listRoles' )
-    def listRoles( self ):
-
-        """ List the valid role IDs for our site.
-        """
-        return self._site.valid_roles()
-
-    security.declareProtected( ManagePortal, 'listPermissions' )
-    def listPermissions( self ):
-
-        """ List permissions for export.
-
-        o Returns a sqeuence of mappings describing locally-modified
-          permission / role settings.  Keys include:
-          
-          'permission' -- the name of the permission
-          
-          'acquire' -- a flag indicating whether to acquire roles from the
-              site's container
-              
-          'roles' -- the list of roles which have the permission.
-
-        o Do not include permissions which both acquire and which define
-          no local changes to the acquired policy.
-        """
-        permissions = []
-        valid_roles = self.listRoles()
-
-        for perm in self._site.ac_inherited_permissions( 1 ):
-
-            name = perm[ 0 ]
-            p = Permission( name, perm[ 1 ], self._site )
-            roles = p.getRoles( default=[] )
-            acquire = isinstance( roles, list )  # tuple means don't acquire
-            roles = [ r for r in roles if r in valid_roles ]
-
-            if roles or not acquire:
-                permissions.append( { 'name'    : name
-                                    , 'acquire' : acquire
-                                    , 'roles'   : roles
-                                    } )
-
-        return permissions
-
-    security.declareProtected( ManagePortal, 'generateXML' )
-    def generateXML( self ):
-
-        """ Pseudo API.
-        """
-        return self._rolemap()
-
-    security.declareProtected( ManagePortal, 'parseXML' )
-    def parseXML( self, text ):
-
-        """ Pseudo API.
-        """
-        reader = getattr( text, 'read', None )
-
-        if reader is not None:
-            text = reader()
-
-        parseString( text, _RolemapParser( self._site ) )
-
-InitializeClass( RolemapConfigurator )
-
-
 #
 #   Configurator entry points
 #
@@ -235,3 +102,135 @@ def exportRolemap( context ):
     context.writeDataFile( _FILENAME, text, 'text/xml' )
 
     return 'Role / permission map exported.'
+
+
+class RolemapConfigurator( Implicit ):
+
+    """ Synthesize XML description of sitewide role-permission settings.
+    """
+    security = ClassSecurityInfo()   
+    security.setDefaultAccess( 'allow' )
+    
+    def __init__( self, site ):
+        self._site = site
+
+    _rolemap = PageTemplateFile( 'rmeExport.xml'
+                               , _xmldir
+                               , __name__='_rolemap'
+                               )
+
+    security.declareProtected( ManagePortal, 'listRoles' )
+    def listRoles( self ):
+
+        """ List the valid role IDs for our site.
+        """
+        return self._site.valid_roles()
+
+    security.declareProtected( ManagePortal, 'listPermissions' )
+    def listPermissions( self ):
+
+        """ List permissions for export.
+
+        o Returns a sqeuence of mappings describing locally-modified
+          permission / role settings.  Keys include:
+          
+          'permission' -- the name of the permission
+          
+          'acquire' -- a flag indicating whether to acquire roles from the
+              site's container
+              
+          'roles' -- the list of roles which have the permission.
+
+        o Do not include permissions which both acquire and which define
+          no local changes to the acquired policy.
+        """
+        permissions = []
+        valid_roles = self.listRoles()
+
+        for perm in self._site.ac_inherited_permissions( 1 ):
+
+            name = perm[ 0 ]
+            p = Permission( name, perm[ 1 ], self._site )
+            roles = p.getRoles( default=[] )
+            acquire = isinstance( roles, list )  # tuple means don't acquire
+            roles = [ r for r in roles if r in valid_roles ]
+
+            if roles or not acquire:
+                permissions.append( { 'name'    : name
+                                    , 'acquire' : acquire
+                                    , 'roles'   : roles
+                                    } )
+
+        return permissions
+
+    security.declareProtected( ManagePortal, 'generateXML' )
+    def generateXML( self ):
+
+        """ Pseudo API.
+        """
+        return self._rolemap()
+
+    security.declareProtected( ManagePortal, 'parseXML' )
+    def parseXML( self, text ):
+
+        """ Pseudo API.
+        """
+        reader = getattr( text, 'read', None )
+
+        if reader is not None:
+            text = reader()
+
+        parser = _RolemapParser()
+        parseString( text, parser )
+
+        immediate_roles = list( getattr( self._site, '__ac_roles__', [] ) )[:]
+        already = {}
+        for role in self._site.valid_roles():
+            already[ role ] = 1
+
+        for role in parser._roles:
+
+            if already.get( role ) is None:
+                immediate_roles.append( role )
+                already[ role ] = 1
+
+        immediate_roles.sort()
+        self._site.__ac_roles__ = tuple( immediate_roles )
+
+        for permission in parser._permissions:
+
+            self._site.manage_permission( permission[ 'name' ]
+                                        , permission[ 'roles' ]
+                                        , permission[ 'acquire' ]
+                                        )
+
+InitializeClass( RolemapConfigurator )
+
+
+class _RolemapParser( HandlerBase ):
+
+    def __init__( self, encoding='latin-1' ):
+
+        self._encoding = encoding
+        self._roles = []
+        self._permissions = []
+
+    def startElement( self, name, attrs ):
+
+        if name == 'role':
+            self._roles.append( self._extract( attrs, 'name' )  )
+
+        elif name == 'permission':
+
+            acquire = self._extract( attrs, 'acquire' ).lower()
+            acquire = acquire in ( '1', 'true', 'yes' )
+
+            info = { 'name'     : self._extract( attrs, 'name' )
+                   , 'roles'    : self._extract( attrs, 'roles' ).split()
+                   , 'acquire'  : acquire
+                   }
+
+            self._permissions.append( info )
+
+        elif name not in ( 'rolemap', 'permissions', 'roles' ):
+            raise ValueError, 'Unknown element: %s' % name
