@@ -1,11 +1,10 @@
 ## Script (Python) "collector_add_issue.py"
-##parameters=submitter, email, title, security_related, topic, importance, classification, severity, description, reported_version, other_version_info
+##parameters=submitter, title, security_related, topic, importance, classification, severity, description, reported_version, other_version_info
 ##title=Submit a Request
 
 REQUEST = context.REQUEST
 
 id = context.add_issue(submitter=submitter,
-                       email=email,
                        title=title,
                        description=description,
                        security_related=security_related,
