@@ -431,9 +431,14 @@ class ToolInit:
             icon = self.icon
             )
 
+        if self.icon:
+            icon = os_path.split(self.icon)[1]            
+        else:
+            icon = None
+        
         for tool in self.tools:
             tool.__factory_meta_type__ = self.meta_type
-            tool.icon = 'misc_/%s/%s' % (self.product_name, self.icon)
+            tool.icon = 'misc_/%s/%s' % (self.product_name, icon)
 
 InitializeClass( ToolInit )
 
