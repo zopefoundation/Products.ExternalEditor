@@ -21,8 +21,8 @@
    </div>
    <div tal:condition="python: not(here.portal_membership.isAnonymousUser())"
         tal:define="member python: here.portal_membership.getAuthenticatedMember()">
-		  <div tal:condition="python: member.login_time == here.ZopeTime('2000/01/01') and p_props.validate_email"
-		       tal:define="dum_reg python: here.portal_registration.setProperties(last_login_time=here.ZopeTime(),login_time=here.ZopeTime())">
+		  <div tal:condition="python: member.login_time == here.ZopeTime('2000/01/01') and p_props.validate_email">
+		      <div tal:define="dum_reg python: here.portal_registration.setProperties(last_login_time=here.ZopeTime(),login_time=here.ZopeTime())" />
 			   <h1 class="DesktopTitle">Welcome!</h1>
 			   <p class="Desktop">This is the first time that you've logged in to <span replace="p_props/title">Here</span>. 
 			   Before you start exploring you need to change your original password. 
