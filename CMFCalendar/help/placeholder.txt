@@ -1,1 +1,0 @@
-So that 'cvs up -d' doesn't blow us away.
