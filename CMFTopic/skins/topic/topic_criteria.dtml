@@ -1,0 +1,51 @@
+<dtml-var standard_html_header>
+
+<div class="Desktop">
+
+<div class="Topic">
+
+<h2> Topic Criteria: &dtml-id; </h2>
+
+<form action="&dtml-absolute_url;" method="post">
+
+<dtml-in listCriteria>
+ <dtml-var expr="_[getEditForm()]">
+</dtml-in>
+<input type="submit" name="deleteCriteria:action" value=" Delete selected ">
+&nbsp;&nbsp;
+<input type="submit" name="editCriteria:action" value=" Save changes ">
+<input type="hidden" name=":default_action" value="editCriteria">
+</form>
+
+
+<form action="&dtml-absolute_url;/addCriteria" method="post">
+<h2> Add New Topic Criteria: </h2>
+<table class="FormLayout">
+ <tr valign="top">
+  <th align="right"> Field id: </th>
+  <td><select name="field">
+    <dtml-in name="listAvailableFields">
+    <option value="&dtml-sequence-item;">&dtml-sequence-item;</option>
+    </dtml-in>
+  </select></td>
+ </tr>
+ <tr valign="top">
+  <th align="left"> Criteria type: </th>
+  <td><select name="criteria_type">
+    <dtml-in name="listCriteriaTypes" mapping>
+    <option value="&dtml-name;">&dtml-name;</option>
+    </dtml-in>
+  </select></td>
+ </tr>
+ <tr>
+  <td>&nbsp;</td>
+  <td><input type="submit" value=" Add "></td>
+ </tr>
+</table>
+</form>
+
+</div>
+
+</div>
+
+<dtml-var standard_html_footer>

@@ -87,12 +87,15 @@ import Topic
 import SimpleStringCriterion
 import SimpleIntCriterion
 import ListCriterion
+import Products.CMFCore
 
 from ZClasses import createZClassForBase
+from Products.CMFCore import utils
+from Products.CMFCore.DirectoryView import registerDirectory
 
-bases = ( Topic.Topic
-        , SimpleStringCriterion.SimpleStringCriterion
-        )
+
+bases = (Topic.Topic,)
+
 
 import sys
 this_module = sys.modules[ __name__ ]
@@ -101,41 +104,20 @@ for base in bases:
     createZClassForBase( base, this_module )
 
 TOPIC_CTOR_FORM = ( 'manage_addPortalTopicForm', Topic.addTopicForm )
-SSC_CTOR_FORM = ( 'manage_addSimpleStringCriterionForm'
-                , SimpleStringCriterion.addSimpleStringCriterionForm )
-SSI_CTOR_FORM = ( 'manage_addSimpleIntCriterionForm'
-                , SimpleIntCriterion.addSimpleIntCriterionForm )
-LISTC_CTOR_FORM = ( 'manage_addListCriterionForm'
-                , ListCriterion.addListCriterionForm )
-        
+
+
+# Make the skins available as DirectoryViews
+registerDirectory('skins/topic', globals())
+
 def initialize( context ):
-
-    context.registerClass( Topic.Topic
-                         , constructors = ( TOPIC_CTOR_FORM, Topic.addTopic )
-                         , permission = Topic.ADD_TOPICS_PERMISSION
-                         , icon="images/topic.gif"
-                         )
-
-    context.registerClass( SimpleStringCriterion.SimpleStringCriterion
-                         , constructors = ( SSC_CTOR_FORM
-                             , SimpleStringCriterion.addSimpleStringCriterion )
-                         , permission = Topic.ADD_TOPICS_PERMISSION
-                         , icon="images/topic.gif"
-                         )
-
-    context.registerClass( SimpleIntCriterion.SimpleIntCriterion
-                         , constructors = ( SSI_CTOR_FORM
-                             , SimpleIntCriterion.addSimpleIntCriterion )
-                         , permission = Topic.ADD_TOPICS_PERMISSION
-                         , icon="images/topic.gif"
-                         )
-
-    context.registerClass( ListCriterion.ListCriterion
-                         , constructors = ( LISTC_CTOR_FORM
-                             , ListCriterion.addListCriterion )
-                         , permission = Topic.ADD_TOPICS_PERMISSION
-                         , icon="images/topic.gif"
-                         )
-
-    context.registerHelpTitle( 'PortalTopic Help' )
+    context.registerHelpTitle('PortalTopic Help')
     context.registerHelp(directory='help')
+
+    # CMF Initializers
+    utils.ContentInit(
+        'Portal Topic',
+        content_types = (Topic.Topic,),
+        permission = Topic.ADD_TOPICS_PERMISSION,
+        extra_constructors = (Topic.addTopic,),
+        fti = Topic.factory_type_information,
+        ).initialize(context)

@@ -1,0 +1,13 @@
+<table border="0" cellpadding="0" cellspacing="2" class="FormLayout">
+ <tr>
+  <td width="20"><input type="checkbox" value="&dtml-id;" name="criterion_ids:list" id="cb_&dtml-id;"></td>
+  <td align="left"><label for="cb_&dtml-id;"><strong>List:</strong> <tt>&dtml-field;</tt></label>
+  <input type="hidden" name="criteria.id:records" value="&dtml-id;"></td>
+ </tr>
+ <tr valign="top">
+  <td width="20">&nbsp;</td>
+  <td><strong>Value:</strong><br>
+  <textarea name="criteria.value:lines:records" rows="5" cols="40"
+   ><dtml-var expr="_.string.join(value, '\n')"></textarea></td>
+ </tr>
+</table>

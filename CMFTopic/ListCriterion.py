@@ -86,113 +86,53 @@
     Declare list criterion class.
 """
 from OFS.SimpleItem import Item
-import Acquisition
-from Topic import VIEW_PERMISSION
-from Topic import ADD_TOPICS_PERMISSION
-from Topic import CHANGE_TOPICS_PERMISSION
-from Topic import _dtmldir, Topic
+from AccessControl import ClassSecurityInfo
+from Topic import Topic
+import Acquisition, Globals, string
 
-import string
-from Globals import HTMLFile, default__class_init__
+from Products.CMFCore import CMFCorePermissions
+import TopicPermissions
 
-addListCriterionForm = HTMLFile( 'listcAdd', _dtmldir )
-def addListCriterion( self, id, value=None, REQUEST=None ):
-    """
-    """
-    listc = ListCriterion( id, value )
-    self._setObject( id, listc )
-    
-    if REQUEST is not None:
-        REQUEST['RESPONSE'].redirect( self.absolute_url() + '/folder_contents' )
-
-LISTC_ACTION = 'manage_addProduct/PortalTopic/manage_addListCriterionForm'
-
-class ListCriterion( Item, Acquisition.Implicit ):
-    """
-        Represent a criterion which is a list of values (for an
-        "OR" search).
+class ListCriterion(Item, Acquisition.Implicit):
+    """\
+    Represent a criterion which is a list of values (for an
+    'OR' search).
     """
 
     meta_type = 'List Criterion'
 
-    __ac_permissions__ = ( ( VIEW_PERMISSION
-                           , ( 'index_html'
-                             , 'getCriteriaItems'
-                             )
-                           )
-                         , ( CHANGE_TOPICS_PERMISSION
-                           , ( 'edit', 'editForm' )
-                           , ( 'Manager', 'Owner' )
-                           )
-                         )
+    security = ClassSecurityInfo()
 
-    def __init__( self, id, value=None ):
-        self.id = ( id )
-        self.edit( value )
-    
-    #
-    #   HTML interface
-    #
-    view = index_html = HTMLFile( 'listcView', _dtmldir )
+    _editableAttributes = ('value',)
 
-    editForm = HTMLFile( 'listcEdit', _dtmldir )
-    def edit( self, value, REQUEST=None ):
-        """
-            Update the value we match against.
-        """
+    def __init__( self, id, field, value=None):
+        self.id = id
+        self.field = field
+        
+        self.edit(value)
+
+    security.declareProtected(TopicPermissions.ChangeTopics, 'getEditForm')
+    def getEditForm(self):
+        return "listc_edit"
+
+    security.declareProtected(TopicPermissions.ChangeTopics, 'edit')
+    def edit(self, value=None, REQUEST=None):
+        """ Update the value we match against. """
         if value is not None:
-            if type( value ) == type( '' ):
-                value = string.split( value, '\n' )
-            self.value = tuple( value )
+            if type(value) == type(''):
+                value = string.split(value, '\n')
+            self.value = tuple(value)
         else:
-            self.value = None
+            self.value = ('',)
 
-        if REQUEST is not None:
-            REQUEST['RESPONSE'].redirect( self.absolute_url() + '/view' )
-    
-    #
-    #   Criterion interface
-    #
-    def getCriteriaItems( self ):
-        """
-        """
-        return self.value is not None and ( ( self.id, self.value ), ) or ()
+    security.declareProtected(CMFCorePermissions.View, 'getCriteriaItems')
+    def getCriteriaItems(self):
+        """ Used by Topic.buildQuery to construct catalog queries """
+        return self.value is not None and ((self.field, self.value),) or ()
 
-    #
-    #   PTK support
-    #
-    listActions__roles__ = ()
-    def listActions( self, info ):
-        """
-        """
-        url = info.content_url
-        return ( { 'name'           : 'View'
-                 , 'url'            : url + '/view'
-                 , 'permissions'    : ( VIEW_PERMISSION, )
-                 , 'category'       : 'object'
-                 }
-               , { 'name'           : 'Edit'
-                 , 'url'            : url + '/editForm'
-                 , 'permissions'    : ( CHANGE_TOPICS_PERMISSION, )
-                 , 'category'       : 'object'
-                 }
-               )
 
-default__class_init__( ListCriterion )
 
-Topic.criteriaMetatypes.append(
-       { 'name'         : ListCriterion.meta_type
-       , 'action'       : LISTC_ACTION
-       , 'permission'   : ADD_TOPICS_PERMISSION
-       }
-)
+Globals.InitializeClass(ListCriterion)
 
-from Products.CMFCore.register import registerPortalContent
-registerPortalContent( ListCriterion
-                     , constructors= ( addListCriterionForm
-                                     , addListCriterion
-                                     )
-                     , action=LISTC_ACTION
-                     , icon="images/topic.gif"
-                     , productGlobals=globals()
-                     )
+# Register as a criteria type with the Topic class
+Topic._criteriaTypes.append(ListCriterion)

@@ -10,6 +10,10 @@
 <table class="FormLayout">
 
  <tr valign="top">
+  <th align="right"> Title: </th>
+  <td><input type="text" name="title" value="&dtml-title;" size="30" /></td>
+ </tr>
+ <tr valign="top">
   <th align="right"> Acquire Criteria<br>from Parent: </th>
   <td>
    <dtml-let acqChecked="acquireCriteria and 'checked' or ''">

@@ -86,43 +86,24 @@
     Declare simple int-match criterion class.
 """
 from OFS.SimpleItem import Item
-import Acquisition
-from Topic import VIEW_PERMISSION
-from Topic import ADD_TOPICS_PERMISSION
-from Topic import CHANGE_TOPICS_PERMISSION
-from Topic import _dtmldir, Topic
+from AccessControl import ClassSecurityInfo
+from Topic import Topic
+import Acquisition, Globals
 
-from Globals import HTMLFile, default__class_init__
-
-addSimpleIntCriterionForm = HTMLFile( 'sicAdd', _dtmldir )
-def addSimpleIntCriterion( self, id, value=None, direction=None, REQUEST=None ):
-    """
-    """
-    sic = SimpleIntCriterion( id, value, direction )
-    self._setObject( id, sic )
-    
-    if REQUEST is not None:
-        REQUEST['RESPONSE'].redirect( self.absolute_url() + '/folder_contents' )
-
-SIC_ACTION = 'manage_addProduct/PortalTopic/manage_addSimpleIntCriterionForm'
+from Products.CMFCore import CMFCorePermissions
+import TopicPermissions
 
 class SimpleIntCriterion( Item, Acquisition.Implicit ):
-    """
-        Represent a simple field-match for a string value.
+    """\
+    Represent a simple field-match for an integer value, including
+    catalog range searches.    
     """
 
-    meta_type = 'Simple Int Criterion'
+    meta_type = 'Integer Criterion'
 
-    __ac_permissions__ = ( ( VIEW_PERMISSION
-                           , ( 'index_html'
-                             , 'getCriteriaItems'
-                             )
-                           )
-                         , ( CHANGE_TOPICS_PERMISSION
-                           , ( 'edit', 'editForm' )
-                           , ( 'Manager', 'Owner' )
-                           )
-                         )
+    security = ClassSecurityInfo()
+
+    _editableAttributes = ('value', 'direction',)
 
     direction = None
 
@@ -130,91 +111,44 @@ class SimpleIntCriterion( Item, Acquisition.Implicit ):
     MAXIMUM = 'max'
     MINMAX = 'min:max'
 
-    def __init__( self, id, value=None, direction=None ):
-
+    def __init__( self, id, field, value=None, direction=None ):
         self.id = id
+        self.field = field
 
         if value is not None:
-            self.value = int( value )
+            self.value = int(value)
         else:
             self.value = None
 
         self.direction = direction
-    
-    #
-    #   HTML interface
-    #
-    view = index_html = HTMLFile( 'sicView', _dtmldir )
 
-    editForm = HTMLFile( 'sicEdit', _dtmldir )
-    def edit( self, value, direction=None, REQUEST=None ):
-        """
-            Update the value we match against.
-        """
-        self.value = int( value )
+    security.declareProtected(TopicPermissions.ChangeTopics, 'getEditForm')
+    def getEditForm(self):
+        """ Used to build sequences of editable criteria """
+        return 'sic_edit'
+
+    security.declareProtected(TopicPermissions.ChangeTopics, 'edit')
+    def edit(self, value, direction=None):
+        """ Update the value we match against. """
+        self.value = int(value)
         self.direction = direction
 
-        if REQUEST is not None:
-            REQUEST['RESPONSE'].redirect( self.absolute_url() + '/view' )
-    
-    #
-    #   Criterion interface
-    #
-    def getCriteriaItems( self ):
-        """
-        """
+    security.declareProtected(CMFCorePermissions.View, 'getCriteriaItems')
+    def getCriteriaItems(self):
+        """ Used by Topic.buildQuery() """
         if self.value is None:
             return ()
 
-        result = ( ( self.id
-                   , self.value
-                   )
-                 ,
-                 )
+        result = ((self.field, self.value),)
 
         if self.direction is not None:
-            result = result + ( ( '%s_usage' % self.id
-                                , 'range:%s' % self.direction 
-                                )
-                              ,
-                              )
+            result = result + (('%s_usage' % self.id, 
+                                'range:%s' % self.direction ),)
         return result
 
-    #
-    #   PTK support
-    #
-    listActions__roles__ = ()
-    def listActions( self, info ):
-        """
-        """
-        url = info.content_url
-        return ( { 'name'           : 'View'
-                 , 'url'            : url + '/view'
-                 , 'permissions'    : ( VIEW_PERMISSION, )
-                 , 'category'       : 'object'
-                 }
-               , { 'name'           : 'Edit'
-                 , 'url'            : url + '/editForm'
-                 , 'permissions'    : ( CHANGE_TOPICS_PERMISSION, )
-                 , 'category'       : 'object'
-                 }
-               )
 
-default__class_init__( SimpleIntCriterion )
 
-Topic.criteriaMetatypes.append(
-       { 'name'         : SimpleIntCriterion.meta_type
-       , 'action'       : SIC_ACTION
-       , 'permission'   : ADD_TOPICS_PERMISSION
-       }
-)
+Globals.InitializeClass(SimpleIntCriterion)
 
-from Products.CMFCore.register import registerPortalContent
-registerPortalContent( SimpleIntCriterion
-                     , constructors= ( addSimpleIntCriterionForm
-                                     , addSimpleIntCriterion
-                                     )
-                     , action=SIC_ACTION
-                     , icon="images/topic.gif"
-                     , productGlobals=globals()
-                     )
+# Register as a criteria type with the Topic class
+Topic._criteriaTypes.append(SimpleIntCriterion)

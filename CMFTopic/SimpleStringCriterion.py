@@ -86,109 +86,49 @@
     Declare simple string-match criterion class.
 """
 from OFS.SimpleItem import Item
-import Acquisition
-from Topic import VIEW_PERMISSION
-from Topic import ADD_TOPICS_PERMISSION
-from Topic import CHANGE_TOPICS_PERMISSION
-from Topic import _dtmldir, Topic
+from AccessControl import ClassSecurityInfo
+from Topic import Topic
+import Acquisition, Globals
 
-from Globals import HTMLFile, default__class_init__
+from Products.CMFCore import CMFCorePermissions
+import TopicPermissions
 
-addSimpleStringCriterionForm = HTMLFile( 'sscAdd', _dtmldir )
-def addSimpleStringCriterion( self, id, value=None, REQUEST=None ):
-    """
-    """
-    ssc = SimpleStringCriterion( id, value )
-    self._setObject( id, ssc )
-    
-    if REQUEST is not None:
-        REQUEST['RESPONSE'].redirect( self.absolute_url() + '/folder_contents' )
-
-SSC_ACTION = 'manage_addProduct/PortalTopic/manage_addSimpleStringCriterionForm'
-
-class SimpleStringCriterion( Item, Acquisition.Implicit ):
+class SimpleStringCriterion(Item, Acquisition.Implicit):
     """
         Represent a simple field-match for a string value.
     """
 
-    meta_type = 'Simple String Criterion'
+    meta_type = 'String Criterion'
+    security = ClassSecurityInfo()
 
-    __ac_permissions__ = ( ( VIEW_PERMISSION
-                           , ( 'index_html'
-                             , 'getCriteriaItems'
-                             )
-                           )
-                         , ( CHANGE_TOPICS_PERMISSION
-                           , ( 'edit', 'editForm' )
-                           , ( 'Manager', 'Owner' )
-                           )
-                         )
+    _editableAttributes = ('value',)
 
-    def __init__( self, id, value=None ):
-        self.id = ( id )
+    def __init__(self, id, field, value=None):
+        self.id = id
+        self.field = field
+        
         if value is not None:
-            self.value = str( value )
+            self.value = str(value)
         else:
             self.value = None
     
-    #
-    #   HTML interface
-    #
-    view = index_html = HTMLFile( 'sscView', _dtmldir )
-
-    editForm = HTMLFile( 'sscEdit', _dtmldir )
-    def edit( self, value, REQUEST=None ):
-        """
-            Update the value we match against.
-        """
-        self.value = str( value )
-
-        if REQUEST is not None:
-            REQUEST['RESPONSE'].redirect( self.absolute_url() + '/view' )
+    security.declareProtected(TopicPermissions.ChangeTopics, 'getEditForm')
+    def getEditForm(self):
+        " Return the skinned name of the edit form "
+        return 'ssc_edit'
     
-    #
-    #   Criterion interface
-    #
+    security.declareProtected(TopicPermissions.ChangeTopics, 'edit')
+    def edit(self, value):
+        """ Update the value we are to match up against """
+        self.value = str(value)
+    
+    security.declareProtected(CMFCorePermissions.View, 'getCriteriaItems')
     def getCriteriaItems( self ):
-        """
-        """
-        return self.value is not None and ( ( self.id, self.value ), ) or ()
+        """ Return a sequence of criteria items, used by Topic.buildQuery """
+        return self.value is not None and ((self.field, self.value),) or ()
 
-    #
-    #   PTK support
-    #
-    listActions__roles__ = ()
-    def listActions( self, info ):
-        """
-        """
-        url = info.content_url
-        return ( { 'name'           : 'View'
-                 , 'url'            : url + '/view'
-                 , 'permissions'    : ( VIEW_PERMISSION, )
-                 , 'category'       : 'object'
-                 }
-               , { 'name'           : 'Edit'
-                 , 'url'            : url + '/editForm'
-                 , 'permissions'    : ( CHANGE_TOPICS_PERMISSION, )
-                 , 'category'       : 'object'
-                 }
-               )
 
-default__class_init__( SimpleStringCriterion )
+Globals.InitializeClass(SimpleStringCriterion)
 
-Topic.criteriaMetatypes.append(
-       { 'name'         : SimpleStringCriterion.meta_type
-       , 'action'       : SSC_ACTION
-       , 'permission'   : ADD_TOPICS_PERMISSION
-       }
-)
-
-from Products.CMFCore.register import registerPortalContent
-registerPortalContent( SimpleStringCriterion
-                     , constructors= ( addSimpleStringCriterionForm
-                                     , addSimpleStringCriterion
-                                     )
-                     , action=SSC_ACTION
-                     , icon="images/topic.gif"
-                     , productGlobals=globals()
-                     )
+# Register as a criteria type with the Topic class
+Topic._criteriaTypes.append(SimpleStringCriterion)
