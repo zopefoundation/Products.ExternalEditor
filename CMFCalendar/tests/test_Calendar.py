@@ -87,9 +87,12 @@ class CalendarRequestTests(unittest.TestCase):
         self.Tool = app.CalendarTest.portal_calendar
 
         # sessioning setup
-        app._setObject( 'temp_folder', MountedTemporaryFolder('temp_folder') )
-        app.temp_folder._setObject( 'session_data',
-                                    TransientObjectContainer('session_data') )
+        if getattr(app, 'temp_folder', None) is None:
+            temp_folder = MountedTemporaryFolder('temp_folder')
+            app._setObject('temp_folder', temp_folder)
+        if getattr(app.temp_folder, 'session_data', None) is None:
+            session_data = TransientObjectContainer('session_data')
+            app.temp_folder._setObject('session_data', session_data)
         app.REQUEST.set_lazy( 'SESSION',
                               app.session_data_manager.getSessionData )
 
