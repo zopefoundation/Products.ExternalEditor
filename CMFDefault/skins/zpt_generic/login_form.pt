@@ -1,0 +1,70 @@
+<html xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="here/main_template/macros/master">
+<body>
+<div metal:fill-slot="main">
+<div class="Desktop">
+<h1 class="Desktop">Log in</h1>
+
+<form action="" method="post" tal:attributes="action python: here.portal_url() + '/logged_in'">
+
+<!-- ****** Enable the automatic redirect ***** -->
+<span tal:condition="exists: request/came_from">
+  <input type="hidden" name="came_from" value="" tal:attributes="value request/came_from">
+</span>
+<!-- ****** Enable the automatic redirect ***** -->
+
+<table class="FormLayout">
+<tr>
+  <td align="left" valign="top">
+  <strong>Name</strong>
+  </td>
+  <td align="left" valign="top">
+  <input type="TEXT" name="__ac_name" size="20" value="" tal:attributes="value python: request.get('__ac_name') or ''">
+  </td>
+</tr>
+<tr>
+  <td align="left" valign="top">
+  <strong>Password</strong>
+  </td>
+  <td align="left" valign="top">
+  <input type="PASSWORD" name="__ac_password" size="20">
+  </td>
+</tr>
+
+<tr valign="top" align="left">
+<td></td>
+<td><input type="checkbox" name="__ac_persistent" value="1" checked
+      id="cb_remember" />
+<label for="cb_remember">Remember my name.</label>
+</td></tr>
+
+<tr>
+  <td align="left" valign="top">
+  </td>
+  <td align="left" valign="top">
+  <input type="submit" name="submit" value=" Login ">
+  </td>
+</tr>
+
+</table>
+</form>
+
+<p><a href="" tal:attributes="href python: here.portal_url() + '/mail_password_form'">I forgot my password!</a></p>
+
+<p>
+Having trouble logging in? Make sure to enable cookies in your web browser.
+</p>
+
+<p>Don't forget to logout or exit your browser when you're done.
+</p>
+
+<p>
+Setting the 'Remember my name' option will set a cookie with your username,
+so that when you next log in, your user name will already be filled in for you.
+</p>
+</div>
+</div>
+</body>
+</html>
+

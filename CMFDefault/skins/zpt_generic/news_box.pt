@@ -1,0 +1,37 @@
+ <table class="NewsItems" cellspacing="0" cellpadding="0" border="0" width="100%">
+ <tbody tal:define="news python: here.portal_catalog(meta_type='News Item', sort_on='Date', sort_order='reverse', review_state='published');
+         Batch python:modules['ZTUtils'].Batch;
+		 global batch python:Batch(news, 10, 0, orphan=1)">
+  <tr>
+   <td class="NewsBorder" width="1" rowspan="13" bgcolor="#6699CC">
+    <img src="spacer.gif" alt=" "
+         width="1" height="2" border="0">
+   </td>
+   <td valign="top" class="NewsTitle" width="100%">
+     <b>News</b>
+   </td>
+  </tr>
+  <tr class="NewsItemRow"
+      tal:condition="news"
+	  tal:repeat="news batch">
+   <td valign="top" nowrap>
+    <a href=""
+	   tal:attributes="href python:news.getURL()"
+	   tal:content="news/Title"></a><br>
+    <span tal:replace="news/Date">Date</span>
+   </td>
+  </tr>
+  <tr class="NewsItemRow"
+      tal:condition="python:not(news)">
+   <td valign="top">
+     No news is no news.
+   </td>
+  </tr>
+  <tr class="NewsItemRow">
+   <td>
+     <a href="recent_news">More...</a>
+   </td>
+  </tr>
+</tbody>
+ </table>
+

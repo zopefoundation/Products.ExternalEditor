@@ -1,0 +1,49 @@
+<html xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="here/main_template/macros/master">
+<body>
+<div metal:fill-slot="main">
+<div class="Desktop">
+<h3> Rename Items </h3>
+<TABLE class="FormLayout"
+       tal:condition="here/folder_rename_items">
+	   <FORM ACTION="folder_rename" METHOD="POST">
+  <TR tal:repeat="item here/folder_rename_items">
+    <TD ALIGN="LEFT" VALIGN="TOP" width="8%">
+      <span tal:replace="structure item/iconHTML">Type Image</span>
+    </TD>
+    <TD ALIGN="LEFT" VALIGN="TOP" width="20%" NOWRAP>
+      <span tal:replace="item/getId">ID</span>
+      <INPUT TYPE="HIDDEN" NAME="ids:list" VALUE=""
+	         tal:attributes="value item/getId">
+    </TD>
+    <TD ALIGN="LEFT" VALIGN="TOP" width="5%">
+      <STRONG>to</STRONG>
+    </TD>
+    <TD ALIGN="LEFT" VALIGN="TOP">
+      <INPUT TYPE="TEXT" NAME="new_ids:list" value=""
+	         tal:attributes="value item/getId" SIZE="20">
+    </TD>
+  </TR>
+
+  <TR>
+    <TD COLSPAN=4>
+      <INPUT TYPE="submit" VALUE=" Ok ">
+    </TD>
+  </TR>
+  </FORM>
+</TABLE>
+
+
+
+<div tal:condition="python: not(here.folder_rename_items())">
+  <FORM ACTION="folder_contents" METHOD="GET">
+  <p>You must select one or more items to rename.</p>
+  <INPUT TYPE="submit" VALUE=" Ok ">
+  </FORM>
+</div>
+</div>
+</div>
+</body>
+</html>
+

@@ -1,0 +1,43 @@
+<html xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="here/main_template/macros/master">
+<body>
+<div metal:fill-slot="main">	
+<div tal:define="dummy python:here.portal_discussion.getDiscussionFor(here)">This is evaluated.</div>
+
+<form method="POST" action="" 
+      tal:attributes="action python: here.absolute_url() + '/talkback'">
+<input type="hidden" name="Creator" value=""
+	   tal:attributes="value python: here.portal_membership.getAuthenticatedMember()">
+
+<table class="FormLayout">
+ <tr>
+  <th align="left">Subject (Title)</th>
+  <td><input name="title" value=""
+             tal:attributes="value here/title_override|here/title">
+  </td>
+ </tr>
+ <tr>
+  <td colspan="2">
+   <b>Reply body</b><br>
+   <textarea name="text" cols="70" rows="10" wrap="soft" style="width: 100%"
+			 tal:content="here/text_override | nothing"></textarea>
+  </td>
+ </tr>
+ <tr>
+  <td></td>
+  <td>
+   <input type="submit" value="Preview" name=""
+          tal:define="hId here/getId"
+          tal:attributes="name python: hId + '/discussion_reply_preview:method'">
+   <input type="submit" value="Reply" name=""
+          tal:attributes="name string:discussion_reply:method">
+  </td>
+ </tr>
+</table>
+</form>
+</div>
+</body>
+</html>
+
+

@@ -1,0 +1,50 @@
+<html xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="here/main_template/macros/master">
+<body>
+<div metal:fill-slot="main">
+<div class="Desktop">
+ 
+
+<div tal:condition="options/error_message"
+     tal:content="structure options/error_message" />
+
+<div tal:condition="not: options/error_message">
+  <H2>Site Error</H2>
+
+  <P>An error was encountered while publishing this resource.
+  </P>
+  
+  <P>
+  <STRONG>Error Type: <span tal:replace="structure options/error_type" /></STRONG><BR>
+  <STRONG>Error Value: <span tal:replace="structure options/error_value" /></STRONG><BR> 
+  </P>
+ 
+  <HR NOSHADE>
+ 
+  <P>Troubleshooting Suggestions</P>
+
+  <UL>
+  <div tal:condition="python: options['error_type'] in ('KeyError','NameError')">
+  <LI>This resource may be trying to reference a
+  nonexistent object or variable <STRONG><span tal:replace="options/error_value" /></STRONG>.</LI>
+  </div>
+  <LI>The URL may be incorrect.</LI>
+  <LI>The parameters passed to this resource may be incorrect.</LI>
+  <LI>A resource that this resource relies on may be encountering
+      an error.</LI>
+  </UL>
+
+  <P>For more detailed information about the error, please
+  refer to the HTML source for this page.
+  </P>
+
+  <P>If the error persists please contact the site maintainer.
+  Thank you for your patience.
+  </P>
+
+</div>
+</div>
+</div>
+</body>
+</html>

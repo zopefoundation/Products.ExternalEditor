@@ -1,0 +1,96 @@
+<html xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="here/main_template/macros/master">
+<body>
+<div metal:fill-slot="main">
+<div class="Desktop">
+
+<h1>Become a member</h1>
+
+<div tal:define="registered python: here.portal_membership.getAuthenticatedMember().has_role('Member')">
+    <div tal:condition="python: here.portal_membership.getAuthenticatedMember().has_role('Member')">
+		<p>You are already a member. You may use the <a href="personalize_form">personalization form</a> 
+		to change your membership information. </p>
+    </div>
+ <div tal:condition="python: not(registered)">
+	<p> Becoming a member gives you the ability to personalize the site and participate in the community.</p>
+	<p> It does not cost any money to become a member and your email and other personal information will remain private.</p>
+       <span tal:condition="python: here.portal_properties.validate_email">
+	   <p> You must submit a valid email address. This address will be used to send you your randomly-generated password.  
+	   Once you have logged in with this password, you may change it to anything you like.</p>
+	   </span>
+<div class="DesktopStatusBar"
+     tal:content="request/error|nothing">
+     <hr>
+</div>
+<form action="register" method="POST">
+
+<input type="hidden" name="last_visit:date" value=""
+	   tal:attributes="value here/ZopeTime">
+<input type="hidden" name="prev_visit:date" value=""
+       tal:attributes="value here/ZopeTime">
+
+<table class="FormLayout">
+ <tr>
+  <th> Login Name
+  </th>
+  <td>
+   <input type="text"
+          name="username" size="30"
+          value=""
+		  tal:attributes="value request/username|nothing">
+  </td>
+ </tr>
+ <tr>
+  <th> Email Address
+  </th>
+  <td align="left" valign="top">
+   <input type="text" name="email" size="30"
+          value=""
+		  tal:attributes="value request/email|nothing">
+  </td>
+ </tr>
+
+<div tal:condition="python: not(here.portal_properties.validate_email)">
+ <tr>
+  <th> Password
+  </th>
+  <td align="left" valign="top">
+   <input type="password" name="password" size="30">
+  </td>
+ </tr>
+ <tr>
+  <th> Password (confirm)
+  </th>
+  <td align="left" valign="top">
+   <input type="password" name="confirm" size="30">
+  </td>
+ </tr>
+ <tr>
+  <th> Mail Password?
+  </th>
+  <td>
+   <input type="checkbox" name="mail_me" size="30" id="cb_mailme" />
+   <em><label for="cb_mailme">Check this box to have your password 
+   mailed to you.</label></em>
+  </td>
+ </tr>
+</div>
+
+ <tr>
+  <td><br></td>
+  <td>
+   <input type="submit" name="submit" value="Register"> 
+  </td>
+ </tr>
+</table>
+</form>
+
+</div>
+</div>
+</div>
+</div>
+
+</body>
+</html>
+
