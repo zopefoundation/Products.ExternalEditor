@@ -95,10 +95,10 @@ _marker = 0
 def getToolByName(obj, name, default=_marker):
     " Get the tool, 'toolname', by acquiring it. "
     if default == _marker:
-        try: tool = Acquisition.aq_acquire(obj, name)
+        try: tool = getattr(obj, name)
         except: raise AttributeError, name
     else:
-        tool = Acquisition.aq_acquire(obj, name, default=default)
+        tool = getattr(obj, name, default)
     return tool
 
 class ImmutableId (Base):
