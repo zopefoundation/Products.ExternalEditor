@@ -57,6 +57,17 @@ class UniqueIdHandlerTool(UniqueObject, SimpleItem, ActionProviderBase):
     
     security = ClassSecurityInfo()
     
+    def _reindexObject(self, obj):
+        # add uid index and colums to catalog if not yet done
+        UID_ATTRIBUTE_NAME = self.UID_ATTRIBUTE_NAME
+        catalog = getToolByName(self, 'portal_catalog')
+        if UID_ATTRIBUTE_NAME not in catalog.indexes():
+            catalog.addIndex(UID_ATTRIBUTE_NAME, 'FieldIndex')
+            catalog.addColumn(UID_ATTRIBUTE_NAME)
+        
+        # reindex
+        catalog.reindexObject(obj)
+
     security.declarePublic('queryUid')
     def queryUid(self, obj, default=None):
         """See IUniqueIdQuery.
@@ -89,16 +100,16 @@ class UniqueIdHandlerTool(UniqueObject, SimpleItem, ActionProviderBase):
         if uid is None:
             UID_ATTRIBUTE_NAME = self.UID_ATTRIBUTE_NAME
             generator = getToolByName(self, 'portal_uidgenerator')
-            setattr(obj, UID_ATTRIBUTE_NAME, generator())
-            uid = getattr(obj, UID_ATTRIBUTE_NAME)
+            uid = generator()
+            setattr(obj, UID_ATTRIBUTE_NAME, uid)
             uid.setId(UID_ATTRIBUTE_NAME)
             
             # reindex the object
-            catalog = getToolByName(self, 'portal_catalog')
-            catalog.reindexObject(obj)
+            self._reindexObject(obj)
 
             # return uid not uid object
             uid = uid()
+            
         return uid
     
     security.declareProtected(ManagePortal, 'unregister')
@@ -110,12 +121,9 @@ class UniqueIdHandlerTool(UniqueObject, SimpleItem, ActionProviderBase):
             raise UniqueIdError, \
                   "No unique id available to be unregistered on '%s'" % obj
             
-        # delete the uid
+        # delete the uid and reindex
         delattr(obj, UID_ATTRIBUTE_NAME)
-
-        # reindex the object
-        portal_catalog = getToolByName(self, 'portal_catalog')
-        portal_catalog.reindexObject(obj)
+        self._reindexObject(obj)
     
     
     security.declarePublic('queryBrain')
