@@ -39,7 +39,7 @@ class ActionProviderBase:
                      )
 
     security.declarePrivate('listActions')
-    def listActions(self):
+    def listActions(self, info=None):
         """
         Return all the actions defined by a tool
         """

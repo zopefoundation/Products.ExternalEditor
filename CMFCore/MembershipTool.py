@@ -389,7 +389,7 @@ class MembershipTool (UniqueObject, SimpleItem, ActionProviderBase):
 
 
     security.declarePrivate('listActions')
-    def listActions(self):
+    def listActions(self, info=None):
         return None
 
     security.declarePublic('getHomeFolder')
