@@ -19,7 +19,7 @@
        <img src="misc_/&dtml-factory_product_name;/&dtml-factory_icon;">
       </dtml-if>
      </dtml-if>
-     Note: these are normally only useful inside a PTK portal.
+     Note: these are normally only useful inside a CMF site.
     </div>
     </td>
   </tr>
