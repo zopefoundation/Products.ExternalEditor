@@ -51,7 +51,7 @@ Zope Content Management Framework (CMF) README
          '$INSTANCE_HOME/Products'.  For instance:
 
            $ cd /var/zope/Products
-           $ ln -s /usr/local/zope/CMF-1.0beta/* .
+           $ ln -s /usr/local/zope/CMF-1.0/* .
  
       3. Restart Zope;  verify that the three CMF products loaded
          property, by examining them in 'Control_Panel/Product'.
