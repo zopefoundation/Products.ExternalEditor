@@ -95,8 +95,10 @@ class DirectoryInformation:
         '''
         types = {}
         fp = expandpath(self.filepath)
-        try: f = open(path.join(fp, '.objects'), 'rt')
-        except: pass
+        try:
+            f = open( path.join(fp, '.objects'), 'rt' )
+        except IOError:
+            pass
         else:
             lines = f.readlines()
             f.close()
@@ -236,17 +238,26 @@ class DirectoryInformation:
                             tb = None   # Avoid leaking frame!
 
                     # FS-based security
-                    try:
-                        permissions = metadata.getSecurity()
-                        if permissions is not None:
-                            for name in permissions.keys():
-                                acquire,roles = permissions[name]
+                    permissions = metadata.getSecurity()
+                    if permissions is not None:
+                        for name in permissions.keys():
+                            acquire, roles = permissions[name]
+                            try:
                                 ob.manage_permission(name,roles,acquire)
-                    except:
-                        LOG('DirectoryView',
-                            ERROR,
-                            'Error setting permissions',
-                            error=exc_info())
+                            except ValueError:
+                                LOG('DirectoryView',
+                                    ERROR,
+                                    'Error setting permissions',
+                                    error=exc_info())
+                            except:
+                                # for Zope versions before 2.7.0
+                                if exc_info()[0] == 'Invalid Permission':
+                                    LOG('DirectoryView',
+                                        ERROR,
+                                        'Error setting permissions',
+                                        error=exc_info())
+                                else:
+                                    raise
 
                     # only DTML Methods can have proxy roles
                     if hasattr(ob, '_proxy_roles'):

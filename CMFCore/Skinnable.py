@@ -29,10 +29,10 @@ from OFS.ObjectManager import ObjectManager
 # used to do.
 try:
     superGetAttr = ObjectManager.__getattr__
-except:
+except AttributeError:
     try:
         superGetAttr = ObjectManager.inheritedAttribute('__getattr__')
-    except:
+    except AttributeError:
         superGetAttr = None
 
 _marker = []  # Create a new marker object.

@@ -495,9 +495,12 @@ class FactoryTypeInformation (TypeInformation):
             return default
         try:
             p = container.manage_addProduct[self.product]
-            m = getattr(p, self.factory, None)
-            if m is None:
-                return default
+        except AttributeError:
+            LOG('Types Tool', ERROR, '_queryFactoryMethod raised an exception',
+                error=sys.exc_info())
+            return default
+        m = getattr(p, self.factory, None)
+        if m:
             try:
                 # validate() can either raise Unauthorized or return 0 to
                 # mean unauthorized.
@@ -505,10 +508,6 @@ class FactoryTypeInformation (TypeInformation):
                     return m
             except Unauthorized:
                 pass
-            return default
-        except:
-            LOG('Types Tool', ERROR, '_queryFactoryMethod raised an exception',
-                error=sys.exc_info())
         return default
 
     security.declarePublic('isConstructionAllowed')
