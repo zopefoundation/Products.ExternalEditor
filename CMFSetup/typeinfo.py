@@ -52,9 +52,11 @@ def importTypesTool( context ):
             types_tool._delObject(type)
 
     ttc = TypesToolConfigurator( site, encoding )
-    text = context.readDataFile( _TOOL_FILENAME )
-    tool_info = ttc.parseXML( text )
+    xml = context.readDataFile( _TOOL_FILENAME )
+    if xml is None:
+        return 'Types tool: Nothing to import.'
 
+    tool_info = ttc.parseXML( xml )
     tic = TypeInfoConfigurator( site, encoding )
 
     for type_info in tool_info[ 'types' ]:
@@ -84,7 +86,7 @@ def importTypesTool( context ):
     # importScriptsToContainer(types_tool, ('typestool_scripts',),
     #                          context)
 
-    return 'Type tool imported'
+    return 'Types tool imported.'
 
 def exportTypesTool( context ):
 

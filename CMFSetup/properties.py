@@ -51,6 +51,9 @@ def importSiteProperties(context):
                 site._updateProperty(prop_id, prop_value)
 
     xml = context.readDataFile(_FILENAME)
+    if xml is None:
+        return 'Site properties: Nothing to import.'
+
     spc = SitePropertiesConfigurator(site, encoding)
     site_info = spc.parseXML(xml)
 

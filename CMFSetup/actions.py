@@ -75,62 +75,60 @@ def importActionProviders( context ):
         for obj_id in actions_tool.objectIds():
             actions_tool._delObject(obj_id)
 
-    text = context.readDataFile( _FILENAME )
+    xml = context.readDataFile(_FILENAME)
+    if xml is None:
+        return 'Action providers: Nothing to import.'
 
-    if text is not None:
+    apc = ActionProvidersConfigurator(site, encoding)
+    tool_info = apc.parseXML(xml)
 
-        apc = ActionProvidersConfigurator( site, encoding )
-        tool_info = apc.parseXML( text )
+    for p_info in tool_info['providers']:
 
-        for p_info in tool_info[ 'providers' ]:
+        if p_info['id'] in _SPECIAL_PROVIDERS and \
+                p_info['id'] not in actions_tool.listActionProviders():
+            actions_tool.addActionProvider(p_info['id'])
 
-            if p_info[ 'id' ] in _SPECIAL_PROVIDERS and \
-                    p_info[ 'id' ] not in actions_tool.listActionProviders():
+        provider = getToolByName(site, p_info['id'])
+        provider._actions = ()
 
-                actions_tool.addActionProvider( p_info[ 'id' ] )
+        for a_info in p_info['actions']:
+            parent = actions_tool
+            for category_id in a_info['category'].split('/'):
+                if category_id not in parent.objectIds():
+                    o_info = {'id': str(category_id),
+                              'meta_type': 'CMF Action Category',
+                              'properties':(),
+                              'objects': ()}
+                    apc.initObject(parent, o_info)
+                parent = parent._getOb(category_id)
+            if a_info['id'] not in parent.objectIds():
+                o_info = {'id': str(a_info['id']),
+                          'meta_type': 'CMF Action',
+                          'properties':
+                             ( {'id': 'title',
+                                'value': a_info.get('title', ''),
+                                'elements': ()}
+                             , {'id': 'description',
+                                'value': a_info.get('description', ''),
+                                'elements': ()}
+                             , {'id': 'url_expr',
+                                'value': a_info.get('action', ''),
+                                'elements': ()}
+                             , {'id': 'available_expr',
+                                'value': a_info.get('condition', ''),
+                                'elements': ()}
+                             , {'id': 'permissions',
+                                'value': '',
+                                'elements': a_info['permissions']}
+                             , {'id': 'visible',
+                                'value': a_info.get('visible', True),
+                                'elements': ()}
+                             ),
+                          'objects': ()}
+                apc.initObject(parent, o_info)
 
-            provider = getToolByName( site, p_info[ 'id' ] )
-            provider._actions = ()
-
-            if p_info['actions']:
-                for a_info in p_info['actions']:
-                    parent = actions_tool
-                    for category_id in a_info['category'].split('/'):
-                        if category_id not in parent.objectIds():
-                            o_info = {'id': str(category_id),
-                                      'meta_type': 'CMF Action Category',
-                                      'properties':(),
-                                      'objects': ()}
-                            apc.initObject(parent, o_info)
-                        parent = parent._getOb(category_id)
-                    if a_info['id'] not in parent.objectIds():
-                        o_info = {'id': str(a_info['id']),
-                                  'meta_type': 'CMF Action',
-                                  'properties':
-                                     ( {'id': 'title',
-                                        'value': a_info.get('title', ''),
-                                        'elements': ()}
-                                     , {'id': 'description',
-                                        'value': a_info.get('description', ''),
-                                        'elements': ()}
-                                     , {'id': 'url_expr',
-                                        'value': a_info.get('action', ''),
-                                        'elements': ()}
-                                     , {'id': 'available_expr',
-                                        'value': a_info.get('condition', ''),
-                                        'elements': ()}
-                                     , {'id': 'permissions',
-                                        'value': '',
-                                        'elements': a_info['permissions']}
-                                     , {'id': 'visible',
-                                        'value': a_info.get('visible', True),
-                                        'elements': ()}
-                                     ),
-                                  'objects': ()}
-                        apc.initObject(parent, o_info)
-
-    for sub_info in tool_info[ 'objects' ]:
-        apc.initObject( actions_tool, sub_info )
+    for sub_info in tool_info['objects']:
+        apc.initObject(actions_tool, sub_info)
 
     return 'Action providers imported.'
 
