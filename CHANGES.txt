@@ -37,6 +37,10 @@
 
   - (__future__) Merged Chris Withers' FSSQLMethod into CMFCore.
 
+  - Perform permission checking inside personalize_form to make
+    sure Anonymous cannot access it without logging in (CMF Tracker
+    Issue 349, thanks go to Bill Anderson)
+
   - Added initial CMF use cases as FSSTXMethods in CMFDefault/help.
 
   - Made validation methods of 'portal_metadata' available to
