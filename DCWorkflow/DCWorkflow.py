@@ -178,7 +178,6 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
         sdef = self._getWorkflowStateOf(ob)
         if sdef is None:
             return None
-        sm = getSecurityManager()
         res = []
         for tid in sdef.transitions:
             tdef = self.transitions.get(tid, None)
