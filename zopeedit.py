@@ -186,7 +186,7 @@ class ExternalEditor:
     def __del__(self):
         if getattr(self, 'clean_up', 1) and hasattr(self, 'content_file'):
             # for security we always delete the files by default
-	        try:
+            try:
                 os.remove(self.content_file)
             except OSError:
                 pass     
