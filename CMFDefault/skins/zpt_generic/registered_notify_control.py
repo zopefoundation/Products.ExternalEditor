@@ -23,7 +23,7 @@ control['portal_description'] = ptool.getProperty('description')
 control['portal_url'] = '<%s>' % utool()
 control['member_id'] = member_id
 control['password'] = password
-target = '%s/logged_in' % context.absolute_url()
+target = '%s/logged_in' % utool()
 query = make_query(__ac_name=member_id, __ac_password=password)
 control['login_url'] = '<%s?%s>' % (target, query)
 
