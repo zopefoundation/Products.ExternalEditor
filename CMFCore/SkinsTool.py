@@ -274,10 +274,7 @@ class SkinsTool(UniqueObject, SkinsContainer, Folder, ActionProviderBase):
                 if cookie != mskin:
                     resp = req.RESPONSE
                     
-                    # you'd think that portal_url would expose this
-                    portalPath = pu()[len(req['BASE0']):]
-                    # ensure it starts with a '/'
-                    if not portalPath or portalPath[0] != '/': portalPath = '/'+portalPath
+                    portalPath = '/' + pu.getPortalObject().absolute_url(1)
                         
                     if not self.cookie_persistence:
                         # *Don't* make the cookie persistent!
