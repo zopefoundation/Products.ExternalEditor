@@ -35,7 +35,11 @@
         <tr>
           <td>
             <div id="DesktopDescription"
-                 tal:content="here/description">DESCRIPTION</div>
+                 tal:define="stx nocall:
+                       modules/Products/PythonScripts/standard/structured_text"
+                 tal:content="structure here/description">
+              DESCRIPTION
+            </div>
           </td>
         </tr>
       </table>
