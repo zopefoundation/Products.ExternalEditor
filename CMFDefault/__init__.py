@@ -10,29 +10,46 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-"""
-"""
+""" Default implementation of CMFCore.
 
+$Id$
+"""
 from AccessControl import ModuleSecurityInfo
 
-prod_security = ModuleSecurityInfo( 'Products' )
-prod_security.declarePublic( 'CMFDefault' )
+from Products import CMFCore
 
-security = ModuleSecurityInfo( 'Products.CMFDefault' )
-security.declarePublic( 'utils' )
- 
-import Portal
-import Document, Link, NewsItem, File, Image, Favorite, SkinnedFolder
-
-import DiscussionItem
-import PropertiesTool, MembershipTool, MetadataTool
-import RegistrationTool, URLTool, DublinCore, DiscussionTool
-import SyndicationTool
-from Products.CMFCore import utils
 from Products.CMFCore.CMFCorePermissions import AddPortalContent
 import Products.CMFCore
+
 from Products.CMFCore.DirectoryView import registerDirectory
+from Products.CMFCore.utils import initializeBasesPhase1
+from Products.CMFCore.utils import initializeBasesPhase2
+from Products.CMFCore.utils import ToolInit
+from Products.CMFCore.utils import ContentInit
+from Products.CMFCore.utils import registerIcon
+
+import utils
+ 
+import Portal
+import Document
+import Document 
+import NewsItem
+import File
+import Image
+import Favorite
+import SkinnedFolder
+
+import DiscussionItem
+import PropertiesTool
+import MembershipTool
+import MetadataTool
+import RegistrationTool
+import URLTool
+import DublinCore
+import DiscussionTool
+import SyndicationTool
 import DefaultWorkflow
+
 
 # Old name that some third-party packages may need.
 ADD_CONTENT_PERMISSION = AddPortalContent
@@ -104,8 +121,8 @@ tools = ( DiscussionTool.DiscussionTool
 import sys
 this_module = sys.modules[ __name__ ]
 
-z_bases = utils.initializeBasesPhase1( bases, this_module )
-z_tool_bases = utils.initializeBasesPhase1( tools, this_module )
+z_bases = initializeBasesPhase1( bases, this_module )
+z_tool_bases = initializeBasesPhase1( tools, this_module )
 
 cmfdefault_globals=globals()
 
@@ -115,26 +132,40 @@ registerDirectory('help', globals())
 
 def initialize( context ):
 
-    utils.initializeBasesPhase2( z_bases, context )
-    utils.initializeBasesPhase2( z_tool_bases, context )
-    utils.ToolInit('CMFDefault Tool', tools=tools,
-                   product_name='CMFDefault', icon='tool.gif',
-                   ).initialize( context )
+    initializeBasesPhase2( z_bases, context )
+    initializeBasesPhase2( z_tool_bases, context )
 
-    utils.ContentInit( 'CMFDefault Content'
-                     , content_types=contentClasses
-                     , permission=AddPortalContent
-                     , extra_constructors=contentConstructors
-                     , fti=Portal.factory_type_information
-                     ).initialize( context )
+    ToolInit( 'CMFDefault Tool'
+            , tools=tools
+            , product_name='CMFDefault'
+            , icon='tool.gif'
+            ).initialize( context )
 
-    context.registerClass(Portal.CMFSite,
-                          constructors=(Portal.manage_addCMFSiteForm,
-                                        Portal.manage_addCMFSite,
-                                        ),
-                          icon='portal.gif')
-    utils.registerIcon(DefaultWorkflow.DefaultWorkflowDefinition,
-                       'images/workflow.gif', globals())
+    ContentInit( 'CMFDefault Content'
+               , content_types=contentClasses
+               , permission=AddPortalContent
+               , extra_constructors=contentConstructors
+               , fti=Portal.factory_type_information
+               ).initialize( context )
+
+    context.registerClass( Portal.CMFSite
+                         , constructors=( Portal.manage_addCMFSiteForm
+                                        , Portal.manage_addCMFSite
+                                        )
+                         , icon='portal.gif'
+                         )
+
+    registerIcon( DefaultWorkflow.DefaultWorkflowDefinition
+                , 'images/workflow.gif'
+                , globals()
+                )
 
     context.registerHelp()
     context.registerHelpTitle('CMF Default Help')
+
+
+prod_security = ModuleSecurityInfo( 'Products' )
+prod_security.declarePublic( 'CMFDefault' )
+
+security = ModuleSecurityInfo( 'Products.CMFDefault' )
+security.declarePublic( 'utils' )
