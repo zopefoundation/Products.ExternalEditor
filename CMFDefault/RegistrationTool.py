@@ -1,7 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2001-2003 Zope Corporation and Contributors.
-# All Rights Reserved.
+# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
@@ -11,7 +10,7 @@
 # FOR A PARTICULAR PURPOSE
 #
 ##############################################################################
-"""CMFDefault portal_registration tool.
+""" CMFDefault portal_registration tool.
 
 $Id$
 """
@@ -31,15 +30,13 @@ from Products.CMFCore.CMFCorePermissions import ManagePortal
 from utils import _dtmldir
 
 class RegistrationTool(BaseTool):
-
     """ Manage through-the-web signup policies.
     """
 
     __implements__ = BaseTool.__implements__
 
     meta_type = 'Default Registration Tool'
-
-    _actions = [ ActionInformation( id='join'
+    _actions = ( ActionInformation( id='join'
                                   , title='Join'
                                   , description='Click here to Join'
                                   , action=Expression(
@@ -48,7 +45,9 @@ class RegistrationTool(BaseTool):
                                   , category='user'
                                   , condition=Expression(text='not: member')
                                   , visible=1
-                                  ) ]
+                                  )
+               ,
+               )
 
     security = ClassSecurityInfo()
 

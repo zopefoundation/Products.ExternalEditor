@@ -1,7 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2001-2003 Zope Corporation and Contributors.
-# All Rights Reserved.
+# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
@@ -47,10 +46,8 @@ class SyndicationTool (UniqueObject, SimpleItem, ActionProviderBase):
     __implements__ = ActionProviderBase.__implements__
 
     id = 'portal_syndication'
-
     meta_type = 'Default Syndication Tool'
-
-    _actions = [ ActionInformation(
+    _actions = ( ActionInformation(
                     id='syndication'
                   , title='Syndication'
                   , action=Expression(
@@ -61,10 +58,9 @@ class SyndicationTool (UniqueObject, SimpleItem, ActionProviderBase):
                   , category='folder'
                   , visible=1
                   )
-               ]
+               ,
+               )
 
-    security = ClassSecurityInfo()
-    
     #Default Sitewide Values
     isAllowed = 0
     syUpdatePeriod = 'daily'
@@ -72,6 +68,8 @@ class SyndicationTool (UniqueObject, SimpleItem, ActionProviderBase):
     syUpdateBase = DateTime()
     max_items = 15
 
+    security = ClassSecurityInfo()
+    
     #ZMI Methods
     manage_options = ( ActionProviderBase.manage_options
                      + ( { 'label'  : 'Overview'
