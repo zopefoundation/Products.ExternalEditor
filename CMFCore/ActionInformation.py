@@ -19,14 +19,14 @@ from AccessControl import ClassSecurityInfo
 from Globals import InitializeClass
 from Globals import DTMLFile
 from Acquisition import aq_inner, aq_parent
+from OFS.SimpleItem import SimpleItem
 
 from CMFCorePermissions import View
 from CMFCorePermissions import ManagePortal
-from utils import SimpleItemWithProperties
 from utils import _dtmldir
 from utils import getToolByName
 
-class ActionInformation( SimpleItemWithProperties ):
+class ActionInformation( SimpleItem ):
 
     """ Represent a single selectable action.
     
@@ -36,49 +36,7 @@ class ActionInformation( SimpleItemWithProperties ):
     _isActionInformation = 1
     __allow_access_to_unprotected_subobjects__ = 1
 
-    manage_options = ( SimpleItemWithProperties.manage_options[:1]
-                     + ( { 'label': 'Actions'
-                         , 'action': 'manage_editActionsForm'
-                         }
-                       ,
-                       )
-                     + SimpleItemWithProperties.manage_options[1:]
-                     )
     security = ClassSecurityInfo()
-    security.declareProtected( ManagePortal
-                             , 'manage_editProperties'
-                             , 'manage_changeProperties'
-                             , 'manage_propertiesForm'
-                             )
-
-    _basic_properties = ( { 'id'    : 'title'
-                          , 'type'  : 'string'
-                          , 'mode'  : 'w'
-                          , 'label' : 'Title'
-                          }
-                        , { 'id'    : 'description'
-                          , 'type'  : 'text'
-                          , 'mode'  : 'w'
-                          , 'label' : 'Description'
-                          }
-                        , { 'id'    : 'category'
-                          , 'type'  : 'string'
-                          , 'mode'  : 'w'
-                          , 'label' : 'Category'
-                          }
-                        , { 'id'    : 'priority'
-                          , 'type'  : 'boolean'
-                          , 'mode'  :  'w'
-                          , 'label' : 'Priority'
-                          }
-                        )
-    title = ''
-    description = ''
-    category = ''
-    priority = 0
-    visible = 1
-    action = ''
-    condition = ''
 
     def __init__( self
                 , id
