@@ -122,7 +122,7 @@ class ContentTypeRegistryTests( unittest.TestCase ):
         reg = ContentTypeRegistry()
         predIDs = ( 'foo', 'bar', 'baz', 'qux' )
         for predID in predIDs:
-            reg.addPredicate( predID, 'name' )
+            reg.addPredicate( predID, 'name_regex' )
         ids = tuple( map( lambda x: x[0], reg.listPredicates() ) )
         assert ids == predIDs
         reg.reorderPredicate( 'bar', 3 )
@@ -131,7 +131,7 @@ class ContentTypeRegistryTests( unittest.TestCase ):
 
     def test_lookup( self ):
         reg = ContentTypeRegistry()
-        reg.addPredicate( 'onlyfoo', 'name' )
+        reg.addPredicate( 'onlyfoo', 'name_regex' )
         reg.getPredicate( 'onlyfoo' ).edit( 'foo' )
         reg.assignTypeName( 'onlyfoo', 'Foo' )
         assert reg.findTypeName( 'foo', 'text/plain', 'asdfljksadf' ) == 'Foo'

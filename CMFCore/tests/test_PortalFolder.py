@@ -3,6 +3,7 @@ import unittest
 import re, new
 import OFS.Folder, OFS.SimpleItem
 from AccessControl import SecurityManager
+from Products.CMFCore.TypesTool import TypesTool
 from Products.CMFCore.CatalogTool import CatalogTool
 from Products.CMFCore.PortalContent import PortalContent
 from Products.CMFCore.PortalFolder import *
@@ -108,6 +109,9 @@ class PortalFolderTests( unittest.TestCase ):
         self.root._setObject( 'test', PortalFolder( 'test', '' ) )
         test = self.root.test
 
+        self.root._setObject( 'portal_types', TypesTool() )
+        types_tool = self.root.portal_types
+
         self.root._setObject( 'portal_catalog', CatalogTool() )
         catalog = self.root.portal_catalog
         assert len( catalog ) == 0
@@ -134,6 +138,9 @@ class PortalFolderTests( unittest.TestCase ):
         #
         self.root._setObject( 'test', PortalFolder( 'test', '' ) )
         test = self.root.test
+
+        self.root._setObject( 'portal_types', TypesTool() )
+        types_tool = self.root.portal_types
 
         self.root._setObject( 'portal_catalog', CatalogTool() )
         catalog = self.root.portal_catalog
