@@ -1,5 +1,11 @@
-import unittest
+from unittest import TestCase, TestSuite, makeSuite, main
+
 import Zope
+try:
+    Zope.startup()
+except AttributeError:
+    # for Zope versions before 2.6.1
+    pass
 try:
     from Interface.Verify import verifyClass
 except ImportError:
@@ -94,7 +100,7 @@ class TypesToolTests( SecurityRequestTest ):
         verifyClass(IActionProvider, TypesTool)
 
 
-class TypeInfoTests( unittest.TestCase ):
+class TypeInfoTests(TestCase):
     
     def test_construction( self ):
         ti = self._makeInstance( 'Foo'
@@ -169,13 +175,13 @@ class TypeInfoTests( unittest.TestCase ):
     ACTION_LIST = \
     ( { 'id'            : 'view'
       , 'name'          : 'View'
-      , 'action'        : 'string:foo_view'
+      , 'action'        : 'string:'
       , 'permissions'   : ( 'View', )
       , 'category'      : 'object'
       , 'visible'       : 1
       }
     , { 'name'          : 'Edit'                # Note: No ID passed
-      , 'action'        : 'string:foo_edit'
+      , 'action'        : 'string:${object_url}/foo_edit'
       , 'permissions'   : ( 'Modify', )
       , 'category'      : 'object'
       , 'visible'       : 1
@@ -235,7 +241,7 @@ class TypeInfoTests( unittest.TestCase ):
         self.assertRaises( ValueError, ti.getActionById, 'foo' )
         
         action = ti.getActionById( 'view' )
-        self.assertEqual( action, 'foo_view' )
+        self.assertEqual( action, '' )
         
         action = ti.getActionById( 'edit' )
         self.assertEqual( action, 'foo_edit' )
@@ -269,7 +275,8 @@ class TypeInfoTests( unittest.TestCase ):
         self.failUnless( isinstance( action, ActionInformation ) )
         self.assertEqual( action.getId(), 'bar' )
         self.assertEqual( action.Title(), 'Bar' )
-        self.assertEqual( action.getActionExpression(), 'string:bar_action' )
+        self.assertEqual( action.getActionExpression(),
+                          'string:${object_url}/bar_action' )
         self.assertEqual( action.getCondition(), '' )
         self.assertEqual( action.getPermissions(), ( 'Bar permission', ) )
         self.assertEqual( action.getCategory(), 'baz' )
@@ -326,7 +333,7 @@ class STIDataTests( TypeInfoTests ):
         verifyClass(ITypeInformation, STI)
         
 
-class FTIConstructionTests( unittest.TestCase ):
+class FTIConstructionTests(TestCase):
 
     def setUp( self ):
         noSecurityManager()
@@ -370,7 +377,7 @@ class FTIConstructionTests( unittest.TestCase ):
 
         self.failIf( ti.isConstructionAllowed( folder ) )
 
-class FTIConstructionTests_w_Roles( unittest.TestCase ):
+class FTIConstructionTests_w_Roles(TestCase):
 
     def tearDown( self ):
         noSecurityManager()
@@ -464,13 +471,13 @@ class FTIConstructionTests_w_Roles( unittest.TestCase ):
 
 
 def test_suite():
-    return unittest.TestSuite((
-        unittest.makeSuite(TypesToolTests),
-        unittest.makeSuite(FTIDataTests),
-        unittest.makeSuite(STIDataTests),
-        unittest.makeSuite(FTIConstructionTests),
-        unittest.makeSuite(FTIConstructionTests_w_Roles),
+    return TestSuite((
+        makeSuite(TypesToolTests),
+        makeSuite(FTIDataTests),
+        makeSuite(STIDataTests),
+        makeSuite(FTIConstructionTests),
+        makeSuite(FTIConstructionTests_w_Roles),
         ))
 
 if __name__ == '__main__':
-    unittest.main(defaultTest='test_suite')
+    main(defaultTest='test_suite')

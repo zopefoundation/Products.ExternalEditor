@@ -1,20 +1,20 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
- 
-"""
-This module implements a portal-managed File class.  It is based on
+""" This module implements a portal-managed File class.  It is based on
 Zope's built-in File object, but modifies the behaviour slightly to
 make it more Portal-friendly.
+
+$Id$
 """
 
 from Globals import InitializeClass
@@ -40,22 +40,22 @@ File objects can contain arbitrary downloadable files.
   , 'immediate_view' : 'metadata_edit_form'
   , 'actions'        : ( { 'id'            : 'view'
                          , 'name'          : 'View'
-                         , 'action'        : 'string:file_view'
+                         , 'action': 'string:${object_url}/file_view'
                          , 'permissions'   : (View,)
                          }
                        , { 'id'            : 'download'
                          , 'name'          : 'Download'
-                         , 'action'        : 'string:'
+                         , 'action': 'string:${object_url}'
                          , 'permissions'   : (View,)
                          }
                        , { 'id'            : 'edit'
                          , 'name'          : 'Edit'
-                         , 'action'        : 'string:file_edit_form'
+                         , 'action': 'string:${object_url}/file_edit_form'
                          , 'permissions'   : (ModifyPortalContent,)
                          }
                        , { 'id'            : 'metadata'
                          , 'name'          : 'Metadata'
-                         , 'action'        : 'string:metadata_edit_form'
+                         , 'action': 'string:${object_url}/metadata_edit_form'
                          , 'permissions'   : (ModifyPortalContent,)
                          }
                        )

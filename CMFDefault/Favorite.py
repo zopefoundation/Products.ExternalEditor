@@ -1,21 +1,20 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
-""" Favorites are references to other objects within the same CMF site..
+""" Favorites are references to other objects within the same CMF site.
 
 $Id$
 """
 
-import string
 import urlparse
 
 from Globals import InitializeClass
@@ -39,17 +38,17 @@ A Favorite is a Link to an intra-portal resource.
   , 'immediate_view' : 'metadata_edit_form'
   , 'actions'        : ( { 'id'            : 'view'
                          , 'name'          : 'View'
-                         , 'action'        : 'string:favorite_view'
+                         , 'action': 'string:${object_url}/favorite_view'
                          , 'permissions'   : ( View, )
                          }
                        , { 'id'            : 'edit'
                          , 'name'          : 'Edit'
-                         , 'action'        : 'string:link_edit_form'
+                         , 'action': 'string:${object_url}/link_edit_form'
                          , 'permissions'   : ( ModifyPortalContent, )
                          }
                        , { 'id'            : 'metadata'
                          , 'name'          : 'Metadata'
-                         , 'action'        : 'string:metadata_edit_form'
+                         , 'action': 'string:${object_url}/metadata_edit_form'
                          , 'permissions'   : ( ModifyPortalContent, )
                          }
                        )
@@ -137,7 +136,7 @@ class Favorite( Link ):
             remote_url=urlparse.urlunparse(t)
         # if URL begins with site URL, remove site URL
         portal_url = getToolByName(self, 'portal_url').getPortalPath()
-        i=string.find(remote_url, portal_url)
+        i = remote_url.find(portal_url)
         if i==0:
             remote_url=remote_url[len(portal_url):]
         # if site is still absolute, make it relative

@@ -37,21 +37,23 @@ factory_type_information = (
          'factory': None,               # So not included in 'New' add form
          'allowed_content_types': None,
          'immediate_view': 'collector_transcript_view',
-         'actions': ({'id': 'view',
-                      'name': 'View',
-                      'action': '../',
-                      'permissions': (CMFCorePermissions.View,)},
-                     {'id': 'addcomment',
-                      'name': 'Add Comment',
-                      'action': 'string:collector_transcript_comment_form',
-                      'permissions':
-                      (CollectorPermissions.AddCollectorIssueFollowup,)},
-                     {'id': 'edittranscript',
-                      'name': 'Edit Transcript',
-                      'action': 'string:collector_transcript_edit_form',
-                      'permissions':
-                      (CollectorPermissions.EditCollectorIssue,)},
-                     ),
+         'actions': (
+               { 'id': 'view',
+                 'name': 'View',
+                 'action': 'string:${object_url}/../',
+                 'permissions': (CMFCorePermissions.View,) },
+               { 'id': 'addcomment',
+                 'name': 'Add Comment',
+                 'action':
+                     'string:${object_url}/collector_transcript_comment_form',
+                 'permissions':
+                          (CollectorPermissions.AddCollectorIssueFollowup,) },
+               { 'id': 'edittranscript',
+                 'name': 'Edit Transcript',
+                 'action':
+                        'string:${object_url}/collector_transcript_edit_form',
+                 'permissions': (CollectorPermissions.EditCollectorIssue,) },
+             ),
          },
         )
      )

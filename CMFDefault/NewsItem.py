@@ -1,16 +1,18 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
-"""
+""" News content object.
+
+$Id$
 """
 
 from Globals import InitializeClass
@@ -35,17 +37,17 @@ an optional description.
   , 'immediate_view' : 'metadata_edit_form'
   , 'actions'        : ( { 'id'            : 'view'
                          , 'name'          : 'View'
-                         , 'action'        : 'string:newsitem_view'
+                         , 'action': 'string:${object_url}/newsitem_view'
                          , 'permissions'   : (View,)
                          }
                        , { 'id'            : 'edit'
                          , 'name'          : 'Edit'
-                         , 'action'        : 'string:newsitem_edit_form'
+                         , 'action': 'string:${object_url}/newsitem_edit_form'
                          , 'permissions'   : (ModifyPortalContent,)
                          }
                        , { 'id'            : 'metadata'
                          , 'name'          : 'Metadata'
-                         , 'action'        : 'string:metadata_edit_form'
+                         , 'action': 'string:${object_url}/metadata_edit_form'
                          , 'permissions'   : (ModifyPortalContent,)
                          }
                        )

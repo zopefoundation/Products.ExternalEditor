@@ -1,21 +1,20 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """ Event: A CMF-enabled Event object.
 
 $Id$
 """
 
-import os, urllib
 from DateTime import DateTime
 from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
@@ -44,11 +43,11 @@ factory_type_information = (
      'immediate_view': 'event_edit_form',
      'actions': ({'id': 'view',
                   'name': 'View',
-                  'action': 'string:event_view',
+                  'action': 'string:${object_url}/event_view',
                   'permissions': (View,)},
                  {'id': 'edit',
                   'name': 'Edit',
-                  'action': 'string:event_edit_form',
+                  'action': 'string:${object_url}/event_edit_form',
                   'permissions': (EventPermissions.ChangeEvents,)},
                  ),                     # End Actions
      },

@@ -1,21 +1,20 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """ Link instances represent explicit links-as-content.
 
 $Id$
 """
 
-import string
 import urlparse
 
 from Globals import InitializeClass, DTMLFile
@@ -43,17 +42,17 @@ Link items are annotated URLs.
   , 'immediate_view' : 'metadata_edit_form'
   , 'actions'        : ( { 'id'            : 'view'
                          , 'name'          : 'View'
-                         , 'action'        : 'string:link_view'
+                         , 'action': 'string:${object_url}/link_view'
                          , 'permissions'   : (View,)
                          }
                        , { 'id'            : 'edit'
                          , 'name'          : 'Edit'
-                         , 'action'        : 'string:link_edit_form'
+                         , 'action': 'string:${object_url}/link_edit_form'
                          , 'permissions'   : (ModifyPortalContent,)
                          }
                        , { 'id'            : 'metadata'
                          , 'name'          : 'Metadata'
-                         , 'action'        : 'string:metadata_edit_form'
+                         , 'action': 'string:${object_url}/metadata_edit_form'
                          , 'permissions'   : (ModifyPortalContent,)
                          }
                        )
@@ -169,7 +168,7 @@ class Link( PortalContent
     def _writeFromPUT( self, body ):
         headers = {}
         headers, body = parseHeadersBody(body, headers)
-        lines = string.split( body, '\n' )
+        lines = body.split('\n')
         self.edit( lines[0] )
         headers['Format'] = self.URL_FORMAT
         new_subject = keywordsplitter(headers)
@@ -214,8 +213,6 @@ class Link( PortalContent
         """
             Get the link as text for WebDAV src / FTP download.
         """
-        join = string.join
-        lower = string.lower
         hdrlist = self.getMetadataHeaders()
         hdrtext = formatRFC822Headers( hdrlist )
         bodytext = '%s\n\n%s' % ( hdrtext, self.getRemoteUrl() )

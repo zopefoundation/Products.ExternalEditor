@@ -48,7 +48,7 @@ They should *not* be addable through the standard 'folder_factories' interface.
   , 'immediate_view' : ''
   , 'actions'        : ( { 'id'            : 'view'
                          , 'name'          : 'View'
-                         , 'action'        : 'string:discussionitem_view'
+                         , 'action': 'string:${object_url}/discussionitem_view'
                          , 'permissions'   : (View,)
                          }
                        ,

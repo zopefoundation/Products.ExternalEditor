@@ -5,17 +5,17 @@
 
 <p> This tool assembles the "actions" which are germane to the current
     user (anonymous, member, etc.) and context (content object or folder
-    being viewed).  These actions are drawn from several sources:
+    being viewed).  These actions are drawn from several optional sources:
 
     <ul>
-      <li> the actions tool itself, for "global" actions (optional);</li>
+      <li> the actions tool itself, for "global" actions;</li>
       <li> the workflow tool, for actions which depend on the
-           workflow state of the content object (optional);</li>
+           workflow state of the content object;</li>
       <li> the membership tool, for actions which depend on the
-           member or user (optional);</li>
+           member or user;</li>
       <li> the types tool, for actions which are specific to a given
-           content type (hardwired);</li>
-      <li> other action providers (optional).</li>
+           content type;</li>
+      <li> other action providers.</li>
     </ul>
 
 </p>

@@ -71,13 +71,13 @@ you navigate efficiently.
   , 'immediate_view' : 'workspace_view'
   , 'actions'        : ( { 'id'            : 'view'
                          , 'name'          : 'Workspace'
-                         , 'action'        : 'string:workspace_view'
+                         , 'action': 'string:${object_url}/workspace_view'
                          , 'permissions'   : (View,)
                          , 'category'      : 'object'
                          }
                        , { 'id'            : 'metadata'
                          , 'name'          : 'Metadata'
-                         , 'action'        : 'string:metadata_edit_form'
+                         , 'action': 'string:${object_url}/metadata_edit_form'
                          , 'permissions'   : (View,)
                          , 'category'      : 'object'
                          }

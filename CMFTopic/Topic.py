@@ -1,14 +1,14 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """ Topic: Canned catalog queries
 
@@ -21,45 +21,44 @@ from Products.CMFCore.CMFCorePermissions import View
 from Products.CMFCore.utils import _checkPermission, _getViewFor,getToolByName
 from Products.CMFCore.PortalFolder import PortalFolder
 
-from Globals import HTMLFile, package_home, InitializeClass
+from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
 from Acquisition import aq_parent, aq_inner, aq_base
-from ComputedAttribute import ComputedAttribute
 
-import os
 
 # Factory type information -- makes Topic objects play nicely
 # with the Types Tool (portal_types )
 factory_type_information = (
-  { 'id'                : 'Topic'
-  , 'content_icon'      : 'topic_icon.gif'
-  , 'meta_type'         : 'Portal Topic'
-  , 'description'       : 'Topics are canned queries for organizing content '
-                          'with up to date queries into the catalog.'
-  , 'product'           : 'CMFTopic'
-  , 'factory'           : 'addTopic'
-  , 'immediate_view'    : 'topic_edit_form'
-  , 'actions'           : ( { 'id'            : 'view'
-                            , 'name'          : 'View'
-                            , 'action'        : 'string:topic_view'
-                            , 'permissions'   : (View,)
-                            }
-                          , { 'id'            : 'edit'
-                            , 'name'          : 'Edit'
-                            , 'action'        : 'string:topic_edit_form'
-                            , 'permissions'   : (ChangeTopics,)
-                            }
-                          , { 'id'            : 'criteria'
-                            , 'name'          : 'Criteria'
-                            , 'action'        : 'string:topic_criteria_form'
-                            , 'permissions'   : (ChangeTopics,)
-                            }
-                          , { 'id'            : 'subtopics'
-                            , 'name'          : 'Subtopics'
-                            , 'action'        : 'string:topic_subtopics_form'
-                            , 'permissions'   : (ChangeTopics,)
-                            }
-                          )
+  { 'id'             : 'Topic'
+  , 'content_icon'   : 'topic_icon.gif'
+  , 'meta_type'      : 'Portal Topic'
+  , 'description'    : 'Topics are canned queries for organizing content '
+                       'with up to date queries into the catalog.'
+  , 'product'        : 'CMFTopic'
+  , 'factory'        : 'addTopic'
+  , 'immediate_view' : 'topic_edit_form'
+  , 'actions'        : ( { 'id'            : 'view'
+                         , 'name'          : 'View'
+                         , 'action': 'string:${object_url}/topic_view'
+                         , 'permissions'   : (View,)
+                         }
+                       , { 'id'            : 'edit'
+                         , 'name'          : 'Edit'
+                         , 'action': 'string:${object_url}/topic_edit_form'
+                         , 'permissions'   : (ChangeTopics,)
+                         }
+                       , { 'id'            : 'criteria'
+                         , 'name'          : 'Criteria'
+                         , 'action': 'string:${object_url}/topic_criteria_form'
+                         , 'permissions'   : (ChangeTopics,)
+                         }
+                       , { 'id'            : 'subtopics'
+                         , 'name'          : 'Subtopics'
+                         , 'action':
+                                   'string:${object_url}/topic_subtopics_form'
+                         , 'permissions'   : (ChangeTopics,)
+                         }
+                       )
   }
 ,
 )

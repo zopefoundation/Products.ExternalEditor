@@ -1,27 +1,26 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
-"""
-    Allow the "view" of a folder to be skinned by type.
+""" Allow the "view" of a folder to be skinned by type.
+
+$Id$
 """
 
 from Products.CMFCore.PortalFolder import PortalFolder
-from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.CMFCorePermissions import View
 from Products.CMFCore.CMFCorePermissions import ManageProperties
 from Products.CMFCore.CMFCorePermissions import ListFolderContents
-from AccessControl import ClassSecurityInfo, Owned
+from AccessControl import ClassSecurityInfo
 from Globals import InitializeClass
-from ComputedAttribute import ComputedAttribute
 from Products.CMFCore.utils import _getViewFor
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
 from Acquisition import aq_base
@@ -39,19 +38,19 @@ Skinned folders can define custom 'view' actions.
   , 'immediate_view' : 'folder_edit_form'
   , 'actions'        : ( { 'id'            : 'view' 
                          , 'name'          : 'View'
-                         , 'action'        : 'string:folder_view'
+                         , 'action': 'string:${object_url}/folder_view'
                          , 'permissions'   : (View,)
                          , 'category'      : 'folder'
                          }
                        , { 'id'            : 'edit'
                          , 'name'          : 'Edit'
-                         , 'action'        : 'string:folder_edit_form'
+                         , 'action': 'string:${object_url}/folder_edit_form'
                          , 'permissions'   : (ManageProperties,)
                          , 'category'      : 'folder'
                          }
                        , { 'id'            : 'foldercontents'
                          , 'name'          : 'Folder contents'
-                         , 'action'        : 'string:folder_contents'
+                         , 'action': 'string:${object_url}/folder_contents'
                          , 'permissions'   : (ListFolderContents,)
                          , 'category'      : 'folder'
                          }

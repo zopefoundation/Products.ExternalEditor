@@ -252,16 +252,22 @@ class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
             Return the URL of the action whose ID is id.
         """
         context = getActionContext( self )
-        for action in self.listActions() or ():
+        for action in self.listActions():
 
             __traceback_info__ = (self.getId(), action)
 
             if action.getId() == id:
-                return action.action( context )
+                target = action.action(context).strip()
+                if target.startswith('/'):
+                    target = target[1:]
+                return target
             else:
                 # Temporary backward compatibility.
                 if action.Title().lower() == id:
-                    return action.action( context )
+                    target = action.action(context).strip()
+                    if target.startswith('/'):
+                        target = target[1:]
+                    return target
 
         if default is _marker:
             raise ValueError, ('No action "%s" for type "%s"'
@@ -274,39 +280,24 @@ class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
         """
             Upgrade dictionary-based actions.
         """
-        if not self._actions:
-            return
+        aa, self._actions = self._actions, ()
 
-        if type( self._actions[0] ) == type( {} ):
+        for action in aa:
 
-            aa, self._actions = self._actions, ()
+            # XXX:  historically, action['action'] is simple string
+            actiontext = action.get('action')
+            if actiontext:
+                actiontext = '/' + actiontext
 
-            for action in aa:
-
-                # XXX:  historically, action['action'] is simple string
-
-                self.addAction( id=action['id']
-                            , name=action['name']
-                            , action='string:%s' % action.get( 'action' )
-                            , condition=action.get( 'condition' )
-                            , permission=action.get('permissions', () )
-                            , category=action.get( 'category', 'object' )
-                            , visible=action.get( 'visible', 1 )
-                            )
-        else:
-
-            new_actions = []
-            for clone in self._cloneActions():
-
-                a_expr = clone.getActionExpression()
-
-                # XXX heuristic, may miss
-                if a_expr and ':' not in a_expr and '/' not in a_expr:
-                    clone.action = Expression( 'string:%s' % a_expr )
-
-                new_actions.append( clone )
-
-            self._actions = tuple( new_actions )
+            self.addAction(
+                  id=action['id']
+                , name=action['name']
+                , action='string:${object_url}%s' % actiontext
+                , condition=action.get('condition')
+                , permission=action.get( 'permissions', () )
+                , category=action.get('category', 'object')
+                , visible=action.get('visible', 1)
+                )
 
     security.declarePrivate('_finishConstruction')
     def _finishConstruction(self, ob):

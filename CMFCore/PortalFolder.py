@@ -1,14 +1,14 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """ PortalFolder: CMF-enabled Folder objects.
 
@@ -43,19 +43,20 @@ factory_type_information = (
   , 'immediate_view' : 'folder_edit_form'
   , 'actions'        : ( { 'id'            : 'view'
                          , 'name'          : 'View'
-                         , 'action'        : 'string:'
+                         , 'action': 'string:${object_url}'
                          , 'permissions'   : (View,)
                          , 'category'      : 'folder'
                          }
                        , { 'id'            : 'edit'
                          , 'name'          : 'Edit'
-                         , 'action'        : 'string:folder_edit_form'
+                         , 'action': 'string:${object_url}/folder_edit_form'
                          , 'permissions'   : (ManageProperties,)
                          , 'category'      : 'folder'
                          }
                        , { 'id'            : 'localroles'
                          , 'name'          : 'Local Roles'
-                         , 'action'        : 'string:folder_localrole_form'
+                         , 'action':
+                                  'string:${object_url}/folder_localrole_form'
                          , 'permissions'   : (ManageProperties,)
                          , 'category'      : 'folder'
                          }

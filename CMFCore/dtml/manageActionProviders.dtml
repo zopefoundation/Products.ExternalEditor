@@ -13,9 +13,7 @@
 </dtml-let>
 <dtml-var manage_tabs>
 
-<p>Content type specific actions of portal_types are always queried by this
-    tool. The usage of other action providers and of portal_types' global
-    actions is configurable here.</p>
+<p>The list of action providers queried by this tool is configurable here.</p>
 
 <form action="manage_aproviders" method="POST">
 <table>

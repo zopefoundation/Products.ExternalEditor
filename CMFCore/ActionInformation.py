@@ -133,7 +133,7 @@ class ActionInformation( SimpleItem ):
         expr = action and action.text or ''
         if expr and type( expr ) is StringType:
             if not expr.startswith('python:') and not expr.startswith('string:'):
-                expr = 'string:%s' % expr
+                expr = 'string:${object_url}/%s' % expr
                 self.action = Expression( expr )
         return expr
 
@@ -141,7 +141,7 @@ class ActionInformation( SimpleItem ):
     def setActionExpression(self, action):
         if action and type( action ) is StringType:
             if not action.startswith('python:')  and not action.startswith('string:'):
-                action = 'string:%s' % action
+                action = 'string:${object_url}/%s' % action
                 action = Expression( action )
         self.action = action
 

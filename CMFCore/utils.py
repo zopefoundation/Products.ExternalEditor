@@ -154,10 +154,11 @@ def _getViewFor(obj, view='view'):
         actions = ti.listActions()
 
         for action in actions:
-
             if action.getId() == view:
                 if _verifyActionPermissions( obj, action ):
-                    target = action.action( context )
+                    target = action.action(context).strip()
+                    if target.startswith('/'):
+                        target = target[1:]
                     __traceback_info__ = ( ti.getId(), target )
                     return obj.restrictedTraverse( target )
 
@@ -165,7 +166,9 @@ def _getViewFor(obj, view='view'):
         # Find something that's allowed.
         for action in actions:
             if _verifyActionPermissions(obj, action):
-                target = action.action( context )
+                target = action.action(context).strip()
+                if target.startswith('/'):
+                    target = target[1:]
                 __traceback_info__ = ( ti.getId(), target )
                 return obj.restrictedTraverse( target )
 

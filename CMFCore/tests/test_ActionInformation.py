@@ -1,5 +1,11 @@
-import Zope
 from unittest import TestSuite, makeSuite, main
+
+import Zope
+try:
+    Zope.startup()
+except AttributeError:
+    # for Zope versions before 2.6.1
+    pass
 
 from Products.CMFCore.tests.base.testcase import \
      TransactionalTest
@@ -48,7 +54,7 @@ class ActionInformationTests(TransactionalTest):
         self.assertEqual(ai.Title(), 'View')
         self.assertEqual(ai.Description(), '')
         self.assertEqual(ai.getCondition(), 'member')
-        self.assertEqual(ai.getActionExpression(), 'string:view')
+        self.assertEqual(ai.getActionExpression(), 'string:${object_url}/view')
         self.assertEqual(ai.getVisibility(), 0)
         self.assertEqual(ai.getCategory(), 'global')
         self.assertEqual(ai.getPermissions(), ())

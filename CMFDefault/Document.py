@@ -44,17 +44,17 @@ They may also contain HTML, or "plain" text.
   , 'immediate_view' : 'metadata_edit_form'
   , 'actions'        : ( { 'id'            : 'view' 
                          , 'name'          : 'View'
-                         , 'action'        : 'string:document_view'
+                         , 'action': 'string:${object_url}/document_view'
                          , 'permissions'   : (View,)
                          }
                        , { 'id'            : 'edit'
                          , 'name'          : 'Edit'
-                         , 'action'        : 'string:document_edit_form'
+                         , 'action': 'string:${object_url}/document_edit_form'
                          , 'permissions'   : (ModifyPortalContent,)
                          }
                        , { 'id'            : 'metadata'
                          , 'name'          : 'Metadata'
-                         , 'action'        : 'string:metadata_edit_form'
+                         , 'action': 'string:${object_url}/metadata_edit_form'
                          , 'permissions'   : (ModifyPortalContent,)
                          }
                        )
