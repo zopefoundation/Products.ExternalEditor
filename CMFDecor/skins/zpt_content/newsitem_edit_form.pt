@@ -37,7 +37,8 @@
  <tr>
   <th> <br> 
   <td>
-   <input type="submit" value=" Change ">
+   <input type="submit" name="choice" value=" Change ">
+   <input type="submit" name="choice" value=" Change and View ">
   </td>
  </tr>
 </table>

@@ -35,7 +35,9 @@
 
  <tr>
   <td> <br> </td>
-  <td><input type="submit" name="submit" value=" Change " /></td>
+  <td><input type="submit" name="choice" value=" Change " />
+      <input type="submit" name="choice" value=" Change and View ">
+  </td>
  </tr>
 
 </table>
