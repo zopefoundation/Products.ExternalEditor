@@ -47,6 +47,10 @@ CMF 1.3 beta2 (2002/06/30)
 
   Bugs Fixed
 
+    - Fixed CatalogTool to create a meta_type index; this is needed now
+      that ZCatalog doesn't create any default indexes when
+      instantiated.
+
     - Fixed recent_news to use 'Title' instead of 'title' to display the
       title of each news ('title' isn't indexed anymore).
 

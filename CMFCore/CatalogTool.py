@@ -121,6 +121,7 @@ class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
                , ('allowedRolesAndUsers', 'KeywordIndex')
                , ('review_state', 'FieldIndex')
                , ('in_reply_to', 'FieldIndex')
+               , ('meta_type', 'FieldIndex')
                )
     
     security.declarePublic( 'enumerateColumns' )
