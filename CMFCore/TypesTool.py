@@ -475,15 +475,25 @@ class FactoryTypeInformation (TypeInformation):
         raise AccessControl_Unauthorized( 'Cannot create %s' % self.getId() )
 
     def _queryFactoryMethod(self, container, default=None):
-        if not self.product or not self.factory:
+
+        if not self.product or not self.factory or container is None:
             return default
+
+        # In case we aren't wrapped.
+        dispatcher = getattr(container, 'manage_addProduct', None)
+
+        if dispatcher is None:
+            return default
+
         try:
-            p = container.manage_addProduct[self.product]
+            p = dispatcher[self.product]
         except AttributeError:
             LOG('Types Tool', ERROR, '_queryFactoryMethod raised an exception',
                 error=exc_info())
             return default
+
         m = getattr(p, self.factory, None)
+
         if m:
             try:
                 # validate() can either raise Unauthorized or return 0 to
@@ -492,6 +502,7 @@ class FactoryTypeInformation (TypeInformation):
                     return m
             except zExceptions_Unauthorized:  # Catch *all* Unauths!
                 pass
+
         return default
 
     security.declarePublic('isConstructionAllowed')
