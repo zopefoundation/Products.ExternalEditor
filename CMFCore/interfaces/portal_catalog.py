@@ -89,43 +89,39 @@ $Id$
 __version__='$Revision$'[11:-2]
 
 
-try:
-    from Interface import *
-except:
-    def Attribute( name, value ): pass
-    class Base: ' '
+from Interface import Attribute, Base
 
-class portal_catalog (Base):
+class portal_catalog():
     '''This tool interacts with a customized ZCatalog.
     '''
     id = Attribute('id', 'Must be set to "portal_catalog"')
 
     # searchResults inherits security assertions from ZCatalog.
-    def searchResults(self, REQUEST=None, **kw):
+    def searchResults(REQUEST=None, **kw):
         '''Calls SiteIndex.searchResults() with extra arguments that
         limit the results to what the user is allowed to see.
         '''
 
     # __call__ inherits security assertions from ZCatalog.
-    def __call__(self, REQUEST=None, **kw):
+    def __call__(REQUEST=None, **kw):
         '''Same as searchResults().'''
 
     # indexObject__roles__ = ()  # Called only by Python code.
-    def indexObject(self, object):
+    def indexObject(object):
         '''Add to catalog.
         '''
 
     # unindexObject__roles__ = ()
-    def unindexObject(self, object):
+    def unindexObject(object):
         '''Remove from catalog.
         '''
 
     # reindexObject__roles__ = ()
-    def reindexObject(self, object):
+    def reindexObject(object):
         '''Update entry in catalog.
         '''
 
     # getpath inherits security assertions from ZCatalog.
-    def getpath(self, data_record_id_):
+    def getpath(data_record_id_):
         '''Calls ZCatalog.getpath().
         '''

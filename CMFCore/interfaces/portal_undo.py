@@ -88,20 +88,15 @@ $Id$
 """
 __version__='$Revision$'[11:-2]
 
+from Interface import Attribute, Base
 
-try:
-    from Interface import *
-except:
-    def Attribute( name, value ): pass
-    class Base: ' '
-
-class portal_undo (Base):
+class portal_undo(Base):
     '''Provides access to Zope undo functions.
     '''
     id = Attribute('id', 'Must be set to "portal_undo"')
 
     # permission: 'Undo changes'
-    def listUndoableTransactionsFor(self, object,
+    def listUndoableTransactionsFor(object,
                                     first_transaction=None,
                                     last_transaction=None,
                                     PrincipiaUndoBatchSize=None):
@@ -109,6 +104,6 @@ class portal_undo (Base):
         '''
 
     # permission: 'Undo changes'
-    def undo(self, object, transaction_info):
+    def undo(object, transaction_info):
         '''Performs an undo operation.
         '''

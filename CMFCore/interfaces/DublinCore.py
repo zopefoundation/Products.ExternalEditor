@@ -82,13 +82,15 @@
 # attributions are listed in the accompanying credits file.
 # 
 ##############################################################################
-class DublinCore:
+import Interface
+
+class DublinCore(Interface.Base):
     """
         Define which Dublin Core metadata elements are supported by the PTK,
         and the semantics therof.
     """
 
-    def Title( self ):
+    def Title():
         """
             Dublin Core element - resource name
 
@@ -96,7 +98,7 @@ class DublinCore:
             Permissions: View
         """
         
-    def Creator( self ):
+    def Creator():
         """
             Dublin Core element - resource creator
 
@@ -106,7 +108,7 @@ class DublinCore:
             Permission: View
         """
 
-    def Subject( self ):
+    def Subject():
         """
             Dublin Core element - resource keywords
 
@@ -116,7 +118,7 @@ class DublinCore:
             Permission: View
         """
 
-    def Description( self ):
+    def Description():
         """
             Dublin Core element - resource summary
 
@@ -126,7 +128,7 @@ class DublinCore:
             Permissions: View
         """
 
-    def Publisher( self ):
+    def Publisher():
         """
             Dublin Core element - resource publisher
 
@@ -137,7 +139,7 @@ class DublinCore:
             Permission: View
         """
 
-    def Contributors( self ):
+    def Contributors():
         """
             Dublin Core element - resource collaborators
 
@@ -147,7 +149,7 @@ class DublinCore:
             Permission: View
         """
     
-    def Date( self ):
+    def Date():
         """
             Dublin Core element - default date
 
@@ -155,7 +157,7 @@ class DublinCore:
             Permissions: View
         """
     
-    def CreationDate( self ):
+    def CreationDate():
         """
             Dublin Core element - date resource created.
 
@@ -163,7 +165,7 @@ class DublinCore:
             Permissions: View
         """
     
-    def EffectiveDate( self ):
+    def EffectiveDate():
         """
             Dublin Core element - date resource becomes effective.
 
@@ -171,7 +173,7 @@ class DublinCore:
             Permissions: View
         """
     
-    def ExpirationDate( self ):
+    def ExpirationDate():
         """
             Dublin Core element - date resource expires.
 
@@ -179,7 +181,7 @@ class DublinCore:
             Permissions: View
         """
     
-    def ModificationDate( self ):
+    def ModificationDate():
         """
             Dublin Core element - date resource last modified.
 
@@ -187,7 +189,7 @@ class DublinCore:
             Permissions: View
         """
 
-    def Type( self ):
+    def Type():
         """
             Dublin Core element - resource type
 
@@ -198,7 +200,7 @@ class DublinCore:
             Permissions: View
         """
 
-    def Format( self ):
+    def Format():
         """
             Dublin Core element - resource format
 
@@ -209,7 +211,7 @@ class DublinCore:
             Permissions: View
         """
 
-    def Identifier( self ):
+    def Identifier():
         """
             Dublin Core element - resource ID
 
@@ -219,7 +221,7 @@ class DublinCore:
             Permissions: View
         """
 
-    def Language( self ):
+    def Language():
         """
             Dublin Core element - resource language
 
@@ -230,7 +232,7 @@ class DublinCore:
             Permissions: View
         """
 
-    def Rights( self ):
+    def Rights():
         """
             Dublin Core element - resource copyright
 
@@ -242,11 +244,11 @@ class DublinCore:
             Permissions: View
         """
 
-class CatalogableDublinCore:
+class CatalogableDublinCore(Interface.Base):
     """
         Provide Zope-internal date objects for cataloging purposes.
     """
-    def created( self ):
+    def created():
         """
             Dublin Core element - date resource created,
 
@@ -254,7 +256,7 @@ class CatalogableDublinCore:
             Permissions: View
         """
     
-    def effective( self ):
+    def effective():
         """
             Dublin Core element - date resource becomes effective,
 
@@ -262,7 +264,7 @@ class CatalogableDublinCore:
             Permissions: View
         """
     
-    def expires( self ):
+    def expires():
         """
             Dublin Core element - date resource expires,
 
@@ -270,7 +272,7 @@ class CatalogableDublinCore:
             Permissions: View
         """
     
-    def modified( self ):
+    def modified():
         """
             Dublin Core element - date resource last modified,
 
@@ -278,34 +280,34 @@ class CatalogableDublinCore:
             Permissions: View
         """
 
-class MutableDublinCore:
+class MutableDublinCore(Interface.Base):
     """
         Update interface for mutable metadata.
     """
-    def setTitle( self, title ):
+    def setTitle(title):
         "Dublin Core element - update resource name"
 
-    def setSubject( self, subject ):
+    def setSubject(subject):
         "Dublin Core element - update resource keywords"
 
-    def setDescription( self, description ):
+    def setDescription(description):
         "Dublin Core element - update resource summary"
 
-    def setContributors( self, contributors ):
+    def setContributors(contributors):
         "Dublin Core element - update additional contributors to resource"
 
-    def setEffectiveDate( self, effective_date ):
+    def setEffectiveDate(effective_date):
         """ Dublin Core element - update date resource becomes effective.  """
     
-    def setExpirationDate( self, expiration_date ):
+    def setExpirationDate(expiration_date):
         """ Dublin Core element - update date resource expires.  """
     
-    def setFormat( self, format ):
+    def setFormat(format):
         """ Dublin Core element - update resource format """
 
-    def setLanguage( self, language ):
+    def setLanguage(language):
         """ Dublin Core element - update resource language """
 
-    def setRights( self, rights ):
+    def setRights(rights):
         """ Dublin Core element - update resource copyright """
 

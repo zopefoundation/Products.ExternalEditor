@@ -89,20 +89,16 @@ $Id$
 __version__='$Revision$'[11:-2]
 
 
-try:
-    from Interface import *
-except:
-    def Attribute( name, value ): pass
-    class Base: ' '
+from Interface import Base, Attribute
 
-class portal_actions (Base):
+class portal_actions(Base):
     '''Gathers a list of links which the user is allowed to view according to
     the current context.
     '''
     id = Attribute('id', 'Must be set to "portal_actions"')
 
     # listFilteredActionsFor__roles__ = None
-    def listFilteredActionsFor(self, object):
+    def listFilteredActionsFor(object):
         '''Gets all actions available to the user and returns a mapping
         containing a list of user actions, folder actions, object actions,
         and global actions.  Each action has the following keys:
@@ -116,17 +112,17 @@ class portal_actions (Base):
         '''
 
     # listFilteredActions__roles__ = None
-    def listFilteredActions(self):
+    def listFilteredActions():
         '''Gets all actions available to the user in no particular context.
         '''
 
 
-class ActionProvider (Base):
+class ActionProvider():
     '''The interface expected of an object that can provide actions.
     '''
 
     # listActions__roles__ = ()  # No permission.
-    def listActions(self, info):
+    def listActions(info):
         '''Returns a list of mappings describing actions.  Each action
         should contain the keys "name", "url", "permissions", and
         "category", conforming to the specs outlined in

@@ -89,24 +89,20 @@ $Id$
 __version__='$Revision$'[11:-2]
 
 
-try:
-    from Interface import *
-except:
-    def Attribute( name, value ): pass
-    class Base: ' '
+from Interface import Attribute, Base
 
-class portal_discussion (Base):
+class portal_discussion(Base):
     '''Links content to discussions.
     '''
     id = Attribute('id', 'Must be set to "portal_discussion"')
 
     #getDiscussionFor__roles__ = None
-    def getDiscussionFor(self, content):
+    def getDiscussionFor(content):
         '''Gets the PortalDiscussion object that applies to content.
         '''
 
     #isDiscussionAllowedFor__roles__ = None
-    def isDiscussionAllowedFor(self, content):
+    def isDiscussionAllowedFor(content):
         '''Returns a boolean indicating whether a discussion is
         allowed for the specified content.
         '''

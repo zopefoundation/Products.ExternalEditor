@@ -90,22 +90,18 @@ __version__='$Revision$'[11:-2]
 
 
 
-try:
-    from Interface import *
-except:
-    def Attribute( name, value ): pass
-    class Base: ' '
+from Interface import Attribute, Base
 
-class ContentTypeInformation( Base ):
+class ContentTypeInformation(Base):
     """
         Registry entry interface.
     """
-    def Metatype( self ):
+    def Metatype():
         """
             Return the Zope 'meta_type' for this content object.
         """
     
-    def Type( self ):
+    def Type():
         """
             Return the "human readable" type name (note that it
             may not map exactly to the 'meta_type', e.g., for
@@ -113,54 +109,54 @@ class ContentTypeInformation( Base ):
             used twice, under different names.
         """
     
-    def Description( self ):
+    def Description():
         """
             Textual description of the class of objects (intended
             for display in a "constructor list").
         """
     
-    def isConstructionAllowed( self, container ):
+    def isConstructionAllowed(container):
         """
         Does the current user have the permission required in
         order to construct an instance?
         """
 
-    def allowType( self, contentType ):
+    def allowType(contentType):
         """
             Can objects of 'contentType' be added to containers whose
             type object we are?
         """
 
-    def constructInstance( self, container, id ):
+    def constructInstance(container, id):
         """
             Build a "bare" instance of the appropriate type in
             'container', using 'id' as its id.  Return the URL
             of its "immediate" view (typically the metadata form).
         """
 
-    def allowDiscussion( self ):
+    def allowDiscussion():
         """
             Can this type of object support discussion?
         """
 
-    def getActionById( self, id ):
+    def getActionById(id):
         """
             Return the URL of the action whose ID is id.
         """
 
-    def getIcon(self):
+    def getIcon():
         """
             Returns the portal-relative icon for this type.
         """
 
-class portal_types( Base ):
+class portal_types(Base):
     """
         Provides a configurable registry of portal content types.
     """
     id = Attribute('id', 'Must be set to "portal_types"')
 
     # getType__roles__ = None  # Public
-    def getTypeInfo( self, contentType ):
+    def getTypeInfo(contentType):
         """
             Return an instance which implements the
             ContentTypeInformation interface, corresponding to
@@ -170,7 +166,7 @@ class portal_types( Base ):
         """
 
     # listTypeInfo__roles__ = None  # Public
-    def listTypeInfo( self, container=None ):
+    def listTypeInfo(container=None):
         """
             Return a sequence of instances which implement the
             ContentTypeInformation interface, one for each content
@@ -179,7 +175,7 @@ class portal_types( Base ):
             the user's permissions.
         """
 
-    def listContentTypes( self, container=None, by_metatype=0 ):
+    def listContentTypes(container=None, by_metatype=0):
         """
             Return list of content types, or the equivalent
             metatypes;  if 'container' is passed, then filter
@@ -187,7 +183,7 @@ class portal_types( Base ):
             'container'.
         """
     
-    def constructContent( self, contentType, container, id ):
+    def constructContent(contentType, container, id):
         """
             Build an instance of the appropriate content class in
             'container', using 'id'.

@@ -82,7 +82,9 @@
 # attributions are listed in the accompanying credits file.
 # 
 ##############################################################################
-class Contentish:
+import Interface
+
+class Contentish(Interface.Base):
     """
     General interface for "contentish" items.
 
@@ -92,7 +94,7 @@ class Contentish:
     PortalContent implements this interface.
     """
     
-    def getIcon(self, relative_to_portal=0):
+    def getIcon(relative_to_portal=0):
         """
         This method returns the path to an object's icon. It is used 
         in the folder_contents view to generate an appropriate icon 
@@ -107,7 +109,7 @@ class Contentish:
         return it as an absolute URL.
         """
 
-    def listActions(self):
+    def listActions():
         """
         listAction returns a tuple containing dictionaries that describe 
         a specific "action". An "action" shows up as a link in the PTK
@@ -119,7 +121,7 @@ class Contentish:
         content object.
         """
 
-    def SearchableText(self):
+    def SearchableText():
         """
         SearchableText is called to provide the Catalog with textual 
         information about your object. It is a string usually generated 
@@ -128,7 +130,7 @@ class Contentish:
         make it findable through the catalog.
         """
 
-    def allowedRolesAndUsers(self, permission='View'):
+    def allowedRolesAndUsers(permission='View'):
         """
         Return a list of roles and users with View permission.
         Used by PortalCatalog to filter out items you're not allowed to see.

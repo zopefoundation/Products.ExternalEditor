@@ -89,19 +89,15 @@ $Id$
 __version__='$Revision$'[11:-2]
 
 
-try:
-    from Interface import *
-except:
-    def Attribute( name, value ): pass
-    class Base: ' '
+from Interface import Attribute, Base
 
-class portal_workflow (Base):
+class portal_workflow(Base):
     '''This tool accesses and changes the workflow state of content.
     '''
     id = Attribute('id', 'Must be set to "portal_workflow"')
 
     # security.declarePrivate('getCatalogVariablesFor')
-    def getCatalogVariablesFor(self, ob):
+    def getCatalogVariablesFor(ob):
         '''
         Invoked by portal_catalog.  Allows workflows
         to add variables to the catalog based on workflow status,
@@ -111,7 +107,7 @@ class portal_workflow (Base):
         '''
 
     # security.declarePrivate('listActions')
-    def listActions(self, info):
+    def listActions(info):
         '''
         Invoked by the portal_actions tool.  Allows workflows to
         include actions to be displayed in the actions box.
@@ -122,7 +118,7 @@ class portal_workflow (Base):
         '''
 
     # security.declarePublic('doActionFor')
-    def doActionFor(self, ob, action, wf_id=None, *args, **kw):
+    def doActionFor(ob, action, wf_id=None, *args, **kw):
         '''
         Invoked by user interface code.
         Allows the user to request a workflow action.  The workflow object
@@ -130,7 +126,7 @@ class portal_workflow (Base):
         '''
 
     # security.declarePublic('getInfoFor')
-    def getInfoFor(self, ob, name, default, wf_id=None, *args, **kw):
+    def getInfoFor(ob, name, default, wf_id=None, *args, **kw):
         '''
         Invoked by user interface code.  Allows the user to request
         information provided by the workflow.  The workflow object
@@ -138,14 +134,14 @@ class portal_workflow (Base):
         '''
 
     # security.declarePrivate('notifyCreated')
-    def notifyCreated(self, ob):
+    def notifyCreated(ob):
         '''
         Notifies all applicable workflows after an object has been created
         and put in its new place.
         '''
 
     # security.declarePrivate('notifyBefore')
-    def notifyBefore(self, ob, action):
+    def notifyBefore(ob, action):
         '''
         Notifies all applicable workflows of an action before it happens,
         allowing veto by exception.  Unless an exception is thrown, either
@@ -154,45 +150,45 @@ class portal_workflow (Base):
         '''
 
     # security.declarePrivate('notifySuccess')
-    def notifySuccess(self, ob, action, result=None):
+    def notifySuccess(ob, action, result=None):
         '''
         Notifies all applicable workflows that an action has taken place.
         '''
 
     # security.declarePrivate('notifyException')
-    def notifyException(self, ob, action, exc):
+    def notifyException(ob, action, exc):
         '''
         Notifies all applicable workflows that an action failed.
         '''
 
     # security.declarePrivate('getHistoryOf')
-    def getHistoryOf(self, wf_id, ob):
+    def getHistoryOf(wf_id, ob):
         '''
         Invoked by workflow definitions.  Returns the history
         of an object.
         '''
 
     # security.declarePrivate('getStatusOf')
-    def getStatusOf(self, wf_id, ob):
+    def getStatusOf(wf_id, ob):
         '''
         Invoked by workflow definitions.  Returns the last element of a
         history.
         '''
 
     # security.declarePrivate('setStatusOf')
-    def setStatusOf(self, wf_id, ob, status):
+    def setStatusOf(wf_id, ob, status):
         '''
         Invoked by workflow definitions.  Appends to the workflow history.
         '''
 
 
-class WorkflowDefinition (Base):
+class WorkflowDefinition(Base):
     '''The interface expected of workflow definitions objects.
     Accesses and changes the workflow state of objects.
     '''
 
     # security.declarePrivate('getCatalogVariablesFor')
-    def getCatalogVariablesFor(self, ob):
+    def getCatalogVariablesFor(ob):
         '''
         Invoked by the portal_workflow tool.
         Allows this workflow to make workflow-specific variables
@@ -203,7 +199,7 @@ class WorkflowDefinition (Base):
         '''
 
     # security.declarePrivate('listObjectActions')
-    def listObjectActions(self, info):
+    def listObjectActions(info):
         '''
         Invoked by the portal_workflow tool.
         Allows this workflow to
@@ -214,7 +210,7 @@ class WorkflowDefinition (Base):
         '''
 
     # security.declarePrivate('listGlobalActions')
-    def listGlobalActions(self, info):
+    def listGlobalActions(info):
         '''
         Invoked by the portal_workflow tool.
         Allows this workflow to
@@ -224,14 +220,14 @@ class WorkflowDefinition (Base):
         '''
 
     # security.declarePrivate('isActionSupported')
-    def isActionSupported(self, ob, action):
+    def isActionSupported(ob, action):
         '''
         Invoked by the portal_workflow tool.
         Returns a true value if the given action name is supported.
         '''
 
     # security.declarePrivate('doActionFor')
-    def doActionFor(self, ob, action, *args, **kw):
+    def doActionFor(ob, action, *args, **kw):
         '''
         Invoked by the portal_workflow tool.
         Allows the user to request a workflow action.  This method
@@ -239,14 +235,14 @@ class WorkflowDefinition (Base):
         '''
 
     # security.declarePrivate('isInfoSupported')
-    def isInfoSupported(self, ob, name):
+    def isInfoSupported(ob, name):
         '''
         Invoked by the portal_workflow tool.
         Returns a true value if the given info name is supported.
         '''
 
     # security.declarePrivate('getInfoFor')
-    def getInfoFor(self, ob, name, default, *args, **kw):
+    def getInfoFor(ob, name, default, *args, **kw):
         '''
         Invoked by the portal_workflow tool.
         Allows the user to request information provided by the
@@ -254,7 +250,7 @@ class WorkflowDefinition (Base):
         '''
 
     # security.declarePrivate('notifyCreated')
-    def notifyCreated(self, ob):
+    def notifyCreated(ob):
         '''
         Invoked by the portal_workflow tool.
         Notifies this workflow after an object has been created
@@ -262,7 +258,7 @@ class WorkflowDefinition (Base):
         '''
 
     # security.declarePrivate('notifyBefore')
-    def notifyBefore(self, ob, action):
+    def notifyBefore(ob, action):
         '''
         Invoked by the portal_workflow tool.
         Notifies this workflow of an action before it happens,
@@ -272,21 +268,21 @@ class WorkflowDefinition (Base):
         '''
 
     # security.declarePrivate('notifySuccess')
-    def notifySuccess(self, ob, action, result):
+    def notifySuccess(ob, action, result):
         '''
         Invoked by the portal_workflow tool.
         Notifies this workflow that an action has taken place.
         '''
 
     # security.declarePrivate('notifyException')
-    def notifyException(self, ob, action, exc):
+    def notifyException(ob, action, exc):
         '''
         Invoked by the portal_workflow tool.
         Notifies this workflow that an action failed.
         '''
 
     #security.declarePrivate('updateRoleMappingsFor')
-    def updateRoleMappingsFor(self, ob):
+    def updateRoleMappingsFor(ob):
         '''
         Updates the object permissions according to the current
         workflow state.

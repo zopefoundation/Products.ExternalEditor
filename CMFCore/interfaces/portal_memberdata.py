@@ -89,26 +89,22 @@ $Id$
 __version__='$Revision$'[11:-2]
 
 
-try:
-    from Interface import *
-except:
-    def Attribute( name, value ): pass
-    class Base: ' '
+from Interface import Attribute, Base
 
-class portal_memberdata (Base):
+class portal_memberdata(Base):
     '''A helper for portal_membership that transparently adds
     member data to user objects.
     '''
     id = Attribute('id', 'Must be set to "portal_memberdata"')
 
     ## wrapUser__roles__ = ()  # Private.
-    def wrapUser(self, u):
+    def wrapUser(u):
         '''
         If possible, returns the Member object that corresponds
         to the given User object.
         '''
     ## getMemberDataContents__roles__ = ()  # Private.
-    def getMemberDataContents(self):
+    def getMemberDataContents():
         '''
         Returns a list containing a dictionary with information 
         about the _members BTree contents: member_count is the 
@@ -120,9 +116,9 @@ class portal_memberdata (Base):
         '''
 
     ## pruneMemberDataContents__roles__ = ()  # Private.
-    def pruneMemberDataContents(self):
-       '''
-       Compare the user IDs stored in the member data
-       tool with the list in the actual underlying acl_users
-       and delete anything not in acl_users
-       '''
+    def pruneMemberDataContents():
+        '''
+        Compare the user IDs stored in the member data
+        tool with the list in the actual underlying acl_users
+        and delete anything not in acl_users
+        '''

@@ -89,19 +89,15 @@ $Id$
 __version__='$Revision$'[11:-2]
 
 
-try:
-    from Interface import *
-except:
-    def Attribute( name, value ): pass
-    class Base: ' '
+from Interface import Attribute, Base
 
-class portal_skins (Base):
+class portal_skins(Base):
     '''An object that provides skins to a portal object.
     '''
     id = Attribute('id', 'Must be set to "portal_skins"')
 
     # getSkin__roles__ = ()  # Private
-    def getSkin(self, request):
+    def getSkin(request):
         '''
         Returns the requested skin object as a tuple:
         (skinob, skinpath).  Note that self will not normally
@@ -110,7 +106,7 @@ class portal_skins (Base):
         '''
 
     # getSkinSelections__roles__ = None  # Public
-    def getSkinSelections(self):
+    def getSkinSelections():
         '''
         Returns the sorted list of available skin names.
         '''

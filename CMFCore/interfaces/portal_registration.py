@@ -89,44 +89,40 @@ $Id$
 __version__='$Revision$'[11:-2]
 
 
-try:
-    from Interface import *
-except:
-    def Attribute( name, value ): pass
-    class Base: ' '
+from Interface import Attribute, Base
 
-class portal_registration (Base):
+class portal_registration(Base):
     '''Establishes policies for member registration. Depends on
     portal_membership. Is not aware of membership storage details.
     '''
     id = Attribute('id', 'Must be set to "portal_registration"')
 
     #isRegistrationAllowed__roles__ = None  # Anonymous permission
-    def isRegistrationAllowed(self, REQUEST):
+    def isRegistrationAllowed(REQUEST):
         '''Returns a boolean value indicating whether the user
         is allowed to add a member to the portal.
         '''
 
     #testPasswordValidity__roles__ = None  # Anonymous permission
-    def testPasswordValidity(self, password, confirm=None):
+    def testPasswordValidity(password, confirm=None):
         '''If the password is valid, returns None.  If not, returns
         a string explaining why.
         '''
 
     #testPropertiesValidity__roles__ = None  # Anonymous permission
-    def testPropertiesValidity(self, new_properties, member=None):
+    def testPropertiesValidity(new_properties, member=None):
         '''If the properties are valid, returns None.  If not, returns
         a string explaining why.
         '''
 
     #generatePassword__roles__ = None  # Anonymous permission
-    def generatePassword(self):
+    def generatePassword():
         '''Generates a password which is guaranteed to comply
         with the password policy.
         '''
 
     # permission: 'Add portal member'
-    def addMember(self, id, password, roles=('Member',), domains='',
+    def addMember(id, password, roles=('Member',), domains='',
                   properties=None):
         '''Creates a PortalMember and returns it. The properties argument
         can be a mapping with additional member properties. Raises an
@@ -138,27 +134,27 @@ class portal_registration (Base):
         '''
 
     # permission: 'Add portal member'
-    def isMemberIdAllowed(self, id):
+    def isMemberIdAllowed(id):
         '''Returns 1 if the ID is not in use and is not reserved.
         '''
 
     #afterAdd__roles__ = ()  # No permission.
-    def afterAdd(self, member, id, password, properties):
+    def afterAdd(member, id, password, properties):
         '''Called by portal_registration.addMember()
         after a member has been added successfully.'''
 
     # permission: 'Mail forgotten password'
-    def mailPassword(self, forgotten_userid, REQUEST):
+    def mailPassword(forgotten_userid, REQUEST):
         '''Email a forgotten password to a member.  Raises an exception
         if user ID is not found.
         '''
 
     # permission: 'Set own password'
-    def setPassword(self, password, domains=None):
+    def setPassword(password, domains=None):
         '''Allows the authenticated member to set his/her own password.
         '''
             
     # permission: 'Set own properties'
-    def setProperties(self, properties=None, **kw):
+    def setProperties(properties=None, **kw):
         '''Allows the authenticated member to set his/her own properties.
         '''
