@@ -32,11 +32,17 @@ class ImportContext( Implicit ):
 
     security = ClassSecurityInfo()
 
-    def __init__( self, tool, profile_path, should_purge=False ):
+    def __init__( self
+                , tool
+                , profile_path
+                , should_purge=False
+                , encoding=None
+                ):
 
         self._site = aq_parent( aq_inner( tool ) )
         self._profile_path = profile_path
         self._should_purge = bool( should_purge )
+        self._encoding = encoding
 
     security.declareProtected( ManagePortal, 'getSite' )
     def getSite( self ):
@@ -44,6 +50,14 @@ class ImportContext( Implicit ):
         """ See ISetupContext.
         """
         return self._site
+
+    def getEncoding( self ):
+
+        """ Return the encoding used in data files.
+
+        o Return None if the data should not be encoded.
+        """
+        return self._encoding
 
     security.declareProtected( ManagePortal, 'readDataFile' )
     def readDataFile( self, filename, subdir=None ):

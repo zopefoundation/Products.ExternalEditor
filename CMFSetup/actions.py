@@ -24,7 +24,7 @@ class _FauxContent:
 
 class _ActionProviderParser( HandlerBase ):
 
-    def __init__( self, site, encoding='latin-1' ):
+    def __init__( self, site, encoding ):
 
         self._site = site
         self._encoding = encoding
@@ -156,7 +156,7 @@ class ActionProvidersConfigurator( Implicit ):
         return self._providers()
 
     security.declareProtected( ManagePortal, 'parseXML' )
-    def parseXML( self, text ):
+    def parseXML( self, text, encoding=None ):
 
         """ Pseudo API.
         """
@@ -165,7 +165,7 @@ class ActionProvidersConfigurator( Implicit ):
         if reader is not None:
             text = reader()
 
-        parseString( text, _ActionProviderParser( self._site ) )
+        parseString( text, _ActionProviderParser( self._site, encoding ) )
 
 InitializeClass( ActionProvidersConfigurator )
 
@@ -204,6 +204,7 @@ def importActionProviders( context ):
 
     """
     site = context.getSite()
+    encoding = context.getEncoding()
 
     if context.shouldPurge():
 
@@ -216,7 +217,7 @@ def importActionProviders( context ):
     if text is not None:
 
         apc = ActionProvidersConfigurator( site ).__of__( site )
-        apc.parseXML( text )
+        apc.parseXML( text, encoding )
 
     return 'Action providers imported.'
 

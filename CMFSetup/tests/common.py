@@ -133,6 +133,9 @@ class DummyImportContext:
     def getSite( self ):
         return self._site
 
+    def getEncoding( self ):
+        return None
+
     def readDataFile( self, filename, subdir=None ):
 
         if subdir is not None:

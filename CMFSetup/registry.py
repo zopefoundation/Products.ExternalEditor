@@ -14,6 +14,7 @@ from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from interfaces import IImportStepRegistry
 from interfaces import IExportStepRegistry
 from permissions import ManagePortal
+from utils import HandlerBase
 from utils import _xmldir
 from utils import _getDottedName
 from utils import _resolveDottedName
@@ -190,7 +191,7 @@ class ImportStepRegistry( Implicit ):
         self._registered[ id ] = info
 
     security.declarePrivate( 'importFromXML' )
-    def importFromXML( self, text ):
+    def importFromXML( self, text, encoding=None ):
 
         """ Parse 'text' into a clean registry.
         """
@@ -201,7 +202,7 @@ class ImportStepRegistry( Implicit ):
         if reader is not None:
             text = reader()
 
-        parseString( text, _ImportStepRegistryParser( self ) )
+        parseString( text, _ImportStepRegistryParser( self, None ) )
 
     #
     #   Helper methods
@@ -237,13 +238,13 @@ class ImportStepRegistry( Implicit ):
 
 InitializeClass( ImportStepRegistry )
 
-class _ImportStepRegistryParser( ContentHandler ):
+class _ImportStepRegistryParser( HandlerBase ):
 
     security = ClassSecurityInfo()
     security.declareObjectPrivate()
     security.setDefaultAccess( 'deny' )
 
-    def __init__( self, registry, encoding='latin-1' ):
+    def __init__( self, registry, encoding ):
 
         self._registry = registry
         self._encoding = encoding
@@ -264,15 +265,15 @@ class _ImportStepRegistryParser( ContentHandler ):
             if self._pending is not None:
                 raise ValueError, 'Cannot nest setup-step elements'
 
-            self._pending = dict( [ ( k, v.encode( self._encoding ) )
-                                    for k, v in attrs.items() ] )
+            self._pending = dict( [ ( k, self._extract( attrs, k ) )
+                                    for k in attrs.keys() ] )
 
         elif name == 'dependency':
 
             if not self._pending:
                 raise ValueError, 'Dependency outside of step'
 
-            depended = attrs['step'].encode('latin-1')
+            depended = self._extract( attrs, 'step' )
             self._pending.setdefault( 'dependencies', [] ).append( depended )
 
         else:
@@ -281,7 +282,7 @@ class _ImportStepRegistryParser( ContentHandler ):
     def characters( self, content ):
 
         if self._pending is not None:
-            content = content.encode( self._encoding )
+            content = self._encode( content )
             self._pending.setdefault( 'description', [] ).append( content )
 
     def endElement(self, name):
@@ -436,7 +437,7 @@ class ExportStepRegistry( Implicit ):
         self._registered[ id ] = info
 
     security.declarePrivate( 'importFromXML' )
-    def importFromXML( self, text ):
+    def importFromXML( self, text, encoding=None ):
 
         """ Parse 'text' into a clean registry.
         """
@@ -447,7 +448,7 @@ class ExportStepRegistry( Implicit ):
         if reader is not None:
             text = reader()
 
-        parseString( text, _ExportStepRegistryParser( self ) )
+        parseString( text, _ExportStepRegistryParser( self, encoding ) )
 
     #
     #   Helper methods
@@ -462,13 +463,13 @@ class ExportStepRegistry( Implicit ):
 
 InitializeClass( ExportStepRegistry )
 
-class _ExportStepRegistryParser( ContentHandler ):
+class _ExportStepRegistryParser( HandlerBase ):
 
     security = ClassSecurityInfo()
     security.declareObjectPrivate()
     security.setDefaultAccess( 'deny' )
 
-    def __init__( self, registry, encoding='latin-1' ):
+    def __init__( self, registry, encoding ):
 
         self._registry = registry
         self._encoding = encoding
@@ -489,8 +490,8 @@ class _ExportStepRegistryParser( ContentHandler ):
             if self._pending is not None:
                 raise ValueError, 'Cannot nest export-step elements'
 
-            self._pending = dict( [ ( k, v.encode( self._encoding ) )
-                                    for k, v in attrs.items() ] )
+            self._pending = dict( [ ( k, self._extract( attrs, k ) )
+                                    for k in attrs.keys() ] )
 
         else:
             raise ValueError, 'Unknown element %s' % name
@@ -498,7 +499,7 @@ class _ExportStepRegistryParser( ContentHandler ):
     def characters( self, content ):
 
         if self._pending is not None:
-            content = content.encode( self._encoding )
+            content = self._encode( content )
             self._pending.setdefault( 'description', [] ).append( content )
 
     def endElement(self, name):

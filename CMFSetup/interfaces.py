@@ -21,6 +21,13 @@ class ISetupContext( Interface ):
 
 class IImportContext( ISetupContext ):
 
+    def getEncoding():
+
+        """ Return the encoding used in data files.
+
+        o Return None if the data should not be encoded.
+        """
+
     def readDataFile( filename, subdir=None ):
 
         """ Search the current configuration for the requested file.
