@@ -13,6 +13,7 @@ from Products.DCWorkflow.Transitions import TRIGGER_USER_ACTION
 from Products.DCWorkflow.Transitions import TRIGGER_AUTOMATIC
 
 from common import BaseRegistryTests
+from common import DummyExportContext
 
 class DummyWorkflowTool( Folder ):
 
@@ -640,6 +641,22 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
                                                    , WF_INITIAL_STATE
                                                    ) )
 
+    def test_generateWorkflowXML_nondc( self ):
+
+        WF_ID_NON = 'non_dcworkflow'
+        WF_TITLE_NON = 'Non-DCWorkflow'
+
+        site = self._initSite()
+
+        wf_tool = site.portal_workflow
+        nondcworkflow = DummyWorkflow( WF_TITLE_NON )
+        nondcworkflow.title = WF_TITLE_NON
+        wf_tool._setObject( WF_ID_NON, nondcworkflow )
+
+        configurator = self._makeOne( site ).__of__( site )
+
+        self.assertEqual( configurator.generateWorkflowXML( WF_ID_NON ), None )
+
     def test_generateWorkflowXML_normal( self ):
 
         WF_ID = 'normal'
@@ -664,6 +681,55 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
                           % { 'workflow_id' : WF_ID
                             , 'title' : WF_TITLE
                             , 'initial_state' : WF_INITIAL_STATE
+                            , 'workflow_filename' : WF_ID.replace(' ', '_')
+                            } )
+
+    def test_generateWorkflowXML_multiple( self ):
+
+        WF_ID_1 = 'dc1'
+        WF_TITLE_1 = 'Normal DCWorkflow #1'
+        WF_ID_2 = 'dc2'
+        WF_TITLE_2 = 'Normal DCWorkflow #2'
+        WF_INITIAL_STATE = 'closed'
+
+        site = self._initSite()
+
+        dcworkflow_1 = self._initDCWorkflow( WF_ID_1 )
+        dcworkflow_1.title = WF_TITLE_1
+        dcworkflow_1.initial_state = WF_INITIAL_STATE
+        dcworkflow_1.permissions = _WF_PERMISSIONS
+        self._initVariables( dcworkflow_1 )
+        self._initStates( dcworkflow_1 )
+        self._initTransitions( dcworkflow_1 )
+        self._initWorklists( dcworkflow_1 )
+        self._initScripts( dcworkflow_1 )
+
+        dcworkflow_2 = self._initDCWorkflow( WF_ID_2 )
+        dcworkflow_2.title = WF_TITLE_2
+        dcworkflow_2.initial_state = WF_INITIAL_STATE
+        dcworkflow_2.permissions = _WF_PERMISSIONS
+        self._initVariables( dcworkflow_2 )
+        self._initStates( dcworkflow_2 )
+        self._initTransitions( dcworkflow_2 )
+        self._initWorklists( dcworkflow_2 )
+        self._initScripts( dcworkflow_2 )
+
+        configurator = self._makeOne( site ).__of__( site )
+
+        self._compareDOM( configurator.generateWorkflowXML( WF_ID_1 )
+                        , _NORMAL_WORKFLOW_EXPORT
+                          % { 'workflow_id' : WF_ID_1
+                            , 'title' : WF_TITLE_1
+                            , 'initial_state' : WF_INITIAL_STATE
+                            , 'workflow_filename' : WF_ID_1.replace(' ', '_')
+                            } )
+
+        self._compareDOM( configurator.generateWorkflowXML( WF_ID_2 )
+                        , _NORMAL_WORKFLOW_EXPORT
+                          % { 'workflow_id' : WF_ID_2
+                            , 'title' : WF_TITLE_2
+                            , 'initial_state' : WF_INITIAL_STATE
+                            , 'workflow_filename' : WF_ID_2.replace(' ', '_')
                             } )
 
     def test_parseToolXML_empty( self ):
@@ -774,6 +840,7 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
                           % { 'workflow_id' : WF_ID
                             , 'title' : WF_TITLE
                             , 'initial_state' : WF_INITIAL_STATE
+                            , 'workflow_filename' : WF_ID.replace(' ', '_')
                             } )
 
         self.assertEqual( workflow_id, WF_ID )
@@ -806,6 +873,7 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
                           % { 'workflow_id' : WF_ID
                             , 'title' : WF_TITLE
                             , 'initial_state' : WF_INITIAL_STATE
+                            , 'workflow_filename' : WF_ID.replace(' ', '_')
                             } )
 
         self.assertEqual( len( states ), len( _WF_STATES ) )
@@ -857,6 +925,7 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
                           % { 'workflow_id' : WF_ID
                             , 'title' : WF_TITLE
                             , 'initial_state' : WF_INITIAL_STATE
+                            , 'workflow_filename' : WF_ID.replace(' ', '_')
                             } )
 
         self.assertEqual( len( transitions ), len( _WF_TRANSITIONS ) )
@@ -923,6 +992,7 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
                           % { 'workflow_id' : WF_ID
                             , 'title' : WF_TITLE
                             , 'initial_state' : WF_INITIAL_STATE
+                            , 'workflow_filename' : WF_ID.replace(' ', '_')
                             } )
 
         self.assertEqual( len( variables ), len( _WF_VARIABLES ) )
@@ -981,6 +1051,7 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
                           % { 'workflow_id' : WF_ID
                             , 'title' : WF_TITLE
                             , 'initial_state' : WF_INITIAL_STATE
+                            , 'workflow_filename' : WF_ID.replace(' ', '_')
                             } )
 
         self.assertEqual( len( worklists ), len( _WF_WORKLISTS ) )
@@ -1041,6 +1112,7 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
                           % { 'workflow_id' : WF_ID
                             , 'title' : WF_TITLE
                             , 'initial_state' : WF_INITIAL_STATE
+                            , 'workflow_filename' : WF_ID.replace(' ', '_')
                             } )
 
         self.assertEqual( len( permissions ), len( _WF_PERMISSIONS ) )
@@ -1076,6 +1148,7 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
                           % { 'workflow_id' : WF_ID
                             , 'title' : WF_TITLE
                             , 'initial_state' : WF_INITIAL_STATE
+                            , 'workflow_filename' : WF_ID.replace(' ', '_')
                             } )
 
         self.assertEqual( len( scripts ), len( _WF_SCRIPTS ) )
@@ -1360,6 +1433,21 @@ _NORMAL_TOOL_EXPORT = """\
 </workflow-tool>
 """
 
+_FILENAME_TOOL_EXPORT = """\
+<?xml version="1.0"?>
+<workflow-tool>
+ <workflow
+    workflow_id="name with spaces"
+    filename="workflows/name_with_spaces/definition.xml"
+    meta_type="Workflow"
+    />
+ <bindings>
+  <default>
+  </default>
+ </bindings>
+</workflow-tool>
+"""
+
 _EMPTY_WORKFLOW_EXPORT = """\
 <?xml version="1.0"?>
 <dc-workflow
@@ -1578,26 +1666,135 @@ _NORMAL_WORKFLOW_EXPORT = """\
  <script
     script_id="after_close"
     type="Script (Python)"
-    filename="workflows/%(workflow_id)s/after_close.py"
+    filename="workflows/%(workflow_filename)s/after_close.py"
     />
  <script
     script_id="after_kill"
     type="Script (Python)"
-    filename="workflows/%(workflow_id)s/after_kill.py"
+    filename="workflows/%(workflow_filename)s/after_kill.py"
     />
  <script
     script_id="before_open"
     type="Script (Python)"
-    filename="workflows/%(workflow_id)s/before_open.py"
+    filename="workflows/%(workflow_filename)s/before_open.py"
     />
 </dc-workflow>
 """
+
+class Test_exportWorkflow( _WorkflowSetup
+                         , _GuardChecker
+                         ):
+
+    def test_empty( self ):
+
+        site = self._initSite()
+        context = DummyExportContext( site )
+
+        from Products.CMFSetup.workflow import exportWorkflowTool
+        exportWorkflowTool( context )
+
+        self.assertEqual( len( context._wrote ), 1 )
+        filename, text, content_type = context._wrote[ 0 ]
+        self.assertEqual( filename, 'workflows.xml' )
+        self._compareDOM( text, _EMPTY_TOOL_EXPORT )
+        self.assertEqual( content_type, 'text/xml' )
+
+    def test_normal( self ):
+
+        WF_ID_NON = 'non_dcworkflow'
+        WF_TITLE_NON = 'Non-DCWorkflow'
+        WF_ID_DC = 'dcworkflow'
+        WF_TITLE_DC = 'DCWorkflow'
+        WF_INITIAL_STATE = 'closed'
+
+        site = self._initSite()
+
+        wf_tool = site.portal_workflow
+        nondcworkflow = DummyWorkflow( WF_TITLE_NON )
+        nondcworkflow.title = WF_TITLE_NON
+        wf_tool._setObject( WF_ID_NON, nondcworkflow )
+
+        dcworkflow = self._initDCWorkflow( WF_ID_DC )
+        dcworkflow.title = WF_TITLE_DC
+        dcworkflow.initial_state = WF_INITIAL_STATE
+        dcworkflow.permissions = _WF_PERMISSIONS
+        self._initVariables( dcworkflow )
+        self._initStates( dcworkflow )
+        self._initTransitions( dcworkflow )
+        self._initWorklists( dcworkflow )
+        self._initScripts( dcworkflow )
+
+        context = DummyExportContext( site )
+
+        from Products.CMFSetup.workflow import exportWorkflowTool
+        exportWorkflowTool( context )
+
+        self.assertEqual( len( context._wrote ), 2 )
+
+        filename, text, content_type = context._wrote[ 0 ]
+        self.assertEqual( filename, 'workflows.xml' )
+        self._compareDOM( text, _NORMAL_TOOL_EXPORT )
+        self.assertEqual( content_type, 'text/xml' )
+
+        filename, text, content_type = context._wrote[ 1 ]
+        self.assertEqual( filename, 'workflows/%s/definition.xml' % WF_ID_DC )
+        self._compareDOM( text
+                        , _NORMAL_WORKFLOW_EXPORT
+                          % { 'workflow_id' : WF_ID_DC
+                            , 'title' : WF_TITLE_DC
+                            , 'initial_state' : WF_INITIAL_STATE
+                            , 'workflow_filename' : WF_ID_DC.replace(' ', '_')
+                            } )
+        self.assertEqual( content_type, 'text/xml' )
+
+    def test_with_filenames( self ):
+
+        WF_ID_DC = 'name with spaces'
+        WF_TITLE_DC = 'DCWorkflow with spaces'
+        WF_INITIAL_STATE = 'closed'
+
+        site = self._initSite()
+
+        dcworkflow = self._initDCWorkflow( WF_ID_DC )
+        dcworkflow.title = WF_TITLE_DC
+        dcworkflow.initial_state = WF_INITIAL_STATE
+        dcworkflow.permissions = _WF_PERMISSIONS
+        self._initVariables( dcworkflow )
+        self._initStates( dcworkflow )
+        self._initTransitions( dcworkflow )
+        self._initWorklists( dcworkflow )
+        self._initScripts( dcworkflow )
+
+        context = DummyExportContext( site )
+
+        from Products.CMFSetup.workflow import exportWorkflowTool
+        exportWorkflowTool( context )
+
+        self.assertEqual( len( context._wrote ), 2 )
+
+        filename, text, content_type = context._wrote[ 0 ]
+        self.assertEqual( filename, 'workflows.xml' )
+        self._compareDOM( text, _FILENAME_TOOL_EXPORT )
+        self.assertEqual( content_type, 'text/xml' )
+
+        filename, text, content_type = context._wrote[ 1 ]
+        self.assertEqual( filename
+                        , 'workflows/name_with_spaces/definition.xml' )
+        self._compareDOM( text
+                        , _NORMAL_WORKFLOW_EXPORT
+                          % { 'workflow_id' : WF_ID_DC
+                            , 'title' : WF_TITLE_DC
+                            , 'initial_state' : WF_INITIAL_STATE
+                            , 'workflow_filename' : WF_ID_DC.replace(' ', '_')
+                            } )
+        self.assertEqual( content_type, 'text/xml' )
+
 
 
 def test_suite():
     return unittest.TestSuite((
         unittest.makeSuite( WorkflowToolConfiguratorTests ),
-        #unittest.makeSuite( Test_exportWorkflow ),
+        unittest.makeSuite( Test_exportWorkflow ),
         #unittest.makeSuite( Test_importWorkflow ),
         ))
 

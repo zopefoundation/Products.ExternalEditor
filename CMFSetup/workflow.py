@@ -100,10 +100,19 @@ def exportWorkflowTool( context ):
 
     """
     site = context.getSite()
-    apc = WorkflowToolConfigurator( site ).__of__( site )
-    text = apc.generateXML()
+    configurator = WorkflowToolConfigurator( site ).__of__( site )
+    wf_tool = getToolByName( site, 'portal_workflow' )
+    text = configurator.generateToolXML()
 
     context.writeDataFile( _FILENAME, text, 'text/xml' )
+
+    for wf_id in wf_tool.getWorkflowIds():
+
+        wf_filename = _getWorkflowFilename( wf_id )
+        wf_xml = configurator.generateWorkflowXML( wf_id )
+
+        if wf_xml is not None:
+            context.writeDataFile( wf_filename, wf_xml, 'text/xml' )
 
     return 'Workflows exported.'
 
@@ -199,6 +208,11 @@ class WorkflowToolConfigurator( Implicit ):
 
         """ Pseudo API.
         """
+        info = self.getWorkflowInfo( workflow_id )
+
+        if info[ 'meta_type' ] != DCWorkflowDefinition.meta_type:
+            return None
+
         return self._workflowConfig( workflow_id=workflow_id )
 
     security.declareProtected( ManagePortal, 'parseToolXML' )
@@ -294,8 +308,7 @@ class WorkflowToolConfigurator( Implicit ):
           'script_info' -- a list of mappings describing the scripts which
             provide added business logic (wee '_extractScripts').
         """
-        workflow_info[ 'filename' ] = ( 'workflows/%s/definition.xml'
-                                      % workflow.getId())
+        workflow_info[ 'filename' ] = _getWorkflowFilename( workflow.getId() )
         workflow_info[ 'state_variable' ] = workflow.state_var
         workflow_info[ 'initial_state' ] = workflow.initial_state
         workflow_info[ 'permissions' ] = workflow.permissions
@@ -947,3 +960,9 @@ _METATYPE_SUFFIXES = \
 , ExternalMethod.meta_type : 'em'
 , DTMLMethod.meta_type : 'dtml'
 }
+
+def _getWorkflowFilename( wf_id ):
+
+    """ Return the name of the file which holds info for a given workflow.
+    """
+    return 'workflows/%s/definition.xml' % wf_id.replace( ' ', '_' )

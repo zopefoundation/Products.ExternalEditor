@@ -5,18 +5,19 @@
         title="Some DCWorkflow"
         state_variable="review_state" 
         initial_state="visible" 
-        tal:repeat="workflow here/listWorkflowInfo"
-        tal:attributes="workflow_id workflow/id;
-                        title workflow/title;
-                        state_variable workflow/state_variable;
-                        initial_state workflow/initial_state">
+        tal:define="info python: here.getWorkflowInfo(
+                                                options[ 'workflow_id' ] )"
+        tal:attributes="workflow_id info/id;
+                        title info/title;
+                        state_variable info/state_variable;
+                        initial_state info/initial_state">
  <permission
-        tal:repeat="permission workflow/permissions"
+        tal:repeat="permission info/permissions"
         tal:content="permission">PERMISSION</permission>
  <state
         state_id="pending"
         title="Waiting for reviewer"
-        tal:repeat="state workflow/state_info"
+        tal:repeat="state info/state_info"
         tal:attributes="state_id state/id;
                         title state/title;
                        ">
@@ -60,7 +61,7 @@
         trigger="USER"
         before_script=""
         after_script=""
-        tal:repeat="transition workflow/transition_info"
+        tal:repeat="transition info/transition_info"
         tal:attributes="transition_id transition/id;
                         title transition/title;
                         new_state transition/new_state_id;
@@ -101,7 +102,7 @@
  <worklist
         worklist_id="reviewer_queue"
         title="For Review"
-        tal:repeat="worklist workflow/worklist_info"
+        tal:repeat="worklist info/worklist_info"
         tal:attributes="worklist_id worklist/id;
                         title worklist/title;
                        ">
@@ -143,7 +144,7 @@
         for_catalog="True"
         for_status="True"
         update_always="True" 
-        tal:repeat="variable workflow/variable_info"
+        tal:repeat="variable info/variable_info"
         tal:attributes="variable_id variable/id;
                         for_catalog variable/for_catalog;
                         for_status variable/for_status;
@@ -178,7 +179,7 @@
         script_id="SCRIPT_ID"
         type="Script (Python)"
         filename="/path/to/SCRIPT_ID.py"
-        tal:repeat="script workflow/script_info"
+        tal:repeat="script info/script_info"
         tal:attributes="script_id script/id;
                         type script/meta_type;
                         filename script/filename;
