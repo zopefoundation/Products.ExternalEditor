@@ -95,6 +95,8 @@ from Globals import HTMLFile
 from zLOG import LOG, ERROR
 import sys
 
+from ZPublisher.HTTPRequest import HTTPRequest
+
 # Constants.
 ATTEMPT_NONE = 0
 ATTEMPT_LOGIN = 1
@@ -164,6 +166,15 @@ class CookieCrumbler (SimpleItemWithProperties):
     security.declarePrivate('modifyRequest')
     def modifyRequest(self, req, resp):
         # Returns flags indicating what the user is trying to do.
+
+        if req.__class__ is not HTTPRequest:
+            req[ 'disable_cookie_login__' ] = 1
+            return ATTEMPT_NONE
+
+        if not req[ 'REQUEST_METHOD' ] in ( 'GET', 'PUT', 'POST' ):
+            req[ 'disable_cookie_login__' ] = 1
+            return ATTEMPT_NONE
+
         if not req._auth:
             if (req.has_key(self.pw_cookie) and
                 req.has_key(self.name_cookie)):
