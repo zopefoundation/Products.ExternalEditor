@@ -1,6 +1,6 @@
 <!-- Top bar -->
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
-<tr><td colspan="3" witdth="100%">
+<tr><td colspan="3" width="100%">
 <!-- hack around netscape 4.x to ensure top table is solid black -->
 <table class="Masthead" cellspacing="0" cellpadding="0" border="0"
        width="100%">
