@@ -1,6 +1,6 @@
 import Zope
 import unittest
-import re
+import re, new
 import OFS.Folder, OFS.SimpleItem
 from AccessControl import SecurityManager
 from Products.CMFCore.CatalogTool import CatalogTool
@@ -21,9 +21,10 @@ class UnitTestSecurityPolicy:
     def checkPermission( self, permission, object, context) :
         return 1
 
-class DummyContent( PortalContent ):
+class DummyContent( PortalContent, OFS.SimpleItem.Item ):
     """
     """
+    meta_type = 'Dummy'
     after_add_called = before_delete_called = 0
 
     def __init__( self, id, catalog=0 ):
@@ -43,6 +44,10 @@ class DummyContent( PortalContent ):
     
     def reset( self ):
         self.after_add_called = self.before_delete_called = 0
+
+
+def extra_meta_types():
+    return (  { 'name' : 'Dummy', 'action' : 'manage_addFolder' }, )
 
 class PortalFolderTests( unittest.TestCase ):
 
@@ -144,10 +149,41 @@ class PortalFolderTests( unittest.TestCase ):
         foo = sub.foo
         assert len( catalog ) == 1
         assert 'foo' in catalog.uniqueValuesFor( 'id' )
+        assert has_path( catalog._catalog, '/test/folder/sub/foo' )
 
         folder.manage_renameObject( id='sub', new_id='new_sub' )
         assert 'foo' in catalog.uniqueValuesFor( 'id' )
         assert len( catalog ) == 1
+        assert has_path( catalog._catalog, '/test/folder/new_sub/foo' )
+
+        folder._setObject( 'bar', DummyContent( 'bar', 1 ) )
+        bar = folder.bar
+        assert 'bar' in catalog.uniqueValuesFor( 'id' )
+        assert len( catalog ) == 2
+        assert has_path( catalog._catalog, '/test/folder/bar' )
+
+        folder._setObject( 'sub2', PortalFolder( 'sub2', '' ) )
+        sub2 = folder.sub2
+        # Waaa! force sub2 to allow paste of Dummy object.
+        sub2.all_meta_types = sub2.all_meta_types() + extra_meta_types()
+
+        cookie = folder.manage_cutObjects( ids=['bar'] )
+        sub2.manage_pasteObjects( cookie )
+
+        assert 'foo' in catalog.uniqueValuesFor( 'id' )
+        assert 'bar' in catalog.uniqueValuesFor( 'id' )
+        assert len( catalog ) == 2
+        assert has_path( catalog._catalog, '/test/folder/sub2/bar' )
+
+def has_path( catalog, path ):
+    """
+        Verify that catalog has an object at path.
+    """
+    rids = map( lambda x: x.data_record_id_, catalog.searchResults() )
+    for rid in rids:
+        if catalog.getpath( rid ) == path:
+            return 1
+    return 0
 
 
 def test_suite():
