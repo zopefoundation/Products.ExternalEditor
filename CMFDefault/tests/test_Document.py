@@ -9,6 +9,7 @@ BASIC_HTML = '''\
   <title>Title in tag</title>
   <meta name="description" content="Describe me">
   <meta name="contributors" content="foo@bar.com baz@bam.net">
+  <meta name="title" content="Title in meta">
  </head>
  <body bgcolor="#ffffff">
   <h1>Not a lot here</h1>
@@ -32,15 +33,31 @@ Title: My Document
 Description: A document by me
 Contributors: foo@bar.com baz@bam.net no@yes.maybe
 
-This is the header and it supercedes the title
+This is the header
 
   Body body body body body
   body body body.
 
-   o What does this do
+   o A list item
    
-   o if it happens to you?
+   o And another thing...
 '''
+
+STX_WITH_HTML = """\
+Sometimes people do interesting things
+
+  Sometimes people do interesting things like have examples
+  of HTML inside their structured text document.  We should
+  be detecting that this is indeed a structured text document
+  and **NOT** an HTML document::
+
+    <html>
+    <head><title>Hello World</title></head>
+    <body><p>Hello world, I am Bruce.</p></body>
+    </html>
+
+  All in favor say pi!
+"""
 
 class DocumentTests(unittest.TestCase):
 
@@ -120,11 +137,71 @@ class DocumentTests(unittest.TestCase):
         assert d.Format() == 'text/plain'
 
 
+class TestDocumentPUT(unittest.TestCase):
+    def setUp(self):
+        class Request:
+            body = ''
+            def get_header(self, h, d=''): return d
+            def get(self, *args): return self.body
+        class Response:
+            status = 0
+            def setHeader(self, *args): pass
+            def setStatus(self, status): self.status = status
+        self._request, self._response = Request(), Response()
+
+    def tearDown(self):
+        del self._response
+        del self._request
+
+    def test_PutStructuredTextWithHTML(self):
+        d = Document('foo')
+            
+        self._request.body = STX_WITH_HTML
+
+        r = d.PUT(self._request, self._response)
+        assert d.Format() == 'text/plain', "%s != %s" % (
+            d.Format(), 'text/plain')
+        assert r.status == 204
+
+    def test_PutStructuredText(self):
+        d = Document('foo')
+
+        self._request.body = BASIC_STRUCTUREDTEXT
+
+        r = d.PUT(self._request, self._response)
+        assert d.Format() == 'text/plain', '%s != %s' % (
+            d.Format(), 'text/plain')
+        assert r.status == 204
+
+    def test_PutHtmlWithDoctype(self):
+        d = Document('foo')
+        html = '%s\n\n  \n   %s' % (DOCTYPE, BASIC_HTML)
+        self._request.body = html
+        r = d.PUT(self._request, self._response)
+        assert d.Format() == 'text/html', "%s != %s" % (
+            d.Format(), 'text/html')
+        assert d.Description() == 'Describe me'
+        assert r.status == 204
+
+    def test_PutHtml(self):
+        d = Document('foo')
+        self._request.body = BASIC_HTML
+        r = d.PUT(self._request, self._response)
+        assert d.Format() == 'text/html', "%s != %s" % (
+            d.Format(), 'text/html')
+        assert d.Description() == 'Describe me'
+        assert r.status == 204
+
 
 def test_suite():
-    return unittest.makeSuite(DocumentTests)
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(DocumentTests))
+    suite.addTest(unittest.makeSuite(TestDocumentPUT))
+    return suite
 
-def main():
+def run():
     unittest.TextTestRunner().run(test_suite())
 
-if __name__=='__main__': main()
+if __name__ == '__main__':
+    run()
+
