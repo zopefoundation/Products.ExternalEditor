@@ -94,17 +94,18 @@ from Products.CMFCore.utils import UniqueObject
 from OFS.SimpleItem import SimpleItem
 from Globals import default__class_init__
 import string
+from Acquisition import aq_inner, aq_parent
 
 
 class URLTool (UniqueObject, SimpleItem):
     id = 'portal_url'
     meta_type = 'Default URL Tool'
 
-    def __call__(self, *args, **kw):
+    def __call__(self, relative=0, *args, **kw):
         '''
         Returns the absolute URL of the portal.
         '''
-        return self.aq_inner.aq_parent.absolute_url()
+        return aq_parent(aq_inner(self)).absolute_url(relative=relative)
 
     getPortalObject = None
     def getPortalObject( self ):
