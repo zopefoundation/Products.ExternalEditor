@@ -58,12 +58,18 @@ class DummyContent(OriginalDummyContent):
 
 
 class OpaqueBase:
-    """ Opaque item without manage_after/before hookes
+    """ Dummy opaque item without manage_after/before hookes
     """
     def __init__(self, id):
         self.id = id
         self.addCount = self.cloneCount = self.deleteCount = 0
         self.addCounter = self.cloneCounter = self.deleteCounter = 1
+        
+    def __call__():
+        return
+        
+    def getId(self):
+        return self.id
 
 class MarkerOnly(OpaqueBase):
     """ Opaque item without manage_after/before hookes but marked

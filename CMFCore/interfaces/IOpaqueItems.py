@@ -20,12 +20,20 @@ from Interface import Interface
 
 
 class ICallableOpaqueItemWithHooks(Interface):
-    """Marker interface for callable opaque items with manage_* hooks.
+    """Interface for callable opaque items with manage_* hooks.
 
     Opaque items are subelements that are contained using something that
     is not an ObjectManager.
 
     On add, copy, move and delete operations a marked opaque items
     'manage_afterAdd', 'manage_afterClone' and 'manage_beforeDelete' hooks
-    get called.
+    get called if available. Unavailable hooks do not throw exceptions.
     """
+
+    def __call__():
+        """Returns the opaque items value.
+        """
+    
+    def getId():
+        """Returns the name of the attribute the opaque item is assigend to.
+        """
