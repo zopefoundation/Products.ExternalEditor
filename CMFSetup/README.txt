@@ -19,6 +19,8 @@ CMFSetup Product README
 
       - (x) the role / permission map on the site object
 
+      - (x) properties of the site object
+
       - (x) 'portal_actions'
             (Products.CMFCore.ActionsTool.ActionsTool)
 
