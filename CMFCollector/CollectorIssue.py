@@ -163,6 +163,9 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
 
         if modification_date:
             self._setModificationDate(DateTime(modification_date))
+        wf = getToolByName(self, 'portal_workflow', None)
+        if wf is not None:
+            wf.notifyCreated(contained)
 
     def _set_submitter_specs(self, submitter_id,
                              submitter_name, submitter_email):
@@ -702,9 +705,6 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         # Are we being added (or moved)?
         if aq_base(container) is not aq_base(self):
             self._set_collector_path(self.aq_parent)
-            wf = getToolByName(self, 'portal_workflow', None)
-            if wf is not None:
-                wf.notifyCreated(self)
             self.indexObject()
 
     def manage_beforeDelete(self, item, container):
