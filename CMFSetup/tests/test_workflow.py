@@ -641,7 +641,7 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
     def test_generateWorkflowXML_normal( self ):
 
         WF_ID = 'normal'
-        WF_TITLE = 'Empty DCWorkflow'
+        WF_TITLE = 'Normal DCWorkflow'
         WF_INITIAL_STATE = 'closed'
 
         site = self._initSite()
@@ -661,6 +661,168 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
                                                     , WF_TITLE
                                                     , WF_INITIAL_STATE
                                                     ) )
+
+    def test_parseToolXML_empty( self ):
+
+        site = self._initSite()
+        configurator = self._makeOne( site ).__of__( site )
+
+        workflows, bindings = configurator.parseToolXML( _EMPTY_TOOL_EXPORT )
+
+        self.assertEqual( len( workflows ), 0 )
+        self.assertEqual( len( bindings ), 0 )
+
+    def test_parseToolXML_default_chain_plus_overrides( self ):
+
+        site = self._initSite()
+        configurator = self._makeOne( site ).__of__( site )
+
+        workflows, bindings = configurator.parseToolXML( _OVERRIDE_TOOL_EXPORT )
+
+        self.assertEqual( len( workflows ), 0 )
+        self.assertEqual( len( bindings ), 2 )
+
+        default = bindings[ None ]
+        self.assertEqual( len( default ), 2 )
+        self.assertEqual( default[ 0 ], 'foo' )
+        self.assertEqual( default[ 1 ], 'bar' )
+
+        override = bindings[ 'qux' ]
+        self.assertEqual( len( override ), 1 )
+        self.assertEqual( override[ 0 ], 'baz' )
+
+    def test_parseToolXML_normal( self ):
+
+        site = self._initSite()
+        configurator = self._makeOne( site ).__of__( site )
+
+        workflows, bindings = configurator.parseToolXML( _NORMAL_TOOL_EXPORT )
+
+        self.assertEqual( len( workflows ), 2 )
+
+        wfid, meta_type, filename = workflows[ 0 ]
+        self.assertEqual( wfid, 'non_dcworkflow' )
+        self.assertEqual( meta_type, DummyWorkflow.meta_type )
+        self.assertEqual( filename, None )
+
+        wfid, meta_type, filename = workflows[ 1 ]
+        self.assertEqual( wfid, 'dcworkflow' )
+        self.assertEqual( meta_type, DCWorkflowDefinition.meta_type )
+        self.assertEqual( filename, 'workflows/dcworkflow/definition.xml' )
+
+        self.assertEqual( len( bindings ), 0 )
+
+    def test_parseWorkflowXML_empty( self ):
+
+        WF_ID = 'empty'
+        WF_TITLE = 'Empty DCWorkflow'
+        WF_INITIAL_STATE = 'initial'
+
+        site = self._initSite()
+
+        configurator = self._makeOne( site ).__of__( site )
+
+        ( workflow_id
+        , title
+        , state_variable
+        , initial_state
+        , states
+        , transitions
+        , variables
+        , worklists
+        , permissions
+        , scripts
+        ) = configurator.parseWorkflowXML( _EMPTY_WORKFLOW_EXPORT
+                                         % ( WF_ID
+                                           , WF_TITLE
+                                           , WF_INITIAL_STATE
+                                           ) )
+
+        self.assertEqual( len( states ), 0 )
+        self.assertEqual( len( transitions ), 0 )
+        self.assertEqual( len( variables ), 0 )
+        self.assertEqual( len( worklists ), 0 )
+        self.assertEqual( len( permissions ), 0 )
+        self.assertEqual( len( scripts ), 0 )
+
+    def test_parseWorkflowXML_normal_attribs( self ):
+
+        WF_ID = 'normal'
+        WF_TITLE = 'Normal DCWorkflow'
+        WF_INITIAL_STATE = 'closed'
+
+        site = self._initSite()
+
+        configurator = self._makeOne( site ).__of__( site )
+
+        ( workflow_id
+        , title
+        , state_variable
+        , initial_state
+        , states
+        , transitions
+        , variables
+        , worklists
+        , permissions
+        , scripts
+        ) = configurator.parseWorkflowXML( _NORMAL_WORKFLOW_EXPORT
+                                         % ( WF_ID
+                                           , WF_TITLE
+                                           , WF_INITIAL_STATE
+                                           ) )
+
+        self.assertEqual( workflow_id, WF_ID )
+        self.assertEqual( title, WF_TITLE )
+        self.assertEqual( state_variable, 'state' )
+        self.assertEqual( initial_state, WF_INITIAL_STATE )
+
+    def test_parseWorkflowXML_normal_states( self ):
+
+        WF_ID = 'normal'
+        WF_TITLE = 'Normal DCWorkflow'
+        WF_INITIAL_STATE = 'closed'
+
+        site = self._initSite()
+
+        configurator = self._makeOne( site ).__of__( site )
+
+        ( workflow_id
+        , title
+        , state_variable
+        , initial_state
+        , states
+        , transitions
+        , variables
+        , worklists
+        , permissions
+        , scripts
+        ) = configurator.parseWorkflowXML( _NORMAL_WORKFLOW_EXPORT
+                                         % ( WF_ID
+                                           , WF_TITLE
+                                           , WF_INITIAL_STATE
+                                           ) )
+
+        self.assertEqual( len( states ), len( _WF_STATES ) )
+
+        for state in states:
+
+            state_id = state[ 'state_id' ]
+            self.failUnless( state_id in _WF_STATES )
+
+            expected = _WF_STATES[ state_id ]
+
+            self.assertEqual( state[ 'title' ], expected[ 0 ] )
+
+            description = ''.join( state[ 'description' ] )
+            self.failUnless( expected[ 1 ] in description )
+
+            self.assertEqual( tuple( state[ 'transitions' ] ), expected[ 2 ] )
+            self.assertEqual( state[ 'permissions' ], expected[ 3 ] )
+            self.assertEqual( tuple( state[ 'groups' ] )
+                            , tuple( expected[ 4 ] ) )
+
+            for k, v in state[ 'variables' ].items():
+                self.assertEqual( v, str( expected[ 5 ][ k ] ) )
 
 
 _WF_PERMISSIONS = \
@@ -929,7 +1091,6 @@ _EMPTY_WORKFLOW_EXPORT = """\
 <?xml version="1.0"?>
 <dc-workflow
     workflow_id="%s"
-    type="DCWorkflow"
     title="%s"
     state_variable="state" 
     initial_state="%s">
@@ -940,7 +1101,6 @@ _NORMAL_WORKFLOW_EXPORT = """\
 <?xml version="1.0"?>
 <dc-workflow
     workflow_id="%s"
-    type="DCWorkflow"
     title="%s"
     state_variable="state" 
     initial_state="%s">
@@ -1016,14 +1176,14 @@ _NORMAL_WORKFLOW_EXPORT = """\
     state_id="expired"
     title="Expired">
   Expiration date has passed
-  <permission
-    acquired="True"
-    name="Modify content">
-   <role>Owner</role>
-   <role>Manager</role>
-  </permission>
   <exit-transition
     transition_id="open"/>
+  <permission-map
+    acquired="True"
+    name="Modify content">
+   <permission-role>Owner</permission-role>
+   <permission-role>Manager</permission-role>
+  </permission-map>
   <assignment
     name="is_closed">False</assignment>
   <assignment
@@ -1033,18 +1193,21 @@ _NORMAL_WORKFLOW_EXPORT = """\
     state_id="opened"
     title="Opened">
   Open for modifications
-  <permission
-    acquired="True"
-    name="Modify content">
-   <role>Owner</role>
-   <role>Manager</role>
-  </permission>
   <exit-transition
     transition_id="close"/>
   <exit-transition
     transition_id="kill"/>
   <exit-transition
     transition_id="expire"/>
+  <permission-map
+    acquired="True"
+    name="Modify content">
+   <permission-role>Owner</permission-role>
+   <permission-role>Manager</permission-role>
+  </permission-map>
+  <group-map name="Content_owners">
+   <group-role>Owner</group-role>
+  </group-map>
   <assignment
     name="is_closed">False</assignment>
   <assignment
@@ -1054,16 +1217,16 @@ _NORMAL_WORKFLOW_EXPORT = """\
     state_id="closed"
     title="Closed">
   Closed for modifications
-  <permission
-    acquired="False"
-    name="Modify content">
-  </permission>
   <exit-transition
     transition_id="open"/>
   <exit-transition
     transition_id="kill"/>
   <exit-transition
     transition_id="expire"/>
+  <permission-map
+    acquired="False"
+    name="Modify content">
+  </permission-map>
   <assignment
     name="is_closed">True</assignment>
   <assignment

@@ -2,7 +2,6 @@
 <dc-workflow
         xmlns:tal="http://xml.zope.org/namespaces/tal"
         workflow_id="dcworkflow"
-        type="DCWorkflow"
         title="Some DCWorkflow"
         state_variable="review_state" 
         initial_state="visible" 
@@ -96,22 +95,31 @@
                        ">
   <span
         tal:replace="state/description">DESCRIPTION</span>
-  <permission
+  <exit-transition
+        transition_id="TRANSITION_ID"
+        tal:repeat="exit state/transitions"
+        tal:attributes="transition_id exit"
+        />
+  <permission-map
         name=""
         acquired="True"
         tal:repeat="perm state/permissions"
         tal:attributes="name perm/name;
                         acquired perm/acquired;
                        ">
-   <role
+   <permission-role
         tal:repeat="role perm/roles"
-        tal:content="role">ROLE</role>
-  </permission>
-  <exit-transition
-        transition_id="TRANSITION_ID"
-        tal:repeat="exit state/transitions"
-        tal:attributes="transition_id exit"
-        />
+        tal:content="role">ROLE</permission-role>
+  </permission-map>
+  <group-map
+        name=""
+        tal:repeat="group state/groups"
+        tal:attributes="name python: group[ 0 ];
+                       ">
+   <group-role
+        tal:repeat="role python: group[ 1 ]"
+        tal:content="role">ROLE</group-role>
+  </group-map>
   <assignment
         name="VAR_NAME"
         tal:repeat="var state/variables"
