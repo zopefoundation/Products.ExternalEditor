@@ -31,7 +31,7 @@ from Products.PageTemplates.Expressions import getEngine
 from Products.PageTemplates.Expressions import SecureModuleImporter
 
 from Products.CMFCore.interfaces.CachingPolicyManager \
-        import CachingPolicyManager
+        import CachingPolicyManager as ICachingPolicyManager
 
 from Products.CMFCore.ActionProviderBase import ActionProviderBase
 from Products.CMFCore.CMFCorePermissions import View
@@ -218,7 +218,7 @@ class CachingPolicyManager( SimpleItem ):
         to them from skin methods.
     """
 
-    __implements__ = CachingPolicyManager
+    __implements__ = ICachingPolicyManager
 
     id = 'caching_policy_manager'
     meta_type = 'CMF Caching Policy Manager'

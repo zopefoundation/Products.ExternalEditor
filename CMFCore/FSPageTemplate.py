@@ -122,8 +122,7 @@ class FSPageTemplate(FSObject, Script, PageTemplate):
 
             return FSPageTemplate.inheritedAttribute('pt_render')( self,
                     source, extra_context )
-            return FSPageTemplate.inheritedAttribute('pt_render')(
-                self, source, extra_context )
+
         except RuntimeError:
             if Globals.DevelopmentMode:
                 err = FSPageTemplate.inheritedAttribute( 'pt_errors' )( self )

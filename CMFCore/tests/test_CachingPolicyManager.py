@@ -27,8 +27,18 @@ class CachingPolicyTests( unittest.TestCase ):
     def _makeContext( self, **kw ):
 
         from Products.CMFCore.CachingPolicyManager import createCPContext
+        from Products.CMFCore.CachingPolicyManager import createCPContext
         return createCPContext( DummyContent(), 'foo_view', kw )
         
+    def test_interface( self ):
+        from Products.CMFCore.interfaces.CachingPolicyManager \
+            import CachingPolicyManager as ICachingPolicyManager
+        from Products.CMFCore.CachingPolicyManager import CachingPolicyManager
+        from Interface import verify_class_implementation
+
+        verify_class_implementation( ICachingPolicyManager
+                                   , CachingPolicyManager )
+
     def test_empty( self ):
 
         policy = self._makePolicy( 'empty' )
