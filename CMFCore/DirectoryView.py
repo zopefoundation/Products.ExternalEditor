@@ -197,12 +197,16 @@ class DirectoryInformation:
                 self.data, self.objects = self.prepareContents(registry,
                     register_subdirs=changed)
             except:
-                # DEBUG
-                import traceback
-                traceback.print_exc()
-
+                from zLOG import LOG, ERROR
+                import sys
+                type,value,tb = sys.exc_info()
+                LOG('DirectoryView',
+                    ERROR,
+                    'Error during prepareContents:',
+                    "\nType:%s\nValue:%s\n" % (type,value))
                 self.data = {}
                 self.objects = ()
+                    
         return self.data, self.objects
 
     def prepareContents(self, registry, register_subdirs=0):
