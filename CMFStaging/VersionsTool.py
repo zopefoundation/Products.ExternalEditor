@@ -152,14 +152,14 @@ class VersionsTool(UniqueObject, SimpleItemWithProperties):
 
 
     security.declarePublic('checkin')
-    def checkin(self, obj, message=''):
+    def checkin(self, obj, message=None):
         """Checks in a new version.
         """
         verifyPermission(UseVersionControl, obj)
         obj = unproxied(obj)
         repo = self._getVersionRepository()
         if not repo.isUnderVersionControl(obj):
-            repo.applyVersionControl(obj)
+            repo.applyVersionControl(obj, message)
         else:
             if (not repo.isResourceUpToDate(obj, require_branch=1)
                 and self.isCheckedOut(obj)):
@@ -181,7 +181,7 @@ class VersionsTool(UniqueObject, SimpleItemWithProperties):
                 for key, value in new_dict.items():
                     if key != '__vc_info__':
                         obj.__dict__[key] = value
-            repo.checkinResource(obj, message)
+            repo.checkinResource(obj, message or '')
         return None
 
 
