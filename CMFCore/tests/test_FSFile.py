@@ -8,7 +8,7 @@ class DummyCachingManager:
 
 from Products.CMFCore.tests.base.testcase import RequestTest, FSDVTest
 
-class FSImageTests( RequestTest, FSDVTest):
+class FSFileTests( RequestTest, FSDVTest):
 
     def setUp(self):
         FSDVTest.setUp(self)
@@ -39,11 +39,11 @@ class FSImageTests( RequestTest, FSDVTest):
 
         path, ref = self._extractFile()
 
-        image = self._makeOne( 'test_file', 'test_file.gif' )
-        image = image.__of__( self.root )
+        file = self._makeOne( 'test_file', 'test_file.swf' )
+        file = file.__of__( self.root )
 
-        self.assertEqual( image.get_size(), len( ref ) )
-        self.assertEqual( image._data, ref )
+        self.assertEqual( file.get_size(), len( ref ) )
+        self.assertEqual( file._readFile(0), ref )
 
     def test_index_html( self ):
 
@@ -54,10 +54,10 @@ class FSImageTests( RequestTest, FSDVTest):
 
         mod_time = os.stat( path )[ 8 ]
 
-        image = self._makeOne( 'test_file', 'test_file.gif' )
-        image = image.__of__( self.root )
+        file = self._makeOne( 'test_file', 'test_file.swf' )
+        file = file.__of__( self.root )
 
-        data = image.index_html( self.REQUEST, self.RESPONSE )
+        data = file.index_html( self.REQUEST, self.RESPONSE )
 
         self.assertEqual( len( data ), len( ref ) )
         self.assertEqual( data, ref )
@@ -67,7 +67,7 @@ class FSImageTests( RequestTest, FSDVTest):
         self.assertEqual( self.RESPONSE.getHeader( 'Content-Length'.lower() )
                         , len( ref ) )
         self.assertEqual( self.RESPONSE.getHeader( 'Content-Type'.lower() )
-                        , 'image/gif' )
+                        , 'application/octet-stream' )
         self.assertEqual( self.RESPONSE.getHeader( 'Last-Modified'.lower() )
                         , rfc1123_date( mod_time ) )
 
@@ -81,13 +81,13 @@ class FSImageTests( RequestTest, FSDVTest):
 
         mod_time = os.stat( path )[ 8 ]
 
-        image = self._makeOne( 'test_file', 'test_file.gif' )
-        image = image.__of__( self.root )
+        file = self._makeOne( 'test_file', 'test_file.swf' )
+        file = file.__of__( self.root )
 
         self.REQUEST.environ[ 'IF_MODIFIED_SINCE'
                             ] = '%s;' % rfc1123_date( mod_time+3600 )
 
-        data = image.index_html( self.REQUEST, self.RESPONSE )
+        data = file.index_html( self.REQUEST, self.RESPONSE )
 
         self.assertEqual( data, '' )
         self.assertEqual( self.RESPONSE.getStatus(), 304 )
@@ -102,13 +102,13 @@ class FSImageTests( RequestTest, FSDVTest):
 
         mod_time = os.stat( path )[ 8 ]
 
-        image = self._makeOne( 'test_image', 'test_image.gif' )
-        image = image.__of__( self.root )
+        file = self._makeOne( 'test_file', 'test_file.swf' )
+        file = file.__of__( self.root )
 
         self.REQUEST.environ[ 'IF_MODIFIED_SINCE'
                             ] = '%s;' % rfc1123_date( mod_time-3600 )
 
-        data = image.index_html( self.REQUEST, self.RESPONSE )
+        data = file.index_html( self.REQUEST, self.RESPONSE )
 
         self.failUnless( data, '' )
         self.assertEqual( self.RESPONSE.getStatus(), 200 )

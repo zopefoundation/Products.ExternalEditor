@@ -15,6 +15,7 @@ def test_suite():
         'test_Expression',
         'test_CatalogTool',
         'test_DirectoryView',
+        'test_FSFile',
         'test_FSPythonScript',
         'test_FSPageTemplate',
         'test_FSImage',
