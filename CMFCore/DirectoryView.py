@@ -1,41 +1,44 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """ Views of filesystem directories as folders.
 
 $Id$
 """
 
-import Globals
-from Globals import HTMLFile, Persistent, package_home, DTMLFile
-import os
+import re
 from os import path, listdir, stat
-from Acquisition import aq_inner, aq_parent, aq_base
-from string import split, rfind, strip, join
-from App.Common import package_home
-from OFS.ObjectManager import bad_id
-from OFS.Folder import Folder
-from AccessControl import ClassSecurityInfo
-from CMFCorePermissions import AccessContentsInformation
-from CMFCorePermissions import ManagePortal
-from FSObject import BadFile
-from utils import expandpath, minimalpath
-from zLOG import LOG, ERROR
 from sys import exc_info
 from types import StringType
-from FSMetadata import FSMetadata
-import re
 
-_dtmldir = path.join( package_home( globals() ), 'dtml' )
+from AccessControl import ClassSecurityInfo
+from Acquisition import aq_inner, aq_parent
+from Globals import DevelopmentMode
+from Globals import DTMLFile
+from Globals import HTMLFile
+from Globals import InitializeClass
+from Globals import package_home
+from Globals import Persistent
+from OFS.Folder import Folder
+from OFS.ObjectManager import bad_id
+from zLOG import LOG, ERROR
+
+from CMFCorePermissions import AccessContentsInformation
+from CMFCorePermissions import ManagePortal
+from FSMetadata import FSMetadata
+from FSObject import BadFile
+from utils import _dtmldir
+from utils import expandpath
+from utils import minimalpath
 
 __reload_module__ = 0
 
@@ -57,6 +60,7 @@ def _walker (listdir, dirname, names):
               in names
               if name not in ignore and not ignore_re.match(name) ]
     listdir.extend(names)
+
 
 class DirectoryInformation:
     data = None
@@ -97,13 +101,15 @@ class DirectoryInformation:
             lines = f.readlines()
             f.close()
             for line in lines:
-                try: obname, meta_type = split(line, ':')
-                except: pass
+                try:
+                    obname, meta_type = line.split(':')
+                except ValueError:
+                    pass
                 else:
-                    types[strip(obname)] = strip(meta_type)
+                    types[obname.strip()] = meta_type.strip()
         return types
 
-    if Globals.DevelopmentMode:
+    if DevelopmentMode:
 
         def _changed(self):
             mtime=0
@@ -111,13 +117,13 @@ class DirectoryInformation:
             try:
                 fp = expandpath(self.filepath)
                 mtime = stat(fp)[8]
-                # some Windows directories don't change mtime 
+                # some Windows directories don't change mtime
                 # when a file is added to or deleted from them :-(
                 # So keep a list of files as well, and see if that
                 # changes
                 path.walk(fp,_walker,filelist)
                 filelist.sort()
-            except: 
+            except:
                 LOG('DirectoryView',
                     ERROR,
                     'Error checking for directory modification',
@@ -126,16 +132,16 @@ class DirectoryInformation:
             if mtime != self._v_last_read or filelist != self._v_last_filelist:
                 self._v_last_read = mtime
                 self._v_last_filelist = filelist
-                
+
                 return 1
 
             return 0
-        
+
     else:
 
         def _changed(self):
             return 0
-        
+
     def getContents(self, registry):
         changed = self._changed()
         if self.data is None or changed:
@@ -149,7 +155,7 @@ class DirectoryInformation:
                     error=exc_info())
                 self.data = {}
                 self.objects = ()
-                    
+
         return self.data, self.objects
 
     def prepareContents(self, registry, register_subdirs=0):
@@ -183,7 +189,7 @@ class DirectoryInformation:
                     data[ob_id] = ob
                     objects.append({'id': ob_id, 'meta_type': ob.meta_type})
             else:
-                pos = rfind(entry, '.')
+                pos = entry.rfind('.')
                 if pos >= 0:
                     name = entry[:pos]
                     ext = path.normcase(entry[pos + 1:])
@@ -205,7 +211,7 @@ class DirectoryInformation:
                     t = registry.getTypeByMetaType(mt)
                 if t is None:
                     t = registry.getTypeByExtension(ext)
-                
+
                 if t is not None:
                     metadata = FSMetadata(e_fp)
                     metadata.read()
@@ -219,17 +225,16 @@ class DirectoryInformation:
                             exc_lines = traceback.format_exception( typ,
                                                                     val,
                                                                     tb )
-                            LOG( 'DirectoryView',
-                                 ERROR,
-                                 join( exc_lines, '\n' ) )
-                            
+                            LOG( 'DirectoryView', ERROR,
+                                 '\n'.join(exc_lines) )
+
                             ob = BadFile( name,
                                           e_filepath,
-                                          exc_str=join( exc_lines, '\r\n' ),
+                                          exc_str='\r\n'.join(exc_lines),
                                           fullname=entry )
                         finally:
                             tb = None   # Avoid leaking frame!
-                            
+
                     # FS-based security
                     try:
                         permissions = metadata.getSecurity()
@@ -252,11 +257,11 @@ class DirectoryInformation:
                                 ERROR,
                                 'Error setting proxy role',
                                 error=exc_info())
-                    
+
                     ob_id = ob.getId()
                     data[ob_id] = ob
                     objects.append({'id': ob_id, 'meta_type': ob.meta_type})
-                    
+
         return data, tuple(objects)
 
 
@@ -266,7 +271,7 @@ class DirectoryRegistry:
         self._meta_types = {}
         self._object_types = {}
         self._directories = {}
-    
+
     def registerFileExtension(self, ext, klass):
         self._object_types[ext] = klass
 
@@ -319,7 +324,7 @@ class DirectoryRegistry:
         dirs = self._directories.keys()
         dirs.sort()
         return dirs
-        
+
 
 _dirreg = DirectoryRegistry()
 registerDirectory = _dirreg.registerDirectory
@@ -388,7 +393,7 @@ class DirectoryView (Persistent):
     def getId(self):
         return self.id
 
-Globals.InitializeClass(DirectoryView)
+InitializeClass(DirectoryView)
 
 
 class DirectoryViewSurrogate (Folder):
@@ -452,8 +457,8 @@ class DirectoryViewSurrogate (Folder):
     security.declarePublic('getId')
     def getId(self):
         return self.id
-    
-Globals.InitializeClass(DirectoryViewSurrogate)
+
+InitializeClass(DirectoryViewSurrogate)
 
 
 manage_addDirectoryViewForm = HTMLFile('dtml/addFSDirView', globals())
@@ -504,4 +509,3 @@ def manage_listAvailableDirectories(*args):
     '''
     '''
     return list(_dirreg.listDirectories())
-

@@ -1,38 +1,41 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """ Customizable Python scripts that come from the filesystem.
 
 $Id$
 """
 
-from string import strip, split
 from os import path, stat
 import new
 
 import Globals
 from AccessControl import ClassSecurityInfo, getSecurityManager
+from OFS.Cache import Cacheable
 from Products.PythonScripts.PythonScript import PythonScript
 from Shared.DC.Scripts.Script import Script
 from ComputedAttribute import ComputedAttribute
 
-from utils import _dtmldir
-from CMFCorePermissions import ViewManagementScreens, View, FTPAccess
-from DirectoryView import registerFileExtension, registerMetaType, expandpath
+from CMFCorePermissions import FTPAccess
+from CMFCorePermissions import View
+from CMFCorePermissions import ViewManagementScreens
+from DirectoryView import registerFileExtension
+from DirectoryView import registerMetaType
 from FSObject import FSObject
-
-from OFS.Cache import Cacheable
+from utils import _dtmldir
+from utils import expandpath
 
 _marker = []
+
 
 class bad_func_code:
     co_varnames = ()
@@ -49,7 +52,7 @@ class FSPythonScript (FSObject, Script):
     _proxy_roles = ()
 
     _owner = None  # Unowned
-    
+
     manage_options=(
         (
             {'label':'Customize', 'action':'manage_main'},
@@ -79,7 +82,7 @@ class FSPythonScript (FSObject, Script):
 
     def _readFile(self, reparse):
         """Read the data from the filesystem.
-        
+
         Read the file (indicated by exandpath(self._filepath), and parse the
         data if necessary.
         """
@@ -129,7 +132,6 @@ class FSPythonScript (FSObject, Script):
                 # Got a cached value.
                 return result
 
-        
         # Prepare the function.
         f = self._v_f
         if f is None:
@@ -157,10 +159,10 @@ class FSPythonScript (FSObject, Script):
         security=getSecurityManager()
         security.addContext(self)
         try:
-            result = apply(f, args, kw)
+            result = f(*args, **kw)
             if keyset is not None:
                 # Store the result in the cache.
-                self.ZCacheable_set(result, keywords=keyset)           
+                self.ZCacheable_set(result, keywords=keyset)
             return result
         finally:
             security.removeContext(self)
@@ -174,10 +176,10 @@ class FSPythonScript (FSObject, Script):
     def ZScriptHTML_tryParams(self):
         """Parameters to test the script with."""
         param_names = []
-        for name in split(self._params, ','):
-            name = strip(name)
+        for name in self._params.split(','):
+            name = name.strip()
             if name and name[0] != '*':
-                param_names.append(split(name, '=', 1)[0])
+                param_names.append( name.split('=', 1)[0] )
         return param_names
 
     security.declareProtected(ViewManagementScreens, 'read')
@@ -270,7 +272,6 @@ class FSPythonScript (FSObject, Script):
             # Now do it for real
             self._updateFromFS()
         return self._bind_names
-
 
 Globals.InitializeClass(FSPythonScript)
 

@@ -25,7 +25,7 @@ class URLToolTests(TestCase):
         self.site = DummySite(id='foo')
 
     def _makeOne(self, *args, **kw):
-        url_tool = apply( URLTool, args, kw )
+        url_tool = URLTool(*args, **kw)
         return url_tool.__of__( self.site )
 
     def test_portal_methods(self):

@@ -1,24 +1,24 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """ Base class for objects that supply skins.
 
 $Id$
 """
 
-from string import split, join, strip
 from Acquisition import aq_base
 from AccessControl import ClassSecurityInfo
 from Globals import InitializeClass
+
 
 class SkinPathError (Exception):
     'Invalid skin path'
@@ -57,11 +57,11 @@ class SkinsContainer:
         '''
         baseself = aq_base(self)
         skinob = baseself
-        parts = list(split(path, ','))
+        parts = list( path.split(',') )
         parts.reverse()
         for part_path in parts:
             partob = baseself
-            for name in split(strip(part_path), '/'):
+            for name in part_path.strip().split('/'):
                 if name == '':
                     continue
                 if name[:1] == '_':
@@ -84,7 +84,7 @@ class SkinsContainer:
                 # of the new skinob.
                 skinob = partob.__of__(skinob)
         return skinob
-        
+
     security.declarePrivate('getSkinByName')
     def getSkinByName(self, name):
         path = self.getSkinPath(name)

@@ -1,49 +1,46 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
-##########################################################################
-"""Customizable page templates that come from the filesystem.
+#
+##############################################################################
+""" Customizable page templates that come from the filesystem.
 
 $Id$
 """
 
-from string import split, replace
-from os import stat
 import re, sys
 
-import Globals, Acquisition
-from DateTime import DateTime
+import Globals
 from DocumentTemplate.DT_Util import html_quote
-from Acquisition import aq_parent
 from AccessControl import getSecurityManager, ClassSecurityInfo
+from OFS.Cache import Cacheable
 from Shared.DC.Scripts.Script import Script
 from Products.PageTemplates.PageTemplate import PageTemplate
 from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate, Src
 
-from DirectoryView import registerFileExtension, registerMetaType, expandpath
-from CMFCorePermissions import ViewManagementScreens
-from CMFCorePermissions import View
 from CMFCorePermissions import FTPAccess
+from CMFCorePermissions import View
+from CMFCorePermissions import ViewManagementScreens
+from DirectoryView import registerFileExtension
+from DirectoryView import registerMetaType
 from FSObject import FSObject
-from utils import getToolByName, _setCacheHeaders
+from utils import _setCacheHeaders
+from utils import expandpath
 
 xml_detect_re = re.compile('^\s*<\?xml\s+')
-
-from OFS.Cache import Cacheable
-
 _marker = []  # Create a new marker object.
+
 
 class FSPageTemplate(FSObject, Script, PageTemplate):
     "Wrapper for Page Template"
-     
+
     meta_type = 'Filesystem Page Template'
 
     _owner = None  # Unowned
@@ -54,7 +51,7 @@ class FSPageTemplate(FSObject, Script, PageTemplate):
             {'label':'Test', 'action':'ZScriptHTML_tryForm'},
             )
             +Cacheable.manage_options
-        ) 
+        )
 
     security = ClassSecurityInfo()
     security.declareObjectProtected(View)
@@ -82,9 +79,9 @@ class FSPageTemplate(FSObject, Script, PageTemplate):
     def _readFile(self, reparse):
         fp = expandpath(self._filepath)
         file = open(fp, 'r')    # not 'rb', as this is a text file!
-        try: 
+        try:
             data = file.read()
-        finally: 
+        finally:
             file.close()
         if reparse:
             if xml_detect_re.match(data):
@@ -134,13 +131,13 @@ class FSPageTemplate(FSObject, Script, PageTemplate):
                 if not err:
                     err = sys.exc_info()
                 err_type = err[0]
-                err_msg = '<pre>%s</pre>' % replace( str(err[1]), "\'", "'" )
+                err_msg = '<pre>%s</pre>' % str(err[1]).replace("\'", "'")
                 msg = 'FS Page Template %s has errors: %s.<br>%s' % (
                     self.id, err_type, html_quote(err_msg) )
                 raise RuntimeError, msg
             else:
                 raise
-                
+
     security.declarePrivate( '_ZPT_exec' )
     _ZPT_exec = ZopePageTemplate._exec
 
@@ -153,7 +150,7 @@ class FSPageTemplate(FSObject, Script, PageTemplate):
             response = None
         # Read file first to get a correct content_type default value.
         self._updateFromFS()
-        
+
         if not kw.has_key('args'):
             kw['args'] = args
         bound_names['options'] = kw
@@ -164,7 +161,7 @@ class FSPageTemplate(FSObject, Script, PageTemplate):
                 response.setHeader('content-type', self.content_type)
         except AttributeError:
             pass
-            
+
         security=getSecurityManager()
         bound_names['user'] = security.getUser()
 
@@ -175,7 +172,7 @@ class FSPageTemplate(FSObject, Script, PageTemplate):
             keyset = {
                       # Why oh why?
                       # All this code is cut and paste
-                      # here to make sure that we 
+                      # here to make sure that we
                       # dont call _getContext and hence can't cache
                       # Annoying huh?
                       'here': self.aq_parent.getPhysicalPath(),
@@ -195,9 +192,9 @@ class FSPageTemplate(FSObject, Script, PageTemplate):
             return result
         finally:
             security.removeContext(self)
-        
+
         return result
- 
+
     # Copy over more methods
     security.declareProtected(FTPAccess, 'manage_FTPget')
     manage_FTPget = ZopePageTemplate.manage_FTPget
@@ -227,4 +224,3 @@ registerFileExtension('zpt', FSPageTemplate)
 registerFileExtension('html', FSPageTemplate)
 registerFileExtension('htm', FSPageTemplate)
 registerMetaType('Page Template', FSPageTemplate)
-

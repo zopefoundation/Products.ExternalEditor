@@ -1,34 +1,31 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
-"""FSSTXMethod: Filesystem methodish Structured Text document.
+""" FSSTXMethod: Filesystem methodish Structured Text document.
 
 $Id$
 """
 
 import Globals
 from AccessControl import ClassSecurityInfo
-import StructuredText
 
-from DirectoryView import registerFileExtension
-from DirectoryView import registerMetaType
-from DirectoryView import expandpath
-from FSObject import FSObject
-
+from CMFCorePermissions import FTPAccess
 from CMFCorePermissions import View
 from CMFCorePermissions import ViewManagementScreens
-from CMFCorePermissions import FTPAccess
-
+from DirectoryView import registerFileExtension
+from DirectoryView import registerMetaType
+from FSObject import FSObject
 from utils import _dtmldir
+from utils import expandpath
 from utils import format_stx
 
 
@@ -91,7 +88,7 @@ class FSSTXMethod( FSObject ):
     func_code.co_varnames= ()
     func_code.co_argcount=0
     func_code.__roles__=()
-    
+
     func_defaults__roles__=()
     func_defaults=()
 
@@ -119,7 +116,7 @@ class FSSTXMethod( FSObject ):
 
         if RESPONSE is not None:
             RESPONSE.setHeader( 'Content-Type', 'text/html' )
-        return apply( self._render, ( REQUEST, RESPONSE ), kw )
+        return self._render(REQUEST, RESPONSE, **kw)
 
     security.declarePrivate( '_render' )
     def _render( self, REQUEST={}, RESPONSE=None, **kw ):
@@ -133,8 +130,8 @@ class FSSTXMethod( FSObject ):
             posargs = ( self, REQUEST )
         else:
             posargs = ()
-        
-        return apply( template, posargs, { 'cooked' : self.cook() } )
+
+        return template(*posargs, **{ 'cooked' : self.cook() } )
 
     security.declareProtected( FTPAccess, 'manage_FTPget' )
     def manage_FTPget( self ):

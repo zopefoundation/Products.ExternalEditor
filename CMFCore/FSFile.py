@@ -1,33 +1,37 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
-"""Customizable image objects that come from the filesystem."""
-__version__='$Revision$'[11:-2]
+""" Customizable image objects that come from the filesystem.
 
-import string, os
+$Id$
+"""
 
 import Globals
 from DateTime import DateTime
 from AccessControl import ClassSecurityInfo
 from webdav.common import rfc1123_date
+from OFS.Cache import Cacheable
 from OFS.Image import File
 from OFS.content_types import guess_content_type
 
-from utils import _dtmldir
-from CMFCorePermissions import ViewManagementScreens, View, FTPAccess
+from CMFCorePermissions import FTPAccess
+from CMFCorePermissions import View
+from CMFCorePermissions import ViewManagementScreens
+from DirectoryView import registerFileExtension
+from DirectoryView import registerMetaType
 from FSObject import FSObject
-from DirectoryView import registerFileExtension, registerMetaType, expandpath
+from utils import _dtmldir
+from utils import expandpath
 
-from OFS.Cache import Cacheable
 
 class FSFile(FSObject):
     """FSFiles act like images but are not directly
@@ -75,7 +79,7 @@ class FSFile(FSObject):
         return data
 
     #### The following is mainly taken from OFS/File.py ###
-        
+
     __str__ = File.__str__
 
     security.declareProtected(View, 'index_html')
@@ -91,7 +95,7 @@ class FSFile(FSObject):
         # HTTP If-Modified-Since header handling.
         header=REQUEST.get_header('If-Modified-Since', None)
         if header is not None:
-            header=string.split(header, ';')[0]
+            header = header.split(';')[0]
             # Some proxies seem to send invalid date strings for this
             # header. If the date string is not valid, we ignore it
             # rather than raise an error to be generally consistent

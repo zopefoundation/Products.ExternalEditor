@@ -1,39 +1,40 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """ Customizable objects that come from the filesystem (base class).
 
 $Id$
 """
 
-from string import split
 from os import path, stat
 
-import Acquisition, Globals
+import Globals
 from AccessControl import ClassSecurityInfo
+from Acquisition import Implicit
+from OFS.Cache import Cacheable
 from OFS.SimpleItem import Item
 from DateTime import DateTime
 from Products.PythonScripts.standard import html_quote
 
-from utils import expandpath, getToolByName
+from CMFCorePermissions import ManagePortal
 from CMFCorePermissions import View
 from CMFCorePermissions import ViewManagementScreens
-from CMFCorePermissions import ManagePortal
+from utils import expandpath
+from utils import getToolByName
 
-from OFS.Cache import Cacheable
 
-class FSObject(Acquisition.Implicit, Item, Cacheable):
+class FSObject(Implicit, Item, Cacheable):
     """FSObject is a base class for all filesystem based look-alikes.
-    
+
     Subclasses of this class mimic ZODB based objects like Image and
     DTMLMethod, but are not directly modifiable from the management
     interface. They provide means to create a TTW editable copy, however.
@@ -64,7 +65,7 @@ class FSObject(Acquisition.Implicit, Item, Cacheable):
         self.__name__ = id # __name__ is used in traceback reporting
         self._filepath = filepath
         fp = expandpath(self._filepath)
-        
+
         try: self._file_mod_time = stat(fp)[8]
         except: pass
         self._readFile(0)
@@ -77,10 +78,10 @@ class FSObject(Acquisition.Implicit, Item, Cacheable):
         """
 
         obj = self._createZODBClone()
-        
+
         id = obj.getId()
-        fpath = tuple(split(folder_path, '/'))
-        portal_skins = getToolByName(self,'portal_skins') 
+        fpath = tuple( folder_path.split('/') )
+        portal_skins = getToolByName(self,'portal_skins')
         folder = portal_skins.restrictedTraverse(fpath)
         if id in folder.objectIds():
             # we cant catch the badrequest so
@@ -90,9 +91,9 @@ class FSObject(Acquisition.Implicit, Item, Cacheable):
                 RESPONSE.redirect('%s/manage_main?manage_tabs_message=%s' % (
                     obj.absolute_url(), html_quote("An object with this id already exists")
                     ))
-        else:            
+        else:
             folder._verifyObjectPaste(obj, validate_src=0)
-            folder._setObject(id, obj)        
+            folder._setObject(id, obj)
 
             if RESPONSE is not None:
                 RESPONSE.redirect('%s/%s/manage_main' % (
@@ -108,7 +109,7 @@ class FSObject(Acquisition.Implicit, Item, Cacheable):
 
     def _readFile(self, reparse):
         """Read the data from the filesystem.
-        
+
         Read the file indicated by exandpath(self._filepath), and parse the
         data if necessary.  'reparse' is set when reading the second
         time and beyond.
@@ -152,6 +153,7 @@ class FSObject(Acquisition.Implicit, Item, Cacheable):
         return self._filepath
 
 Globals.InitializeClass(FSObject)
+
 
 class BadFile( FSObject ):
     """
@@ -201,7 +203,7 @@ class BadFile( FSObject ):
     security.declarePrivate( '_readFile' )
     def _readFile( self, reparse ):
         """Read the data from the filesystem.
-        
+
         Read the file indicated by exandpath(self._filepath), and parse the
         data if necessary.  'reparse' is set when reading the second
         time and beyond.
@@ -216,14 +218,14 @@ class BadFile( FSObject ):
         except:  # No errors of any sort may propagate
             data = self.file_contents = None #give up
         return data
-    
+
     security.declarePublic( 'getFileContents' )
     def getFileContents( self ):
         """
             Return the contents of the file, if we could read it.
         """
         return self.file_contents
-    
+
     security.declarePublic( 'getExceptionText' )
     def getExceptionText( self ):
         """
@@ -231,6 +233,5 @@ class BadFile( FSObject ):
             the file.
         """
         return self.exc_str
-
 
 Globals.InitializeClass( BadFile )

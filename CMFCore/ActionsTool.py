@@ -17,9 +17,10 @@ $Id$
 
 from types import DictionaryType
 
-from Globals import InitializeClass, DTMLFile, package_home
 from AccessControl import ClassSecurityInfo
-from Acquisition import aq_base, aq_inner, aq_parent
+from Acquisition import aq_base
+from Globals import DTMLFile
+from Globals import InitializeClass
 from OFS.Folder import Folder
 from OFS.SimpleItem import SimpleItem
 
@@ -34,7 +35,6 @@ from interfaces.portal_actions import portal_actions as IActionsTool
 from TypesTool import TypeInformation
 from utils import _checkPermission
 from utils import _dtmldir
-from utils import getToolByName
 from utils import SimpleItemWithProperties
 from utils import UniqueObject
 

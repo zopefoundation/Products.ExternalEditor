@@ -30,7 +30,6 @@ from interfaces.portal_actions \
         import OldstyleActionProvider as IOldstyleActionProvider
 from utils import _checkPermission
 from utils import _dtmldir
-from utils import getToolByName
 
 
 class ActionProviderBase:
@@ -48,7 +47,7 @@ class ActionProviderBase:
     manage_options = ( { 'label' : 'Actions'
                        , 'action' : 'manage_editActionsForm'
                        }
-                     , 
+                     ,
                      )
 
     #
@@ -302,7 +301,7 @@ class ActionProviderBase:
         """ Return a list of actions, cloned from our current list.
         """
         return map( lambda x: x.clone(), list( self._actions ) )
- 
+
     security.declarePrivate( '_extractAction' )
     def _extractAction( self, properties, index ):
 
