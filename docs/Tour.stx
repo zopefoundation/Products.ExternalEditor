@@ -166,7 +166,7 @@ CMF Tour
 
   Scenario Share content.
 
-    Reporter 1 adds content, gives report 2 'Manager' role
+    Reporter 1 adds content, gives report 2 'Owner' role
 
     Reporter 2 can access content and change it
 
