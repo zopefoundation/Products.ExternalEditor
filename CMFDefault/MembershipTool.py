@@ -178,7 +178,6 @@ class MembershipTool ( Products.CMFCore.MembershipTool.MembershipTool ):
             user = acl_users.getUser(member_id).__of__(acl_users)
             f.changeOwnership(user)
             f.manage_setLocalRoles(member_id, ['Owner'])
-            f._setPortalTypeName( 'Document' )
  
             # Create Member's home page.
             # default_member_content ought to be configurable per
@@ -191,6 +190,8 @@ class MembershipTool ( Products.CMFCore.MembershipTool.MembershipTool ):
                                 , (default_member_content % id)
                                 )
  
+            f.index_html._setPortalTypeName( 'Document' )
+
             # Overcome an apparent catalog bug.
             f.index_html.reindexObject()
             
