@@ -15,7 +15,7 @@
 $Id$
 """
 
-from string import join
+from types import TupleType
 
 from Acquisition import aq_inner, aq_parent
 import Globals
@@ -28,9 +28,6 @@ from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
 from ContainerTab import ContainerTab
 from utils import _dtmldir
-
-
-TupleType = type(())
 
 
 class StateDefinition (SimpleItem):

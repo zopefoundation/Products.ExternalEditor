@@ -15,8 +15,6 @@
 $Id$
 """
 
-from string import join, split, strip
-
 from OFS.SimpleItem import SimpleItem
 from Globals import DTMLFile, PersistentMapping
 from Acquisition import aq_inner, aq_parent
