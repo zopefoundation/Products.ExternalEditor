@@ -174,6 +174,62 @@ class SkinsToolConfiguratorTests( _SkinsSetup ):
 
         self._compareDOM( configurator.generateXML(), _NORMAL_EXPORT )
 
+    def test_parseXML_empty( self ):
+
+        _IDS = ( 'one', 'two', 'three' )
+        _FSDVS = [ ( id, DummyFSDV( id ) ) for id in _IDS ]
+        _PATHS = { 'basic' : 'one'
+                 , 'fancy' : 'three, two, one'
+                 }
+
+        site = self._initSite( selections=_PATHS, fsdvs=_FSDVS )
+        skins_tool = site.portal_skins
+
+        self.failIf( skins_tool._setup_called )
+        self.assertEqual( len( skins_tool.getSkinPaths() ), 2 )
+        self.assertEqual( len( skins_tool.objectItems() ), 3 )
+
+        configurator = self._makeOne( site ).__of__( site )
+        configurator.parseXML( _EMPTY_EXPORT )
+
+        self.assertEqual( skins_tool.default_skin, "default_skin" )
+        self.assertEqual( skins_tool.request_varname, "request_varname" )
+        self.failIf( skins_tool.allow_any )
+        self.failIf( skins_tool.cookie_persistence )
+
+        # Skin setup is done by 'importSkinsTool', not 'parseXML'.
+        self.failIf( skins_tool._setup_called )
+
+        # Purging is done by 'importSkinsTool', not 'parseXML'.
+        self.assertEqual( len( skins_tool.getSkinPaths() ), 2 )
+        self.assertEqual( len( skins_tool.objectItems() ), 3 )
+
+    def test_normal( self ):
+
+        site = self._initSite()
+        self._registerDirectoryView( os.path.join( _TESTS_PATH, 'one' ) )
+        self._registerDirectoryView( os.path.join( _TESTS_PATH, 'two' ) )
+        self._registerDirectoryView( os.path.join( _TESTS_PATH, 'three' ) )
+        skins_tool = site.portal_skins
+
+        self.failIf( skins_tool._setup_called )
+        self.assertEqual( len( skins_tool.getSkinPaths() ), 0 )
+        self.assertEqual( len( skins_tool.objectItems() ), 0 )
+
+        configurator = self._makeOne( site ).__of__( site )
+        configurator.parseXML( _NORMAL_EXPORT )
+
+        self.assertEqual( skins_tool.default_skin, "basic" )
+        self.assertEqual( skins_tool.request_varname, "skin_var" )
+        self.failUnless( skins_tool.allow_any )
+        self.failUnless( skins_tool.cookie_persistence )
+
+        # Skin setup is done by 'importSkinsTool', not 'parseXML'.
+        self.failIf( skins_tool._setup_called )
+
+        self.assertEqual( len( skins_tool.getSkinPaths() ), 2 )
+        self.assertEqual( len( skins_tool.objectItems() ), 3 )
+
 
 
 _EMPTY_EXPORT = """\
