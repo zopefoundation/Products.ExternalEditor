@@ -1,6 +1,6 @@
 External Editor Change Log
 
-  Next Release
+  ExternalEditor-0.8.1 release (12/19/04)
 
     - External Editor now compatible with objects that return a
       "filestream iterator" in Zope 2.7.1+. (if upgrading: this fix
@@ -18,7 +18,7 @@ External Editor Change Log
       function does not work with a hidden root Tk window in Python 2.3.4.
       Thanks to Christopher Mann.
 
-  7/13/04 - 0.8 release
+  ExternalEditor-0.8 release (7/13/04)
   
     - Add external editor icon to ZMI breadcrumbs for editable objects.
 
@@ -46,7 +46,7 @@ External Editor Change Log
       using the Excel plugin where the symptom was a "Call was
       rejected by callee" COM error. Thanks to Chris McDonough.
 
-  4/23/04 - 0.7.2 Release
+  ExternalEditor-0.7.2 Release (4/23/04)
 
     - Change default configuration to use .txt extension for text/plain only. 
       Add extensions for css and javascript files.
@@ -58,14 +58,14 @@ External Editor Change Log
     - Fixed a bug where very short editing sessions where no changes were
       made could make EE think the editor never launched. Thanks to Maik Ihde.
 
-  11/7/03 - 0.7.1 Release (affects win32 binary only)
+  ExternalEditor-0.7.1 Release (affects win32 binary only) (11/7/03)
 
     - Fix encoding bug in windows binary. Thanks to Chris McDonough.
   
     - Added tip for configuring IE to save files over SSL. Thanks to
       Jonah Bossewitch.
 
-  4/1/03 - 0.7 Release
+  ExternalEditor-0.7 Release (4/1/03)
 
     - Added working distutils setup for Unix.
 
@@ -82,7 +82,7 @@ External Editor Change Log
     - Added the man page from the Debian distro. Thanks go out to
       Federico Sevilla III and Andreas Tille
 
-  11/02/02 - 0.6 Release
+  ExternalEditor-0.6 Release (11/02/02)
 
     - Built Windows helper app using Python 2.2.2 and PythonWin 148.
 
@@ -106,7 +106,7 @@ External Editor Change Log
 
     - Added win32 editor plugin support for the helper application.
 
-  8/19/02 - 0.5 Release
+  ExternalEditor-0.5 Release (8/19/02)
 
     - Added patch for Zope find template so that you can use external editor
       directly from find results in the ZMI. Thanks to Jim Washington.
@@ -140,12 +140,12 @@ External Editor Change Log
     - Fixed auth bug when product was used with mysqlUserFolder. Thanks to
       ViNiL.
 
-  6/30/02 - 0.4.2 Release (affects win32 binary only)
+  ExternalEditor-0.4.2 Release (affects win32 binary only) (6/30/02)
 
     - Added SSL support to Windows binary package. Thanks to Federico 
       Sevilla III
 
-  6/29/02 - 0.4.1 Release
+  ExternalEditor-0.4.1 Release (6/29/02)
 
     - Fixed dangling dav lock bug on fatal errors. Thanks to Marc St-Jean.
 
@@ -156,7 +156,7 @@ External Editor Change Log
 
     - Fixed bug setting the editor on Posix platforms.
 
-  6/24/02 - 0.4 Release
+  ExternalEditor-0.4 Release (6/24/02)
 
     - Added --version command line argument
 
@@ -172,7 +172,7 @@ External Editor Change Log
 
     - Fixed bug in Windows registry editor lookup.
 
-  6/16/02 - 0.3 Release
+  ExternalEditor-0.3 Release (6/16/02)
 
     - Improved behavior when saving after lock attempts fail.
 
@@ -215,10 +215,10 @@ External Editor Change Log
     - Eliminated spurious "Editor did not launch" errors on short sessions
       or when other errors occurred.
 
-  5/16/02 - 0.2 Release
+  ExternalEditor-0.2 Release (5/16/02)
 
     - Fixed product uninstallation bug
 
-  5/15/02 - 0.1
+  ExternalEditor-0.1 Release (5/15/02)
 
     - Initial release
