@@ -51,11 +51,10 @@ class ImportContext( Implicit ):
         """
         return self._site
 
+    security.declareProtected( ManagePortal, 'getEncoding' )
     def getEncoding( self ):
 
-        """ Return the encoding used in data files.
-
-        o Return None if the data should not be encoded.
+        """ See IImportContext.
         """
         return self._encoding
 
@@ -318,5 +317,121 @@ class SnapshotExportContext( Implicit ):
 
         return current
 
-
 InitializeClass( SnapshotExportContext )
+
+
+class SnapshotImportContext( Implicit ):
+
+    __implements__ = ( IImportContext, )
+
+    security = ClassSecurityInfo()
+
+    def __init__( self
+                , tool
+                , snapshot_id
+                , encoding=None
+                , should_purge=False
+                ):
+
+        self._tool = tool = aq_inner( tool )
+        self._site = aq_parent( tool )
+        self._snapshot_id = snapshot_id
+        self._encoding = encoding
+        self._should_purge = bool( should_purge )
+
+    security.declareProtected( ManagePortal, 'getSite' )
+    def getSite( self ):
+
+        """ See ISetupContext.
+        """
+        return self._site
+
+    security.declareProtected( ManagePortal, 'getEncoding' )
+    def getEncoding( self ):
+
+        """ Return the encoding used in data files.
+
+        o Return None if the data should not be encoded.
+        """
+        return self._encoding
+
+    security.declareProtected( ManagePortal, 'readDataFile' )
+    def readDataFile( self, filename, subdir=None ):
+
+        """ See IImportContext.
+        """
+        try:
+            snapshot = self._getSnapshotFolder( subdir )
+            object = snapshot._getOb( filename )
+        except ( AttributeError, KeyError ):
+            return None
+        else:
+            return object.manage_FTPget()
+
+    security.declareProtected( ManagePortal, 'getLastModified' )
+    def getLastModified( self, path ):
+
+        """ See IImportContext.
+        """
+        try:
+            snapshot = self._getSnapshotFolder()
+            object = snapshot.restrictedTraverse( path )
+        except ( AttributeError, KeyError ):
+            return None
+        else:
+            return object.bobobase_modification_time()
+
+    security.declareProtected( ManagePortal, 'isDirectory' )
+    def isDirectory( self, path ):
+
+        """ See IImportContext.
+        """
+        try:
+            snapshot = self._getSnapshotFolder()
+            object = snapshot.restrictedTraverse( path )
+        except ( AttributeError, KeyError ):
+            return None
+        else:
+            folderish = getattr( object, 'isPrincipiaFolderish', False )
+            return bool( folderish )
+
+    security.declareProtected( ManagePortal, 'listDirectory' )
+    def listDirectory( self, path, skip=() ):
+
+        """ See IImportContext.
+        """
+        try:
+            snapshot = self._getSnapshotFolder()
+            subdir = snapshot.restrictedTraverse( path )
+        except ( AttributeError, KeyError ):
+            return None
+        else:
+            if not getattr( subdir, 'isPrincipiaFolderish', False ):
+                return None
+
+            object_ids = subdir.objectIds()
+            return [ x for x in object_ids if x not in skip ]
+
+    security.declareProtected( ManagePortal, 'shouldPurge' )
+    def shouldPurge( self ):
+
+        """ See IImportContext.
+        """
+        return self._should_purge
+
+    #
+    #   Helper methods
+    #
+    security.declarePrivate( '_getSnapshotFolder' )
+    def _getSnapshotFolder( self, subdir=None ):
+
+        """ Return the appropriate snapshot (sub)folder.
+        """
+        path = [ 'snapshots', self._snapshot_id ]
+
+        if subdir is not None:
+            path.extend( subdir.split( '/' ) )
+
+        return self._tool.restrictedTraverse( path )
+
+InitializeClass( SnapshotImportContext )
