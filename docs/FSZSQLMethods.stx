@@ -1,0 +1,50 @@
+FS ZSQL Methods
+
+  This document describes how to use FS ZSQL Methods. These are 
+  Z SQL Methods that form part of filesystem-based skin layers.
+
+  They behave identically to normal Z SQL Methods except that
+  their parameters are specified in a comment block in the
+  method's body. This comment block may appear anywhere, but
+  it is recommended you place it at the top of the body.
+
+  Here is a sample:
+	
+    <dtml-comment>
+    Connection_id : my_db_connection
+    arguments: arg1 arg2 arg3
+    max_cache: 1000
+    max_rows: 0
+    cache_time: 0
+    </dtml-comment>
+
+    INSERT INTO
+      mytable
+    SET
+      col1    = <dtml-sqlvar arg1 type=int>,
+      col2    = <dtml-sqlvar arg2 type=string>,
+      col3    = <dtml-sqlvar arg3 type=int>
+
+    <dtml-var sql_delimiter>
+
+    SELECT LAST_INSERT_ID() as NEWID
+  
+  The following list describes how the parameters in the
+  comment block map to the properties of a ZSQL Method:
+
+    FS ZSQL Method  Z SQL Method
+    title           Title
+    connection_id   Connection Id
+    arguments       Arguments
+    max_rows        Maximum rows to retrieve 
+    max_cache       Maximum results to cache 
+    cache_time      Maximum time (sec) to cache 
+
+  You cannot control the class used for the data records
+  with FS ZSQL Methods.
+
+  For further details, please see the documentation for
+  Z SQL Methods.
+
+
+  
