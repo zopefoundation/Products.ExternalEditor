@@ -1,24 +1,38 @@
 ## Script (Python) "collector_issue_edit.py"
-##parameters=
 ##title=Submit a Request
 
-REQUEST = context.REQUEST
+from Products.PythonScripts.standard import url_quote_plus
 
-import pdb; pdb.set_trace()
+reqget = context.REQUEST.get
 
-id = context.edit(comment=REQUEST.get('comment'),
-                  status=REQUEST.get('status'),
-                  submitter_name=REQUEST.get('submitter_name'),
-                  title=REQUEST.get('title'),
-                  description=REQUEST.get('description'),
-                  security_related=REQUEST.get('security_related'),
-                  topic=REQUEST.get('topic'),
-                  importance=REQUEST.get('importance'),
-                  classification=REQUEST.get('classification'),
-                  severity=REQUEST.get('severity'),
-                  reported_version=REQUEST.get('reported_version'),
-                  other_version_info=REQUEST.get('other_version_info'))
+was_security_related = context.security_related
 
-context.REQUEST.RESPONSE.redirect("%s/collector_issue_contents"
-                                  % context.absolute_url())
+changed = context.edit(title=reqget('title'),
+                       security_related=reqget('security_related', 0),
+                       description=reqget('description'),
+                       topic=reqget('topic'),
+                       classification=reqget('classification'),
+                       importance=reqget('importance'),
+                       severity=reqget('severity'),
+                       reported_version=reqget('reported_version'),
+                       other_version_info=reqget('other_version_info'),
+                       text=reqget('text'))
+
+if context.security_related != was_security_related:
+    # Do first available restrict/unrestrict action:
+    for action, pretty in context.valid_actions_pairs():
+        if pretty in ['Restrict', 'Unrestrict']:
+            context.do_action(action, ' Triggered by security_related toggle.')
+            changed = changed + ", " + pretty.lower() + 'ed'
+            break
+
+whence = context.absolute_url()
+
+if changed:
+    msg = url_quote_plus("Changed: " + changed)
+    context.REQUEST.RESPONSE.redirect("%s?portal_status_message=%s"
+                                      % (whence, msg))
+
+else:
+    context.REQUEST.RESPONSE.redirect(whence)
 
