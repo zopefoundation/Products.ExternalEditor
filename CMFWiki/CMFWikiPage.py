@@ -1799,91 +1799,107 @@ def initPageMetadata(page):
 
 
 factory_type_information = (
-    {'id': 'CMF Wiki Page',
-     'content_icon': 'wikipage_icon.gif',
-     'meta_type': 'CMF Wiki Page',
-     'product': 'CMFWiki',
-     'factory': 'addCMFWikiPage',
-     'immediate_view': 'wikipage_view',
-     'actions': ({'id': 'view',
-                  'name': 'View',
-                  'action': 'wikipage_view',
-                  'permissions': (CMFWikiPermissions.View,)},
-                 {'id': 'comment',
-                  'name': 'Comment',
-                  'action': 'wikipage_comment_form',
-                  'permissions': (CMFWikiPermissions.Comment,)},
-                 {'id': 'edit',
-                  'name': 'Edit',
-                  'action': 'wikipage_edit_form',
-                  'permissions': (CMFWikiPermissions.Edit,)},
-                 {'id': 'history',
-                  'name': 'History',
-                  'action': 'wikipage_history',
-                  'permissions': (CMFWikiPermissions.View,)},
-                 {'id': 'backlinks',
-                  'name': 'Backlinks',
-                  'action': 'wikipage_backlinks',
-                  'permissions': (CMFWikiPermissions.View,)},
-                 {'id': 'advanced',
-                  'name': 'Advanced',
-                  'action': 'wikipage_advanced_form',
-                  'permissions': (CMFWikiPermissions.View,)},
-                 {'id': 'toc',
-                  'name': 'Wiki Contents',
-                  'category': 'folder',
-                  'action':'wikipage_toc',
-                  'permissions': (CMFWikiPermissions.View,)},
-                 {'id': 'recent_changes',
-                  'name': 'Recent Changes',
-                  'category': 'folder',
-                  'action':'wikipage_recentchanges',
-                  'permissions': (CMFWikiPermissions.View,)},
-                 {'id': 'create',
-                  'name': 'Create',
-                  'category': 'folder',
-                  'action':'wikipage_create_form',
-                  'permissions': (CMFWikiPermissions.Create,),
-                  'visible': 0 },
-                 ),
-     },
-    {'id': 'CMF Wiki',
-     'content_icon': 'folder_icon.gif',
-     'meta_type': 'CMF Wiki',
-     'description': ('Loosely organized (yet structured) content can be '
-                     'added to Wikis.'),
-     'product': 'CMFWiki',
-     'factory': 'addCMFWikiFolder',
-     'immediate_view': 'FrontPage',
-     'actions': ({'id': 'toc',
-                  'name': 'Wiki Contents',
-                  'category': 'folder',
-                  'action':'wiki_toc',
-                  'permissions': (CMFWikiPermissions.View,)},
-                 {'id': 'view',
-                  'name': 'FrontPage',
-                  'category': 'folder',
-                  'action':'FrontPage',
-                  'permissions': (CMFWikiPermissions.View,)},
-                 {'id': 'all',
-                  'name': 'All Pages',
-                  'category': 'folder',
-                  'action':'wiki_allpages',
-                  'permissions': (CMFWikiPermissions.View,)},
-                 {'id': 'recent_changes',
-                  'name': 'Recent Changes',
-                  'category': 'folder',
-                  'action':'wiki_recentchanges',
-                  'permissions': (CMFWikiPermissions.View,)},
-                 {'id': 'wikihelp',
-                  'name': 'WikiHelp',
-                  'category': 'folder',
-                  'action': 'WikiHelp',
-                  'permissions': (CMFWikiPermissions.View,)}
-                 ),
-     },
-    )
-     
+  { 'id'                : 'CMF Wiki Page'
+  , 'content_icon'      : 'wikipage_icon.gif'
+  , 'meta_type'         : 'CMF Wiki Page'
+  , 'product'           : 'CMFWiki'
+  , 'factory'           : 'addCMFWikiPage'
+  , 'immediate_view'    : 'wikipage_view'
+  , 'actions'           : ( { 'id': 'view'
+                            , 'name': 'View'
+                            , 'action': 'string:wikipage_view'
+                            , 'permissions': (CMFWikiPermissions.View,)
+                            }
+                          , { 'id': 'comment'
+                            , 'name': 'Comment'
+                            , 'action': 'string:wikipage_comment_form'
+                            , 'permissions': (CMFWikiPermissions.Comment,)
+                            }
+                          , { 'id': 'edit'
+                            , 'name': 'Edit'
+                            , 'action': 'string:wikipage_edit_form'
+                            , 'permissions': (CMFWikiPermissions.Edit,)
+                            }
+                          , { 'id': 'history'
+                            , 'name': 'History'
+                            , 'action': 'string:wikipage_history'
+                            , 'permissions': (CMFWikiPermissions.View,)
+                            }
+                          , { 'id': 'backlinks'
+                            , 'name': 'Backlinks'
+                            , 'action': 'string:wikipage_backlinks'
+                            , 'permissions': (CMFWikiPermissions.View,)
+                            }
+                          , { 'id': 'advanced'
+                            , 'name': 'Advanced'
+                            , 'action': 'string:wikipage_advanced_form'
+                            , 'permissions': (CMFWikiPermissions.View,)
+                            }
+                          , { 'id': 'toc'
+                            , 'name': 'Wiki Contents'
+                            , 'category': 'folder'
+                            , 'action': 'string:wikipage_toc'
+                            , 'permissions': (CMFWikiPermissions.View,)
+                            }
+                          , { 'id': 'recent_changes'
+                            , 'name': 'Recent Changes'
+                            , 'category': 'folder'
+                            , 'action': 'string:wikipage_recentchanges'
+                            , 'permissions': (CMFWikiPermissions.View,)
+                            }
+                          , { 'id': 'create'
+                            , 'name': 'Create'
+                            , 'category': 'folder'
+                            , 'action': 'string:wikipage_create_form'
+                            , 'permissions': (CMFWikiPermissions.Create,)
+                            , 'visible': 0
+                            }
+                          )
+  }
+,
+  { 'id'                : 'CMF Wiki'
+  , 'content_icon'      : 'folder_icon.gif'
+  , 'meta_type'         : 'CMF Wiki'
+  , 'description'       : """
+Loosely organized (yet structured) content can be added to Wikis.
+"""
+  , 'product'           : 'CMFWiki'
+  , 'factory'           : 'addCMFWikiFolder'
+  , 'immediate_view'    : 'FrontPage'
+  , 'actions'           : ( { 'id': 'toc'
+                            , 'name': 'Wiki Contents'
+                            , 'category': 'folder'
+                            , 'action': 'string:wiki_toc'
+                            , 'permissions': (CMFWikiPermissions.View,)
+                            }
+                          , { 'id': 'view'
+                            , 'name': 'FrontPage'
+                            , 'category': 'folder'
+                            , 'action': 'string:FrontPage'
+                            , 'permissions': (CMFWikiPermissions.View,)
+                            }
+                          , { 'id': 'all'
+                            , 'name': 'All Pages'
+                            , 'category': 'folder'
+                            , 'action': 'string:wiki_allpages'
+                            , 'permissions': (CMFWikiPermissions.View,)
+                            }
+                          , { 'id': 'recent_changes'
+                            , 'name': 'Recent Changes'
+                            , 'category': 'folder'
+                            , 'action': 'string:wiki_recentchanges'
+                            , 'permissions': (CMFWikiPermissions.View,)
+                            }
+                          , { 'id': 'wikihelp'
+                            , 'name': 'WikiHelp'
+                            , 'category': 'folder'
+                            , 'action': 'string:WikiHelp'
+                            , 'permissions': (CMFWikiPermissions.View,)
+                            }
+                          )
+  }
+)
+ 
 default_perms = {
     'create': 'nonanon',
     'edit': 'nonanon',

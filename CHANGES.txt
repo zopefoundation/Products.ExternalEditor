@@ -25,6 +25,10 @@ CMF 1.4 alpha
 
   New Features
 
+    - Made TypeInformation objects derive from CMFCore.ActionProviderBase:
+      their actions are now TALES expressions, and they have conditions
+      (like all the "tool actions").
+      
     - zpt skins (CMFDefault): Added i18n attributes.
       See INSTALL.txt for installing internationalization support.
       (Collector #122, thanks to Gitte Wange for her contribution)

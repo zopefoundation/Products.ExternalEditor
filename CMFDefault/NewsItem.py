@@ -22,34 +22,36 @@ from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
 from AccessControl import ClassSecurityInfo
 from Products.CMFCore.WorkflowCore import WorkflowAction
 
-factory_type_information = ( { 'id'             : 'News Item'
-                             , 'meta_type'      : 'News Item'
-                             , 'description'    : """\
-News Items contain short text articles and carry a title as well as an optional description."""
-                             , 'icon'           : 'newsitem_icon.gif'
-                             , 'product'        : 'CMFDefault'
-                             , 'factory'        : 'addNewsItem'
-                             , 'immediate_view' : 'metadata_edit_form'
-                             , 'actions'        :
-                                ( { 'id'            : 'view'
-                                  , 'name'          : 'View'
-                                  , 'action'        : 'newsitem_view'
-                                  , 'permissions'   : (View,)
-                                  }
-                                , { 'id'            : 'edit'
-                                  , 'name'          : 'Edit'
-                                  , 'action'        : 'newsitem_edit_form'
-                                  , 'permissions'   : (ModifyPortalContent,)
-                                  }
-                                , { 'id'            : 'metadata'
-                                  , 'name'          : 'Metadata'
-                                  , 'action'        : 'metadata_edit_form'
-                                  , 'permissions'   : (ModifyPortalContent,)
-                                  }
-                                )
-                             }
-                           ,
-                           )
+factory_type_information = (
+  { 'id'             : 'News Item'
+  , 'meta_type'      : 'News Item'
+  , 'description'    : """\
+News Items contain short text articles and carry a title as well as
+an optional description.
+"""
+  , 'icon'           : 'newsitem_icon.gif'
+  , 'product'        : 'CMFDefault'
+  , 'factory'        : 'addNewsItem'
+  , 'immediate_view' : 'metadata_edit_form'
+  , 'actions'        : ( { 'id'            : 'view'
+                         , 'name'          : 'View'
+                         , 'action'        : 'string:newsitem_view'
+                         , 'permissions'   : (View,)
+                         }
+                       , { 'id'            : 'edit'
+                         , 'name'          : 'Edit'
+                         , 'action'        : 'string:newsitem_edit_form'
+                         , 'permissions'   : (ModifyPortalContent,)
+                         }
+                       , { 'id'            : 'metadata'
+                         , 'name'          : 'Metadata'
+                         , 'action'        : 'string:metadata_edit_form'
+                         , 'permissions'   : (ModifyPortalContent,)
+                         }
+                       )
+  }
+,
+)
 
 def addNewsItem( self
                , id

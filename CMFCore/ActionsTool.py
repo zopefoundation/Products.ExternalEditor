@@ -70,6 +70,7 @@ class ActionsTool(UniqueObject, Folder, ActionProviderBase):
     action_providers = ( 'portal_membership'
                        , 'portal_actions'
                        , 'portal_registration'
+                       , 'portal_types'
                        , 'portal_discussion'
                        , 'portal_undo'
                        , 'portal_syndication'
@@ -176,6 +177,7 @@ class ActionsTool(UniqueObject, Folder, ActionProviderBase):
         actions = []
         append = actions.append
         info = oai(self, folder, object)
+
         # Include actions from specific tools.
         for provider_name in self.listActionProviders():
             provider = getattr(self, provider_name)
@@ -184,27 +186,6 @@ class ActionsTool(UniqueObject, Folder, ActionProviderBase):
         # Include actions from object.
         if object is not None:
             base = aq_base(object)
-            types_tool = getToolByName( self, 'portal_types' )
-            # we might get None back from getTypeInfo.  We construct
-            # a dummy TypeInformation object here in that case (the 'or'
-            # case).  This prevents us from needing to check the condition.
-            ti = types_tool.getTypeInfo( object ) or TypeInformation('Dummy')
-            defs = ti.getActions()
-            url = object_url = object.absolute_url()
-            for d in defs:
-                # we can't modify or expose the original actionsd... this
-                # stems from the fact that getActions returns a ref to the
-                # actual dictionary used to store actions instead of a
-                # copy.  We copy it here to prevent it from being modified.
-                d = d.copy()
-                d['id'] = d.get('id', None)
-                if d['action']:
-                    url = '%s/%s' % (object_url, d['action'])
-                d['url'] = url
-                d['category'] = d.get('category', 'object')
-                d['visible'] = d.get('visible', 1)
-                actions.append(d)
-
             if hasattr(base, 'listActions'):
                 self._listActions(append,object,info,ec)
 

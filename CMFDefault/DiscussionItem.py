@@ -35,27 +35,27 @@ from Products.CMFCore.interfaces.Discussions import DiscussionResponse
 from Products.CMFCore.interfaces.Discussions import Discussable
 
 
-factory_type_information = ( { 'id'             : 'Discussion Item'
-                             , 'meta_type'      : 'Discussion Item'
-                             , 'description'    : """\
+factory_type_information = (
+  { 'id'             : 'Discussion Item'
+  , 'meta_type'      : 'Discussion Item'
+  , 'description'    : """\
 Discussion Items are documents which reply to other content.
-They should *not* be addable through the standard 'folder_factories'
-interface."""
-                             , 'icon'           : 'discussionitem_icon.gif'
-                             , 'product'        : '' # leave blank to suppress
-                             , 'factory'        : ''
-                             , 'immediate_view' : ''
-                             , 'actions'        :
-                                ( { 'id'            : 'view'
-                                  , 'name'          : 'View'
-                                  , 'action'        : 'discussionitem_view'
-                                  , 'permissions'   : (View,)
-                                  }
-                                ,
-                                )
-                             }
-                           ,
-                           )
+They should *not* be addable through the standard 'folder_factories' interface.
+"""
+  , 'icon'           : 'discussionitem_icon.gif'
+  , 'product'        : '' # leave blank to suppress
+  , 'factory'        : ''
+  , 'immediate_view' : ''
+  , 'actions'        : ( { 'id'            : 'view'
+                         , 'name'          : 'View'
+                         , 'action'        : 'string:discussionitem_view'
+                         , 'permissions'   : (View,)
+                         }
+                       ,
+                       )
+  }
+,
+)
 
 
 from utils import scrubHTML

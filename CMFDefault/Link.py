@@ -31,34 +31,35 @@ from Products.CMFCore.utils import keywordsplitter
 from DublinCore import DefaultDublinCoreImpl
 from utils import formatRFC822Headers, parseHeadersBody, _dtmldir
 
-factory_type_information = ( { 'id'             : 'Link'
-                             , 'meta_type'      : 'Link'
-                             , 'description'    : """\
-Link items are URLs that come with additional information."""
-                             , 'icon'           : 'link_icon.gif'
-                             , 'product'        : 'CMFDefault'
-                             , 'factory'        : 'addLink'
-                             , 'immediate_view' : 'metadata_edit_form'
-                             , 'actions'        :
-                                ( { 'id'            : 'view'
-                                  , 'name'          : 'View'
-                                  , 'action'        : 'link_view'
-                                  , 'permissions'   : (View,)
-                                  }
-                                , { 'id'            : 'edit'
-                                  , 'name'          : 'Edit'
-                                  , 'action'        : 'link_edit_form'
-                                  , 'permissions'   : (ModifyPortalContent,)
-                                  }
-                                , { 'id'            : 'metadata'
-                                  , 'name'          : 'Metadata'
-                                  , 'action'        : 'metadata_edit_form'
-                                  , 'permissions'   : (ModifyPortalContent,)
-                                  }
-                                )
-                             }
-                           ,
-                           )
+factory_type_information = (
+  { 'id'             : 'Link'
+  , 'meta_type'      : 'Link'
+  , 'description'    : """\
+Link items are annotated URLs.
+"""
+  , 'icon'           : 'link_icon.gif'
+  , 'product'        : 'CMFDefault'
+  , 'factory'        : 'addLink'
+  , 'immediate_view' : 'metadata_edit_form'
+  , 'actions'        : ( { 'id'            : 'view'
+                         , 'name'          : 'View'
+                         , 'action'        : 'string:link_view'
+                         , 'permissions'   : (View,)
+                         }
+                       , { 'id'            : 'edit'
+                         , 'name'          : 'Edit'
+                         , 'action'        : 'string:link_edit_form'
+                         , 'permissions'   : (ModifyPortalContent,)
+                         }
+                       , { 'id'            : 'metadata'
+                         , 'name'          : 'Metadata'
+                         , 'action'        : 'string:metadata_edit_form'
+                         , 'permissions'   : (ModifyPortalContent,)
+                         }
+                       )
+  }
+,
+)
 
 
 def addLink( self

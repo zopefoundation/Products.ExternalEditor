@@ -30,8 +30,8 @@ import os
 
 # Factory type information -- makes Topic objects play nicely
 # with the Types Tool (portal_types )
-factory_type_information = \
-( { 'id'                : 'Topic'
+factory_type_information = (
+  { 'id'                : 'Topic'
   , 'content_icon'      : 'topic_icon.gif'
   , 'meta_type'         : 'Portal Topic'
   , 'description'       : 'Topics are canned queries for organizing content '
@@ -39,28 +39,27 @@ factory_type_information = \
   , 'product'           : 'CMFTopic'
   , 'factory'           : 'addTopic'
   , 'immediate_view'    : 'topic_edit_form'
-  , 'actions'           :
-    ( { 'id'            : 'view'
-      , 'name'          : 'View'
-      , 'action'        : 'topic_view'
-      , 'permissions'   : (View,)
-      }
-    , { 'id'            : 'edit'
-      , 'name'          : 'Edit'
-      , 'action'        : 'topic_edit_form'
-      , 'permissions'   : (ChangeTopics,)
-      }
-    , { 'id'            : 'criteria'
-      , 'name'          : 'Criteria'
-      , 'action'        : 'topic_criteria_form'
-      , 'permissions'   : (ChangeTopics,)
-      }
-    , { 'id'            : 'subtopics'
-      , 'name'          : 'Subtopics'
-      , 'action'        : 'topic_subtopics_form'
-      , 'permissions'   : (ChangeTopics,)
-      }
-    )
+  , 'actions'           : ( { 'id'            : 'view'
+                            , 'name'          : 'View'
+                            , 'action'        : 'string:topic_view'
+                            , 'permissions'   : (View,)
+                            }
+                          , { 'id'            : 'edit'
+                            , 'name'          : 'Edit'
+                            , 'action'        : 'string:topic_edit_form'
+                            , 'permissions'   : (ChangeTopics,)
+                            }
+                          , { 'id'            : 'criteria'
+                            , 'name'          : 'Criteria'
+                            , 'action'        : 'string:topic_criteria_form'
+                            , 'permissions'   : (ChangeTopics,)
+                            }
+                          , { 'id'            : 'subtopics'
+                            , 'name'          : 'Subtopics'
+                            , 'action'        : 'string:topic_subtopics_form'
+                            , 'permissions'   : (ChangeTopics,)
+                            }
+                          )
   }
 ,
 )

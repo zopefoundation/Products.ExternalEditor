@@ -43,12 +43,12 @@ factory_type_information = (
                       'permissions': (CMFCorePermissions.View,)},
                      {'id': 'addcomment',
                       'name': 'Add Comment',
-                      'action': 'collector_transcript_comment_form',
+                      'action': 'string:collector_transcript_comment_form',
                       'permissions':
                       (CollectorPermissions.AddCollectorIssueFollowup,)},
                      {'id': 'edittranscript',
                       'name': 'Edit Transcript',
-                      'action': 'collector_transcript_edit_form',
+                      'action': 'string:collector_transcript_edit_form',
                       'permissions':
                       (CollectorPermissions.EditCollectorIssue,)},
                      ),

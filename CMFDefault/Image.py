@@ -26,34 +26,35 @@ from Products.CMFCore.CMFCorePermissions import View
 from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
 from Products.CMFCore.WorkflowCore import WorkflowAction
 
-factory_type_information = ( { 'id'             : 'Image'
-                             , 'meta_type'      : 'Portal Image'
-                             , 'description'    : """\
-Image objects can be embedded in Portal documents."""
-                             , 'icon'           : 'image_icon.gif'
-                             , 'product'        : 'CMFDefault'
-                             , 'factory'        : 'addImage'
-                             , 'immediate_view' : 'metadata_edit_form'
-                             , 'actions'        :
-                                ( { 'id'            : 'view'
-                                  , 'name'          : 'View'
-                                  , 'action'        : 'image_view'
-                                  , 'permissions'   : (View,)
-                                  }
-                                , { 'id'            : 'edit'
-                                  , 'name'          : 'Edit'
-                                  , 'action'        : 'image_edit_form'
-                                  , 'permissions'   : (ModifyPortalContent,)
-                                  }
-                                , { 'id'            : 'metadata'
-                                  , 'name'          : 'Metadata'
-                                  , 'action'        : 'metadata_edit_form'
-                                  , 'permissions'   : (ModifyPortalContent,)
-                                  }
-                                )
-                             }
-                           ,
-                           )
+factory_type_information = (
+  { 'id'             : 'Image'
+  , 'meta_type'      : 'Portal Image'
+  , 'description'    : """\
+Image objects can be embedded in Portal documents.
+"""
+  , 'icon'           : 'image_icon.gif'
+  , 'product'        : 'CMFDefault'
+  , 'factory'        : 'addImage'
+  , 'immediate_view' : 'metadata_edit_form'
+  , 'actions'        : ( { 'id'            : 'view'
+                         , 'name'          : 'View'
+                         , 'action'        : 'string:image_view'
+                         , 'permissions'   : (View,)
+                         }
+                       , { 'id'            : 'edit'
+                         , 'name'          : 'Edit'
+                         , 'action'        : 'string:image_edit_form'
+                         , 'permissions'   : (ModifyPortalContent,)
+                         }
+                       , { 'id'            : 'metadata'
+                         , 'name'          : 'Metadata'
+                         , 'action'        : 'string:metadata_edit_form'
+                         , 'permissions'   : (ModifyPortalContent,)
+                         }
+                       )
+  }
+,
+)
 
 import OFS.Image
 

@@ -31,34 +31,36 @@ from utils import SimpleHTMLParser, bodyfinder, _dtmldir
 from utils import html_headcheck
 from DocumentTemplate.DT_Util import html_quote
 
-factory_type_information = ( { 'id'             : 'Document'
-                             , 'meta_type'      : 'Document'
-                             , 'description'    : """\
-Documents can contain text that can be formatted using 'Structured Text.'"""
-                             , 'icon'           : 'document_icon.gif'
-                             , 'product'        : 'CMFDefault'
-                             , 'factory'        : 'addDocument'
-                             , 'immediate_view' : 'metadata_edit_form'
-                             , 'actions'        :
-                                ( { 'id'            : 'view' 
-                                  , 'name'          : 'View'
-                                  , 'action'        : 'document_view'
-                                  , 'permissions'   : (View,)
-                                  }
-                                , { 'id'            : 'edit'
-                                  , 'name'          : 'Edit'
-                                  , 'action'        : 'document_edit_form'
-                                  , 'permissions'   : (ModifyPortalContent,)
-                                  }
-                                , { 'id'            : 'metadata'
-                                  , 'name'          : 'Metadata'
-                                  , 'action'        : 'metadata_edit_form'
-                                  , 'permissions'   : (ModifyPortalContent,)
-                                  }
-                                )
-                             }
-                           ,
-                           )
+factory_type_information = (
+  { 'id'             : 'Document'
+  , 'meta_type'      : 'Document'
+  , 'description'    : """\
+Documents contain text that can be formatted using 'Structured Text.'
+They may also contain HTML, or "plain" text.
+"""
+  , 'icon'           : 'document_icon.gif'
+  , 'product'        : 'CMFDefault'
+  , 'factory'        : 'addDocument'
+  , 'immediate_view' : 'metadata_edit_form'
+  , 'actions'        : ( { 'id'            : 'view' 
+                         , 'name'          : 'View'
+                         , 'action'        : 'string:document_view'
+                         , 'permissions'   : (View,)
+                         }
+                       , { 'id'            : 'edit'
+                         , 'name'          : 'Edit'
+                         , 'action'        : 'string:document_edit_form'
+                         , 'permissions'   : (ModifyPortalContent,)
+                         }
+                       , { 'id'            : 'metadata'
+                         , 'name'          : 'Metadata'
+                         , 'action'        : 'string:metadata_edit_form'
+                         , 'permissions'   : (ModifyPortalContent,)
+                         }
+                       )
+  }
+,
+)
 
 def addDocument(self, id, title='', description='', text_format='',
                 text=''):

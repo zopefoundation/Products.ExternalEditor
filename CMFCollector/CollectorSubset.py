@@ -21,17 +21,17 @@ factory_type_information = \
   , 'actions'       :
     ( { 'id'        : 'view'
       , 'name'          : 'View'
-      , 'action'        : 'subset_view'
+      , 'action'        : 'string:subset_view'
       , 'permissions'   : ( View, )
       }
     , { 'id'            : 'edit'
       , 'name'          : 'Edit'
-      , 'action'        : 'subset_edit_form'
+      , 'action'        : 'string:subset_edit_form'
       , 'permissions'   : ( ModifyPortalContent, )
       }
     , { 'id'            : 'metadata'
       , 'name'          : 'Metadata'
-      , 'action'        : 'metadata_edit_form'
+      , 'action'        : 'string:metadata_edit_form'
       , 'permissions'   : ( ModifyPortalContent, )
       }
     )

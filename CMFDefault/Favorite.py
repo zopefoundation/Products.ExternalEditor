@@ -27,34 +27,35 @@ from Products.CMFCore.CMFCorePermissions import View, ModifyPortalContent
 from DublinCore import DefaultDublinCoreImpl
 from Link import Link
 
-factory_type_information = ( { 'id'             : 'Favorite'
-                             , 'meta_type'      : 'Favorite'
-                             , 'description'    : """\
-A Favorite is a Link to an intra-portal resource."""
-                             , 'icon'           : 'link_icon.gif'
-                             , 'product'        : 'CMFDefault'
-                             , 'factory'        : 'addFavorite'
-                             , 'immediate_view' : 'metadata_edit_form'
-                             , 'actions'        :
-                                ( { 'id'            : 'view'
-                                  , 'name'          : 'View'
-                                  , 'action'        : 'favorite_view'
-                                  , 'permissions'   : ( View, )
-                                  }
-                                , { 'id'            : 'edit'
-                                  , 'name'          : 'Edit'
-                                  , 'action'        : 'link_edit_form'
-                                  , 'permissions'   : ( ModifyPortalContent, )
-                                  }
-                                , { 'id'            : 'metadata'
-                                  , 'name'          : 'Metadata'
-                                  , 'action'        : 'metadata_edit_form'
-                                  , 'permissions'   : ( ModifyPortalContent, )
-                                  }
-                                )
-                             }
-                           ,
-                           )
+factory_type_information = (
+  { 'id'             : 'Favorite'
+  , 'meta_type'      : 'Favorite'
+  , 'description'    : """\
+A Favorite is a Link to an intra-portal resource.
+"""
+  , 'icon'           : 'link_icon.gif'
+  , 'product'        : 'CMFDefault'
+  , 'factory'        : 'addFavorite'
+  , 'immediate_view' : 'metadata_edit_form'
+  , 'actions'        : ( { 'id'            : 'view'
+                         , 'name'          : 'View'
+                         , 'action'        : 'string:favorite_view'
+                         , 'permissions'   : ( View, )
+                         }
+                       , { 'id'            : 'edit'
+                         , 'name'          : 'Edit'
+                         , 'action'        : 'string:link_edit_form'
+                         , 'permissions'   : ( ModifyPortalContent, )
+                         }
+                       , { 'id'            : 'metadata'
+                         , 'name'          : 'Metadata'
+                         , 'action'        : 'string:metadata_edit_form'
+                         , 'permissions'   : ( ModifyPortalContent, )
+                         }
+                       )
+  }
+,
+)
 
 def addFavorite(self, id, title='', remote_url='', description=''):
     """

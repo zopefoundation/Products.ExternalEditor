@@ -26,38 +26,39 @@ from Products.CMFCore.utils import _getViewFor
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
 from Acquisition import aq_base
 
-factory_type_information = ( { 'id'             : 'Skinned Folder'
-                             , 'meta_type'      : 'Skinned Folder'
-                             , 'description'    : """\
-Skinned folders can define custom 'view' actions."""
-                             , 'icon'           : 'folder_icon.gif'
-                             , 'product'        : 'CMFDefault'
-                             , 'factory'        : 'addSkinnedFolder'
-                             , 'filter_content_types' : 0
-                             , 'immediate_view' : 'folder_edit_form'
-                             , 'actions'        :
-                                ( { 'id'            : 'view' 
-                                  , 'name'          : 'View'
-                                  , 'action'        : ''
-                                  , 'permissions'   : (View,)
-                                  , 'category'      : 'folder'
-                                  }
-                                , { 'id'            : 'edit'
-                                  , 'name'          : 'Edit'
-                                  , 'action'        : 'folder_edit_form'
-                                  , 'permissions'   : (ManageProperties,)
-                                  , 'category'      : 'folder'
-                                  }
-                                , { 'id'            : 'foldercontents'
-                                  , 'name'          : 'Folder contents'
-                                  , 'action'        : 'folder_contents'
-                                  , 'permissions'   : (ListFolderContents,)
-                                  , 'category'      : 'folder'
-                                  }
-                                )
-                             }
-                           ,
-                           )
+factory_type_information = (
+  { 'id'             : 'Skinned Folder'
+  , 'meta_type'      : 'Skinned Folder'
+  , 'description'    : """\
+Skinned folders can define custom 'view' actions.
+"""
+  , 'icon'           : 'folder_icon.gif'
+  , 'product'        : 'CMFDefault'
+  , 'factory'        : 'addSkinnedFolder'
+  , 'filter_content_types' : 0
+  , 'immediate_view' : 'folder_edit_form'
+  , 'actions'        : ( { 'id'            : 'view' 
+                         , 'name'          : 'View'
+                         , 'action'        : 'string:folder_view'
+                         , 'permissions'   : (View,)
+                         , 'category'      : 'folder'
+                         }
+                       , { 'id'            : 'edit'
+                         , 'name'          : 'Edit'
+                         , 'action'        : 'string:folder_edit_form'
+                         , 'permissions'   : (ManageProperties,)
+                         , 'category'      : 'folder'
+                         }
+                       , { 'id'            : 'foldercontents'
+                         , 'name'          : 'Folder contents'
+                         , 'action'        : 'string:folder_contents'
+                         , 'permissions'   : (ListFolderContents,)
+                         , 'category'      : 'folder'
+                         }
+                       )
+  }
+,
+)
 
 
 class SkinnedFolder(CMFCatalogAware, PortalFolder):

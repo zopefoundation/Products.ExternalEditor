@@ -2,7 +2,7 @@ from Acquisition import Implicit, aq_inner, aq_parent
 from OFS.SimpleItem import Item
 from Products.CMFCore.PortalContent import PortalContent
 from Products.CMFCore.TypesTool import TypeInformation
-from Products.CMFCore.TypesTool import FactoryTypeInformation
+from Products.CMFCore.TypesTool import FactoryTypeInformation as FTI
 from Products.CMFCore.ActionProviderBase import ActionProviderBase
 
 class DummyObject(Implicit):
@@ -122,23 +122,25 @@ class DummyTypeInfo(TypeInformation):
     """ Dummy class of type info object """
     meta_type = "Dummy Test Type Info"
 
-DummyFTI = FactoryTypeInformation( 'Dummy Content',
-                                   title='Dummy Content Title',
-                                   meta_type=DummyContent.meta_type,
-                                   product='CMFDefault',
-                                   factory='addDocument',
-                                   actions= ( { 'name'          : 'View',
-                                                'action'        : 'view',
-                                                'permissions'   : ('View', ) },
-                                              { 'name'          : 'View2',
-                                                'action'        : 'view2',
-                                                'permissions'   : ('View', ) },
-                                              { 'name'          : 'Edit',
-                                                'action'        : 'edit',
-                                                'permissions'   : ('forbidden permission',)
-                                                }
-                                              )
-                                   )
+DummyFTI = FTI( 'Dummy Content'
+              , title='Dummy Content Title'
+              , meta_type=DummyContent.meta_type
+              , product='CMFDefault'
+              , factory='addDocument'
+              , actions= ( { 'name'          : 'View'
+                           , 'action'        : 'string:view'
+                           , 'permissions'   : ( 'View', )
+                           }
+                         , { 'name'          : 'View2'
+                           , 'action'        : 'string:view2'
+                           , 'permissions'   : ( 'View', )
+                           }
+                         , { 'name'          : 'Edit'
+                           , 'action'        : 'string:edit'
+                           , 'permissions'   : ( 'forbidden permission',)
+                           }
+                         )
+              )
 
 class DummyFolder( Implicit ):
     """

@@ -17,6 +17,12 @@ import re
 import operator
 from types import StringType
 
+from Globals import package_home
+from Globals import HTMLFile
+from Globals import ImageFile
+from Globals import InitializeClass
+from Globals import MessageDialog
+
 from ExtensionClass import Base
 from Acquisition import aq_get, aq_inner, aq_parent
 
@@ -27,12 +33,6 @@ from AccessControl.Permission import Permission
 from AccessControl.PermissionRole import rolesForPermissionOn
 from AccessControl.Role import gather_permissions
 
-from Globals import package_home
-from Globals import InitializeClass
-from Globals import HTMLFile
-from Globals import ImageFile
-from Globals import MessageDialog
-
 from OFS.PropertyManager import PropertyManager
 from OFS.SimpleItem import SimpleItem
 from OFS.PropertySheets import PropertySheets
@@ -42,6 +42,8 @@ try:
     from OFS.ObjectManager import UNIQUE
 except ImportError:
     UNIQUE = 2
+from Products.PageTemplates.Expressions import getEngine
+from Products.PageTemplates.Expressions import SecureModuleImporter
 
 
 security = ModuleSecurityInfo( 'Products.CMFCore.utils' )
@@ -119,7 +121,7 @@ def _checkPermission(permission, obj, StringType = type('')):
 
 security.declarePrivate('_verifyActionPermissions')
 def _verifyActionPermissions(obj, action):
-    pp = action.get('permissions', ())
+    pp = action.getPermissions()
     if not pp:
         return 1
     for p in pp:
@@ -127,20 +129,42 @@ def _verifyActionPermissions(obj, action):
             return 1
     return 0
 
+security.declarePublic( 'getActionContext' )
+def getActionContext( self ):
+    data = { 'object_url'   : ''
+           , 'folder_url'   : ''
+           , 'portal_url'   : ''
+           , 'object'       : None
+           , 'folder'       : None
+           , 'portal'       : None
+           , 'nothing'      : None
+           , 'request'      : getattr( self, 'REQUEST', None )
+           , 'modules'      : SecureModuleImporter
+           , 'member'       : None
+           }
+    return getEngine().getContext( data )
+
 security.declarePrivate('_getViewFor')
 def _getViewFor(obj, view='view'):
     ti = obj.getTypeInfo()
+
     if ti is not None:
-        actions = ti.getActions()
+
+        context = getActionContext( obj )
+        actions = ti.listActions()
+
         for action in actions:
-            if action.get('id', None) == view:
-                if _verifyActionPermissions(obj, action):
-                    return obj.restrictedTraverse(action['action'])
+
+            if action.getId() == view:
+                if _verifyActionPermissions( obj, action ):
+                    return obj.restrictedTraverse( action.action( context ) )
+
         # "view" action is not present or not allowed.
         # Find something that's allowed.
         for action in actions:
             if _verifyActionPermissions(obj, action):
-                return obj.restrictedTraverse(action['action'])
+                return obj.restrictedTraverse( action.action( context ) )
+
         raise 'Unauthorized', ('No accessible views available for %s' %
                                '/'.join(obj.getPhysicalPath()))
     else:
@@ -364,7 +388,6 @@ class ToolInit:
             tool.icon = 'misc_/%s/%s' % (self.product_name, self.icon)
 
 InitializeClass( ToolInit )
-
 
 addInstanceForm = HTMLFile('dtml/addInstance', globals())
 

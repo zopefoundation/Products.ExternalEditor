@@ -28,39 +28,40 @@ from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
 from Products.CMFCore.WorkflowCore import WorkflowAction
 
 
-factory_type_information = ( { 'id'             : 'File'
-                             , 'meta_type'      : 'Portal File'
-                             , 'description'    : """\
-File objects can contain arbitrary downloadable files."""
-                             , 'icon'           : 'file_icon.gif'
-                             , 'product'        : 'CMFDefault'
-                             , 'factory'        : 'addFile'
-                             , 'immediate_view' : 'metadata_edit_form'
-                             , 'actions'        :
-                                ( { 'id'            : 'view'
-                                  , 'name'          : 'View'
-                                  , 'action'        : 'file_view'
-                                  , 'permissions'   : (View,)
-                                  }
-                                , { 'id'            : 'download'
-                                  , 'name'          : 'Download'
-                                  , 'action'        : ''
-                                  , 'permissions'   : (View,)
-                                  }
-                                , { 'id'            : 'edit'
-                                  , 'name'          : 'Edit'
-                                  , 'action'        : 'file_edit_form'
-                                  , 'permissions'   : (ModifyPortalContent,)
-                                  }
-                                , { 'id'            : 'metadata'
-                                  , 'name'          : 'Metadata'
-                                  , 'action'        : 'metadata_edit_form'
-                                  , 'permissions'   : (ModifyPortalContent,)
-                                  }
-                                )
-                             }
-                           ,
-                           )
+factory_type_information = (
+  { 'id'             : 'File'
+  , 'meta_type'      : 'Portal File'
+  , 'description'    : """\
+File objects can contain arbitrary downloadable files.
+"""
+  , 'icon'           : 'file_icon.gif'
+  , 'product'        : 'CMFDefault'
+  , 'factory'        : 'addFile'
+  , 'immediate_view' : 'metadata_edit_form'
+  , 'actions'        : ( { 'id'            : 'view'
+                         , 'name'          : 'View'
+                         , 'action'        : 'string:file_view'
+                         , 'permissions'   : (View,)
+                         }
+                       , { 'id'            : 'download'
+                         , 'name'          : 'Download'
+                         , 'action'        : 'string:'
+                         , 'permissions'   : (View,)
+                         }
+                       , { 'id'            : 'edit'
+                         , 'name'          : 'Edit'
+                         , 'action'        : 'string:file_edit_form'
+                         , 'permissions'   : (ModifyPortalContent,)
+                         }
+                       , { 'id'            : 'metadata'
+                         , 'name'          : 'Metadata'
+                         , 'action'        : 'string:metadata_edit_form'
+                         , 'permissions'   : (ModifyPortalContent,)
+                         }
+                       )
+  }
+,
+)
 
 import OFS.Image
 

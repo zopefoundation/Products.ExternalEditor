@@ -57,32 +57,34 @@ ManageWorkspaces = 'Manage Workspaces'
 
 
 factory_type_information = (
-    { 'id'             : 'Workspace',
-      'meta_type'      : 'Workspace',
-      'description'    : """Workspaces are places to put temporary references
+  { 'id'             : 'Workspace'
+  , 'meta_type'      : 'Workspace'
+  , 'description'    : """\
+Workspaces are places to put temporary references
 to content you are currently working on.  Workspaces are designed to help
-you navigate efficiently.""",
-      'icon'           : 'folder_icon.gif',
-      'product'        : 'CMFWorkspaces',
-      'factory'        : 'addWorkspace',
-      'filter_content_types' : 0,
-      'immediate_view' : 'workspace_view',
-      'actions'        :
-      ({'id'            : 'view',
-        'name'          : 'Workspace',
-        'action'        : 'workspace_view',
-        'permissions'   : (View,),
-        'category'      : 'object',
-        },
-       {'id'            : 'metadata',
-        'name'          : 'Metadata',
-        'action'        : 'metadata_edit_form',
-        'permissions'   : (View,),
-        'category'      : 'object',
-        },       
-       )
-      },
-    )
+you navigate efficiently.
+"""
+  , 'icon'           : 'folder_icon.gif'
+  , 'product'        : 'CMFWorkspaces'
+  , 'factory'        : 'addWorkspace'
+  , 'filter_content_types' : 0
+  , 'immediate_view' : 'workspace_view'
+  , 'actions'        : ( { 'id'            : 'view'
+                         , 'name'          : 'Workspace'
+                         , 'action'        : 'string:workspace_view'
+                         , 'permissions'   : (View,)
+                         , 'category'      : 'object'
+                         }
+                       , { 'id'            : 'metadata'
+                         , 'name'          : 'Metadata'
+                         , 'action'        : 'string:metadata_edit_form'
+                         , 'permissions'   : (View,)
+                         , 'category'      : 'object'
+                         }
+                       )
+  }
+,
+)
 
 
 class Workspace (PortalContent.PortalContent, 

@@ -274,7 +274,8 @@ class PortalFolderTests( SecurityTest ):
         # Now, test overridden behavior
         types_tool.Folder.addAction( id = 'mkdir'
                                    , name = 'MKDIR handler'
-                                   , action = 'grabbed'
+                                   , action = 'string:grabbed'
+                                   , condition = ''
                                    , permission = ''
                                    , category = 'folder'
                                    , visible = 0

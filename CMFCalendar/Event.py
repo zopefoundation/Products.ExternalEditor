@@ -44,11 +44,11 @@ factory_type_information = (
      'immediate_view': 'event_edit_form',
      'actions': ({'id': 'view',
                   'name': 'View',
-                  'action': 'event_view',
+                  'action': 'string:event_view',
                   'permissions': (View,)},
                  {'id': 'edit',
                   'name': 'Edit',
-                  'action': 'event_edit_form',
+                  'action': 'string:event_edit_form',
                   'permissions': (EventPermissions.ChangeEvents,)},
                  ),                     # End Actions
      },

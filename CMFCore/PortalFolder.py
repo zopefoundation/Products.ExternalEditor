@@ -32,38 +32,37 @@ from Acquisition import aq_parent, aq_inner, aq_base
 from DynamicType import DynamicType
 from utils import getToolByName, _checkPermission
 
-factory_type_information = ( { 'id'             : 'Folder'
-                             , 'meta_type'      : 'Portal Folder'
-                             , 'description'    : """\
-Use folders to put content in categories."""
-                             , 'icon'           : 'folder_icon.gif'
-                             , 'product'        : 'CMFCore'
-                             , 'factory'        : 'manage_addPortalFolder'
-                             , 'filter_content_types' : 0
-                             , 'immediate_view' : 'folder_edit_form'
-                             , 'actions'        :
-                                ( { 'id'            : 'view'
-                                  , 'name'          : 'View'
-                                  , 'action'        : ''
-                                  , 'permissions'   : (View,)
-                                  , 'category'      : 'folder'
-                                  }
-                                , { 'id'            : 'edit'
-                                  , 'name'          : 'Edit'
-                                  , 'action'        : 'folder_edit_form'
-                                  , 'permissions'   : (ManageProperties,)
-                                  , 'category'      : 'folder'
-                                  }
-                                , { 'id'            : 'localroles'
-                                  , 'name'          : 'Local Roles'
-                                  , 'action'        : 'folder_localrole_form'
-                                  , 'permissions'   : (ManageProperties,)
-                                  , 'category'      : 'folder'
-                                  }
-                                )
-                             }
-                           ,
-                           )
+factory_type_information = (
+  { 'id'             : 'Folder'
+  , 'meta_type'      : 'Portal Folder'
+  , 'description'    : """ Use folders to put content in categories."""
+  , 'icon'           : 'folder_icon.gif'
+  , 'product'        : 'CMFCore'
+  , 'factory'        : 'manage_addPortalFolder'
+  , 'filter_content_types' : 0
+  , 'immediate_view' : 'folder_edit_form'
+  , 'actions'        : ( { 'id'            : 'view'
+                         , 'name'          : 'View'
+                         , 'action'        : 'string:'
+                         , 'permissions'   : (View,)
+                         , 'category'      : 'folder'
+                         }
+                       , { 'id'            : 'edit'
+                         , 'name'          : 'Edit'
+                         , 'action'        : 'string:folder_edit_form'
+                         , 'permissions'   : (ManageProperties,)
+                         , 'category'      : 'folder'
+                         }
+                       , { 'id'            : 'localroles'
+                         , 'name'          : 'Local Roles'
+                         , 'action'        : 'string:folder_localrole_form'
+                         , 'permissions'   : (ManageProperties,)
+                         , 'category'      : 'folder'
+                         }
+                       )
+  }
+,
+)
 
 
 class PortalFolder(DynamicType, CMFCatalogAware, Folder):
