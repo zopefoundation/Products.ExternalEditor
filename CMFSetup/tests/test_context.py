@@ -412,7 +412,8 @@ class SnapshotExportContextTests( SecurityRequestTest
         from OFS.Image import Image
         _FILENAME = 'simple.txt'
         _CONTENT_TYPE = 'image/png'
-        png_filename = os.path.join( os.path.split( __file__ )[0], 'test.png' )
+        png_filename = os.path.join( os.path.split( __file__ )[0]
+                                   , 'simple.png' )
         png_file = open( png_filename, 'rb' )
         png_data = png_file.read()
         png_file.close()

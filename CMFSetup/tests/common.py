@@ -14,6 +14,17 @@ class DOMComparator:
         from xml.dom.minidom import parseString
         found = parseString( found_text )
         expected = parseString( expected_text )
+        fxml = found.toxml()
+        exml = expected.toxml()
+
+        if fxml != exml:
+            print 'Found:'
+            print fxml
+            print
+            print 'Expected:'
+            print exml
+            print
+
         self.assertEqual( found.toxml(), expected.toxml() )
 
 class BaseRegistryTests( SecurityRequestTest, DOMComparator ):

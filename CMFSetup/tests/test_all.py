@@ -13,7 +13,8 @@ from Products.CMFCore.tests.base.utils import build_test_suite
 
 def suite():
     return build_test_suite( 'Products.CMFSetup.tests'
-                           , [ 'test_context'
+                           , [ 'test_actions'
+                             , 'test_context'
                              , 'test_registry'
                              , 'test_rolemap'
                              , 'test_tool'

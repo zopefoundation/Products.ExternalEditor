@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<actions-tool xmlns:tal="http://xml.zope.org/namespaces/tal">
+ <tal:loop tal:repeat="info here/listProviderInfo"
+ ><action-provider id="portal_actions"
+                  tal:attributes="id info/id;" >
+  <action action_id="folder_contents"
+          title="Folder Contents"
+          category="folder"
+          action_expr="${folder_url}/folder_contents"
+          condition_expr=""
+          visible="1"
+          permission="View"
+          tal:repeat="action info/actions"
+          tal:attributes="action_id action/id;
+                          title action/name;
+                          category action/category;
+                          action_expr action/action;
+                          condition_expr action/condition;
+                          visible action/visible;
+                          permission action/permission;
+                         " />
+ </action-provider></tal:loop>
+</actions-tool>
+

@@ -2,6 +2,8 @@
 
 $Id$
 """
+from xml.sax import parseString
+from xml.sax.handler import ContentHandler
 
 from AccessControl import ClassSecurityInfo
 from AccessControl.Permission import Permission
@@ -11,12 +13,6 @@ from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
 from permissions import ManagePortal
 from utils import _xmldir
-
-#
-# Import
-#
-from xml.sax import parseString
-from xml.sax.handler import ContentHandler
 
 class _RolemapParser( ContentHandler ):
 
@@ -74,7 +70,7 @@ class RolemapConfigurator( Implicit ):
     security.setDefaultAccess( 'allow' )
     
     def __init__( self, site ):
-        self.site = site
+        self._site = site
 
     _rolemap = PageTemplateFile( 'rmeExport.xml'
                                , _xmldir
@@ -86,7 +82,7 @@ class RolemapConfigurator( Implicit ):
 
         """ List the valid role IDs for our site.
         """
-        return self.site.valid_roles()
+        return self._site.valid_roles()
 
     security.declareProtected( ManagePortal, 'listPermissions' )
     def listPermissions( self ):
@@ -109,10 +105,10 @@ class RolemapConfigurator( Implicit ):
         permissions = []
         valid_roles = self.listRoles()
 
-        for perm in self.site.ac_inherited_permissions( 1 ):
+        for perm in self._site.ac_inherited_permissions( 1 ):
 
             name = perm[ 0 ]
-            p = Permission( name, perm[ 1 ], self.site )
+            p = Permission( name, perm[ 1 ], self._site )
             roles = p.getRoles( default=[] )
             acquire = isinstance( roles, list )  # tuple means don't acquire
             roles = [ r for r in roles if r in valid_roles ]
@@ -142,7 +138,7 @@ class RolemapConfigurator( Implicit ):
         if reader is not None:
             text = reader()
 
-        parseString( text, _RolemapParser( self.site ) )
+        parseString( text, _RolemapParser( self._site ) )
 
 InitializeClass( RolemapConfigurator )
 
@@ -161,9 +157,9 @@ def importRolemap( context ):
     o Register via Python:
 
       registry = site.portal_setup.setup_steps
-      registry.registerStep( 'importRoleMap'
+      registry.registerStep( 'importRolemap'
                            , '20040518-01'
-                           , Products.CMFSetup.rolemap.importRoleMap
+                           , Products.CMFSetup.rolemap.importRolemap
                            , ()
                            , 'Role / Permission import'
                            , 'Import additional roles, and map '
@@ -172,9 +168,9 @@ def importRolemap( context ):
 
     o Register via XML:
  
-      <setup-step id="importRoleMap"
+      <setup-step id="importRolemap"
                   version="20040518-01"
-                  handler="Products.CMFSetup.rolemap.importRoleMap"
+                  handler="Products.CMFSetup.rolemap.importRolemap"
                   title="Role / Permission import"
       >Import additional roles, and map roles to permissions.</setup-step>
 
@@ -212,10 +208,8 @@ def exportRolemap( context ):
     o Register via Python:
 
       registry = site.portal_setup.export_steps
-      registry.registerStep( 'exportRoleMap'
-                           , '20040518-01'
-                           , Products.CMFSetup.rolemap.exportRoleMap
-                           , ()
+      registry.registerStep( 'exportRolemap'
+                           , Products.CMFSetup.rolemap.exportRolemap
                            , 'Role / Permission export'
                            , 'Export additional roles, and '
                              'role / permission map '
@@ -223,9 +217,9 @@ def exportRolemap( context ):
 
     o Register via XML:
  
-      <export-script id="exportRoleMap"
+      <export-script id="exportRolemap"
                      version="20040518-01"
-                     handler="Products.CMFSetup.rolemap.exportRoleMap"
+                     handler="Products.CMFSetup.rolemap.exportRolemap"
                      title="Role / Permission export"
       >Export additional roles, and role / permission map.</export-script>
 
