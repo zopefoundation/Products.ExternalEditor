@@ -2,6 +2,8 @@ CMF 1.5alpha (unreleased)
 
   New Features
 
+    - PortalFolder: Added invisible 'new' and 'rename_items' actions.
+
     - CMFCoreExceptions: Added some Exceptions.
       AccessControl.Unauthorized is a subclass of zExceptions.Unauthorized, so
       for best results use 'AccessControl_Unauthorized' to raise Unauthorized

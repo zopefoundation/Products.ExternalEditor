@@ -71,6 +71,20 @@ factory_type_information = (
                          , 'permissions'   : (ChangeLocalRoles,)
                          , 'category'      : 'folder'
                          }
+                       , { 'id'            : 'new'
+                         , 'name'          : 'New...'
+                         , 'action': 'string:${object_url}/folder_factories'
+                         , 'permissions'   : (AddPortalContent,)
+                         , 'category'      : 'folder'
+                         , 'visible'       : 0
+                         }
+                       , { 'id'            : 'rename_items'
+                         , 'name'          : 'Rename items'
+                         , 'action': 'string:${object_url}/folder_rename_form'
+                         , 'permissions'   : (AddPortalContent,)
+                         , 'category'      : 'redirect'
+                         , 'visible'       : 0
+                         }
                        )
   }
 ,
