@@ -7,10 +7,13 @@ from Products.CMFCore.tests.base.content import SIMPLE_STRUCTUREDTEXT
 from Products.CMFCore.tests.base.content import SIMPLE_XHTML
 from Products.CMFCore.tests.base.content import STX_WITH_HTML
 
-from Products.CMFDefault.utils import parseHeadersBody, tuplize, comma_split
 from Products.CMFDefault.utils import bodyfinder
+from Products.CMFDefault.utils import comma_split
 from Products.CMFDefault.utils import html_headcheck
+from Products.CMFDefault.utils import parseHeadersBody
+from Products.CMFDefault.utils import scrubHTML
 from Products.CMFDefault.utils import seq_strip
+from Products.CMFDefault.utils import tuplize
 
 
 class DefaultUtilsTests(TestCase):
@@ -67,6 +70,26 @@ Header: value
         assert( len( headers ) == 3, '%d!' % len( headers ) )
         assert( preloaded[ 'Author' ] != headers[ 'Author' ] )
         assert( preloaded[ 'text_format' ] == headers[ 'text_format' ] )
+
+    def test_scrubHTML(self):
+        self.assertEqual( scrubHTML('<a href="foo.html">bar</a>'),
+                          '<a href="foo.html">bar</a>' )
+        self.assertEqual( scrubHTML('<b>bar</b>'),
+                          '<b>bar</b>' )
+        self.assertEqual( scrubHTML('<base href="" /><base>'),
+                          '<base href="" /><base />' )
+        self.assertEqual( scrubHTML('<blockquote>bar</blockquote>'),
+                          '<blockquote>bar</blockquote>' )
+        self.assertEqual( scrubHTML('<body bgcolor="#ffffff">bar</body>'),
+                          '<body bgcolor="#ffffff">bar</body>' )
+        self.assertEqual( scrubHTML('<br /><br>'),
+                          '<br /><br />' )
+        self.assertEqual( scrubHTML('<hr /><hr>'),
+                          '<hr /><hr />' )
+        self.assertEqual( scrubHTML('<img src="foo.png" /><img>'),
+                          '<img src="foo.png" /><img />' )
+        self.assertEqual( scrubHTML('<meta name="title" content="" /><meta>'),
+                          '<meta name="title" content="" /><meta />' )
 
     def test_bodyfinder(self):
         self.assertEqual( bodyfinder(FAUX_HTML_LEADING_TEXT),

@@ -234,10 +234,10 @@ class SimpleHTMLParser( SGMLParser ):
 # These are the HTML tags that we will leave intact
 VALID_TAGS = { 'a'          : 1
              , 'b'          : 1
-             , 'base'       : 1
+             , 'base'       : 0
              , 'blockquote' : 1
              , 'body'       : 1
-             , 'br'         : 1
+             , 'br'         : 0
              , 'caption'    : 1
              , 'cite'       : 1
              , 'code'       : 1
@@ -253,14 +253,14 @@ VALID_TAGS = { 'a'          : 1
              , 'h5'         : 1
              , 'h6'         : 1
              , 'head'       : 1
-             , 'hr'         : 1
+             , 'hr'         : 0
              , 'html'       : 1
              , 'i'          : 1
-             , 'img'        : 1
+             , 'img'        : 0
              , 'kbd'        : 1
              , 'li'         : 1
            # , 'link'       : 1 type="script" hoses us
-             , 'meta'       : 1
+             , 'meta'       : 0
              , 'ol'         : 1
              , 'p'          : 1
              , 'pre'        : 1
@@ -321,7 +321,7 @@ class StrippingParser( SGMLParser ):
 
         """ Delete all tags except for legal ones.
         """
-        if VALID_TAGS.get( tag ):
+        if VALID_TAGS.has_key(tag):
 
             self.result = self.result + '<' + tag
 
@@ -336,7 +336,10 @@ class StrippingParser( SGMLParser ):
                 self.result = '%s %s="%s"' % (self.result, k, v)
 
             endTag = '</%s>' % tag
-            self.result = self.result + '>'
+            if VALID_TAGS.get(tag):
+                self.result = self.result + '>'
+            else:
+                self.result = self.result + ' />'
 
         elif NASTY_TAGS.get( tag ):
             raise IllegalHTML, 'Dynamic tag "%s" not allowed.' % tag

@@ -1,13 +1,6 @@
 Future
 
   New Features
-  
-    - Added .css to the extensions that create FSFile objects in DirectoryViews (see CMFCore/FSFile.py)
-      All sites upgrading which expected css extension to be dropped and to contain DTML will be
-      required to rename their css files to foo.dtml.
-
-    - Added .js to the extensions that create FSFile objects in
-      DirectoryViews
 
     - (__future__) Exposed role management for manager users on the
       default roster:  managers can now "promote" members without going
@@ -27,6 +20,23 @@ Future
 
     - (__future__) Added DCWorkflow (through-the-web configurable
       workflows) to the core set of CMF products.
+
+CMF 1.4 alpha
+
+  New Features
+
+    - utils: Changed behavior of 'StrippingParser' and 'scrubHTML'.
+      They now close empty tags.
+      (Collector #108, thanks to 'tanghus' for the patch)
+
+    - Added .css to the extensions that create FSFile objects in
+      DirectoryViews (see CMFCore/FSFile.py)
+      All sites upgrading which expected css extension to be dropped and to
+      contain DTML will be required to rename their css files to foo.dtml.
+      (Collector #129)
+
+    - Added .js to the extensions that create FSFile objects in
+      DirectoryViews
 
     - MembershipTool (CMFDefault): Un-hardwired members folder.
       You now can get the members folder object using 'getMembersFolder()'.
