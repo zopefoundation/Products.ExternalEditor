@@ -8,11 +8,11 @@ except AttributeError:
     # for Zope versions before 2.6.1
     pass
 
-from Testing.makerequest import makerequest
-from DateTime import DateTime
 from AccessControl.SecurityManagement import newSecurityManager
 from AccessControl.User import UnrestrictedUser
+from DateTime import DateTime
 from Products.ExternalMethod.ExternalMethod import manage_addExternalMethod
+from Testing.makerequest import makerequest
 
 from Products.CMFCalendar import CalendarTool
 
@@ -60,7 +60,7 @@ class TestCalendar(unittest.TestCase):
         obj = Site.restrictedTraverse(url)
         if params is None:
             params=(obj, Site.REQUEST)
-        apply(obj,params)
+        obj(*params)
 
     def tearDown(self):
         get_transaction().abort()
@@ -147,7 +147,8 @@ class TestCalendar(unittest.TestCase):
                  {'day': 0, 'event': 0, 'eventslist':[]}
                  ]
                 ]
-        assert self.Tool.getEventsForCalendar(month='1', year='2002') == data, self.Tool.getEventsForCalendar(month='1', year='2002')
+        result = self.Tool.getEventsForCalendar(month='1', year='2002')
+        self.assertEqual(result, data)
 
     def test_singleEventCalendarRendering(self):
 
@@ -219,7 +220,8 @@ class TestCalendar(unittest.TestCase):
                  {'day': 0, 'event': 0, 'eventslist':[]}
                  ]
                 ]
-        assert self.Tool.getEventsForCalendar(month='1', year='2002') == data, self.Tool.getEventsForCalendar(month='1', year='2002')
+        result = self.Tool.getEventsForCalendar(month='1', year='2002')
+        self.assertEqual(result, data)
 
     def test_spanningEventCalendarRendering(self):
 
@@ -291,7 +293,8 @@ class TestCalendar(unittest.TestCase):
                  {'day': 0, 'event': 0, 'eventslist':[]}
                  ]
                 ]
-        assert self.Tool.getEventsForCalendar(month='1', year='2002') == data, self.Tool.getEventsForCalendar(month='1', year='2002')
+        result = self.Tool.getEventsForCalendar(month='1', year='2002')
+        self.assertEqual(result, data)
 
     def test_getPreviousMonth(self):
         assert self.Tool.getPreviousMonth(2,2002) == DateTime('1/1/2002')
@@ -302,7 +305,9 @@ class TestCalendar(unittest.TestCase):
         assert self.Tool.getNextMonth(1,2002) == DateTime('2/1/2002')
 
     def test_getBeginAndEndTimes(self):
-        assert self.Tool.getBeginAndEndTimes(1,12,2001) == (DateTime('12/1/2001 12:00:00AM'),DateTime('12/1/2001 11:59:59PM'))
+        self.assertEqual( self.Tool.getBeginAndEndTimes(1,12,2001),
+                          ( DateTime('12/1/2001 12:00:00AM'),
+                            DateTime('12/1/2001 11:59:59PM') ) )
 
     def test_singleDayRendering(self):
 
