@@ -107,10 +107,10 @@ class DiscussionItem(Document):
     def listCreators(self):
         """ List Dublin Core Creator elements - resource authors.
         """
-        if not hasattr(self, 'creators'):
+        if not hasattr(aq_base(self), 'creators'):
             # for content created with CMF versions before 1.5
             owner = self.getOwner()
-            if self.creator and self.creator != 'unknown':
+            if hasattr(aq_base(self), 'creator') and self.creator != 'unknown':
                 self.creators = ( self.creator, )
             else:
                 self.creators = ()
