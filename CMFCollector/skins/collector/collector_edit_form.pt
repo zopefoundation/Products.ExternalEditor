@@ -129,7 +129,7 @@
            tal:attributes="checked not: here/dispatching|nothing">
           Off
             <font color="gray">
-              Managers and supporters receive non-consultation notices </font>
+              Managers and supporters receive initial notices </font>
   </td>
  </tr>
 
@@ -140,7 +140,7 @@
            tal:attributes="checked here/dispatching|nothing">
           On
             <font color="gray">
-              Only managers recieve non-consultation notices </font>
+              Only managers recieve initial notices </font>
   </td>
  </tr>
   
