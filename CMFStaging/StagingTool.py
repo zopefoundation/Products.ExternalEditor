@@ -212,11 +212,13 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
     security.declareProtected(StageObjects, 'removeStages')
     def removeStages(self, object, stages):
         """Removes the copies on the given stages."""
+        object_map = self._getObjectStages(object)
         container_map = self._getObjectStages(object, get_container=1)
         id = object.getId()
         for stage_name, container in container_map.items():
-            if container is not None and stage_name in stages:
-                container._delObject(id)
+            if object_map.get(stage_name) is not None:
+                if container is not None and stage_name in stages:
+                    container._delObject(id)
 
 
     security.declareProtected(StageObjects, 'versions')
