@@ -94,7 +94,7 @@ class ConformsToISetupTool:
 
     def test_ISetupTool_conformance( self ):
 
-        from Products.CMFSetup.tool import ISetupTool
+        from Products.CMFSetup.interfaces import ISetupTool
         from Interface.Verify import verifyClass
 
         verifyClass( ISetupTool, self._getTargetClass() )
