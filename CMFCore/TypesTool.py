@@ -410,17 +410,24 @@ class FactoryTypeInformation (TypeInformation):
         # Get the factory method, performing a security check
         # in the process.
         m = self._getFactoryMethod(container, raise_exc=1)
+
         if m is None:
             raise 'Unauthorized', ('Cannot create %s' % self.getId())
+
         id = str(id)
+
         if getattr( m, 'isDocTemp', 0 ):
+            args = ( m.aq_parent, self.REQUEST ) + args
             kw[ 'id' ] = id
-            apply( m, ( m.aq_parent, self.REQUEST ) + args, kw )
         else:
-            apply(m, (id,) + args, kw)
-        ob = container._getOb(id)
+            args = ( id, ) + args
+
+        id = apply( m, args, kw ) or id  # allow factory to munge ID
+        ob = container._getOb( id )
+
         if hasattr(ob, '_setPortalTypeName'):
             ob._setPortalTypeName(self.getId())
+
         return ob
 
 InitializeClass( FactoryTypeInformation )

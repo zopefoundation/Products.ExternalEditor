@@ -367,8 +367,12 @@ class FauxFactory:
         self._folder = folder
 
     def addFoo( self, id, *args, **kw ):
+        if self._folder._prefix:
+            id = '%s_%s' % ( self._folder._prefix, id )
         foo = apply( Foo, ( id, ) + args, kw )
         self._folder._setOb( id, foo )
+        if self._folder._prefix:
+            return id
 
     __roles__ = ( 'FooAdder', )
     __allow_access_to_unprotected_subobjects__ = { 'addFoo' : 1 }
@@ -377,11 +381,13 @@ class FauxFolder( Acquisition.Implicit ):
     """
         Shim container
     """
-    def __init__( self, fake_product=0 ):
+    def __init__( self, fake_product=0, prefix='' ):
+        self._prefix = prefix
+
         if fake_product:
             self.manage_addProduct = { 'FooProduct' : FauxFactory( self ) }
 
-        self._objects = []
+        self._objects = {}
 
     def _setOb( self, id, obj ):
         self._objects[id] = obj
@@ -445,13 +451,13 @@ class FTIConstructionTests_w_Roles( unittest.TestCase ):
     def tearDown( self ):
         noSecurityManager()
 
-    def _makeStuff( self ):
+    def _makeStuff( self, prefix='' ):
 
         ti = FactoryTypeInformation( 'Foo'
                                    , product='FooProduct'
                                    , factory='addFoo'
                                    )
-        folder = FauxFolder( fake_product=1 )
+        folder = FauxFolder( fake_product=1, prefix=prefix )
         
         return ti, folder
 
@@ -479,7 +485,7 @@ class FTIConstructionTests_w_Roles( unittest.TestCase ):
         self.assertRaises( 'Unauthorized', ti.isConstructionAllowed
                          , folder, raise_exc=1 )
 
-    def _test_constructInstance_wo_Roles( self ):
+    def test_constructInstance_wo_Roles( self ):
 
         ti, folder = self._makeStuff()
 
@@ -489,7 +495,7 @@ class FTIConstructionTests_w_Roles( unittest.TestCase ):
         self.assertRaises( 'Unauthorized'
                          , ti.constructInstance, folder, 'foo' )
 
-    def _test_constructInstance( self ):
+    def test_constructInstance( self ):
 
         ti, folder = self._makeStuff()
 
@@ -499,6 +505,13 @@ class FTIConstructionTests_w_Roles( unittest.TestCase ):
         ti.constructInstance( folder, 'foo' )
         foo = folder._getOb( 'foo' )
         self.assertEqual( foo.id, 'foo' )
+
+    def test_constructInstance_w_args_kw( self ):
+
+        ti, folder = self._makeStuff()
+
+        newSecurityManager( None
+                          , UserWithRoles( 'FooAdder' ).__of__( folder ) )
 
         ti.constructInstance( folder, 'bar', 0, 1 )
         bar = folder._getOb( 'bar' )
@@ -515,6 +528,17 @@ class FTIConstructionTests_w_Roles( unittest.TestCase ):
         self.assertEqual( bam.id, 'bam' )
         self.assertEqual( bam._args, ( 0, 1 ) )
         self.assertEqual( bam._kw[ 'frickle' ], 'natz' )
+
+    def test_constructInstance_w_id_munge( self ):
+
+        ti, folder = self._makeStuff( 'majyk' )
+
+        newSecurityManager( None
+                          , UserWithRoles( 'FooAdder' ).__of__( folder ) )
+
+        ti.constructInstance( folder, 'dust' )
+        majyk_dust = folder._getOb( 'majyk_dust' )
+        self.assertEqual( majyk_dust.id, 'majyk_dust' )
 
 def test_suite():
     suite = unittest.TestSuite()
