@@ -229,7 +229,7 @@ class WorkflowToolConfigurator( Implicit ):
         transitions = _extractTransitionNodes( root )
         variables = _extractVariableNodes( root )
         worklists = _extractWorklistNodes( root )
-        permissions = []
+        permissions = _extractPermissionNodes( root )
         scripts = []
 
         return ( workflow_id
@@ -808,6 +808,16 @@ def _extractWorklistNodes( root, encoding=None ):
 
     return result
 
+def _extractPermissionNodes( root, encoding=None ):
+
+    result = []
+
+    for p_node in root.getElementsByTagName( 'permission' ):
+
+        result.append( _coalesceTextNodeChildren( p_node, encoding ) )
+
+    return result
+
 def _extractActionNode( parent, encoding=None ):
 
     nodes = parent.getElementsByTagName( 'action' )
@@ -833,7 +843,7 @@ def _extractGuardNode( parent, encoding=None ):
 
     node = nodes[ 0 ]
 
-    expr_nodes = node.getElementsByTagName( 'expression' )
+    expr_nodes = node.getElementsByTagName( 'guard-expression' )
     assert( len( expr_nodes ) <= 1 )
 
     expr_text = expr_nodes and _coalesceTextNodeChildren( expr_nodes[ 0 ]
@@ -842,11 +852,11 @@ def _extractGuardNode( parent, encoding=None ):
 
     return { 'permissions' : [ _coalesceTextNodeChildren( x, encoding )
                                 for x in node.getElementsByTagName(
-                                                            'permission' ) ]
+                                                    'guard-permission' ) ]
            , 'roles' : [ _coalesceTextNodeChildren( x, encoding )
-                          for x in node.getElementsByTagName( 'role' ) ]
+                          for x in node.getElementsByTagName( 'guard-role' ) ]
            , 'groups' : [ _coalesceTextNodeChildren( x, encoding )
-                          for x in node.getElementsByTagName( 'group' ) ]
+                          for x in node.getElementsByTagName( 'guard-group' ) ]
            , 'expression' : expr_text
            }
 

@@ -1005,6 +1005,40 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
                             , expected[ 8 ] )
             self.assertEqual( guard.get( 'expression', '' ), expected[ 9 ] )
 
+    def test_parseWorkflowXML_normal_permissions( self ):
+
+        from Products.CMFSetup.workflow import TRIGGER_TYPES
+
+        WF_ID = 'normal'
+        WF_TITLE = 'Normal DCWorkflow'
+        WF_INITIAL_STATE = 'closed'
+
+        site = self._initSite()
+
+        configurator = self._makeOne( site ).__of__( site )
+
+        ( workflow_id
+        , title
+        , state_variable
+        , initial_state
+        , states
+        , transitions
+        , variables
+        , worklists
+        , permissions
+        , scripts
+        ) = configurator.parseWorkflowXML( _NORMAL_WORKFLOW_EXPORT
+                                         % ( WF_ID
+                                           , WF_TITLE
+                                           , WF_INITIAL_STATE
+                                           ) )
+
+        self.assertEqual( len( permissions ), len( _WF_PERMISSIONS ) )
+
+        for permission in permissions:
+
+            self.failUnless( permission in _WF_PERMISSIONS )
+
 
 _WF_PERMISSIONS = \
 ( 'Open content for modifications'
@@ -1299,8 +1333,8 @@ _NORMAL_WORKFLOW_EXPORT = """\
     <value>n/a</value>
    </default>
    <guard>
-    <role>Hangman</role>
-    <role>Sherrif</role>
+    <guard-role>Hangman</guard-role>
+    <guard-role>Sherrif</guard-role>
    </guard>
  </variable>
  <variable
@@ -1313,8 +1347,8 @@ _NORMAL_WORKFLOW_EXPORT = """\
     <expression>nothing</expression>
    </default>
    <guard>
-    <permission>Query history</permission>
-    <permission>Open content for modifications</permission>
+    <guard-permission>Query history</guard-permission>
+    <guard-permission>Open content for modifications</guard-permission>
    </guard>
  </variable>
  <variable
@@ -1327,8 +1361,8 @@ _NORMAL_WORKFLOW_EXPORT = """\
     <expression>python:None</expression>
    </default>
    <guard>
-    <permission>Query history</permission>
-    <permission>Open content for modifications</permission>
+    <guard-permission>Query history</guard-permission>
+    <guard-permission>Open content for modifications</guard-permission>
    </guard>
  </variable>
  <worklist
@@ -1339,7 +1373,7 @@ _NORMAL_WORKFLOW_EXPORT = """\
     category="workflow"
     url="string:${portal_url}/expired_items">Expired items</action>
   <guard>
-   <permission>Restore expired content</permission>
+   <guard-permission>Restore expired content</guard-permission>
   </guard>
   <match name="state" values="open; closed"/>
  </worklist>
@@ -1351,7 +1385,7 @@ _NORMAL_WORKFLOW_EXPORT = """\
     category="workflow"
     url="string:${portal_url}/expired_items">Expired items</action>
   <guard>
-   <permission>Restore expired content</permission>
+   <guard-permission>Restore expired content</guard-permission>
   </guard>
   <match name="state" values="expired"/>
  </worklist>
@@ -1432,8 +1466,8 @@ _NORMAL_WORKFLOW_EXPORT = """\
     category="workflow"
     url="string:${object_url}/close_for_modifications">Close</action>
   <guard>
-   <role>Owner</role>
-   <role>Manager</role>
+   <guard-role>Owner</guard-role>
+   <guard-role>Manager</guard-role>
   </guard>
  </transition>
  <transition
@@ -1445,7 +1479,7 @@ _NORMAL_WORKFLOW_EXPORT = """\
     after_script="">
   Retire objects whose expiration is past.
   <guard>
-   <expression>python: object.expiration() &lt;= object.ZopeTime()</expression>
+   <guard-expression>python: object.expiration() &lt;= object.ZopeTime()</guard-expression>
   </guard>
   <assignment
     name="when_expired">object/ZopeTime</assignment>
@@ -1462,7 +1496,7 @@ _NORMAL_WORKFLOW_EXPORT = """\
     category="workflow"
     url="string:${object_url}/open_for_modifications">Open</action>
   <guard>
-   <permission>Open content for modifications</permission>
+   <guard-permission>Open content for modifications</guard-permission>
   </guard>
   <assignment name="when_opened">object/ZopeTime</assignment>
  </transition>
@@ -1478,7 +1512,7 @@ _NORMAL_WORKFLOW_EXPORT = """\
     category="workflow"
     url="string:${object_url}/kill_object">Kill</action>
   <guard>
-   <group>Content_assassins</group>
+   <guard-group>Content_assassins</guard-group>
   </guard>
   <assignment
     name="killed_by">string:${user/getId}</assignment>

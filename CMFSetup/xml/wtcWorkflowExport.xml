@@ -35,18 +35,18 @@
         tal:content="variable/default_expr">EXPRESSION</expression>
    </default>
    <guard>
-    <permission
+    <guard-permission
         tal:repeat="permission variable/guard_permissions"
-        tal:content="permission">PERMISSION</permission>
-    <role
+        tal:content="permission">PERMISSION</guard-permission>
+    <guard-role
         tal:repeat="role variable/guard_roles"
-        tal:content="role">ROLE</role>
-    <group
+        tal:content="role">ROLE</guard-role>
+    <guard-group
         tal:repeat="group variable/guard_groups"
-        tal:content="group">GROUP</group>
-    <expression
+        tal:content="group">GROUP</guard-group>
+    <guard-expression
         tal:condition="variable/guard_expr"
-        tal:content="variable/guard_expr">EXPRESSION</expression>
+        tal:content="variable/guard_expr">EXPRESSION</guard-expression>
    </guard>
  </variable>
  <worklist
@@ -67,18 +67,18 @@
                        "
         tal:content="worklist/actbox_name">ACTION NAME</action>
   <guard>
-   <permission
+   <guard-permission
         tal:repeat="permission worklist/guard_permissions"
-        tal:content="permission">PERMISSION</permission>
-   <role
+        tal:content="permission">PERMISSION</guard-permission>
+   <guard-role
         tal:repeat="role worklist/guard_roles"
-        tal:content="role">ROLE</role>
-   <group
+        tal:content="role">ROLE</guard-role>
+   <guard-group
         tal:repeat="group worklist/guard_groups"
-        tal:content="group">GROUP</group>
-   <expression
+        tal:content="group">GROUP</guard-group>
+   <guard-expression
         tal:condition="worklist/guard_expr"
-        tal:content="worklist/guard_expr">EXPRESSION</expression>
+        tal:content="worklist/guard_expr">EXPRESSION</guard-expression>
   </guard>
   <match
         name="review_state"
@@ -155,18 +155,18 @@
                        "
         tal:content="transition/actbox_name">ACTION NAME</action>
   <guard>
-   <permission
+   <guard-permission
         tal:repeat="permission transition/guard_permissions"
-        tal:content="permission">PERMISSION</permission>
-   <role
+        tal:content="permission">PERMISSION</guard-permission>
+   <guard-role
         tal:repeat="role transition/guard_roles"
-        tal:content="role">ROLE</role>
-   <group
+        tal:content="role">ROLE</guard-role>
+   <guard-group
         tal:repeat="group transition/guard_groups"
-        tal:content="group">GROUP</group>
-   <expression
+        tal:content="group">GROUP</guard-group>
+   <guard-expression
         tal:condition="transition/guard_expr"
-        tal:content="transition/guard_expr">EXPRESSION</expression>
+        tal:content="transition/guard_expr">EXPRESSION</guard-expression>
   </guard>
   <assignment
         name="VAR_NAME"
