@@ -68,43 +68,43 @@ CMF TODO's
       - ( ) Actions fixes
 
         ( ) Tracker #481:  Reduntant syndication action on Skinned
-            Folder
+                           Folder
 
         ( ) Tracker #495:  Make logged-in userid available to actions
-            providers
+                           providers
 
         ( ) Tracker #496:  Allow string: expressions in DCWorkflow
-            actions
+                           actions
 
         ( ) Tracker #509:  "Join" action not protected by right
-            permission
+                           permission
 
       - ( ) Membership fixes
 
         ( ) Tracker #485:  "External" users don't get member folder
-            (patch)
+                           (patch)
 
         ( ) Tracker #501:  addToFavorites loses if no member folder
 
         ( ) Tracker #508:  logged_in pukes if no email
 
         ( ) Tracker #519:  CMFDefault.MembershipTool always creates
-            member folder
+                           member folder
 
       - ( ) Folder fixes
 
         ( ) Tracker #483:  listFolderContents doesn't filter properly
 
         ( ) Tracker #503:  index_html/folder_view don't skip unauth
-            folders
+                           folders
 
         ( ) Tracker #512:  Incorrect use of string exception in
-            PortalFolder.
+                           PortalFolder.
 
       - ( ) Tool fixes
 
         ( ) Tracker #465:  Adding title to TypeInfo breaks
-              content_type_registry.
+                           content_type_registry.
 
       - ( ) Skin fixes
 
