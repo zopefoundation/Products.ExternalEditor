@@ -35,12 +35,10 @@ class TestCase(unittest.TestCase):
         assert d.title == ''
         assert d.description == ''
         assert d.text == ''
-        assert d.text_format == ''
-        assert d.cooked_text == ''
+        assert d.text_format == 'structured-text'
 
     def test_BasicHtml(self):
-        d = Document('foo')
-        d.edit(text_format='', text=BASIC_HTML)
+        d = Document('foo', text=BASIC_HTML)
         assert d.Format() == 'text/html'
         assert d.title == 'Title in tag'
         assert string.find(d.text, '</body>') == -1
@@ -65,6 +63,24 @@ class TestCase(unittest.TestCase):
         assert d.Description() == 'A document by me'
         assert len(d.Contributors()) == 3
         assert string.find(d.cooked_text, '<p>') >= 0
+
+    def test_Init(self):
+        d = Document('foo', text=BASIC_STRUCTUREDTEXT)
+        assert d.Format() == 'text/plain'
+        assert d.Title() == 'My Document'
+        assert d.Description() == 'A document by me'
+        assert len(d.Contributors()) == 3
+        assert string.find(d.cooked_text, '<p>') >= 0
+
+        d = Document('foo', text=BASIC_HTML)
+        assert d.Format() == 'text/html'
+        assert d.Title() == 'Title in tag'
+        assert len(d.Contributors()) == 2
+
+        d = Document('foo', title='Foodoc')
+        assert d.text == ''
+        assert d.title == 'Foodoc'
+        assert d.Format() == 'text/plain'
 
 def test_suite():
     return unittest.makeSuite(TestCase)
