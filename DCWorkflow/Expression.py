@@ -104,12 +104,12 @@ except ImportError:
 
 try:
     # Zope 2.4.x
-    from AccessControl import full_read_guard
+    from AccessControl.DTML import RestrictedDTML
 except ImportError:
-    full_read_guard = None
+    class RestrictedDTML: pass
 
 
-class Expression (Persistent):
+class Expression (Persistent, RestrictedDTML):
     text = ''
     _v_eval = None
 
@@ -128,11 +128,6 @@ class Expression (Persistent):
         # Zope 2.3.x
         return getSecurityManager().validate(inst, parent, name, value)
 
-    security.declarePrivate('read_guard')
-    def read_guard(self, ob):
-        # Zope 2.4.x
-        return full_read_guard(ob)
-
     def __call__(self, md):
         # md is a TemplateDict instance.
         eval = self._v_eval
@@ -144,7 +139,9 @@ class Expression (Persistent):
                 eval = Eval(text)
             self._v_eval = eval
         md.validate = self.validate  # Zope 2.3.x
-        md.read_guard = self.read_guard  # Zope 2.4.x
+        # Zope 2.4.x
+        md.guarded_getattr = getattr(self, 'guarded_getattr', None)
+        md.guarded_getitem = getattr(self, 'guarded_getitem', None)
         return eval.eval(md)
 
 Globals.InitializeClass(Expression)
