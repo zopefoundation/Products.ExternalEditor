@@ -26,7 +26,7 @@ from Products.CMFCore import CMFCorePermissions
 from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
 
-import string, operator
+import string
 
 class ListCriterion( AbstractCriterion ):
     """
@@ -39,7 +39,7 @@ class ListCriterion( AbstractCriterion ):
 
     security = ClassSecurityInfo()
 
-    _editableAttributes = ( 'value', )
+    _editableAttributes = ( 'value', 'operator' )
 
     def __init__( self, id, field ):
         self.id = id
@@ -52,6 +52,7 @@ class ListCriterion( AbstractCriterion ):
             Restore to original value.
         """
         self.value = ( '', )    # *Not* '()', which won't do at all!
+        self.operator = None
 
     security.declareProtected( TopicPermissions.ChangeTopics, 'getEditForm' )
     def getEditForm( self ):
@@ -62,7 +63,7 @@ class ListCriterion( AbstractCriterion ):
         return "listc_edit"
 
     security.declareProtected( TopicPermissions.ChangeTopics, 'edit' )
-    def edit( self, value=None ):
+    def edit( self, value=None, operator=None ):
         """
             Update the value we match against.
         """
@@ -73,6 +74,11 @@ class ListCriterion( AbstractCriterion ):
                 value = string.split( value, '\n' )
             self.value = tuple( value )
 
+        if not operator:
+            operator = None
+
+        self.operator = operator
+
     security.declareProtected( CMFCorePermissions.View, 'getCriteriaItems' )
     def getCriteriaItems( self ):
         """
@@ -80,8 +86,17 @@ class ListCriterion( AbstractCriterion ):
             (used by 'Topic.buildQuery()').
         """
         # filter out empty strings
-        value = tuple( filter( operator.truth, self.value ) ) 
-        return operator.truth( value ) and ( ( self.field, self.value ), ) or ()
+        result = []
+
+        value = tuple( filter( None, self.value ) ) 
+        if not value:
+            return ()
+        result.append( ( self.field, self.value ), )
+
+        if self.operator is not None:
+            result.append( ( '%s_operator' % self.field, self.operator ) )
+
+        return tuple( result )
 
 
 

@@ -61,7 +61,29 @@ class ListCriterionTests( unittest.TestCase ):
         listc.edit( abc )
 
         items = listc.getCriteriaItems()
-        self.assertEqual( items[0][1], tuple( abc ) )
+        self.failUnless( 'foofield' in map( lambda x: x[0], items ) )
+        self.failUnless( tuple( abc ) in map( lambda x: x[1], items ) )
+
+    def test_operator( self ):
+
+        from Products.CMFTopic.ListCriterion import ListCriterion
+        listc = ListCriterion( 'foo', 'foofield' )
+
+        abc = [ 'a', 'b', 'c' ]
+
+        listc.edit( abc )
+        items = listc.getCriteriaItems()
+        self.assertEqual( len( items ), 1 )
+
+        listc.edit( abc, 'or' )
+        items = listc.getCriteriaItems()
+        self.assertEqual( len( items ), 2 )
+        self.failUnless( ( 'foofield_operator', 'or' ) in items )
+
+        listc.edit( abc, 'and' )
+        items = listc.getCriteriaItems()
+        self.assertEqual( len( items ), 2 )
+        self.failUnless( ( 'foofield_operator', 'and' ) in items )
 
 def test_suite():
     return unittest.makeSuite( ListCriterionTests )

@@ -14,8 +14,20 @@
  </tr>
  <tr valign="top">
   <td width="20">&nbsp;</td>
-  <td><strong>Value:</strong><br>
-  <textarea name="criteria.value:lines:records" rows="5" cols="40"
-   ><dtml-var expr="_.string.join(value, '\n')"></textarea></td>
+  <td>
+   <strong>Value:</strong><br>
+   <textarea name="criteria.value:lines:records" rows="5" cols="40"
+   ><dtml-var expr="_.string.join(value, '\n')"></textarea><br>
+   <strong>Operator:</strong><br>
+   <dtml-let noneSel="not operator and 'selected' or ''"
+             orSel="operator == 'or' and 'selected' or ''"
+             andSel="operator == 'and' and 'selected' or ''">
+   <select name="criteria.operator:records">
+    <option value="" &dtml-noneSel;>-- none --</option>
+    <option value="or" &dtml-orSel;>or</option>
+    <option value="and" &dtml-andSel;>and</option>
+   </select>
+   </dtml-let>
+  </td>
  </tr>
 </table>
