@@ -159,7 +159,6 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
                              submitter_name, submitter_email):
         """Given an id, set the name and email as warranted by the values."""
 
-        import pdb; pdb.set_trace()
         mbrtool = getToolByName(self, 'portal_membership')
         user = mbrtool.getMemberById(submitter_id)
         changes = []
