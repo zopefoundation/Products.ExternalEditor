@@ -3,5 +3,5 @@
                             , log=REQUEST['log']
                             )">
 <dtml-call expr="REQUEST['RESPONSE'].redirect(
-                           this().aq_parent[page].absolute_url()
+                           this().aq_parent[page].wiki_page_url()
                            + '?portal_status_message=Page+added.' )">
