@@ -45,7 +45,7 @@ factory_type_information = (
                      ' other issues.'), 
      'product': 'CMFCollector',
      'factory': 'addCollector',
-     'allowed_content_types': ('CollectorIssue',), 
+     'allowed_content_types': ('CollectorIssue', 'CollectorCatalog'), 
      'immediate_view': 'collector_edit_form',
      'actions': ({'id': 'view',
                   'name': 'Browse',
@@ -72,10 +72,9 @@ class Collector(SkinnedFolder):
     meta_type = 'CMF Collector'
     effective_date = expiration_date = None
     
-    DEFAULT_IMPORTANCES = ['medium', 'high', 'low']
+    DEFAULT_IMPORTANCES = ['medium', 'critical', 'low']
     DEFAULT_SEVERITIES = ['normal', 'critical', 'major', 'minor']
-    DEFAULT_CLASSIFICATIONS = ['bug', 'bug+solution', 'feature', 'doc',
-                               'test'] 
+    DEFAULT_CLASSIFICATIONS = ['bug', 'bug+solution', 'feature', 'doc', 'test']
     DEFAULT_VERSIONS = ['current', 'development', 'old', 'unique']
     DEFAULT_OTHER_VERSIONS_SPIEL = (
         "Pertinent other-system details, eg browser, webserver,"
@@ -94,7 +93,7 @@ class Collector(SkinnedFolder):
 
         SkinnedFolder.__init__(self, id, title)
 
-        self._setup_catalog()
+        self._setup_internal_catalog()
 
         self.last_issue_id = 0
 
@@ -143,7 +142,7 @@ class Collector(SkinnedFolder):
     def _setup_internal_catalog(self):
         """Create and situate properly configured collector catalog."""
         catalog = CollectorCatalog()
-        self._setOb(catalog.id, catalog)
+        self._setObject(catalog.id, catalog)
 
     security.declareProtected(CMFCorePermissions.View, 'get_internal_catalog')
     def get_internal_catalog(self):
@@ -286,10 +285,12 @@ class Collector(SkinnedFolder):
     def reinstate_catalog(self, internal_only=0):
         """Recreate and reload internal catalog, to accommodate drastic
         changes."""
-        if hasattr(self, INTERNAL_CATALOG_ID):
-            self._delOb(INTERNAL_CATALOG_ID)
+        try:
+            self._delObject(INTERNAL_CATALOG_ID)
+        except AttributeError:
+            pass
         self._setup_internal_catalog()
-        for i in self.objectValues():
+        for i in self.objectValues(spec='CMF Collector Issue'):
             # Normalize security_related setting
             if i.security_related not in [0, 1]:
                 i.security_related = (i.security_related and 1) or 0
@@ -297,7 +298,7 @@ class Collector(SkinnedFolder):
 
     def _reindex_issues(self, internal_only=0):
         """For, eg, allowedRolesAndUsers recompute after local_role changes."""
-        for i in self.objectValues():
+        for i in self.objectValues(spec='CMF Collector Issue'):
             i.reindexObject(internal_only=internal_only)
 
     security.declareProtected(CMFCorePermissions.View, 'Subject')
@@ -320,8 +321,21 @@ class Collector(SkinnedFolder):
 
 InitializeClass(Collector)
     
+catalog_factory_type_information = (
+    {'id': 'Collector Catalog',
+     'content_icon': 'collector_icon.gif',
+     'meta_type': 'CMF Collector Catalog',
+     'description': ('Internal catalog.'), 
+     'product': 'CMFCollector',
+     'factory': None,
+     'immediate_view': None},)
+
 class CollectorCatalog(CatalogTool):
+
     id = INTERNAL_CATALOG_ID
+    meta_type = 'CMF Collector Catalog'
+    portal_type = 'Collector Catalog'
+
     def enumerateIndexes(self):
         standard = CatalogTool.enumerateIndexes(self)
         custom = (('status', 'FieldIndex'),
@@ -354,7 +368,6 @@ class CollectorCatalog(CatalogTool):
                   'upload_number',
                   )
         return standard + custom
-
 
 InitializeClass(CollectorCatalog)
 
