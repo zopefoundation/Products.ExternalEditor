@@ -59,6 +59,8 @@
   <th align="right"> Description
   </th>
   <td colspan="3">
+   <font size="-1" color="gray"> Will be rendered as HTML </font>
+   <br>
    <textarea name="description:text" rows="3"
              cols="50"
        tal:content="here/description">
