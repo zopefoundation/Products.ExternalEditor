@@ -222,7 +222,7 @@ class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
 
     manage_catalogFind = DTMLFile( 'catalogFind', _dtmldir )
 
-    def catalog_object(self, object, uid, idxs=[]):
+    def catalog_object(self, object, uid, idxs=()):
         # Wraps the object with workflow and accessibility
         # information just before cataloging.
         wf = getattr(self, 'portal_workflow', None)
@@ -248,7 +248,7 @@ class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
         self.uncatalog_object(url)
 
     security.declarePrivate('reindexObject')
-    def reindexObject(self, object, idxs=[]):
+    def reindexObject(self, object, idxs=()):
         '''Update catalog after object data has changed.
         The optional idxs argument is a list of specific indexes
         to update (all of them by default).
@@ -257,7 +257,7 @@ class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
         ## Zope 2.3 ZCatalog is supposed to work better if
         ## you don't uncatalog_object() when reindexing.
         # self.uncatalog_object(url)
-        if idxs != []:
+        if idxs:
             # Filter out invalid indexes.
             valid_indexes = self._catalog.indexes.keys()
             idxs = [i for i in idxs if i in valid_indexes]
