@@ -20,7 +20,7 @@ from Globals import InitializeClass, DTMLFile
 from Acquisition import Implicit
 from AccessControl import ClassSecurityInfo
 
-from ActionProviderBase import OldstyleActionProviderBase
+from ActionProviderBase import ActionProviderBase
 from permissions import AccessContentsInformation
 from permissions import ManagePortal
 from permissions import ReplyToItem
@@ -112,10 +112,10 @@ class OldDiscussable(Implicit):
         return ""
 
 
-class DiscussionTool (UniqueObject, SimpleItem, OldstyleActionProviderBase):
+class DiscussionTool (UniqueObject, SimpleItem, ActionProviderBase):
 
     __implements__ = (IOldstyleDiscussionTool,
-                      OldstyleActionProviderBase.__implements__)
+                      ActionProviderBase.__implements__)
 
     id = 'portal_discussion'
     meta_type = 'Oldstyle CMF Discussion Tool'
@@ -156,11 +156,13 @@ class DiscussionTool (UniqueObject, SimpleItem, OldstyleActionProviderBase):
         return 0
 
     security.declarePrivate('listActions')
-    def listActions(self, info):
+    def listActions(self, info=None, object=None):
         # Return actions for reply and show replies
+        if object is not None or info is None:
+            info = getOAI(self, object)
         content = info.content
         if content is None or not self.isDiscussionAllowedFor(content):
-            return []
+            return ()
 
         discussion = self.getDiscussionFor(content)
         if discussion.aq_base == content.aq_base:

@@ -19,15 +19,11 @@ from AccessControl import ClassSecurityInfo
 from Globals import DTMLFile
 from Globals import InitializeClass
 
+from ActionInformation import ActionInfo
 from ActionInformation import ActionInformation
-from ActionInformation import getOAI
-from Expression import Expression
 from Expression import getExprContext
 from interfaces.portal_actions import ActionProvider as IActionProvider
-from interfaces.portal_actions \
-        import OldstyleActionProvider as IOldstyleActionProvider
 from permissions import ManagePortal
-from utils import _checkPermission
 from utils import _dtmldir
 
 
@@ -80,11 +76,12 @@ class ActionProviderBase:
     def listActionInfos(self, action_chain=None, object=None,
                         check_visibility=1, check_permissions=1,
                         check_condition=1, max=-1):
-        # List Action info mappings.
+        # List ActionInfo objects.
         # (method is without docstring to disable publishing)
         #
         ec = getExprContext(self, object)
         actions = self.listActions(object=object)
+        actions = [ ActionInfo(action, ec) for action in actions ]
 
         if action_chain:
             filtered_actions = []
@@ -94,36 +91,19 @@ class ActionProviderBase:
                 sep = action_ident.rfind('/')
                 category, id = action_ident[:sep], action_ident[sep+1:]
                 for ai in actions:
-                    if id == ai.getId() and category == ai.getCategory():
+                    if id == ai['id'] and category == ai['category']:
                         filtered_actions.append(ai)
             actions = filtered_actions
 
         action_infos = []
         for ai in actions:
-            if check_visibility and not ai.getVisibility():
+            if check_visibility and not ai['visible']:
                 continue
-            if check_permissions:
-                permissions = ai.getPermissions()
-                if permissions:
-                    category = ai.getCategory()
-                    if (object is not None and
-                        (category.startswith('object') or
-                         category.startswith('workflow'))):
-                        context = object
-                    elif (ec.contexts['folder'] is not None and
-                          category.startswith('folder')):
-                        context = ec.contexts['folder']
-                    else:
-                        context = ec.contexts['portal']
-                    for permission in permissions:
-                        allowed = _checkPermission(permission, context)
-                        if allowed:
-                            break
-                    if not allowed:
-                        continue
-            if check_condition and not ai.testCondition(ec):
+            if check_permissions and not ai['allowed']:
                 continue
-            action_infos.append( ai.getAction(ec) )
+            if check_condition and not ai['available']:
+                continue
+            action_infos.append(ai)
             if max + 1 and len(action_infos) >= max:
                 break
         return action_infos
@@ -131,7 +111,7 @@ class ActionProviderBase:
     security.declarePublic('getActionInfo')
     def getActionInfo(self, action_chain, object=None, check_visibility=0,
                       check_condition=0):
-        """ Get an Action info mapping specified by a chain of actions.
+        """ Get an ActionInfo object specified by a chain of actions.
         """
         action_infos = self.listActionInfos(action_chain, object,
                                        check_visibility=check_visibility,
@@ -176,8 +156,8 @@ class ActionProviderBase:
         if not name:
             raise ValueError('A name is required.')
 
-        a_expr = action and Expression(text=str(action)) or ''
-        c_expr = condition and Expression(text=str(condition)) or ''
+        action = action and str(action) or ''
+        condition = condition and str(condition) or ''
 
         if not isinstance(permission, tuple):
             permission = (str(permission),)
@@ -186,11 +166,11 @@ class ActionProviderBase:
 
         new_action = ActionInformation( id=str(id)
                                       , title=str(name)
-                                      , action=a_expr
-                                      , condition=c_expr
-                                      , permissions=permission
                                       , category=str(category)
-                                      , visible=int(visible)
+                                      , condition=condition
+                                      , permissions=permission
+                                      , visible=bool(visible)
+                                      , action=action
                                       )
 
         new_actions.append( new_action )
@@ -337,88 +317,3 @@ class ActionProviderBase:
                                 )
 
 InitializeClass(ActionProviderBase)
-
-
-class OldstyleActionProviderBase:
-    """ Base class for ActionProviders with oldstyle Actions.
-    """
-
-    __implements__ = IOldstyleActionProvider
-
-    security = ClassSecurityInfo()
-
-    _actions = ()
-
-    #
-    #   OldstyleActionProvider interface
-    #
-    security.declarePrivate('listActions')
-    def listActions(self, info):
-        """ List all the actions defined by a provider.
-        """
-        return self._actions or ()
-
-    security.declarePrivate('getActionObject')
-    getActionObject = ActionProviderBase.getActionObject.im_func
-
-    security.declarePublic('listActionInfos')
-    def listActionInfos(self, action_chain=None, object=None,
-                        check_visibility=1, check_permissions=1,
-                        check_condition=1, max=-1):
-        # List Action info mappings.
-        # (method is without docstring to disable publishing)
-        #
-        info = getOAI(self, object)
-        actions = self.listActions(info=info)
-
-        if action_chain:
-            filtered_actions = []
-            if isinstance(action_chain, basestring):
-                action_chain = (action_chain,)
-            for action_ident in action_chain:
-                sep = action_ident.rfind('/')
-                category, id = action_ident[:sep], action_ident[sep+1:]
-                for ai in actions:
-                    if id == ai['id'] and category == ai['category']:
-                        filtered_actions.append(ai)
-            actions = filtered_actions
-
-        action_infos = []
-        for ai in actions:
-            if check_permissions:
-                permissions = ai.get( 'permissions', () )
-                if permissions:
-                    category = ai['category']
-                    if (object is not None and
-                        (category.startswith('object') or
-                         category.startswith('workflow'))):
-                        context = object
-                    elif (info['folder'] is not None and
-                          category.startswith('folder')):
-                        context = info['folder']
-                    else:
-                        context = info['portal']
-                    for permission in permissions:
-                        allowed = _checkPermission(permission, context)
-                        if allowed:
-                            break
-                    if not allowed:
-                        continue
-            action_infos.append(ai)
-            if max + 1 and len(action_infos) >= max:
-                break
-        return action_infos
-
-    security.declarePublic('getActionInfo')
-    def getActionInfo(self, action_chain, object=None, check_visibility=0,
-                      check_condition=0):
-        """ Get an Action info mapping specified by a chain of actions.
-        """
-        action_infos = self.listActionInfos(action_chain, object,
-                                       check_visibility=check_visibility,
-                                       check_condition=check_condition, max=1)
-        if not action_infos:
-            raise ValueError('No Action meets the given specification.')
-        return action_infos[0]
-
-InitializeClass(OldstyleActionProviderBase)

@@ -20,12 +20,96 @@ from Acquisition import aq_base, aq_inner, aq_parent
 from Globals import InitializeClass
 from OFS.SimpleItem import SimpleItem
 
+from interfaces.portal_actions import ActionInfo as IActionInfo
 from Expression import Expression
 from permissions import View
+from utils import _checkPermission
 from utils import getToolByName
 
 
 _unchanged = [] # marker
+
+class ActionInfo(dict):
+    """ A lazy dictionary for Action infos.
+    """
+    __implements__ = IActionInfo
+    __allow_access_to_unprotected_subobjects__ = 1
+
+    def __init__(self, action, ec):
+        self._marker = marker = object()
+
+        if isinstance(action, dict):
+            dict.__init__(self, action)
+            self.setdefault( 'id', self['name'].lower() )
+            self.setdefault( 'title', self['name'] )
+            self.setdefault( 'url', '' )
+            self.setdefault( 'permissions', () )
+            self.setdefault( 'category', 'object' )
+            self.setdefault( 'visible', True )
+            self['available'] = True
+            self['allowed'] = self['permissions'] and marker or True
+
+        else:
+            self._action = action
+            self._ec = ec
+            mapping = action.getMapping()
+            self['id']          = mapping['id']
+            self['title']       = mapping['title']
+            self['name']        = mapping['title']
+            self['url']         = mapping['action'] and marker or ''
+            self['permissions'] = mapping['permissions']
+            self['category']    = mapping['category']
+            self['visible']     = mapping['visible']
+            self['available']   = mapping['condition'] and marker or True
+            self['allowed']     = mapping['permissions'] and marker or True
+
+    def __getitem__(self, key):
+        value = dict.__getitem__(self, key)
+        if value == self._marker:
+            if key == 'allowed':
+                value = self[key] = self._checkPermissions()
+            elif key == 'available':
+                value = self[key] = self._checkCondition()
+            elif key == 'url':
+                value = self[key] = self._getURL()
+        return value
+
+    def __eq__(self, other):
+        # this is expensive, use it with care
+        [ self[key] for key in self ]
+        [ other[key] for key in other ]
+        return dict.__eq__(self, other)
+
+    def _getURL(self):
+        """ Get the result of the URL expression in the current context.
+        """
+        return self._action._getActionObject()(self._ec)
+
+    def _checkCondition(self):
+        """ Check condition expression in the current context.
+        """
+        return self._action.testCondition(self._ec)
+
+    def _checkPermissions(self):
+        """ Check permissions in the current context.
+        """
+        category = self['category']
+        object = self._ec.contexts['object']
+        if object is not None and ( category.startswith('object') or
+                                    category.startswith('workflow') ):
+            context = object
+        else:
+            folder = self._ec.contexts['folder']
+            if folder is not None and category.startswith('folder'):
+                context = folder
+            else:
+                context = self._ec.contexts['portal']
+
+        for permission in self['permissions']:
+            if _checkPermission(permission, context):
+                return True
+        return False
+
 
 class ActionInformation( SimpleItem ):
 
@@ -123,9 +207,9 @@ class ActionInformation( SimpleItem ):
         """ Evaluate condition using context, 'ec', and return 0 or 1.
         """
         if self.condition:
-            return self.condition(ec)
+            return bool( self.condition(ec) )
         else:
-            return 1
+            return True
 
     security.declarePublic( 'getAction' )
     def getAction( self, ec ):
@@ -133,17 +217,7 @@ class ActionInformation( SimpleItem ):
         """ Compute the action using context, 'ec'; return a mapping of
             info about the action.
         """
-        info = {}
-        info['id'] = self.id
-        info['title'] = info['name'] = self.Title()
-        expr = self.getActionExpression()
-        __traceback_info__ = (info['id'], info['name'], expr)
-        action_obj = self._getActionObject()
-        info['url'] = action_obj and action_obj( ec ) or ''
-        info['permissions'] = self.getPermissions()
-        info['category'] = self.getCategory()
-        info['visible'] = self.getVisibility()
-        return info
+        return ActionInfo(self, ec)
 
     security.declarePrivate( '_getActionObject' )
     def _getActionObject( self ):
@@ -168,7 +242,7 @@ class ActionInformation( SimpleItem ):
         action = self._getActionObject()
         expr = action and action.text or ''
         if expr and isinstance(expr, basestring):
-            if not expr.startswith('python:') and not expr.startswith('string:'):
+            if not expr.startswith('string:') and not expr.startswith('python:'):
                 expr = 'string:${object_url}/%s' % expr
                 self.action = Expression( expr )
         return expr
@@ -176,7 +250,7 @@ class ActionInformation( SimpleItem ):
     security.declarePrivate( 'setActionExpression' )
     def setActionExpression(self, action):
         if action and isinstance(action, basestring):
-            if not action.startswith('python:')  and not action.startswith('string:'):
+            if not action.startswith('string:') and not action.startswith('python:'):
                 action = 'string:${object_url}/%s' % action
                 action = Expression( action )
         self.action = action
@@ -215,13 +289,14 @@ class ActionInformation( SimpleItem ):
     def getMapping(self):
         """ Get a mapping of this object's data.
         """
-        return { 'id': self.getId(),
-                 'title': self.Title(),
-                 'description': self.Description(),
-                 'category': self.getCategory(),
-                 'condition': self.getCondition(),
-                 'permissions': self.getPermissions(),
-                 'visible': self.getVisibility(),
+        return { 'id': self.id,
+                 'title': self.title or self.id,
+                 'description': self.description,
+                 'category': self.category or 'object',
+                 'condition': getattr(self, 'condition', None)
+                              and self.condition.text or '',
+                 'permissions': self.permissions,
+                 'visible': bool(self.visible),
                  'action': self.getActionExpression() }
 
     security.declarePrivate('clone')

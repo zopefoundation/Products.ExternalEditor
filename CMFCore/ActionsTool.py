@@ -28,6 +28,7 @@ from ActionInformation import getOAI
 from ActionProviderBase import ActionProviderBase
 from Expression import Expression
 from Expression import getExprContext
+from interfaces.portal_actions import ActionProvider as IActionProvider
 from interfaces.portal_actions import portal_actions as IActionsTool
 from permissions import ListFolderContents
 from permissions import ManagePortal
@@ -153,7 +154,7 @@ class ActionsTool(UniqueObject, Folder, ActionProviderBase):
         # Include actions from specific tools.
         for provider_name in self.listActionProviders():
             provider = getattr(self, provider_name)
-            if hasattr( aq_base(provider), 'listActionInfos' ):
+            if IActionProvider.isImplementedBy(provider):
                 actions.extend( provider.listActionInfos(object=object) )
             else:
                 # for Action Providers written for CMF versions before 1.5
@@ -162,7 +163,7 @@ class ActionsTool(UniqueObject, Folder, ActionProviderBase):
         # Include actions from object.
         if object is not None:
             base = aq_base(object)
-            if hasattr(base, 'listActionInfos'):
+            if IActionProvider.isImplementedBy(base):
                 actions.extend( object.listActionInfos(object=object) )
             elif hasattr(base, 'listActions'):
                 # for objects written for CMF versions before 1.5
@@ -180,12 +181,10 @@ class ActionsTool(UniqueObject, Folder, ActionProviderBase):
             catlist = filtered_actions.get(category, None)
             if catlist is None:
                 filtered_actions[category] = catlist = []
-            # Filter out duplicate actions by identity...
-            if not action in catlist:
-                catlist.append(action)
+            catlist.append(action)
             # ...should you need it, here's some code that filters
-            # by equality (use instead of the two lines above)
-            #if not [a for a in catlist if a==action]:
+            # by equality (use instead of the line above)
+            #if not action in catlist:
             #    catlist.append(action)
         return filtered_actions
 

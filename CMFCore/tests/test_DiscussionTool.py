@@ -14,10 +14,10 @@ class DiscussionToolTests(TestCase):
         from Products.CMFCore.interfaces.portal_discussion \
                 import oldstyle_portal_discussion as IOldstyleDiscussionTool
         from Products.CMFCore.interfaces.portal_actions \
-                import OldstyleActionProvider as IOldstyleActionProvider
+                import ActionProvider as IActionProvider
 
         verifyClass(IOldstyleDiscussionTool, DiscussionTool)
-        verifyClass(IOldstyleActionProvider, DiscussionTool)
+        verifyClass(IActionProvider, DiscussionTool)
 
 
 class OldDiscussableTests(TestCase):

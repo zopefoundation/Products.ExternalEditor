@@ -69,36 +69,10 @@ class ActionsToolTests( SecurityRequestTest ):
                                       'title': 'Folder contents',
                                       'name': 'Folder contents',
                                       'visible': True,
+                                      'available': True,
+                                      'allowed': True,
                                       'category': 'folder'}],
                           'global': []})
-
-    def test_DuplicateActions(self):
-        """
-        Check that listFilteredActionsFor
-        filters out duplicate actions.
-        """
-        root = self.root
-        tool = self.tool
-        action = ActionInformation(id='test',
-                                   title='Test',
-                                   action=Expression(
-                                          text='string: a_url'
-                                          ),
-                                   condition='',
-                                   permissions=(),
-                                   category='object',
-                                   visible=1
-                                   )
-        tool._actions = [action,action]
-        self.tool.action_providers = ('portal_actions',)
-        self.assertEqual(tool.listFilteredActionsFor(root)['object'],
-                          [{'permissions': (),
-                            'id': 'test',
-                            'url': ' a_url',
-                            'title': 'Test',
-                            'name': 'Test',
-                            'visible': True,
-                            'category': 'object'}])
 
     def test_interface(self):
         from Products.CMFCore.interfaces.portal_actions \

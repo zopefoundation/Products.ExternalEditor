@@ -2,6 +2,16 @@ CMF 1.5.0-beta (unreleased)
 
   New Features
 
+    - Actions and Action providers: Further refactoring.
+
+      o Removed again OldstyleActionProvider Interface and
+        OldstyleActionProviderBase that existed only in 1.5.0-alpha.
+        ActionProvider now also works with oldstyle Action mappings.
+
+      o listActionInfos() and getActionInfo() now return ActionInfo objects
+        instead of Action info mappings. ActionInfo objects have a backwards
+        compatible mapping interface.
+
     - Added CMFUid which provides unique id functionality. 
 
     - As example of how to use unique ids CMFDefaults Favorite content 

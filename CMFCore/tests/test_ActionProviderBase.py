@@ -213,7 +213,7 @@ class ActionProviderBaseTests(SecurityRequestTest):
     def test_listActionInfos(self):
         wanted = [{'id': 'an_id', 'title': 'A Title', 'name': 'A Title',
                    'url': '', 'permissions': (), 'category': 'object',
-                   'visible': False }]
+                   'visible': False, 'available': True, 'allowed': True}]
 
         apb = self.site._setObject( 'portal_apb', self._makeProvider(1) )
         rval = apb.listActionInfos()
@@ -234,7 +234,7 @@ class ActionProviderBaseTests(SecurityRequestTest):
     def test_getActionInfo(self):
         wanted = {'id': 'an_id', 'title': 'A Title', 'name': 'A Title',
                   'url': '', 'permissions': (), 'category': 'object',
-                  'visible': False }
+                  'visible': False, 'available': True, 'allowed': True}
 
         apb = self.site._setObject( 'portal_apb', self._makeProvider(1) )
         rval = apb.getActionInfo( ('object/an_id',) )

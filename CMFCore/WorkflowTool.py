@@ -22,7 +22,8 @@ from Globals import InitializeClass, PersistentMapping, DTMLFile
 from AccessControl import ClassSecurityInfo
 from Acquisition import aq_base, aq_inner, aq_parent
 
-from ActionProviderBase import OldstyleActionProviderBase
+from ActionInformation import getOAI
+from ActionProviderBase import ActionProviderBase
 from permissions import ManagePortal
 from interfaces.portal_workflow import portal_workflow as IWorkflowTool
 from utils import _dtmldir
@@ -54,13 +55,13 @@ class WorkflowInformation:
         raise KeyError, name
 
 
-class WorkflowTool(UniqueObject, Folder, OldstyleActionProviderBase):
+class WorkflowTool(UniqueObject, Folder, ActionProviderBase):
     """ Mediator tool, mapping workflow objects
     """
     id = 'portal_workflow'
     meta_type = 'CMF Workflow Tool'
     __implements__ = (IWorkflowTool,
-                      OldstyleActionProviderBase.__implements__)
+                      ActionProviderBase.__implements__)
 
     _chains_by_type = None  # PersistentMapping
     _default_chain = ('default_workflow',)
@@ -230,7 +231,7 @@ class WorkflowTool(UniqueObject, Folder, OldstyleActionProviderBase):
         return vars
 
     security.declarePrivate('listActions')
-    def listActions(self, info):
+    def listActions(self, info=None, object=None):
 
         """ Returns a list of actions to be displayed to the user.
 
@@ -243,9 +244,12 @@ class WorkflowTool(UniqueObject, Folder, OldstyleActionProviderBase):
 
         o Global actions are supplied by all workflows.
         """
+        if object is not None or info is None:
+            info = getOAI(self, object)
         chain = self.getChainFor(info.content)
         did = {}
         actions = []
+
         for wf_id in chain:
             did[wf_id] = 1
             wf = self.getWorkflowById(wf_id)

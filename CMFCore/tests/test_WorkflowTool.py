@@ -319,10 +319,10 @@ class WorkflowToolTests(TestCase):
         from Products.CMFCore.interfaces.portal_workflow \
                 import portal_workflow as IWorkflowTool
         from Products.CMFCore.interfaces.portal_actions \
-                import OldstyleActionProvider as IOldstyleActionProvider
+                import ActionProvider as IActionProvider
 
         verifyClass(IWorkflowTool, WorkflowTool)
-        verifyClass(IOldstyleActionProvider, WorkflowTool)
+        verifyClass(IActionProvider, WorkflowTool)
 
 
 def test_suite():

@@ -11,7 +11,6 @@ from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
 from Products.CMFCore.ActionInformation import ActionInformation
 from Products.CMFCore.ActionProviderBase import IActionProvider
-from Products.CMFCore.ActionProviderBase import IOldstyleActionProvider
 from Products.CMFCore.utils import getToolByName
 
 from permissions import ManagePortal
@@ -151,10 +150,11 @@ class ActionProvidersConfigurator( Implicit ):
             if not IActionProvider.isImplementedBy( provider ):
                 continue
 
-            if IOldstyleActionProvider.isImplementedBy( provider ):
+            actions = provider.listActions()
+
+            if actions and isinstance(actions[0], dict):
                 continue
 
-            actions = provider.listActions()
             provider_info['actions'] = [ ai.getMapping() for ai in actions ]
 
         return result
