@@ -376,9 +376,11 @@ class DefaultWorkflowDefinition (SimpleItemWithProperties):
             reviewer_view = 1
         # Modify role to permission mappings directly.
 
-        modifyPermissionMappings(ob,
+        return modifyPermissionMappings(ob,
             {'View': {'Anonymous': anon_view,
-                      'Reviewer': reviewer_view},
+                      'Reviewer': reviewer_view,
+                      'Owner': 1,
+                      },
              'Modify portal content': {'Owner': owner_modify}})
 
 Globals.InitializeClass(DefaultWorkflowDefinition)

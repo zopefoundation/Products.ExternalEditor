@@ -173,15 +173,9 @@ class MembershipTool ( Products.CMFCore.MembershipTool.MembershipTool ):
             members.manage_addPortalFolder(member_id)
             f=getattr(members, member_id)
  
-            f.manage_permission(View,
-                                ['Owner','Manager','Reviewer'], 0)
-            f.manage_permission(AccessContentsInformation,
-                                ['Owner','Manager','Reviewer'], 0)
- 
             # Grant ownership to Member
             user = self.__getPUS().getUser(member_id)
-            try: f.changeOwnership(user)
-            except AttributeError: pass  # Zope 2.1.x compatibility
+            f.changeOwnership(user)
             f.manage_setLocalRoles(member_id, ['Owner'])
  
             # Create Member's home page.
