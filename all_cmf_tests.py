@@ -55,12 +55,12 @@ def main():
     import getopt
 
     try:
-        opts, args = getopt.getopt( sys.argv[1:], 'v?' )
+        opts, args = getopt.getopt( sys.argv[1:], 'vq?' )
     except getopt.GetoptError:
         usage()
 
     sys.argv[ 1: ] = []
-    PASSTHROUGH = ( '-v', )
+    PASSTHROUGH = ( '-v', '-q' )
 
     for k, v in opts:
 
