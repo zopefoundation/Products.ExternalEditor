@@ -542,6 +542,14 @@ class FTIConstructionTests_w_Roles(TestCase):
         foo = folder._getOb( 'foo' )
         self.assertEqual( foo.id, 'foo' )
 
+    def test_constructInstance_private(self):
+        ti, folder = self._makeStuff()
+        newSecurityManager(None,
+                           UserWithRoles('NotAFooAdder').__of__(folder))
+        ti._constructInstance(folder, 'foo')
+        foo = folder._getOb('foo')
+        self.assertEqual(foo.id, 'foo')
+
     def test_constructInstance_w_args_kw( self ):
 
         ti, folder = self._makeStuff()

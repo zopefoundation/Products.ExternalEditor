@@ -322,6 +322,20 @@ class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
                 , visible=action.get('visible', 1)
                 )
 
+    security.declarePublic('constructInstance')
+    def constructInstance(self, container, id, *args, **kw):
+        """Build an instance of the type.
+
+        Builds the instance in 'container', using 'id' as its id.
+        Returns the object.
+        """
+        if not self.isConstructionAllowed(container):
+            raise AccessControl_Unauthorized('Cannot create %s' % self.getId())
+
+        ob = self._constructInstance(container, id, *args, **kw)
+
+        return self._finishConstruction(ob)
+
     security.declarePrivate('_finishConstruction')
     def _finishConstruction(self, ob):
         """
@@ -480,7 +494,7 @@ class FactoryTypeInformation (TypeInformation):
     #
     #   Agent methods
     #
-    def _getFactoryMethod(self, container):
+    def _getFactoryMethod(self, container, check_security=1):
         if not self.product or not self.factory:
             raise ValueError, ('Product factory for %s was undefined' %
                                self.getId())
@@ -489,6 +503,8 @@ class FactoryTypeInformation (TypeInformation):
         if m is None:
             raise ValueError, ('Product factory for %s was invalid' %
                                self.getId())
+        if not check_security:
+            return m
         if getSecurityManager().validate(p, p, self.factory, m):
             return m
         raise AccessControl_Unauthorized( 'Cannot create %s' % self.getId() )
@@ -526,29 +542,27 @@ class FactoryTypeInformation (TypeInformation):
         m = self._queryFactoryMethod(container)
         return (m is not None)
 
-    security.declarePublic('constructInstance')
-    def constructInstance( self, container, id, *args, **kw ):
-        """
-        Build a "bare" instance of the appropriate type in
-        'container', using 'id' as its id.  Return the object.
-        """
-        # Get the factory method, performing a security check
-        # in the process.
+    security.declarePrivate('_constructInstance')
+    def _constructInstance(self, container, id, *args, **kw):
+        """Build a bare instance of the appropriate type.
 
-        m = self._getFactoryMethod(container)
+        Does not do any security checks.
+
+        Returns the object without calling _finishConstruction().
+        """
+        m = self._getFactoryMethod(container, check_security=0)
 
         id = str(id)
 
-        if getattr( m, 'isDocTemp', 0 ):
-            args = ( m.aq_parent, self.REQUEST ) + args
-            kw[ 'id' ] = id
+        if getattr(aq_base(m), 'isDocTemp', 0):
+            kw['id'] = id
+            newid = m(m.aq_parent, self.REQUEST, *args, **kw)
         else:
-            args = ( id, ) + args
+            newid = m(id, *args, **kw)
+        # allow factory to munge ID
+        newid = newid or id
 
-        id = m(*args, **kw) or id  # allow factory to munge ID
-        ob = container._getOb( id )
-
-        return self._finishConstruction(ob)
+        return container._getOb(newid)
 
 InitializeClass( FactoryTypeInformation )
 
@@ -587,27 +601,24 @@ class ScriptableTypeInformation( TypeInformation ):
             return 0
         return 1
 
-    security.declarePublic('constructInstance')
-    def constructInstance( self, container, id, *args, **kw ):
-        """
-        Build a "bare" instance of the appropriate type in
-        'container', using 'id' as its id.  Return the object.
-        """
-        if not self.isConstructionAllowed(container):
-            raise AccessControl_Unauthorized
+    security.declarePrivate('_constructInstance')
+    def _constructInstance(self, container, id, *args, **kw):
+        """Build a bare instance of the appropriate type.
 
+        Does not do any security checks.
+
+        Returns the object without calling _finishConstruction().
+        """
         constructor = self.restrictedTraverse( self.constructor_path )
+
         # make sure ownership is explicit before switching the context
         if not hasattr( aq_base(constructor), '_owner' ):
             constructor._owner = aq_get(constructor, '_owner')
-
         #   Rewrap to get into container's context.
         constructor = aq_base(constructor).__of__( container )
 
         id = str(id)
-        ob = constructor(container, id, *args, **kw)
-
-        return self._finishConstruction(ob)
+        return constructor(container, id, *args, **kw)
 
 InitializeClass( ScriptableTypeInformation )
 
