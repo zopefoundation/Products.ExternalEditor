@@ -17,7 +17,7 @@
 
 # Zope External Editor Helper Application by Casey Duncan
 
-__version__ = '0.4.2'
+__version__ = '0.5'
 
 import sys, os
 import traceback
@@ -29,10 +29,9 @@ import urllib
 
 try:
     # See if ssl is available on this system
-    from socket import ssl, sslerror
+    from socket import ssl
 except ImportError:
     ssl_available = 0
-    sslerror = None # Used for catching sslserver protocol violations
 else:
     ssl_available = 1
     del ssl 
@@ -95,9 +94,6 @@ class Configuration:
         
 class ExternalEditor:
     
-    saved = 1
-    did_lock = 0
-    
     def __init__(self, input_file):
         try:
             # Read the configuration file
@@ -157,6 +153,7 @@ class ExternalEditor:
             body_f = open(content_file, 'wb')
             body_f.write(in_f.read())
             self.content_file = content_file
+            self.saved = 1
             in_f.close()
             body_f.close()
             self.clean_up = int(self.options.get('cleanup_files', 1))
@@ -170,6 +167,8 @@ class ExternalEditor:
                 fatalError('SSL support is not available on this system. '
                            'Make sure openssl is installed '
                            'and reinstall Python.')
+            self.lock_token = None
+            self.did_lock = 0
         except:
             # for security, always delete the input file even if
             # a fatal error occurs, unless explicitly stated otherwise
@@ -188,7 +187,7 @@ class ExternalEditor:
             # for security we always delete the files by default
             os.remove(self.content_file)
 
-        if self.did_lock and hasattr(self, 'lock_token'):
+        if self.did_lock:
             # Try not to leave dangling locks on the server
             self.unlock(interactive=0)
             
@@ -298,8 +297,20 @@ class ExternalEditor:
         
     def launch(self):
         """Launch external editor"""
-        save_interval = float(self.options.get('save_interval'))
         use_locks = int(self.options.get('use_locks', 0))
+        if use_locks and self.metadata.get('lock-token'):
+            # A lock token came down with the data, so the object is
+            # already locked, see if we can borrow the lock
+            if int(self.options.get('always_borrow_locks', 0)) \
+               or askYesNo('This object is already locked by you in another'
+                           ' session.\n Do you want to borrow this lock'
+                           ' and continue?'):
+                self.lock_token = 'opaquelocktoken:%s' \
+                                  % self.metadata['lock-token']
+            else:
+                sys.exit()            
+        
+        save_interval = float(self.options.get('save_interval'))
         launch_success = 0
         last_mtime = os.path.getmtime(self.content_file)
         command = self.getEditorCommand()
@@ -310,7 +321,7 @@ class ExternalEditor:
         editor = EditorProcess(command)
         
         if use_locks:
-            self.did_lock = self.lock()
+            self.lock()
             
         while 1:
             editor.wait(save_interval or 2)
@@ -333,8 +344,8 @@ class ExternalEditor:
                        'to editor process.\n'
                        '(%s)' % command)
         
-        if use_locks and self.did_lock:
-            self.did_lock = not self.unlock()
+        if use_locks:
+            self.unlock()
         
         if not self.saved \
            and askYesNo('File not saved to Zope.\nReopen local copy?'):
@@ -342,8 +353,7 @@ class ExternalEditor:
         
     def putChanges(self):
         """Save changes to the file back to Zope"""
-        if int(self.options.get('use_locks', 0)) and \
-           not hasattr(self, 'lock_token'):
+        if int(self.options.get('use_locks', 0)) and self.lock_token is None:
             # We failed to get a lock initially, so try again before saving
             if not self.lock():
                 # Confirm save without lock
@@ -357,7 +367,7 @@ class ExternalEditor:
         headers = {'Content-Type': 
                    self.metadata.get('content_type', 'text/plain')}
         
-        if hasattr(self, 'lock_token'):
+        if self.lock_token is not None:
             headers['If'] = '<%s> (<%s>)' % (self.path, self.lock_token)
         
         response = self.zopeRequest('PUT', headers, body)
@@ -375,18 +385,8 @@ class ExternalEditor:
     
     def lock(self):
         """Apply a webdav lock to the object in Zope"""
-        
-        # Check and see if we already have a lock token
-        # that came down with the data
-        if self.metadata.get('lock-token'):
-            if self.options.get('always_borrow_locks') \
-               or askYesNo('This object is already locked by you in another'
-                           ' session.\n Do you want to borrow this lock?'):
-                self.lock_token = 'opaquelocktoken:%s' \
-                                  % self.metadata['lock-token']
-                return 0
-            else:
-                sys.exit()            
+        if self.lock_token is not None:
+            return 0 # Already have a lock token
         
         headers = {'Content-Type':'text/xml; charset="utf-8"',
                    'Timeout':'infinite',
@@ -412,6 +412,7 @@ class ExternalEditor:
             token_end = reply.find('<', token_start)
             if token_start > 0 and token_end > 0:
                 self.lock_token = reply[token_start+1:token_end]
+                self.did_lock = 1
         else:
             # We can't lock her sir!
             if response.status == 423:
@@ -422,27 +423,29 @@ class ExternalEditor:
             if self.askRetryAfterError(response, 
                                        'Lock request failed', 
                                        message):
-                return self.lock()
+                self.lock()
             else:
-                return 0
-        return 1
+                self.did_lock = 0
+        return self.did_lock
                     
     def unlock(self, interactive=1):
         """Remove webdav lock from edited zope object"""
-        if not hasattr(self, 'lock_token'): 
-            return 0
+        if not self.did_lock or self.lock_token is None:
+            return 0 # nothing to do
             
         headers = {'Lock-Token':self.lock_token}
         response = self.zopeRequest('UNLOCK', headers)
         
         if interactive and response.status / 100 != 2:
             # Captain, she's still locked!
-            if self.askRetryAfterError(response, 
-                                       'Unlock request failed'):
-                return self.unlock(token)
+            if self.askRetryAfterError(response, 'Unlock request failed'):
+                self.unlock(token)
             else:
-                return 0
-        return 1
+                self.did_lock = 0
+        else:
+            self.did_lock = 1
+            self.lock_token = None
+        return self.did_lock
         
     def zopeRequest(self, method, headers={}, body=''):
         """Send a request back to Zope"""
@@ -648,6 +651,12 @@ cleanup_files = 1
 # different users. Disable for single user use or for
 # better performance
 use_locks = 1
+
+# To suppress warnings about borrowing locks on objects
+# locked by you before you began editing you can
+# set this flag. This is useful for applications that
+# use server-side locking, like CMFStaging
+always_borrow_locks = 0
 
 # Specific settings by content-type or meta-type. Specific
 # settings override general options above. Content-type settings

@@ -39,7 +39,9 @@ class ExternalEditor(Acquisition.Implicit):
         security = getSecurityManager()
         parent = self.aq_parent
         try:
-            ob = parent[REQUEST['target']]
+            ob = parent[REQUEST['target']] # Try getitem
+        except KeyError:
+            ob = getattr(parent, REQUEST['target']) # Try getattr
         except AttributeError:
             # Handle objects that are methods in ZClasses
             ob = parent.propertysheets.methods[REQUEST['target']]
