@@ -2,7 +2,9 @@ HEAD only (unreleased)
 
   New Features
 
-    - 
+    - CMFDefault: Added importVarious setup handler.
+      This provisional handler will be removed again as soon as full handlers
+      are implemented for these steps.
 
   Bug Fixes
 
