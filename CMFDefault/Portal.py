@@ -349,17 +349,13 @@ class PortalGenerator:
         p.__ac_roles__ = ('Member', 'Reviewer',)
 
     def setupPermissions(self, p):
-        # Set up the suggested role to permission mappings.
+        # Set up some suggested role to permission mappings.
         mp = p.manage_permission
 
-        mp('Manage portal',           ['Manager',],             1)
-        mp('Add portal member',       ['Anonymous','Manager',], 1)
         mp('Set own password',        ['Member','Manager',],    1)
         mp('Set own properties',      ['Member','Manager',],    1)
-        mp('Mail forgotten password', ['Anonymous','Manager',], 1)
-        mp('Add portal content',      ['Member','Manager',],    1)
-        mp('Modify portal content',   ['Owner','Manager',],     1)
-        mp('Request review',          ['Owner','Manager',],     1)
+        mp('Add portal content',      ['Owner','Member','Manager',], 1)
+        mp('Add portal folders',      ['Owner','Member','Manager',], 1)
         mp('Review portal content',   ['Reviewer','Manager',],  1)
         mp('Access future portal content',
                                       ['Reviewer','Manager',],  1)
