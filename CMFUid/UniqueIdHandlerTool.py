@@ -20,6 +20,7 @@ __version__ = "$Revision$"
 
 import Missing
 
+import zLOG
 from Globals import InitializeClass, Persistent
 from AccessControl import ClassSecurityInfo
 from Acquisition import Implicit, aq_base
@@ -49,7 +50,7 @@ class UniqueIdHandlerTool(UniqueObject, SimpleItem, ActionProviderBase):
     
     # make the uid attribute name available for the unit tests
     # not meant to be altered!!!
-    _UID_ATTRIBUTE_NAME = UID_ATTRIBUTE_NAME
+    UID_ATTRIBUTE_NAME = UID_ATTRIBUTE_NAME
     
     # make the exception class available through the tool
     UniqueIdError = UniqueIdError
@@ -60,7 +61,7 @@ class UniqueIdHandlerTool(UniqueObject, SimpleItem, ActionProviderBase):
     def queryUid(self, obj, default=None):
         """See IUniqueIdQuery.
         """
-        uid = getattr(aq_base(obj), self._UID_ATTRIBUTE_NAME, None)
+        uid = getattr(aq_base(obj), self.UID_ATTRIBUTE_NAME, None)
         # If 'obj' is a content object the 'uid' attribute is usually a
         # callable object. If 'obj' is a catalog brain the uid attribute 
         # is non callable and possibly equals the 'Missing.MV' value.
@@ -86,7 +87,7 @@ class UniqueIdHandlerTool(UniqueObject, SimpleItem, ActionProviderBase):
         """
         uid = self.queryUid(obj, default=None)
         if uid is None:
-            UID_ATTRIBUTE_NAME = self._UID_ATTRIBUTE_NAME
+            UID_ATTRIBUTE_NAME = self.UID_ATTRIBUTE_NAME
             generator = getToolByName(self, 'portal_uidgenerator')
             setattr(obj, UID_ATTRIBUTE_NAME, generator())
             uid = getattr(obj, UID_ATTRIBUTE_NAME)
@@ -104,7 +105,7 @@ class UniqueIdHandlerTool(UniqueObject, SimpleItem, ActionProviderBase):
     def unregister(self, obj):
         """See IUniqueIdSet.
         """
-        UID_ATTRIBUTE_NAME = self._UID_ATTRIBUTE_NAME
+        UID_ATTRIBUTE_NAME = self.UID_ATTRIBUTE_NAME
         if getattr(aq_base(obj), UID_ATTRIBUTE_NAME, None) is None:
             raise UniqueIdError, \
                   "No unique id available to be unregistered on '%s'" % obj
@@ -125,7 +126,7 @@ class UniqueIdHandlerTool(UniqueObject, SimpleItem, ActionProviderBase):
             return default
         
         catalog = getToolByName(self, 'portal_catalog')
-        result = catalog({self._UID_ATTRIBUTE_NAME: uid})
+        result = catalog({self.UID_ATTRIBUTE_NAME: uid})
         len_result = len(result)
 
         # return None if no object found with this uid
@@ -136,7 +137,7 @@ class UniqueIdHandlerTool(UniqueObject, SimpleItem, ActionProviderBase):
         # the same uid (uups!)
         # TODO: It would be nice if there were a logging tool :-)
         if len_result > 1:
-            zLOG.LOG("UidTool ASSERT:", zLOG.INFO,
+            zLOG.LOG("CMUid ASSERT:", zLOG.INFO,
                      "Uups, %s objects have '%s' as uid!!!" % \
                      (len_result, uid))
         

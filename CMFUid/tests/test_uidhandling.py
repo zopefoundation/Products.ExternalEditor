@@ -51,7 +51,7 @@ class UniqueIdHandlerTests(SecurityTest):
         self.root._setObject('portal_uidgenerator', UniqueIdGeneratorTool())
         self.root._setObject('portal_uidhandler', UniqueIdHandlerTool())
         self.root._setObject('dummy', DummyContent(id='dummy'))
-        self.uid_attr_name = self.root.portal_uidhandler._UID_ATTRIBUTE_NAME
+        self.uid_attr_name = self.root.portal_uidhandler.UID_ATTRIBUTE_NAME
         setupIndexes(self.root.portal_catalog, self.uid_attr_name)
     
     def test_interface(self):
