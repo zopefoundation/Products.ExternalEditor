@@ -1,4 +1,6 @@
+import Zope
 import unittest
+
 from Products.CMFCalendar.tests import test_Event
 
 def test_suite():

@@ -1,4 +1,6 @@
+import Zope
 import unittest
+
 from Products.CMFDefault.tests import test_Discussions
 from Products.CMFDefault.tests import test_Document
 from Products.CMFDefault.tests import test_NewsItem

@@ -1,3 +1,4 @@
+import Zope
 import unittest
 #from Products.CMFDecor.tests import test_Decor
 

@@ -1,3 +1,4 @@
+import Zope
 import unittest
 #from Products.DCWorkflow.tests import test_DCWorkflow
 

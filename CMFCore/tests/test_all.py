@@ -1,3 +1,4 @@
+import Zope
 import unittest
 from Products.CMFCore.tests import test_ContentTypeRegistry
 from Products.CMFCore.tests import test_PortalFolder

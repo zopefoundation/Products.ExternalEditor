@@ -1,4 +1,6 @@
+import Zope
 import unittest
+
 from Products.CMFTopic.tests import test_Topic
 from Products.CMFTopic.tests import test_DateC
 from Products.CMFTopic.tests import test_ListC
