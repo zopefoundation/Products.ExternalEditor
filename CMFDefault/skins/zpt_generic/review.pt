@@ -42,11 +42,11 @@
           tal:attributes="value objPath">
   </td>
   <td>
-   <span tal:condition="item/icon">
+   <span tal:condition="item/getIcon">
    <a href="url"
       tal:attributes="href objURL"
    ><img border="0" src="icon" alt="Type" title="Type"
-         tal:attributes="src string:${here/portal_url}/${item/icon};
+         tal:attributes="src string:${here/portal_url}/${item/getIcon};
                          alt item/Type|nothing;
                          title item/Type|nothing;
                         "></a>
