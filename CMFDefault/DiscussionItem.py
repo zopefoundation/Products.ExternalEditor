@@ -179,7 +179,7 @@ class DiscussionItem( Document
 
         for item in talkback._container.values():
             if item.in_reply_to == my_url:
-                if wf.getInfoFor( item, 'review_state' ) == 'published':
+                #if wf.getInfoFor( item, 'review_state' ) == 'published':
                     result.append(item.__of__(talkback))
 
         return result
@@ -295,15 +295,13 @@ class DiscussionItemContainer(Persistent, Implicit):
         item = DiscussionItem( `id` )
         item.title = title
         item.description = title
-        item.text_format = 'structured-text'
-        item.text = text
+        item._edit('structured-text', text)
 
         if REQUEST.has_key( 'Creator' ):
             item.creator = REQUEST[ 'Creator' ]
 
         item.__of__(self).setReplyTo(self.aq_parent)
  
-        item._parse()
         self._container[`id`] = item
 
         RESPONSE.redirect( self.aq_inner.aq_parent.absolute_url() + '/view' )
@@ -329,7 +327,7 @@ class DiscussionItemContainer(Persistent, Implicit):
 
         for item in self._container.values():
             if item.in_reply_to == my_url:
-                if wf.getInfoFor( item, 'review_state' ) == 'published':
+                #if wf.getInfoFor( item, 'review_state' ) == 'published':
                     result.append(item.getId())
 
         return result
