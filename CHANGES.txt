@@ -2,14 +2,19 @@ CMF 1.5alpha (unreleased)
 
   New Features
 
+    - zpt skin: Some forms are now scripts.
+      These scripts are dispatchers that call validators and controllers and
+      set redirect depending on the selected button. If redirect is not set,
+      the script calls a template and returns the resulting HTML page.
+
     - ActionProviderBase, ActionInformation: Added methods to modify/edit 
       actions. New method 'getActionObject' in 'ActionProviderBase' and 
       'edit' method in 'ActionInformation' (Collector 195).
       An action now may be modified/edited the following way::
-          
+
         action_provider.getActionObject('object/view').edit(title='VIEW')
 
-    - Topic objects now supoprt syndication (Collector #203).
+    - Topic objects now support syndication (Collector #203).
 
     - PortalFolder and zpt skin: PortalFolder now inherits from OrderedFolder.
 
@@ -194,6 +199,8 @@ CMF 1.5alpha (unreleased)
       tool overrides default member content creation.
 
   Bug Fixes
+
+    - zpt skin: Removed dependency on dtml layers.
 
     - CMFCore utils: Marked 'format_stx' function as deprecated.
       It's no longer necessary to work around default STX handling.

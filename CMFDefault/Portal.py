@@ -252,7 +252,7 @@ class PortalGenerator:
         ps.manage_addProduct['OFSP'].manage_addFolder(id='custom')
         ps.addSkinSelection('Basic',
             'custom, zpt_topic, zpt_content, zpt_generic,'
-            + 'zpt_control, topic, content, generic, control, Images',
+            + 'zpt_control, Images',
             make_default=1)
         ps.addSkinSelection('Nouvelle',
             'nouvelle, custom, topic, content, generic, control, Images')
