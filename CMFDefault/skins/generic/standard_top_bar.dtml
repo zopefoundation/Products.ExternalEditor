@@ -19,7 +19,12 @@
   <td class="NavBar" align="right" valign="bottom" width="70%" wrap="no">
    <form action="&dtml-portal_url;/search">
     <a href="&dtml-portal_url;">home</a>&nbsp;
+    <dtml-let member="portal_membership.getAuthenticatedMember()"
+              listMembers="portal_membership.checkPermission('List portal members', member)">
+    <dtml-if listMembers>`
     <a href="&dtml-portal_url;/roster">members</a>&nbsp;
+    </dtml-if>
+    </dtml-let>
     <a href="&dtml-portal_url;/recent_news">news</a>&nbsp;
     <a href="&dtml-portal_url;/search_form">search</a>
     <input name="SearchableText" size="16">
