@@ -190,7 +190,7 @@ class CleanupTemp:
     def __del__(self):
         try:
             del self._tool._v_temps
-        except AttributeError:
+        except (AttributeError, KeyError):
             # The object has already been deactivated.
             pass
 
