@@ -21,6 +21,7 @@ __version__ = '0.3'
 
 import sys, os
 from os import path
+import traceback
 from tempfile import mktemp
 from ConfigParser import ConfigParser
 from httplib import HTTPConnection, HTTPSConnection
@@ -354,8 +355,8 @@ class ExternalEditor:
             # On error return a null response with error info
             class NullResponse:
                 def getheader(n,d): return d
-                def read(self): return '(No Response From Server)\n\n%s' \
-                                       % sys.exc_info[2]
+                def read(self): 
+                    return '(No Response From Server)'
             
             response = NullResponse()
             response.reason = sys.exc_info()[1]
@@ -363,6 +364,9 @@ class ExternalEditor:
                 response.status, response.reason = response.reason
             except:
                 response.status = 0
+            
+            sys.stderr.write('\n -- Zope Request Traceback --\n')
+            traceback.print_exc(file=sys.stderr)
             return response
 
 title = 'Zope External Editor'
