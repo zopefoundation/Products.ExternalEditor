@@ -232,8 +232,10 @@ class ConfiguratorBase(Implicit):
             { '#text':           {KEY: None} } }
 
     def _convertToBoolean(self, val):
-
-        return val.lower() in ('true', 'yes', '1')
+        if isinstance(val, basestring):
+            return val.lower() in ('true', 'yes', '1')
+        else:
+            return val
 
     def _convertToUnique(self, val):
 
