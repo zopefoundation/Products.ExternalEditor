@@ -84,9 +84,7 @@ class DefaultDublinCoreImpl( PropertyManager ):
             When called without an argument, sets the date to now.
         """
         if modification_date is None:
-            # XXX which one is more correct ?
-            #self.modification_date = DateTime()
-            self.modification_date = self.bobobase_modification_time()
+            self.modification_date = DateTime()
         else:
             self.modification_date = self._datify(modification_date)
 
