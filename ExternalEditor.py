@@ -55,13 +55,15 @@ class ExternalEditor(Acquisition.Implicit):
                 r.append('content_type:%s' % ob.content_type())
             else:
                 r.append('content_type:%s' % ob.content_type)
+                
+        if REQUEST._auth:
+            if REQUEST._auth[-1] == '\n':
+                auth = REQUEST._auth[:-1]
+            else:
+                auth = REQUEST._auth
+                
+            r.append('auth:%s' % auth)
             
-        if REQUEST._auth[-1] == '\n':
-            auth = REQUEST._auth[:-1]
-        else:
-            auth = REQUEST._auth
-           
-        r.append('auth:%s' % auth)
         r.append('cookie:%s' % REQUEST.environ.get('HTTP_COOKIE',''))            
         r.append('')
         

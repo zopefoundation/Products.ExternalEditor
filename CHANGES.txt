@@ -1,5 +1,8 @@
 External Editor Change Log
 
+    - Fixed auth bug when product was used with mysqlUserFolder. Thanks to
+      ViNiL.
+
   6/30/02 - 0.4.2 Release (affects win32 binary only)
 
     - Added SSL support to Windows binary package. Thanks to Federico 
