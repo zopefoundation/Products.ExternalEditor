@@ -44,30 +44,30 @@ CMFSetup Product README
 
             o DCWorkflow definitions, including supporting scripts
 
-      - ( ) 'portal_catalog'
+      - (_) 'portal_catalog'
             (Products.CMFCore.CatalogTool.CatalogTool)
 
             o index names / types
         
             o metadata column names
 
-      - ( ) 'portal_membership'
+      - (_) 'portal_membership'
 
             o "skeleton" home folder (XXX: is this in the core?)
 
-      - ( ) 'portal_memberdata'
+      - (_) 'portal_memberdata'
 
             o member properties
 
-      - ( ) 'content_type_registry'
+      - (_) 'content_type_registry'
 
             o predicate -> portal_type bindings.
 
-      - ( ) 'caching_policy_manager'
+      - (_) 'caching_policy_manager'
 
             o policy settins
 
-      - ( ) 'portal_metadata'
+      - (_) 'portal_metadata'
 
             o global properties
 
@@ -75,22 +75,32 @@ CMFSetup Product README
 
             o type-specific element policies
 
-      - ( ) 'portal_actionicons'
+      - (_) 'portal_actionicons'
             (Products.CMFActionIcons.ActionIconsTool.ActionIconsTool)
 
             o action title / icon bindings
 
-      - ( ) 'cookie_authentication'
+      - (_) 'cookie_authentication'
 
             o tool properties
 
-      - ( ) 'MailHost'
+      - (_) 'MailHost'
 
             o tool properties
 
-      - ( ) user folder configuration
+      - (_) user folder configuration
 
-      - ( ) folder structure
+      - (_) folder structure
+
+  TODO
+
+      - (x) Display / download diffs between configurations (profiles
+            and shapshots) Done 2004/07/20, TS.
+
+      - (_) Modify profile selection to use a drop-down list of registered
+            profiles.
+
+      - (_) Allow import from snapshots.
 
   Extending The Tool
 
