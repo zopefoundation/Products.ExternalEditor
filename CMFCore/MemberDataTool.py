@@ -89,6 +89,7 @@ $Id$
 __version__='$Revision$'[11:-2]
 
 
+import string
 from utils import UniqueObject, getToolByName, _dtmldir
 from OFS.SimpleItem import SimpleItem
 from OFS.PropertyManager import PropertyManager
@@ -172,6 +173,24 @@ class MemberDataTool (UniqueObject, SimpleItem, PropertyManager):
 
         return [{ 'member_count' : member_count,
                   'orphan_count' : orphan_count }]
+
+    security.declarePrivate( 'searchMemberDataContents' )
+    def searchMemberDataContents( self, search_param, search_term ):
+        """ Search members """
+        res = []
+
+        if search_param == 'username':
+            search_param = 'id'
+
+        for user_wrapper in self._members.values():
+            searched = getattr( user_wrapper, search_param, None )
+            if searched is not None and string.find( searched, search_term ) != -1:
+                res.append( { 'username' : getattr( user_wrapper, 'id' )
+                            , 'email' : getattr( user_wrapper, 'email', '' )
+                            }
+                          )
+
+        return res
 
     security.declarePrivate('pruneMemberDataContents')
     def pruneMemberDataContents(self):

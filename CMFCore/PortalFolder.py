@@ -121,6 +121,11 @@ Use folders to put content in categories."""
                                   , 'permissions'   : (ManageProperties,)
                                   , 'category'      : 'folder'
                                   }
+                                , { 'name'          : 'Local Roles'
+                                  , 'action'        : 'folder_localrole_form'
+                                  , 'permissions'   : (ManageProperties,)
+                                  , 'category'      : 'folder'
+                                  }
                                 , { 'name'          : 'Syndication'
                                   , 'action'        : 'synPropertiesForm'
                                   , 'permissions'   : (ManageProperties,)

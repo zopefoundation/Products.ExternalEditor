@@ -88,7 +88,7 @@ $Id$
 """
 __version__='$Revision$'[11:-2]
 
-
+from string import find
 from utils import UniqueObject, _getAuthenticatedUser, _checkPermission
 from utils import getToolByName, _dtmldir
 from OFS.SimpleItem import SimpleItem
@@ -388,6 +388,52 @@ class MembershipTool (UniqueObject, SimpleItem):
         '''Gets the list of all members.
         '''
         return map(self.wrapUser, self.__getPUS().getUsers())
+
+    security.declareProtected(CMFCorePermissions.View, 'searchMembers')
+    def searchMembers( self, search_param, search_term ):
+        """ Search the membership """
+        md = getToolByName( self, 'portal_memberdata' )
+
+        return md.searchMemberDataContents( search_param, search_term )
+
+        
+    security.declareProtected(CMFCorePermissions.View, 'getCandidateLocalRoles')
+    def getCandidateLocalRoles( self, obj ):
+        """ What local roles can I assign? """
+        member = self.getAuthenticatedMember()
+
+        if 'Manager' in member.getRoles():
+            return self.getPortalRoles()
+        else:
+            member_roles = list( member.getRolesInContext( obj ) )
+            del member_roles[member_roles.index( 'Member')]
+
+        return tuple( member_roles )
+
+    security.declareProtected(CMFCorePermissions.View, 
+                                'setLocalRoles')
+    def setLocalRoles( self, obj, member_ids, member_role ):
+        """ Set local roles on an item """
+        member = self.getAuthenticatedMember()
+        my_roles = member.getRolesInContext( obj )
+        
+        if 'Manager' in my_roles or member_role in my_roles:
+            for member_id in member_ids:
+                roles = list(obj.get_local_roles_for_userid( userid=member_id ))
+            
+                if member_role not in roles:
+                    roles.append( member_role )
+                    obj.manage_setLocalRoles( member_id, roles )
+
+    security.declareProtected( CMFCorePermissions.View,
+                                    'deleteLocalRoles' )
+    def deleteLocalRoles( self, obj, member_ids ):
+        """ Delete local roles for members member_ids """
+        member = self.getAuthenticatedMember()
+        my_roles = member.getRolesInContext( obj )
+
+        if 'Manager' in my_roles or 'Owner' in my_roles:
+            obj.manage_delLocalRoles( userids=member_ids )
 
     security.declarePrivate('addMember')
     def addMember(self, id, password, roles, domains, properties=None):
