@@ -15,17 +15,18 @@
 $Id$
 """
 
-from Products.ZCatalog.ZCatalog import ZCatalog
-from DateTime import DateTime
-from AccessControl.PermissionRole import rolesForPermissionOn
 from AccessControl import ClassSecurityInfo
+from AccessControl.PermissionRole import rolesForPermissionOn
+from DateTime import DateTime
 from Globals import DTMLFile
 from Globals import InitializeClass
+from Products.ZCatalog.ZCatalog import ZCatalog
 
 from utils import _checkPermission
 from utils import _dtmldir
 from utils import _getAuthenticatedUser
 from utils import _mergedLocalRoles
+from utils import getToolByName
 from utils import UniqueObject
 from ActionProviderBase import ActionProviderBase
 from CMFCorePermissions import AccessInactivePortalContent
@@ -69,11 +70,13 @@ class IndexableObjectWrapper:
             del allowed['Owner']
         return list(allowed.keys())
 
+
 class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
     """ This is a ZCatalog that filters catalog queries.
     """
 
-    __implements__ = (ICatalogTool, ActionProviderBase.__implements__)
+    __implements__ = (ICatalogTool, ZCatalog.__implements__,
+                      ActionProviderBase.__implements__)
 
     id = 'portal_catalog'
     meta_type = 'CMF Catalog'
@@ -204,16 +207,20 @@ class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
 
     manage_catalogFind = DTMLFile( 'catalogFind', _dtmldir )
 
-    def catalog_object(self, object, uid, idxs=[]):
+    def catalog_object(self, obj, uid, idxs=None, update_metadata=1):
         # Wraps the object with workflow and accessibility
         # information just before cataloging.
-        wf = getattr(self, 'portal_workflow', None)
-        if wf is not None:
-            vars = wf.getCatalogVariablesFor(object)
+        wftool = getToolByName(self, 'portal_workflow', None)
+        if wftool is not None:
+            vars = wftool.getCatalogVariablesFor(obj)
         else:
             vars = {}
-        w = IndexableObjectWrapper(vars, object)
-        ZCatalog.catalog_object(self, w, uid, idxs)
+        w = IndexableObjectWrapper(vars, obj)
+        try:
+            ZCatalog.catalog_object(self, w, uid, idxs, update_metadata)
+        except TypeError:
+            # for Zope versions until 2.6.2
+            ZCatalog.catalog_object(self, w, uid, idxs)
 
     security.declarePrivate('indexObject')
     def indexObject(self, object):
@@ -230,7 +237,7 @@ class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
         self.uncatalog_object(url)
 
     security.declarePrivate('reindexObject')
-    def reindexObject(self, object, idxs=[]):
+    def reindexObject(self, object, idxs=[], update_metadata=1):
         '''Update catalog after object data has changed.
         The optional idxs argument is a list of specific indexes
         to update (all of them by default).
@@ -240,6 +247,6 @@ class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
             # Filter out invalid indexes.
             valid_indexes = self._catalog.indexes.keys()
             idxs = [i for i in idxs if i in valid_indexes]
-        self.catalog_object(object, url, idxs=idxs)
+        self.catalog_object(object, url, idxs, update_metadata)
 
 InitializeClass(CatalogTool)

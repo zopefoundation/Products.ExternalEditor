@@ -1,7 +1,13 @@
 CMF 1.5alpha (unreleased)
 
   New Features
-  
+
+    - CatalogTool: Updated to post Zope 2.6.2 ZCatalog interface.
+      'catalog_object()' and 'reindexObject()' now support the new
+      'update_metadata' argument. 'reindexObjectSecurity()' doesn't update
+      catalog metadata anymore. With older Zope versions 'update_metadata=0'
+      is ignored.
+
     - Added new hook to CookieCrumbler "twiddleAuthCookie". The
       twiddleAuthCookie skin script, if present is called on each request
       where a cookie authentication token is present. It is passed the auth

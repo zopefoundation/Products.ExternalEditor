@@ -1,14 +1,14 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """ Catalog tool interface.
 
@@ -38,27 +38,26 @@ class portal_catalog(Interface):
     def __call__(REQUEST=None, **kw):
         '''Same as searchResults().'''
 
-    # indexObject__roles__ = ()  # Called only by Python code.
     def indexObject(object):
-        '''Add to catalog.
-        '''
+        """ Add to catalog.
 
-    # unindexObject__roles__ = ()
+        Permission -- Python only
+        """
+
     def unindexObject(object):
-        '''Remove from catalog.
-        '''
+        """ Remove from catalog.
 
-    # reindexObject__roles__ = ()
-    def reindexObject(object, idxs=[]):
-        '''Update entry in catalog.
+        Permission -- Python only
+        """
+
+    def reindexObject(object, idxs=[], update_metadata=1):
+        """ Update entry in catalog.
+
         The optional idxs argument is a list of specific indexes
         to update (all of them by default).
-        '''
 
-    # getpath inherits security assertions from ZCatalog.
-    def getpath(data_record_id_):
-        '''Calls ZCatalog.getpath().
-        '''
+        Permission -- Python only
+        """
 
 
 class IndexableObjectWrapper(Interface):

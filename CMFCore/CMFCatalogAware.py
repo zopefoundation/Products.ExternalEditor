@@ -1,26 +1,31 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
+""" Base class for catalog aware content items.
 
-import Globals
-from Acquisition import aq_base
-from ExtensionClass import Base
+$Id$
+"""
 
 from AccessControl import ClassSecurityInfo
-from CMFCorePermissions import ModifyPortalContent
+from Acquisition import aq_base
+from ExtensionClass import Base
+from Globals import DTMLFile
+from Globals import InitializeClass
+
 from CMFCorePermissions import AccessContentsInformation
 from CMFCorePermissions import ManagePortal
-from utils import getToolByName
+from CMFCorePermissions import ModifyPortalContent
 from utils import _dtmldir
+from utils import getToolByName
 
 
 class CMFCatalogAware(Base):
@@ -83,11 +88,13 @@ class CMFCatalogAware(Base):
                     # Ignore old references to deleted objects.
                     continue
                 s = getattr(ob, '_p_changed', 0)
-                catalog.reindexObject(ob, idxs=['allowedRolesAndUsers'])
+                catalog.reindexObject(ob, idxs=['allowedRolesAndUsers'],
+                                      update_metadata=0)
                 if s is None: ob._p_deactivate()
             # Reindex the object itself, as the PathIndex only gave us
             # the descendants.
-            self.reindexObject(idxs=['allowedRolesAndUsers'])
+            catalog.reindexObject(self, idxs=['allowedRolesAndUsers'],
+                                  update_metadata=0)
 
     # Workflow methods
     # ----------------
@@ -185,7 +192,7 @@ class CMFCatalogAware(Base):
                        },
                        )
 
-    _manage_workflowsTab = Globals.DTMLFile('zmi_workflows', _dtmldir)
+    _manage_workflowsTab = DTMLFile('zmi_workflows', _dtmldir)
 
     security.declareProtected(ManagePortal, 'manage_workflowsTab')
     def manage_workflowsTab(self, REQUEST, manage_tabs_message=None):
@@ -220,5 +227,4 @@ class CMFCatalogAware(Base):
             management_view='Workflows',
             manage_tabs_message=manage_tabs_message)
 
-
-Globals.InitializeClass(CMFCatalogAware)
+InitializeClass(CMFCatalogAware)

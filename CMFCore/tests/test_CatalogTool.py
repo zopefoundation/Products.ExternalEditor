@@ -1,6 +1,12 @@
 from unittest import TestCase, TestSuite, makeSuite, main
 
+import Testing
 import Zope
+try:
+    Zope.startup()
+except AttributeError:
+    # for Zope versions before 2.6.1
+    pass
 try:
     from Interface.Verify import verifyClass
 except ImportError:
@@ -39,10 +45,12 @@ class CatalogToolTests( TestCase ):
     def test_interface(self):
         from Products.CMFCore.interfaces.portal_catalog \
                 import portal_catalog as ICatalogTool
+        from Products.ZCatalog.IZCatalog import IZCatalog
         from Products.CMFCore.interfaces.portal_actions \
                 import ActionProvider as IActionProvider
 
         verifyClass(ICatalogTool, CatalogTool)
+        verifyClass(IZCatalog, CatalogTool)
         verifyClass(IActionProvider, CatalogTool)
 
 
