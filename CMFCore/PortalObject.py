@@ -27,7 +27,6 @@ PORTAL_SKINS_TOOL_ID = 'portal_skins'
 class PortalObjectBase(PortalFolder, SkinnableObjectManager):
 
     meta_type = 'Portal Site'
-    portal_type = None
     _isPortalRoot = 1
 
     # Ensure certain attributes come from the correct base class.
