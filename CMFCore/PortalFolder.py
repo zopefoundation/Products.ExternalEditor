@@ -17,6 +17,7 @@ $Id$
 
 import sys
 import re, base64, marshal
+from warnings import warn
 
 from AccessControl import ClassSecurityInfo
 from AccessControl import getSecurityManager
@@ -172,6 +173,11 @@ class PortalFolder(DynamicType, CMFCatalogAware, Folder):
         meta_types.  Otherwise ensures all of the given meta types are
         contentish.
         '''
+        warn('Using the \'spec\' argument is deprecated. In CMF 1.6 '
+             'contentItems(), contentIds(), contentValues() and '
+             'listFolderContents() will no longer support \'spec\'. Use the '
+             '\'filter\' argument with \'portal_type\' instead.',
+             DeprecationWarning)
         new_spec = []
         types_tool = getToolByName(self, 'portal_types')
         types = types_tool.listContentTypes( by_metatype=1 )
@@ -225,12 +231,13 @@ class PortalFolder(DynamicType, CMFCatalogAware, Folder):
         """
             Provide a filtered view onto 'objectIds', allowing only
             PortalFolders and PortalContent-derivatives to show through.
-
-            If 'kw' passed, use them to filter the results further,
-            qua the standard Zope filter interface.
         """
-        spec = self._morphSpec( spec )
-        ids = self.objectIds( spec )
+        if spec is None:
+            ids = self.objectIds()
+        else:
+            # spec is deprecated, use filter instead!
+            spec = self._morphSpec(spec)
+            ids = self.objectIds(spec)
         return map( lambda item: item[0],
                     self._filteredItems( ids, filter ) )
 
@@ -240,8 +247,12 @@ class PortalFolder(DynamicType, CMFCatalogAware, Folder):
             Provide a filtered view onto 'objectValues', allowing only
             PortalFolders and PortalContent-derivatives to show through.
         """
-        spec = self._morphSpec( spec )
-        ids = self.objectIds( spec )
+        if spec is None:
+            ids = self.objectIds()
+        else:
+            # spec is deprecated, use filter instead!
+            spec = self._morphSpec(spec)
+            ids = self.objectIds(spec)
         return map( lambda item: item[1],
                     self._filteredItems( ids, filter ) )
 
@@ -251,15 +262,13 @@ class PortalFolder(DynamicType, CMFCatalogAware, Folder):
             Hook around 'contentValues' to let 'folder_contents'
             be protected.  Duplicating skip_unauthorized behavior of dtml-in.
         """
-        items = self.contentValues(spec=spec, filter=contentFilter)
+        items = self.contentItems(spec=spec, filter=contentFilter)
         l = []
-        for obj in items:
-            id = obj.getId()
-            v = obj
+        for id, obj in items:
             # validate() can either raise Unauthorized or return 0 to
             # mean unauthorized.
             try:
-                if getSecurityManager().validate(self, self, id, v):
+                if getSecurityManager().validate(self, self, id, obj):
                     l.append(obj)
             except zExceptions_Unauthorized:  # Catch *all* Unauths!
                 pass
@@ -271,8 +280,12 @@ class PortalFolder(DynamicType, CMFCatalogAware, Folder):
             Provide a filtered view onto 'objectItems', allowing only
             PortalFolders and PortalContent-derivatives to show through.
         """
-        spec = self._morphSpec( spec )
-        ids = self.objectIds( spec )
+        if spec is None:
+            ids = self.objectIds()
+        else:
+            # spec is deprecated, use filter instead!
+            spec = self._morphSpec(spec)
+            ids = self.objectIds(spec)
         return self._filteredItems( ids, filter )
 
     security.declareProtected(View, 'Title')
@@ -578,8 +591,9 @@ class ContentFilter:
         if portal_type and portal_type is not self.MARKER:
             if type(portal_type) is type(''):
                 portal_type = [portal_type]
-            self.predicates.append(lambda x, pt=portal_type:
-                                   x.getPortalTypeName() in pt)
+            self.predicates.append( lambda x, pt=portal_type:
+                                    hasattr(aq_base(x), 'getPortalTypeName')
+                                    and x.getPortalTypeName() in pt )
             self.description.append( 'Portal Type: %s'
                                      % ', '.join(portal_type) )
 

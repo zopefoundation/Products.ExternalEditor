@@ -172,6 +172,12 @@ CMF 1.5alpha (unreleased)
 
   Bug Fixes
 
+    - PortalFolder: Marked the 'spec' argument as deprecated.
+      Use the 'filter' argument with 'portal_type' instead for contentItems(),
+      contentIds(), contentValues() and listFolderContents().
+
+    - PortalFolder: Fixed portal_type acquisition bug in ContentFilter.
+
     - DynamicType: Added 'getPortalTypeName()' to the interface.
 
     - Collector #227:  expose ZPT filename in tracebacks which include
