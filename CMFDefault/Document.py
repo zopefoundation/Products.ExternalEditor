@@ -129,13 +129,11 @@ class Document(PortalContent, DefaultDublinCoreImpl):
                 )
 
     def _edit(self, text, text_format='', safety_belt=''):
-        """ Edit the Document - Parses headers and cooks the body"""
-        headers = {}
+        """ Edit the Document and cook the body.
+        """
         level = self._stx_level
         if not text_format:
             text_format = self.text_format
-        if not safety_belt:
-            safety_belt = headers.get('SafetyBelt', '')
         if not self._safety_belt_update(safety_belt=safety_belt):
             msg = ("Intervening changes from elsewhere detected."
                    " Please refetch the document and reapply your changes."
@@ -147,7 +145,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
             self.text = self.cooked_text = text
         elif text_format == 'plain':
             self.text = text
-            self.cooked_text = html_quote(text).replace('\n','<br>')
+            self.cooked_text = html_quote(text).replace('\n','<br />')
         else:
             self.cooked_text = format_stx(text=text, level=level)
             self.text = text
@@ -171,7 +169,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
         if file and (type(file) is not type('')):
             contents=file.read()
             if contents:
-                text = self.text = contents
+                text = contents
         if html_headcheck(text):
             text = bodyfinder(text)
         self.setFormat(text_format)
@@ -353,14 +351,14 @@ class Document(PortalContent, DefaultDublinCoreImpl):
         self.dav__init(REQUEST, RESPONSE)
         self.dav__simpleifhandler(REQUEST, RESPONSE, refresh=1)
         body = REQUEST.get('BODY', '')
+        headers, body, format = self.handleText(text=body)
+        safety_belt = headers.get('SafetyBelt', '')
+        if REQUEST.get_header('Content-Type', '') == 'text/html':
+            text_format = 'html'
+        else:
+            text_format = format
 
         try:
-            headers, body, format = self.handleText(text=body)
-            safety_belt = headers.get('SafetyBelt', '')
-            if REQUEST.get_header('Content-Type', '') == 'text/html':
-                text_format = 'html'
-            else:
-                text_format = format
             self.setFormat(text_format)
             self.setMetadata(headers)
             self._edit(text=body, safety_belt=safety_belt)
