@@ -243,28 +243,32 @@ class DefaultWorkflowDefinition (SimpleItemWithProperties):
         tool = aq_parent(aq_inner(self))
 
         if action == 'submit':
-            if not allow_request or review_state != 'private':
-                raise 'Unauthorized'
+            if not allow_request:
+                raise 'Unauthorized', 'Not authorized'
+            elif review_state != 'private':
+                raise 'Unauthorized', 'Already in submit state'
             self.setReviewStateOf(ob, 'pending', action, comment)
 
         elif action == 'retract':
-            if not allow_request or review_state == 'private':
-                raise 'Unauthorized'
+            if not allow_request:
+                raise 'Unauthorized', 'Not authorized'
+            elif review_state == 'private':
+                raise 'Unauthorized', 'Already private'
             content_creator = ob.Creator()
             pm = getToolByName(self, 'portal_membership')
             current_user = pm.getAuthenticatedMember().getUserName()
-            if content_creator != current_user:
-                raise 'Unauthorized'
+            if (content_creator != current_user) and not allow_review:
+                raise 'Unauthorized', 'Not creator or reviewer'
             self.setReviewStateOf(ob, 'private', action, comment)
 
         elif action == 'publish':
             if not allow_review:
-                raise 'Unauthorized'
+                raise 'Unauthorized', 'Not authorized'
             self.setReviewStateOf(ob, 'published', action, comment)
 
         elif action == 'reject':
             if not allow_review:
-                raise 'Unauthorized'
+                raise 'Unauthorized', 'Not authorized'
             self.setReviewStateOf(ob, 'private', action, comment)
 
     security.declarePrivate('isInfoSupported')
@@ -371,6 +375,7 @@ class DefaultWorkflowDefinition (SimpleItemWithProperties):
             owner_modify = 0
             reviewer_view = 1
         # Modify role to permission mappings directly.
+
         modifyPermissionMappings(ob,
             {'View': {'Anonymous': anon_view,
                       'Reviewer': reviewer_view},
