@@ -17,6 +17,7 @@ def test_suite():
         'test_DirectoryView',
         'test_FSPythonScript',
         'test_FSPageTemplate',
+        'test_FSImage',
         'test_CachingPolicyManager',
         ])
 

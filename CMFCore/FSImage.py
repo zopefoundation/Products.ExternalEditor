@@ -33,6 +33,8 @@ class FSImage(FSObject):
 
     meta_type = 'Filesystem Image'
 
+    _data = None
+
     manage_options=(
         {'label':'Customize', 'action':'manage_main'},
         )
@@ -54,8 +56,10 @@ class FSImage(FSObject):
     def _readFile(self, reparse):
         fp = expandpath(self._filepath)
         file = open(fp, 'rb')
-        try: data = file.read()
-        finally: file.close()
+        try:
+            data = self._data = file.read()
+        finally:
+            file.close()
         if reparse or self.content_type == 'unknown/unknown':
             ct, width, height = getImageInfo( data )
             self.content_type = ct
@@ -83,7 +87,7 @@ class FSImage(FSObject):
         Content-Type HTTP header to the objects content type.
         """
         self._updateFromFS()
-        data = self._readFile(0)
+        data = self._data
         # HTTP If-Modified-Since header handling.
         header=REQUEST.get_header('If-Modified-Since', None)
         if header is not None:
@@ -103,7 +107,7 @@ class FSImage(FSObject):
                     # Content-Length of 0 in response if size is not set here
                     RESPONSE.setHeader('Last-Modified', rfc1123_date(last_mod))
                     RESPONSE.setHeader('Content-Type', self.content_type)
-                    RESPONSE.setHeader('Content-Length', self.get_size())
+                    RESPONSE.setHeader('Content-Length', len(data))
                     RESPONSE.setStatus(304)
                     return ''
 
@@ -121,6 +125,14 @@ class FSImage(FSObject):
         """
         self._updateFromFS()
         return self.content_type
+
+    security.declareProtected(View, 'get_size')
+    def get_size( self ):
+        """
+            Return the size of the image.
+        """
+        self._updateFromFS()
+        return self._data and len( self._data ) or 0
 
     security.declareProtected(FTPAccess, 'manage_FTPget')
     manage_FTPget = index_html
