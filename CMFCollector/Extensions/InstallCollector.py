@@ -1,13 +1,16 @@
 ##############################################################################
-# Copyright (c) 2001 Zope Corporation.  All Rights Reserved.
+#
+# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
-# Version 1.1 (ZPL).  A copy of the ZPL should accompany this distribution.
+# Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND
-# FITNESS FOR A PARTICULAR PURPOSE.
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE
+#
 ##############################################################################
+
 """This file is an installation script (External method) for the CMF Collector.
 
 To use, add an external method to the root of the CMF Site that you want CMF
