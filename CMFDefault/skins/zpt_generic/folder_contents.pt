@@ -179,7 +179,8 @@
      <tr>
       <td align="left" valign="top" width="16"></td>
       <td align="left" valign="top">
-      <span tal:condition="python: checkPerm('Add portal content', here)">
+      <span tal:condition="python: test(checkPerm('Add portal content', here)
+            and here.allowedContentTypes(), 1, 0)">
         <input type="submit" name="folder_factories:method" value="New..."
                i18n:attributes="value" />
       </span>
