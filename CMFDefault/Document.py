@@ -154,6 +154,8 @@ class Document(PortalContent, DefaultDublinCoreImpl):
     effective_date = expiration_date = None
     _isDiscussable = 1
 
+    _stx_level = 1                      # Structured text level
+
     _last_safety_belt_editor = ''
     _last_safety_belt = ''
     _safety_belt = ''
@@ -241,10 +243,12 @@ class Document(PortalContent, DefaultDublinCoreImpl):
             return 'structured-text'
     
     security.declarePrivate('handleText')
-    def handleText(self, text, format=None):
+    def handleText(self, text, format=None, stx_level=None):
         """ Handles the raw text, returning headers, body, cooked, format """
         headers = {}
         body = cooked = text
+        level = stx_level or self._stx_level
+
         if not format:
             format = self.guessFormat(text)
 
@@ -259,7 +263,8 @@ class Document(PortalContent, DefaultDublinCoreImpl):
                 cooked = body = bodyfound.group('bodycontent')
         else:
             headers, body = parseHeadersBody(text, headers)
-            cooked = _format_stx(text=body)
+            cooked = _format_stx(text=body, level=level)
+            self._stx_level = level
 
         return headers, body, cooked, format
             
@@ -323,13 +328,27 @@ class Document(PortalContent, DefaultDublinCoreImpl):
         return "%s %s %s" % (self.title, self.description, self.text)
 
     security.declareProtected(CMFCorePermissions.View, 'CookedBody')
-    def CookedBody(self):
+    def CookedBody(self, stx_level=None, setlevel=0):
         """\
         The prepared basic rendering of an object.  For Documents, this
         means pre-rendered structured text, or what was between the
         <BODY> tags of HTML.
+
+        If the format is html, and 'stx_level' is not passed in or is the
+        same as the object's current settings, return the cached cooked
+        text.  Otherwise, recook.  If we recook and 'setlevel' is true,
+        then set the recooked text and stx_level on the object.
         """
-        return self.cooked_text
+        if (self.text_format == 'html'
+            or (stx_level is None)
+            or (stx_level == self._stx_level)):
+            return self.cooked_text
+        else:
+            cooked = _format_stx(self.text, stx_level)
+            if setlevel:
+                self._stx_level = stx_level
+                self.cooked_text = cooked
+            return cooked
 
     security.declareProtected(CMFCorePermissions.View, 'EditableBody')
     def EditableBody(self):
