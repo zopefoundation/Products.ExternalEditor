@@ -161,6 +161,7 @@ class CatalogTool (UniqueObject, ZCatalog):
         self._catalog.addIndex('created', 'FieldIndex')
         self._catalog.addIndex('effective', 'FieldIndex')
         self._catalog.addIndex('expires', 'FieldIndex')
+        self._catalog.addIndex('modified', 'FieldIndex')
         # Catalog meta-data
         self._catalog.addColumn('Subject')
         self._catalog.addColumn('Title')
@@ -173,6 +174,11 @@ class CatalogTool (UniqueObject, ZCatalog):
         self._catalog.addColumn('created')
         self._catalog.addColumn('effective')
         self._catalog.addColumn('expires')
+        self._catalog.addColumn('modified')
+        self._catalog.addColumn('CreatedDate')
+        self._catalog.addColumn('EffectiveDate')
+        self._catalog.addColumn('ExpiresDate')
+        self._catalog.addColumn('ModifiedDate')
 
     # searchResults has inherited security assertions.
     def searchResults(self, REQUEST=None, **kw):
