@@ -82,13 +82,13 @@ class DummyWorkflow( Dummy ):
 
 class DummyContent( Dummy ):
 
-    meta_type = 'DummyContent'
-    portal_type = 'DummyContentPT'
+    meta_type = 'Dummy'
     _isPortalContent = 1
+    def _getPortalTypeName(self): return 'Dummy Content'
 
 class DummyNotReallyContent( Dummy ):
 
-    meta_type = 'DummyContentPT'
+    meta_type = 'Dummy Content'
 
 class DummyTypeInfo( Dummy ):
 
@@ -97,11 +97,11 @@ class DummyTypeInfo( Dummy ):
 class DummyTypesTool( SimpleItem ):
 
     def listTypeInfo( self ):
-        return [ DummyTypeInfo( 'DummyContentPT' ) ]
+        return [ DummyTypeInfo( 'Dummy Content' ) ]
 
     def getTypeInfo( self, ob ):
-        if getattr( ob, 'meta_type', None ) is 'DummyContent':
-            return DummyTypeInfo( 'DummyContentPT' )
+        if getattr( ob, 'meta_type', None ) is 'Dummy':
+            return DummyTypeInfo( 'Dummy Content' )
         return None
         
 
@@ -140,7 +140,7 @@ class WorkflowToolTests( unittest.TestCase ):
     def _makeWithTypesAndChain( self ):
 
         tool = self._makeWithTypes()
-        tool.setChainForPortalTypes( ( 'DummyContentPT', ), ( 'a', 'b' ) )
+        tool.setChainForPortalTypes( ( 'Dummy Content', ), ( 'a', 'b' ) )
         return tool
 
     def test_interface( self ):

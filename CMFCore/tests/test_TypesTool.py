@@ -33,7 +33,7 @@ class TypesToolTests( SecurityRequestTest ):
 
         root._setObject( 'portal_types', TypesTool() )
         tool = root.portal_types
-        tool._setObject( 'Dummy', DummyFTI ) 
+        tool._setObject( 'Dummy Content', DummyFTI ) 
     
     def test_processActions( self ):
         """
@@ -41,7 +41,7 @@ class TypesToolTests( SecurityRequestTest ):
         """
         self.root._setObject( 'portal', PortalFolder( 'portal', '' ) )
         portal = self.root.portal
-        portal.invokeFactory( 'Dummy', 'actions_dummy' )
+        portal.invokeFactory( 'Dummy Content', 'actions_dummy' )
         dummy = portal._getOb( 'actions_dummy' )
 
         # so we can traverse to it:
