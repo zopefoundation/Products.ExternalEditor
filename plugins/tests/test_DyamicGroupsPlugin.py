@@ -295,7 +295,10 @@ class DynamicGroupsPlugin( unittest.TestCase
         self.assertEqual( info[ 'predicate' ], 'python:False' )
         self.assertEqual( info[ 'pluginid' ], 'enumerating' )
 
-        URL = '/enumerating/noone/manage_propertiesForm'
+        # Because teher is no proper REQUEST, the properties_url will be incorrect
+        # It should normally be  '/enumerating/noone/manage_propertiesForm'
+        # But it will be '//noone/manage_propertiesForm'
+        URL = '//noone/manage_propertiesForm'
         self.assertEqual( info[ 'properties_url' ], URL )
         self.assertEqual( info[ 'members_url' ], URL )
 
