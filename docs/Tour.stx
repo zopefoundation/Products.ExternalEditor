@@ -1,0 +1,179 @@
+CMF Tour
+
+  The Zope Content Managment Framework can be used to provide a whole
+  range of content managment solutions.  In this chapter, we'll take
+  you on a quick tour of an online newspaper. Keep in mind that this
+  is just one example of using the CMF to manage content.
+
+  Imagine a small newspaper that has reporters, editors, and readers.
+  The reporters want to create new news stories which are submited to
+  the editor.  The editor needs to either approve or reject those
+  stories.  Approved stories go on to the front page of the newspaper,
+  but rejected stories are sent back to the reporter to be revised and
+  reviewed again.
+
+  This may sound like a simple problem to solve with email, but an
+  email system does not enforce a certain flow of actions that need to
+  be taken.  If a reporter sends their story to the editor by email,
+  the editor may simply foget to take care of it.  
+  
+  The email system can't remind him to take care of it, because with
+  email the workflow and what state the work is in must always be
+  known by the various actors involved, and if one person forgets a
+  task the the whole system breaks down.  The more actors you add to
+  an email-based system, the faster it becomes unmanagable.
+
+  A true workflow system like Zope's CMF keeps the user focused on
+  achieving their goals.  The editor can't go off and forget to review
+  a story, because anytime editors log in they are shown a list of
+  pending articles they (or someone with the same editorial "role")
+  must review.
+
+  In the next sections, we'll walk you through six different day to
+  day scenarios at a fictitious newspaper.  In later chapters, we'll
+  show you how you can go about building a site like this using Zope's
+  CMF in no time.  In fact, this example is from a stock CMF and no
+  HTML programming, python scripting or any other advanced techniques
+  are needed to create it.
+
+  Scenario: Create content.
+
+    The most basic task in the Zope CMF is to create content.
+    *Content* are objects like documents, folders, news items, files,
+    images, and discussion topics. In the following screen shot:
+
+      <screenshot>
+
+    You see the content managment interface for Fred.  Fred is a
+    reporter that works at our newspaper, and today he is going to
+    write a story.  He does this by creating a news object in his
+    personal area.  He can do this by clicking on the *New* button.
+
+      <screenshot>
+
+    After clicking the *New* button, Fred is taken to this screen
+    where he can choose a type of content to create.  He's going to
+    select *News Item* type in an id, and click *Add and Edit*.
+
+      <screenshot>
+
+    Here we see Fred is now editing the news item he just created.  He
+    types in some news about the local school BBQ, and clicks
+    *Change*.  Now fred has created some content in Zope.  He can
+    repeat this task as many times as he wants for lots of content.
+
+  Scenario: Submit, Review, Approve content.
+
+    We just showed how fred can create News content in his area.  Now
+    in a newspaper, this news should be first read and approved by the
+    editor.  This is called *workflow*.  Fred writes the content and
+    the editor, Janet, reads and either approves or rejects Fred's
+    stories.
+
+    This kind of simple workflow is built right into the CMF.  Let's
+    look at the last news item Fred created:
+
+      <screenshot>
+
+    Notice the *Submit* link on the left.  Clicking this link will
+    submit this news item for review.  When Janet logs in, she gets a
+    special message that tells her if she has any pending items:
+
+    Janet can now click on the *Pending (1)* link in the bottom left
+    hand corner of her member area.  When Janet clicks on this link,
+    it takes her to this screen:
+
+      <screenshot>
+
+    Here, Janet can either accept or reject Fred's stories.  To do
+    that, she clicks on the new story and selects either 'Publish' or
+    'Reject' on the left of the screen:
+
+      <screenshot>
+
+    If she accepts them, they become public on the site and
+    the newspapers readers will see the story on the front page.  If
+    she rejects a story, she can type in a reason why into a box and a
+    message is sent back to Fred, telling him that his story was
+    rejected and the reason why.  Fred can now revise the story and
+    submit it again for approval.
+
+  Scenario Search content
+
+    Recent stories on the front page are timely, but sometimes users
+    may want to search through a large amount of news, or search news
+    in the past.  The Zope CMF lets you do many kinds of searches on
+    your content.  At the top left of every screen is a *search* link.
+    Clicking this link will take you to the CMF search page:
+
+      <screenshot>
+
+    Here, you can specify search terms and get reports back on what
+    kind of content matches your terms.  For example, you can search
+    for content that contains the words "baked beans" by typing those
+    words into the *Text* field and then clicking *Search*:
+
+      <screenshot>
+
+    Here are the results of the search.  You can also specify more
+    than one term.  For example, "Fred" can be selected from the
+    *Author* field and only content created by Fred will be searched.
+
+  Scenario: Undo mistakes.
+
+    People make mistakes.  Fred could submit a story and then realize
+    that he forgot some details.  Janet could reject a story by
+    accidentaly clicking the wrong button.  In a world of mistakes,
+    the CMF lets you undo all of the actions you take.  After creating
+    a new news item, here is what Fred sees when he clicks the *Undo*
+    link in his personal area:
+
+      <screenshot>
+
+    The first item on the list was creating the news item.  Fred can
+    undo this by selecting the first check box and clicking *Undo*.
+    Now when he goes back to his Member area, the new news item he
+    created is gone.
+
+    All users have the same interface for undoing their actions.  If
+    Janet accidentaly clicks the wrong button, she can undo that
+    mistake the same way Fred undid his.
+
+  Scenario: Organize content.
+
+    Being able to search through content is pretty useful, but it
+    would be more useful if you could categorize your content with
+    your own keywords.  This way, you could tag certain news items
+    with special keywords like 'Local' or 'Financial' and offer your
+    users the ability to look for items that match those keywords.
+
+    When Fred creates a new news item, he can click on the *Metadata*
+    link on the left of the content's interface.  On this next screen,
+    he can enter keywords for the content in the *Category* form
+    element:
+
+      <screenshot>
+
+    Here, fred gave this news item the keyword 'birds'.  Fred can add
+    as many keywords as he wants.  The next time he creates content,
+    all of the keywords he has defined so far will show up in a pull
+    down box on the *Metadata* screen, so that he can just select the
+    ones he wants.
+
+    Now, when Fred goes to the *search* link, he can choose from a
+    list of keywords which will return only content items that are
+    tagged with those categories.
+
+  Scenario Share content.
+
+    Reporter 1 adds content, gives report 2 'Manager' role
+
+    Reporter 2 can access content and change it
+
+
+
+
+
+
+
+
