@@ -12,6 +12,12 @@ PluggableAuthService changelog
         could not authenticate, although all calls expected a tuple.
 
       - challenge() did not get called, even when no user could be validated.
+      
+      - The user id in extract user now calls _verifyUser to get the ID 
+        mangled by the enumeration plugin, instead of mangling it with the
+        authentication ID, thereby allowing the authentication and 
+        enumeration plugins to be different plugins.
+        
               
   Version 1.0.2 (2004/07/15)
 

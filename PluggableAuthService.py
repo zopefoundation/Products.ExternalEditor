@@ -735,8 +735,7 @@ class PluggableAuthService( Folder ):
                             continue
 
                         if user_id is not None:
-                            mangled_id = self._mangleId( authenticator_id
-                                                       , user_id )
+                            mangled_id = self._verifyUser(plugins, user_id)
                             user_ids.append( (mangled_id, name) )
 
 
