@@ -49,8 +49,32 @@ RELEASE.txt - notes for creating a CMF release
 
   **Creating and publishing the release**
 
-    With CVS preparations done the 'slurp_release.py' script will do the
-    remaining work. You run it with the CVS tag and version ID as parameters::
+    Now that the CVS repository is prepared the files need to be put onto
+    zope.org. First of all, the Software Release object needs to be created.
+    Go to http://www.zope.org/Products/CMF and create a Software Release 
+    from the Folder Contents view:
+
+      - Name CMF-1.8.4beta2
+
+      - Version 1.8.4-beta2
+
+      - Maturity value depends on status: beta releases are 'development'
+
+      - License ZPL
+
+      - Info URL '/Products/CMF/CMF-1.8.4beta2/README.txt'
+
+      - License URL '/Resources/License/ZPL-2.1'
+
+      - Changes URL '/Products/CMF/CMF-1.8.4beta2/CHANGES.txt'
+
+      - Installation URL '/Products/CMF/CMF-1.8.4beta2/INSTALL.txt'
+
+    Make sure to publish this Software Release.
+
+    With CVS and zope.org preparations done the 'slurp_release.py' script will 
+    do the remaining work. You run it with the CVS tag and version ID as 
+    parameters::
 
       slurp_release.py [options] release_tag version_id
 
@@ -66,4 +90,7 @@ RELEASE.txt - notes for creating a CMF release
 
     An announcement email should go out to zope-announce@zope.org, 
     zope-cmf@zope.org and zope@zope.org. Also, a NewsItem for the release
-    should be created on the zope.org site.
+    should be created on the zope.org site. The existing News Items inside
+    http://www.zope.org/Products/CMF can be used as models for your
+    announcement.
+
