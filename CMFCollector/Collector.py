@@ -21,6 +21,7 @@ from AccessControl import getSecurityManager
 from Products.CMFDefault.DublinCore import DefaultDublinCoreImpl
 from Products.CMFCore.PortalContent import PortalContent
 from Products.CMFCore.WorkflowCore import WorkflowAction
+from Products.CMFCore.CatalogTool import CatalogTool
 
 from Products.CMFDefault.SkinnedFolder import SkinnedFolder
 
@@ -31,6 +32,8 @@ from Products.CMFCore import CMFCorePermissions
 from CollectorPermissions import *
 
 from CollectorIssue import addCollectorIssue
+
+INTERNAL_CATALOG_ID = 'collector_catalog'
 
 # Factory type information -- makes Events objects play nicely
 # with the Types Tool (portal_types)
@@ -91,6 +94,8 @@ class Collector(SkinnedFolder):
 
         SkinnedFolder.__init__(self, id, title)
 
+        self._setup_catalog()
+
         self.last_issue_id = 0
 
         self.description = description
@@ -134,6 +139,17 @@ class Collector(SkinnedFolder):
         else: self.other_versions_spiel = other_versions_spiel
 
         return self
+
+    def _setup_internal_catalog(self):
+        """Create and situate properly configured collector catalog."""
+        catalog = CollectorCatalog()
+        self._setOb(catalog.id, catalog)
+
+    security.declareProtected(CMFCorePermissions.View, 'get_internal_catalog')
+    def get_internal_catalog(self):
+        """ """
+        return self._getOb(INTERNAL_CATALOG_ID)
+        
 
     security.declareProtected(AddCollectorIssue, 'new_issue_id')
     def new_issue_id(self):
@@ -186,7 +202,7 @@ class Collector(SkinnedFolder):
              topics=None, classifications=None,
              importances=None, severities=None,
              versions=None, other_versions_spiel=None):
-        changed = 0
+        changed = reindex = 0
         if title is not None and title != self.title:
             self.title = title
             changed = 1
@@ -206,6 +222,7 @@ class Collector(SkinnedFolder):
                 self._adjust_supporters_roster(x)
                 self.supporters = x
                 changed = 1
+                reindex = 1
         if topics is not None:
             x = filter(None, topics)
             if self.topics != x:
@@ -236,6 +253,10 @@ class Collector(SkinnedFolder):
             if self.other_versions_spiel != other_versions_spiel:
                 self.other_versions_spiel = other_versions_spiel
                 changed = 1
+
+        if reindex:
+            self._reindex_issues()
+
         return changed
 
     def _adjust_supporters_roster(self, new_roster):
@@ -261,14 +282,36 @@ class Collector(SkinnedFolder):
             if u not in already:
                 util.add_local_role(self, u, 'Reviewer')
 
+    security.declareProtected(ManageCollector, 'reinstate_catalog')
+    def reinstate_catalog(self, internal_only=0):
+        """Recreate and reload internal catalog, to accommodate drastic
+        changes."""
+        if hasattr(self, INTERNAL_CATALOG_ID):
+            self._delOb(INTERNAL_CATALOG_ID)
+        self._setup_internal_catalog()
+        for i in self.objectValues():
+            # Normalize security_related setting
+            if i.security_related not in [0, 1]:
+                i.security_related = (i.security_related and 1) or 0
+        self._reindex_issues(internal_only=internal_only)
+
+    def _reindex_issues(self, internal_only=0):
+        """For, eg, allowedRolesAndUsers recompute after local_role changes."""
+        for i in self.objectValues():
+            i.reindexObject(internal_only=internal_only)
+
+    security.declareProtected(CMFCorePermissions.View, 'Subject')
+    def Subject(self):
+        return self.topics
+
     security.declareProtected(CMFCorePermissions.View, 'length')
     def length(self):
         """Use length protocol."""
         return self.__len__()
         
     def __len__(self):
-        """Implement length protocol method."""
-        return len(self.objectIds())
+        """length() protocol method."""
+        return len(self.objectIds()) - 1
 
     def __repr__(self):
         return ("<%s %s (%d issues) at 0x%s>"
@@ -277,6 +320,45 @@ class Collector(SkinnedFolder):
 
 InitializeClass(Collector)
     
+class CollectorCatalog(CatalogTool):
+    id = INTERNAL_CATALOG_ID
+    def enumerateIndexes(self):
+        standard = CatalogTool.enumerateIndexes(self)
+        custom = (('status', 'FieldIndex'),
+                  ('topic', 'FieldIndex'),
+                  ('classification', 'FieldIndex'),
+                  ('importance', 'FieldIndex'),
+                  ('security_related', 'FieldIndex'),
+                  ('confidential', 'FieldIndex'),
+                  ('resolution', 'TextIndex'),
+                  ('submitter_email', 'TextIndex'),
+                  ('version_info', 'TextIndex'),
+                  ('assigned_to', 'KeywordIndex'),
+                  ('upload_number', 'KeywordIndex')
+                  )
+        return standard + custom
+
+    def enumerateColumns( self ):
+        """Return field names of data to be cached on query results."""
+        standard = CatalogTool.enumerateColumns(self)
+        custom = ('status',
+                  'topic',
+                  'classification',
+                  'importance',
+                  'security_related',
+                  'confidential',
+                  'version_info',
+                  'assigned_to',
+                  'uploads',
+                  'action_number',
+                  'upload_number',
+                  )
+        return standard + custom
+
+
+InitializeClass(CollectorCatalog)
+
+
 # XXX Enable use of pdb.set_trace() in python scripts
 ModuleSecurityInfo('pdb').declarePublic('set_trace')
 
