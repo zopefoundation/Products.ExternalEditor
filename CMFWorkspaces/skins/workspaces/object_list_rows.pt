@@ -1,35 +1,29 @@
+<!-- Invoke this macro with "items" in the namespace. -->
 
-  <form metal:define-macro="form" action="" method="POST"
-        tal:attributes="action here/absolute_url"
-        tal:define="sort_attr python: request.get('sort_attr', 'Title');
-           sort_order python: request.get('sort_order', 'normal');
-           items python: here.listReferencedItems(sort_attr, sort_order)">
-
-    <table tal:condition="items">
-
-<thead>
-      <tr tal:define="sort_fmt python: here.absolute_url() +
-                                           '?sort_attr=%s&sort_order=%s'">
+<table>
+<tbody metal:define-macro="tbody"
+       tal:define="my_url python: request['URL'] + '?';
+                   mq python: modules['ZTUtils'].make_query">
+      <tr>
         <th width="1%"> </th>
         <th nowrap width="5%"></th>
         <th tal:repeat="column python: ['Title', 'Type', 'CreationDate']"
             tal:attributes="width python:
                             column == 'Title' and '50%' or default">
           <a href="" tal:omit-tag="python: sort_attr == column"
-             tal:attributes="href python: sort_fmt % (column, 'normal')"
+             tal:attributes="href python: my_url + 
+             mq(request.form, sort_attr=column, sort_order='normal')"
              tal:content="column">Title</a>
           <a href="" tal:condition="python: sort_attr == column"
-             tal:attributes="href python: sort_fmt % (column,
-             (sort_order == 'normal' and 'reverse' or 'normal'))"><img
-             border="0" src="sorted_down.gif" tal:attributes="src python:
-             '%s/%s' % (here.portal_url(), sort_order == 'normal'
+             tal:attributes="href python: my_url + mq(request.form,
+             sort_attr=column, sort_order=(sort_order == 'normal'
+             and 'reverse' or 'normal'))"><img border="0"
+             src="sorted_down.gif" tal:attributes="src
+             python: '%s/%s' % (here.portal_url(), sort_order == 'normal'
              and 'sorted_down.gif' or 'sorted_up.gif')" /></a>
         </th>
       </tr>
-</thead>
 
-
-<tbody>
       <tr tal:repeat="it items">
 <tal:block define="item python:it[1]">
         <td><img tal:define="status_image item/get_status_image | nothing"
@@ -47,6 +41,7 @@
             <a href="#"
                tal:attributes="href string:${item/absolute_url}/view"
                tal:content="item/Title"
+               tal:omit-tag="no_item_links|nothing"
                tal:on-error="string:(broken)">
               TITLE or ID </a>
         </td>
@@ -64,24 +59,4 @@
 </tal:block>
       </tr>
 </tbody>
-
-
-<tfoot>
-      <tr>
-
-        <td colspan="5">
-          <input type="submit" name="workspace_remove:method"
-                 value="Remove from workspace" />
-          <input type="submit" name="workspace_copy_to_other_form:method"
-                 value="Copy to other workspace..." />
-        </td>
-
-      </tr>
-</tfoot>
-
-    </table>
-
-    <p tal:condition="not:items"><em>No items are in this workspace.</em></p>
-
-  </form>
-
+</table>

@@ -23,9 +23,42 @@
 
   </form>
 
-  <div metal:use-macro="here/workspace_content_rows/macros/form">
-    Workspace contents
-  </div>
+
+  <form action="" method="POST"
+        tal:attributes="action here/absolute_url"
+        tal:define="sort_attr python: request.get('sort_attr', 'Title');
+           sort_order python: request.get('sort_order', 'normal');
+           items python: here.listReferencedItems(sort_attr, sort_order)">
+
+    <table tal:condition="items">
+
+     <tbody metal:use-macro="here/object_list_rows/macros/tbody">
+      <tr><td>Workspace contents</td></tr>
+     </tbody>
+
+     <tfoot>
+      <tr>
+
+        <td colspan="5">
+          <input type="submit" name="workspace_remove:method"
+                 value="Remove from workspace" />
+          <input type="submit" name="workspace_copy_to_other_form:method"
+                 value="Copy to other workspace..." />
+        </td>
+
+      </tr>
+     </tfoot>
+
+    </table>
+
+    <p tal:condition="not:items"><em>No items are in this workspace.</em></p>
+
+  </form>
+
+
+
+
+
 
 <!--
   <div tal:define="
