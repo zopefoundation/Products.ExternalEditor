@@ -248,8 +248,8 @@ class DefaultWorkflowDefinition (SimpleItemWithProperties):
         Notifies this workflow after an object has been created
         and put in its new place.
         '''
-        self.setReviewStateOf( ob, 'private', 'joined', '' )
-        self.notifySuccess(ob, 'joined', '')
+        self.setReviewStateOf( ob, 'private', 'created', '' )
+        self.notifySuccess(ob, 'created', '')
 
     security.declarePrivate('notifyBefore')
     def notifyBefore(self, ob, action):
