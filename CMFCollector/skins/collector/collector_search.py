@@ -35,9 +35,15 @@ supplement_subject_many("supporters", "assigned_to")
 supplement_subject_one("resolution")
 supplement_subject_one("reported_version")
 
-sr = reqget("security_related", 'x')
-if sr in ['0', '1']:
-    subj_items.append('security_related:%s' % sr)
+sr = reqget("security_related", [])
+
+if sr:
+    if 'Yes' in sr and 'No' in sr:
+        pass
+    elif 'Yes' in sr:
+        subj_items.append('security_related:1')
+    else:
+        subj_items.append('security_related:0')
 
 if subj_items:
     query["Subject"] = subj_items
