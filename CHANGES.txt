@@ -1,23 +1,13 @@
-Future
+CMF 1.5alpha
 
   New Features
 
-    - (__future__) Exposed role management for manager users on the
-      default roster:  managers can now "promote" members without going
-      to the ZMI.
+    - 
 
-    - (__future__) Added "custom schema" mechanism for content objects:
-      site managers can now define additional propertysheets for a
-      content type, which will then be reflected in instances created
-      from the type.
+  Bug Fixes
 
-    - (__future__) Added simple link extraction / checking for textual
-      content.  Link checking also works for Link objects.
+    - 
 
-    - (__future__) Added "composite content" types (see the "dogbowl
-      proposal",
-      (http://cmf.zope.org/rqmts/proposals/compounds/compoundproposal.txt).
+CMF 1.4x
 
-    - (__future__) Added DCWorkflow (through-the-web configurable
-      workflows) to the core set of CMF products.
-
+  see CHANGES.txt of CMF-1_4-branch
