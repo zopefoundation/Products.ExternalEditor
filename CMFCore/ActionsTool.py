@@ -231,6 +231,9 @@ class ActionsTool(UniqueObject, OFS.Folder.Folder, ActionProviderBase):
                 # This action requires no extra permissions.
                 verified = 1
             else:
+                # startswith() is used so that we can have several
+                # different categories that are checked in the object or
+                # folder context.
                 if (object is not None and
                     (category.startswith('object') or
                      category.startswith('workflow'))):
