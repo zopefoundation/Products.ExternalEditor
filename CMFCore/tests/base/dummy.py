@@ -32,6 +32,7 @@ class DummyContent( PortalContent, Item ):
     A Dummy piece of PortalContent
     """
     meta_type = 'Dummy'
+    portal_type = 'Dummy Content'
     url = 'foo_url'
     after_add_called = before_delete_called = 0
 
@@ -90,7 +91,7 @@ class DummyContent( PortalContent, Item ):
         return self._safe_get('modified_date')
     
     def Type( self ):
-        return 'Dummy Content'
+        return 'Dummy Content Title'
 
 def addDummy( self, id ):
     """
@@ -121,8 +122,8 @@ class DummyTypeInfo(TypeInformation):
     """ Dummy class of type info object """
     meta_type = "Dummy Test Type Info"
 
-DummyFTI = FactoryTypeInformation( 'Dummy',
-                                   title='Dummy Content',
+DummyFTI = FactoryTypeInformation( 'Dummy Content',
+                                   title='Dummy Content Title',
                                    meta_type=DummyContent.meta_type,
                                    product='CMFDefault',
                                    factory='addDocument',

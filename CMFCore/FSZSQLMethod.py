@@ -6,8 +6,10 @@
 #
 # $Id$
 
-"""(not yet)Customizable ZSQL methods that come from the filesystem."""
-__version__='$Revision$'[11:-2]
+""" (not yet)Customizable ZSQL methods that come from the filesystem.
+
+$Id$
+"""
 
 import Globals
 from AccessControl import ClassSecurityInfo

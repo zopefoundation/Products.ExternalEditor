@@ -68,6 +68,8 @@ class SkinnedFolder(CMFCatalogAware, PortalFolder):
 
     security = ClassSecurityInfo()
 
+    manage_options = PortalFolder.manage_options
+
     def __call__(self):
         '''
         Invokes the default view.
@@ -89,6 +91,8 @@ class SkinnedFolder(CMFCatalogAware, PortalFolder):
             Return the ID of our owner.
         """
         return self.getOwner( info=1 )[1]
+
+    # We derive from CMFCatalogAware first, so we are cataloged too.
 
 InitializeClass( SkinnedFolder )
 

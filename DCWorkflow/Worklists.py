@@ -10,11 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-'''
-Worklists in a web-configurable workflow.
+""" Worklists in a web-configurable workflow.
+
 $Id$
-'''
-__version__='$Revision$'[11:-2]
+"""
 
 from OFS.SimpleItem import SimpleItem
 from Globals import DTMLFile, PersistentMapping
@@ -28,8 +27,7 @@ from ContainerTab import ContainerTab
 from Guard import Guard
 from utils import _dtmldir
 from string import split, strip, join
-
-StringType = type('')
+from types import TupleType
 
 class WorklistDefinition (SimpleItem):
     meta_type = 'Worklist'
@@ -55,7 +53,7 @@ class WorklistDefinition (SimpleItem):
         if self.guard is not None:
             return self.guard
         else:
-            return Guard()  # Create a temporary guard.
+            return Guard().__of__(self)  # Create a temporary guard.
 
     def getGuardSummary(self):
         res = None
@@ -75,10 +73,16 @@ class WorklistDefinition (SimpleItem):
         res.sort()
         return res
 
+    def getVarMatchKeys(self):
+        if self.var_matches:
+            return self.var_matches.keys()
+        else:
+            return []
+
     def getVarMatch(self, id):
         if self.var_matches:
             matches = self.var_matches.get(id, ())
-            if type(matches) is StringType:
+            if not isinstance(matches, TupleType):
                 # Old version, convert it.
                 matches = (matches,)
                 self.var_matches[id] = matches

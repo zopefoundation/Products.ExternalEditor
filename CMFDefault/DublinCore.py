@@ -84,9 +84,7 @@ class DefaultDublinCoreImpl( PropertyManager ):
             When called without an argument, sets the date to now.
         """
         if modification_date is None:
-            # XXX which one is more correct ?
-            #self.modification_date = DateTime()
-            self.modification_date = self.bobobase_modification_time()
+            self.modification_date = DateTime()
         else:
             self.modification_date = self._datify(modification_date)
 
@@ -152,14 +150,16 @@ class DefaultDublinCoreImpl( PropertyManager ):
         """
             Dublin Core element - date resource becomes effective.
         """
-        return self.effective_date and self.effective_date.ISO() or 'None'
+        ed = getattr( self, 'effective_date', None )
+        return ed and ed.ISO() or 'None'
 
     security.declarePublic( 'ExpirationDate' )
     def ExpirationDate( self ):
         """
             Dublin Core element - date resource expires.
         """
-        return self.expiration_date and self.expiration_date.ISO() or 'None'
+        ed = getattr( self, 'expiration_date', None )
+        return ed and ed.ISO() or 'None'
 
     security.declarePublic( 'ModificationDate' )
     def ModificationDate( self ):

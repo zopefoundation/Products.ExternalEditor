@@ -138,7 +138,7 @@ class ActionInformation( SimpleItem ):
         """
         return getattr( self, 'condition', None ) and self.condition.text or ''
 
-    security.declarePublic( 'getPermission' )
+    security.declarePublic( 'getPermissions' )
     def getPermissions( self ):
 
         """ Return the permission, if any, required to execute the action.

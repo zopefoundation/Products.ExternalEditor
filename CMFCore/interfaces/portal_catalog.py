@@ -10,11 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
+""" Catalog tool interface description.
 
-"""Catalog tool interface description.
 $Id$
 """
-__version__='$Revision$'[11:-2]
 
 
 from Interface import Attribute, Base

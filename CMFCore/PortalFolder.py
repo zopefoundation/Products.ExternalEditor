@@ -10,14 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-"""PortalFolder: CMF-enabled Folder objects.
+""" PortalFolder: CMF-enabled Folder objects.
+
 $Id$
 """
-
-__version__='$Revision$'[11:-2]
-
-ADD_FOLDERS_PERMISSION = 'Add portal folders'
-ADD_CONTENT_PERMISSION = 'Add portal content'
 
 import sys
 import Globals, re, base64, marshal, string
@@ -25,6 +21,7 @@ import CMFCorePermissions
 
 from CMFCorePermissions import View, ManageProperties, ListFolderContents
 from CMFCorePermissions import AddPortalFolders, AddPortalContent
+from CMFCatalogAware import CMFCatalogAware
 from OFS.Folder import Folder
 from OFS.ObjectManager import REPLACEABLE
 from Globals import DTMLFile
@@ -67,7 +64,7 @@ Use folders to put content in categories."""
                            )
 
 
-class PortalFolder( Folder, DynamicType ):
+class PortalFolder(DynamicType, CMFCatalogAware, Folder):
     """
         Implements portal content management, but not UI details.
     """
@@ -77,6 +74,9 @@ class PortalFolder( Folder, DynamicType ):
     security = ClassSecurityInfo()
 
     description = ''
+
+    manage_options = Folder.manage_options + \
+                     CMFCatalogAware.manage_options
 
     def __init__( self, id, title='' ):
         self.id = id
@@ -105,6 +105,7 @@ class PortalFolder( Folder, DynamicType ):
         """
         self.setTitle( title )
         self.setDescription( description )
+        self.reindexObject()
 
     security.declarePublic('allowedContentTypes')
     def allowedContentTypes( self ):
@@ -270,10 +271,10 @@ class PortalFolder( Folder, DynamicType ):
         """
              Implement dublin core type
         """
-        portal_types = getToolByName(self, 'portal_types')
-        ti = portal_types.getTypeInfo(self)
-        if ti is not None:
-            return ti.Title()
+        if hasattr(aq_base(self), 'getTypeInfo'):
+            ti = self.getTypeInfo()
+            if ti is not None:
+                return ti.Title()
         return self.meta_type
 
     security.declarePublic('encodeFolderFilter')
@@ -305,10 +306,16 @@ class PortalFolder( Folder, DynamicType ):
         """
         return None
 
-    def reindexObject( self, idxs=[] ):
-        """
-            Make content-assuming factory mechanism happy.
-        """
+    # Ensure pure PortalFolders don't get cataloged.
+    # XXX We may want to revisit this.
+
+    def indexObject(self):
+        pass
+
+    def unindexObject(self):
+        pass
+
+    def reindexObject(self, idxs=[]):
         pass
 
     def PUT_factory( self, name, typ, body ):

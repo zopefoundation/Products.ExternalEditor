@@ -10,11 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
+""" Base class for objects that supply skins.
 
-"""Base class for objects that supply skins.
 $Id$
 """
-__version__='$Revision$'[11:-2]
 
 from string import split, join, strip
 from Acquisition import aq_base

@@ -9,6 +9,7 @@ class MembershipTests( TransactionalTest ):
     def test_join( self ):
         self.root.manage_addProduct[ 'CMFDefault' ].manage_addCMFSite( 'site' )
         site = self.root.site
+        site.portal_membership.memberareaCreationFlag = 0
         member_id = 'test_user'
         site.portal_registration.addMember( member_id
                                           , 'zzyyzz'

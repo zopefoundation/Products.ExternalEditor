@@ -10,12 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
+""" Cookie Crumbler: Enable cookies for non-cookie user folders.
 
-"""Cookie Crumbler: Enable cookies for non-cookie user folders.
 $Id$
 """
-__version__='$Revision$'[11:-2]
-
 
 from base64 import encodestring
 from urllib import quote, unquote
@@ -92,7 +90,7 @@ class CookieCrumbler (SimpleItemWithProperties):
     def getCookieMethod( self, name='setAuthCookie', default=None ):
         return getattr( self.aq_inner.aq_parent, name, default )
 
-    security.declarePrivate('setDefaultAuthCookie')
+    security.declarePrivate('defaultSetAuthCookie')
     def defaultSetAuthCookie( self, resp, cookie_name, cookie_value ):
         resp.setCookie( cookie_name, cookie_value, path='/')
 
@@ -122,7 +120,7 @@ class CookieCrumbler (SimpleItemWithProperties):
                 name = req[self.name_cookie]
                 pw = req[self.pw_cookie]
                 ac = encodestring('%s:%s' % (name, pw))
-                req._auth = 'basic %s' % ac
+                req._auth = 'Basic %s' % ac
                 req._cookie_auth = 1
                 resp._auth = 1
                 if req.get(self.persist_cookie, 0):
@@ -142,7 +140,7 @@ class CookieCrumbler (SimpleItemWithProperties):
             elif req.has_key(self.auth_cookie):
                 # Copy __ac to the auth header.
                 ac = unquote(req[self.auth_cookie])
-                req._auth = 'basic %s' % ac
+                req._auth = 'Basic %s' % ac
                 req._cookie_auth = 1
                 resp._auth = 1
                 self.delRequestVar(req, self.auth_cookie)

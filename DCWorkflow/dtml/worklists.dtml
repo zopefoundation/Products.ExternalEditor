@@ -18,15 +18,17 @@
    <dtml-if name_fmt>
     Name format: <code>&dtml-name_fmt;</code><br />
    </dtml-if>
-   <dtml-if var_matches>
+   <dtml-if getVarMatchKeys>
     Catalog matches:
-    <dtml-in expr="var_matches.items()" sort>
-     <code>&dtml-sequence-key;</code> =
-     <dtml-in sequence-item>
+    <dtml-in getVarMatchKeys sort>
+    <dtml-let key=sequence-item value="getVarMatch(key)">
+     <code>&dtml-key;</code> =
+     <dtml-in value>
        <code>&dtml-sequence-item;</code>
        <dtml-unless sequence-end>or</dtml-unless>
      </dtml-in>
-    <dtml-unless sequence-end>;</dtml-unless>
+     <dtml-unless sequence-end>;</dtml-unless>
+    </dtml-let>
     </dtml-in>
     <br />
    </dtml-if>

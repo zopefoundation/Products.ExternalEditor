@@ -10,13 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-
-"""CMFDefault portal_properties tool.
+""" CMFDefault portal_properties tool.
 
 $Id$
 """
-__version__='$Revision$'[11:-2]
-
 
 from Products.CMFCore.utils import UniqueObject
 from OFS.SimpleItem import SimpleItem

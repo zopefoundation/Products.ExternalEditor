@@ -10,8 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-"""Portal services base objects"""
-__version__='$Revision$'[11:-2]
+""" Portal services base objects
+
+$Id$
+"""
 
 import PortalObject, PortalContent, PortalFolder
 import MembershipTool, WorkflowTool, CatalogTool, DiscussionTool
@@ -25,6 +27,15 @@ import ContentTypeRegistry
 import CachingPolicyManager
 import utils
 
+from AccessControl import ModuleSecurityInfo
+from CMFCorePermissions import AddPortalFolders
+
+prod_security = ModuleSecurityInfo( 'Products' )
+prod_security.declarePublic( 'CMFCore' )
+
+security = ModuleSecurityInfo( 'Products.CMFCore' )
+security.declarePublic( 'utils' )
+
 try:
     import FSPageTemplate
 except ImportError:
@@ -33,7 +44,8 @@ else:
     HAS_PAGE_TEMPLATES = 1
 
 
-ADD_FOLDERS_PERMISSION = 'Add portal folders'
+# Old name that some third-party packages may need.
+ADD_FOLDERS_PERMISSION = AddPortalFolders
 
 bases = (
     PortalObject.PortalObjectBase,
@@ -133,7 +145,7 @@ def initialize(context):
 
     utils.ContentInit( 'CMF Core Content'
                      , content_types=( PortalFolder.PortalFolder, )
-                     , permission=ADD_FOLDERS_PERMISSION
+                     , permission=AddPortalFolders
                      , extra_constructors=(
                            PortalFolder.manage_addPortalFolder, )
                      , fti=PortalFolder.factory_type_information

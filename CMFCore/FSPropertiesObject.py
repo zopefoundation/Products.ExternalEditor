@@ -10,8 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-"""Customizable properties that come from the filesystem."""
-__version__='$Revision$'[11:-2]
+""" Customizable properties that come from the filesystem.
+
+$Id$
+"""
 
 from string import split, strip
 
@@ -110,9 +112,9 @@ class FSPropertiesObject (FSObject, PropertyManager):
             try:
                 propname, proptv = split( line, ':' )
                 #XXX multi-line properties?
-                proptype, propvstr = split( proptv, '=' )
+                proptype, propvstr = proptv.split( '=', 1 )
                 propname = strip(propname)
-                proptv = strip(proptv)
+                proptype = strip(proptype)
                 propvstr = strip(propvstr)
                 converter = get_converter( proptype, lambda x: x )
                 propvalue = converter( strip( propvstr ) )

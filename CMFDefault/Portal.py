@@ -10,11 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
+""" Portal class
 
-"""Portal class
 $Id$
 """
-__version__='$Revision$'[11:-2]
  
 import Globals
 from Products.CMFCore.PortalObject import PortalObjectBase

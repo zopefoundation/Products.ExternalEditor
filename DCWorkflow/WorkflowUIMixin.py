@@ -10,11 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-'''
-Web-configurable workflow UI.
+""" Web-configurable workflow UI.
+
 $Id$
-'''
-__version__='$Revision$'[11:-2]
+"""
 
 from Globals import DTMLFile
 import Globals

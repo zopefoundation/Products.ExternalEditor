@@ -8,8 +8,8 @@ States Tab
  the possible transitions from that state (and their titles). You can go
  straight to the details of each state and transition from here.
 
- Within a state's properties tab you can set the title, and the
- transitions that are possible from this state from a list of
+ Within a state's properties tab you can set the title, description, 
+ and the transitions that are possible from this state from a list of
  all the available transitions created in the workflow's 
  transitions tab.
 

@@ -10,10 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-"""PortalContent: Base class for all CMF content.
+""" PortalContent: Base class for all CMF content.
+
 $Id$
 """
-__version__='$Revision$'[11:-2]
 
 import string, urllib
 
@@ -71,6 +71,7 @@ class PortalContent(DynamicType, CMFCatalogAware, SimpleItem):
                          , 'action' : 'view'
                          }
                        )
+                     + CMFCatalogAware.manage_options
                      + SimpleItem.manage_options
                      )
 
@@ -123,40 +124,5 @@ class PortalContent(DynamicType, CMFCatalogAware, SimpleItem):
         Returns the default view even if index_html is overridden.
         '''
         return self()
-
-    # Methods to support items that might be stored in attributes
-    # unknown to the content object, such as the DiscussionItemContainer
-    # "talkback".
-
-    security.declareProtected(AccessContentsInformation, 'opaqueItems')
-    def opaqueItems(self):
-        """
-        Returns opaque items (subelements that are contained
-        using something that is not an ObjectManager).
-        """
-        # Since 'talkback' is the only opaque item on content
-        # right now, I will return that. Should be replaced with
-        # a list of tuples for every opaque item!
-        if hasattr(aq_base(self), 'talkback'):
-            talkback = self.talkback
-            if talkback is not None:
-                return ((talkback.id, talkback),)
-        return ()
-
-    security.declareProtected(AccessContentsInformation, 'opaqueIds')
-    def opaqueIds(self):
-        """
-        Returns opaque ids (subelements that are contained
-        using something that is not an ObjectManager).
-        """
-        return [t[0] for t in self.opaqueItems()]
-
-    security.declareProtected(AccessContentsInformation, 'opaqueValues')
-    def opaqueValues(self):
-        """
-        Returns opaque values (subelements that are contained
-        using something that is not an ObjectManager).
-        """
-        return [t[1] for t in self.opaqueItems()]
 
 InitializeClass(PortalContent)

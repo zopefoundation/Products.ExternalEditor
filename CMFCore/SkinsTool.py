@@ -10,16 +10,13 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
+""" Portal skins tool.
 
-"""Portal skins tool.
 $Id$
 """
-__version__='$Revision$'[11:-2]
-
 
 from string import split
 from utils import UniqueObject, getToolByName, _dtmldir
-from PortalFolder import PortalFolder
 import Globals
 from Globals import DTMLFile, PersistentMapping
 from SkinsContainer import SkinsContainer
@@ -31,6 +28,7 @@ from ActionProviderBase import ActionProviderBase
 from ActionInformation import ActionInformation
 from Expression import Expression
 
+from OFS.Folder import Folder
 from OFS.Image import Image
 from OFS.DTMLMethod import DTMLMethod
 from OFS.ObjectManager import REPLACEABLE
@@ -49,7 +47,7 @@ def modifiedOptions():
     # Remove the existing "Properties" option and add our own.
     rval = []
     pos = -1
-    for o in PortalFolder.manage_options:
+    for o in Folder.manage_options:
         label = o.get('label', None)
         if label != 'Properties':
             rval.append(o)
@@ -57,7 +55,7 @@ def modifiedOptions():
                   'action':'manage_propertiesForm'}]
     return tuple(rval)
 
-class SkinsTool(UniqueObject, SkinsContainer, PortalFolder, ActionProviderBase):
+class SkinsTool(UniqueObject, SkinsContainer, Folder, ActionProviderBase):
     '''
     This tool is used to supply skins to a portal.
     '''

@@ -10,11 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-"""Simple int-matching criterion
+""" Simple int-matching criterion
 
 $Id$
 """
-__version__='$Revision$'[11:-2]
 
 from Products.CMFTopic import TopicPermissions
 from Products.CMFTopic.AbstractCriterion import AbstractCriterion

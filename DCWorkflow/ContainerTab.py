@@ -10,12 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-'''
-A convenient base class for representing a container as a management tab.
-$Id$
-'''
-__version__='$Revision$'[11:-2]
+""" A convenient base class for representing a container as a management tab.
 
+$Id$
+"""
 
 from OFS.Folder import Folder
 from OFS.SimpleItem import Item_w__name__
