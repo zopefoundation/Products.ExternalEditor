@@ -111,7 +111,7 @@ class PortalContent(DynamicType, CMFCatalogAware, SimpleItem):
         '''
         view = _getViewFor(self)
         if getattr(aq_base(view), 'isDocTemp', 0):
-            return apply(view, (self, self.REQUEST))
+            return view(self, self.REQUEST)
         else:
             return view()
 
