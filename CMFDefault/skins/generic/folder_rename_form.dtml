@@ -5,52 +5,52 @@
 <dtml-if cb_isMoveable>
 
 <div class="Desktop">
-<H1> Rename <dtml-var meta_type> </H2>
+<h1> Rename <dtml-var meta_type> </H2>
 
-<FORM ACTION="folder_rename" METHOD="POST">
-<TABLE class="FormLayout">
-<TR>
-  <TD ALIGN="LEFT" VALIGN="TOP">
+<form action="folder_rename" method="POST">
+<table class="FormLayout">
+<tr>
+  <td align="left" valign="top">
   <dtml-let getIcon="_.hasattr(this(), 'getIcon') and getIcon()"
             icon="getIcon or _.getattr(this(), 'icon', '')">
   <dtml-if icon>
-  <IMG SRC="&dtml-BASEPATH1;/&dtml-icon;" ALT="" BORDER="0">
+  <img src="&dtml-portal_url;/&dtml-icon;" alt="" border="0">
   </dtml-if></dtml-let>
-  </TD>
-  <TD ALIGN="LEFT" VALIGN="TOP">
+  </td>
+  <td align="left" valign="top">
   <dtml-var getId>
-  </TD>
-</TR>
-<TR>
-  <TD ALIGN="LEFT" VALIGN="TOP">
-  <STRONG>to:</STRONG>
-  </TD>
-  <TD ALIGN="LEFT" VALIGN="TOP">
-  <INPUT TYPE="TEXT" NAME="new_id" value="&dtml-getId;" SIZE="20">
-  </TD>
-</TR>
-<TR>
-<TD></TD>
-<TD>
-  <INPUT TYPE="HIDDEN" NAME="id" VALUE="&dtml-getId;">
-  <INPUT TYPE="submit" VALUE=" Ok ">
-</TD>
-</TR>
-</TABLE>
-</FORM>
+  </td>
+</tr>
+<tr>
+  <td align="left" valign="top">
+  <strong>to:</strong>
+  </td>
+  <td align="left" valign="top">
+  <input type="text" name="new_id" value="&dtml-getId;" size="20">
+  </td>
+</tr>
+<tr>
+<td></td>
+<td>
+  <input type="hidden" name="id" value="&dtml-getId;">
+  <input type="submit" value=" Ok ">
+</td>
+</tr>
+</table>
+</form>
 <dtml-else>
-<FORM ACTION="folder_contents" METHOD="GET">
-<p>The item <EM>&dtml-getId;</EM> does not support this operation.</P>
-<INPUT TYPE="submit" NAME="submit" VALUE=" Ok ">
-</FORM>
+<form action="folder_contents" method="get">
+<p>The item <em>&dtml-getId;</em> does not support this operation.</P>
+<input type="submit" name="submit" value=" Ok ">
+</form>
 </dtml-if>
 
 </dtml-with>
 <dtml-else>
-<FORM ACTION="folder_contents" METHOD="GET">
+<form action="folder_contents" method="get">
 <p>You must select an item to rename.</p>
-<INPUT TYPE="submit" NAME="submit" VALUE=" Ok ">
-</FORM>
+<input type="submit" name="submit" value=" Ok ">
+</form>
 
 </dtml-if>
 

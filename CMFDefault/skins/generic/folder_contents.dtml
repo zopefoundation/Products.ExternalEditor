@@ -90,7 +90,7 @@ Folder contents display.
       <td>
          <dtml-if icon>
          <a href="&dtml.url_quote-getId;&dtml-methodID;"
-          ><img src="&dtml-BASEPATH1;/&dtml-icon;"
+          ><img src="&dtml-portal_url;/&dtml-icon;"
                 alt="&dtml-Type;" border="0"></a> 
          </dtml-if>
       </td>

@@ -44,7 +44,7 @@
              objID="obj.getId()"
    >
      <dtml-if icon>
-     <img src="&dtml-BASEPATH1;/&dtml-icon;" align="left" alt="&dtml-typ;" />
+     <img src="&dtml-portal_url;/&dtml-icon;" align="left" alt="&dtml-typ;" />
      </dtml-if>
      <dtml-var objID size=15 html_quote>
     </dtml-let>

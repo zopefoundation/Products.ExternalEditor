@@ -29,7 +29,7 @@ items<dtml-if name="SearchableText"> matching "&dtml-SearchableText;"</dtml-if>.
   <td>
    <dtml-if getIcon>
    <a href="&dtml-objURL;"><img
-    src="&dtml-BASEPATH1;/&dtml-getIcon;" border="0"
+    src="&dtml-portal_url;/&dtml-getIcon;" border="0"
     alt="[&dtml.missing-Type;]"
     title="[&dtml.missing-Type;]"></a>
    </dtml-if>
