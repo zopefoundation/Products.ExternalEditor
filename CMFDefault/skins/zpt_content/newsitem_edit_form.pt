@@ -1,17 +1,20 @@
-<html xmlns:tal="http://xml.zope.org/namespaces/tal"
-      xmlns:metal="http://xml.zope.org/namespaces/metal"
-      metal:use-macro="here/main_template/macros/master">
+<tal:page
+   xmlns:tal="http://xml.zope.org/namespaces/tal"
+   xmlns:metal="http://xml.zope.org/namespaces/metal"
+   tal:define="control python: here.newsitem_edit_control(**request.form)"
+   tal:condition="control"
+><html metal:use-macro="here/main_template/macros/master">
 <body>
-<div metal:fill-slot="main" i18n:domain="cmf_default">
-<div class="Desktop">
-<div class="NewsItem">
+
+<metal:block metal:fill-slot="main"
+   tal:define="form control/form">
+<div class="Desktop" i18n:domain="cmf_default">
 
 <h2 i18n:translate="">Edit <span
     tal:replace="here/getId" i18n:name="objectid">My ID</span></h2>
 
-<form action="newsitem_edit" method="post"
-      tal:attributes="action string:${here/absolute_url}/newsitem_edit"
->
+<form action="newsitem_edit_form" method="post"
+   tal:attributes="action control/form/action">
 <table class="FormLayout">
  <tr>
   <th i18n:translate="">Title</th>
@@ -49,17 +52,14 @@
  <tr>
   <td> <br /> </td>
   <td>
-   <input type="submit" name="change" value="Change"
-          i18n:attributes="value" />
-   <input type="submit" name="change_and_view" value="Change and View"
-          i18n:attributes="value" />
+   <metal:block metal:use-macro="here/form_widgets/macros/buttons" />
   </td>
  </tr>
 </table>
 </form>
 
 </div>
-</div>
-</div>
+</metal:block>
+
 </body>
-</html>
+</html></tal:page>
