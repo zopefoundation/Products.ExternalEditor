@@ -21,6 +21,9 @@ Future
     - (__future__) Added DCWorkflow (through-the-web configurable
       workflows) to the core set of CMF products.
 
+    - Added FSFile skin object, in order to allow .swf files (et al.) in 
+      skins
+
     - Added 'listMetaTags' skin method, which filters the DublinCore
       metadata into a form suitable for inclusion as <meta> tags.
 

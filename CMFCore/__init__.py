@@ -19,7 +19,7 @@ import PortalObject, PortalContent, PortalFolder
 import MembershipTool, WorkflowTool, CatalogTool, DiscussionTool
 import ActionsTool, UndoTool, RegistrationTool, SkinsTool
 import MemberDataTool, TypesTool
-import DirectoryView, FSImage, FSPropertiesObject
+import DirectoryView, FSImage, FSFile, FSPropertiesObject
 import FSDTMLMethod, FSPythonScript, FSSTXMethod
 import FSZSQLMethod
 import CookieCrumbler
@@ -122,6 +122,8 @@ def initialize(context):
                        'images/fspy.gif', globals())
     utils.registerIcon(FSImage.FSImage,
                        'images/fsimage.gif', globals())
+    utils.registerIcon(FSFile.FSFile,
+                       'images/fsfile.gif', globals())
     utils.registerIcon(FSPropertiesObject.FSPropertiesObject,
                        'images/fsprops.gif', globals())
     utils.registerIcon(FSZSQLMethod.FSZSQLMethod,
