@@ -88,6 +88,7 @@ from Products.CMFCore.PortalFolder import PortalFolder
 from Products.CMFCore import utils
 from AccessControl import ClassSecurityInfo
 from Acquisition import aq_parent, aq_inner
+from ComputedAttribute import ComputedAttribute
 
 # Import permission names
 from Products.CMFCore import CMFCorePermissions
@@ -151,6 +152,33 @@ class Topic( PortalFolder ):
 ##                       'permission'   : TopicPermissions.AddTopics,
 ##                       },
 ##                     )
+
+    # Contentish interface methods
+    # ----------------------------
+
+    def _index_html(self):
+        '''
+        Invokes the action identified by the id "view" or the first action.
+        '''
+        ti = self.getTypeInfo()
+        if ti is not None:
+            path = ti.getActionById('view', None)
+            if path is not None:
+                view = self.restrictedTraverse(path)
+                return view
+            actions = ti.getActions()
+            if actions:
+                path = actions[0]['action']
+                view = self.restrictedTraverse(path)
+                return view
+            raise 'Not Found', ('No default view defined for type "%s"'
+                                % ti.id)
+        else:
+            raise 'Not Found', ('Cannot find default view for "%s"'
+                                % self.getPhysicalPath())
+
+    security.declareProtected(CMFCorePermissions.View, 'index_html')
+    index_html = ComputedAttribute(_index_html, 1)
 
     def _criteria_metatype_ids(self):
         result = []
