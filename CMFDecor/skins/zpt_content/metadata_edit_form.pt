@@ -18,7 +18,20 @@
 
  <tr valign="top">
 
-  <td> </td> <td> </td>
+  <th>
+    Enable Discussion?
+  </th>
+  <td>
+    <select name="allowDiscussion"
+            tal:define="val here/isDiscussable">
+        <option value="None"
+                tal:attributes="selected python: val == None"> Default </option>
+        <option value="0"
+                tal:attributes="selected python: val == 0"> Off </option>
+        <option value="1"
+                tal:attributes="selected python: val == 1"> On </option>
+     </select>
+  </td>
   <td colspan="2" align="right">
    <a href="full_metadata_edit_form"> Edit all metadata </a>
   </td>

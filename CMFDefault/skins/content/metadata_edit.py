@@ -1,6 +1,6 @@
 ## Script (Python) "metadata_edit"
 ##title=Update Content Metadata
-##parameters=title=None,subject=None,description=None,contributors=None,effective_date=None,expiration_date=None,format=None,language=None,rights=None
+##parameters=allowDiscussion=None,title=None,subject=None,description=None,contributors=None,effective_date=None,expiration_date=None,format=None,language=None,rights=None
 
 def tuplify( value ):
 
@@ -40,6 +40,8 @@ if language is None:
 
 if rights is None:
     rights = context.Rights()
+
+context.portal_discussion.overrideDiscussionFor(context, allowDiscussion)
 
 try:  
     context.editMetadata( title=title

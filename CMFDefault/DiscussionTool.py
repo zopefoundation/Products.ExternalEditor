@@ -52,6 +52,23 @@ class DiscussionTool( UniqueObject, SimpleItem ):
     #   'portal_discussion' interface methods
     #
 
+    security.declareProtected(CMFCorePermissions.ModifyPortalContent
+                            , 'overrideDiscussionFor')
+    def overrideDiscussionFor(self, content, allowDiscussion):
+        """
+        Override discussability for a per object basis or clear and let the site default
+        override.
+        """
+        if allowDiscussion is None or allowDiscussion == 'None':
+            if hasattr(content, 'allow_discussion'):
+                del content.allow_discussion
+        else:
+            allowDiscussion = int(allowDiscussion)
+            if hasattr(content, 'allow_discussion'):
+                content.allow_discussion = allowDiscussion
+            else:
+                content.manage_addProperty('allow_discussion', allowDiscussion, 'boolean')
+
     security.declarePublic( 'getDiscussionFor' )
     def getDiscussionFor(self, content):
         """

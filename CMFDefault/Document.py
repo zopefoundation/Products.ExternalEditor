@@ -182,7 +182,6 @@ class Document(PortalContent, DefaultDublinCoreImpl):
         disables header processing
         """
         self.failIfLocked()
-
         if text_format == 'structured-text' and FIRST_LINE_COLON.match( text ):
             # WAAAA! Inject line to disable header munging.
             text = '\n%s' % text
