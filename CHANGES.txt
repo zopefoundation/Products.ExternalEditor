@@ -32,6 +32,8 @@ Future
 
   Bug Fixes
 
+    - Fixed incorrect security declaration in File.py (Collector #91).
+
     - Multimodule checkin to convert calls from user.getUserName() to
       user.getId() where appropriate.  User names should not be used
       as immutable references, while user ids should.  The distinction
