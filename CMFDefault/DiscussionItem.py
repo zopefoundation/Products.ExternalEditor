@@ -287,7 +287,7 @@ class DiscussionItemContainer( Persistent, Implicit, Traversable ):
         """ Remove a reply from this container """
         if self._container.has_key( reply_id ):
             reply = self._container.get( reply_id ).__of__( self )
-            my_replies = reply.getReplies()
+            my_replies = reply.talkback.getReplies()
             for my_reply in my_replies:
                 my_reply_id = my_reply.getId()
                 if hasattr( my_reply, 'unindexObject' ):

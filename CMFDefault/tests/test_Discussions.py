@@ -127,7 +127,7 @@ class DiscussionTests( SecurityTest ):
         assert len( parents ) == 1
         assert parents[ 0 ] == reply1
 
-    def test_itemCatloguing( self ):
+    def test_itemCataloguing( self ):
 
         test = self.root.test
         catalog = self.catalog_tool._catalog
@@ -171,6 +171,32 @@ class DiscussionTests( SecurityTest ):
                             )
         self.root._delObject( 'test' )
         assert len( self.catalog_tool ) == 0
+
+    def test_deleteReplies(self):
+        test = self.root.test
+        test.allow_discussion = 1
+
+        talkback = self.discussion_tool.getDiscussionFor(test)
+        id1 = talkback.createReply(title='test1', text='blah')
+        reply1 = talkback.getReply(id1)
+        talkback1 = self.discussion_tool.getDiscussionFor(reply1)
+        id2 = talkback1.createReply(title='test2', text='blah')
+        reply2 = talkback1.getReply(id2)
+        talkback2 = self.discussion_tool.getDiscussionFor(reply2)
+        id3 = talkback2.createReply(title='test3', text='blah')
+        reply3 = talkback.getReply(id3)
+        talkback3 = self.discussion_tool.getDiscussionFor(reply3)
+        self.assertEqual(len(talkback.getReplies()), 1)
+        self.assertEqual(len(talkback1.getReplies()), 1)
+        self.assertEqual(len(talkback2.getReplies()), 1)
+        self.assertEqual(len(talkback3.getReplies()), 0)
+
+        talkback.deleteReply(id2)
+        self.assertEqual(len(talkback.getReplies()), 1)
+        reply1 = talkback.getReply(id1)
+        talkback1 = self.discussion_tool.getDiscussionFor(reply1)
+        self.assertEqual(len(talkback.getReplies()), 1)
+        self.assertEqual(len(talkback1.getReplies()), 0)
 
 def test_suite():
     return TestSuite((

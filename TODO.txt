@@ -120,7 +120,7 @@ CMF TODO's
 
         (x) Tracker #507:  Link inconsistent on empty remote_url
 
-        ( ) Tracker #513:  deleteReply is genocidal
+        (x) Tracker #513:  deleteReply is genocidal
 
         ( ) Tracker #515:  Improper default button for discussion reply
 
