@@ -25,6 +25,7 @@ from permissions import AccessContentsInformation
 from permissions import ManagePortal
 from permissions import ModifyPortalContent
 from utils import _dtmldir
+from utils import _getAuthenticatedUser
 from utils import getToolByName
 
 from interfaces.IOpaqueItems import ICallableOpaqueItem
@@ -174,6 +175,14 @@ class CMFCatalogAware(Base):
         """
         self.notifyWorkflowCreated()
         self.__recurse('manage_afterClone', item)
+
+        # Make sure owner local role is set after pasting
+        # The standard Zope mechanisms take care of executable ownership
+        current_user = _getAuthenticatedUser(self)
+        if current_user is not None:
+            local_role_holders = [x[0] for x in self.get_local_roles()]
+            self.manage_delLocalRoles(local_role_holders)
+            self.manage_setLocalRoles(current_user.getId(), ['Owner'])
 
     def manage_beforeDelete(self, item, container):
         """
