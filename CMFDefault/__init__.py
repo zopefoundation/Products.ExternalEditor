@@ -88,7 +88,13 @@
 ADD_CONTENT_PERMISSION = 'Add portal content'
  
 import Portal
-import Document, Link, NewsItem, File, Image, Favorite, SkinnedFolder
+import Document, Link, NewsItem, File, Image, Favorite
+try:
+    import SkinnedFolder
+    HAS_SKINNED_FOLDER=1
+except ImportError:
+    HAS_SKINNED_FOLDER=0
+
 import Discussions, DiscussionItem
 import PropertiesTool, MembershipTool, MetadataTool
 import RegistrationTool, URLTool, DublinCore, DiscussionTool
@@ -134,8 +140,10 @@ contentClasses = ( Document.Document
                  , Link.Link
                  , Favorite.Favorite
                  , NewsItem.NewsItem
-                 , SkinnedFolder.SkinnedFolder
                  )
+
+if HAS_SKINNED_FOLDER:
+    contentClasses = contentClasses + ( SkinnedFolder.SkinnedFolder, )
 
 contentConstructors = ( Document.addDocument
                         , File.addFile
@@ -193,14 +201,6 @@ def initialize( context ):
                           icon='portal.gif')
     utils.registerIcon(DefaultWorkflow.DefaultWorkflowDefinition,
                        'images/workflow.gif', globals())
-
-    reg = Products.CMFCore.PortalFolder.addPortalTypeHandler
-    reg( 'text/html', Document.Document )
-    reg( 'text/plain', Document.Document )
-    reg( 'image/png', Image.Image )
-    reg( 'image/gif', Image.Image )
-    reg( 'image/jpeg', Image.Image )
-    reg( 'image/unknown', Image.Image )
 
     context.registerHelp()
     context.registerHelpTitle('CMF Default Help')
