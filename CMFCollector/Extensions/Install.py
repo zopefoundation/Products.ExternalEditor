@@ -36,7 +36,7 @@ import string
 
 INVISIBLE_TYPES = ('Collector Issue', 'Collector Issue Transcript')
 
-def install_collector(self):
+def install(self):
     " Register the Collector with portal_types and friends "
     out = StringIO()
     types_tool = getToolByName(self, 'portal_types')
