@@ -102,6 +102,8 @@ class MetadataElementPolicy( Persistent ):
     """
         Represent a type-specific policy about a particular DCMI element.
     """
+
+    security = ClassSecurityInfo()
     #
     #   Default values.
     #
@@ -117,6 +119,7 @@ class MetadataElementPolicy( Persistent ):
     #
     #   Mutator.
     #
+    security.declareProtected( CMFCorePermissions.ManagePortal , 'edit' )
     def edit( self
             , is_required
             , supply_default
@@ -133,39 +136,47 @@ class MetadataElementPolicy( Persistent ):
     #
     #   Query interface
     #
+    security.declareProtected( CMFCorePermissions.View , 'isMultiValued' )
     def isMultiValued( self ):
         """
             Can this element hold multiple values?
         """
         return self.is_multi_valued
 
+    security.declareProtected( CMFCorePermissions.View , 'isRequired' )
     def isRequired( self ):
         """
             Must this element be supplied?
         """
         return self.is_required
     
+    security.declareProtected( CMFCorePermissions.View , 'supplyDefault' )
     def supplyDefault( self ):
         """
             Should the tool supply a default?
         """
         return self.supply_default
 
+    security.declareProtected( CMFCorePermissions.View , 'defaultValue' )
     def defaultValue( self ):
         """
             If so, what is the default?
         """
         return self.default_value
 
+    security.declareProtected( CMFCorePermissions.View , 'enforceVocabulary' )
     def enforceVocabulary( self ):
         """
         """
         return self.enforce_vocabulary
 
+    security.declareProtected( CMFCorePermissions.View , 'allowedVocabulary' )
     def allowedVocabulary( self ):
         """
         """
         return self.allowed_vocabulary
+
+InitializeClass( MetadataElementPolicy )
 
 
 DEFAULT_ELEMENT_SPECS = ( ( 'Title', 0 )
@@ -180,6 +191,8 @@ class ElementSpec( Persistent ):
     """
         Represent all the tool knows about a single metadata element.
     """
+    security = ClassSecurityInfo()
+
     #
     #   Default values.
     #
@@ -191,15 +204,18 @@ class ElementSpec( Persistent ):
         self.policies[ None ] = self._makePolicy()  # set default policy
         
     
+    security.declarePrivate( '_makePolicy' )
     def _makePolicy( self ):
         return MetadataElementPolicy( self.is_multi_valued )
 
+    security.declareProtected( CMFCorePermissions.View , 'isMultiValued' )
     def isMultiValued( self ):
         """
             Is this element multi-valued?
         """
         return self.is_multi_valued
 
+    security.declareProtected( CMFCorePermissions.View , 'getPolicy' )
     def getPolicy( self, typ=None ):
         """
             Find the policy this element for objects whose type
@@ -210,12 +226,14 @@ class ElementSpec( Persistent ):
         except KeyError:
             return self.policies[ None ]
 
+    security.declareProtected( CMFCorePermissions.View , 'listPolicies' )
     def listPolicies( self ):
         """
             Return a list of all policies for this element.
         """
         return self.policies.items()
 
+    security.declareProtected( CMFCorePermissions.ManagePortal , 'addPolicy' )
     def addPolicy( self, typ ):
         """
             Add a policy to this element for objects whose type
@@ -229,6 +247,7 @@ class ElementSpec( Persistent ):
 
         self.policies[ typ ] = self._makePolicy()
 
+    security.declareProtected( CMFCorePermissions.ManagePortal, 'removePolicy' )
     def removePolicy( self, typ ):
         """
             Remove the policy from this element for objects whose type
@@ -237,6 +256,8 @@ class ElementSpec( Persistent ):
         if typ is None:
             raise MetadataError, "Can't remove default policy."
         del self.policies[ typ ]
+
+InitializeClass( ElementSpec )
 
 class MetadataError( Exception ):
     pass
@@ -338,7 +359,7 @@ class MetadataTool( UniqueObject, SimpleItem ):
                         , default_value
                         , enforce_vocabulary
                         , allowed_vocabulary
-                        , REQUEST
+                        , REQUEST=None
                         ):
         """
             Add a type-specific policy for one of our elements.
@@ -367,7 +388,7 @@ class MetadataTool( UniqueObject, SimpleItem ):
     def removeElementPolicy( self
                            , element
                            , content_type
-                           , REQUEST
+                           , REQUEST=None
                            ):
         """
             Remvoe a type-specific policy for one of our elements.
@@ -459,7 +480,7 @@ class MetadataTool( UniqueObject, SimpleItem ):
         """
         del self.element_specs[ element ]
 
-    security.declareProtected( 'listPolicies' )
+    security.declareProtected( CMFCorePermissions.ManagePortal, 'listPolicies' )
     def listPolicies( self, typ=None ):
         """
             Show all policies for a given content type, or the default
