@@ -67,7 +67,7 @@ class ActionsToolTests( SecurityRequestTest ):
         root = self.root
         tool = self.tool
         root._setObject('portal_registration', RegistrationTool())
-        self.tool.action_providers = ('portal_actions','portal_registration')
+        self.tool.action_providers = ('portal_actions',)
         self.assertEqual(tool.listFilteredActionsFor(root.portal_registration),
                          {'workflow': [],
                           'user': [],
