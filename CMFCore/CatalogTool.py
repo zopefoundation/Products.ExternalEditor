@@ -256,9 +256,6 @@ class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
         to update (all of them by default).
         '''
         url = self.__url(object)
-        ## Zope 2.3 ZCatalog is supposed to work better if
-        ## you don't uncatalog_object() when reindexing.
-        # self.uncatalog_object(url)
         if idxs != []:
             # Filter out invalid indexes.
             valid_indexes = self._catalog.indexes.keys()
