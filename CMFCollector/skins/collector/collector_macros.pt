@@ -43,8 +43,6 @@
     <div metal:define-macro="issue_header"
          tal:define="global collector_issue_header_present python: 1;
                      TITLELEN python: 45;
-                     crdate python: here.creation_date;
-                     DateTime nocall: modules/DateTime/DateTime;
                      split nocall: modules/string/split;
                      TRUNCDESCR python: 150;
                      global artifacts
@@ -92,8 +90,9 @@
                 </span>
            </td>
 
-           <td align="right"> Security related: </td>
+           <td align="right"> Security </td> 
            <td metal:define-slot="issue_security_slot">
+             related:
              <span tal:condition="not: here/security_related">
                No
              </span>
@@ -125,7 +124,42 @@
          </tr>
 
          <tr>
-           <td align="right">Topic/Class:</td>
+           <td align="right">From:</td>
+           <td NOWRAP>
+              <span tal:content="here/submitter_name">NAME</span>
+           </td>
+           <td align="right"> on: </td>
+           <td NOWRAP>
+             <code>
+               <span tal:replace="python: here.aCompact(here.creation_date)">
+                 CREATIONDATE
+               </span>
+             </code>
+           </td>
+         </tr>
+
+         <tr>
+           <td> </td>
+           <td>
+             (<em><span tal:content="here/submitter_id">ID</span></em>)
+           </td>
+           <td tal:define="actions here/action_number" align="right">
+             Last update:
+           </td>
+           <td>
+             <code>
+               <span tal:condition="python: actions <= 1">~</span>
+               <span tal:condition="python: actions > 1"
+                     tal:replace="python:
+                                  here.aCompact(here.modified())">
+                 MODDATE
+               </span>
+             </code>
+           </td>
+         </tr>
+
+         <tr>
+           <td align="right">Topic/class:</td>
            <td> <strong>
            <span metal:define-slot="issue_topic_slot"
                  tal:replace="here/topic">
@@ -134,62 +168,21 @@
             >CLASSIFICATION</span>
              </strong>
            </td>
-           <td align="right">From:</td>
-           <td>
-              <span tal:content="here/submitter_name">NAME</span>
-              (<em><span tal:content="here/submitter_id">ID</span></em>)
-         </tr>
-
-         <tr>
-           <td align="right"> Importance: </td>
+           <td align="right"> Importance:
+           </td>
            <td metal:define-slot="issue_importance_slot">
-             <span tal:replace="python: here.importance.capitalize()">
+             <span tal:replace="here/importance">
                IMPORTANCE
              </span>
            </td>
-
-           <td align="right"> on: </td>
-           <td>
-             <code>
-               <span tal:replace="python: crdate.aCommon()">
-                 CREATIONDATE
-               </span>
-             </code>
-           </td>
          </tr>
 
          <tr>
-           <td align="right"> Severity: </td>
-           <td metal:define-slot="issue_severity_slot">
-             <span tal:replace="python: here.severity.capitalize()">
-               SEVERITY
-             </span>
-           </td>
-
-           <td align="right">Last update:</td>
-           <td tal:define="actions here/action_number">
-             <code>
-               <span tal:condition="python: actions <= 1">~</span>
-               <span tal:condition="python: actions > 1"
-                     tal:replace="python: 
-                                  DateTime(here.ModificationDate()).aCommon()">
-                 MODDATE
-               </span>
-             </code>
-           </td>
-         </tr>
-
-         <tr>
-           <td align="right">Versions:</td>
-           <td metal:define-slot="issue_version_slot">
-               <span tal:content="here/reported_version">VERSION
-               </span>
-           </td>
-
-           <td metal:define-slot="issue_other_versions_slot"
-               colspan="2"
-               tal:content="here/other_version_info">
-             OTHER_VERSION_INFO
+           <td align="right"> Version info: </td>
+           <td metal:define-slot="issue_version_info_slot"
+               colspan="3"
+               tal:content="here/version_info">
+             VERSION_INFO
            </td>
          </tr>
 
