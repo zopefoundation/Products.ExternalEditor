@@ -430,15 +430,15 @@ class ImportStepRegistryTests( BaseRegistryTests
         self.assertEqual( len( incomplete ), 1 )
         self.failUnless( ( 'two', 'four' ) in incomplete )
 
-    def test_export_empty( self ):
+    def test_generateXML_empty( self ):
 
         registry = self._makeOne().__of__( self.root )
 
-        xml = registry.exportAsXML()
+        xml = registry.generateXML()
 
-        self._compareDOM( registry.exportAsXML(), _EMPTY_IMPORT_XML )
+        self._compareDOM( registry.generateXML(), _EMPTY_IMPORT_XML )
 
-    def test_export_single( self ):
+    def test_generateXML_single( self ):
 
         registry = self._makeOne().__of__( self.root )
 
@@ -450,9 +450,9 @@ class ImportStepRegistryTests( BaseRegistryTests
                              , description='One small step'
                              )
 
-        self._compareDOM( registry.exportAsXML(), _SINGLE_IMPORT_XML )
+        self._compareDOM( registry.generateXML(), _SINGLE_IMPORT_XML )
 
-    def test_export_ordered( self ):
+    def test_generateXML_ordered( self ):
 
         registry = self._makeOne().__of__( self.root )
 
@@ -480,9 +480,9 @@ class ImportStepRegistryTests( BaseRegistryTests
                              , description='Gimme three steps'
                              )
 
-        self._compareDOM( registry.exportAsXML(), _ORDERED_IMPORT_XML )
+        self._compareDOM( registry.generateXML(), _ORDERED_IMPORT_XML )
 
-    def test_import_empty( self ):
+    def test_parseXML_empty( self ):
 
         registry = self._makeOne().__of__( self.root )
 
@@ -493,13 +493,13 @@ class ImportStepRegistryTests( BaseRegistryTests
                              , description='One small step'
                              )
 
-        registry.importFromXML( _EMPTY_IMPORT_XML )
+        registry.parseXML( _EMPTY_IMPORT_XML )
 
         self.assertEqual( len( registry.listSteps() ), 0 )
         self.assertEqual( len( registry.listStepMetadata() ), 0 )
         self.assertEqual( len( registry.sortSteps() ), 0 )
 
-    def test_import_single( self ):
+    def test_parseXML_single( self ):
 
         registry = self._makeOne().__of__( self.root )
 
@@ -511,7 +511,7 @@ class ImportStepRegistryTests( BaseRegistryTests
                              , description='Texas two step'
                              )
 
-        registry.importFromXML( _SINGLE_IMPORT_XML )
+        registry.parseXML( _SINGLE_IMPORT_XML )
 
         self.assertEqual( len( registry.listSteps() ), 1 )
         self.failUnless( 'one' in registry.listSteps() )
@@ -524,11 +524,11 @@ class ImportStepRegistryTests( BaseRegistryTests
         self.assertEqual( info[ 'title' ], 'One Step' )
         self.failUnless( 'One small step' in info[ 'description' ] )
 
-    def test_import_ordered( self ):
+    def test_parseXML_ordered( self ):
 
         registry = self._makeOne().__of__( self.root )
 
-        registry.importFromXML( _ORDERED_IMPORT_XML )
+        registry.parseXML( _ORDERED_IMPORT_XML )
 
         self.assertEqual( len( registry.listSteps() ), 3 )
         self.failUnless( 'one' in registry.listSteps() )
@@ -687,75 +687,75 @@ class ExportStepRegistryTests( BaseRegistryTests
         registry.registerStep( 'one', ONE_FUNC )
         self.assertRaises( KeyError, registry.registerStep, 'one', TWO_FUNC )
 
-    def test_export_empty( self ):
+    def test_generateXML_empty( self ):
 
         registry = self._makeOne().__of__( self.root )
 
-        xml = registry.exportAsXML()
+        xml = registry.generateXML()
 
-        self._compareDOM( registry.exportAsXML(), _EMPTY_EXPORT_XML )
+        self._compareDOM( registry.generateXML(), _EMPTY_EXPORT_XML )
 
-    def test_export_single( self ):
-
-        registry = self._makeOne().__of__( self.root )
-
-        registry.registerStep( id='one'
-                               , handler=ONE_FUNC
-                               , title='One Step'
-                               , description='One small step'
-                               )
-
-        self._compareDOM( registry.exportAsXML(), _SINGLE_EXPORT_XML )
-
-    def test_export_ordered( self ):
+    def test_generateXML_single( self ):
 
         registry = self._makeOne().__of__( self.root )
 
         registry.registerStep( id='one'
-                               , handler=ONE_FUNC
-                               , title='One Step'
-                               , description='One small step'
-                               )
+                             , handler=ONE_FUNC
+                             , title='One Step'
+                             , description='One small step'
+                             )
+
+        self._compareDOM( registry.generateXML(), _SINGLE_EXPORT_XML )
+
+    def test_generateXML_ordered( self ):
+
+        registry = self._makeOne().__of__( self.root )
+
+        registry.registerStep( id='one'
+                             , handler=ONE_FUNC
+                             , title='One Step'
+                             , description='One small step'
+                             )
 
         registry.registerStep( id='two'
-                               , handler=TWO_FUNC
-                               , title='Two Steps'
-                               , description='Texas two step'
-                               )
+                             , handler=TWO_FUNC
+                             , title='Two Steps'
+                             , description='Texas two step'
+                             )
 
         registry.registerStep( id='three'
-                               , handler=THREE_FUNC
-                               , title='Three Steps'
-                               , description='Gimme three steps'
-                               )
+                             , handler=THREE_FUNC
+                             , title='Three Steps'
+                             , description='Gimme three steps'
+                             )
 
-        self._compareDOM( registry.exportAsXML(), _ORDERED_EXPORT_XML )
+        self._compareDOM( registry.generateXML(), _ORDERED_EXPORT_XML )
 
-    def test_import_empty( self ):
+    def test_parseXML_empty( self ):
 
         registry = self._makeOne().__of__( self.root )
 
         registry.registerStep( id='one'
-                               , handler=ONE_FUNC
-                               , description='One small step'
-                               )
+                             , handler=ONE_FUNC
+                             , description='One small step'
+                             )
 
-        registry.importFromXML( _EMPTY_EXPORT_XML )
+        registry.parseXML( _EMPTY_EXPORT_XML )
 
         self.assertEqual( len( registry.listSteps() ), 0 )
         self.assertEqual( len( registry.listStepMetadata() ), 0 )
 
-    def test_import_single( self ):
+    def test_parseXML_single( self ):
 
         registry = self._makeOne().__of__( self.root )
 
         registry.registerStep( id='two'
-                               , handler=TWO_FUNC
-                               , title='Two Steps'
-                               , description='Texas two step'
-                               )
+                             , handler=TWO_FUNC
+                             , title='Two Steps'
+                             , description='Texas two step'
+                             )
 
-        registry.importFromXML( _SINGLE_EXPORT_XML )
+        registry.parseXML( _SINGLE_EXPORT_XML )
 
         self.assertEqual( len( registry.listSteps() ), 1 )
         self.failUnless( 'one' in registry.listSteps() )
@@ -766,11 +766,32 @@ class ExportStepRegistryTests( BaseRegistryTests
         self.assertEqual( info[ 'title' ], 'One Step' )
         self.failUnless( 'One small step' in info[ 'description' ] )
 
-    def test_import_ordered( self ):
+    def test_parseXML_single_as_ascii( self ):
 
         registry = self._makeOne().__of__( self.root )
 
-        registry.importFromXML( _ORDERED_EXPORT_XML )
+        registry.registerStep( id='two'
+                             , handler=TWO_FUNC
+                             , title='Two Steps'
+                             , description='Texas two step'
+                             )
+
+        registry.parseXML( _SINGLE_EXPORT_XML, encoding='ascii' )
+
+        self.assertEqual( len( registry.listSteps() ), 1 )
+        self.failUnless( 'one' in registry.listSteps() )
+
+        info = registry.getStepMetadata( 'one' )
+        self.assertEqual( info[ 'id' ], 'one' )
+        self.assertEqual( info[ 'handler' ], ONE_FUNC_NAME )
+        self.assertEqual( info[ 'title' ], 'One Step' )
+        self.failUnless( 'One small step' in info[ 'description' ] )
+
+    def test_parseXML_ordered( self ):
+
+        registry = self._makeOne().__of__( self.root )
+
+        registry.parseXML( _ORDERED_EXPORT_XML )
 
         self.assertEqual( len( registry.listSteps() ), 3 )
         self.failUnless( 'one' in registry.listSteps() )

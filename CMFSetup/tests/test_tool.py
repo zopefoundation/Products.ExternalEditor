@@ -184,6 +184,28 @@ class SetupToolTests( FilesystemTestBase
                         , 'Products.CMFSetup.tests.common.dummy_handler' )
         self.assertEqual( export_registry.getStep( 'one' ), dummy_handler )
 
+    def test_setProfileDirectory_relative_encode_as_ascii( self ):
+
+        import Products.CMFSetup
+        from common import dummy_handler
+
+        _PATH = 'tests/default_profile'
+        _PRODUCT_PATH = os.path.split( Products.CMFSetup.__file__ )[0]
+        _FQPATH = os.path.join( _PRODUCT_PATH, _PATH )
+
+        tool = self._makeOne()
+        tool.setProfileDirectory( _PATH, 'CMFSetup', encoding='ascii' )
+
+        import_registry = tool.getImportStepRegistry()
+        self.assertEqual( len( import_registry.listSteps() ), 1 )
+        self.failUnless( 'one' in import_registry.listSteps() )
+        self.assertEqual( import_registry.getStep( 'one' ), dummy_handler )
+
+        export_registry = tool.getExportStepRegistry()
+        self.assertEqual( len( export_registry.listSteps() ), 1 )
+        self.failUnless( 'one' in import_registry.listSteps() )
+        self.assertEqual( export_registry.getStep( 'one' ), dummy_handler )
+
     def test_setProfileDirectory_relative_invalid_product( self ):
 
         _PATH = 'tests/default_profile'

@@ -105,8 +105,8 @@ class ImportStepRegistry( Implicit ):
         step_ids.sort()
         return [ self.getStepMetadata( x ) for x in step_ids ]
 
-    security.declareProtected( ManagePortal, 'exportAsXML' )
-    def exportAsXML( self ):
+    security.declareProtected( ManagePortal, 'generateXML' )
+    def generateXML( self ):
 
         """ Return a round-trippable XML representation of the registry.
 
@@ -190,8 +190,8 @@ class ImportStepRegistry( Implicit ):
 
         self._registered[ id ] = info
 
-    security.declarePrivate( 'importFromXML' )
-    def importFromXML( self, text, encoding=None ):
+    security.declarePrivate( 'parseXML' )
+    def parseXML( self, text, encoding=None ):
 
         """ Parse 'text' into a clean registry.
         """
@@ -375,8 +375,8 @@ class ExportStepRegistry( Implicit ):
         step_ids.sort()
         return [ self.getStepMetadata( x ) for x in step_ids ]
 
-    security.declareProtected( ManagePortal, 'exportAsXML' )
-    def exportAsXML( self ):
+    security.declareProtected( ManagePortal, 'generateXML' )
+    def generateXML( self ):
 
         """ Return a round-trippable XML representation of the registry.
 
@@ -436,8 +436,8 @@ class ExportStepRegistry( Implicit ):
 
         self._registered[ id ] = info
 
-    security.declarePrivate( 'importFromXML' )
-    def importFromXML( self, text, encoding=None ):
+    security.declarePrivate( 'parseXML' )
+    def parseXML( self, text, encoding=None ):
 
         """ Parse 'text' into a clean registry.
         """

@@ -125,16 +125,17 @@ class DummyExportContext:
 
 class DummyImportContext:
 
-    def __init__( self, site, purge=True ):
+    def __init__( self, site, purge=True, encoding=None ):
         self._site = site
         self._purge = purge
+        self._encoding = encoding
         self._files = {}
 
     def getSite( self ):
         return self._site
 
     def getEncoding( self ):
-        return None
+        return self._encoding
 
     def readDataFile( self, filename, subdir=None ):
 

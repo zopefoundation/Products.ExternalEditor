@@ -718,6 +718,43 @@ class Test_importRolemap( BaseRegistryTests ):
         self.failIf( site.acquiredRolesAreUsedBy( ACI ) )
         self.failIf( site.acquiredRolesAreUsedBy( VIEW ) )
 
+    def test_unacquired_permission_added_role_skip_purge_encode_ascii( self ):
+
+        ACI = 'Access contents information'
+        VIEW = 'View'
+
+        self.root.site = Folder( id='site' )
+        site = self.root.site
+        site.manage_permission( VIEW, () )
+
+        existing_allowed = [ x[ 'name' ]
+                                for x in site.rolesOfPermission( ACI )
+                                if x[ 'selected' ] ]
+
+        self.assertEqual( existing_allowed, [ 'Manager' ] )
+    
+        self.failUnless( site.acquiredRolesAreUsedBy( ACI ) )
+        self.failIf( site.acquiredRolesAreUsedBy( VIEW ) )
+
+        self.failIf( site._has_user_defined_role( 'ZZZ' ) )
+
+        context = DummyImportContext( site, False, encoding='ascii' )
+        context._files[ 'rolemap.xml' ] = _COMBINED_EXPORT
+
+        from Products.CMFSetup.rolemap import importRolemap
+        importRolemap( context )
+
+        self.failUnless( site._has_user_defined_role( 'ZZZ' ) )
+
+        new_allowed = [ x[ 'name' ]
+                           for x in site.rolesOfPermission( ACI )
+                           if x[ 'selected' ] ]
+
+        self.assertEqual( new_allowed, [ 'Manager', 'Owner', 'ZZZ' ] )
+    
+        self.failIf( site.acquiredRolesAreUsedBy( ACI ) )
+        self.failIf( site.acquiredRolesAreUsedBy( VIEW ) )
+
 
 def test_suite():
     return unittest.TestSuite((

@@ -155,14 +155,14 @@ class IStepRegistry( Interface ):
         o The 'handler' metadata is available via 'getStep'.
         """
 
-    def exportAsXML():
+    def generateXML():
 
         """ Return a round-trippable XML representation of the registry.
 
         o 'handler' values are serialized using their dotted names.
         """
 
-    def importFromXML( text ):
+    def parseXML( text ):
 
         """ Parse 'text' into a clean registry.
         """

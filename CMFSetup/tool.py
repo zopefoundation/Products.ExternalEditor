@@ -71,7 +71,7 @@ class SetupTool( UniqueObject, Folder ):
                )
 
     security.declareProtected( ManagePortal, 'setProfileDirectory' )
-    def setProfileDirectory( self, path, product_name=None ):
+    def setProfileDirectory( self, path, product_name=None, encoding=None ):
 
         """ See ISetupTool.
         """
@@ -96,8 +96,8 @@ class SetupTool( UniqueObject, Folder ):
         self._profile_directory = path
         self._product_name = product_name
 
-        self._updateImportStepsRegistry()
-        self._updateExportStepsRegistry()
+        self._updateImportStepsRegistry( encoding )
+        self._updateExportStepsRegistry( encoding )
     
     security.declareProtected( ManagePortal, 'getImportStepRegistry' )
     def getImportStepRegistry( self ):
@@ -403,7 +403,7 @@ class SetupTool( UniqueObject, Folder ):
         return self._profile_directory
 
     security.declarePrivate( '_updateImportStepsRegistry' )
-    def _updateImportStepsRegistry( self ):
+    def _updateImportStepsRegistry( self, encoding ):
 
         """ Update our import steps registry from our profile.
         """
@@ -413,10 +413,10 @@ class SetupTool( UniqueObject, Folder ):
         xml = f.read()
         f.close()
 
-        self._import_registry.importFromXML( xml )
+        self._import_registry.parseXML( xml, encoding )
 
     security.declarePrivate( '_updateExportStepsRegistry' )
-    def _updateExportStepsRegistry( self ):
+    def _updateExportStepsRegistry( self, encoding ):
 
         """ Update our export steps registry from our profile.
         """
@@ -426,7 +426,7 @@ class SetupTool( UniqueObject, Folder ):
         xml = f.read()
         f.close()
 
-        self._export_registry.importFromXML( xml )
+        self._export_registry.parseXML( xml, encoding )
 
     security.declarePrivate( '_doRunImportStep' )
     def _doRunImportStep( self, step_id, context ):
@@ -474,10 +474,10 @@ def exportStepRegistries( context ):
     site = context.getSite()
     tool = getToolByName( site, 'portal_setup' )
 
-    import_steps_xml = tool.getImportStepRegistry().exportAsXML()
+    import_steps_xml = tool.getImportStepRegistry().generateXML()
     context.writeDataFile( 'import_steps.xml', import_steps_xml, 'text/xml' )
 
-    export_steps_xml = tool.getExportStepRegistry().exportAsXML()
+    export_steps_xml = tool.getExportStepRegistry().generateXML()
     context.writeDataFile( 'export_steps.xml', export_steps_xml, 'text/xml' )
 
     return 'Step registries exported'

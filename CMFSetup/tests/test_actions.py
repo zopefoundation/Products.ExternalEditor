@@ -216,6 +216,7 @@ _NORMAL_EXPORT = """\
 </actions-tool>
 """
 
+
 class Test_exportActionProviders( BaseRegistryTests
                                 , _ActionSetup
                                 ):
@@ -324,6 +325,26 @@ class Test_importActionProviders( BaseRegistryTests
         self.failUnless( 'portal_actions' in atool.listActionProviders() )
 
         context = DummyImportContext( site )
+        context._files[ 'actions.xml' ] = _NORMAL_EXPORT
+
+        from Products.CMFSetup.actions import importActionProviders
+        importActionProviders( context )
+
+        self.assertEqual( len( atool.listActionProviders() ), 3 )
+        self.failUnless( 'portal_foo' in atool.listActionProviders() )
+        self.failUnless( foo.listActions() )
+        self.failUnless( 'portal_bar' in atool.listActionProviders() )
+        self.failUnless( bar.listActions() )
+        self.failUnless( 'portal_actions' in atool.listActionProviders() )
+
+    def test_normal_encode_as_ascii( self ):
+
+        site = self._initSite( 1, 1 )
+        atool = site.portal_actions
+        foo = site.portal_foo
+        bar = site.portal_bar
+
+        context = DummyImportContext( site, encoding='ascii' )
         context._files[ 'actions.xml' ] = _NORMAL_EXPORT
 
         from Products.CMFSetup.actions import importActionProviders
