@@ -19,10 +19,12 @@ from sys import modules
 
 from Products.CMFCore import utils
 
+import UniqueIdAnnotationTool
 import UniqueIdGeneratorTool
 import UniqueIdHandlerTool
 
 tools = (
+    UniqueIdAnnotationTool.UniqueIdAnnotationTool,
     UniqueIdGeneratorTool.UniqueIdGeneratorTool,
     UniqueIdHandlerTool.UniqueIdHandlerTool,
 )
