@@ -20,39 +20,40 @@
 <div metal:fill-slot="main">
 
   <form method="POST" enctype="multipart/form-data"
-        action="collector_issue_followup"
-        tal:define="actionsd python:
-                             here.portal_actions.listFilteredActionsFor(here);
-                    wf_actions python:
-                               [i['name'] for i in actionsd['workflow']]">
+        action="collector_issue_followup">
 
     <table>
 
       <tr>
         <th align="left">
-          Followup
+          <font size="+1"> Followup </font>
         </th>
         <td align="center">
           Click <a href="QUALIFIED" 
                    tal:attributes="href python: request.URL + '?do_cite=1'">
-                here</a> for a copy of the transcript as cited text.
+                here</a> to cite the existing transcript text.
         </td>
       </tr>
 
       <tr>
-        <td colspan="2">
-          <strong> Action: </strong>
-          <input type="radio" name="action" value="comment" CHECKED>
-          Comment &nbsp;
-          <span tal:repeat="action python:
-                                  ['Accept', 'Resolve', 'Reject', 'Defer',
-                                   'Declassify', 'Classify']">
+        <th align="right"> Action: </th>
+        <td>
+          <input type="radio"
+                 name="action" value="comment" CHECKED>Comment&nbsp;
+          <span tal:repeat="pair here/valid_actions_pairs">
             <input type="radio" name="action" value="VALUE"
-                   tal:attributes="value action"
-                   tal:condition="python: action in wf_actions"
-            ><span tal:replace="action"
-                   tal:condition="python: action in wf_actions">
-            ACTION</span>&nbsp;
+                   tal:attributes="value python: pair[0]"
+            ><span tal:replace="python: pair[1]">ACTION</span
+            ><span tal:condition="python: pair[1] == 'Assign'">:
+             <select name="assignees:list" MULTIPLE size="1">
+                <span tal:repeat="supporter python: here.aq_parent.supporters">
+                  <option tal:content="supporter"
+                          tal:attributes="selected python:
+                                          supporter in here.assigned_to()">
+                  SUPPORTER</option>
+               </span>
+             </select>
+             </span>&nbsp;
           </span>
         </td>
       </tr>
