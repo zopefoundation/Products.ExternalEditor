@@ -1,0 +1,205 @@
+1.1 beta
+
+ New features
+
+  - CMF Document now uses StructuredTextNG for structured text
+    handling.  Nicely enough, it uses the "with images" features, and
+    also enables named and inner links.
+
+  - CMF Document exposes two new accessor methods for getting at the
+    "cooked" and editable body, 'CookedBody()', and 'EditableBody()'.
+    Using the 'cooked_text' and 'text' instance attributes should be
+    considered deprecated.
+
+  - Added new "exemplar" content product, CMFCalendar, which
+    (for now) adds a simple content object, Event.  This product
+    serves a similar didactic purpose as CMFTopic (which is now
+    "in the core"):  it shows how to build new content types as
+    filesystem products.
+
+  - Implemented improved "safety belt" for concurrent Document
+    editing.  See the dogbowl proposal,
+     http://cmf.zope.org/rqmts/proposals/ContentSafetyBelt
+
+  - Added new filesystem-based skin method type, FSSTXMethod, for
+    creating "methods" which render STX.
+
+  - Exposed "controlled vocabulary" for Subject in
+    'metadata_edit_form'.
+
+  - Gave 'portal_skins' tool its own PUT_factory (Tracker #238).
+    Allows site builder to create skin methods via WebDAV/FTP,
+    including ZPT, PythonScripts, etc.
+
+  - Implemented "outbound" segment of the "Syndication tool"
+    proposal, q.v.,
+     http://cmf.zope.org/CMF/Members/andrew/folderRSS
+
+  - Made 'PUT_factory' use new 'content_type_registry' tool.
+
+  - Made 'PUT_factory' use 'invokeFactory', so that objects
+    created via PUT have their 'portal_type' set properly.
+
+  - Added ContentTypeRegistry class and related predicates for
+    mapping PUT requests (name,content_type,body) to type object
+    names.
+
+  - Allowed Reviewers to "retract" published content owned by
+    others.
+
+  - Added "Overview" ZMI view to tools.
+
+  - Added "Dublin Core" ZMI view to PortalContent;  added an
+    editing view for Document and derivatives.
+
+  - Added "drop-in" workflow objects to the WorkflowTool,
+    including the ability to map workflows onto content types.
+
+  - Changed CMFDefault.Portal to install CMF Topic by default
+    when building a new CMF Site.
+
+  - Added a new criteria type, *FriendlyDateCriterion*, to
+    CMFTopic for building queries like 'When effective_date is
+    less than five days old'.
+
+  - Implemented 'portal_metadata' tool.  See the dogbowl
+    proposal,
+    http://cmf.zope.org/rqmts/proposals/completed/metadata_tool. 
+
+  - Extended DirectoryView objects to reload when the directory
+    they represent has changed, if Zope is running in debug mode.
+
+  - Added hooks to CookieCrumbler to permit site managers to
+    customize seting/expiring of the authentication cookie by
+    adding PythonScripts; two default filesystem implementations
+    are in CMFDefault's "control" skin.
+
+  - Extended TypesTool to deal appropriately with DTML factory
+    methods (e.g., for ZClasses).
+
+  - Made FSDTMLMethods searchable from the ZMI (Issue PTK(251)[]).
+
+ Bug Fixes
+
+  - Replaced 'metadata_edit' DTMLMethod with PythonScript.
+
+  - Updated 'metadata_edit' to avoid clearing values not passed
+    in REQUEST (Tracker issue #268).
+
+  - Removed spurious whitespace being added to Subject.
+
+  - Fixed FSPythonScript to open file in text mode, so that
+    Windows verstions with CR don't cause the parser to choke
+    (Tracker #284).
+
+  - Simplified login-disabling logic in CookieCrumbler.
+
+  - Added '<base>' tag to headers of Document, NewsItem, and
+    DiscussionItem so that relative links work properly.
+
+  - Fixed the ActionsTool to suppress adding a trailing '/' to
+    "empty" action URL's.
+
+  - Fixed Document's content type sniffing to deal with odd case
+    in which "entire" HTML document was embedded as an STX
+    example.
+
+  - Replaced literal string permissins with "named permissions",
+    imported from modules in most places. (Please report any
+    which escaped!)
+
+  - Moved 'factory_type_information' registry entries back out
+    to the relevant modules (instead of lumping them in
+    CMFDefault.Portal).
+
+  - Simplified NewsItem to "Document with a twist" (NewsItems now
+    inherit lots of useful behavior from Document.
+
+  - Aliased DublinCore's Format() as 'content_type', so that
+    Zope's WebDAV support will do the Right Thing (TM) when
+    handling a PROPFIND.
+
+  - Suppressed "eager redirect" behavior in CookieCrumbler for
+    FTP or WebDAV (note that WebDAV fix only works for "extra"
+    HTTP methods; GET/PUT/POST still redirect).
+
+  - Made sure to update the catalog when a content object's
+    parent is deleted / moved (Tracker #261).
+
+  - Fixed lossage to File objects when no upload supplied
+    (Tracker issue #271).
+
+  - Fixed "Add to Favorites" when applied to Folders.
+
+  - Suppressed "Members" link in topbar (pointed to 'roster' method)
+    for users who would not be able to see it.
+
+  - Fixed irritating bugs in setting of skin-selection cookie.
+
+  - Removed ugly '_mimetype_registry' hack for 'PUT_factory'.
+
+  - Fixed a bug in CMFDefault.Document with PUT that only affected
+    FTP: when a StructuredText document that contained a full HTML
+    example (complete with <html>, <head>, and <body> tags) in its
+    body, it would pass the "does it smell like HTML" test and throw
+    everything away that wasn't inside the first matching pair of
+    <body> tags it found.  Funnily enough, this bug was exposed when
+    trying to save an article about how to use FTP with Zope and the
+    CMF that contained such an example.
+
+  - Fixed glitch caused by '<dtml-return>' in
+    CMFDefault/skins/control/reconfig.dtml.  Thanks to Hans de Wit
+    <hw@scp.nl> for reporting this!
+
+  - Allowed 'portal_type' to be a method, as well as an attribute
+    (eases ZClass-as-content).
+
+  - Fixed search form to pass 'created' instead of 'date' (probably
+    need 'modified', too);  also, added selection list for 'Subject',
+    and fixed the "Last Month" option value.
+
+  - Fixed non-import in CMFCore/WorkflowCore.py (Tracker issue #239,
+    thanks to 'snej' for the patch).
+
+  - Updated CatalogTool to handle searchable vs. displayable DublinCore
+    dates properly.
+
+  - Replaced usage of .id with .getId() all through the CMF, to
+    conform with the new SimpleItem API. Thanks to Jens Quade
+    <jq@jquade.de> for pointing this out. (Issue PTK(241)[]).
+
+  - Extended 'index_html' to render portal description using STX
+    (Tracker issue #246).
+
+  - Updated CMFDefault skins to use Contentish.getIcon, including
+    the portal catalog. This greatly simplifies using ZClasses as
+    content. In CMFDefault/scripts you will find
+    'convertCatalogGetIconColumn.pys), a Python Script that will
+    convert your existing Catalog to use 'getIcon' instead of
+    'icon' (Issue PTK(244)[]). Also, synched interface definition
+    to show the 'relative_to_portal' argument.
+
+  - Extended 'folder_factories' to filter type objects using
+    'isConstructionAllowed' in 'PortalFolder.allowedContentTypes'
+    (Tracker issue #249).
+
+  - Fixed display of replies on discussion items.
+
+  - Made appropriate use of 'portal_url', instead of BASEPATH
+    ad hockery, in skin methods.
+
+  - Synched interface definition of 'Contentish.getIcon' with
+    reality (documented 'relative' parameter).
+
+  - Fixed "Ever" entry in 'search_form' to use a value safe in
+    timezones east of GMT (Tracker issue #236).
+
+  - Deprecated the CMFDefault.File.download method; it is still
+    available, but is no longer called by the current CMF skin,
+    nor is index_html aliased to it.
+
+    The method was necessary when the "View' method was the
+    default action when calling the URL of the File object, this
+    is no longer the case. The setting of the Content-Disposition
+    header is not needed when using the absolute URL of the
+    object, and causes certain browsers to misbehave.
