@@ -150,6 +150,10 @@ CMFHtmlWithImages = CMFHtmlWithImages()
 class Document(PortalContent, DefaultDublinCoreImpl):
     """ A Document - Handles both StructuredText and HTML """
 
+    __implements__ = ( PortalContent.__implements__
+                     , DefaultDublinCoreImpl.__implements__
+                     )
+
     meta_type = 'Document'
     effective_date = expiration_date = None
     text_format = ''

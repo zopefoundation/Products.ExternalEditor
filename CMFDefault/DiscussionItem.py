@@ -155,6 +155,11 @@ class DiscussionItem( Document
     """
         Class for content which is a response to other content.
     """
+
+    __implements__ = ( PortalContent.__implements__
+                     , DefaultDublinCoreImpl.__implements__
+                     )
+
     meta_type           = 'Discussion Item'
     allow_discussion    = 1
     creator             = 'unknown'

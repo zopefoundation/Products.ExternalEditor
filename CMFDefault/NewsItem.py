@@ -149,6 +149,8 @@ class NewsItem( Document ):
         A News Item
     """
 
+    __implements__ = Document.__implements__  # redundant, but explicit
+
     meta_type='News Item'
 
     security = ClassSecurityInfo()

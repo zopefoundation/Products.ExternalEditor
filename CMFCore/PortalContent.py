@@ -91,6 +91,7 @@ from AccessControl import ClassSecurityInfo, getSecurityManager
 from CMFCorePermissions import AccessContentsInformation, View, \
      ReviewPortalContent, ModifyPortalContent
 import CMFCorePermissions
+from interfaces.Contentish import Contentish
 from DynamicType import DynamicType
 from utils import getToolByName, _checkPermission
 
@@ -107,6 +108,7 @@ class PortalContent(DynamicType, SimpleItem):
         interfaces/DublinCore.py.
     """
 
+    __implements__ = Contentish
     isPortalContent = 1
     _isPortalContent = 1  # More reliable than 'isPortalContent'.
 

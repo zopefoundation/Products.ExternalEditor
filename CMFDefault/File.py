@@ -196,6 +196,10 @@ class File( OFS.Image.File
     # Note that if you use getId() to retrieve an object's ID, you will avoid
     # this problem altogether. getId is the new way, accessing .id is
     # deprecated.
+
+    __implements__ = ( PortalContent.__implements__
+                     , DefaultDublinCoreImpl.__implements__
+                     )
     
     meta_type='Portal File'
     effective_date = expiration_date = None

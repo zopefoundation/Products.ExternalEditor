@@ -88,6 +88,9 @@ from OFS.PropertyManager import PropertyManager
 from DateTime.DateTime import DateTime
 from Acquisition import aq_base
 from Products.CMFCore.WorkflowCore import WorkflowAction
+from Products.CMFCore.interfaces.DublinCore import DublinCore
+from Products.CMFCore.interfaces.DublinCore import CatalogableDublinCore
+from Products.CMFCore.interfaces.DublinCore import MutableDublinCore
 
 from utils import tuplize, _dtmldir, semi_split
 from Globals import InitializeClass, DTMLFile
@@ -99,6 +102,7 @@ class DefaultDublinCoreImpl( PropertyManager ):
     """
         Mix-in class which provides Dublin Core methods
     """
+    __implements__ = DublinCore, CatalogableDublinCore, MutableDublinCore
 
     security = ClassSecurityInfo()
 

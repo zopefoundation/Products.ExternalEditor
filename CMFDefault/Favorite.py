@@ -141,6 +141,8 @@ class Favorite( Link ):
         A Favorite (special kind of Link)
     """
 
+    __implements__ = Link.__implements__ # redundant, but explicit
+
     meta_type='Favorite'
 
     def __init__( self

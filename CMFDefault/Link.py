@@ -145,6 +145,10 @@ class Link( PortalContent
         A Link
     """
 
+    __implements__ = ( PortalContent.__implements__
+                     , DefaultDublinCoreImpl.__implements__
+                     )
+
     meta_type='Link'
     effective_date = expiration_date = None
     _isDiscussable = 1
