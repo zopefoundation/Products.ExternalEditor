@@ -292,6 +292,11 @@ class Collector(SkinnedFolder):
             # Use a new dict, to ensure it's divorced from shared class
             # variable hood.
             se = {}
+            if type(self.state_email) != type({}):
+                # Backwards-compat hack.  Convert back to dictionary...
+                d = {}
+                for k, v in self.state_email.items(): d[k] = v
+                self.state_email = d
             se.update(self.state_email)
             for k, v in state_email.items():
                 current_setting = se.get(k, None)
