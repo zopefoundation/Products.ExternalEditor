@@ -174,7 +174,8 @@ class MembershipTool ( Products.CMFCore.MembershipTool.MembershipTool ):
             f=getattr(members, member_id)
  
             # Grant ownership to Member
-            user = self.__getPUS().getUser(member_id)
+            acl_users = self.__getPUS()
+            user = acl_users.getUser(member_id).__of__(acl_users)
             f.changeOwnership(user)
             f.manage_setLocalRoles(member_id, ['Owner'])
  
