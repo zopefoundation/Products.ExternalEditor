@@ -136,7 +136,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
 
     def edit(self, text_format, text, file=''):
         """
-            Edit the Document
+        Edit the Document
         """
         self.text = text
         headers = {}
@@ -147,14 +147,15 @@ class Document(PortalContent, DefaultDublinCoreImpl):
 
         # Now parse out HTML if its applicable, or the plain text,
         # getting any headers passed along in the document
-        ishtml = (text_format == 'html') or (string.find(text,'</body>') > -1)
+        bodyfound = bodyfinder.search(text)
+        ishtml = (text_format == 'html') or (bodyfound is not None)
         if ishtml:
             parser = SimpleHTMLParser()
             parser.feed(text)
             headers.update(parser.metatags)
             if parser.title: headers['Title'] = parser.title
-            b = bodyfinder.search(text)
-            if b: text = self.text = b.group('bodycontent')
+            if bodyfound:
+                text = self.text = bodyfound.group('bodycontent')
             text_format = self.text_format = 'html'
         else:
             headers, text = parseHeadersBody(text, headers)
@@ -181,6 +182,10 @@ class Document(PortalContent, DefaultDublinCoreImpl):
     edit = WorkflowAction(edit)
 
     def _parse(self):
+        """\
+        If the format is structured text, this method turns our body text
+        into HTML for 'cooked_text', used by the default skins for Document.
+        """
         if self.text_format=='structured-text':
             ct = self._format_text(text=self.text)
             if type(ct) is not type(''):
