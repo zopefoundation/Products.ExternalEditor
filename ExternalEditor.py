@@ -81,12 +81,18 @@ class ExternalEditor(Acquisition.Implicit):
         r.append('url:%s' % ob.absolute_url())
         r.append('meta_type:%s' % ob.meta_type)
         
+        title = getattr(Acquisition.aq_base(ob), 'title', None)
+        if title is not None:
+            if callable(title):
+                title = title()
+            r.append('title:%s' % title)
+                
         if hasattr(Acquisition.aq_base(ob), 'content_type'):
             if callable(ob.content_type):
                 r.append('content_type:%s' % ob.content_type())
             else:
                 r.append('content_type:%s' % ob.content_type)
-                
+
         if REQUEST._auth:
             if REQUEST._auth[-1] == '\n':
                 auth = REQUEST._auth[:-1]
