@@ -212,9 +212,9 @@ class Event(PortalContent, DefaultDublinCoreImpl):
         start_date = end_date = None
 
         if effectiveDay and effectiveMo and effectiveYear and start_time:
-            efdate = '%s/%s/%s %s %s' % (effectiveDay
+            efdate = '%s/%s/%s %s %s' % (effectiveYear
                                          , effectiveMo
-                                         , effectiveYear
+                                         , effectiveDay
                                          , start_time
                                          , startAMPM
                                          )
@@ -222,9 +222,9 @@ class Event(PortalContent, DefaultDublinCoreImpl):
 
         if expirationDay and expirationMo and expirationYear and stop_time:
 
-            exdate = '%s/%s/%s %s %s' % (expirationDay
+            exdate = '%s/%s/%s %s %s' % (expirationYear
                                          , expirationMo
-                                         , expirationYear
+                                         , expirationDay
                                          , stop_time
                                          , stopAMPM
                                          )

@@ -40,15 +40,17 @@ class TestEvent(TestCase):
         assert not event.Title()
 
     def test_edit(self):
+        # Year month and day were processed in the wrong order
+        # Also see http://collector.zope.org/CMF/202
         event = self.site._setObject( 'testimage', Event('editing') )
         event.edit( title='title'
                   , description='description'
                   , eventType=( 'eventType', )
                   , effectiveDay=1
-                  , effectiveMo=1
+                  , effectiveMo=5
                   , effectiveYear=1999
-                  , expirationDay=12
-                  , expirationMo=31
+                  , expirationDay=31
+                  , expirationMo=12
                   , expirationYear=1999
                   , start_time="00:00"
                   , startAMPM="AM"
@@ -61,7 +63,7 @@ class TestEvent(TestCase):
         assert event.effective_date == None
         assert event.expiration_date == None
         assert event.end() == DateTime('1999/12/31 23:59')
-        assert event.start() == DateTime('1999/01/01 00:00')
+        assert event.start() == DateTime('1999/05/01 00:00')
         assert not event.contact_name
 
     def test_puke(self):

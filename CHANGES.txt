@@ -32,6 +32,10 @@ CMF 1.5.0-beta (unreleased)
       
   Bug Fixes
 
+    - CMFCalendar.Event: Day, month, and year were processed in the wrong
+      order by Event.edit().
+      Also see http://collector.zope.org/CMF/202
+
     - CMFCore.PortalFolder: _verifyObjectPaste() did not check the
       container's allowed content types, enabling users to paste objects
       they were not allowed to add.
