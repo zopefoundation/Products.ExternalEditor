@@ -55,6 +55,11 @@ Future
 
   Bug Fixes
 
+    - Enabled the CMF to be installed in a PRODUCTS_PATH.
+      In doing so, also made it easier to move CMF sites between 
+      Windows and Unix.
+      (Collector #64)
+
     - Multimodule checkin to convert calls from user.getUserName() to
       user.getId() where appropriate.  User names should not be used
       as immutable references, while user ids should.  The distinction
