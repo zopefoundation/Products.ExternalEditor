@@ -19,7 +19,7 @@
      <img src=""
 	      tal:condition="icon" align="left" alt="Type"
 		  tal:attributes="src python:'%s/%s' % (here.portal_url(), icon); alt typ" />
-     <span tal:replace="structure python: here.trunID(objID)">ObjectID</span>
+     <span tal:replace="structure python: here.truncID(objID, size=15)">ObjectID</span>
   </td>
  </tr>
  <tr class=""

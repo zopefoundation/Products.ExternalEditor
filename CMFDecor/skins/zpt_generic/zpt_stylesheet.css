@@ -334,10 +334,13 @@ table.FormLayout tr td.TextField {
 
 table.FormLayout th {
     text-align: right;
+    font-size: 80%;
+    font-weight: bold;
 }
 
 table.FormLayout dl.FieldHelp dd {
-    font-size: 70%;
+    font-size: 80%;
+    color: #000000;
 }
 
 table.FormLayout td.ListName {
