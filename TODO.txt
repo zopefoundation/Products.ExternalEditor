@@ -118,8 +118,6 @@ CMF TODO's
 
         ( ) Tracker #513:  deleteReply is genocidal
 
-      - Tracker #506:  Invalid relative URL on metadata_edit_form
-
       - (/) Documentation fixes
 
         (/) Tracker #489:  Dependency on TAL breaks Zope 2.4.x
