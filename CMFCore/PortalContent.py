@@ -10,10 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-"""PortalContent: Base class for all CMF content.
+""" PortalContent: Base class for all CMF content.
+
 $Id$
 """
-__version__='$Revision$'[11:-2]
 
 import string, urllib
 

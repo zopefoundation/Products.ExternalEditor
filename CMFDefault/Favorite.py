@@ -10,13 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-"""
-    Favorites represent references to other objects within the same
-    CMF site..
+""" Favorites are references to other objects within the same CMF site..
 
 $Id$
 """
-__version__ = "$Revision$"[11:-2]
 
 import Globals
 from Globals import HTMLFile, HTML

@@ -1,4 +1,17 @@
-"""
+##############################################################################
+#
+# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
+# 
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE
+# 
+##############################################################################
+""" CMFWiki Installation script
+
 This file is an installation script for CMFWiki.  It's meant to be
 used as an External Method.  To use, add an external method to the
 root of the CMF Site that you want CMF Wiki registered in with the
@@ -13,8 +26,9 @@ Then go to the management screen for the newly added external method
 and click the 'Try it' tab.  The install function will execute and give
 information about the steps it took to register and install the CMF Wiki
 into the CMF Site instance.
+
+$Id$
 """
-__version__='$Revision$'[11:-2]
 
 from Products.CMFCore.TypesTool import ContentFactoryMetadata
 from Products.CMFCore.DirectoryView import addDirectoryViews

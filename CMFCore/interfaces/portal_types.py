@@ -10,11 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
+""" Type registration tool interface description.
 
+$Id$
 """
-    Type registration tool interface description.
-"""
-__version__='$Revision$'[11:-2]
 
 from Interface import Attribute, Base
 

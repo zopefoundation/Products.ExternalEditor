@@ -10,8 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-"""Customizable image objects that come from the filesystem."""
-__version__='$Revision$'[11:-2]
+""" Customizable image objects that come from the filesystem.
+
+$Id$
+"""
 
 import string, os
 

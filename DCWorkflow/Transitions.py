@@ -10,11 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-'''
-Transitions in a web-configurable workflow.
+""" Transitions in a web-configurable workflow.
+
 $Id$
-'''
-__version__='$Revision$'[11:-2]
+"""
 
 from string import join, split, strip
 

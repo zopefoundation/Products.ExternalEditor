@@ -10,11 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
+""" PortalObject: The portal root object class
 
-"""PortalObject: The portal root object class
 $Id$
 """
-__version__='$Revision$'[11:-2]
 
 from Globals import default__class_init__
 from PortalFolder import PortalFolder

@@ -10,8 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-"""Customizable properties that come from the filesystem."""
-__version__='$Revision$'[11:-2]
+""" Customizable properties that come from the filesystem.
+
+$Id$
+"""
 
 import Globals
 import Acquisition

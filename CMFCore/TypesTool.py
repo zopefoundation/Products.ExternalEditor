@@ -10,12 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
+""" Type registration tool.
 
+$Id$
 """
-    Type registration tool.
-    $Id$
-"""
-__version__='$Revision$'[11:-2]
 
 import OFS
 from Globals import InitializeClass, DTMLFile

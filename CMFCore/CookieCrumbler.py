@@ -10,12 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
+""" Cookie Crumbler: Enable cookies for non-cookie user folders.
 
-"""Cookie Crumbler: Enable cookies for non-cookie user folders.
 $Id$
 """
-__version__='$Revision$'[11:-2]
-
 
 from base64 import encodestring
 from urllib import quote, unquote

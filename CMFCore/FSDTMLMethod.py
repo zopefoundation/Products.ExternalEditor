@@ -10,8 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-"""Customizable DTML methods that come from the filesystem."""
-__version__='$Revision$'[11:-2]
+""" Customizable DTML methods that come from the filesystem.
+
+$Id$
+"""
 
 from string import split
 from os import path, stat

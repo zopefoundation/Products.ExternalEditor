@@ -10,10 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-"""Event: A CMF-enabled Event object.
+""" Event: A CMF-enabled Event object.
+
 $Id$
 """
-__version__='$Revision$'[11:-2]
 
 import os, urllib
 from DateTime import DateTime

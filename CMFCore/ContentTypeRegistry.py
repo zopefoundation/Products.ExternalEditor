@@ -10,12 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
+""" Basic Site content type registry
 
-"""
-Basic Site content type registry
 $Id$
 """
-__version__='$Revision$'[11:-2]
 
 from OFS.SimpleItem import SimpleItem, Item
 from AccessControl import ClassSecurityInfo

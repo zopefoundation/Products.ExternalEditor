@@ -10,13 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-
-"""Basic action list tool.
+""" Basic action list tool.
 
 $Id$
 """
-__version__='$Revision$'[11:-2]
-
 
 import OFS
 from utils import UniqueObject, SimpleItemWithProperties, _getAuthenticatedUser, _checkPermission

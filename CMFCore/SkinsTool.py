@@ -10,12 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-
 """Portal skins tool.
+
 $Id$
 """
-__version__='$Revision$'[11:-2]
-
 
 from string import split
 from utils import UniqueObject, getToolByName, _dtmldir

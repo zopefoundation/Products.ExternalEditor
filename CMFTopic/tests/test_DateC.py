@@ -10,11 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-"""Unit tests for DateCriterion module.
+""" Unit tests for DateCriterion module.
 
 $Id$
 """
-__version__ = '$Revision$'[11:-2]
 
 import unittest
 from DateTime.DateTime import DateTime

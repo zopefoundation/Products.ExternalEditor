@@ -10,8 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-"""Portal services base objects"""
-__version__='$Revision$'[11:-2]
+""" Portal services base objects
+
+$Id$
+"""
 
 import PortalObject, PortalContent, PortalFolder
 import MembershipTool, WorkflowTool, CatalogTool, DiscussionTool

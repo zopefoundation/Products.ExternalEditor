@@ -10,11 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-'''
-Web-configurable workflow.
+""" Web-configurable workflow.
+
 $Id$
-'''
-__version__='$Revision$'[11:-2]
+"""
 
 # Python library
 from string import join

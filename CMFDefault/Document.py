@@ -10,7 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-__version__ = "$Revision$"[11:-2]
+""" Basic textual content object, supporting both HTML and STX.
+
+$Id$
+"""
 
 ADD_CONTENT_PERMISSION = 'Add portal content'
 

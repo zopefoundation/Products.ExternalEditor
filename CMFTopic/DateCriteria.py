@@ -10,11 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-"""Various date criteria
+""" Various date criteria
 
 $Id$
 """
-__version__ = '$Revision$'[11:-2]
 
 from Products.CMFTopic.AbstractCriterion import AbstractCriterion
 from Products.CMFTopic.interfaces import Criterion

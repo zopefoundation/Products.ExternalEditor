@@ -10,8 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-"""Customizable objects that come from the filesystem (base class)."""
-__version__='$Revision$'[11:-2]
+""" Customizable objects that come from the filesystem (base class).
+
+$Id$
+"""
 
 from string import split
 from os import path, stat

@@ -11,9 +11,10 @@
 # FOR A PARTICULAR PURPOSE
 #
 ##############################################################################
-__doc__='''CMFWorkspaces Product Initialization
-$Id$'''
-__version__='$Revision$'[11:-2]
+""" CMFWorkspaces Product Initialization
+
+$Id$
+"""
 
 import sys
 

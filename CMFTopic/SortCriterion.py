@@ -14,7 +14,6 @@
 
 $Id$
 """
-__version__ = '$Revision$'[11:-2]
 
 from Products.CMFTopic.AbstractCriterion import AbstractCriterion
 from Products.CMFTopic.Topic import Topic

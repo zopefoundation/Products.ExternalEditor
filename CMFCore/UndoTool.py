@@ -10,12 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
+""" Basic undo tool.
 
-"""Basic undo tool.
 $Id$
 """
-__version__='$Revision$'[11:-2]
-
 
 from utils import UniqueObject, _getAuthenticatedUser, _checkPermission
 from utils import getToolByName, _dtmldir

@@ -14,7 +14,6 @@
 
 $Id$
 """
-__version__ = "$Revision$"[11:-2]
 
 import string
 import urlparse

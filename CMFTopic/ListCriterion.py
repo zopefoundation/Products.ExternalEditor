@@ -10,11 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-"""List Criterion: A criterion that is a list
+""" List Criterion: A criterion that is a list
 
 $Id$
 """
-__version__ = '$Revision$'[11:-2]
 
 from Products.CMFTopic.AbstractCriterion import AbstractCriterion
 from Products.CMFTopic.interfaces import Criterion

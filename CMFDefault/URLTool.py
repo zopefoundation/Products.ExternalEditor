@@ -10,12 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-
-"""CMFDefault portal_url tool.
+""" CMFDefault portal_url tool.
 
 $Id$
 """
-__version__='$Revision$'[11:-2]
 
 
 from Products.CMFCore.utils import UniqueObject

@@ -10,11 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-'''
-Some common utilities.
+""" Some common utilities.
+
 $Id$
-'''
-__version__='$Revision$'[11:-2]
+"""
 
 import os
 from App.Common import package_home

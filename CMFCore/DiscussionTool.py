@@ -10,12 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
+""" Basic portal discussion access tool.
 
-"""Basic portal discussion access tool.
 $Id$
 """
-__version__='$Revision$'[11:-2]
-
 
 from utils import UniqueObject, getToolByName
 from utils import getToolByName, _dtmldir

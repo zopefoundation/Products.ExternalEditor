@@ -10,11 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
+""" Membership tool interface description.
 
-"""Membership tool interface description.
 $Id$
 """
-__version__='$Revision$'[11:-2]
 
 from Interface import Attribute, Base
 

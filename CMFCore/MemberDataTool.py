@@ -11,10 +11,10 @@
 # 
 ##############################################################################
 
-"""Basic member data tool.
+""" Basic member data tool.
+
 $Id$
 """
-__version__='$Revision$'[11:-2]
 
 import string
 from utils import UniqueObject, getToolByName, _dtmldir

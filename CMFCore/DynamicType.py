@@ -10,11 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
+""" DynamicType: Mixin for dynamic properties.
 
-"""DynamicType: Mixin for dynamic properties.
 $Id$
 """
-__version__='$Revision$'[11:-2]
 
 from AccessControl import ClassSecurityInfo
 from utils import getToolByName

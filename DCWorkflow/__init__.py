@@ -10,11 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-'''
-Web-configurable workflow.
+""" Web-configurable workflow.
+
 $Id$
-'''
-__version__='$Revision$'[11:-2]
+"""
 
 from Products.CMFCore.utils import registerIcon
 import DCWorkflow, States, Transitions, Variables, Worklists, Scripts

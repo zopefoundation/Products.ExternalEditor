@@ -10,11 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-'''
-Guard conditions in a web-configurable workflow.
+""" Guard conditions in a web-configurable workflow.
+
 $Id$
-'''
-__version__='$Revision$'[11:-2]
+"""
 
 from string import split, strip, join
 from cgi import escape

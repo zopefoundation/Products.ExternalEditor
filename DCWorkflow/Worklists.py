@@ -10,11 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-'''
-Worklists in a web-configurable workflow.
+""" Worklists in a web-configurable workflow.
+
 $Id$
-'''
-__version__='$Revision$'[11:-2]
+"""
 
 from OFS.SimpleItem import SimpleItem
 from Globals import DTMLFile, PersistentMapping

@@ -10,9 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-"""Views of filesystem directories as folders."""
+""" Views of filesystem directories as folders.
 
-__version__='$Revision$'[11:-2]
+$Id$
+"""
 
 import Globals
 from Globals import HTMLFile, Persistent, package_home, DTMLFile

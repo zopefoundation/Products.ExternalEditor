@@ -10,11 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-'''
-Programmatically creates a workflow.
+""" Programmatically creates a workflow.
+
 $Id$
-'''
-__version__='$Revision$'[11:-2]
+"""
 
 from Products.CMFCore.CMFCorePermissions import RequestReview, \
                                                 ModifyPortalContent, \

@@ -10,11 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-"""Unit tests for ListCriterion module.
+""" Unit tests for ListCriterion module.
 
 $Id$
 """
-__version__ = '$Revision$'[11:-2]
 
 import unittest
 
