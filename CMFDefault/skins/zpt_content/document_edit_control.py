@@ -1,29 +1,13 @@
-## Script (Python) "document_edit_control"
-##parameters=text_format='', text='', file='', SafetyBelt='', change='', change_and_view='', **kw
-##title=
+##parameters=text_format, text, SafetyBelt='', **kw
 ##
-form = context.REQUEST.form
-if change and \
-        context.validateTextFile(**form) and \
-        context.validateHTML(**form) and \
-        context.document_edit(**form) and \
-        context.setRedirect(context, 'object/edit'):
-    return
-elif change_and_view and \
-        context.validateTextFile(**form) and \
-        context.validateHTML(**form) and \
-        context.document_edit(**form) and \
-        context.setRedirect(context, 'object/view'):
-    return
+from Products.CMFDefault.exceptions import EditingConflict
+from Products.CMFDefault.exceptions import ResourceLockedError
 
-
-control = {}
-
-buttons = []
-target = context.getActionInfo('object/edit')['url']
-buttons.append( {'name': 'change', 'value': 'Change'} )
-buttons.append( {'name': 'change_and_view', 'value': 'Change and View'} )
-control['form'] = { 'action': target,
-                    'listButtonInfos': tuple(buttons) }
-
-return control
+if text_format != context.text_format or text != context.text:
+    try:
+        context.edit(text_format, text, safety_belt=SafetyBelt)
+        return context.setStatus(True, 'Document changed.')
+    except (ResourceLockedError, EditingConflict), errmsg:
+        return context.setStatus(False, errmsg)
+else:
+    return context.setStatus(False, 'Nothing to change.')

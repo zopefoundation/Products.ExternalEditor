@@ -1,27 +1,14 @@
-## Script (Python) "newsitem_edit_control"
-##parameters=description='', text_format='', text='', change='', change_and_view='', **kw
-##title=
+##parameters=text_format, text, description='', **kw
 ##
-form = context.REQUEST.form
-if change and \
-        context.validateHTML(**form) and \
-        context.newsitem_edit(**form) and \
-        context.setRedirect(context, 'object/edit'):
-    return
-elif change_and_view and \
-        context.validateHTML(**form) and \
-        context.newsitem_edit(**form) and \
-        context.setRedirect(context, 'object/view'):
-    return
+from Products.CMFDefault.exceptions import ResourceLockedError
 
-
-control = {}
-
-buttons = []
-target = context.getActionInfo('object/edit')['url']
-buttons.append( {'name': 'change', 'value': 'Change'} )
-buttons.append( {'name': 'change_and_view', 'value': 'Change and View'} )
-control['form'] = { 'action': target,
-                    'listButtonInfos': tuple(buttons) }
-
-return control
+if description != context.description or \
+        text_format != context.text_format or text != context.text:
+    try:
+        context.edit(text=text, description=description,
+                     text_format=text_format)
+        return context.setStatus(True, 'News Item changed.')
+    except ResourceLockedError, errmsg:
+        return context.setStatus(False, errmsg)
+else:
+    return context.setStatus(False, 'Nothing to change.')
