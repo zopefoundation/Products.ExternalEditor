@@ -94,6 +94,12 @@ CMF 1.4 alpha
     - Raise ValueError instead of TypeError in TypesTool.getActionById
       if the action is not found (Collector #56).
 
+    - Added .metadata file for FSObjects, which allows the easy addition of 
+      more features without adding lots and lots of files. ConfigParser format.
+
+    - Added proxy roles to FS Python Scripts and FS DTML Methods via the proxy
+      property in .metadata files.
+
   Bug Fixes
 
     - MembershipTool (CMFDefault): Fixed acquisition bug. (Collector #102)
