@@ -37,7 +37,7 @@ from staging_utils import getProxyReference, cloneByPickle
 # Permission name
 StageObjects = 'Use version control'
 
-_wwwdir = os.path.join(os.path.dirname(__file__), 'www') 
+_wwwdir = os.path.join(os.path.dirname(__file__), 'www')
 
 
 class StagingError (Exception):
@@ -124,11 +124,17 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
             stage = stages[stage_name]
             if stage is not None:
                 obj = stage.restrictedTraverse(rel_path, None)
-                if obj is not None and not obj.aq_inContextOf(stage, 1):
-                    # Avoid dangerous acquisition. Eg: acquiring
-                    # stuff from portal_skins or from above the stage
-                    # and being unable to stage an object with the same
-                    # id because the acquired object is non-versionable.
+                # Avoid dangerous acquisition. Eg: acquiring
+                # from higher level folders or from above the stage
+                # and being unable to stage an object with the same
+                # id because the acquired object is non-versionable
+                # or backed by a different version history.
+                if (obj is not None and
+                    (not obj.aq_inContextOf(obj.aq_parent, 1) or
+                    obj == aq_parent(obj))):
+                    # XXX aq_inContextOf returns true if
+                    # aq_parent is the same object, so acquiring a folder
+                    # through itself causes trouble!
                     obj = None
             else:
                 obj = None

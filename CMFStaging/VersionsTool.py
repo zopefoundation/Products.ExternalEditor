@@ -32,7 +32,7 @@ from staging_utils import getPortal, verifyPermission, unproxied
 # Permission name
 UseVersionControl = 'Use version control'
 
-_wwwdir = os.path.join(os.path.dirname(__file__), 'www') 
+_wwwdir = os.path.join(os.path.dirname(__file__), 'www')
 
 
 class VersionsTool(UniqueObject, SimpleItemWithProperties):
@@ -42,7 +42,7 @@ class VersionsTool(UniqueObject, SimpleItemWithProperties):
 
     security = ClassSecurityInfo()
 
-    manage_options = ({'label' : 'Overview', 'action' : 'manage_overview'}, 
+    manage_options = ({'label' : 'Overview', 'action' : 'manage_overview'},
                       ) + SimpleItemWithProperties.manage_options
 
 
@@ -111,7 +111,7 @@ class VersionsTool(UniqueObject, SimpleItemWithProperties):
     security.declarePublic('checkout')
     def checkout(self, obj):
         """Opens the object for development.
-        
+
         Returns the object, which might be different from what was passed to
         the method if the object was replaced.
         """
@@ -182,7 +182,6 @@ class VersionsTool(UniqueObject, SimpleItemWithProperties):
                         obj.__dict__[key] = value
             repo.checkinResource(obj, message or '')
         return None
-
 
     security.declarePublic('getLogEntries')
     def getLogEntries(self, obj, only_checkins=0):
