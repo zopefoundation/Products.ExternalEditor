@@ -1,7 +1,6 @@
 <tal:page xmlns:tal="http://xml.zope.org/namespaces/tal"
-   xmlns:i18n="http://xml.zope.org/namespaces/i18n"
    tal:define="control python: here.registered_notify_control(**options)"
-   i18n:domain="cmf_default"
+><div tal:omit-tag="" i18n:domain="cmf_default"
 >Subject: <tal:span i18n:translate=""><tal:span i18n:name="portal_title"
                                          tal:content="control/portal_title"
                                     />: Your Membership Information</tal:span>
@@ -39,4 +38,4 @@ in the complete string.
 
 <tal:span i18n:name="email_from_name"
    tal:content="control/email_from_name" />
-</tal:span></tal:page>
+</tal:span></div></tal:page>

@@ -34,10 +34,11 @@
    ><tal:case tal:condition="not: repeat/creator/start"
     ><tal:case tal:condition="not: repeat/creator/end">, </tal:case
     ><tal:case tal:condition="repeat/creator/end"
-     > <tal:span i18n:translate="">and</tal:span> </tal:case></tal:case
+     > <span tal:omit-tag="" i18n:translate="">and</span> </tal:case
+   ></tal:case
    ><tal:span tal:content="creator">creator</tal:span></tal:loop></tal:case
- ><tal:case tal:condition="not: obj/listCreators" i18n:translate=""
-  >unknown</tal:case>
+ ><tal:case tal:condition="not: obj/listCreators"
+  ><span tal:omit-tag="" i18n:translate="">unknown</span></tal:case>
    on <span tal:replace="obj/CreationDate">Today</span>
   </td>
  </tr>

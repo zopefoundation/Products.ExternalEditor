@@ -17,8 +17,8 @@
   ><tal:span tal:content="batch/navigation/previous/text"
    >Previous</tal:span
   > <tal:case tal:condition="batch/navigation/previous/length"
-      tal:content="batch/navigation/previous/length"
-      i18n:name="count">n</tal:case
+   ><span tal:omit-tag="" tal:content="batch/navigation/previous/length"
+      i18n:name="count">n</span></tal:case
   > <tal:span tal:content="batch/navigation/previous/type"
    >items</tal:span></a></tal:case
  ><tal:case tal:condition="python:p and n">
@@ -28,8 +28,8 @@
   ><tal:span tal:content="batch/navigation/next/text"
    >Next</tal:span
   > <tal:case tal:condition="batch/navigation/next/length"
-      tal:content="batch/navigation/next/length"
-      i18n:name="count">n</tal:case
+   ><span tal:omit-tag="" tal:content="batch/navigation/next/length"
+      i18n:name="count">n</span></tal:case
   > <tal:span tal:content="batch/navigation/next/type"
    >items</tal:span></a></tal:case
  ></p

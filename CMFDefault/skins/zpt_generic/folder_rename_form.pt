@@ -1,16 +1,15 @@
 <tal:page
    xmlns:tal="http://xml.zope.org/namespaces/tal"
    xmlns:metal="http://xml.zope.org/namespaces/metal"
-   xmlns:i18n="http://xml.zope.org/namespaces/i18n"
    tal:define="control python: here.folder_rename_control(**request.form)"
    tal:condition="control"
 ><html metal:use-macro="here/main_template/macros/master">
 <body>
 
-<metal:block metal:fill-slot="main" i18n:domain="cmf_default"
+<metal:block metal:fill-slot="main"
    tal:define="batch control/batch;
                form control/form">
-<div class="Desktop">
+<div class="Desktop" i18n:domain="cmf_default">
 
 <h2 i18n:translate="">Rename Items</h2>
 

@@ -1,17 +1,16 @@
 <tal:page
    xmlns:tal="http://xml.zope.org/namespaces/tal"
    xmlns:metal="http://xml.zope.org/namespaces/metal"
-   xmlns:i18n="http://xml.zope.org/namespaces/i18n"
    tal:define="control python: here.folder_contents_control(**request.form)"
    tal:condition="control"
 ><html metal:use-macro="here/main_template/macros/master">
 <body>
 
-<metal:block metal:fill-slot="main" i18n:domain="cmf_default"
+<metal:block metal:fill-slot="main"
    tal:define="batch control/batch;
                form control/form;
                up control/up">
-<div class="Desktop">
+<div class="Desktop" i18n:domain="cmf_default">
 
 <h2 i18n:translate="">Desktop</h2>
 
@@ -20,7 +19,7 @@
  ><a href="" tal:attributes="href up/url"
   ><img src="" alt="[Link]" border="0" tal:attributes="src up/icon"
       i18n:attributes="alt" /></a>
-  <tal:span i18n:translate="">Up to</tal:span>
+  <span tal:omit-tag="" i18n:translate="">Up to</span>
   <a href="" tal:attributes="href up/url" tal:content="up/id">ID</a></tal:case
 ><tal:case tal:condition="not: up/url"
  ><span class="mild" i18n:translate="">Root</span></tal:case></tal:case>
