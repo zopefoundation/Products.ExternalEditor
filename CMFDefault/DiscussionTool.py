@@ -16,6 +16,7 @@ $Id$
 """
 
 from AccessControl import ClassSecurityInfo
+from Acquisition import aq_base
 from Globals import DTMLFile
 from Globals import InitializeClass
 from OFS.SimpleItem import SimpleItem
@@ -23,6 +24,8 @@ from OFS.SimpleItem import SimpleItem
 from Products.CMFCore.ActionInformation import ActionInformation
 from Products.CMFCore.ActionProviderBase import ActionProviderBase
 from Products.CMFCore.Expression import Expression
+from Products.CMFCore.interfaces.Discussions \
+        import DiscussionResponse as IDiscussionResponse
 from Products.CMFCore.interfaces.portal_discussion \
         import portal_discussion as IDiscussionTool
 from Products.CMFCore.utils import getToolByName
@@ -38,6 +41,8 @@ from utils import _dtmldir
 
 
 class DiscussionTool( UniqueObject, SimpleItem, ActionProviderBase ):
+    """ Links content to discussions.
+    """
 
     __implements__ = (IDiscussionTool, ActionProviderBase.__implements__)
 
@@ -76,55 +81,53 @@ class DiscussionTool( UniqueObject, SimpleItem, ActionProviderBase ):
 
     security.declarePublic( 'overrideDiscussionFor' )
     def overrideDiscussionFor(self, content, allowDiscussion):
-        """
-            Override discussability for a per object basis or clear and let
-            the site default override.
+        """ Override discussability for the given object or clear the setting.
         """
         mtool = getToolByName( self, 'portal_membership' )
         if not mtool.checkPermission(ModifyPortalContent, content):
             raise AccessControl_Unauthorized
 
         if allowDiscussion is None or allowDiscussion == 'None':
-            if hasattr(content, 'allow_discussion'):
+            if hasattr( aq_base(content), 'allow_discussion'):
                 del content.allow_discussion
         else:
-            content.allow_discussion = int(allowDiscussion)
+            content.allow_discussion = bool(allowDiscussion)
 
     security.declarePublic( 'getDiscussionFor' )
     def getDiscussionFor(self, content):
-        """
-            Return the talkback for content, creating it if need be.
+        """ Get DiscussionItemContainer for content, create it if necessary.
         """
         if not self.isDiscussionAllowedFor( content ):
             raise DiscussionNotAllowed
 
-        talkback = getattr( content, 'talkback', None )
-        if not talkback:
-            talkback = self._createDiscussionFor( content )
+        if IDiscussionResponse.isImplementedBy(content):
+            # Discussion Items use the DiscussionItemContainer object of the
+            # related content item, so talkback needs to be acquired
+            talkback = getattr(content, 'talkback')
+        else:
+            talkback = getattr( aq_base(content), 'talkback', None )
+            if not talkback:
+                talkback = self._createDiscussionFor( content )
 
         return talkback
 
     security.declarePublic( 'isDiscussionAllowedFor' )
     def isDiscussionAllowedFor( self, content ):
-        '''
-            Returns a boolean indicating whether a discussion is
-            allowed for the specified content.
-        '''
+        """ Get boolean indicating whether discussion is allowed for content.
+        """
         if hasattr( content, 'allow_discussion' ):
-            return content.allow_discussion
+            return bool(content.allow_discussion)
         typeInfo = getToolByName(self, 'portal_types').getTypeInfo( content )
         if typeInfo:
-            return typeInfo.allowDiscussion()
-        return 0
+            return bool( typeInfo.allowDiscussion() )
+        return False
 
     #
     #   Utility methods
     #
     security.declarePrivate( '_createDiscussionFor' )
     def _createDiscussionFor( self, content ):
-        """
-            Create the object that holds discussion items inside
-            the object being discussed, if allowed.
+        """ Create DiscussionItemContainer for content, if allowed.
         """
         if not self.isDiscussionAllowedFor( content ):
             raise DiscussionNotAllowed

@@ -24,19 +24,23 @@ class oldstyle_portal_discussion(Interface):
     """
     id = Attribute('id', 'Must be set to "portal_discussion"')
 
-    #getDiscussionFor__roles__ = None
     def getDiscussionFor(content):
-        """
-            Find / create the DiscussionItemContainer for 'content'.
+        """ Get DiscussionItemContainer for content, create it if necessary.
+
+        Permission -- Always available
+
+        Returns -- DiscussionItemContainer object
         """
 
-    #isDiscussionAllowedFor__roles__ = None
     def isDiscussionAllowedFor(content):
-        """
-            Return a boolean indicating whether discussion is
-            allowed for the specified content;  this may be looked
-            up via an object-specific value, or by place, or from
-            a site-wide policy.
+        """ Get boolean indicating whether discussion is allowed for content.
+
+        This may be looked up via an object-specific value, or by place, or
+        from a site-wide policy.
+
+        Permission -- Always available
+
+        Returns -- Boolean value
         """
 
 
@@ -44,11 +48,12 @@ class portal_discussion(oldstyle_portal_discussion):
     """ Links content to discussions.
     """
 
-    #getDiscussionFor__roles__ = None
     def overrideDiscussionFor(content, allowDiscussion):
-        """
-            if 'allowDiscussion' is None, then clear any overridden
-            setting for discussability, letting the site's default
-            policy apply.  Otherwise, set the override to match
-            the boolean equivalent of 'allowDiscussion'.
+        """ Override discussability for the given object or clear the setting.
+
+        If 'allowDiscussion' is None, then clear any overridden setting for
+        discussability, letting the site's default policy apply.  Otherwise,
+        set the override to match the boolean equivalent of 'allowDiscussion'.
+
+        Permission -- Always available
         """

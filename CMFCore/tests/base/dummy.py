@@ -1,7 +1,6 @@
 from Acquisition import Implicit, aq_base, aq_inner, aq_parent
 from OFS.SimpleItem import Item
 from Products.CMFCore.PortalContent import PortalContent
-from Products.CMFCore.TypesTool import FactoryTypeInformation as FTI
 from Products.CMFCore.ActionProviderBase import ActionProviderBase
 from security import OmnipotentUser
 
@@ -253,12 +252,6 @@ class DummyTool(Implicit,ActionProviderBase):
     def __init__(self, anon=1):
         self.anon = anon
 
-    def isAnonymousUser(self):
-        return self.anon
-
-    def getAuthenticatedMember(self):
-        return DummyUser()
-
     def __call__( self ):
         return self.root
 
@@ -269,6 +262,16 @@ class DummyTool(Implicit,ActionProviderBase):
 
     def getIcon( self, relative=0 ):
         return 'Tool: %s' % relative
+
+    # MembershipTool
+    def getAuthenticatedMember(self):
+        return DummyUser()
+
+    def isAnonymousUser(self):
+        return self.anon
+
+    def checkPermission(self, permissionName, object, subobjectName=None):
+        return True
 
     # TypesTool
     def listTypeInfo(self, container=None):

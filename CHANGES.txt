@@ -1,3 +1,10 @@
+CMF 1.5.0-beta (unreleased)
+
+  Bug Fixes
+
+    - DiscussionTool: Fixed two acquisition bugs.
+      (Collector #119 and #201)
+
 CMF 1.5.0-alpha (2004/07/09)
 
   New Features
@@ -13,8 +20,8 @@ CMF 1.5.0-alpha (2004/07/09)
       set redirect depending on the selected button. If redirect is not set,
       the script calls a template and returns the resulting HTML page.
 
-    - ActionProviderBase, ActionInformation: Added methods to modify/edit 
-      actions. New method 'getActionObject' in 'ActionProviderBase' and 
+    - ActionProviderBase, ActionInformation: Added methods to modify/edit
+      actions. New method 'getActionObject' in 'ActionProviderBase' and
       'edit' method in 'ActionInformation' (Collector 195).
       An action now may be modified/edited the following way::
 
