@@ -137,7 +137,7 @@ class MembershipTool (UniqueObject, SimpleItem):
     #   'portal_membership' interface methods
     #
     security.declareProtected(ManagePortal, 'manage_mapRoles')
-    manage_mapRoles = DTMLFile('dtml/membershipRolemapping', _dtmldir )
+    manage_mapRoles = DTMLFile('membershipRolemapping', _dtmldir )
  
     security.declarePublic('getAuthenticatedMember')
     def getAuthenticatedMember(self):
