@@ -380,7 +380,12 @@ class Collector(SkinnedFolder):
         elif mode == 'anyone':
             target_roles = target_roles + ['Authenticated', 'Anonymous']
 
+        # Adjust who can add followups:
         self.manage_permission(AddCollectorIssueFollowup,
+                               roles=target_roles,
+                               acquire=1)
+        # Adjust who can add "attachments":
+        self.manage_permission(AddPortalContent,
                                roles=target_roles,
                                acquire=1)
 
@@ -406,9 +411,10 @@ class Collector(SkinnedFolder):
 
         for i in self.objectValues(spec='CMF Collector Issue'):
 
-            # Ensure the issue acquires AddCollectorIssueFollowup permission.
+            # Ensure the issue acquires AddCollectorIssueFollowup
+            # and AddPortalContent permissions.
             for m in i.ac_inherited_permissions(1):
-                if m[0] == AddCollectorIssueFollowup:
+                if m[0] in [AddCollectorIssueFollowup, AddPortalContent]:
                     perm = Permission.Permission(m[0], m[1], i)
                     roles = perm.getRoles()
                     if type(roles) == type(()):
@@ -534,6 +540,9 @@ def addCollector(self, id, title='', description='', abbrev='',
                          roles=['Reviewer'],
                          acquire=1)
     it.manage_permission(AddCollectorIssueFollowup,
+                         roles=['Reviewer', 'Manager', 'Owner'],
+                         acquire=1)
+    it.manage_permission(AddPortalContent,
                          roles=['Reviewer', 'Manager', 'Owner'],
                          acquire=1)
     it.manage_permission(CMFCorePermissions.AccessInactivePortalContent,
