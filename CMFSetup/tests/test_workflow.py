@@ -1051,6 +1051,24 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
 
             default = variable[ 'default' ]
             self.assertEqual( default[ 'value' ], expected[ 1 ] )
+
+            exp_type = 'n/a'
+
+            if expected[ 1 ]:
+                exp_value = expected[ 1 ]
+
+                if isinstance( exp_value, bool ):
+                    exp_type = 'bool'
+                elif isinstance( exp_value, int ):
+                    exp_type = 'int'
+                elif isinstance( exp_value, float ):
+                    exp_type = 'float'
+                elif isinstance( exp_value, basestring ):
+                    exp_type = 'string'
+                else:
+                    exp_type = 'XXX'
+
+            self.assertEqual( default[ 'type' ], exp_type )
             self.assertEqual( default[ 'expression' ], expected[ 2 ] )
 
             self.assertEqual( variable[ 'for_catalog' ], expected[ 3 ] )
@@ -1695,7 +1713,7 @@ _NORMAL_WORKFLOW_EXPORT = """\
     update_always="True">
    Killed by
    <default>
-    <value>n/a</value>
+    <value type="string">n/a</value>
    </default>
    <guard>
     <guard-role>Hangman</guard-role>

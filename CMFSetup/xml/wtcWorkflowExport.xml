@@ -157,6 +157,8 @@
         tal:replace="variable/description">The last transition</span>
    <default>
     <value
+        type="VAR_TYPE"
+        tal:attributes="type variable/default_type"
         tal:condition="variable/default_value"
         tal:content="variable/default_value">VALUE</value>
     <expression

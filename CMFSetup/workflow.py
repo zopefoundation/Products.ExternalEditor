@@ -407,12 +407,15 @@ class WorkflowToolConfigurator( Implicit ):
 
             guard = v.getInfoGuard()
 
+            default_type = _guessVariableType( v.default_value )
+
             info = { 'id'                   : k
                    , 'description'          : v.description
                    , 'for_catalog'          : bool( v.for_catalog )
                    , 'for_status'           : bool( v.for_status )
                    , 'update_always'        : bool( v.update_always )
                    , 'default_value'        : v.default_value
+                   , 'default_type'         : default_type
                    , 'default_expr'         : v.getDefaultExprText()
                    , 'guard_permissions'    : guard.permissions
                    , 'guard_roles'          : guard.roles
@@ -993,12 +996,16 @@ def _extractDefaultNode( parent, encoding=None ):
     assert len( nodes ) <= 1, nodes
 
     if len( nodes ) < 1:
-        return { 'value' : '', 'expression' : '' }
+        return { 'value' : '', 'expression' : '', 'type' : 'n/a' }
 
     node = nodes[ 0 ]
 
     value_nodes = node.getElementsByTagName( 'value' )
     assert( len( value_nodes ) <= 1 )
+
+    value_type = 'n/a'
+    if value_nodes:
+        value_type = value_nodes[ 0 ].getAttribute( 'type' ) or 'n/a'
 
     value_text = value_nodes and _coalesceTextNodeChildren( value_nodes[ 0 ]
                                                           , encoding
@@ -1012,6 +1019,7 @@ def _extractDefaultNode( parent, encoding=None ):
                                                         ) or ''
 
     return { 'value' : value_text
+           , 'type' : value_type
            , 'expression' : expr_text
            }
 
@@ -1033,6 +1041,9 @@ def _guessVariableType( value ):
 
     from DateTime.DateTime import DateTime
 
+    if value is None:
+        return 'none'
+
     if isinstance( value, DateTime ):
         return 'datetime'
 
@@ -1053,6 +1064,9 @@ def _guessVariableType( value ):
 def _convertVariableValue( value, type_id ):
 
     from DateTime.DateTime import DateTime
+
+    if type_id == 'none':
+        return None
 
     if type_id == 'datetime':
 
@@ -1137,9 +1151,13 @@ def _initDCWorkflowVariables( workflow, variables ):
                 , 'guard_expr' : guard[ 'expression' ]
                 }
 
+        default = v_info[ 'default' ]
+        default_value = _convertVariableValue( default[ 'value' ]
+                                             , default[ 'type' ] )
+
         v.setProperties( description = v_info[ 'description' ]
-                       , default_value = v_info[ 'default' ][ 'value' ]
-                       , default_expr = v_info[ 'default' ][ 'expression' ]
+                       , default_value = default_value
+                       , default_expr = default[ 'expression' ]
                        , for_catalog = v_info[ 'for_catalog' ]
                        , for_status = v_info[ 'for_status' ]
                        , update_always = v_info[ 'update_always' ]
