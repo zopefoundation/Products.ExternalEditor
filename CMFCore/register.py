@@ -10,7 +10,6 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-
 """register: register portal content types with the CMF.
 $Id$
 """

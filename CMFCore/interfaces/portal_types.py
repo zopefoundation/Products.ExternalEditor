@@ -16,8 +16,6 @@
 """
 __version__='$Revision$'[11:-2]
 
-
-
 from Interface import Attribute, Base
 
 class ContentTypeInformation(Base):

@@ -16,7 +16,6 @@ $Id$
 """
 __version__='$Revision$'[11:-2]
 
-
 import sys
 from utils import UniqueObject, _checkPermission, getToolByName, _dtmldir
 from OFS.Folder import Folder

@@ -10,10 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-
 """PortalFolder: CMF-enabled Folder objects.
 $Id$
 """
+
 __version__='$Revision$'[11:-2]
 
 ADD_FOLDERS_PERMISSION = 'Add portal folders'

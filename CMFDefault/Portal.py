@@ -228,7 +228,8 @@ class PortalGenerator:
         addDirectoryViews(ps, 'skins', topic_globals)
         ps.manage_addProduct['OFSP'].manage_addFolder(id='custom')
         ps.addSkinSelection('Basic',
-            'custom, topic, content, generic, control, Images',
+            'custom, zpt_topic, zpt_content, zpt_generic,'
+            + 'zpt_control, topic, content, generic, control, Images',
             make_default=1)
         ps.addSkinSelection('Nouvelle',
             'nouvelle, custom, topic, content, generic, control, Images')

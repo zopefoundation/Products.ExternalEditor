@@ -2,6 +2,34 @@
 
  New features
 
+  - reindexObject moved out of _edit and _editMetadata to the
+    presentation level methods (edit, PUT, and editMetadata)
+
+  - _edit method removed from NewsItem, renamed to edit to work nicely with
+    the changes to Document edit and _edit
+
+  - added setMetadata method to remove the editing of metadata from the edit
+    methods
+
+  - CMFDecor megreged into CMF.  FSPageTemplate put into CMFCore, skins
+    put into CMFDefault, and basic skin setup to include ZPT skins.
+
+  - Added cookString method to CMFCore.utils for taking a string and making it id
+    friendly, it also does a string.lower on the resultant regex.
+    
+  - Change in TypesTool to utilize cookString to ensure the id is 
+    properly formated if the name is being used as the id.
+
+  - Added failIfLocked method to PortalContent which handles the necessary
+    checks to make sure a Document isn't locked via webDAV.
+
+  - Added edit method to Document and editMetadata method to fix problems
+    with working nicely with webDAV.  The PUT method calls _edit method if
+    it passes lock checks, while through the web code calls the edit variant
+    and it in turn calls the _ method if the lock check passes.  Similar
+    cases for handling the editMetadata method calls and checks for webDAV
+    locks.
+
   - (__future__) Added docs from the crack ZC docs guys.
 
   - (__future__) Exposed role management for manager users on

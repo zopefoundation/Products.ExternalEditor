@@ -16,7 +16,6 @@ $Id$
 """
 __version__='$Revision$'[11:-2]
 
-
 from Interface import Base, Attribute
 
 class portal_actions(Base):

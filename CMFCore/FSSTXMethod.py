@@ -10,7 +10,6 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-
 """FSSTXMethod: Filesystem methodish Structured Text document.
 $Id$
 """

@@ -10,7 +10,6 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-
 """PortalContent: Base class for all CMF content.
 $Id$
 """
