@@ -168,7 +168,8 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
                                  % self.absolute_url(),
                                  text)
         else:
-            text = uploadexp.sub(r'\1 "\2" (%s/\2/view)' % self.absolute_url(),
+            text = uploadexp.sub(r'\1 "\2" - %s/\2/view'
+                                 % self.absolute_url(),
                                  text)
             text = string.replace(text, "<hr>", "-" * 62)
         return text
