@@ -92,6 +92,7 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
                  {'id':'last_editor', 'type': 'string', 'mode': 'w'},
                  {'id':'last_log', 'type': 'string', 'mode': 'w'},
                  )
+    # permission defaults
     set = security.setPermissionDefault
     set(CMFWikiPermissions.Edit, ('Owner', 'Manager', 'Authenticated'))
     set(CMFWikiPermissions.FTPRead, ('Owner', 'Manager'))
@@ -100,24 +101,17 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
     set(CMFWikiPermissions.Move, ('Owner', 'Manager'))
     set(CMFWikiPermissions.Comment, ('Owner', 'Manager', 'Authenticated'))
     set = None
-##    __ac_permissions__=(
-##         ('Change CMFWiki Pages',
-##          ['PUT','manage_edit','manage_upload'],
-##          ['Owner', 'Manager']
-##          ),
-##         ('FTP access',
-##          ['manage_FTPstat','manage_FTPget','manage_FTPlist'],
-##          ['Owner', 'Manager']
-##          ),
 
     security.declarePublic('getId')
     def getId(self):
         try: return self.id()
         except TypeError: return self.id
 
+    security.declareProtected(CMFWikiPermissions.View, 'SearchableText')
     def SearchableText(self):
         return self.raw
 
+    security.declareProtected(CMFWikiPermissions.View, '__call__')
     def __call__(self, client=None, REQUEST={}, RESPONSE=None, **kw):
         """Render a zwiki page, with standard header & footer
         """
@@ -267,6 +261,7 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
         t = wikilinkexp.sub(self._wikilink_replace, t)
         return t
 
+    security.declarePublic('htmlquote')
     def htmlquote(self, text):
         return html_quote(text)
 
@@ -277,7 +272,7 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
         return wikilinkexp.sub(r'!\1', match.group(1))
 
     def _my_folder(self):
-        """Obtain parent folder, avoiding potential acquisition recursion."""
+        """ Obtain parent folder """
         return aq_parent(aq_inner(self))
 
     def _simplewikilink_replace(self, match, allowed=1, state=None, text=''):
@@ -311,11 +306,11 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
 
         # otherwise, provide a suitable creation link
         elif allowed:
-            return ('%s<a href="%s/new?id=%s">?</a>' %
+            return ('%s<a href="%s/wiki_createform?page=%s">?</a>' %
                     (m, quote(self.getId()), quote(m)))
         else:
-            return ('%s<sup><a href="%s/new?id=%s">x</a></sup>' %
-                    (m, quote(self.getId()), quote(m)))
+            return ('%s<sup><a href="%s/wiki_createform?page=%s">x</a></sup>'
+                    % (m, quote(self.getId()), quote(m)))
 
     def _wikilink_replace(self, match, allowed=0, state=None, text=''):
         """Replace occurrence of the wikilink regexp with suitable hyperlink.
@@ -532,9 +527,11 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
         return got
 
     security.declarePublic('isAllowed')
-    def isAllowed(self, op, REQUEST=None):
+    def isAllowed(self, op, **kw): 
         """ determine if currently logged in user is able to perform
-        the operation associated with the string represented by op """
+        the operation associated with the string represented by op
+        **kw exists in the arglist in case anything still tries to
+        pass in REQUEST, it should go away at some point"""
         return getSecurityManager().checkPermission(self._perms[op], self)
     
     security.declareProtected(CMFWikiPermissions.Regulate, 'setSubOwner')
@@ -544,11 +541,10 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
          - 'creator': person doing the page creation.
          - 'original_owner': parties that have owner role for this page.
          - 'both': includes both 'original_owner' and 'creator'."""
-        if which is None: return # use default shared-instance _subowner
         if which in ('creator', 'original_owner', 'both'):
             self._subowner = which
         else:
-            raise ValueError, "Subowner '%s'" % which
+            raise ValueError, "Bad subowner value '%s'" % which
 
     security.declarePublic('subOwner')
     def subOwner(self):
@@ -556,16 +552,11 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
         return self._subowner
 
     security.declarePublic('isRegSetter')
-    def isRegSetter(self, new=0):
+    def isRegSetter(self):
         """User is among those allowed to set the regulations for curr page.
-
-        If 'new' is true, then the computation is for the user as creator
-        of a new page, from the current page."""
-        if new and self.subOwner() in ['creator', 'both']: return 1
-        else:
-            return getSecurityManager().checkPermission(
-                self._perms['regulate'], self
-                )
+        """
+        check = getSecurityManager().checkPermission
+        return check(self._perms['regulate'], self)
 
     security.declarePrivate('clearLocalWikiRoles')
     def clearLocalWikiRoles(self):
@@ -587,7 +578,6 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
     security.declareProtected(CMFWikiPermissions.Regulate, 'setOp')
     def setOp(self, op, usernames, category):
         """Set who can do a particular operation."""
-        self.clearLocalWikiRoles()
         if category is None:
             raise "Programmer error, emasculate programmer"
         this_perm = self._perms[op]
@@ -599,19 +589,17 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
                      self.manage_addLocalRoles(username,[this_local_role])
 
     security.declareProtected(CMFWikiPermissions.Regulate, 'setRegulations')
-    def setRegulations(self, REQUEST):
+    def setRegulations(self, d):
         """Set regulations for CMFWiki page """
-        if not self.isRegSetter():
-            raise 'Unauthorized', ('You are not allowed to set CMFWiki page '
-                                   'regulations in this folder.')
         offspring = None
         # clear local roles related to Wiki stuff
+        self.clearLocalWikiRoles()
         for op in self.regOps(): # create, edit, comment, move
-            usernames = REQUEST.get(op + '-usernames', [])
-            category = REQUEST.get(op + '-category', None)
+            usernames = d.get(op + '-usernames', [])
+            category = d.get(op + '-category', None)
             self.setOp(op, usernames, category)
             # Propagate to subpages if desired
-            if REQUEST.get('propagate-' + op, None) == "ON":
+            if d.get('propagate-' + op, None) == "ON":
                 if offspring is None:
                     page_meta_type = self.meta_type
                     nesting = WikiNesting(self._my_folder(), page_meta_type)
@@ -622,7 +610,7 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
                     subobj = self._my_folder()[sub]
                     if subobj.isRegSetter():
                         subobj.setOp(op, usernames, category)
-        self.setSubOwner(REQUEST.get('who_owns_subs', None))
+        d.has_key('who_owns_subs') and self.setSubOwner(d['who_owns_subs'])
         
     security.declarePublic('regOps')
     def regOps(self):
@@ -745,6 +733,9 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
         ob.last_editor = username
         ob.indexObject()
         
+    # we want a Wiki page's manage_upload method to be
+    # protected by something other than 'Change DTML Methods'
+    security.declareProtected(CMFWikiPermissions.Edit, 'manage_upload')
     security.declareProtected(CMFWikiPermissions.Create, 'create_file')
     def create_file(self, id, file='', filetype='file', title='',
                     precondition='', content_type=''):
@@ -967,14 +958,13 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
 
     security.declareProtected(CMFWikiPermissions.Edit,
                               'history_copy_page_to_present')
-    def history_copy_page_to_present(self, keys=[], REQUEST=None):
+    def history_copy_page_to_present(self, keys=[]):
         """Create a new object copy with the contents of an historic copy."""
         self.manage_historyCopy(keys=keys)
         self.reindexObject()
-        if REQUEST is not None:
-            REQUEST.RESPONSE.redirect(self.wiki_page_url())
 
-    security.declarePublic('history_compare_versions')
+    security.declareProtected(CMFWikiPermissions.View,
+                              'history_compare_versions')
     def history_compare_versions(self, keys=[], REQUEST=None):
         """Do history comparisons.
 
@@ -1007,13 +997,8 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
         t1, t2 = rev1._st_data, rev2._st_data
         if t1 is None or t2 is None:
             t1, t2 = rev1.xread(), rev2.xread()
-        top = self._manage_historyComparePage(
-            self, REQUEST,
-            dt1=dt1, dt2=dt2,
-            historyComparisonResults=html_diff(t1, t2),
-            manage_tabs=self.standard_wiki_header)
-        bottom = self.standard_wiki_footer(self, REQUEST=REQUEST)
-        return top + bottom
+        historyComparisonResults = html_diff(t1, t2)
+        return dt1, dt2, historyComparisonResults
 
     def __str__(self):
         return self.quotedHTML(self._st_data or self.xread())
@@ -1039,17 +1024,9 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
     security.declareProtected(CMFWikiPermissions.Edit, 'PUT')
     def PUT(self, REQUEST, RESPONSE):
         """Handle HTTP/FTP/WebDav PUT requests."""
-        import pdb
-        pdb.set_trace()
         self.dav__init(REQUEST, RESPONSE)
         body=REQUEST.get('BODY', '')
         self._validateProxy(REQUEST)
-
-        # need to protect inline
-        if not self.isAllowed('edit'):
-            # Return 'Unauthorized'.
-            RESPONSE.setStatus(401)
-            return RESPONSE
 
         headers, body = parseHeadersBody(body)
 
@@ -1078,10 +1055,8 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
     def checkEditTimeStamp(self, timeStamp):
         if timeStamp is not None and timeStamp != self.editTimestamp():
             raise 'EditingConflict', (
-                '''Someone has edited this page since you loaded the
-                page for editing.<p>
-                Try editing the page again.
-                ''')
+                'Someone has edited this page since you loaded the page '
+                'for editing.  Try editing the page again.')
 
     security.declarePublic('editTimestamp')
     def editTimestamp(self):
@@ -1113,14 +1088,9 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
                     backlinks.append({'pageid':pageid, 'isparent':0})
         return backlinks
     
-##         if hasattr(self._my_folder(), 'view_wiki_backlinks'):
-##             return self._my_folder().backlinks(self,REQUEST)
-##         else:
-##             return default_backlinks(self,REQUEST)
-
-    security.declarePublic('text')
+    security.declareProtected(CMFWikiPermissions.View, 'text')
     def text(self, REQUEST=None, RESPONSE=None):
-        """Permission-free version of document_src"""
+        """ document source """
         if RESPONSE is not None:
             RESPONSE.setHeader('Content-Type', 'text/plain')
         return self._st_data or self.read()
@@ -1227,30 +1197,16 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
         """Present the nesting layout of the entire wiki, showing:
         - All the independent nodes, ie those without parents or children,
         - All the branches in the wiki - from the possibly multiple roots."""
-        page_meta_type = self.meta_type
-        map = WikiNesting(self._my_folder(), page_meta_type).get_map()
+        map = WikiNesting(self._my_folder(), self.meta_type).get_map()
         singletons = []
         combos = []
-        rel = self.wiki_base_url()      # SKWM 
-        wikid = self._my_folder().id
         for i in map:
             if type(i) == StringType:
-                # SKWM add named targets
-                singletons.append('<a href="%s/%s" name="%s">%s</a>' 
-                                  % (rel, quote(i), quote(i), i))
+                singletons.append(i)
             else:
                 combos.append(i)
-        header = self.standard_wiki_header(self, REQUEST=REQUEST)
-        footer = self.standard_wiki_footer(self, REQUEST=REQUEST)
-        return ("%(header)s\n<h3><i>%(wikid)s</i> Contents</h3>"
-                "%(nesting)s </p>"
-                '<font size="+1"><b><i>%(wikid)s</i> Singletons</b></font>'
-                " (no parents and no offspring): <ul> %(singletons)s </ul>"
-                "\n%(footer)s"
-                % {'header': header, 'wikid': wikid, 
-                   'nesting': present_nesting(self.getId(), combos, rel),
-                   'singletons': string.join(singletons," "),
-                   'footer': footer})
+        nesting = present_nesting(self.getId(), combos, self.wiki_base_url())
+        return nesting, singletons
 
     security.declarePublic('Title')
     def Title(self): # for CMFCatalog
@@ -1258,9 +1214,7 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
     
     security.declarePublic('title_or_id')
     def title_or_id(self):
-        fid = self._my_folder().id
-        if callable(fid):
-            fid = fid()
+        fid = self._my_folder().getId()
         return "%s of %s" % (self.getId(), fid)
     
     def __repr__(self):
@@ -1387,52 +1341,6 @@ def within_literal(upto, after, state, text,
 
     state['lastend'] = after
     return newinpre or newincode or newintag
-
-def old_within_literal(upto, after, state, text,
-                   rfind=string.rfind, lower=string.lower):
-    """Check text from state['lastend'] to upto for literal context:
-
-    - Within an enclosing <pre>
-    - Within a tag body - with a pending opening '<'
-
-    We also update the state dict accordingly."""
-    # XXX This breaks on badly nested angle brackets and <pre></pre>, etc.
-    lastend, inpre, intag = state['lastend'], state['inpre'], state['intag']
-    relevent = lower(text[lastend:upto])
-    newintag = newinpre = 0
-
-    # Check whether '<pre>' is currently prevailing.
-    fragment = split(relevent, '<pre>')
-    if len(fragment) > 1 or inpre:
-        fragment = fragment[-1]
-    else:
-        fragment = ''
-    if fragment:
-        fragment = split(fragment, '</pre>')
-        if len(fragment) == 1:
-            newinpre = 1
-    elif inpre:
-        # Didn't resolve pre, remaining inside:
-        newinpre = 1
-    state['inpre'] = newinpre
-
-    # Check whether we're within a tag.
-    fragment = split(relevent, '<')
-    if len(fragment) > 1 or intag:
-        fragment = fragment[-1]
-    else:
-        fragment = ''
-    if fragment:
-        fragment = split(fragment, '>')
-        if len(fragment) == 1:
-            newinliteral = 1
-    elif intag:
-        # Didn't resolve tag, remaining inside:
-        newintag = 1
-    state['intag'] = newintag
-
-    state['lastend'] = after
-    return newinpre or newintag
 
 default__class_init__(CMFWikiPage)
 
@@ -1884,16 +1792,13 @@ default_perms = {
 
 class CMFWikiFolder(PortalFolder):
     def PUT_factory(self, name, typ, body):
-        if find(type, 'text') != -1:
-            return CMFWikiPage(body, __name__=name)
-    
-def addCMFWikiPage(self, id, title='', file=''):
-    id=str(id)
-    title=str(title)
+        if find(typ, 'text') != -1:
+            return makeCMFWikiPage(name, '', body)
+
+def makeCMFWikiPage(id, title, file):
     ob = CMFWikiPage(file, __name__=id)
     ob.title = title
     ob.parents = []
-    id=self._setObject(id, ob)
     username = getSecurityManager().getUser().getUserName()
     ob.manage_addLocalRoles(username, ['Owner'])
     ob.setSubOwner('both')
@@ -1904,6 +1809,13 @@ def addCMFWikiPage(self, id, title='', file=''):
         roles_map = ob._roles_map
         roles = [local_roles_map[name], roles_map[pseudoperm]]
         ob.manage_permission(perm, roles=roles)
+    return ob
+
+def addCMFWikiPage(self, id, title='', file=''):
+    id=str(id)
+    title=str(title)
+    ob = makeCMFWikiPage(id, title, file)
+    self._setObject(id, ob)
 
 def addCMFWikiFolder(self, id, title=''):
     id = str(id)
