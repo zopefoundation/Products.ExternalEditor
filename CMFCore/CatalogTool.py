@@ -66,9 +66,12 @@ class IndexableObjectWrapper:
                 if allowed.has_key(role):
                     allowed['user:' + user] = 1
         if allowed.has_key('Owner'):
+            owner = ob.getOwner()
+            if hasattr( owner, 'getId' ):
+                if owner.getId() is not None:
+                    allowed['user:' + owner.getId()] = 1
             del allowed['Owner']
         return list(allowed.keys())
-
 
 class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
     """ This is a ZCatalog that filters catalog queries.
