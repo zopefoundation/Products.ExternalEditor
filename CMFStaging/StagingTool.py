@@ -25,8 +25,8 @@ from Globals import InitializeClass, DTMLFile
 from AccessControl import ClassSecurityInfo
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
-from Products.CMFCore.utils import UniqueObject, getToolByName, \
-     SimpleItemWithProperties
+from Products.CMFCore.utils \
+     import UniqueObject, getToolByName, SimpleItemWithProperties
 from Products.CMFCore.CMFCorePermissions import ManagePortal
 
 from staging_utils import getPortal, verifyPermission, unproxied
@@ -157,7 +157,7 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
                 lt.unlock(obj)
         vt = getToolByName(self, 'portal_versions', None)
         if vt is not None:
-            if vt.isCheckedOut(obj):
+            if not vt.isUnderVersionControl(obj) or vt.isCheckedOut(obj):
                 vt.checkin(obj, message)
 
 
@@ -210,7 +210,7 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
         from_stage.  updateStages2() eliminates the potential
         ambiguity by eliminating from_stage.
         """
-        s = self.getStageOf(obj)  # Checks the StageObjects permission
+        s = self.getStageOf(obj)
         if s != from_stage:
             raise StagingError("Ambiguous source stage")
         self.updateStages2(obj, to_stages, message)
@@ -220,7 +220,8 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
     def updateStages2(self, obj, to_stages, message=''):
         """Updates objects to match the version in the source stage.
         """
-        from_stage = self.getStageOf(obj)  # Checks the StageObjects permission
+        verifyPermission(StageObjects, obj)
+        from_stage = self.getStageOf(obj)
         if from_stage is None:
             raise StagingError("Object %s is not in any stage" %
                                '/'.join(obj.getPhysicalPath()))
@@ -228,9 +229,20 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
             raise StagingError("Invalid to_stages parameter")
 
         if aq_base(unproxied(obj)) is not aq_base(obj):
-            # obj is a proxy.  Update both the reference and the target.
+            # obj is a proxy.  Find the wrapped target and update that
+            # instead of the reference.  Note that the reference will
+            # be updated with the container.
             proxy = obj
             obj = getProxyTarget(proxy)
+            # Decide whether the reference should be staged at the
+            # same time.  If the reference is contained in a
+            # non-versioned container, the reference should be staged.
+            # OTOH, if the reference is in a versioned container,
+            # staging the container will create the reference, so the
+            # reference should not be staged by this operation.
+            repo = self._getVersionRepository()
+            if repo.isUnderVersionControl(aq_parent(aq_inner(proxy))):
+                proxy = None
         else:
             proxy = None
 
@@ -244,19 +256,20 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
             self._checkContainers(proxy, to_stages, proxy_cmap)
 
         # Update the stages.
-        self._updateObjectStates(obj, cmap, to_stages, message)
+        if self.auto_checkin:
+            self._autoCheckin(obj, message)
+        self._updateObjectStates(obj, cmap, to_stages)
         if proxy is not None:
             # Create and update the reference objects also.
             self._updateReferences(proxy, proxy_cmap, to_stages)
 
 
-    def _updateObjectStates(self, source_object, container_map,
-                            to_stages, message):
+    def _updateObjectStates(self, source_object, container_map, to_stages):
         """Internal: updates the state of an object in specified stages.
+
+        Uses version control to do the propagation.
         """
         repo = self._getVersionRepository()
-        if self.auto_checkin:
-            self._autoCheckin(source_object, message)
         object_map = self._getObjectStages(source_object)
         version_info = repo.getVersionInfo(source_object)
         version_id = version_info.version_id
@@ -269,16 +282,8 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
                     # The object has not yet been created in the stage.
                     # Copy from the repository to the given stage.
                     ob = repo.getVersionOfResource(history_id, version_id)
-                    container = container_map.get(stage_name, None)
-                    if container is None:
-                        # This can happen if a site doesn't yet exist on
-                        # the stage.
-                        p = '/'.join(source_object.getPhysicalPath())
-                        raise StagingError(
-                            'The container for "%s" does not exist on "%s"'
-                            % (p, stage_name))
+                    container = container_map[stage_name]
                     # Make a copy and put it in the new place.
-                    # (see CopySupport.manage_pasteObjects())
                     id = source_object.getId()
                     container._setObject(id, ob)
                 else:
@@ -407,6 +412,39 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
             return url
         else:
             return None
+
+
+    security.declarePublic('getObjectStats')
+    def getObjectStats(self, source):
+        """Returns a structure suitable for presentation of staging status.
+        """
+        verifyPermission(StageObjects, source)
+        res = []
+        revisions = self._getObjectVersionIds(source, include_status=1)
+        source_stage = self.getStageOf(source)
+        for stage_name, stage_title, path in self._stages:
+            stageable = (stage_name != source_stage) and (
+                not revisions[stage_name]
+                or revisions[stage_name] != revisions[source_stage])
+            stats = {
+                "name": stage_name,
+                "title": stage_title,
+                "exists": revisions.get(stage_name) is not None,
+                "revision": revisions.get(stage_name),
+                "stageable": stageable,
+                }
+            res.append(stats)
+        return res
+
+
+    security.declarePublic('getStageTitle')
+    def getStageTitle(self, stage_name):
+        """Returns a stage title given a stage name.
+        """
+        for name, stage_title, path in self._stages:
+            if name == stage_name:
+                return stage_title
+        raise KeyError, "Unknown stage: %s" % stage_name
 
 
     security.declareProtected(ManagePortal, 'manage_stagesForm')
