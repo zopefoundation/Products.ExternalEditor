@@ -89,9 +89,11 @@ $Id$
 __version__='$Revision$'[11:-2]
 
 
+import os
 from utils import UniqueObject, _checkPermission, _getAuthenticatedUser
+from utils import getToolByName
 from Products.ZCatalog.ZCatalog import ZCatalog
-from Globals import InitializeClass
+from Globals import InitializeClass, package_home, DTMLFile
 import urllib
 from DateTime import DateTime
 from string import join
@@ -99,6 +101,8 @@ from AccessControl.PermissionRole import rolesForPermissionOn
 from AccessControl import ClassSecurityInfo
 from utils import mergedLocalRoles
 import CMFCorePermissions
+
+_dtmldir = os.path.join( package_home( globals() ), 'dtml' )
 
 class IndexableObjectWrapper:
 
@@ -199,6 +203,8 @@ class CatalogTool (UniqueObject, ZCatalog):
 
     def __url(self, ob):
         return join(ob.getPhysicalPath(), '/')
+
+    manage_catalogFind = DTMLFile( 'catalogFind', _dtmldir )
 
     def catalog_object(self, object, uid):
         # Wraps the object with workflow and accessibility
