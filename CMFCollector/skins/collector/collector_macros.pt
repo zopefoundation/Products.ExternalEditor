@@ -259,24 +259,26 @@
                          base python: url_query(request, omit='b_start')">
 
         <tr>
-          <td align="right" width="10%">
+          <td align="left" width="10%">
            <strong>
             <span tal:condition="prev">
-              <a href="FIRST BATCH"
-                 tal:attributes="href here/absolute_url">
-              &lt;&lt; </a>
+               <a href="FIRST BATCH"
+                  tal:attributes="href here/absolute_url">
+               &lt;&lt; </a>
             </span>
            </strong>
           </td>
 
-          <th align="center" width="30%">
+          <td align="left" width="30%">
             <span tal:condition="prev">
+             <strong>
               <a href="PREVIOUS BATCH"
                 tal:attributes="href python:
                                      base+'&'+make_query(b_start=prev.first)">
                Previous</a>
+              </strong>
              </span>
-          </th>
+          </td>
 
           <td align="center" NOWRAP
               tal:define="total here/length;
@@ -296,23 +298,25 @@
             </b>
           </td>
 
-          <th align="center" width="30%">
+          <td align="right" width="30%">
             <span tal:condition="next">
+             <strong>
               <a href="NEXT BATCH"
                 tal:attributes="href python:
                                      base+'&'+make_query(b_start=next.first)">
               Next</a>
+             </strong>
             </span>
-          </th>
+          </td>
 
-          <td align="left" width="10%">
+          <td align="right" width="10%">
             <strong>
-            <span tal:condition="next">
-              <a href="LAST BATCH"
-                tal:attributes="href python:
-                                     base+'&'+make_query(b_start=last_batch)">
-               &gt;&gt; </a>
-            </span>
+              <span tal:condition="next">
+                <a href="LAST BATCH"
+                 tal:attributes="href python:
+                                      base+'&'+make_query(b_start=last_batch)">
+                &gt;&gt; </a>
+              </span>
             </strong>
           </td>
         </tr>
