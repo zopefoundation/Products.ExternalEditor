@@ -68,7 +68,7 @@ class DummyContent( PortalContent, OFS.SimpleItem.Item ):
 
 
 def extra_meta_types():
-    return (  { 'name' : 'Dummy', 'action' : 'manage_addFolder' }, )
+    return [  { 'name' : 'Dummy', 'action' : 'manage_addFolder' } ]
 
 class PortalFolderTests( unittest.TestCase ):
 
