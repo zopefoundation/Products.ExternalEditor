@@ -1,4 +1,4 @@
-#! /usr/bin/env python2.1
+#!/usr/bin/python
 """ Make a CMF release.
 """
 
@@ -107,7 +107,7 @@ options:
 
     -x, --execute       Select a particular step. Available steps are:
 
-                        exportReleaseFile
+                        exportReleaseFiles
                         makeArchives
                         uploadArchives
                         uploadDocs

@@ -14,6 +14,7 @@
 
 $Id$
 """
+import re
 
 from Globals import InitializeClass, DTMLFile
 from AccessControl import ClassSecurityInfo
@@ -107,7 +108,12 @@ class RegistrationTool(BaseTool):
                 return ('The login name you selected is already '
                         'in use or is not valid. Please choose another.')
 
-            if not props.get('email'):
+            email = props.get('email')
+            if email is None:
+                return 'You must enter an email address.'
+
+            ok, message =  _checkEmail( email )
+            if not ok:
                 return 'You must enter a valid email address.'
 
         else: # Existing member.
@@ -204,3 +210,42 @@ class RegistrationTool(BaseTool):
         return member
 
 InitializeClass(RegistrationTool)
+
+# See URL: http://www.zopelabs.com/cookbook/1033402597
+
+_TESTS = ( ( re.compile("^[0-9a-zA-Z\.\-\_]+\@[0-9a-zA-Z\.\-]+$")
+           , True
+           , "Failed a"
+           )
+         , ( re.compile("^[^0-9a-zA-Z]|[^0-9a-zA-Z]$")
+           , False
+           , "Failed b"
+           )
+         , ( re.compile("([0-9a-zA-Z]{1})\@.")
+           , True
+           , "Failed c"
+           )
+         , ( re.compile(".\@([0-9a-zA-Z]{1})")
+           , True
+           , "Failed d"
+           )
+         , ( re.compile(".\.\-.|.\-\..|.\.\..|.\-\-.")
+           , False
+           , "Failed e"
+           )
+         , ( re.compile(".\.\_.|.\-\_.|.\_\..|.\_\-.|.\_\_.")
+           , False
+           , "Failed f"
+           )
+         , ( re.compile(".\.([a-zA-Z]{2,3})$|.\.([a-zA-Z]{2,4})$")
+           , True
+           , "Failed g"
+           )
+         )
+
+def _checkEmail( address ):
+    for pattern, expected, message in _TESTS:
+        matched = pattern.search( address ) is not None
+        if matched != expected:
+            return False, message
+    return True, ''
