@@ -89,7 +89,7 @@ CMFDefault portal_metadata tool.
 
 import os
 from OFS.SimpleItem import SimpleItem
-from Globals import InitializeClass, HTMLFile, package_home
+from Globals import InitializeClass, HTMLFile, package_home, PersistentMapping
 from AccessControl import getSecurityManager, ClassSecurityInfo
 from Products.CMFCore.CMFCorePermissions import View, ManagePortal
 from Products.CMFCore.utils import UniqueObject
@@ -185,7 +185,7 @@ class ElementSpec:
 
     def __init__( self, is_multi_valued ):
         self.is_multi_valued  = is_multi_valued
-        self.policies         = {}                  # XXX: use PersistentDict?
+        self.policies         = PersistentMapping()
         self.policies[ None ] = self._makePolicy()  # set default policy
         
     
@@ -266,7 +266,7 @@ class MetadataTool( UniqueObject, SimpleItem ):
                           #, validation_hook
                            )
 
-        self.element_specs = {}     # XXX: use PersistentDict?
+        self.element_specs = PersistentMapping()
 
         for name, is_multi_valued in element_specs:
             self.element_specs[ name ] = ElementSpec( is_multi_valued )

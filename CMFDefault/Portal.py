@@ -331,6 +331,7 @@ class PortalGenerator:
         addCMFDefaultTool('Default Registration Tool', None)
         addCMFDefaultTool('Default URL Tool', None)
         addCMFDefaultTool('Default Properties Tool', None)
+        addCMFDefaultTool('Default Metadata Tool', None)
 
     def setupMailHost(self, p):
         p.manage_addProduct['MailHost'].manage_addMailHost(
