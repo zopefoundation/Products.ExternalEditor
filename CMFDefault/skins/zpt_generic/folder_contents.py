@@ -110,11 +110,11 @@ columns = ( {'key': 'Type',
              'colspan': '2'}
           , {'key': 'getId',
              'title': 'Name',
-             'width': '380',
+             'width': '360',
              'colspan': None}
           , {'key': 'modified',
              'title': 'Last Modified',
-             'width': '160',
+             'width': '180',
              'colspan': None}
           , {'key': 'position',
              'title': 'Position',

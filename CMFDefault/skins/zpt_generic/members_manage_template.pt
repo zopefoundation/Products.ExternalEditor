@@ -19,7 +19,7 @@
     <td width="20">&nbsp;</td>
     <th width="120" i18n:translate="">Member</th>
     <th width="260" i18n:translate="">Email Address</th>
-    <th width="80" i18n:translate="">Last Login</th>
+    <th width="100" i18n:translate="">Last Login</th>
    </tr>
   </thead>
   <tbody tal:repeat="member batch/listItemInfos">

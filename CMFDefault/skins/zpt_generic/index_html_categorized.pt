@@ -25,7 +25,7 @@
 <div metal:fill-slot="main">
 
   <div id="content_well"
-       style="float: left; top: 0; width: 80%;">
+       style="float: left; top: 0; width: 78%;">
 
     <div tal:condition="not: has_local">
 
