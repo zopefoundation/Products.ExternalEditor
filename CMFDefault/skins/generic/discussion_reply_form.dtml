@@ -1,7 +1,7 @@
 <dtml-var standard_html_header>
 
 <dtml-if expr="not _.hasattr(this(), 'talkback') and this().meta_type != 'Discussion Item'">
-  <dtml-call expr="portal_discussion.createDiscussionFor(this())">
+  <dtml-call expr="portal_discussion.getDiscussionFor(this())">
 </dtml-if>
 
 <form method="POST" action="<dtml-var expr="absolute_url() + '/talkback'">">
