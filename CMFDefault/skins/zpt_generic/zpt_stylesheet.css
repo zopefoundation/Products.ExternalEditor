@@ -1,10 +1,8 @@
 body {
     background-color: White;
     color: Black;
-    margin-top: 0;
-    margin-left:2pt;
-    margin-right:2pt;
-    margin-bottom:0;
+    margin: 0;
+    padding: 0;
 }
 
 p {
@@ -205,8 +203,8 @@ td {
 }
 
 #Desktop {
-    margin-left: 8pt;
-    margin-right: 8pt;
+    margin-left: 2pt;
+    margin-right: 2pt;
 }
 
 #ContentByline {
@@ -359,6 +357,20 @@ td.NewsTitle {
 
 p.NewsHeadline {
     background-color:  #336699;
+}
+
+.BatchListing {
+    text-indent: -25px;
+    margin: 7pt 0pt 1pt 25px;
+}
+
+.BatchListing img {
+    vertical-align: baseline;
+}
+
+.BatchListing span {
+    font: bold 8pt Verdana, sans-serif;
+    color: #aaaaaa;
 }
 
 .BatchTable {
