@@ -213,4 +213,22 @@ class PortalContent(SimpleItem, DynamicType):
         else:
             return view()
 
+    # Overridden methods to support cataloging items that might
+    # be stored in attributes unknown to the content object, such
+    # as the DiscussionItemContainer "talkback"
+
+    security.declareProtected(AccessContentsInformation, 'objectItems')
+    def objectItems(self):
+        """
+        since "talkback" is the only opaque item on content
+        right now i will return that. should be replaces with
+        a list of tuples for every opaque item!
+        """
+        talkback = getattr(self, 'talkback', None)
+        if talkback is not None:
+            return ((talkback.id, talkback),)
+        else:
+            return []
+
+
 Globals.InitializeClass(PortalContent)
