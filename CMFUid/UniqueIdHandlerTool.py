@@ -39,7 +39,7 @@ class UniqueIdHandlerTool(UniqueObject, SimpleItem, ActionProviderBase):
     __doc__ = __doc__ # copy from module
 
     __implements__ = (
-        IUniqueIdGenerator,
+        IUniqueIdHandler,
         ActionProviderBase.__implements__,
         SimpleItem.__implements__,
     )
