@@ -9,9 +9,10 @@
 <div tal:define="transactions python: here.portal_undo.listUndoableTransactionsFor(here)">
     <div tal:condition="transactions">
         <FORM ACTION="undo" METHOD="POST">
-        <p>This application's transactional feature allows you to easily undo changes
-           made to the application's settings or data. You can revert the application
-           to a &quot;snapshot&quot; of it's state at a previous point in time. </p>
+        <p>The system's transactional basis enables you to undo
+           changes to application settings and data. You can revert
+           to a &quot;snapshot&quot; of the application's state at a previous
+           point in time. </p>
         <P>Select one or more transactions below and then click on the &quot;Undo&quot;
            button to undo the transactions.  Note that even though a transaction
            is shown below, you will not be able to undo it if later transactions
