@@ -87,7 +87,7 @@
 
 ADD_CONTENT_PERMISSION = 'Add portal content'
 
-import Globals
+import Globals, string
 from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
 from Products.CMFCore.PortalContent import PortalContent
