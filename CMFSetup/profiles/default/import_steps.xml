@@ -48,7 +48,7 @@
  
   <dependency step="toolset" />
  </import-step>
- <import-step id="typeinfo" version="20040630-01"
+ <import-step id="workflow" version="20040630-01"
               handler="Products.CMFSetup.workflow.importWorkflowTool"
               title="Workflow Tool">
   

@@ -89,7 +89,8 @@ def exportToolset( context ):
     """ Export required / forbidden tools to XML file.
     """
     site = context.getSite()
-    toolset = ToolsetRegistry().__of__( site )
+    setup_tool = getToolByName( site, 'portal_setup' )
+    toolset = setup_tool.getToolsetRegistry()
 
     xml = toolset.generateXML()
     context.writeDataFile( TOOLSET_XML, xml, 'text/xml' )

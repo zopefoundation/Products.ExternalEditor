@@ -785,7 +785,7 @@ class Test_exportToolset( _ToolsetSetup
         self.assertEqual( len( context._wrote ), 1 )
         filename, text, content_type = context._wrote[ 0 ]
         self.assertEqual( filename, TOOLSET_XML )
-        self._compareDOM( text, _EMPTY_TOOLSET_XML )
+        self._compareDOM( text, _NORMAL_TOOLSET_XML )
         self.assertEqual( content_type, 'text/xml' )
 
 class Test_importToolset( _ToolsetSetup ):
@@ -906,6 +906,15 @@ class AnotherDummyTool( Folder ):
 _EMPTY_TOOLSET_XML = """\
 <?xml version="1.0"?>
 <tool-setup>
+</tool-setup>
+"""
+
+_NORMAL_TOOLSET_XML = """\
+<?xml version="1.0" ?>
+<tool-setup>
+<forbidden tool_id="doomed"/>
+<required class="path.to.one" tool_id="mandatory"/>
+<required class="path.to.another" tool_id="obligatory"/>
 </tool-setup>
 """
 

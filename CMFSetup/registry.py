@@ -415,7 +415,9 @@ class ToolsetRegistry( Implicit ):
 
         """ See IToolsetRegistry.
         """
-        return tuple( self._forbidden )
+        result = list( self._forbidden )
+        result.sort()
+        return result
 
     security.declareProtected( ManagePortal, 'addForbiddenTool' )
     def addForbiddenTool( self, tool_id ):
@@ -435,7 +437,9 @@ class ToolsetRegistry( Implicit ):
 
         """ See IToolsetRegistry.
         """
-        return self._required.keys()
+        result = list( self._required.keys() )
+        result.sort()
+        return result
 
     security.declareProtected( ManagePortal, 'getRequiredToolInfo' )
     def getRequiredToolInfo( self, tool_id ):
@@ -450,7 +454,7 @@ class ToolsetRegistry( Implicit ):
         """ See IToolsetRegistry.
         """
         return [ self.getRequiredToolInfo( x )
-                        for x in self._required.keys() ]
+                        for x in self.listRequiredTools() ]
 
     security.declareProtected( ManagePortal, 'addRequiredTool' )
     def addRequiredTool( self, tool_id, dotted_name ):

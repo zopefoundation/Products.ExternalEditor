@@ -13,7 +13,7 @@ CMFSetup Product README
     The 'portal_setup' tool knows how to export / import configurations
     and scripts for the following tools:
 
-      - ( ) removal / creation of specified tools
+      - (x) removal / creation of specified tools
 
       - (x) itself :)
 
@@ -44,7 +44,7 @@ CMFSetup Product README
 
             o DCWorkflow definitions, including supporting scripts
 
-      - ( ) 'portal_catalogs'
+      - ( ) 'portal_catalog'
             (Products.CMFCore.CatalogTool.CatalogTool)
 
             o index names / types
@@ -59,12 +59,36 @@ CMFSetup Product README
 
             o member properties
 
+      - ( ) 'content_type_registry'
+
+            o predicate -> portal_type bindings.
+
+      - ( ) 'caching_policy_manager'
+
+            o policy settins
+
+      - ( ) 'portal_metadata'
+
+            o global properties
+
+            o default element policies
+
+            o type-specific element policies
+
       - ( ) 'portal_actionicons'
             (Products.CMFActionIcons.ActionIconsTool.ActionIconsTool)
 
             o action title / icon bindings
 
-      - ( ) cookie crumbler configuration
+      - ( ) 'cookie_authentication'
+
+            o tool properties
+
+      - ( ) 'MailHost'
+
+            o tool properties
+
+      - ( ) user folder configuration
 
       - ( ) folder structure
 
