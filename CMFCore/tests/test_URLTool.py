@@ -2,40 +2,21 @@ from unittest import TestCase, TestSuite, makeSuite, main
 
 import Zope
 try:
+    Zope.startup()
+except AttributeError:
+    # for Zope versions before 2.6.1
+    pass
+try:
     from Interface.Verify import verifyClass
 except ImportError:
     # for Zope versions before 2.6.0
     from Interface import verify_class_implementation as verifyClass
 
-from Products.CMFCore.tests.base.dummy import DummyFolder as BaseDummyFolder
 from Products.CMFCore.tests.base.dummy import DummyContent
+from Products.CMFCore.tests.base.dummy import DummyFolder
+from Products.CMFCore.tests.base.dummy import DummySite
 
 from Products.CMFCore.URLTool import URLTool
-
-
-class DummyFolder(BaseDummyFolder):
-
-    def __init__(self, id='', fake_product=0, prefix=''):
-        BaseDummyFolder.__init__(self, fake_product, prefix)
-        self._id = id
-
-    def getId(self):
-        return self._id
-
-    def getPhysicalPath(self):
-        return self.aq_inner.aq_parent.getPhysicalPath() + ( self._id, )
-
-
-class DummySite(DummyFolder):
-
-    _domain = 'http://www.foobar.com'
-    _path = 'bar'
-
-    def absolute_url(self, relative=0):
-        return '/'.join( (self._domain, self._path, self._id) )
-
-    def getPhysicalPath(self):
-        return ('', self._path, self._id)
 
 
 class URLToolTests(TestCase):

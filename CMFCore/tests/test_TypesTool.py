@@ -12,47 +12,64 @@ except ImportError:
     # for Zope versions before 2.6.0
     from Interface import verify_class_implementation as verifyClass
 
-from Acquisition import aq_base
+from AccessControl import Unauthorized
 from AccessControl.SecurityManagement import newSecurityManager
 from AccessControl.SecurityManagement import noSecurityManager
+from AccessControl.SecurityManager import setSecurityPolicy
+from Acquisition import aq_base
 from webdav.NullResource import NullResource
-
+from Products.PythonScripts.PythonScript import PythonScript
 from Products.PythonScripts.standard import url_quote
 
 from Products.CMFCore.TypesTool import FactoryTypeInformation as FTI
 from Products.CMFCore.TypesTool import ScriptableTypeInformation as STI
 from Products.CMFCore.TypesTool import TypesTool
-from Products.CMFCore.TypesTool import Unauthorized
-
 from Products.CMFCore.PortalFolder import PortalFolder
 from Products.CMFCore.utils import _getViewFor
 
-from Products.CMFCore.tests.base.testcase import SecurityRequestTest
 from Products.CMFCore.tests.base.security import OmnipotentUser
 from Products.CMFCore.tests.base.security import UserWithRoles
-from Products.CMFCore.tests.base.dummy import DummyObject
-from Products.CMFCore.tests.base.dummy import addDummy
-from Products.CMFCore.tests.base.dummy import DummyTypeInfo
+from Products.CMFCore.tests.base.dummy import DummyFactory
 from Products.CMFCore.tests.base.dummy import DummyFolder
 from Products.CMFCore.tests.base.dummy import DummyFTI
+from Products.CMFCore.tests.base.dummy import DummyObject
+from Products.CMFCore.tests.base.dummy import DummySite
+from Products.CMFCore.tests.base.dummy import DummyUserFolder
+from Products.CMFCore.tests.base.testcase import SecurityTest
 
-class TypesToolTests( SecurityRequestTest ):
+STI_SCRIPT = """\
+## Script (Python) "addBaz"
+##bind container=container
+##bind context=context
+##bind namespace=
+##bind script=script
+##bind subpath=traverse_subpath
+##parameters=container, id
+##title=
+##
+product = container.manage_addProduct['FooProduct']
+product.addFoo(id)
+item = getattr(container, id)
+return item
+"""
+
+
+class TypesToolTests(SecurityTest):
 
     def setUp( self ):
-        SecurityRequestTest.setUp(self)
-        root = self.root
-        root.addDummy = addDummy
-
-        root._setObject( 'portal_types', TypesTool() )
-        tool = root.portal_types
-        tool._setObject( 'Dummy Content', DummyFTI ) 
+        SecurityTest.setUp(self)
+        self.site = DummySite('site').__of__(self.root)
+        self.acl_users = self.site._setObject( 'acl_users', DummyUserFolder() )
+        self.ttool = self.site._setObject( 'portal_types', TypesTool() )
+        self.ttool._setObject( 'Dummy Content', DummyFTI ) 
  
     def test_processActions( self ):
         """
         Are the correct, permitted methods returned for actions?
         """
-        self.root._setObject( 'portal', PortalFolder( 'portal', '' ) )
-        portal = self.root.portal
+        site = self.site
+        portal = site._setObject( 'portal', PortalFolder(id='portal') )
+        portal.manage_addProduct = { 'FooProduct' : DummyFactory(portal) }
         portal.invokeFactory( 'Dummy Content', 'actions_dummy' )
         dummy = portal._getOb( 'actions_dummy' )
 
@@ -75,7 +92,7 @@ class TypesToolTests( SecurityRequestTest ):
         Test that everything returned by allMetaTypes can be
         traversed to.
         """
-        tool = self.root.portal_types
+        tool = self.ttool
         meta_types={}
         # Seems we get NullResource if the method couldn't be traverse to
         # so we check for that. If we've got it, something is b0rked.
@@ -90,7 +107,34 @@ class TypesToolTests( SecurityRequestTest ):
         self.failUnless(meta_types.has_key('Scriptable Type Information'))
         self.failUnless(meta_types.has_key('Factory-based Type Information'))
 
-    def test_interface(self):
+    def test_constructContent(self):
+        site = self.site
+        acl_users = self.acl_users
+        ttool = self.ttool
+        setSecurityPolicy(self._oldPolicy)
+        newSecurityManager(None, acl_users.all_powerful_Oz)
+        self.site._owner = (['acl_users'], 'all_powerful_Oz')
+        sti_baz = STI('Baz',
+                      permission='Add portal content',
+                      constructor_path='addBaz')
+        ttool._setObject('Baz', sti_baz)
+        ttool._setObject( 'addBaz',  PythonScript('addBaz') )
+        s = ttool.addBaz
+        s.write(STI_SCRIPT)
+
+        f = site._setObject( 'folder', PortalFolder(id='folder') )
+        f.manage_addProduct = { 'FooProduct' : DummyFactory(f) }
+        f._owner = (['acl_users'], 'user_foo')
+        self.assertEqual( f.getOwner(), acl_users.user_foo )
+
+        ttool.constructContent('Dummy Content', container=f, id='page1')
+        try:
+            ttool.constructContent('Baz', container=f, id='page2')
+        except Unauthorized:
+            self.fail('CMF Collector issue #165 (Ownership bug): '
+                      'Unauthorized raised' )
+
+def test_interface(self):
         from Products.CMFCore.interfaces.portal_types \
                 import portal_types as ITypesTool
         from Products.CMFCore.interfaces.portal_actions \

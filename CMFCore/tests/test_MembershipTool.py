@@ -14,21 +14,12 @@ except ImportError:
 from AccessControl.SecurityManagement import newSecurityManager
 
 from Products.CMFCore.PortalFolder import PortalFolder
-from Products.CMFCore.tests.base.dummy import DummyFolder as DummyFolderBase
+from Products.CMFCore.tests.base.dummy import DummySite
 from Products.CMFCore.tests.base.dummy import DummyTool
 from Products.CMFCore.tests.base.dummy import DummyUserFolder
 from Products.CMFCore.tests.base.testcase import SecurityTest
 
 from Products.CMFCore.MembershipTool import MembershipTool
-
-
-class DummyFolder(DummyFolderBase):
-    def _getProductRegistryData(self, name):
-        return ()
-    def getPhysicalRoot(self):
-        return self
-    def unrestrictedTraverse(self, path, default=None, restricted=0):
-        return self.acl_users
 
 
 class MembershipToolTests(TestCase):
@@ -47,8 +38,7 @@ class MembershipToolSecurityTests(SecurityTest):
 
     def setUp(self):
         SecurityTest.setUp(self)
-        self.site = DummyFolder()
-        self.site.id = 'testSite'
+        self.site = DummySite('site').__of__(self.root)
         self.mtool = MembershipTool().__of__(self.site)
 
     def test_createMemberarea(self):

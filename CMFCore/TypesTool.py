@@ -16,14 +16,14 @@ $Id$
 """
 import sys
 
-from Globals import InitializeClass
 from Globals import DTMLFile
-from AccessControl import getSecurityManager
+from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
+from AccessControl import getSecurityManager
 from AccessControl import Unauthorized
 from Acquisition import aq_base
+from Acquisition import aq_get
 from zLOG import LOG, WARNING, ERROR
-
 from OFS.Folder import Folder
 import Products
 
@@ -31,8 +31,6 @@ from interfaces.portal_types import ContentTypeInformation as ITypeInformation
 from interfaces.portal_types import portal_types as ITypesTool
 
 from ActionProviderBase import ActionProviderBase
-from ActionInformation import ActionInformation
-from Expression import Expression
 
 from CMFCorePermissions import View
 from CMFCorePermissions import ManagePortal
@@ -458,6 +456,10 @@ class ScriptableTypeInformation( TypeInformation ):
             raise Unauthorized
 
         constructor = self.restrictedTraverse( self.constructor_path )
+        # make sure ownership is explicit before switching the context
+        if not hasattr( aq_base(constructor), '_owner' ):
+            constructor._owner = aq_get(constructor, '_owner')
+
         #   Rewrap to get into container's context.
         constructor = aq_base(constructor).__of__( container )
 

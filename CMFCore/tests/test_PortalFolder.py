@@ -1,9 +1,16 @@
 from unittest import TestCase, TestSuite, makeSuite, main
+
 import Zope
+try:
+    Zope.startup()
+except AttributeError:
+    # for Zope versions before 2.6.1
+    pass
 
 from DateTime import DateTime
 
 from Products.CMFCore.tests.base.dummy import DummyContent
+from Products.CMFCore.tests.base.dummy import DummyFactory
 from Products.CMFCore.tests.base.dummy import DummyFTI
 from Products.CMFCore.tests.base.testcase import SecurityTest
 from Products.CMFCore.tests.base.testcase import newSecurityManager
@@ -18,6 +25,7 @@ from Products.CMFCore.PortalFolder import ContentFilter
 
 def extra_meta_types():
     return [  { 'name' : 'Dummy', 'action' : 'manage_addFolder' } ]
+
 
 class PortalFolderFactoryTests( SecurityTest ):
 
@@ -46,6 +54,7 @@ class PortalFolderFactoryTests( SecurityTest ):
 
         self.failIf( 'foo' in f.objectIds() )
 
+        f.manage_addProduct = { 'FooProduct' : DummyFactory(f) }
         f.invokeFactory( type_name='Dummy Content', id='foo' )
 
         self.failUnless( 'foo' in f.objectIds() )

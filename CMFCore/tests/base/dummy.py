@@ -1,9 +1,9 @@
 from Acquisition import Implicit, aq_inner, aq_parent
 from OFS.SimpleItem import Item
 from Products.CMFCore.PortalContent import PortalContent
-from Products.CMFCore.TypesTool import TypeInformation
 from Products.CMFCore.TypesTool import FactoryTypeInformation as FTI
 from Products.CMFCore.ActionProviderBase import ActionProviderBase
+from security import OmnipotentUser
 
 
 class DummyObject(Implicit):
@@ -13,14 +13,14 @@ class DummyObject(Implicit):
     methods.
     """
     def __init__(self, id='dummy',**kw):
-        self.id = id
+        self._id = id
         self.__dict__.update( kw )
         
     def __str__(self):
-        return self.id
+        return self._id
     
     def __call__(self):
-        return self.id
+        return self._id
 
     def restrictedTraverse( self, path ):
         return path and getattr( self, path ) or self
@@ -29,7 +29,7 @@ class DummyObject(Implicit):
         return 'Site: %s' % relative
     
     def getId(self):
-        return self.id
+        return self._id
 
 
 class DummyContent( PortalContent, Item ):
@@ -98,11 +98,6 @@ class DummyContent( PortalContent, Item ):
     def Type( self ):
         return 'Dummy Content Title'
 
-def addDummy( self, id ):
-    """
-    Constructor method for DummyContent
-    """
-    self._setObject( id, DummyContent() )
 
 class DummyFactory:
     """
@@ -111,27 +106,26 @@ class DummyFactory:
     def __init__( self, folder ):
         self._folder = folder
 
+    def getId(self):
+        return 'DummyFactory'
+
     def addFoo( self, id, *args, **kw ):
-        if self._folder._prefix:
+        if getattr(self._folder, '_prefix', None):
             id = '%s_%s' % ( self._folder._prefix, id )
         foo = apply( DummyContent, ( id, ) + args, kw )
-        self._folder._setOb( id, foo )
-        if self._folder._prefix:
+        self._folder._setObject(id, foo)
+        if getattr(self._folder, '_prefix', None):
             return id
 
     __roles__ = ( 'FooAdder', )
     __allow_access_to_unprotected_subobjects__ = { 'addFoo' : 1 }
 
 
-class DummyTypeInfo(TypeInformation):
-    """ Dummy class of type info object """
-    meta_type = "Dummy Test Type Info"
-
 DummyFTI = FTI( 'Dummy Content'
               , title='Dummy Content Title'
               , meta_type=DummyContent.meta_type
-              , product='CMFDefault'
-              , factory='addDocument'
+              , product='FooProduct'
+              , factory='addFoo'
               , actions= ( { 'name'          : 'View'
                            , 'action'        : 'string:view'
                            , 'permissions'   : ( 'View', )
@@ -147,27 +141,52 @@ DummyFTI = FTI( 'Dummy Content'
                          )
               )
 
+
 class DummyFolder( Implicit ):
     """
         Dummy Container for testing
     """
-    def __init__( self, fake_product=0, prefix='' ):
+    def __init__( self, id='dummy', fake_product=0, prefix='' ):
         self._prefix = prefix
+        self._id = id
 
         if fake_product:
             self.manage_addProduct = { 'FooProduct' : DummyFactory( self ) }
-
-        self._objects = {}
-
-    def _setOb( self, id, obj ):
-        self._objects[id] = obj
+    
+    def _setOb(self, id, object):
+        setattr(self, id, object)
+        return self._getOb(id)
 
     def _getOb( self, id ):
-        return self._objects[id]
-
-    def _setObject(self,id,object):
-        setattr(self,id,object)
         return getattr(self, id)
+
+    _setObject = _setOb
+
+    def getPhysicalPath(self):
+        return self.aq_inner.aq_parent.getPhysicalPath() + ( self._id, )
+
+    def getId(self):
+        return self._id
+
+
+class DummySite(DummyFolder):
+    """ A dummy portal folder.
+    """
+
+    _domain = 'http://www.foobar.com'
+    _path = 'bar'
+
+    def absolute_url(self, relative=0):
+        return '/'.join( (self._domain, self._path, self._id) )
+
+    def getPhysicalPath(self):
+        return ('', self._path, self._id)
+
+    def getPhysicalRoot(self):
+        return self
+
+    def unrestrictedTraverse(self, path, default=None, restricted=0):
+        return self.acl_users
 
 
 class DummyUser(Implicit):
@@ -185,6 +204,9 @@ class DummyUser(Implicit):
     def allowed(self, object, object_roles=None):
         if object.getId() == 'portal_membership':
             return 0
+        if object_roles:
+            if 'FooAdder' in object_roles:
+                return 0 
         return 1
 
 
@@ -192,9 +214,12 @@ class DummyUserFolder(Implicit):
     """ A dummy User Folder with 2 dummy Users.
     """
 
+    id = 'acl_users'
+
     def __init__(self):
         setattr( self, 'user_foo', DummyUser(id='user_foo') )
         setattr( self, 'user_bar', DummyUser(id='user_bar') )
+        setattr( self, 'all_powerful_Oz', OmnipotentUser() )
 
     def getUsers(self):
         pass
