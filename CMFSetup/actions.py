@@ -24,9 +24,12 @@ class _FauxContent:
 
 class _ActionProviderParser( HandlerBase ):
 
-    def __init__( self, site, encoding ):
+    security = ClassSecurityInfo()
+    security.declareObjectPrivate()
+    security.setDefaultAccess( 'deny' )
 
-        self._site = site
+    def __init__( self, encoding ):
+
         self._encoding = encoding
         self._provider_info = {}
         self._provider_ids = []
@@ -63,34 +66,8 @@ class _ActionProviderParser( HandlerBase ):
         else:
             raise ValueError, 'Unknown element %s' % name
 
-    def endElement( self, name ):
 
-        if name in ( 'actions-tool', 'action' ):
-            pass
-
-    def endDocument( self ):
-
-        actions_tool = getToolByName( self._site, 'portal_actions' )
-
-        for provider_id in self._provider_ids:
-
-            if provider_id not in actions_tool.listActionProviders():
-
-                actions_tool.addActionProvider( provider_id )
-
-            provider = getToolByName( self._site, provider_id )
-            provider._actions = ()
-
-            for info in self._provider_info.get( provider_id, () ):
-
-                provider.addAction( id=info[ 'action_id' ]
-                                  , name=info[ 'name' ]
-                                  , action=info[ 'action' ]
-                                  , condition=info[ 'condition' ]
-                                  , permission=info[ 'permission' ]
-                                  , category=info[ 'category' ]
-                                  , visible=info[ 'visible' ]
-                                  )
+InitializeClass( _ActionProviderParser )
 
 class ActionProvidersConfigurator( Implicit ):
 
@@ -165,7 +142,30 @@ class ActionProvidersConfigurator( Implicit ):
         if reader is not None:
             text = reader()
 
-        parseString( text, _ActionProviderParser( self._site, encoding ) )
+        parser = _ActionProviderParser( encoding )
+        parseString( text, parser )
+
+        actions_tool = getToolByName( self._site, 'portal_actions' )
+
+        for provider_id in parser._provider_ids:
+
+            if provider_id not in actions_tool.listActionProviders():
+
+                actions_tool.addActionProvider( provider_id )
+
+            provider = getToolByName( self._site, provider_id )
+            provider._actions = ()
+
+            for info in parser._provider_info.get( provider_id, () ):
+
+                provider.addAction( id=info[ 'action_id' ]
+                                  , name=info[ 'name' ]
+                                  , action=info[ 'action' ]
+                                  , condition=info[ 'condition' ]
+                                  , permission=info[ 'permission' ]
+                                  , category=info[ 'category' ]
+                                  , visible=info[ 'visible' ]
+                                  )
 
 InitializeClass( ActionProvidersConfigurator )
 
