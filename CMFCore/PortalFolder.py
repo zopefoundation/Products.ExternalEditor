@@ -106,6 +106,7 @@ class PortalFolder(DynamicType, CMFCatalogAware, Folder):
         """
         self.setTitle( title )
         self.setDescription( description )
+        self.reindexObject()
 
     security.declarePublic('allowedContentTypes')
     def allowedContentTypes( self ):
