@@ -186,7 +186,7 @@ class ExternalEditor:
             
             try:
                 exit_pid, exit_status = os.waitpid(pid, os.WNOHANG)
-                if not exit_pid: launched = 1
+                if exit_pid != pid: launched = 1
             except OSError:
                 exit_pid = pid
             
@@ -194,6 +194,7 @@ class ExternalEditor:
             if (exit_pid == pid or save_interval) \
                and fstat[stat.ST_MTIME] != last_fstat[stat.ST_MTIME]:
                 # File was modified
+                launched = 1 # handle very short editing sessions
                 self.saved = self.putChanges()
                 last_fstat = fstat
                 

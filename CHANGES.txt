@@ -1,5 +1,8 @@
 External Editor Change Log
 
+        Eliminated spurious "Editor did not launch" errors on short sessions
+        os when other errors occurred.
+
     5/16/02 - 0.2 Release
     
         Fixed product uninstallation bug
