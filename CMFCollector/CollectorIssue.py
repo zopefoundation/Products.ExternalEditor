@@ -227,6 +227,8 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
                     url = text[start:end]
                     got.append('<a href="%s">%s</a>' % (url, url))
                     cursor = end
+                if cursor < len(text):
+                    got.append(text[cursor:])
                 text = "".join(got)
             text = util.uploadexp.sub(r'\1<a href="%s/\2/view">\2</a>\3'
                                       % self.absolute_url(),
