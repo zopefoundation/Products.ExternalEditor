@@ -169,7 +169,7 @@ class WorkflowTool (UniqueObject, Folder):
             self._chains_by_type = cbt = PersistentMapping()
         ti = self._listTypeInfo()
         # Set up the chains by type.
-        if props is not None:
+        if not (props is None):
             for t in ti:
                 id = t.getId()
                 field_name = 'chain_%s' % id
