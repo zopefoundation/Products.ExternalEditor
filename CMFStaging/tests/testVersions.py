@@ -105,9 +105,16 @@ class Tests(unittest.TestCase):
         vt.auto_copy_forward = 0
         # Can't normally check out when the object is in an old state
         self.assertRaises(VersionControlError, vt.checkout, content)
+
+        # Can't check out when the object is in the current state
+        # but there's a sticky tag.
+        vt.revertToVersion(content, new_id)
+        self.assertRaises(VersionControlError, vt.checkout, content)
         
         vt.auto_copy_forward = 1
-        # Now we can check out.
+        vt.revertToVersion(content, old_id)
+        # Now we can check out, since the tool will remove the sticky tag
+        # without losing data.
         vt.checkout(content)
         content = self.root.content  # XXX ZopeVersionControl requires this
 

@@ -78,28 +78,33 @@ class VersionsTool(UniqueObject, SimpleItemWithProperties):
         if not repo.isUnderVersionControl(object):
             get_transaction().commit(1)  # Get _p_jar attributes set.
             repo.applyVersionControl(object)
-        elif self.auto_copy_forward and not repo.isResourceUpToDate(object):
-            # Copy the old state forward after the object has been checked out.
+        elif self.auto_copy_forward:
             info = repo.getVersionInfo(object)
-            old_state = repo.getVersionOfResource(
-                info.history_id, info.version_id)
-            # Momentarily revert to the mainline.
-            object = repo.updateResource(object, 'mainline')
-            repo.checkoutResource(object)
+            stuck = (info.sticky and info.sticky[0] != 'B')
+            if stuck:
+                # The object has a sticky tag.  Get it unstuck by
+                # copying the old state forward after the object
+                # has been checked out.
+                old_state = repo.getVersionOfResource(
+                    info.history_id, info.version_id)
+                # Momentarily revert to the mainline.
+                object = repo.updateResource(object, 'mainline')
+                repo.checkoutResource(object)
 
-            # Copy the old state into the mainline object, minus __vc_info__.
-            # XXX There ought to be some way to do this more cleanly.
-            object._p_changed = 1
-            for key in object.__dict__.keys():
-                if key != '__vc_info__':
-                    if not old_state.__dict__.has_key(key):
-                        del object.__dict__[key]
-            for key in old_state.__dict__.keys():
-                if key != '__vc_info__':
-                    object.__dict__[key] = old_state.__dict__[key]
-            # Check in as a copy.
-            repo.checkinResource(
-                object, 'Copied from revision %s' % info.version_id)
+                # Copy the old state into the mainline object,
+                # minus __vc_info__.
+                # XXX There ought to be some way to do this more cleanly.
+                object._p_changed = 1
+                for key in object.__dict__.keys():
+                    if key != '__vc_info__':
+                        if not old_state.__dict__.has_key(key):
+                            del object.__dict__[key]
+                for key in old_state.__dict__.keys():
+                    if key != '__vc_info__':
+                        object.__dict__[key] = old_state.__dict__[key]
+                # Check in as a copy.
+                repo.checkinResource(
+                    object, 'Copied from revision %s' % info.version_id)
 
         repo.checkoutResource(object)
 
