@@ -5,7 +5,7 @@ import OFS.Folder, OFS.SimpleItem
 from AccessControl import SecurityManager
 from AccessControl.SecurityManagement import newSecurityManager
 import Acquisition
-from Products.CMFCore.TypesTool import TypesTool
+from Products.CMFCore.TypesTool import TypesTool, FactoryTypeInformation
 from Products.CMFCore.CatalogTool import CatalogTool
 from Products.CMFCore.PortalContent import PortalContent
 from Products.CMFCore.PortalFolder import *
@@ -59,6 +59,11 @@ class DummyContent( PortalContent, OFS.SimpleItem.Item ):
     
     def reset( self ):
         self.after_add_called = self.before_delete_called = 0
+
+    # WAAAAAAAAA!  we don't want the Database export/import crap in the way.
+    def _getCopy( self, container ):
+        return DummyContent( self.id, self.catalog )
+
 
 
 def extra_meta_types():
@@ -224,6 +229,80 @@ class PortalFolderTests( unittest.TestCase ):
         assert 'bar' in catalog.uniqueValuesFor( 'id' )
         assert len( catalog ) == 2
         assert has_path( catalog._catalog, '/test/folder/sub2/bar' )
+
+    def test_contentPaste( self ):
+        #
+        #   Does copy / paste work?
+        #
+        #import pdb; pdb.set_trace()
+        test = PortalFolder( 'test', '' )
+        self.root._setObject( 'test', test )
+        test = self.root.test
+
+        self.root._setObject( 'portal_types', TypesTool() )
+        types_tool = self.root.portal_types
+        FTI = FactoryTypeInformation
+        types_tool._setObject( 'Dummy'
+                             , FTI( 'Dummy'
+                                  , meta_type=DummyContent.meta_type
+                                  , product='OFSP'
+                                  , factory='addDTMLDocument'
+                                  )
+                             )
+
+        self.root._setObject( 'portal_catalog', CatalogTool() )
+        catalog = self.root.portal_catalog
+        assert len( catalog ) == 0
+
+        test._setObject( 'sub1', PortalFolder( 'sub1', '' ) )
+        sub1 = test.sub1
+
+        test._setObject( 'sub2', PortalFolder( 'sub2', '' ) )
+        sub2 = test.sub2
+
+        test._setObject( 'sub3', PortalFolder( 'sub3', '' ) )
+        sub3 = test.sub3
+
+        sub1._setObject( 'dummy', DummyContent( 'dummy', 1 ) )
+        assert 'dummy' in sub1.objectIds()
+        assert 'dummy' in sub1.contentIds()
+        assert not 'dummy' in sub2.objectIds()
+        assert not 'dummy' in sub2.contentIds()
+        assert not 'dummy' in sub3.objectIds()
+        assert not 'dummy' in sub3.contentIds()
+        assert has_path( catalog._catalog, '/test/sub1/dummy' )
+        assert not has_path( catalog._catalog, '/test/sub2/dummy' )
+        assert not has_path( catalog._catalog, '/test/sub3/dummy' )
+
+        cookie = sub1.manage_copyObjects( ids = ( 'dummy', ) )
+        # Waaa! force sub2 to allow paste of Dummy object.
+        #import pdb; pdb.set_trace()
+        sub2.all_meta_types = sub2.all_meta_types() + extra_meta_types()
+        sub2.manage_pasteObjects( cookie )
+        assert 'dummy' in sub1.objectIds()
+        assert 'dummy' in sub1.contentIds()
+        assert 'dummy' in sub2.objectIds()
+        assert 'dummy' in sub2.contentIds()
+        assert not 'dummy' in sub3.objectIds()
+        assert not 'dummy' in sub3.contentIds()
+        assert has_path( catalog._catalog, '/test/sub1/dummy' )
+        assert has_path( catalog._catalog, '/test/sub2/dummy' )
+        assert not has_path( catalog._catalog, '/test/sub3/dummy' )
+
+        cookie = sub1.manage_cutObjects( ids = ( 'dummy', ) )
+        # Waaa! force sub2 to allow paste of Dummy object.
+        sub3.all_meta_types = sub3.all_meta_types() + extra_meta_types()
+        sub3.manage_pasteObjects( cookie )
+        assert not 'dummy' in sub1.objectIds()
+        assert not 'dummy' in sub1.contentIds()
+        assert 'dummy' in sub2.objectIds()
+        assert 'dummy' in sub2.contentIds()
+        assert 'dummy' in sub3.objectIds()
+        assert 'dummy' in sub3.contentIds()
+        assert not has_path( catalog._catalog, '/test/sub1/dummy' )
+        assert has_path( catalog._catalog, '/test/sub2/dummy' )
+        assert has_path( catalog._catalog, '/test/sub3/dummy' )
+
 
 def has_path( catalog, path ):
     """
