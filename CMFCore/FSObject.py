@@ -104,9 +104,9 @@ class FSObject(Acquisition.Implicit, Item):
             try:    mtime=stat(fp)[8]
             except: mtime=0
             if not parsed or mtime != self._file_mod_time:
-                self._parsed = 1
-                self._file_mod_time = mtime
                 self._readFile(1)
+                self._file_mod_time = mtime
+                self._parsed = 1
 
     security.declareProtected(View, 'get_size')
     def get_size(self):

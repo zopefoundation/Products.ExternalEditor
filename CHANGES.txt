@@ -28,3 +28,8 @@ Future
 
     - Remove redundant VERSION.txt files;  the canonical spelling is
       'version.txt' (Collector #13).
+
+    - Fixed a race condition in CMFCore.FSObject._updateFromFS() which
+      sometimes led to initialization problems in FSPythonScripts.
+      (Collector #37)
+
