@@ -106,6 +106,29 @@ class DummyChallenger( DummyPlugin ):
         response.challenger = self
         return True
 
+class DummyCredentialsStore(DummyPlugin):
+
+    def __init__(self, id):
+        self.id = id
+        self.creds = {}
+
+    def updateCredentials(self, request, response, login, password):
+        self.creds[login] = password
+
+    def resetCredentials(self, request, response):
+        login = request['login']
+        del self.creds[login]
+
+    def extractCredentials(self, request):
+        creds = {}
+        login = request['login']
+
+        if self.creds.get(login) is not None:
+            creds['login'] = login
+            creds['password'] = self.creds.get(login)
+
+        return creds
+
 class DummyBadChallenger( DummyChallenger ):
 
     def challenge(self, request, response):
@@ -180,6 +203,9 @@ class FauxResponse:
     def exception(self):
         self._unauthorized()
         return "An error has occurred."
+
+    def redirect(self, *ignore, **ignored):
+        pass
 
 class FauxObject( Implicit ):
 
@@ -1641,9 +1667,49 @@ class PluggableAuthServiceTests( unittest.TestCase ):
 
         zcuf(self, request)
 
-        self.failUnlessRaises( Unauthorized, response.unauthorized)
+        self.failUnlessRaises(Unauthorized, response.unauthorized)
 
         self.assertEqual(counter.count, 1)
+
+    def test_logout(self):
+        from Products.PluggableAuthService.interfaces.plugins \
+             import IExtractionPlugin, \
+                    ICredentialsUpdatePlugin, \
+                    ICredentialsResetPlugin
+        plugins = self._makePlugins()
+        zcuf = self._makeOne(plugins)
+        creds_store = DummyCredentialsStore('creds')
+        zcuf._setObject('creds', creds_store)
+        creds_store = zcuf._getOb('creds')
+
+        plugins = zcuf._getOb('plugins')
+        #import pdb; pdb.set_trace()
+        directlyProvides( creds_store
+                        , ( IExtractionPlugin
+                          , ICredentialsUpdatePlugin
+                          , ICredentialsResetPlugin
+                          )
+                        )
+        plugins.activatePlugin(IExtractionPlugin, 'creds')
+        plugins.activatePlugin(ICredentialsUpdatePlugin, 'creds')
+        plugins.activatePlugin(ICredentialsResetPlugin, 'creds')
+
+        response = FauxResponse()
+        request = FauxRequest(RESPONSE=response)
+        zcuf.REQUEST = request
+
+        # Put a user in the credentials store
+        creds_store.updateCredentials(request, response, 'foo', 'bar')
+        request['login'] = 'foo'
+        request['HTTP_REFERER'] = ''
+        extracted = creds_store.extractCredentials(request)
+        self.failIf(len(extracted.keys()) == 0)
+
+        # Now call the logout method - the credentials should go away
+        newSecurityManager(None, FauxUser('foo', 'foo'))
+        zcuf.logout(request)
+        extracted = creds_store.extractCredentials(request)
+        self.failUnless(len(extracted.keys()) == 0)
 
 if __name__ == "__main__":
     unittest.main()

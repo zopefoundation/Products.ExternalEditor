@@ -1209,6 +1209,29 @@ class PluggableAuthService( Folder, Cacheable ):
         for updater_id, updater in cred_updaters:
             updater.updateCredentials(request, response, login, new_password)
 
+    security.declarePublic('logout')
+    def logout(self, REQUEST):
+        """Publicly accessible method to log out a user
+        """
+        self.resetCredentials(REQUEST, REQUEST['RESPONSE'])
+
+        # Little bit of a hack: Issuing a redirect to the same place
+        # where the user was so that in the second request the now-destroyed
+        # credentials can be acted upon to e.g. go back to the login page
+        REQUEST['RESPONSE'].redirect(REQUEST['HTTP_REFERER'])
+
+    security.declarePrivate('_resetCredentials')
+    def resetCredentials(self, request, response):
+        """Reset credentials by informing all active resetCredentials plugins
+        """
+        user = getSecurityManager().getUser()
+        if aq_base(user) is not nobody:
+            plugins = self._getOb('plugins')
+            cred_resetters = plugins.listPlugins(ICredentialsResetPlugin)
+
+            for resetter_id, resetter in cred_resetters:
+                resetter.resetCredentials(request, response)
+
 
 InitializeClass( PluggableAuthService )
 

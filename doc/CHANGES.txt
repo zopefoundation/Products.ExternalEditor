@@ -4,6 +4,10 @@ PluggableAuthService changelog
 
     Features Added
 
+      - Add a publicly callable "logout" method on the PluggableAuthService
+        instance that will call resetCredentials on all activated 
+        ICredentialsRest plugins, thus effecting a logout.
+
       - Enabled the usage of the CookieAuthHelper login screen functionality
         without actually using the CookieAuthHelper to maintain the 
         credentials store in its own auth cookie by ensuring that only
