@@ -26,7 +26,6 @@ from Products.CMFCore.interfaces.DublinCore import CatalogableDublinCore
 from Products.CMFCore.interfaces.DublinCore import DublinCore
 from Products.CMFCore.interfaces.DublinCore import MutableDublinCore
 from Products.CMFCore.utils import getToolByName
-from Products.CMFCore.WorkflowCore import WorkflowAction
 
 from permissions import ModifyPortalContent
 from permissions import View

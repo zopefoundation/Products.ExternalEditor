@@ -14,8 +14,6 @@
 
 $Id$
 """
-import sys
-
 from Acquisition import aq_base
 from MethodObject import Method
 

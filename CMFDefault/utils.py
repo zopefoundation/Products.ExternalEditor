@@ -19,16 +19,13 @@ import os
 import re
 from cgi import escape
 from sgmllib import SGMLParser
-from types import ListType
-from types import StringType
-from types import TupleType
-from types import UnicodeType
 
-from Globals import package_home
 from AccessControl import ModuleSecurityInfo
+from Globals import package_home
 from ZTUtils.Zope import complex_marshal
 
 from exceptions import IllegalHTML
+
 
 security = ModuleSecurityInfo( 'Products.CMFDefault.utils' )
 
@@ -142,10 +139,10 @@ security.declarePublic('seq_strip')
 def seq_strip(seq, stripper=lambda x: x.strip() ):
     """ Strip a sequence of strings.
     """
-    if isinstance(seq, ListType):
+    if isinstance(seq, list):
         return map( stripper, seq )
 
-    if isinstance(seq, TupleType):
+    if isinstance(seq, tuple):
         return tuple( map( stripper, seq ) )
 
     raise ValueError, "%s of unsupported sequencetype %s" % ( seq, type( seq ) )
@@ -153,13 +150,13 @@ def seq_strip(seq, stripper=lambda x: x.strip() ):
 security.declarePublic('tuplize')
 def tuplize( valueName, value, splitter=lambda x: x.split() ):
 
-    if isinstance(value, TupleType):
+    if isinstance(value, tuple):
         return seq_strip( value )
 
-    if isinstance(value, ListType):
+    if isinstance(value, list):
         return seq_strip( tuple( value ) )
 
-    if isinstance(value, StringType) or isinstance(value, UnicodeType):
+    if isinstance(value, basestring):
         return seq_strip( tuple( splitter( value ) ) )
 
     raise ValueError, "%s of unsupported type" % valueName

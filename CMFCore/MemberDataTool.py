@@ -16,7 +16,6 @@ $Id$
 """
 
 from AccessControl import ClassSecurityInfo
-from AccessControl.Role import RoleManager
 from Acquisition import aq_inner, aq_parent, aq_base
 from BTrees.OOBTree import OOBTree
 from Globals import DTMLFile

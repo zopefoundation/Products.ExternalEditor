@@ -15,7 +15,6 @@
 $Id$
 """
 
-from types import DictionaryType
 from warnings import warn
 
 from AccessControl import ClassSecurityInfo
@@ -23,17 +22,15 @@ from Acquisition import aq_base
 from Globals import DTMLFile
 from Globals import InitializeClass
 from OFS.Folder import Folder
-from OFS.SimpleItem import SimpleItem
 
 from ActionInformation import ActionInformation
 from ActionInformation import getOAI
 from ActionProviderBase import ActionProviderBase
-from permissions import ListFolderContents
-from permissions import ManagePortal
 from Expression import Expression
 from Expression import getExprContext
 from interfaces.portal_actions import portal_actions as IActionsTool
-from TypesTool import TypeInformation
+from permissions import ListFolderContents
+from permissions import ManagePortal
 from utils import _checkPermission
 from utils import _dtmldir
 from utils import SimpleItemWithProperties
@@ -210,7 +207,7 @@ class ActionsTool(UniqueObject, Folder, ActionProviderBase):
         actions = provider.listActions(info)
 
         action_infos = []
-        if actions and type(actions[0]) is not DictionaryType:
+        if actions and not isinstance(actions[0], dict):
             ec = getExprContext(self, object)
             for ai in actions:
                 if not ai.getVisibility():

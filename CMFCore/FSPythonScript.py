@@ -15,22 +15,23 @@
 $Id$
 """
 
-from os import path, stat
 import new
 
-import Globals
-from AccessControl import ClassSecurityInfo, getSecurityManager
+from AccessControl import ClassSecurityInfo
+from AccessControl import getSecurityManager
+from ComputedAttribute import ComputedAttribute
+from Globals import DTMLFile
+from Globals import InitializeClass
 from OFS.Cache import Cacheable
 from Products.PythonScripts.PythonScript import PythonScript
 from Shared.DC.Scripts.Script import Script
-from ComputedAttribute import ComputedAttribute
 
-from permissions import FTPAccess
-from permissions import View
-from permissions import ViewManagementScreens
 from DirectoryView import registerFileExtension
 from DirectoryView import registerMetaType
 from FSObject import FSObject
+from permissions import FTPAccess
+from permissions import View
+from permissions import ViewManagementScreens
 from utils import _dtmldir
 from utils import expandpath
 
@@ -72,7 +73,7 @@ class FSPythonScript (FSObject, Script):
                             'ZBindingsHTML_editAction')
 
     security.declareProtected(ViewManagementScreens, 'manage_main')
-    manage_main = Globals.DTMLFile('custpy', _dtmldir)
+    manage_main = DTMLFile('custpy', _dtmldir)
 
     def _createZODBClone(self):
         """Create a ZODB (editable) equivalent of this object."""
@@ -273,7 +274,7 @@ class FSPythonScript (FSObject, Script):
             self._updateFromFS()
         return self._bind_names
 
-Globals.InitializeClass(FSPythonScript)
+InitializeClass(FSPythonScript)
 
 
 class FSPythonScriptTracebackSupplement:

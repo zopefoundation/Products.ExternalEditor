@@ -32,7 +32,6 @@ from Products.CMFCore.utils import _checkPermission
 from Products.CMFCore.utils import UniqueObject
 
 from exceptions import AccessControl_Unauthorized
-from permissions import AccessContentsInformation
 from permissions import ManagePortal
 from permissions import ManageProperties
 from SyndicationInfo import SyndicationInformation

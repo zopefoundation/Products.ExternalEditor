@@ -15,12 +15,9 @@
 $Id$
 """
 
-import os
 from os import path as os_path
 from os.path import abspath
 import re
-from types import StringType
-from types import UnicodeType
 from warnings import warn
 
 from AccessControl import ClassSecurityInfo
@@ -124,7 +121,7 @@ def _checkPermission(permission, obj):
     """
     # this code is ported from ZopeSecurityPolicy.checkPermission
     roles = rolesForPermissionOn(permission, obj)
-    if type(roles) in (StringType, UnicodeType):
+    if isinstance(roles, basestring):
         roles = [roles]
     context = getSecurityManager()._context
 
@@ -298,8 +295,7 @@ def _modifyPermissionMappings(ob, map):
     perm_info = _ac_inherited_permissions(ob, 1)
     for name, settings in map.items():
         cur_roles = rolesForPermissionOn(name, ob)
-        t = type(cur_roles)
-        if t is StringType:
+        if isinstance(cur_roles, basestring):
             cur_roles = [cur_roles]
         else:
             cur_roles = list(cur_roles)

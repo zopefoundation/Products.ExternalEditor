@@ -26,9 +26,9 @@ from Acquisition import aq_parent, aq_inner, aq_base
 from Globals import DTMLFile
 from Globals import InitializeClass
 from OFS.OrderedFolder import OrderedFolder
-from OFS.ObjectManager import REPLACEABLE
 
 from CMFCatalogAware import CMFCatalogAware
+from DynamicType import DynamicType
 from exceptions import AccessControl_Unauthorized
 from exceptions import zExceptions_Unauthorized
 from permissions import AddPortalContent
@@ -38,7 +38,6 @@ from permissions import ListFolderContents
 from permissions import ManagePortal
 from permissions import ManageProperties
 from permissions import View
-from DynamicType import DynamicType
 from utils import _checkPermission
 from utils import getToolByName
 

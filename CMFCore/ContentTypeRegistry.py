@@ -15,20 +15,22 @@
 $Id$
 """
 
-from OFS.SimpleItem import SimpleItem, Item
-from AccessControl import ClassSecurityInfo
-from Globals import DTMLFile, InitializeClass, PersistentMapping
-from ZPublisher.mapply import mapply
-
-from permissions import ManagePortal
-from utils import _dtmldir, getToolByName
-
 import re, os, urllib
 
-from interfaces.ContentTypeRegistry \
-        import ContentTypeRegistryPredicate as IContentTypeRegistryPredicate
+from AccessControl import ClassSecurityInfo
+from Globals import DTMLFile
+from Globals import InitializeClass
+from Globals import PersistentMapping
+from OFS.SimpleItem import SimpleItem
+from ZPublisher.mapply import mapply
+
 from interfaces.ContentTypeRegistry \
         import ContentTypeRegistry as IContentTypeRegistry
+from interfaces.ContentTypeRegistry \
+        import ContentTypeRegistryPredicate as IContentTypeRegistryPredicate
+from permissions import ManagePortal
+from utils import _dtmldir
+from utils import getToolByName
 
 
 class MajorMinorPredicate( SimpleItem ):
@@ -135,7 +137,7 @@ class ExtensionPredicate( SimpleItem ):
 
     security.declareProtected( ManagePortal, 'getExtensions' )
     def getExtensions(self):
-        """ Get filename extensions. 
+        """ Get filename extensions.
         """
         if self.extensions is None:
             return 'None'
@@ -280,7 +282,7 @@ class NameRegexPredicate( SimpleItem ):
         """
         if self.pattern is None:
             return 0
-        
+
         return self.pattern.match( name )
 
     security.declareProtected( ManagePortal, 'getTypeLabel' )
@@ -344,7 +346,7 @@ class ContentTypeRegistry( SimpleItem ):
         """
         """
         return map( lambda x: x[0], _predicate_types )
-    
+
     security.declareProtected( ManagePortal, 'manage_predicates' )
     manage_predicates = DTMLFile( 'registryPredList', _dtmldir )
 
@@ -450,7 +452,7 @@ class ContentTypeRegistry( SimpleItem ):
         """
             Return a sequence of tuples,
             '( id, ( predicate, typeObjectName ) )'
-            for all predicates in the registry 
+            for all predicates in the registry
         """
         result = []
         for predicate_id in self.predicate_ids:
