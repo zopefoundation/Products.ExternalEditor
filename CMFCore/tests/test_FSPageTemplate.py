@@ -58,7 +58,8 @@ class FSPageTemplateTests( RequestTest, FSPTMaker ):
         script = self._makeOne( 'testPT_utf8', 'testPT_utf8.pt' )
         script = script.__of__(self.root)
         script()
-        self.assertEqual(self.RESPONSE.getHeader('content-type'), 'text/html; charset=utf-8')
+        self.assertEqual( self.RESPONSE.getHeader('content-type')
+                        , 'text/html; charset=utf-8')
 
     def test_BadCall( self ):
 
@@ -74,9 +75,8 @@ class FSPageTemplateTests( RequestTest, FSPTMaker ):
             self.fail('Calling a bad template did not raise an exception')
 
     def test_caching( self ):
-        """
-            Test HTTP caching headers.
-        """
+
+        #   Test HTTP caching headers.
         self.root.caching_policy_manager = DummyCachingManager()
         original_len = len( self.RESPONSE.headers )
         script = self._makeOne('testPT', 'testPT.pt')
@@ -86,6 +86,11 @@ class FSPageTemplateTests( RequestTest, FSPTMaker ):
         self.failUnless( 'foo' in self.RESPONSE.headers.keys() )
         self.failUnless( 'bar' in self.RESPONSE.headers.keys() )
 
+    def test_pt_properties( self ):
+
+        script = self._makeOne( 'testPT', 'testPT.pt' )
+        self.assertEqual( script.pt_source_file()
+                        , 'file:%s/testPT.pt' % self.skin_path_name )
 
 class FSPageTemplateCustomizationTests( SecurityTest, FSPTMaker ):
 

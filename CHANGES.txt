@@ -172,6 +172,9 @@ CMF 1.5alpha (unreleased)
 
   Bug Fixes
 
+    - Collector #227:  expose ZPT filename in tracebacks which include
+      FSPageTemplates.
+
     - zpt skin: Switched base tag policy back to that of dtml skin.
       This makes the use of relative URLs in content easier. If you have
       content that depends on the old policy you can customize getBaseTag.pt

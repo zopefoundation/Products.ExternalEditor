@@ -138,6 +138,13 @@ class FSPageTemplate(FSObject, Script, PageTemplate):
             else:
                 raise
 
+    security.declareProtected(ViewManagementScreens, 'pt_source_file')
+    def pt_source_file(self):
+
+        """ Return a file name to be compiled into the TAL code.
+        """
+        return 'file:%s' % self._filepath
+
     security.declarePrivate( '_ZPT_exec' )
     _ZPT_exec = ZopePageTemplate._exec.im_func
 
