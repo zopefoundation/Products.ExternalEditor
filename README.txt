@@ -213,10 +213,13 @@ Zope External Editor
     applications without relaunching them and therefore fully support MDI 
     environments. The following applications currently have plugin support::
 
-      Application       Platform    Plugin Module(s)
-      ===============================================
+      Application       Platform    Plugin Module Name(s)
+      ===================================================
       HomeSite          Windows     homesite5, homesite
       Photoshop         Windows     photoshp, photoshop
+      MS Word           Windows     winword, word
+      MS Excel          Windows     excel
+      MS Powerpoint     Windows     powerpnt, powerpoint
 
     External editor will attempt to load a plugin for any application before
     using the general editor control method. It does this by matching the
