@@ -1,14 +1,14 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 
 """CMFDefault portal_membership tool.
@@ -35,7 +35,7 @@ from utils import _dtmldir
 
 default_member_content = '''Default page for %s
 
-  This is the default document created for you when 
+  This is the default document created for you when
   you joined this community.
 
   To change the content just select "Edit"
@@ -54,7 +54,7 @@ class MembershipTool ( Products.CMFCore.MembershipTool.MembershipTool ):
                             , category='user'
                             , condition=Expression(text='not: member')
                             , visible=1
-                             ) 
+                             )
           , ActionInformation(id='preferences'
                             , title='Preferences'
                             , description='Change your user preferences'
@@ -139,21 +139,6 @@ class MembershipTool ( Products.CMFCore.MembershipTool.MembershipTool ):
                                'listed':member.listed})
         return roster
 
-    def addMember(self, id, password, roles, domains, properties=None):
-        '''Adds a new member to the user folder.  Security checks will have
-        already been performed.  Called by portal_registration.
-        '''
-        Products.CMFCore.MembershipTool.MembershipTool.addMember( self
-                                                                , id
-                                                                , password
-                                                                , roles
-                                                                , domains
-                                                                , properties
-                                                                )
-
-        self.createMemberarea(id)
-
-
     security.declareProtected(ManagePortal, 'createMemberarea')
     def createMemberarea(self, member_id):
         """
@@ -166,13 +151,13 @@ class MembershipTool ( Products.CMFCore.MembershipTool.MembershipTool ):
             f_title = "%s's Home" % member_id
             members.manage_addPortalFolder( id=member_id, title=f_title )
             f=getattr(members, member_id)
- 
+
             # Grant ownership to Member
             acl_users = self.__getPUS()
             user = acl_users.getUser(member_id).__of__(acl_users)
             f.changeOwnership(user)
             f.manage_setLocalRoles(member_id, ['Owner'])
- 
+
             # Create Member's home page.
             # default_member_content ought to be configurable per
             # instance of MembershipTool.
@@ -183,14 +168,13 @@ class MembershipTool ( Products.CMFCore.MembershipTool.MembershipTool ):
                                 , "structured-text"
                                 , (default_member_content % member_id)
                                 )
- 
+
             f.index_html._setPortalTypeName( 'Document' )
 
             # Overcome an apparent catalog bug.
             f.index_html.reindexObject()
             wftool = getToolByName( f, 'portal_workflow' )
             wftool.notifyCreated( f.index_html )
-            
 
     def getHomeFolder(self, id=None, verifyPermission=0):
         """Returns a member's home folder object."""
@@ -208,7 +192,7 @@ class MembershipTool ( Products.CMFCore.MembershipTool.MembershipTool ):
                 return folder
             except KeyError: pass
         return None
-        
+
     def getHomeUrl(self, id=None, verifyPermission=0):
         """Returns the URL to a member's home folder."""
         home = self.getHomeFolder(id, verifyPermission)

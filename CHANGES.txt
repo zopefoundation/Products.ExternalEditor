@@ -47,6 +47,12 @@ CMF 1.3 beta2 (2002/06/30)
 
   Bugs Fixed
 
+    - Changed CMFDefault.MembershipTool to not create a member folder at
+      member creation time when the memberareaCreationFlag is false
+      (Tracker #519). Note that any code that depended on the member
+      folder being created after addMember will fail, that code should
+      call createMemberarea directly if needed.
+
     - Fixed CMFDefault.RegistrationTool to correctly check the lack of
       'email' property when creating a new member or when checking
       member's properties validity (Tracker #508).

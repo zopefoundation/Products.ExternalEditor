@@ -9,14 +9,21 @@ class MembershipTests( TransactionalTest ):
     def test_join( self ):
         self.root.manage_addProduct[ 'CMFDefault' ].manage_addCMFSite( 'site' )
         site = self.root.site
-        site.portal_registration.addMember( 'test_user'
+        member_id = 'test_user'
+        site.portal_registration.addMember( member_id
                                           , 'zzyyzz'
-                                          , properties={ 'username':'test_user'
+                                          , properties={ 'username': member_id
                                                        , 'email' : 'foo@bar.com'
                                                        }
                                           )
-        self.failUnless( site.acl_users.getUser( 'test_user' ) )
-        memberfolder = site.Members.test_user
+        u = site.acl_users.getUser(member_id)
+        self.failUnless(u)
+        self.assertRaises(AttributeError,
+                          getattr, site.Members, member_id)
+        # test that wrapUser correctly creates member area
+        site.portal_membership.setMemberareaCreationFlag()
+        site.portal_membership.wrapUser(u)
+        memberfolder = getattr(site.Members, member_id)
         homepage = memberfolder.index_html
         self.assertEqual( memberfolder.Title(), "test_user's Home" )
         tool = site.portal_workflow

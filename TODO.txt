@@ -92,7 +92,7 @@ CMF TODO's
 
         (x) Tracker #508:  logged_in pukes if no email
 
-        ( ) Tracker #519:  CMFDefault.MembershipTool always creates
+        (x) Tracker #519:  CMFDefault.MembershipTool always creates
                            member folder
 
       - ( ) Folder fixes (Florent Guillaume?)
