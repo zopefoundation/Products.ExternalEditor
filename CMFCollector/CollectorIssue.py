@@ -51,11 +51,7 @@ factory_type_information = (
                  {'id': 'followup',
                   'name': 'Followup',
                   'action': 'collector_issue_followup_form',
-                  'permissions': (AddCollectorIssueComment,)},
-                 {'id': 'artifacts',
-                  'name': 'Add Artifacts',
-                  'action': 'collector_issue_add_artifact_form',
-                  'permissions': (AddCollectorIssueArtifact,)},
+                  'permissions': (AddCollectorIssueFollowup,)},
                  {'id': 'edit',
                   'name': 'Edit Issue',
                   'action': 'collector_issue_edit_form',
@@ -195,8 +191,8 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
     def get_transcript(self):
         return self._getOb(TRANSCRIPT_NAME)
     
-    security.declareProtected(AddCollectorIssueComment, 'do_action')
-    def do_action(self, action, comment, attachments=None, assignees=None):
+    security.declareProtected(AddCollectorIssueFollowup, 'do_action')
+    def do_action(self, action, comment, assignees=None):
         """Execute an action, adding comment to the transcript."""
 
         username = str(getSecurityManager().getUser())
@@ -214,7 +210,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
 
         transcript = self.get_transcript()
         self.comment_number = self.comment_number + 1
-        entry_leader = "\n" + self._entry_header(action, username) + "\n"
+        entry_leader = "\n\n" + self._entry_header(action, username) + "\n"
         transcript._edit('stx',
                          transcript.EditableBody()
                          + entry_leader
@@ -238,22 +234,13 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         wftool = getToolByName(self, 'portal_workflow')
         return wftool.getInfoFor(self, 'state', '??')
 
-    security.declareProtected(AddCollectorIssueArtifact, 'add_artifact')
-    def add_artifact(self, id, type, description, file):
-        """Add new artifact, and note in transcript."""
+    def _add_artifact(self, id, type, description, file):
+        """Add new artifact, and return object."""
         self.invokeFactory(type, id)
         it = self._getOb(id)
         it.description = description
         it.manage_upload(file)
-        transcript = self.get_transcript()
-        user = getSecurityManager().getUser()
-        entry_leader = ("\n\n"
-                        + self._entry_header("New Artifact '%s'" % id, user)
-                        + "\n")
-        transcript._edit('stx',
-                         transcript.EditableBody()
-                         + entry_leader
-                         + util.process_comment(description))
+        return it
 
     def _create_transcript(self, description, container,
                            text_format=DEFAULT_TRANSCRIPT_FORMAT):

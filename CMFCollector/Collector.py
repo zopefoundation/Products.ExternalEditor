@@ -291,10 +291,7 @@ def addCollector(self, id, title=None, description=None,
     it.manage_permission(EditCollectorIssue,
                          roles=['Reviewer'],
                          acquire=1)
-    it.manage_permission(AddCollectorIssueComment,
-                         roles=['Reviewer', 'Owner'],
-                         acquire=1)
-    it.manage_permission(AddCollectorIssueArtifact,
+    it.manage_permission(AddCollectorIssueFollowup,
                          roles=['Reviewer', 'Owner'],
                          acquire=1)
     if REQUEST is not None:

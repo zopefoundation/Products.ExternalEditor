@@ -39,7 +39,7 @@ factory_type_information = (
                       'name': 'Add Comment',
                       'action': 'collector_transcript_comment_form',
                       'permissions':
-                      (CollectorPermissions.AddCollectorIssueComment,)},
+                      (CollectorPermissions.AddCollectorIssueFollowup,)},
                      {'id': 'edittranscript',
                       'name': 'Edit Transcript',
                       'action': 'collector_transcript_edit_form',

@@ -6,8 +6,7 @@ ViewCollector = CMFCorePermissions.View
 AddCollector = 'Add portal collector'
 ManageCollector = 'Add portal collector'
 AddCollectorIssue = 'Add collector issue'
-AddCollectorIssueComment = 'Add collector issue comment'
-AddCollectorIssueArtifact = 'Add collector issue artifact'
+AddCollectorIssueFollowup = 'Add collector issue comment'
 EditCollectorIssue = 'Edit collector issue'
 SupportIssue = 'Support collector issue'
 
@@ -17,9 +16,7 @@ setDefaultRoles(ManageCollector,
                 ('Manager', 'Owner'))
 setDefaultRoles(AddCollectorIssue,
                 ('Anonymous', 'Manager', 'Reviewer', 'Owner'))
-setDefaultRoles(AddCollectorIssueComment,
-                ('Manager', 'Reviewer', 'Owner'))
-setDefaultRoles(AddCollectorIssueArtifact,
+setDefaultRoles(AddCollectorIssueFollowup,
                 ('Manager', 'Reviewer', 'Owner'))
 setDefaultRoles(EditCollectorIssue,
                 ('Manager', 'Reviewer'))
