@@ -8,7 +8,7 @@ BASIC_HTML = '''\
  <head>
   <title>Title in tag</title>
   <meta name="description" content="Describe me">
-  <meta name="contributors" content="foo@bar.com baz@bam.net">
+  <meta name="contributors" content="foo@bar.com; baz@bam.net">
  </head>
  <body bgcolor="#ffffff">
   <h1>Not a lot here</h1>
@@ -30,7 +30,7 @@ ENTITY_IN_TITLE = '''\
 BASIC_STRUCTUREDTEXT = '''\
 Title: My NewsItem
 Description: A news item by me
-Contributors: foo@bar.com baz@bam.net no@yes.maybe
+Contributors: foo@bar.com; baz@bam.net; no@yes.maybe
 
 This is the header and it supercedes the title
 
