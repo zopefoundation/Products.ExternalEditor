@@ -217,12 +217,7 @@ class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
         else:
             vars = {}
         w = IndexableObjectWrapper(vars, obj)
-        try:
-            ZCatalog.catalog_object(self, w, uid, idxs, update_metadata)
-        except TypeError:
-            # for Zope versions until 2.6.2
-            idxs = idxs or []
-            ZCatalog.catalog_object(self, w, uid, idxs)
+        ZCatalog.catalog_object(self, w, uid, idxs, update_metadata)
 
     security.declarePrivate('indexObject')
     def indexObject(self, object):

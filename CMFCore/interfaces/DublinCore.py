@@ -15,11 +15,7 @@
 $Id$
 """
 
-try:
-    from Interface import Interface
-except ImportError:
-    # for Zope versions before 2.6.0
-    from Interface import Base as Interface
+from Interface import Interface
 
 
 class DublinCore(Interface):

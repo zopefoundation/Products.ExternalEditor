@@ -2,14 +2,14 @@ Installing CMF 1.5x
 
   Requirements
 
-    - Zope v. 2.5 and later
+    - Zope v. 2.6.4 and later
 
   Assumptions
 
     - New installation
 
     - Zope configured using INSTANCE_HOME, /var/zope, and
-      SOFTWARE_HOME, /usr/local/zope/Zope-2.6.1
+      SOFTWARE_HOME, /usr/local/zope/Zope-2.7.0
 
   Procedure
 
@@ -57,8 +57,6 @@ Installing CMF 1.5x
 Installing Internationalization (I18N) Support for CMF
 
   Requirements
-
-    - Zope 2.6.0 or later
 
     - "Localizer":http://www.localizer.org
 

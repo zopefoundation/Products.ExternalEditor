@@ -12,8 +12,8 @@ Overview
     - See the note below [1] if you want to export or check out
       the sources for a specific version from CVS.
 
- *Please note that current versions of the CMF (1.4 and later)
-  require Zope 2.5 or later*
+ *Please note that current versions of the CMF (1.5 and later)
+  require Zope 2.6.4 or later*
 
   * For help with CVS in general, see the "CVS Online Manual",
     http://www.loria.fr/~molli/cvs-index.html

@@ -16,11 +16,7 @@ $Id$
 """
 
 from Interface import Attribute
-try:
-    from Interface import Interface
-except ImportError:
-    # for Zope versions before 2.6.0
-    from Interface import Base as Interface
+from Interface import Interface
 
 
 class portal_memberdata(Interface):
@@ -38,11 +34,11 @@ class portal_memberdata(Interface):
     ## getMemberDataContents__roles__ = ()  # Private.
     def getMemberDataContents():
         '''
-        Returns a list containing a dictionary with information 
-        about the _members BTree contents: member_count is the 
+        Returns a list containing a dictionary with information
+        about the _members BTree contents: member_count is the
         total number of member instances stored in the memberdata-
-        tool while orphan_count is the number of member instances 
-        that for one reason or another are no longer in the 
+        tool while orphan_count is the number of member instances
+        that for one reason or another are no longer in the
         underlying acl_users user folder.
         The result is designed to be iterated over in a dtml-in
         '''

@@ -16,20 +16,16 @@ $Id$
 """
 
 from Interface import Attribute
-try:
-    from Interface import Interface
-except ImportError:
-    # for Zope versions before 2.6.0
-    from Interface import Base as Interface
+from Interface import Interface
 
 
 class ICallableOpaqueItemWithHooks(Interface):
     """Marker interface for callable opaque items with manage_* hooks.
-    
-    Opaque items are subelements that are contained using something that 
+
+    Opaque items are subelements that are contained using something that
     is not an ObjectManager.
-    
-    On add, copy, move and delete operations a marked opaque items 
-    'manage_afterAdd', 'manage_afterClone' and 'manage_beforeDelete' hooks 
+
+    On add, copy, move and delete operations a marked opaque items
+    'manage_afterAdd', 'manage_afterClone' and 'manage_beforeDelete' hooks
     get called.
     """
