@@ -8,12 +8,13 @@
 <h3> Search Results </h3>
 
 <div tal:define="b_start string:0;b_start request/b_start | b_start;
-       results here/portal_catalog;
-	   Batch python:modules['ZTUtils'].Batch;
-	   global batch python:Batch(results, 25, int(b_start), orphan=1)">
+                 results here/portal_catalog;
+	             Batch python:modules['ZTUtils'].Batch;
+	             global batch python:Batch(results, 25, int(b_start), orphan=1);
+                ">
     <p>Found <span tal:define="pss modules/Products.PythonScripts.standard"
                tal:replace="python:pss.thousands_commas(len(results))">100</span> items 
-		 <span tal:condition="exists: request/SearchableText|nothing"
+		 <span tal:condition="exists: request/SearchableText"
 		       tal:replace="string:matching ${request/SearchableText}"></span>.
     </p>
 <table class="SearchResults">
@@ -61,11 +62,13 @@
  <p class="Desktop">
  <span tal:define="p batch/previous" tal:condition="p">
    <a href=""
-    tal:attributes="href string:?b_start=${p/first}&SearchableText=${request/SearchableText}">Previous <span tal:replace="p/length">n</span> items</a>
+      tal:attributes="href python: here.searchQueryString( b_start=p.first )"
+   >Previous <span tal:replace="p/length">n</span> items</a>
  </span>&nbsp;&nbsp;
  <span tal:define="n batch/next" tal:condition="n">
    <a href=""
-      tal:attributes="href string:?b_start=${batch/end}&SearchableText=${request/SearchableText}">Next <span tal:replace="n/length">n</span> items</a>
+      tal:attributes="href python: here.searchQueryString( b_start=n.first )"
+   >Next <span tal:replace="n/length">n</span> items</a>
  </span> 
  </p>
 </div>
