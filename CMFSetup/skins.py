@@ -71,7 +71,28 @@ def importSkinsTool( context ):
     if text is not None:
 
         stc = SkinsToolConfigurator( site ).__of__( site )
-        stc.parseXML( text, encoding )
+
+        ( default_skin
+        , request_var
+        , allow_arbitrary
+        , persist_cookie
+        , skin_dirs
+        , skin_paths
+        ) = stc.parseXML( text, encoding )
+
+        tool = getToolByName( site, 'portal_skins' )
+
+        tool.default_skin = str( default_skin )
+        tool.request_varname = str( request_var )
+        tool.allow_any =  allow_arbitrary and 1 or 0
+        tool.cookie_persistence =  persist_cookie and 1 or 0
+
+        for id, directory in skin_dirs:
+
+            createDirectoryView( tool, directory, id )
+
+        for path_name, layers in skin_paths:
+            tool.addSkinSelection( path_name, ', '.join( layers ) )
 
     #
     #   Purge and rebuild the skin path, now that we have added our stuff.
@@ -218,19 +239,13 @@ class SkinsToolConfigurator( Implicit ):
         parser = _SkinsParser( encoding )
         parseString( text, parser )
 
-        tool = getToolByName( self._site, 'portal_skins' )
-
-        tool.default_skin = str( parser._default_skin )
-        tool.request_varname = str( parser._request_var )
-        tool.allow_any =  parser._allow_arbitrary and 1 or 0
-        tool.cookie_persistence =  parser._persist_cookie and 1 or 0
-
-        for id, directory in parser._skin_dirs:
-
-            createDirectoryView( tool, directory, id )
-
-        for path_name, layers in parser._skin_paths:
-            tool.addSkinSelection( path_name, ', '.join( layers ) )
+        return ( parser._default_skin
+               , parser._request_var
+               , parser._allow_arbitrary
+               , parser._persist_cookie
+               , parser._skin_dirs
+               , parser._skin_paths
+               )
 
     #
     #   Helper methods

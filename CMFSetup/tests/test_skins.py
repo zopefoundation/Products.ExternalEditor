@@ -190,19 +190,20 @@ class SkinsToolConfiguratorTests( _SkinsSetup ):
         self.assertEqual( len( skins_tool.objectItems() ), 3 )
 
         configurator = self._makeOne( site ).__of__( site )
-        configurator.parseXML( _EMPTY_EXPORT )
+        ( default_skin
+        , request_var
+        , allow_arbitrary
+        , persist_cookie
+        , skin_dirs
+        , skin_paths
+        ) = configurator.parseXML( _EMPTY_EXPORT )
 
-        self.assertEqual( skins_tool.default_skin, "default_skin" )
-        self.assertEqual( skins_tool.request_varname, "request_varname" )
-        self.failIf( skins_tool.allow_any )
-        self.failIf( skins_tool.cookie_persistence )
-
-        # Skin setup is done by 'importSkinsTool', not 'parseXML'.
-        self.failIf( skins_tool._setup_called )
-
-        # Purging is done by 'importSkinsTool', not 'parseXML'.
-        self.assertEqual( len( skins_tool.getSkinPaths() ), 2 )
-        self.assertEqual( len( skins_tool.objectItems() ), 3 )
+        self.assertEqual( default_skin, "default_skin" )
+        self.assertEqual( request_var, "request_varname" )
+        self.failIf( allow_arbitrary )
+        self.failIf( persist_cookie )
+        self.assertEqual( len( skin_dirs ), 0 )
+        self.assertEqual( len( skin_paths ), 0 )
 
     def test_parseXML_normal( self ):
 
@@ -217,18 +218,20 @@ class SkinsToolConfiguratorTests( _SkinsSetup ):
         self.assertEqual( len( skins_tool.objectItems() ), 0 )
 
         configurator = self._makeOne( site ).__of__( site )
-        configurator.parseXML( _NORMAL_EXPORT )
+        ( default_skin
+        , request_var
+        , allow_arbitrary
+        , persist_cookie
+        , skin_dirs
+        , skin_paths
+        ) = configurator.parseXML( _NORMAL_EXPORT )
 
-        self.assertEqual( skins_tool.default_skin, "basic" )
-        self.assertEqual( skins_tool.request_varname, "skin_var" )
-        self.failUnless( skins_tool.allow_any )
-        self.failUnless( skins_tool.cookie_persistence )
-
-        # Skin setup is done by 'importSkinsTool', not 'parseXML'.
-        self.failIf( skins_tool._setup_called )
-
-        self.assertEqual( len( skins_tool.getSkinPaths() ), 2 )
-        self.assertEqual( len( skins_tool.objectItems() ), 3 )
+        self.assertEqual( default_skin, "basic" )
+        self.assertEqual( request_var, "skin_var" )
+        self.failUnless( allow_arbitrary )
+        self.failUnless( persist_cookie )
+        self.assertEqual( len( skin_dirs ), 3 )
+        self.assertEqual( len( skin_paths ), 2 )
 
 
 
