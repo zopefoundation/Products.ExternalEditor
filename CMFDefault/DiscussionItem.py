@@ -85,12 +85,13 @@
 
 import Globals
 from Globals import HTMLFile, Persistent, PersistentMapping
-from Acquisition import Implicit
+from Acquisition import Implicit, aq_base
 from Discussions import DiscussionResponse
 from Document import Document
 from DublinCore import DefaultDublinCoreImpl
 from DateTime import DateTime
 from Products.CMFCore.utils import getToolByName, _checkPermission
+from Products.CMFCore.PortalContent import PortalContent
 import urllib, string
 
 def addDiscussionItem(self, id, title, description, text_format, text,
@@ -256,6 +257,12 @@ class DiscussionItemContainer(Persistent, Implicit):
             except:
                 REQUEST.RESPONSE.notFoundError("%s\n%s" % (name, ''))
 
+    def manage_beforeDelete(self, item, container):
+        "Remove the contained items from the catalog."
+        if aq_base(container) is not aq_base(self):
+            for obj in self.getReplies():
+                obj.manage_beforeDelete(item, container)
+
     def objectIds(self, spec=None):
         """
         return a list of ids of DiscussionItems in
@@ -282,7 +289,7 @@ class DiscussionItemContainer(Persistent, Implicit):
         """
         return self._container.values()
 
-    def createReply(self, title, text, REQUEST, RESPONSE):
+    def createReply(self, title, text, REQUEST={}, RESPONSE=None):
         """
             Create a reply in the proper place
         """
@@ -304,7 +311,8 @@ class DiscussionItemContainer(Persistent, Implicit):
  
         self._container[`id`] = item
 
-        RESPONSE.redirect( self.aq_inner.aq_parent.absolute_url() + '/view' )
+        if RESPONSE is not None:
+            RESPONSE.redirect( self.aq_inner.aq_parent.absolute_url() + '/view' )
 
     def hasReplies(self):
         """
