@@ -29,121 +29,76 @@ class portal_metadata(Interface):
     #   Site-wide queries.
     #
     def getFullName(userid):
+        """
+            Convert an internal userid to a "formal" name, if
+            possible, perhaps using the 'portal_membership' tool.
 
-        """ Convert an internal userid to a "formal" name
-        
-        o Conversion occurs if possible, perhaps using the
-          'portal_membership' tool.
-
-        o Used to map userid's for Creator, Contributor DCMI queries.
+            Used to map userid's for Creator, Contributor DCMI
+            queries.
         """
 
     def getPublisher():
-
-        """ Return the "formal" name of the publisher of the portal.
+        """
+            Return the "formal" name of the publisher of the
+            portal.
         """
 
     #
     #   Content-specific queries.
     #
-    def listAllowedVocabulary( element, content=None, content_type=None ):
-
-        """ List the allowed values of a given DCMI element.
-
-        o If 'content_type' is passed, include only values allowed for
-          that type.
-
-        o Else if 'content' is passed, include only values allowed for
-          its type.
-
-        o Else include all known values.
-        """
-
     def listAllowedSubjects(content=None):
+        """
+            List the allowed values of the 'Subject' DCMI element
+            'Subject' elements should be keywords categorizing
+            their resource.
 
-        """ List the allowed values of the 'Subject' DCMI element.
-
-        o 'Subject' elements should be keywords categorizing their resource.
-
-        o Return only values appropriate for content's type, or all 
-          known values if None is passed.
-
-        o Deprecated;  please use 'listAllowedVocabulary' instead.
+            Return only values appropriate for content's type, or
+            all values if None.
         """
 
     def listAllowedFormats(content=None):
+        """
+            List the allowed values of the 'Format' DCMI element.
+            These items should be usable as HTTP 'Content-type'
+            values.
 
-        """ List the allowed values of the 'Format' DCMI element.
-
-        o These items should be usable as HTTP 'Content-type' values.
-
-        o Return only values appropriate for content's type, or all
-          known values if None is passed.
-
-        o Deprecated;  please use 'listAllowedVocabulary' instead.
+            Return only values appropriate for content's type, or
+            all values if None.
         """
 
     def listAllowedLanguages(content=None):
+        """
+            List the allowed values of the 'Language' DCMI element.
+            'Language' element values should be suitable for generating
+            HTTP headers.
 
-        """ List the allowed values of the 'Language' DCMI element.
-
-        o 'Language' element values should be suitable for generating
-          HTTP headers.
-
-        o Return only values appropriate for content's type, or all
-          known values if None is passed.
-
-        o Deprecated;  please use 'listAllowedVocabulary' instead.
+            Return only values appropriate for content's type, or
+            all values if None.
         """
 
     def listAllowedRights(content=None):
+        """
+            List the allowed values of the 'Rights' DCMI element.
+            The 'Rights' element describes copyright or other IP
+            declarations pertaining to a resource.
 
-        """ List the allowed values of the 'Rights' DCMI element.
-
-        o The 'Rights' element describes copyright or other IP
-          declarations pertaining to a resource.
-
-        o Return only values appropriate for content's type, or all
-          known values if None is passed.
-
-        o Deprecated;  please use 'listAllowedVocabulary' instead.
+            Return only values appropriate for content's type, or
+            all values if None.
         """
 
     #
     #   Validation policy hooks.
     #
     def setInitialMetadata(content):
-
-        """ Set initial values for content metatdata.
-        
-        o Tool should suppl any site-specific defaults.
+        """
+            Set initial values for content metatdata, supplying
+            any site-specific defaults.
         """
 
     def validateMetadata(content):
-
-        """ Enforce portal-wide policies about DCI
-        
-        o E.g., tool may require non-empty title/description, etc.
-        
-        o Should be called by the skin methods immediately after saving
-          changes to the metadata of an object (or at workflow transitions).
         """
-
-    #
-    #   Content lookups
-    #
-    def getContentMetadata(content, element):
-
-        """ Return the given metadata element for 'content'.
-
-        o Allows indirection of the storage / format of metadata through
-          the tool.
-        """
-
-    def setContentMetadata(content, element, value):
-
-        """ Update the given metadata element for 'content'.
-
-        o Allows indirection of the storage / format of metadata through
-          the tool.
+            Enforce portal-wide policies about DCI, e.g.,
+            requiring non-empty title/description, etc.  Called
+            by the CMF immediately before saving changes to the
+            metadata of an object.
         """

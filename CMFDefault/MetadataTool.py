@@ -20,7 +20,6 @@ from AccessControl import getSecurityManager
 from Globals import DTMLFile
 from Globals import InitializeClass
 from Globals import PersistentMapping
-from OFS.PropertySheets import PropertySheet
 from OFS.SimpleItem import SimpleItem
 
 from Products.CMFCore.ActionProviderBase import ActionProviderBase
@@ -36,8 +35,8 @@ from utils import _dtmldir
 
 
 class MetadataElementPolicy( SimpleItem ):
-
-    """ Represent a type-specific policy about a particular DCMI element.
+    """
+        Represent a type-specific policy about a particular DCMI element.
     """
 
     security = ClassSecurityInfo()
@@ -75,43 +74,41 @@ class MetadataElementPolicy( SimpleItem ):
     #
     security.declareProtected(View , 'isMultiValued')
     def isMultiValued( self ):
-
-        """ Can this element hold multiple values?
+        """
+            Can this element hold multiple values?
         """
         return self.is_multi_valued
 
     security.declareProtected(View , 'isRequired')
     def isRequired( self ):
-
-        """ Must this element be supplied?
+        """
+            Must this element be supplied?
         """
         return self.is_required
 
     security.declareProtected(View , 'supplyDefault')
     def supplyDefault( self ):
-
-        """ Should the tool supply a default?
+        """
+            Should the tool supply a default?
         """
         return self.supply_default
 
     security.declareProtected(View , 'defaultValue')
     def defaultValue( self ):
-
-        """ If so, what is the default?
+        """
+            If so, what is the default?
         """
         return self.default_value
 
     security.declareProtected(View , 'enforceVocabulary')
     def enforceVocabulary( self ):
-
-        """ Should the vocabulary for this element be restricted?
+        """
         """
         return self.enforce_vocabulary
 
     security.declareProtected(View , 'allowedVocabulary')
     def allowedVocabulary( self ):
-
-        """ If so, what are the allowed values?
+        """
         """
         return self.allowed_vocabulary
 
@@ -128,8 +125,8 @@ DEFAULT_ELEMENT_SPECS = ( ( 'Title', 0 )
 
 
 class ElementSpec( SimpleItem ):
-
-    """ Represent all the tool knows about a single metadata element.
+    """
+        Represent all the tool knows about a single metadata element.
     """
     security = ClassSecurityInfo()
 
@@ -149,17 +146,16 @@ class ElementSpec( SimpleItem ):
 
     security.declareProtected(View , 'isMultiValued')
     def isMultiValued( self ):
-
-        """ Is this element multi-valued?
+        """
+            Is this element multi-valued?
         """
         return self.is_multi_valued
 
     security.declareProtected(View , 'getPolicy')
     def getPolicy( self, typ=None ):
-
-        """ Find the policy this element for objects of a given type.
-
-        o Return a default, if none found.
+        """
+            Find the policy this element for objects whose type
+            object name is 'typ';  return a default, if none found.
         """
         try:
             return self.policies[ typ ].__of__(self)
@@ -168,8 +164,8 @@ class ElementSpec( SimpleItem ):
 
     security.declareProtected(View , 'listPolicies')
     def listPolicies( self ):
-
-        """ Return a list of all policies for this element.
+        """
+            Return a list of all policies for this element.
         """
         res = []
         for k, v in self.policies.items():
@@ -178,8 +174,9 @@ class ElementSpec( SimpleItem ):
 
     security.declareProtected(ManagePortal , 'addPolicy')
     def addPolicy( self, typ ):
-
-        """ Add a policy to this element for objects of a given type.
+        """
+            Add a policy to this element for objects whose type
+            object name is 'typ'.
         """
         if typ is None:
             raise MetadataError, "Can't replace default policy."
@@ -191,10 +188,9 @@ class ElementSpec( SimpleItem ):
 
     security.declareProtected(ManagePortal, 'removePolicy')
     def removePolicy( self, typ ):
-
-        """ Remove the policy from this element for objects of a given type.
-        
-        o Note that this method does *not* remove the default!
+        """
+            Remove the policy from this element for objects whose type
+            object name is 'typ' (*not* the default, however).
         """
         if typ is None:
             raise MetadataError, "Can't remove default policy."
@@ -205,8 +201,6 @@ InitializeClass( ElementSpec )
 
 class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
 
-    """ Hold, enable, and enforce site-wide metadata policies.
-    """
     __implements__ = (IMetadataTool, ActionProviderBase.__implements__)
 
     id = 'portal_metadata'
@@ -273,8 +267,9 @@ class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
                # TODO , validation_hook=None
                       , REQUEST=None
                       ):
-
-        """ Form handler for "tool-wide" properties .
+        """
+            Form handler for "tool-wide" properties (including list of
+            metadata elements).
         """
         if publisher is not None:
             self.publisher = publisher
@@ -302,8 +297,8 @@ class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
                         , allowed_vocabulary
                         , REQUEST=None
                         ):
-
-        """ Add a type-specific policy for one of our elements.
+        """
+            Add a type-specific policy for one of our elements.
         """
         if content_type == '<default>':
             content_type = None
@@ -330,8 +325,8 @@ class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
                            , content_type
                            , REQUEST=None
                            ):
-
-        """ Remvoe a type-specific policy for one of our elements.
+        """
+            Remvoe a type-specific policy for one of our elements.
         """
         if content_type == '<default>':
             content_type = None
@@ -356,15 +351,12 @@ class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
                            , allowed_vocabulary
                            , REQUEST=None
                            ):
-
-        """ Update a policy for one of our elements
-        
-        o Note that 'content_type' will be passed as '<default>' when we
-          are editing the default.
+        """
+            Update a policy for one of our elements ('content_type'
+            will be '<default>' when we edit the default).
         """
         if content_type == '<default>':
             content_type = None
-
         spec = self.getElementSpec( element )
         policy = spec.getPolicy( content_type )
         policy.edit( is_required
@@ -386,8 +378,9 @@ class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
     #
     security.declareProtected(ManagePortal, 'listElementSpecs')
     def listElementSpecs( self ):
-
-        """ Return a list of ElementSpecs describing our elements.
+        """
+            Return a list of ElementSpecs representing
+            the elements managed by the tool.
         """
         res = []
         for k, v in self.element_specs.items():
@@ -396,15 +389,16 @@ class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
 
     security.declareProtected(ManagePortal, 'getElementSpec')
     def getElementSpec( self, element ):
-
-        """ Return an ElementSpec describing what we know about 'element'.
+        """
+            Return an ElementSpec representing the tool's knowledge
+            of 'element'.
         """
         return self.element_specs[ element ].__of__( self )
 
     security.declareProtected(ManagePortal, 'addElementSpec')
     def addElementSpec( self, element, is_multi_valued, REQUEST=None ):
-
-        """ Add 'element' to our list of managed elements.
+        """
+            Add 'element' to our list of managed elements.
         """
         # Don't replace.
         if self.element_specs.has_key( element ):
@@ -420,8 +414,8 @@ class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
 
     security.declareProtected(ManagePortal, 'removeElementSpec')
     def removeElementSpec( self, element, REQUEST=None ):
-
-        """ Remove 'element' from our list of managed elements.
+        """
+            Remove 'element' from our list of managed elements.
         """
         del self.element_specs[ element ]
 
@@ -433,16 +427,13 @@ class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
 
     security.declareProtected(ManagePortal, 'listPolicies')
     def listPolicies( self, typ=None ):
-
-        """ Show all policies for a given content type.
-        
-        o If 'typ' is none, return the set of default policies.
+        """
+            Show all policies for a given content type, or the default
+            if None.
         """
         result = []
-
         for element, spec in self.listElementSpecs():
             result.append( ( element, spec.getPolicy( typ ) ) )
-
         return result
 
     #
@@ -450,22 +441,28 @@ class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
     #
     security.declarePrivate( 'getFullName' )
     def getFullName( self, userid ):
+        """
+            Convert an internal userid to a "formal" name, if
+            possible, perhaps using the 'portal_membership' tool.
 
-        """ See 'portal_metadata' interface.
+            Used to map userid's for Creator, Contributor DCMI
+            queries.
         """
         return userid   # TODO: do lookup here
 
     security.declarePublic( 'getPublisher' )
     def getPublisher( self ):
-
-        """ See 'portal_metadata' interface.
+        """
+            Return the "formal" name of the publisher of the
+            portal.
         """
         return self.publisher
 
     security.declarePublic( 'listAllowedVocabulary' )
     def listAllowedVocabulary( self, element, content=None, content_type=None ):
-
-        """ See 'portal_metadata' interface.
+        """
+            List allowed keywords for a given portal_type, or all
+            possible keywords if none supplied.
         """
         spec = self.getElementSpec( element )
         if content_type is None and content:
@@ -474,36 +471,41 @@ class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
 
     security.declarePublic( 'listAllowedSubjects' )
     def listAllowedSubjects( self, content=None, content_type=None ):
-
-        """ See 'portal_metadata' interface.
+        """
+            List allowed keywords for a given portal_type, or all
+            possible keywords if none supplied.
         """
         return self.listAllowedVocabulary( 'Subject', content, content_type )
 
     security.declarePublic( 'listAllowedFormats' )
     def listAllowedFormats( self, content=None, content_type=None ):
-
-        """ See 'portal_metadata' interface.
+        """
+            List the allowed 'Content-type' values for a particular
+            portal_type, or all possible formats if none supplied.
         """
         return self.listAllowedVocabulary( 'Format', content, content_type )
 
     security.declarePublic( 'listAllowedLanguages' )
     def listAllowedLanguages( self, content=None, content_type=None ):
-
-        """ See 'portal_metadata' interface.
+        """
+            List the allowed language values.
         """
         return self.listAllowedVocabulary( 'Language', content, content_type )
 
     security.declarePublic( 'listAllowedRights' )
     def listAllowedRights( self, content=None, content_type=None ):
-
-        """ See 'portal_metadata' interface.
+        """
+            List the allowed values for a "Rights"
+            selection list;  this gets especially important where
+            syndication is involved.
         """
         return self.listAllowedVocabulary( 'Rights', content, content_type )
 
     security.declareProtected(ModifyPortalContent, 'setInitialMetadata')
     def setInitialMetadata( self, content ):
-
-        """ See 'portal_metadata' interface.
+        """
+            Set initial values for content metatdata, supplying
+            any site-specific defaults.
         """
         for element, policy in self.listPolicies(content.getPortalTypeName()):
 
@@ -521,8 +523,11 @@ class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
 
     security.declareProtected(View, 'validateMetadata')
     def validateMetadata( self, content ):
-
-        """ See 'portal_metadata' interface.
+        """
+            Enforce portal-wide policies about DCI, e.g.,
+            requiring non-empty title/description, etc.  Called
+            by the CMF immediately before saving changes to the
+            metadata of an object.
         """
         for element, policy in self.listPolicies(content.getPortalTypeName()):
 
@@ -541,119 +546,4 @@ class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
 
         # TODO:  Call validation_hook, if present
 
-    security.declarePrivate( 'getContentMetadata' )
-    def getContentMetadata( self, content, element ):
-
-        """ See 'portal_metadata' interface.
-        """
-        dcmi = self._checkAndConvert( content )
-        return dcmi.getProperty( element )
-
-    security.declarePrivate( 'setContentMetadata' )
-    def setContentMetadata( self, content, element, value ):
-
-        """ See 'portal_metadata' interface.
-        """
-        dcmi = self._checkAndConvert( content )
-        dcmi._updateProperty( element, value )
-
-    #
-    #   Helper methods
-    #
-    def _getDCMISheet( self, content ):
-
-        """ Return the DCMI propertysheet for content.
-
-        o Return 'None' if the sheet does not exist.
-        """
-        return content.propertysheets.get( DCMI_NAMESPACE )
-
-    def _checkAndConvert( self, content ):
-
-        """ Ensure that content has the DCMI propertysheet.
-
-        o Copy any legacy values from DCMI attributes to it, and remove
-          them.
-        """
-        sheets = content.propertysheets
-
-        sheet = sheets.get( DCMI_NAMESPACE )
-        if sheet is not None:
-            return sheet
-
-        md = { 'xmlns' : DCMI_NAMESPACE }
-        sheet = DCMISchema( 'dc', md )
-        marker = object()
-
-        for prop_name, attr in _DCMI_CONVERSIONS:
-
-            old = getattr( content, attr, marker )
-
-            if old is not marker:
-                setattr( sheet, prop_name, old )
-                try:
-                    delattr( content, attr )
-                except ( AttributeError, KeyError ):
-                    pass
-
-        sheets.addPropertySheet( sheet )
-        return sheet.__of__( sheets )
-
 InitializeClass( MetadataTool )
-
-
-DCMI_NAMESPACE = 'http://purl.org/dc/elements/1.1/'
-
-class DCMISchema( PropertySheet ):
-
-    """ Fixed schema for DublinCore metadata.
-
-    o It gets its schema from a static map but has control over its
-      value storage.
-    """
-    def _propertyMap(self):
-        # Return a tuple of mappings, giving meta-data for properties.
-        result = []
-
-        for info in _DCMI_PROPERTY_MAP:
-            info = info.copy()
-            result.append( info )
-
-        return tuple( result )
-
-    def propertyMap(self):
-        return self._propertyMap()
-
-    def property_extensible_schema__(self):
-        return False
-
-InitializeClass( DCMISchema )
-
-_DCMI_PROPERTY_MAP = \
-( { 'id' : 'title', 'type' : 'string', 'mode' : 'w' }
-, { 'id' : 'description', 'type' : 'string', 'mode' : 'w' }
-, { 'id' : 'subject', 'type' : 'lines', 'mode' : 'w' }
-, { 'id' : 'contributors', 'type' : 'lines', 'mode' : 'w' }
-, { 'id' : 'created', 'type' : 'date', 'mode' : 'w' }
-, { 'id' : 'modified', 'type' : 'date', 'mode' : 'w' }
-, { 'id' : 'efffective', 'type' : 'date', 'mode' : 'w' }
-, { 'id' : 'expires', 'type' : 'date', 'mode' : 'w' }
-, { 'id' : 'format', 'type' : 'string', 'mode' : 'w' }
-, { 'id' : 'language', 'type' : 'string', 'mode' : 'w' }
-, { 'id' : 'rights', 'type' : 'string', 'mode' : 'w' }
-)
-
-# Map properties onto attributes
-_DCMI_CONVERSIONS = \
-( ( 'title', 'title' )
-, ( 'description', 'description' )
-, ( 'subject', 'subject' )
-, ( 'contributors', 'contributors' )
-, ( 'created', 'creation_data' )
-, ( 'modified', 'modification_date' )
-, ( 'efffective', 'effective_date' )
-, ( 'expires', 'expiration_date' )
-, ( 'format', 'format' )
-, ( 'language', 'language' )
-, ( 'rights', 'rights' )
-)

@@ -7,111 +7,81 @@ from Interface.Verify import verifyClass
 from Acquisition import aq_base
 
 from Products.CMFDefault.DublinCore import DefaultDublinCoreImpl
+from Products.CMFDefault.exceptions import MetadataError
+from Products.CMFDefault.MetadataTool import DEFAULT_ELEMENT_SPECS
+from Products.CMFDefault.MetadataTool import ElementSpec
+from Products.CMFDefault.MetadataTool import MetadataElementPolicy
+from Products.CMFDefault.MetadataTool import MetadataTool
+
 
 class TestMetadataElementPolicy( TestCase ):
 
-    def _getTargetClass( self ):
+    def setUp( self ):
+        self.sv_policy = MetadataElementPolicy( 0 )
+        self.mv_policy = MetadataElementPolicy( 1 )
 
-        from Products.CMFDefault.MetadataTool import MetadataElementPolicy
-        return MetadataElementPolicy
-
-    def _makeOne( self, multi_valued=False ):
-
-        return self._getTargetClass()( multi_valued )
+    def tearDown( self ):
+        del self.sv_policy
+        del self.mv_policy
 
     def test_emptySV( self ):
-
-        sv_policy = self._makeOne()
-
-        self.failIf( sv_policy.isMultiValued() )
-        self.failIf( sv_policy.isRequired() )
-        self.failIf( sv_policy.supplyDefault() )
-        self.failIf( sv_policy.defaultValue() )
-        self.failIf( sv_policy.enforceVocabulary() )
-        self.failIf( sv_policy.allowedVocabulary() )
+        assert not self.sv_policy.isMultiValued()
+        assert not self.sv_policy.isRequired()
+        assert not self.sv_policy.supplyDefault()
+        assert not self.sv_policy.defaultValue()
+        assert not self.sv_policy.enforceVocabulary()
+        assert not self.sv_policy.allowedVocabulary()
 
     def test_editSV( self ):
-
-        sv_policy = self._makeOne()
-
-        sv_policy.edit( is_required=True
-                      , supply_default=True
-                      , default_value='xxx'
-                      , enforce_vocabulary=False
-                      , allowed_vocabulary=''
-                      )
-
-        self.failIf( sv_policy.isMultiValued() )
-        self.failUnless( sv_policy.isRequired() )
-        self.failUnless( sv_policy.supplyDefault() )
-        self.assertEqual( sv_policy.defaultValue(), 'xxx' )
-        self.failIf( sv_policy.enforceVocabulary() )
-        self.failIf( sv_policy.allowedVocabulary() )
+        self.sv_policy.edit( 1, 1, 'xxx', 0, '' )
+        assert not self.sv_policy.isMultiValued()
+        assert self.sv_policy.isRequired()
+        assert self.sv_policy.supplyDefault()
+        assert self.sv_policy.defaultValue() == 'xxx'
+        assert not self.sv_policy.enforceVocabulary()
+        assert not self.sv_policy.allowedVocabulary()
 
     def test_emptyMV( self ):
-
-        mv_policy = self._makeOne( True )
-
-        self.failUnless( mv_policy.isMultiValued() )
-        self.failIf( mv_policy.isRequired() )
-        self.failIf( mv_policy.supplyDefault() )
-        self.failIf( mv_policy.defaultValue() )
-        self.failIf( mv_policy.enforceVocabulary() )
-        self.failIf( mv_policy.allowedVocabulary() )
+        assert self.mv_policy.isMultiValued()
+        assert not self.mv_policy.isRequired()
+        assert not self.mv_policy.supplyDefault()
+        assert not self.mv_policy.defaultValue()
+        assert not self.mv_policy.enforceVocabulary()
+        assert not self.mv_policy.allowedVocabulary()
 
     def test_editMV( self ):
-
-        mv_policy = self._makeOne( True )
-
-        mv_policy.edit( is_required=True
-                      , supply_default=True
-                      , default_value='xxx'
-                      , enforce_vocabulary=True
-                      , allowed_vocabulary=( 'xxx', 'yyy' )
-                      )
-
-        self.failUnless( mv_policy.isMultiValued() )
-        self.failUnless( mv_policy.isRequired() )
-        self.failUnless( mv_policy.supplyDefault() )
-        self.assertEqual( mv_policy.defaultValue(), 'xxx' )
-        self.failUnless( mv_policy.enforceVocabulary() )
-
-        self.assertEqual( len( mv_policy.allowedVocabulary() ), 2 )
-        self.failUnless( 'xxx' in mv_policy.allowedVocabulary() )
-        self.failUnless( 'yyy' in mv_policy.allowedVocabulary() )
+        self.mv_policy.edit( 1, 1, 'xxx', 1, ( 'xxx', 'yyy' ) )
+        assert self.mv_policy.isMultiValued()
+        assert self.mv_policy.isRequired()
+        assert self.mv_policy.supplyDefault()
+        assert self.mv_policy.defaultValue() == 'xxx'
+        assert self.mv_policy.enforceVocabulary()
+        assert len( self.mv_policy.allowedVocabulary() ) == 2
+        assert 'xxx' in self.mv_policy.allowedVocabulary()
+        assert 'yyy' in self.mv_policy.allowedVocabulary()
 
 class TestElementSpec( TestCase ):
 
-    def _getTargetClass( self ):
+    def setUp( self ):
+        self.sv_spec    = ElementSpec( 0 )
+        self.mv_spec    = ElementSpec( 1 )
 
-        from Products.CMFDefault.MetadataTool import ElementSpec
-        return ElementSpec
+    def tearDown( self ):
+        del self.sv_spec
+        del self.mv_spec
 
-    def _makeOne( self, multi_valued=False ):
+    def test_empty( self ):
+        assert not self.sv_spec.isMultiValued()
+        assert self.sv_spec.getPolicy() == self.sv_spec.getPolicy( 'XYZ' )
+        policies = self.sv_spec.listPolicies()
+        assert len( policies ) == 1
+        assert policies[0][0] is None
 
-        return self._getTargetClass()( multi_valued )
-
-    def test_single_valued( self ):
-
-        sv_spec = self._makeOne()
-
-        self.failIf( sv_spec.isMultiValued() )
-        self.assertEqual( sv_spec.getPolicy(), sv_spec.getPolicy( 'XYZ' ) )
-
-        policies = sv_spec.listPolicies()
-        self.assertEqual( len( policies ), 1 )
-        self.assertEqual( policies[0][0], None )
-
-    def test_multi_valued( self ):
-
-        mv_spec = self._makeOne( True )
-
-        self.failUnless( mv_spec.isMultiValued() )
-        self.assertEqual( mv_spec.getPolicy(), mv_spec.getPolicy( 'XYZ' ) )
-
-        policies = mv_spec.listPolicies()
-        self.assertEqual( len( policies ), 1 )
-        self.assertEqual( policies[0][0], None )
+        assert self.mv_spec.isMultiValued()
+        assert self.mv_spec.getPolicy() == self.mv_spec.getPolicy( 'XYZ' )
+        policies = self.mv_spec.listPolicies()
+        assert len( policies ) == 1
+        assert policies[0][0] is None
 
 
 class Foo( DefaultDublinCoreImpl ):
@@ -134,447 +104,277 @@ class Bar( Foo ):
 
 class TestMetadataTool( TestCase ):
 
-    def _getTargetClass( self ):
+    def setUp( self ):
+        self.tool = MetadataTool()
 
-        from Products.CMFDefault.MetadataTool import MetadataTool
-        return MetadataTool
+    def tearDown( self ):
+        del self.tool
 
-    def _makeOne( self, *args, **kw ):
+    def test_empty( self ):
 
-        return self._getTargetClass()( *args, **kw )
+        assert not self.tool.getPublisher()
+        assert self.tool.getFullName( 'foo' ) == 'foo'
 
-    def test_interface( self ):
+        specs = list( self.tool.listElementSpecs() )
+        defaults = list( DEFAULT_ELEMENT_SPECS )
+        specs.sort(); defaults.sort()
 
+        assert len( specs ) == len( defaults )
+        for i in range( len( specs ) ):
+            assert specs[i][0] == defaults[i][0]
+            assert specs[i][1].isMultiValued() == defaults[i][1]
+            policies = specs[i][1].listPolicies()
+            assert len( policies ) == 1
+            assert policies[0][0] is None
+
+        assert not self.tool.getElementSpec( 'Title'        ).isMultiValued()
+        assert not self.tool.getElementSpec( 'Description'  ).isMultiValued()
+        assert     self.tool.getElementSpec( 'Subject'      ).isMultiValued()
+        assert not self.tool.getElementSpec( 'Format'       ).isMultiValued()
+        assert not self.tool.getElementSpec( 'Language'     ).isMultiValued()
+        assert not self.tool.getElementSpec( 'Rights'       ).isMultiValued()
+
+        try:
+            dummy = self.tool.getElementSpec( 'Foo' )
+        except KeyError:
+            pass
+        else:
+            assert 0, "Expected KeyError"
+
+        assert not self.tool.listAllowedSubjects()
+        assert not self.tool.listAllowedFormats()
+        assert not self.tool.listAllowedLanguages()
+        assert not self.tool.listAllowedRights()
+
+    def test_add( self ):
+        self.tool.addElementSpec( 'Rating', 1 )
+        assert len( self.tool.listElementSpecs() ) \
+            == len( DEFAULT_ELEMENT_SPECS ) + 1
+        rating = self.tool.getElementSpec( 'Rating' )
+        assert rating.isMultiValued()
+
+    def test_remove( self ):
+        self.tool.removeElementSpec( 'Rights' )
+
+        assert len( self.tool.listElementSpecs() ) \
+            == len( DEFAULT_ELEMENT_SPECS ) - 1
+
+        try:
+            dummy = self.tool.getElementSpec( 'Rights' )
+        except KeyError:
+            pass
+        else:
+            assert 0, "Expected KeyError"
+
+        try:
+            self.tool.removeElementSpec( 'Foo' )
+        except KeyError:
+            pass
+        else:
+            assert 0, "Expected KeyError"
+
+    def test_simplePolicies( self ):
+
+        tSpec = self.tool.getElementSpec( 'Title' )
+
+        # Fetch default policy.
+        tDef  = tSpec.getPolicy()
+        assert not tDef.isRequired()
+        assert not tDef.supplyDefault()
+        assert not tDef.defaultValue()
+
+        # Fetch (default) policy for a type.
+        tDoc  = tSpec.getPolicy( 'Document' )
+        self.assertEqual(aq_base(tDoc), aq_base(tDef))
+
+        # Changing default changes policies found from there.
+        tDef.edit( 1, 1, 'xyz', 0, () )
+        assert tDef.isRequired()
+        assert tDef.supplyDefault()
+        assert tDef.defaultValue() == 'xyz'
+        assert tDoc.isRequired()
+        assert tDoc.supplyDefault()
+        assert tDoc.defaultValue() == 'xyz'
+
+        tSpec.addPolicy( 'Document' )
+        assert len( tSpec.listPolicies() ) == 2
+
+        tDoc  = tSpec.getPolicy( 'Document' )
+        self.assertNotEqual(aq_base(tDoc), aq_base(tDef))
+        assert not tDoc.isRequired()
+        assert not tDoc.supplyDefault()
+        assert not tDoc.defaultValue()
+
+        tSpec.removePolicy( 'Document' )
+        tDoc  = tSpec.getPolicy( 'Document' )
+        self.assertEqual(aq_base(tDoc), aq_base(tDef))
+        assert tDoc.isRequired()
+        assert tDoc.supplyDefault()
+        assert tDoc.defaultValue() == 'xyz'
+
+    def test_multiValuedPolicies( self ):
+
+        sSpec = self.tool.getElementSpec( 'Subject' )
+
+        # Fetch default policy.
+        sDef  = sSpec.getPolicy()
+        assert not sDef.isRequired()
+        assert not sDef.supplyDefault()
+        assert not sDef.defaultValue()
+        assert not sDef.enforceVocabulary()
+        assert not sDef.allowedVocabulary()
+
+        # Fetch (default) policy for a type.
+        sDoc  = sSpec.getPolicy( 'Document' )
+        self.assertEqual(aq_base(sDoc), aq_base(sDef))
+
+        # Changing default changes policies found from there.
+        sDef.edit( 1, 1, 'xyz', 1, ( 'foo', 'bar' ) )
+        assert sDef.isRequired()
+        assert sDef.supplyDefault()
+        assert sDef.defaultValue() == 'xyz'
+        assert sDoc.isRequired()
+        assert sDoc.supplyDefault()
+        assert sDoc.defaultValue() == 'xyz'
+        assert sDef.enforceVocabulary()
+        assert len( sDef.allowedVocabulary() ) == 2
+        assert 'foo' in sDef.allowedVocabulary()
+        assert 'bar' in sDef.allowedVocabulary()
+        assert sDoc.enforceVocabulary()
+        assert len( sDoc.allowedVocabulary() ) == 2
+        assert 'foo' in sDoc.allowedVocabulary()
+        assert 'bar' in sDoc.allowedVocabulary()
+
+        sSpec.addPolicy( 'Document' )
+        assert len( sSpec.listPolicies() ) == 2
+
+        sDoc  = sSpec.getPolicy( 'Document' )
+        self.assertNotEqual(aq_base(sDoc), aq_base(sDef))
+        assert not sDoc.isRequired()
+        assert not sDoc.supplyDefault()
+        assert not sDoc.defaultValue()
+        assert not sDoc.enforceVocabulary()
+        assert not sDoc.allowedVocabulary()
+
+        sSpec.removePolicy( 'Document' )
+        sDoc  = sSpec.getPolicy( 'Document' )
+        self.assertEqual(aq_base(sDoc), aq_base(sDef))
+        assert sDoc.isRequired()
+        assert sDoc.supplyDefault()
+        assert sDoc.defaultValue() == 'xyz'
+        assert sDoc.enforceVocabulary()
+        assert len( sDoc.allowedVocabulary() ) == 2
+        assert 'foo' in sDoc.allowedVocabulary()
+        assert 'bar' in sDoc.allowedVocabulary()
+
+    def test_vocabularies( self ):
+        fSpec   = self.tool.getElementSpec( 'Format' )
+        fDef    = fSpec.getPolicy()
+        formats = ( 'text/plain', 'text/html' )
+        fDef.edit( 0, 0, '', 0, ( 'text/plain', 'text/html' ) )
+        assert self.tool.listAllowedFormats() == formats
+
+        foo = Foo()
+        assert self.tool.listAllowedFormats( foo ) == formats
+        fSpec.addPolicy( 'Foo' )
+        assert not self.tool.listAllowedFormats( foo )
+        foo_formats = ( 'image/jpeg', 'image/gif', 'image/png' )
+        fFoo        = fSpec.getPolicy( 'Foo' )
+        fFoo.edit( 0, 0, '', 0, foo_formats )
+        assert self.tool.listAllowedFormats( foo ) == foo_formats
+
+    def test_initialValues( self ):
+        foo = Foo()
+        assert not foo.Title()
+        assert not foo.Description()
+        assert not foo.Subject()
+        assert not foo.Format(), foo.Format()
+        assert not foo.Language()
+        assert not foo.Rights()
+
+        self.tool.setInitialMetadata( foo )
+        assert not foo.Title()
+        assert not foo.Description()
+        assert not foo.Subject()
+        assert not foo.Format()
+        assert not foo.Language()
+        assert not foo.Rights()
+
+        # Test default policy.
+        foo     = Foo()
+        fSpec   = self.tool.getElementSpec( 'Format' )
+        fPolicy = fSpec.getPolicy()
+        fPolicy.edit( 0, 1, 'text/plain', 0, () )
+        self.tool.setInitialMetadata( foo )
+        assert not foo.Title()
+        assert not foo.Description()
+        assert not foo.Subject()
+        assert foo.Format() == 'text/plain'
+        assert not foo.Language()
+        assert not foo.Rights()
+
+        # Test type-specific policy.
+        foo     = Foo()
+        tSpec   = self.tool.getElementSpec( 'Title' )
+        tSpec.addPolicy( 'Foo' )
+        tPolicy = tSpec.getPolicy( foo.getPortalTypeName() )
+        tPolicy.edit( 1, 0, '', 0, () )
+
+        try:
+            self.tool.setInitialMetadata( foo )
+        except MetadataError:
+            pass
+        else:
+            assert 0, "Expected MetadataError"
+
+        foo.setTitle( 'Foo title' )
+        self.tool.setInitialMetadata( foo )
+        assert foo.Title() == 'Foo title'
+        assert not foo.Description()
+        assert not foo.Subject()
+        assert foo.Format() == 'text/plain'
+        assert not foo.Language()
+        assert not foo.Rights()
+
+        #   Ensure Foo's policy doesn't interfere with other types.
+        bar = Bar()
+        self.tool.setInitialMetadata( bar )
+        assert not bar.Title()
+        assert not bar.Description()
+        assert not bar.Subject()
+        assert bar.Format() == 'text/plain'
+        assert not bar.Language()
+        assert not bar.Rights()
+
+    def test_validation( self ):
+
+        foo = Foo()
+        self.tool.setInitialMetadata( foo )
+        self.tool.validateMetadata( foo )
+
+        tSpec   = self.tool.getElementSpec( 'Title' )
+        tSpec.addPolicy( 'Foo' )
+        tPolicy = tSpec.getPolicy( foo.getPortalTypeName() )
+        tPolicy.edit( 1, 0, '', 0, () )
+
+        try:
+            self.tool.validateMetadata( foo )
+        except MetadataError:
+            pass
+        else:
+            assert 0, "Expected MetadataError"
+
+        foo.setTitle( 'Foo title' )
+        self.tool.validateMetadata( foo )
+
+    def test_interface(self):
         from Products.CMFCore.interfaces.portal_metadata \
                 import portal_metadata as IMetadataTool
         from Products.CMFCore.interfaces.portal_actions \
                 import ActionProvider as IActionProvider
 
-        verifyClass(IMetadataTool, self._getTargetClass())
-        verifyClass(IActionProvider, self._getTargetClass())
-
-    def test_empty( self ):
-
-        from Products.CMFDefault.MetadataTool import DEFAULT_ELEMENT_SPECS
-
-        tool = self._makeOne()
-
-        self.failIf( tool.getPublisher() )
-        self.assertEqual( tool.getFullName( 'foo' ), 'foo' )
-
-        specs = list( tool.listElementSpecs() )
-        defaults = list( DEFAULT_ELEMENT_SPECS )
-        specs.sort()
-        defaults.sort()
-
-        self.assertEqual( len( specs ), len( defaults ) )
-
-        for i in range( len( specs ) ):
-            self.assertEqual( specs[i][0], defaults[i][0] )
-            self.assertEqual( specs[i][1].isMultiValued(), defaults[i][1] )
-            policies = specs[i][1].listPolicies()
-            self.assertEqual( len( policies ), 1 )
-            self.assertEqual( policies[0][0], None )
-
-        self.failIf( tool.getElementSpec( 'Title'        ).isMultiValued() )
-        self.failIf( tool.getElementSpec( 'Description'  ).isMultiValued() )
-        self.failUnless( tool.getElementSpec( 'Subject'  ).isMultiValued() )
-        self.failIf( tool.getElementSpec( 'Format'       ).isMultiValued() )
-        self.failIf( tool.getElementSpec( 'Language'     ).isMultiValued() )
-        self.failIf( tool.getElementSpec( 'Rights'       ).isMultiValued() )
-
-        self.assertRaises( KeyError, tool.getElementSpec, 'Foo' )
-
-        self.assertEqual( len( tool.listAllowedSubjects() ), 0 )
-        self.assertEqual( len( tool.listAllowedFormats() ), 0 )
-        self.assertEqual( len( tool.listAllowedLanguages() ), 0 )
-        self.assertEqual( len( tool.listAllowedRights() ), 0 )
-
-    def test_addElementSpec( self ):
-
-        from Products.CMFDefault.MetadataTool import DEFAULT_ELEMENT_SPECS
-
-        tool = self._makeOne()
-
-        tool.addElementSpec( 'Rating', is_multi_valued=True )
-
-        self.assertEqual( len( tool.listElementSpecs() )
-                        , len( DEFAULT_ELEMENT_SPECS ) + 1 )
-
-        rating = tool.getElementSpec( 'Rating' )
-        self.failUnless( rating.isMultiValued() )
-
-    def test_remove( self ):
-
-        from Products.CMFDefault.MetadataTool import DEFAULT_ELEMENT_SPECS
-
-        tool = self._makeOne()
-
-        tool.removeElementSpec( 'Rights' )
-
-        self.assertEqual( len( tool.listElementSpecs() )
-                        , len( DEFAULT_ELEMENT_SPECS ) - 1 )
-
-        self.assertRaises( KeyError, tool.getElementSpec, 'Rights' )
-
-    def test_remove_nonesuch( self ):
-
-        from Products.CMFDefault.MetadataTool import DEFAULT_ELEMENT_SPECS
-
-        tool = self._makeOne()
-        self.assertRaises( KeyError, tool.removeElementSpec, 'Foo' )
-
-    def test_simplePolicies_without_override( self ):
-
-        tool = self._makeOne()
-
-        tSpec = tool.getElementSpec( 'Title' )
-
-        tDef = tSpec.getPolicy()
-        self.failIf( tDef.isRequired() )
-        self.failIf( tDef.supplyDefault() )
-        self.failIf( tDef.defaultValue() )
-
-        tDoc = tSpec.getPolicy( 'Document' )
-        self.failUnless( aq_base( tDoc ) is aq_base( tDef ) )
-
-    def test_simplePolicies_editing( self ):
-
-        tool = self._makeOne()
-        tSpec = tool.getElementSpec( 'Title' )
-        tDef = tSpec.getPolicy()
-        tDoc = tSpec.getPolicy( 'Document' )
-
-        tDef.edit( is_required=True
-                 , supply_default=True
-                 , default_value='xyz'
-                 , enforce_vocabulary=False
-                 , allowed_vocabulary=()
-                 )
-
-        self.failUnless( tDef.isRequired() )
-        self.failUnless( tDef.supplyDefault() )
-        self.assertEqual( tDef.defaultValue(), 'xyz' )
-
-        self.failUnless( tDoc.isRequired() )
-        self.failUnless( tDoc.supplyDefault() )
-        self.assertEqual( tDoc.defaultValue(), 'xyz' )
-
-    def test_simplePolicies_overriding( self ):
-
-        tool = self._makeOne()
-        tSpec = tool.getElementSpec( 'Title' )
-        tDef = tSpec.getPolicy()
-
-        tDef.edit( is_required=True
-                 , supply_default=True
-                 , default_value='xyz'
-                 , enforce_vocabulary=False
-                 , allowed_vocabulary=()
-                 )
-
-        tSpec.addPolicy( 'Document' )
-        self.assertEqual( len( tSpec.listPolicies() ), 2 )
-
-        tDoc = tSpec.getPolicy( 'Document' )
-        self.failIf( aq_base( tDoc ) is aq_base( tDef ) )
-        self.failIf( tDoc.isRequired() )
-        self.failIf( tDoc.supplyDefault() )
-        self.failIf( tDoc.defaultValue() )
-
-        tSpec.removePolicy( 'Document' )
-        tDoc = tSpec.getPolicy( 'Document' )
-        self.assertEqual(aq_base(tDoc), aq_base(tDef))
-        self.failUnless( tDoc.isRequired() )
-        self.failUnless( tDoc.supplyDefault() )
-        self.assertEqual( tDoc.defaultValue(), 'xyz' )
-
-    def test_multiValuedPolicies_without_override( self ):
-
-        tool = self._makeOne()
-
-        sSpec = tool.getElementSpec( 'Subject' )
-
-        sDef = sSpec.getPolicy()
-        self.failIf( sDef.isRequired() )
-        self.failIf( sDef.supplyDefault() )
-        self.failIf( sDef.defaultValue() )
-        self.failIf( sDef.enforceVocabulary() )
-        self.failIf( sDef.allowedVocabulary() )
-
-        sDoc = sSpec.getPolicy( 'Document' )
-        self.assertEqual( aq_base( sDoc ), aq_base( sDef ))
-
-    def test_multiValuedPolicies_editing( self ):
-
-        tool = self._makeOne()
-        sSpec = tool.getElementSpec( 'Subject' )
-        sDef = sSpec.getPolicy()
-        sDoc = sSpec.getPolicy( 'Document' )
-
-        sDef.edit( is_required=True
-                 , supply_default=True
-                 , default_value='xyz'
-                 , enforce_vocabulary=True
-                 , allowed_vocabulary=( 'foo', 'bar' )
-                 )
-
-        self.failUnless( sDef.isRequired() )
-        self.failUnless( sDef.supplyDefault() )
-        self.assertEqual( sDef.defaultValue(), 'xyz' )
-
-        self.failUnless( sDoc.isRequired() )
-        self.failUnless( sDoc.supplyDefault() )
-        self.assertEqual( sDoc.defaultValue(), 'xyz' )
-
-        self.failUnless( sDef.enforceVocabulary() )
-        self.assertEqual( len( sDef.allowedVocabulary() ), 2 )
-        self.failUnless( 'foo' in sDef.allowedVocabulary() )
-        self.failUnless( 'bar' in sDef.allowedVocabulary() )
-
-        self.failUnless( sDoc.enforceVocabulary() )
-        self.assertEqual( len( sDoc.allowedVocabulary() ), 2 )
-        self.failUnless( 'foo' in sDoc.allowedVocabulary() )
-        self.failUnless( 'bar' in sDoc.allowedVocabulary() )
-
-    def test_multiValuedPolicies_overriding( self ):
-
-        tool = self._makeOne()
-        sSpec = tool.getElementSpec( 'Subject' )
-        sDef = sSpec.getPolicy()
-
-        sDef.edit( is_required=True
-                 , supply_default=True
-                 , default_value='xyz'
-                 , enforce_vocabulary=True
-                 , allowed_vocabulary=( 'foo', 'bar' )
-                 )
-
-        sSpec.addPolicy( 'Document' )
-        self.assertEqual( len( sSpec.listPolicies() ), 2 )
-
-        sDoc = sSpec.getPolicy( 'Document' )
-        self.failIf( aq_base( sDoc ) is aq_base( sDef ) )
- 
-        self.failIf( sDoc.isRequired() )
-        self.failIf( sDoc.supplyDefault() )
-        self.failIf( sDoc.defaultValue() )
-        self.failIf( sDoc.enforceVocabulary() )
-        self.failIf( sDoc.allowedVocabulary() )
-
-        sSpec.removePolicy( 'Document' )
-        sDoc = sSpec.getPolicy( 'Document' )
-        self.assertEqual(aq_base(sDoc), aq_base(sDef))
-        self.failUnless( sDoc.isRequired() )
-        self.failUnless( sDoc.supplyDefault() )
-        self.assertEqual( sDoc.defaultValue(), 'xyz' )
-        self.failUnless( sDoc.enforceVocabulary() )
-        self.assertEqual( len( sDoc.allowedVocabulary() ), 2 )
-        self.failUnless( 'foo' in sDoc.allowedVocabulary() )
-        self.failUnless( 'bar' in sDoc.allowedVocabulary() )
-
-    def test_vocabularies_default( self ):
-
-        tool = self._makeOne()
-
-        fSpec = tool.getElementSpec( 'Format' )
-        fDef = fSpec.getPolicy()
-        formats = ( 'text/plain', 'text/html' )
-        fDef.edit( is_required=False
-                 , supply_default=False
-                 , default_value=''
-                 , enforce_vocabulary=False
-                 , allowed_vocabulary=( 'text/plain', 'text/html' )
-                 )
-
-        self.assertEqual( tool.listAllowedFormats(), formats )
-
-        foo = Foo()
-        self.assertEqual( tool.listAllowedFormats( foo ), formats )
-
-    def test_vocabularies_overriding( self ):
-
-        tool = self._makeOne()
-        foo = Foo()
-
-        fSpec = tool.getElementSpec( 'Format' )
-        fDef = fSpec.getPolicy()
-        formats = ( 'text/plain', 'text/html' )
-        fDef.edit( is_required=False
-                 , supply_default=False
-                 , default_value=''
-                 , enforce_vocabulary=False
-                 , allowed_vocabulary=( 'text/plain', 'text/html' )
-                 )
-
-        fSpec.addPolicy( 'Foo' )
-
-        self.failIf( tool.listAllowedFormats( foo ) )
-
-        foo_formats = ( 'image/jpeg', 'image/gif', 'image/png' )
-        fFoo = fSpec.getPolicy( 'Foo' )
-        fFoo.edit( is_required=False
-                 , supply_default=False
-                 , default_value=''
-                 , enforce_vocabulary=False
-                 , allowed_vocabulary=foo_formats
-                 )
-
-        self.assertEqual( tool.listAllowedFormats( foo ), foo_formats )
-
-    def test_initialValues_no_policy( self ):
-
-        tool = self._makeOne()
-
-        foo = Foo()
-        self.assertEqual( foo.Title(), '' )
-        self.assertEqual( foo.Description(), '' )
-        self.assertEqual( foo.Subject(), () )
-        self.assertEqual( foo.Format(), '' )
-        self.assertEqual( foo.Language(), '' )
-        self.assertEqual( foo.Rights(), '' )
-
-        tool.setInitialMetadata( foo )
-        self.assertEqual( foo.Title(), '' )
-        self.assertEqual( foo.Description(), '' )
-        self.assertEqual( foo.Subject(), () )
-        self.assertEqual( foo.Format(), '' )
-        self.assertEqual( foo.Language(), '' )
-        self.assertEqual( foo.Rights(), '' )
-
-    def test_initialValues_default_policy( self ):
-
-        tool = self._makeOne()
-
-        fSpec = tool.getElementSpec( 'Format' )
-        fPolicy = fSpec.getPolicy()
-        fPolicy.edit( is_required=False
-                    , supply_default=True
-                    , default_value='text/plain'
-                    , enforce_vocabulary=False
-                    , allowed_vocabulary=()
-                    )
-
-        foo = Foo()
-        tool.setInitialMetadata( foo )
-
-        self.assertEqual( foo.Title(), '' )
-        self.assertEqual( foo.Description(), '' )
-        self.assertEqual( foo.Subject(), ())
-        self.assertEqual( foo.Format(), 'text/plain' )
-        self.assertEqual( foo.Language(), '' )
-        self.assertEqual( foo.Rights(), '' )
-
-    def test_initialValues_type_policy( self ):
-
-        from Products.CMFDefault.exceptions import MetadataError
-
-        tool = self._makeOne()
-        foo = Foo()
-
-        tSpec = tool.getElementSpec( 'Title' )
-        tSpec.addPolicy( 'Foo' )
-        tPolicy = tSpec.getPolicy( foo.getPortalTypeName() )
-        tPolicy.edit( is_required=True
-                    , supply_default=False
-                    , default_value=''
-                    , enforce_vocabulary=False
-                    , allowed_vocabulary=()
-                    )
-
-        self.assertRaises( MetadataError, tool.setInitialMetadata, foo )
-
-        foo.setTitle( 'Foo title' )
-        tool.setInitialMetadata( foo )
-
-        self.assertEqual( foo.Title(), 'Foo title' )
-        self.assertEqual( foo.Description(), '' )
-        self.assertEqual( foo.Subject(), () )
-        self.assertEqual( foo.Format(), '' )
-        self.assertEqual( foo.Language(), '' )
-        self.assertEqual( foo.Rights(), '' )
-
-
-    def test_initialValues_type_policy_independant( self ):
-
-        tool = self._makeOne()
-        foo = Foo()
-
-        tSpec = tool.getElementSpec( 'Title' )
-        tSpec.addPolicy( 'Foo' )
-        tPolicy = tSpec.getPolicy( foo.getPortalTypeName() )
-        tPolicy.edit( is_required=True
-                    , supply_default=False
-                    , default_value=''
-                    , enforce_vocabulary=False
-                    , allowed_vocabulary=()
-                    )
-
-        bar = Bar()
-
-        tool.setInitialMetadata( bar )
-
-        self.assertEqual( bar.Title(), '' )
-        self.assertEqual( bar.Description(), '' )
-        self.assertEqual( bar.Subject(), () )
-        self.assertEqual( bar.Format(), '' )
-        self.assertEqual( bar.Language(), '' )
-        self.assertEqual( bar.Rights(), '' )
-
-    def test_validation( self ):
-
-        from Products.CMFDefault.exceptions import MetadataError
-
-        tool = self._makeOne()
-
-        foo = Foo()
-        tool.setInitialMetadata( foo )
-        tool.validateMetadata( foo )
-
-        tSpec = tool.getElementSpec( 'Title' )
-        tSpec.addPolicy( 'Foo' )
-        tPolicy = tSpec.getPolicy( foo.getPortalTypeName() )
-        tPolicy.edit( is_required=True
-                    , supply_default=False
-                    , default_value=''
-                    , enforce_vocabulary=False
-                    , allowed_vocabulary=()
-                    )
-
-        self.assertRaises( MetadataError, tool.validateMetadata, foo )
-
-        foo.setTitle( 'Foo title' )
-        tool.validateMetadata( foo )
-
-    def test_getContentMetadata_converting( self ):
-
-        TITLE = 'A Title'
-
-        tool = self._makeOne()
-        foo = Foo()
-        foo.title = TITLE
-
-        self.assertEqual( tool.getContentMetadata( foo, 'title' ), TITLE )
-
-        self.failIf( 'title' in foo.__dict__.keys() )
-
-    def test_setContentMetadata_converting( self ):
-
-        TITLE = 'A Title'
-        DESCRIPTION = 'This is a description'
-
-        tool = self._makeOne()
-        foo = Foo()
-        foo.title = TITLE
-
-        tool.setContentMetadata( foo, 'description', DESCRIPTION )
-
-        self.failIf( 'title' in foo.__dict__.keys() )
-        self.failIf( 'description' in foo.__dict__.keys() )
-
-        self.assertEqual( tool.getContentMetadata( foo, 'title' ), TITLE )
-        self.assertEqual( tool.getContentMetadata( foo, 'description' )
-                        , DESCRIPTION )
+        verifyClass(IMetadataTool, MetadataTool)
+        verifyClass(IActionProvider, MetadataTool)
 
 
 def test_suite():
