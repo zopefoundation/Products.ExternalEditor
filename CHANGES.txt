@@ -46,6 +46,10 @@ New Features
 
 Bugs Fixed
 
+  - Fixed incorrent permissions in "pending" state of default 
+    DCWorkflows. Thanks for Lynn Walton for the report and 
+    Florent Guillaume for the patch. (Tracker #464)
+
   - Fixed missing comma that affected manager permission to modify
     in the published state. Thanks to Florent Guillaume for the 
     patch (Tracker #459)

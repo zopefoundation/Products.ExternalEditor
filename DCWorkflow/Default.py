@@ -70,8 +70,8 @@ def setupDefaultWorkflowRev2(wf):
     sdef.setProperties(
         title='Waiting for reviewer',
         transitions=('hide', 'publish', 'reject', 'retract',))
-    sdef.setPermission(p_access, 1, (r_anon, r_manager, r_reviewer))
-    sdef.setPermission(p_view, 1, (r_anon, r_manager, r_reviewer))
+    sdef.setPermission(p_access, 1, (r_manager, r_owner, r_reviewer))
+    sdef.setPermission(p_view, 1, (r_manager, r_owner, r_reviewer))
     sdef.setPermission(p_modify, 0, (r_manager, r_reviewer))
 
     sdef = wf.states['published']
@@ -226,8 +226,8 @@ def setupDefaultWorkflowClassic(wf):
     sdef.setProperties(
         title='Waiting for reviewer',
         transitions=('publish', 'reject', 'retract',))
-    sdef.setPermission(p_access, 1, (r_anon, r_manager, r_reviewer))
-    sdef.setPermission(p_view, 1, (r_anon, r_manager, r_reviewer))
+    sdef.setPermission(p_access, 1, (r_manager, r_owner, r_reviewer))
+    sdef.setPermission(p_view, 1, (r_manager, r_owner, r_reviewer))
     sdef.setPermission(p_modify, 0, (r_manager, r_reviewer))
 
     sdef = wf.states['published']
