@@ -150,7 +150,7 @@ class DiscussionTool (UniqueObject, SimpleItem):
         # Return actions for reply and show replies
         content = info.content
         if content is None or not self.isDiscussionAllowedFor(content):
-            return None
+            return []
 
         discussion = self.getDiscussionFor(content)
         if discussion.aq_base == content.aq_base:

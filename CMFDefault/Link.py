@@ -23,7 +23,8 @@ from Globals import InitializeClass, DTMLFile
 from AccessControl import ClassSecurityInfo
 
 from Products.CMFCore import CMFCorePermissions
-from Products.CMFCore.PortalContent import PortalContent
+from Products.CMFCore.PortalContent import PortalContent, NoWL
+from Products.CMFCore.PortalContent import ResourceLockedError
 from Products.CMFCore.WorkflowCore import WorkflowAction
 from Products.CMFCore.utils import keywordsplitter
 
@@ -105,6 +106,24 @@ class Link( PortalContent
         self.title=title
         self.remote_url=remote_url
         self.description=description
+        self.format=self.URL_FORMAT
+
+    security.declareProtected( CMFCorePermissions.ModifyPortalContent
+                             , 'manage_edit' )
+    manage_edit = DTMLFile( 'zmi_editLink', _dtmldir )
+
+    security.declareProtected( CMFCorePermissions.ModifyPortalContent
+                             , 'manage_editLink' )
+    def manage_editLink( self, remote_url, REQUEST=None ):
+        """
+            Update the Link via the ZMI.
+        """
+        self._edit( remote_url )
+        if REQUEST is not None:
+            REQUEST['RESPONSE'].redirect( self.absolute_url()
+                                        + '/manage_edit'
+                                        + '?manage_tabs_message=Link+updated'
+                                        )
 
     security.declareProtected( CMFCorePermissions.ModifyPortalContent
                              , 'manage_edit' )
@@ -133,6 +152,8 @@ class Link( PortalContent
             self.remote_url = urlparse.urlunparse( tokens )
         else:
             self.remote_url = 'http://' + remote_url
+        if self.remote_url[-1] == '/':
+            self.remote_url = self.remote_url[:-1]
 
     security.declareProtected( CMFCorePermissions.ModifyPortalContent, 'edit' )
     edit = WorkflowAction( _edit )
@@ -153,12 +174,10 @@ class Link( PortalContent
 
     security.declarePrivate( '_writeFromPUT' )
     def _writeFromPUT( self, body ):
-
         headers = {}
         headers, body = parseHeadersBody(body, headers)
         lines = string.split( body, '\n' )
         self.edit( lines[0] )
-
         headers['Format'] = self.URL_FORMAT
         new_subject = keywordsplitter(headers)
         headers['Subject'] = new_subject or self.Subject()
@@ -167,7 +186,7 @@ class Link( PortalContent
             if key != 'Format' and not haveheader(key):
                 headers[key] = value
         
-        self.editMetadata(title=headers['Title'],
+        self._editMetadata(title=headers['Title'],
                           subject=headers['Subject'],
                           description=headers['Description'],
                           contributors=headers['Contributors'],
@@ -184,11 +203,18 @@ class Link( PortalContent
         """
             Handle HTTP / WebDAV / FTP PUT requests.
         """
-        self.dav__init(REQUEST, RESPONSE)
+        if not NoWL:
+            self.dav__init(REQUEST, RESPONSE)
+            self.dav__simpleifhandler(REQUEST, RESPONSE, refresh=1)
         body = REQUEST.get('BODY', '')
-        self._writeFromPUT( body )
-        RESPONSE.setStatus(204)
-        return RESPONSE
+        try:
+            self._writeFromPUT( body )
+            RESPONSE.setStatus(204)
+            return RESPONSE
+        except ResourceLockedError, msg:
+            get_transaction().abort()
+            RESPONSE.setStatus(423)
+            return RESPONSE
 
     security.declareProtected( CMFCorePermissions.View, 'manage_FTPget' )
     def manage_FTPget(self):

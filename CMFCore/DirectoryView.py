@@ -333,13 +333,14 @@ class DirectoryViewSurrogate (Folder):
 
     security.declareProtected(ManagePortal,
                               'manage_properties')
-    def manage_properties( self, dirpath, REQUEST ):
+    def manage_properties( self, dirpath, REQUEST=None ):
         """
             Update the directory path of the DV.
         """
         self.__dict__['_real']._dirpath = dirpath
-        REQUEST['RESPONSE'].redirect( '%s/manage_propertiesForm'
-                                    % self.absolute_url() )
+        if REQUEST is not None:
+            REQUEST['RESPONSE'].redirect( '%s/manage_propertiesForm'
+                                        % self.absolute_url() )
     
     security.declareProtected(AccessContentsInformation,
                               'getCustomizableObject')

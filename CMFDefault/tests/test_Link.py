@@ -25,6 +25,8 @@ class LinkTests(unittest.TestCase):
         self.assertEqual( d.Title(), '' )
         self.assertEqual( d.Description(), '' )
         self.assertEqual( d.getRemoteUrl(), '' )
+        self.assertEqual( d.format, 'text/url' )
+        self.assertEqual( d.URL_FORMAT, 'text/url')
 
     def test_StructuredText( self ):
         d = Link('foo')

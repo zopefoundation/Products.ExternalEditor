@@ -22,8 +22,13 @@ from Globals import InitializeClass, DTMLFile
 from utils import UniqueObject, SimpleItemWithProperties, tuplize
 from utils import _dtmldir, _checkPermission, cookString
 import urllib
+from utils import _dtmldir, _checkPermission, cookString, getToolByName
 import string
 from AccessControl import getSecurityManager, ClassSecurityInfo
+try:
+    from AccessControl import Unauthorized
+except:
+    Unauthorized = 'Unauthorized'
 from Acquisition import aq_base
 import Products, CMFCorePermissions
 from ActionProviderBase import ActionProviderBase
@@ -432,7 +437,7 @@ class FactoryTypeInformation (TypeInformation):
         m = self._getFactoryMethod(container, raise_exc=1)
 
         if m is None:
-            raise 'Unauthorized', ('Cannot create %s' % self.getId())
+            raise Unauthorized, ('Cannot create %s' % self.getId())
 
         id = str(id)
 
@@ -447,7 +452,9 @@ class FactoryTypeInformation (TypeInformation):
 
         if hasattr(ob, '_setPortalTypeName'):
             ob._setPortalTypeName(self.getId())
-
+        wf = getToolByName(ob, 'portal_workflow', None)
+        if wf is not None:
+            wf.notifyCreated(ob)
         return ob
 
 InitializeClass( FactoryTypeInformation )
@@ -492,7 +499,7 @@ class ScriptableTypeInformation( TypeInformation ):
         of its "immediate" view (typically the metadata form).
         """
         if not self.isConstructionAllowed(container):
-            raise 'Unauthorized'
+            raise Unauthorized
 
         constructor = self.restrictedTraverse( self.constructor_path )
         #   Rewrap to get into container's context.

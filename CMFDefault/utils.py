@@ -25,7 +25,7 @@ def formatRFC822Headers( headers ):
     return join( munged, '\r\n' )
 
 
-def parseHeadersBody( body, headers=None ):
+def parseHeadersBody( body, headers=None, rc=re.compile(r'\n|\r\n')):
     """
         Parse any leading 'RFC-822'-ish headers from an uploaded
         document, returning a dictionary containing the headers
@@ -61,7 +61,7 @@ def parseHeadersBody( body, headers=None ):
         Allow passing initial dictionary as headers.
     """
     # Split the lines apart, taking into account Mac|Unix|Windows endings
-    lines = re.split(r'[\n\r]+?', body)
+    lines = rc.split(body)
 
     i = 0
     if headers is None:
@@ -71,9 +71,7 @@ def parseHeadersBody( body, headers=None ):
 
     hdrlist = []
     for line in lines:
-        if line and line[-1] == '\r':
-            line = line[:-1]
-        if not line:
+        if not strip(line):
             break
         tokens = split( line, ': ' )
         if len( tokens ) > 1:

@@ -1,41 +1,112 @@
-??
+New Features
 
-  New Features
-
-    - (__future__) Exposed role management for manager users on
+  - (__future__) Exposed role management for manager users on
       the default roster:  managers can now "promote" members
       without going to the ZMI.
 
-    - (__future__) Added "custom schema" mechanism for content
-      objetcts:  site managers can now define additional
-      propertysheets for a content type, which will then be
-      reflected in instances created from the type.
+  - (__future__) Added "custom schema" mechanism for content
+    objetcts:  site managers can now define additional
+    propertysheets for a content type, which will then be
+    reflected in instances created from the type.
 
-    - (__future__) Added simple link extraction / checking for
-      textual content.  Link checking also works for Link objects.
+   - (__future__) Added simple link extraction / checking for
+     textual content.  Link checking also works for Link objects.
 
-    - (__future__) Added "composite content" types (see the
-      "dogbowl proposal",
-      (http://cmf.zope.org/rqmts/proposals/compounds/compoundproposal.txt).
+  - (__future__) Added "composite content" types (see the
+    "dogbowl proposal",
+    (http://cmf.zope.org/rqmts/proposals/compounds/compoundproposal.txt).
 
-    - (__future__) Added DCWorkflow (through-the-web configurable
+  - Enabled querying actions from workflow tool in absence
+    of actions tool (Tracker #401).
+
+  - Added 'operator' attribute to CMFTopic.ListCriterion, to permit
+    specifying an operator ('and', for the most part) for indexes which
+    support it, e.g., KeywordIndex (Tracker #442).
+
+  - Added ZMI interface for editing Link URL (Tracker #364).
+
+  - (__future__) Added DCWorkflow (through-the-web configurable
       workflows) to the core set of CMF products.
 
-    - Extended TypesTool to permit registration of new TypeInformation
-      implementations (Tracker #409, thanks to Jeffrey Shell for the
-      work!)
+Bugs Fixed
 
-    - Made all tool-generated actions configurable through-the-web,
-      via an "Actions" tab on each tool;  made the list of ActionProviders
-      configurable TTW as well.
+  - Fixed a bug where the workflow notifyCreated method was called during
+    manage_afterAdd in PortalContent, making it possible for the
+    notification to occur on the wrong workflow.  The notification has 
+    moved to the contstructInstance method on the TypesTool after
+    the _setPortalTypeName method has been called on the object.
 
-    - Enabled querying actions from workflow tool in absence
-      of actions tool (Tracker #401).
+  - Extended TypesTool to permit registration of new TypeInformation
+    implementations (Tracker #409, thanks to Jeffrey Shell for the
+    work!)
 
-  Bug Fixes
+  - Fixed a bug in Favorites.getObject to use restrictedTraverse on the portal
+    object.
 
-    - Made links emitted by 'topic_view' play nice with virtual hosting
-      (Tracker #433).
+  - Made all tool-generated actions configurable through-the-web,
+    via an "Actions" tab on each tool;  made the list of ActionProviders
+    configurable TTW as well.
 
-    - Ensure that package initialization files are non-empty, to prevent
+  - Fixed setting the Link.format to URL_FORMAT so the initially returned
+    metadata headers would return 'text/url' properly.  Added unittests.
+
+  - Enabled querying actions from workflow tool in absence
+    of actions tool (Tracker #401).
+
+  - Fixed CMFDefault.utils.parseHeadersBody to properly handle the headers
+    generated on a windows app (i.e. Dreamweaver) with /r/n; added the
+    compiled regular expression object to the method signature.
+
+  - Added full webdav sipport code to Link.py.  Changed _writeFromPUT to call
+    _editMetadata instead of editMetadata.
+
+  - Made links emitted by 'topic_view' play nice with virtual hosting
+    (Tracker #433).
+
+  - Cleaned up emission of RFC822-style headers (Tracker #407),
+    terminating headers must be terminated with CRLF, and padding
+    continuation lines (for values with embedded newlines) with
+    leading whitespace).
+
+  - Ensure that package initialization files are non-empty, to prevent
       suspicion that they were corrupted in download (Tracker #426).
+
+  - Added external method update_catalogIndexes.py to run as part of a
+    upgrade to CMFs migrating to Zope2.4+ from from CMF sites which were built
+    using Zope2.3 catalog
+
+  - Use ID to label Favorite when target has an empty Title (Tracker #440).
+
+  - Allowed sub-folders to have different syndication properties 
+    than parents (Tracker #421).
+
+  - Added 'CMFDefault.Upgrade.upgrade_decor_skins' external method to
+    convert existing sites which had installed skin directories from the
+    now-deprecated 'CMFDecor' product (Tracker #434).  Added note
+    explaining the issue, and the workaround, to 'ISSUES.txt'.
+
+  - Ensure that Favorites display the correct, absolute URL to their
+    target, without needing to have <base> tag set (Tracker #419).
+
+  - Worked around Opera's strange insistence on selecting an option,
+    even for multi-select lists (Tracker #332).
+
+  - Hardened CMFCore to initialize correctly in the absence of
+    the PageTemplates product (Tracker #430).
+
+  - Restored slot in <head> of ZPT main template into which content
+    can insert the <base> tag (Tracker #418).
+
+  - Fixed 'CMFTopic.SimpleIntegerCriterion.edit' to require a pair
+    of values when 'direction' is 'min:max';  updated skins to use
+    new 'getValueString', which renders such values properly
+    (Tracker #439).
+
+  - Ensured that Documents created with initial STX get cooked
+    (Tracker #435).
+
+  - Made links emitted by 'topic_view' play nice with virtual hosting
+    (Tracker #433).
+
+  - Made 'CMFCore/interfaces/__init__.py' non-empty, to remove suspicion
+    that the file was corrupted in the download (Tracker #426).

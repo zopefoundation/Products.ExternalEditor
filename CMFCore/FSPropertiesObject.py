@@ -125,7 +125,6 @@ class FSPropertiesObject (FSObject, PropertyManager):
                             'default_value':propvalue,
                             })
             except:
-                import pdb; pdb.set_trace()
                 raise ValueError, ( 'Error processing line %s of %s:\n%s'
                                   % (lino,fp,line) )
         self._properties = tuple(map)            
