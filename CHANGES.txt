@@ -2,6 +2,12 @@
 
  New features
 
+  - Added cookString method to CMFCore.utils for taking a string and making it id
+    friendly, it also does a string.lower on the resultant regex.
+    
+  - Change in TypesTool to utilize cookString to ensure the id is 
+    properly formated if the name is being used as the id.
+
   - Added failIfLocked method to PortalContent which handles the necessary
     checks to make sure a Document isn't locked via webDAV.
 

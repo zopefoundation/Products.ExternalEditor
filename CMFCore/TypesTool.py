@@ -92,7 +92,7 @@ __version__='$Revision$'[11:-2]
 import OFS
 from Globals import InitializeClass, DTMLFile
 from utils import UniqueObject, SimpleItemWithProperties, tuplize
-from utils import _dtmldir, _checkPermission
+from utils import _dtmldir, _checkPermission, cookString
 import string
 from AccessControl import getSecurityManager, ClassSecurityInfo
 from Acquisition import aq_base
@@ -177,7 +177,7 @@ class TypeInformation (SimpleItemWithProperties):
                     action = action.copy()
                     # Some backward compatibility stuff.
                     if not action.has_key('id'):
-                        action['id'] = string.lower(action['name'])
+                        action['id'] = cookString(action['name'])
                     if not action.has_key('category'):
                         action['category'] = 'object'
                     actions.append(action)
@@ -291,7 +291,7 @@ class TypeInformation (SimpleItemWithProperties):
             if not a.has_key('category'):
                 a['category'] = 'object'
             if not a.has_key('id'):
-                a['id'] = string.lower(a['name'])
+                a['id'] = cookString(a['name'])
             if not a.has_key( 'visible' ):
                 a['visible'] = 1
             actions.append(a)

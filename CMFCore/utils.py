@@ -95,6 +95,7 @@ from Acquisition import aq_get, aq_inner, aq_parent
 from string import split
 import os, re
 from Globals import package_home
+from string import lower
 
 try: from OFS.ObjectManager import UNIQUE
 except ImportError: UNIQUE = 2
@@ -134,7 +135,17 @@ class ImmutableId (Base):
 class UniqueObject (ImmutableId):
     __replaceable__ = UNIQUE
 
-    
+
+def cookString(text):
+    """
+    Make a single string without spaces from a string possibly
+    containing spaces....and make it lowercase...also makes a zope
+    friendly id.
+    """
+    rgx = re.compile(r'(^_|[^a-zA-Z0-9-_~\,\.])')
+    cooked = string.lower(re.sub(rgx, "",text))
+    return cooked
+
 def tuplize( valueName, value ):
     if type(value) == type(()): return value
     if type(value) == type([]): return tuple( value )
