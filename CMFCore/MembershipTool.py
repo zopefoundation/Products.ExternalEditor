@@ -109,12 +109,11 @@ class MembershipTool(UniqueObject, Folder, ActionProviderBase):
 
     security.declarePrivate('wrapUser')
     def wrapUser(self, u, wrap_anon=0):
-        '''
-        Sets up the correct acquisition wrappers for a user
-        object and provides an opportunity for a portal_memberdata
-        tool to retrieve and store member data independently of
-        the user object.
-        '''
+        """ Set up the correct acquisition wrappers for a user object.
+
+        Provides an opportunity for a portal_memberdata tool to retrieve and
+        store member data independently of the user object.
+        """
         b = getattr(u, 'aq_base', None)
         if b is None:
             # u isn't wrapped at all.  Wrap it in self.acl_users.
@@ -126,22 +125,17 @@ class MembershipTool(UniqueObject, Folder, ActionProviderBase):
             # member data tool at least partially.
             return u
 
-        parent = self.aq_inner.aq_parent
-        base = getattr(parent, 'aq_base', None)
-        if hasattr(base, 'portal_memberdata'):
-            # Apply any role mapping if we have it
-            if hasattr(self, 'role_map'):
-                for portal_role in self.role_map.keys():
-                    if (self.role_map.get(portal_role) in u.roles and
-                            portal_role not in u.roles):
-                        u.roles.append(portal_role)
+        # Apply any role mapping if we have it
+        if hasattr(self, 'role_map'):
+            for portal_role in self.role_map.keys():
+                if (self.role_map.get(portal_role) in u.roles and
+                        portal_role not in u.roles):
+                    u.roles.append(portal_role)
 
-            # Get portal_memberdata to do the wrapping.
-            md = getToolByName(parent, 'portal_memberdata')
+        mdtool = getToolByName(self, 'portal_memberdata', None)
+        if mdtool:
             try:
-                portal_user = md.wrapUser(u)
-                return portal_user
-
+                u = mdtool.wrapUser(u)
             except:
                 from zLOG import LOG, ERROR
                 import sys
@@ -150,7 +144,6 @@ class MembershipTool(UniqueObject, Folder, ActionProviderBase):
                     'Error during wrapUser',
                     error=sys.exc_info(),
                     )
-        # Failed.
         return u
 
     security.declareProtected(ManagePortal, 'getPortalRoles')
