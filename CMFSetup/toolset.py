@@ -8,8 +8,11 @@ from AccessControl import ClassSecurityInfo
 from Acquisition import Implicit
 from Globals import InitializeClass
 
+from Products.PageTemplates.PageTemplateFile import PageTemplateFile
+
 from permissions import ManagePortal
 from utils import HandlerBase
+from utils import _xmldir
 
 class ToolInitializer( Implicit ):
 
@@ -103,6 +106,13 @@ class ToolInitializer( Implicit ):
                                     , 'class' : dotted_name
                                     }
 
+    security.declareProtected( ManagePortal, 'generateXML' )
+    def generateXML( self ):
+
+        """ Pseudo API.
+        """
+        return self._toolsetConfig()
+
     security.declareProtected( ManagePortal, 'parseXML' )
     def parseXML( self, text, encoding=None ):
 
@@ -132,6 +142,12 @@ class ToolInitializer( Implicit ):
 
         self._forbidden = []
         self._required = {}
+
+    security.declarePrivate( '_toolsetConfig' )
+    _toolsetConfig = PageTemplateFile( 'tscExport.xml'
+                                     , _xmldir
+                                     , __name__='toolsetConfig'
+                                     )
 
 InitializeClass( ToolInitializer )
 

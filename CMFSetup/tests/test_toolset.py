@@ -33,7 +33,7 @@ class TestToolInitializer( BaseRegistryTests ):
         from Products.CMFSetup.toolset import ToolInitializer
         return ToolInitializer
 
-    def _initSite( self, foo=2, bar=2 ):
+    def _initSite( self ):
 
         self.root.site = Folder( id='site' )
         site = self.root.site
@@ -140,9 +140,27 @@ class TestToolInitializer( BaseRegistryTests ):
                          , 'a.name'
                          )
 
+    def test_generateXML_empty( self ):
+
+        site = self._initSite()
+        configurator = self._makeOne( site ).__of__( site )
+
+        self._compareDOM( configurator.generateXML(), _EMPTY_IMPORT_XML )
+
+    def test_generateXML_normal( self ):
+
+        site = self._initSite()
+        configurator = self._makeOne( site ).__of__( site )
+
+        configurator.addForbiddenTool( 'doomed' )
+        configurator.addRequiredTool( 'mandatory', 'path.to.one' )
+        configurator.addRequiredTool( 'obligatory', 'path.to.another' )
+
+        configurator.parseXML( _NORMAL_IMPORT_XML )
+
     def test_parseXML_empty( self ):
 
-        site = self._initSite( 0, 0 )
+        site = self._initSite()
         configurator = self._makeOne( site )
 
         configurator.parseXML( _EMPTY_IMPORT_XML )
@@ -152,7 +170,7 @@ class TestToolInitializer( BaseRegistryTests ):
 
     def test_parseXML_normal( self ):
 
-        site = self._initSite( 0, 0 )
+        site = self._initSite()
         configurator = self._makeOne( site )
 
         configurator.parseXML( _NORMAL_IMPORT_XML )
@@ -172,7 +190,7 @@ class TestToolInitializer( BaseRegistryTests ):
 
     def test_parseXML_confused( self ):
 
-        site = self._initSite( 0, 0 )
+        site = self._initSite()
         configurator = self._makeOne( site )
 
         self.assertRaises( ValueError
