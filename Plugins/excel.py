@@ -57,7 +57,7 @@ class EditorProcess:
             for doc in self.excelapp.Workbooks:
                 if head == doc.Path.lower() and tail == doc.Name.lower():
                     return 1
-                return 0
+            return 0
         except pythoncom.com_error, why:
             # COM will reject the call to enumerate the docs if the user is
             # doing anything interactive at the time the call is made.  The
