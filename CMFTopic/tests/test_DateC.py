@@ -44,9 +44,7 @@ class TestFriendlyDate(unittest.TestCase):
         assert friendly.daterange == 'old'
 
         # Bogus value on the operation
-        try: friendly.edit(4, 'min:max', 'new')
-        except ValueError: pass
-        except: raise
+        self.assertRaises(ValueError, friendly.edit, 4, 'min:max', 'new')
 
     def test_StringAsValue(self):
         friendly = FriendlyDate('foo', 'foofield')
@@ -60,9 +58,7 @@ class TestFriendlyDate(unittest.TestCase):
         assert friendly.value is None
 
         # Bogus value on the, well, value
-        try: friendly.edit('blah')
-        except ValueError: pass
-        except: raise
+        self.assertRaises(ValueError, friendly.edit, 'blah')
 
     def test_FiveDaysOld(self):
         date = (DateTime() - 4).Date()
