@@ -17,38 +17,12 @@ CMFSetup Product README
 
       - (x) the role / permission map on the site object
 
-      - ( ) removal / creation of specified tools
-
-      - ( ) cookie crumbler configuration
-
-      - ( ) folder structure
-
-      - ( ) 'portal_actionicons'
-            (Products.CMFActionIcons.ActionIconsTool.ActionIconsTool)
-
-            o action title / icon bindings
-
       - (x) 'portal_actions'
             (Products.CMFCore.ActionsTool.ActionsTool)
  
             o action providers, and their actions; note that this removes
               the requirement to have individual tools configure their own
               actions
-
-      - ( ) 'portal_catalogs'
-            (Products.CMFCore.CatalogTool.CatalogTool)
-
-            o index names / types
-        
-            o metadata column names
-
-      - ( ) 'portal_membership'
-
-            o "skeleton" home folder (XXX: is this in the core?)
-
-      - ( ) 'portal_memberdata'
-
-            o member properties
 
       - (x) 'portal_skins'
 
@@ -67,6 +41,32 @@ CMFSetup Product README
             o bindings of workflows to content types
 
             o DCWorkflow definitions, including supporting scripts
+
+      - ( ) removal / creation of specified tools
+
+      - ( ) 'portal_catalogs'
+            (Products.CMFCore.CatalogTool.CatalogTool)
+
+            o index names / types
+        
+            o metadata column names
+
+      - ( ) 'portal_membership'
+
+            o "skeleton" home folder (XXX: is this in the core?)
+
+      - ( ) 'portal_memberdata'
+
+            o member properties
+
+      - ( ) 'portal_actionicons'
+            (Products.CMFActionIcons.ActionIconsTool.ActionIconsTool)
+
+            o action title / icon bindings
+
+      - ( ) cookie crumbler configuration
+
+      - ( ) folder structure
 
   Extending The Tool
 
