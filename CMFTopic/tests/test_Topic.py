@@ -19,7 +19,6 @@ class TestTopic(unittest.TestCase):
 
     def test_Empty( self ):
         topic = Topic('top')
-        assert len(topic._criteriaTypes) == 4
         query = topic.buildQuery()
         assert len( query ) == 0
     

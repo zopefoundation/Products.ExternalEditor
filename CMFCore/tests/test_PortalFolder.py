@@ -223,7 +223,9 @@ class PortalFolderTests( unittest.TestCase ):
         folder._setObject( 'sub2', PortalFolder( 'sub2', '' ) )
         sub2 = folder.sub2
         # Waaa! force sub2 to allow paste of Dummy object.
-        sub2.all_meta_types = sub2.all_meta_types() + extra_meta_types()
+        sub2.all_meta_types = []
+        sub2.all_meta_types.extend( sub2.all_meta_types )
+        sub2.all_meta_types.extend( extra_meta_types() )
 
         cookie = folder.manage_cutObjects( ids=['bar'] )
         sub2.manage_pasteObjects( cookie )
@@ -280,7 +282,9 @@ class PortalFolderTests( unittest.TestCase ):
         cookie = sub1.manage_copyObjects( ids = ( 'dummy', ) )
         # Waaa! force sub2 to allow paste of Dummy object.
         #import pdb; pdb.set_trace()
-        sub2.all_meta_types = sub2.all_meta_types() + extra_meta_types()
+        sub2.all_meta_types = []
+        sub2.all_meta_types.extend( sub2.all_meta_types )
+        sub2.all_meta_types.extend( extra_meta_types() )
         sub2.manage_pasteObjects( cookie )
         assert 'dummy' in sub1.objectIds()
         assert 'dummy' in sub1.contentIds()
@@ -294,7 +298,9 @@ class PortalFolderTests( unittest.TestCase ):
 
         cookie = sub1.manage_cutObjects( ids = ( 'dummy', ) )
         # Waaa! force sub2 to allow paste of Dummy object.
-        sub3.all_meta_types = sub3.all_meta_types() + extra_meta_types()
+        sub3.all_meta_types = []
+        sub3.all_meta_types.extend( sub3.all_meta_types )
+        sub3.all_meta_types.extend( extra_meta_types() )
         sub3.manage_pasteObjects( cookie )
         assert not 'dummy' in sub1.objectIds()
         assert not 'dummy' in sub1.contentIds()

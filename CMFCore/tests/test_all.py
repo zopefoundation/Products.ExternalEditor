@@ -9,7 +9,10 @@ def test_suite():
     return suite
 
 def run():
-    unittest.JUnitTextTestRunner().run(test_suite())
+    if hasattr( unittest, 'JUnitTextTestRunner' ):
+        unittest.JUnitTextTestRunner().run( test_suite() )
+    else:
+        unittest.TextTestRunner( verbosity=0 ).run( test_suite() )
 
 if __name__ == '__main__':
     run()
