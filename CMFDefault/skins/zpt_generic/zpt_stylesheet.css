@@ -256,7 +256,7 @@ table.FormLayout td.ListName {
     background-color:  #336699;
     color: #FFFFFF;
     font-weight: bold;
-    verticle-align: middle;
+    vertical-align: middle;
 }
 
 table.FormLayout td.ListDefinition {

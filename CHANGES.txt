@@ -46,6 +46,9 @@ New Features
 
 Bugs Fixed
 
+  - Fixed typo in zpt_stylesheet.css. Thanks to Florent Guillaume
+    for the patch. (Tracker #461)
+
   - Fixed long standing bug in FSPythonScript where get_size returned
     the incorrect length. This broke editing using EMACS via FTP or
     WebDAV. Thanks to John Glavin at South River Technologies for
