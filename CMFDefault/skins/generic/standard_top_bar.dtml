@@ -16,7 +16,7 @@
    ><dtml-if name="Title">: &dtml-Title;</dtml-if></h1>
   </td>
 
-  <td class="NavBar" align="right" valign="bottom" width="70%" wrap="no">
+  <td class="NavBar" align="right" valign="bottom" width="70%" nowrap>
    <form action="&dtml-portal_url;/search">
     <a href="&dtml-portal_url;">home</a>&nbsp;
     <dtml-let member="portal_membership.getAuthenticatedMember()"
