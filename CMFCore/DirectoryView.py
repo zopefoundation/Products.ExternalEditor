@@ -87,7 +87,7 @@ __version__='$Revision$'[11:-2]
 
 
 import Globals
-from Globals import HTMLFile, Persistent
+from Globals import HTMLFile, Persistent, package_home, DTMLFile
 import os
 from os import path, listdir, stat
 from Acquisition import aq_inner, aq_parent, aq_base
@@ -96,10 +96,12 @@ from App.Common import package_home
 from OFS.ObjectManager import bad_id
 from OFS.Folder import Folder
 from AccessControl import ClassSecurityInfo
-from CMFCorePermissions import AccessContentsInformation
+from CMFCorePermissions import AccessContentsInformation, ManagePortal
 import CMFCorePermissions
 from FSObject import BadFile
 from utils import expandpath, minimalpath
+
+_dtmldir = os.path.join( package_home( globals() ), 'dtml' )
 
 __reload_module__ = 0
 
@@ -389,6 +391,20 @@ class DirectoryViewSurrogate (Folder):
         d = self.__dict__
         d[name] = value
         setattr(d['_real'], name, value)
+
+    security.declareProtected(ManagePortal,
+                              'manage_propertiesForm')
+    manage_propertiesForm = DTMLFile( 'dirview_properties', _dtmldir )
+
+    security.declareProtected(ManagePortal,
+                              'manage_properties')
+    def manage_properties( self, dirpath, REQUEST ):
+        """
+            Update the directory path of the DV.
+        """
+        self.__dict__['_real']._dirpath = dirpath
+        REQUEST['RESPONSE'].redirect( '%s/manage_propertiesForm'
+                                    % self.absolute_url() )
     
     security.declareProtected(AccessContentsInformation,
                               'getCustomizableObject')
@@ -410,6 +426,11 @@ class DirectoryViewSurrogate (Folder):
         listFolderHierarchy(ob, '', rval, adding_meta_type)
         rval.sort()
         return rval
+
+    security.declareProtected(AccessContentsInformation,
+                             'getDirPath')
+    def getDirPath(self):
+        return self.__dict__['_real']._dirpath
 
     security.declarePublic('getId')
     def getId(self):
