@@ -259,7 +259,7 @@ class SyndicationTool (UniqueObject, SimpleItem):
         An interface for allowing folderish items to implement an equivalent of PortalFolder.contentValues()
         """
         if hasattr(obj, 'synContentValues'):
-            values = obj.synContentValues(obj)
+            values = obj.synContentValues()
         else:
             values = PortalFolder.contentValues(obj)
         return values
