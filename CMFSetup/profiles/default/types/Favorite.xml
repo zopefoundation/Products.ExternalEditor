@@ -8,10 +8,6 @@
            allow_discussion="False" global_allow="True"
            product="CMFDefault" factory="addFavorite">
   <description>A Favorite is a Link to an intra-portal resource.</description>
-  <aliases>
-   <alias from="(Default)" to="favorite_view"/>
-   <alias from="view" to="favorite_view"/>
-  </aliases>
   <action action_id="view" title="View" condition_expr=""
           url_expr="string:${object_url}/favorite_view"
           category="object" visible="True">

@@ -4,6 +4,17 @@
             cookie_persistence="0">
  <skin-directory id="Images"
                  directory="CMFDefault/skins/Images"/>
+ <skin-directory id="content"
+                 directory="CMFDefault/skins/content"/>
+ <skin-directory id="control"
+                 directory="CMFDefault/skins/control"/>
+ <skin-directory id="generic"
+                 directory="CMFDefault/skins/generic"/>
+ <skin-directory id="no_css"
+                 directory="CMFDefault/skins/no_css"/>
+ <skin-directory id="nouvelle"
+                 directory="CMFDefault/skins/nouvelle"/>
+ <skin-directory id="topic" directory="CMFTopic/skins/topic"/>
  <skin-directory id="zpt_content"
                  directory="CMFDefault/skins/zpt_content"/>
  <skin-directory id="zpt_control"
@@ -18,6 +29,28 @@
   <layer name="zpt_content"/>
   <layer name="zpt_generic"/>
   <layer name="zpt_control"/>
+  <layer name="topic"/>
+  <layer name="content"/>
+  <layer name="generic"/>
+  <layer name="control"/>
+  <layer name="Images"/>
+ </skin-path>
+ <skin-path id="No CSS">
+  <layer name="no_css"/>
+  <layer name="custom"/>
+  <layer name="topic"/>
+  <layer name="content"/>
+  <layer name="generic"/>
+  <layer name="control"/>
+  <layer name="Images"/>
+ </skin-path>
+ <skin-path id="Nouvelle">
+  <layer name="nouvelle"/>
+  <layer name="custom"/>
+  <layer name="topic"/>
+  <layer name="content"/>
+  <layer name="generic"/>
+  <layer name="control"/>
   <layer name="Images"/>
  </skin-path>
 </skins-tool>

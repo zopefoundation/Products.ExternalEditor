@@ -15,4 +15,4 @@
 $Id$
 """
 
-from Products.CMFCore.permissions import ManagePortal
+from Products.CMFCore.CMFCorePermissions import ManagePortal

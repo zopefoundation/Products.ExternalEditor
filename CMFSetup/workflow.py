@@ -421,8 +421,6 @@ class WorkflowToolConfigurator( Implicit ):
           'guard_roles' -- a list of roles guarding access
             to the variable
 
-          'guard_groups' -- a list of groups guarding the transition
-
           'guard_expr' -- an expression guarding access to the variable
         """
         result = []
@@ -446,7 +444,6 @@ class WorkflowToolConfigurator( Implicit ):
                    , 'default_expr'         : v.getDefaultExprText()
                    , 'guard_permissions'    : guard.permissions
                    , 'guard_roles'          : guard.roles
-                   , 'guard_groups'         : guard.groups
                    , 'guard_expr'           : guard.getExprText()
                    }
 
@@ -471,9 +468,6 @@ class WorkflowToolConfigurator( Implicit ):
 
           'permissions' -- a list of mappings describing the permission
             map for the state
-
-          'groups' -- a list of ( group_id, (roles,) ) tuples describing the
-            group-role assignments for the state
 
           'variables' -- a list of mapping for the variables
             to be set when entering the state.
@@ -504,10 +498,6 @@ class WorkflowToolConfigurator( Implicit ):
 
         for k, v in items:
 
-            groups = v.group_roles and list( v.group_roles.items() ) or []
-            groups = [ x for x in groups if x[1] ]
-            groups.sort()
-
             variables = list( v.getVariableValues() )
             variables.sort()
 
@@ -524,7 +514,6 @@ class WorkflowToolConfigurator( Implicit ):
                    , 'description'  : v.description
                    , 'transitions'  : v.transitions
                    , 'permissions'  : self._extractStatePermissions( v )
-                   , 'groups'       : groups
                    , 'variables'    : v_info
                    }
 
@@ -606,8 +595,6 @@ class WorkflowToolConfigurator( Implicit ):
 
           'guard_roles' -- a list of roles guarding the transition
 
-          'guard_groups' -- a list of groups guarding the transition
-
           'guard_expr' -- an expression guarding the transition
 
         """
@@ -638,7 +625,6 @@ class WorkflowToolConfigurator( Implicit ):
                    , 'variables'            : v_info
                    , 'guard_permissions'    : guard.permissions
                    , 'guard_roles'          : guard.roles
-                   , 'guard_groups'         : guard.groups
                    , 'guard_expr'           : guard.getExprText()
                    }
 
@@ -701,7 +687,6 @@ class WorkflowToolConfigurator( Implicit ):
                    , 'actbox_category'      : v.actbox_category
                    , 'guard_permissions'    : guard.permissions
                    , 'guard_roles'          : guard.roles
-                   , 'guard_groups'         : guard.groups
                    , 'guard_expr'           : guard.getExprText()
                    }
 
@@ -847,18 +832,6 @@ def _extractStateNodes( root, encoding=None ):
                 roles = tuple( roles )
 
             permission_map[ name ] = roles
-
-        info[ 'groups' ] = group_map = []
-
-        for g_map in s_node.getElementsByTagName( 'group-map' ):
-
-            name = _getNodeAttribute( g_map, 'name', encoding )
-
-            roles = [ _coalesceTextNodeChildren( x, encoding )
-                        for x in g_map.getElementsByTagName(
-                                            'group-role' ) ]
-
-            group_map.append( ( name, tuple( roles ) ) )
 
         info[ 'variables' ] = var_map = {}
 
@@ -1006,7 +979,7 @@ def _extractGuardNode( parent, encoding=None ):
     assert len( nodes ) <= 1, nodes
 
     if len( nodes ) < 1:
-        return { 'permissions' : (), 'roles' : (), 'groups' : (), 'expr' : '' }
+        return { 'permissions' : (), 'roles' : (), 'expr' : '' }
 
     node = nodes[ 0 ]
 
@@ -1022,8 +995,6 @@ def _extractGuardNode( parent, encoding=None ):
                                                     'guard-permission' ) ]
            , 'roles' : [ _coalesceTextNodeChildren( x, encoding )
                           for x in node.getElementsByTagName( 'guard-role' ) ]
-           , 'groups' : [ _coalesceTextNodeChildren( x, encoding )
-                          for x in node.getElementsByTagName( 'guard-group' ) ]
            , 'expression' : expr_text
            }
 
@@ -1192,7 +1163,6 @@ def _initDCWorkflowVariables( workflow, variables ):
         guard = v_info[ 'guard' ]
         props = { 'guard_roles' : ';'.join( guard[ 'roles' ] )
                 , 'guard_permissions' : ';'.join( guard[ 'permissions' ] )
-                , 'guard_groups' : ';'.join( guard[ 'groups' ] )
                 , 'guard_expr' : guard[ 'expression' ]
                 }
 
@@ -1232,11 +1202,6 @@ def _initDCWorkflowStates( workflow, states ):
         for k, v in s_info[ 'permissions' ].items():
             s.setPermission( k, type( v ) is type( [] ), v )
 
-        gmap = s.group_roles = PersistentMapping()
-
-        for group_id, roles in s_info[ 'groups' ]:
-            gmap[ group_id ] = roles
-
         vmap = s.var_values = PersistentMapping()
 
         for name, v_info in s_info[ 'variables' ].items():
@@ -1268,7 +1233,6 @@ def _initDCWorkflowTransitions( workflow, transitions ):
         guard = t_info[ 'guard' ]
         props = { 'guard_roles' : ';'.join( guard[ 'roles' ] )
                 , 'guard_permissions' : ';'.join( guard[ 'permissions' ] )
-                , 'guard_groups' : ';'.join( guard[ 'groups' ] )
                 , 'guard_expr' : guard[ 'expression' ]
                 }
 
@@ -1306,7 +1270,6 @@ def _initDCWorkflowWorklists( workflow, worklists ):
         guard = w_info[ 'guard' ]
         props = { 'guard_roles' : ';'.join( guard[ 'roles' ] )
                 , 'guard_permissions' : ';'.join( guard[ 'permissions' ] )
-                , 'guard_groups' : ';'.join( guard[ 'groups' ] )
                 , 'guard_expr' : guard[ 'expression' ]
                 }
 

@@ -110,7 +110,6 @@ class TypeInfoConfiguratorTests( _TypeInfoSetup ):
                    , 'allowed_content_types'
                    , 'allow_discussion'
                    , 'global_allow'
-                   , 'aliases'
                    ):
             self.assertEqual( found[ key ], expected[ key ] )
 
@@ -156,7 +155,6 @@ class TypeInfoConfiguratorTests( _TypeInfoSetup ):
                    , 'allowed_content_types'
                    , 'allow_discussion'
                    , 'global_allow'
-                   , 'aliases'
                    ):
             self.assertEqual( found[ key ], expected[ key ] )
 
@@ -307,7 +305,6 @@ class TypeInfoConfiguratorTests( _TypeInfoSetup ):
         info = info_list[ 0 ]
         self.assertEqual( info[ 'id' ], 'foo' )
         self.assertEqual( info[ 'title' ], 'Foo' )
-        self.assertEqual( len( info[ 'aliases' ] ), 2 )
 
     def test_parseTypeXML_STI( self ):
 
@@ -322,7 +319,6 @@ class TypeInfoConfiguratorTests( _TypeInfoSetup ):
         info = info_list[ 0 ]
         self.assertEqual( info[ 'id' ], 'bar' )
         self.assertEqual( info[ 'title' ], 'Bar' )
-        self.assertEqual( len( info[ 'aliases' ] ), 2 )
 
     def test_parseTypeXML_actions( self ):
 
@@ -354,9 +350,6 @@ _TI_LIST = ( { 'id'                     : 'foo'
              , 'allowed_content_types'  : ()
              , 'allow_discussion'       : False
              , 'global_allow'           : False
-             , 'aliases'                : { '(Default)' : 'foo_view'
-                                          , 'view'      : 'foo_view'
-                                          }
              , 'actions'        :
                 ( { 'id'            : 'view'
                   , 'name'          : 'View'
@@ -387,9 +380,6 @@ _TI_LIST = ( { 'id'                     : 'foo'
              , 'allowed_content_types'  : ( 'foo', )
              , 'allow_discussion'       : True
              , 'global_allow'           : True
-             , 'aliases'                : { '(Default)' : 'bar_view'
-                                          , 'view'      : 'bar_view'
-                                          }
              , 'actions'        :
                 ( { 'id'            : 'view'
                   , 'name'          : 'View'
@@ -458,10 +448,6 @@ _FOO_EXPORT = """\
    allow_discussion="False"
    global_allow="False" >
   <description>Foo things</description>
-  <aliases>
-   <alias from="(Default)" to="foo_view" />
-   <alias from="view" to="foo_view" />
-  </aliases>
   <action
      action_id="view"
      title="View"
@@ -507,10 +493,6 @@ _BAR_EXPORT = """\
    global_allow="True" >
   <description>Bar things</description>
   <allowed_content_type>foo</allowed_content_type>
-  <aliases>
-   <alias from="(Default)" to="bar_view" />
-   <alias from="view" to="bar_view" />
-  </aliases>
   <action
      action_id="view"
      title="View"

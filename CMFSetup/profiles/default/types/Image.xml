@@ -7,10 +7,6 @@
            allow_discussion="False" global_allow="True"
            product="CMFDefault" factory="addImage">
   <description>Image objects can be embedded in Portal documents.</description>
-  <aliases>
-   <alias from="(Default)" to="index_html"/>
-   <alias from="view" to="image_view"/>
-  </aliases>
   <action action_id="view" title="View" condition_expr=""
           url_expr="string:${object_url}/image_view"
           category="object" visible="True">

@@ -9,11 +9,6 @@
            product="CMFDefault" factory="addNewsItem">
   <description>News Items contain short text articles and carry a title as well as
 an optional description.</description>
-  <aliases>
-   <alias from="gethtml" to="source_html"/>
-   <alias from="(Default)" to="newsitem_view"/>
-   <alias from="view" to="newsitem_view"/>
-  </aliases>
   <action action_id="view" title="View" condition_expr=""
           url_expr="string:${object_url}/newsitem_view"
           category="object" visible="True">

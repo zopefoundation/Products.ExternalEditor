@@ -7,10 +7,6 @@
            allow_discussion="False" global_allow="True"
            product="CMFDefault" factory="addLink">
   <description>Link items are annotated URLs.</description>
-  <aliases>
-   <alias from="(Default)" to="link_view"/>
-   <alias from="view" to="link_view"/>
-  </aliases>
   <action action_id="view" title="View" condition_expr=""
           url_expr="string:${object_url}/link_view"
           category="object" visible="True">

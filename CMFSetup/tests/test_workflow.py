@@ -69,15 +69,14 @@ class DummyWorkflow( Folder ):
 
 class _GuardChecker:
 
-    def _genGuardProps( self, permissions, roles, groups, expr ):
+    def _genGuardProps( self, permissions, roles, expr ):
 
         return { 'guard_permissions'   : '; '.join( permissions )
                , 'guard_roles'         : '; '.join( roles )
-               , 'guard_groups'        : '; '.join( groups )
                , 'guard_expr'          : expr
                }
 
-    def _assertGuard( self, info, permissions, roles, groups, expr ):
+    def _assertGuard( self, info, permissions, roles, expr ):
 
         self.assertEqual( len( info[ 'guard_permissions' ] )
                         , len( permissions ) )
@@ -90,12 +89,6 @@ class _GuardChecker:
 
         for expected in roles:
             self.failUnless( expected in info[ 'guard_roles' ] )
-
-        self.assertEqual( len( info[ 'guard_groups' ] )
-                        , len( groups ) )
-
-        for expected in groups:
-            self.failUnless( expected in info[ 'guard_groups' ] )
 
         self.assertEqual( info[ 'guard_expr' ], expr )
 
@@ -125,7 +118,7 @@ class _WorkflowSetup( BaseRegistryTests ):
             variable = dcworkflow.variables._getOb( id )
 
             ( descr, def_val, def_exp, for_cat, for_stat, upd_alw
-            ) = args[ :-4 ]
+            ) = args[ :-3 ]
 
             variable.setProperties( description=args[0]
                                   , default_value=args[1]
@@ -133,12 +126,10 @@ class _WorkflowSetup( BaseRegistryTests ):
                                   , for_catalog=args[3]
                                   , for_status=args[4]
                                   , update_always=args[5]
-                                  , props=self._genGuardProps( *args[ -4: ] )
+                                  , props=self._genGuardProps( *args[ -3: ] )
                                   )
 
     def _initStates( self, dcworkflow ):
-
-        dcworkflow.groups = _WF_GROUPS
 
         for k, v in _WF_STATES.items():
 
@@ -159,12 +150,6 @@ class _WorkflowSetup( BaseRegistryTests ):
                                    )
             faux_request = {}
 
-            for group_id, roles in v[ 4 ]:
-                for role in roles:
-                    faux_request[ '%s|%s' % ( group_id, role ) ] = True
-
-            state.setGroups( REQUEST=faux_request )
-
             for k, v in v[ 5 ].items():
                 state.addVariable( k, v )
 
@@ -184,7 +169,7 @@ class _WorkflowSetup( BaseRegistryTests ):
                                     , actbox_name=v[ 6 ]
                                     , actbox_url=v[ 7 ]
                                     , actbox_category=v[ 8 ]
-                                    , props=self._genGuardProps( *v[ -4: ] )
+                                    , props=self._genGuardProps( *v[ -3: ] )
                                     )
 
             for k, v in v[ 9 ].items():
@@ -199,7 +184,7 @@ class _WorkflowSetup( BaseRegistryTests ):
 
             worklist.title = v[ 0 ]
 
-            props=self._genGuardProps( *v[ -4: ] )
+            props=self._genGuardProps( *v[ -3: ] )
 
             for var_id, matches in v[ 2 ].items():
                 props[ 'var_match_%s' % var_id ] = ';'.join( matches )
@@ -320,7 +305,7 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
             self.assertEqual( info[ 'for_status' ], expected[ 4 ] )
             self.assertEqual( info[ 'update_always' ], expected[ 5 ] )
 
-            self._assertGuard( info, *expected[ -4: ] )
+            self._assertGuard( info, *expected[ -3: ] )
 
     def test_getWorkflowInfo_dcworkflow_states( self ):
 
@@ -369,12 +354,6 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
 
                 for ep_role in ep_roles:
                     self.failUnless( ep_role in fp[ 'roles' ] )
-
-            groups = info[ 'groups' ]
-            self.assertEqual( len( groups ), len( expected[ 4 ] ) )
-
-            for i in range( len( groups ) ):
-                self.assertEqual( groups[ i ], expected[ 4 ][ i ] )
 
             variables = info[ 'variables' ]
             self.assertEqual( len( variables ), len( expected[ 5 ] ) )
@@ -438,7 +417,7 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
                 self.assertEqual( v_info[ 'expr' ]
                                 , expected[ 9 ][ v_info[ 'name' ] ] )
 
-            self._assertGuard( info, *expected[ -4: ] )
+            self._assertGuard( info, *expected[ -3: ] )
 
     def test_getWorkflowInfo_dcworkflow_worklists( self ):
 
@@ -481,7 +460,7 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
                 for e_value in e_values:
                     self.failUnless( e_value in values )
 
-            self._assertGuard( info, *expected[ -4: ] )
+            self._assertGuard( info, *expected[ -3: ] )
 
     def test_getWorkflowInfo_dcworkflow_scripts( self ):
 
@@ -939,8 +918,6 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
 
             self.assertEqual( tuple( state[ 'transitions' ] ), expected[ 2 ] )
             self.assertEqual( state[ 'permissions' ], expected[ 3 ] )
-            self.assertEqual( tuple( state[ 'groups' ] )
-                            , tuple( expected[ 4 ] ) )
 
             for k, v_info in state[ 'variables' ].items():
 
@@ -1019,9 +996,7 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
                             , expected[ 10 ] )
             self.assertEqual( tuple( guard.get( 'roles', () ) )
                             , expected[ 11 ] )
-            self.assertEqual( tuple( guard.get( 'groups', () ) )
-                            , expected[ 12 ] )
-            self.assertEqual( guard.get( 'expression', '' ), expected[ 13 ] )
+            self.assertEqual( guard.get( 'expression', '' ), expected[ 12 ] )
 
     def test_parseWorkflowXML_normal_variables( self ):
 
@@ -1096,9 +1071,7 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
                             , expected[ 6 ] )
             self.assertEqual( tuple( guard.get( 'roles', () ) )
                             , expected[ 7 ] )
-            self.assertEqual( tuple( guard.get( 'groups', () ) )
-                            , expected[ 8 ] )
-            self.assertEqual( guard.get( 'expression', '' ), expected[ 9 ] )
+            self.assertEqual( guard.get( 'expression', '' ), expected[ 8 ] )
 
     def test_parseWorkflowXML_normal_worklists( self ):
 
@@ -1157,9 +1130,7 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
                             , expected[ 6 ] )
             self.assertEqual( tuple( guard.get( 'roles', () ) )
                             , expected[ 7 ] )
-            self.assertEqual( tuple( guard.get( 'groups', () ) )
-                            , expected[ 8 ] )
-            self.assertEqual( guard.get( 'expression', '' ), expected[ 9 ] )
+            self.assertEqual( guard.get( 'expression', '' ), expected[ 8 ] )
 
     def test_parseWorkflowXML_normal_permissions( self ):
 
@@ -1251,11 +1222,6 @@ _WF_PERMISSIONS = \
 , 'Restore expired content'
 )
 
-_WF_GROUPS = \
-( 'Content_owners'
-, 'Content_assassins'
-)
-
 _WF_VARIABLES = \
 { 'when_opened':  ( 'Opened when'
                   , ''
@@ -1264,7 +1230,6 @@ _WF_VARIABLES = \
                   , False
                   , True
                   , ( 'Query history', 'Open content for modifications' )
-                  , ()
                   , ()
                   , ""
                   )
@@ -1276,7 +1241,6 @@ _WF_VARIABLES = \
                   , True
                   , ( 'Query history', 'Open content for modifications' )
                   , ()
-                  , ()
                   , ""
                   )
 , 'killed_by':    ( 'Killed by'
@@ -1287,7 +1251,6 @@ _WF_VARIABLES = \
                   , True
                   , ()
                   , ( 'Hangman', 'Sherrif' )
-                  , ()
                   , ""
                   )
 }
@@ -1336,7 +1299,6 @@ _WF_TRANSITIONS = \
              , { 'when_opened' : 'object/ZopeTime' }
              , ( 'Open content for modifications', )
              , ()
-             , ()
              , ""
              )
 , 'close':   ( 'Close'
@@ -1351,7 +1313,6 @@ _WF_TRANSITIONS = \
              , {}
              , ()
              , ( 'Owner', 'Manager' )
-             , ()
              , ""
              )
 , 'kill':    ( 'Kill'
@@ -1366,7 +1327,6 @@ _WF_TRANSITIONS = \
              , { 'killed_by' : 'string:${user/getId}' }
              , ()
              , ()
-             , ( 'Content_assassins', )
              , ""
              )
 , 'expire':  ( 'Expire'
@@ -1379,7 +1339,6 @@ _WF_TRANSITIONS = \
              , ''
              , ''
              , { 'when_expired' : 'object/ZopeTime' }
-             , ()
              , ()
              , ()
              , "python: object.expiration() <= object.ZopeTime()"
@@ -1395,7 +1354,6 @@ _WF_WORKLISTS = \
                     , 'workflow'
                     , ( 'Restore expired content', )
                     , ()
-                    , ()
                     , ""
                     )
 , 'alive_list':     ( 'Alive'
@@ -1405,7 +1363,6 @@ _WF_WORKLISTS = \
                     , 'string:${portal_url}/expired_items'
                     , 'workflow'
                     , ( 'Restore expired content', )
-                    , ()
                     , ()
                     , ""
                     )
@@ -1643,9 +1600,6 @@ _NORMAL_WORKFLOW_EXPORT = """\
    <permission-role>Owner</permission-role>
    <permission-role>Manager</permission-role>
   </permission-map>
-  <group-map name="Content_owners">
-   <group-role>Owner</group-role>
-  </group-map>
   <assignment
     name="is_closed"
     type="bool">False</assignment>
@@ -1695,7 +1649,6 @@ _NORMAL_WORKFLOW_EXPORT = """\
     category="workflow"
     url="string:${object_url}/kill_object">Kill</action>
   <guard>
-   <guard-group>Content_assassins</guard-group>
   </guard>
   <assignment
     name="killed_by">string:${user/getId}</assignment>
@@ -2136,8 +2089,7 @@ class Test_importWorkflow( _WorkflowSetup
 
             self.assertEqual( guard.permissions, expected[ 6 ] )
             self.assertEqual( guard.roles, expected[ 7 ] )
-            self.assertEqual( guard.groups, expected[ 8 ] )
-            self.assertEqual( guard.getExprText(), expected[ 9 ] )
+            self.assertEqual( guard.getExprText(), expected[ 8 ] )
 
     def test_from_empty_dcworkflow_workflow_states( self ):
 
@@ -2177,17 +2129,6 @@ class Test_importWorkflow( _WorkflowSetup
 
                 for role in p_info[ 'roles' ]:
                     self.failIf( role not in p_expected )
-
-            group_roles = state.group_roles or {}
-            self.assertEqual( len( group_roles ), len( expected[ 4 ] ) )
-
-            for group_id, exp_roles in expected[ 4 ]:
-
-                self.assertEqual( len( state.getGroupInfo( group_id ) )
-                                , len( exp_roles ) )
-
-                for role in state.getGroupInfo( group_id ):
-                    self.failUnless( role in exp_roles )
 
             self.assertEqual( len( state.getVariableValues() )
                             , len( expected[ 5 ] ) )
@@ -2235,8 +2176,7 @@ class Test_importWorkflow( _WorkflowSetup
 
             self.assertEqual( guard.permissions, expected[ 10 ] )
             self.assertEqual( guard.roles, expected[ 11 ] )
-            self.assertEqual( guard.groups, expected[ 12 ] )
-            self.assertEqual( guard.getExprText(), expected[ 13 ] )
+            self.assertEqual( guard.getExprText(), expected[ 12 ] )
 
     def test_from_empty_dcworkflow_workflow_worklists( self ):
 
@@ -2277,8 +2217,7 @@ class Test_importWorkflow( _WorkflowSetup
 
             self.assertEqual( guard.permissions, expected[ 6 ] )
             self.assertEqual( guard.roles, expected[ 7 ] )
-            self.assertEqual( guard.groups, expected[ 8 ] )
-            self.assertEqual( guard.getExprText(), expected[ 9 ] )
+            self.assertEqual( guard.getExprText(), expected[ 8 ] )
 
     def test_from_empty_dcworkflow_workflow_scripts( self ):
 
