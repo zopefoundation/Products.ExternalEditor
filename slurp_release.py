@@ -174,10 +174,10 @@ options:
 
         """ Upload the zipfile for the release to the dogbowl.
         """
-        URL = ( '/download/%s/%s' % ( self._version_id, filename ) )
+        URL = ( '/Products/CMF/%s/%s' % ( self._version_id, filename ) )
         body = open( filename ).read()
 
-        conn = httplib.HTTPConnection( 'cmf.zope.org' )
+        conn = httplib.HTTPConnection( 'zope.org' )
         print 'PUTting file, %s, to URL, %s' % ( filename, URL )
         conn.request( 'PUT', URL, body, self._getAuthHeaders() )
         response = conn.getresponse()
