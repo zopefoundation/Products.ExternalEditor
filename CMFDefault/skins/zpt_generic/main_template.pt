@@ -113,7 +113,7 @@
    <td class="ActionLink" align="right">
     <tal:span tal:repeat="action user_actions"
     ><a href="" tal:attributes="href action/url"
-                tal:content="action/name" i18n:translate="">Login</a
+                tal:content="action/title" i18n:translate="">Login</a
     ><tal:span tal:condition="not: repeat/action/end"> |</tal:span></tal:span>
     <tal:span tal:condition="nothing"
     ><a href="">Join</a></tal:span> </td>
@@ -173,7 +173,7 @@
      <span tal:repeat="action object_actions">
       <a href=""
          tal:attributes="href action/url"
-         tal:content="action/name"
+         tal:content="action/title"
          i18n:translate="">View</a><br />
      </span>
 
@@ -205,7 +205,7 @@
       <span tal:repeat="action workflow_actions">
        <a href="content_submit_form"
           tal:attributes="href action/url"
-          tal:content="action/name"
+          tal:content="action/title"
           i18n:translate="">Submit</a><br />
       </span>
     </td>
@@ -219,7 +219,7 @@
       <span tal:repeat="action folder_actions">
        <a href="../folder_contents"
           tal:attributes="href action/url"
-          tal:content="action/name"
+          tal:content="action/title"
           i18n:translate="">Folder contents</a><br />
       </span>
     </td>
@@ -233,7 +233,7 @@
      <span tal:repeat="action global_actions">
       <a href="undo_form"
          tal:attributes="href action/url"
-         tal:content="action/name"
+         tal:content="action/title"
          i18n:translate="">Undo</a><br />
      </span>
     </td>
