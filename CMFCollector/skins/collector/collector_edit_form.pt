@@ -56,7 +56,9 @@
   <th align="right"> Collector Email
   </th>
   <td colspan="2"
-      tal:define="getpropemail python: hasattr(member, 'getProperty')
+      tal:define="member python:
+                         here.portal_membership.getAuthenticatedMember();
+                  getpropemail python: hasattr(member, 'getProperty')
                                        and member.getProperty('email', '');
                   attremail python: getattr(member, 'email', '');
                   email python: getattr(here, 'email', 
