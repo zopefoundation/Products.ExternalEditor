@@ -28,7 +28,6 @@ from Products.CMFTopic import Topic
 from Products.CMFTopic import topic_globals
 
 from DublinCore import DefaultDublinCoreImpl
-from permissions import AccessFuturePortalContent
 from permissions import AddPortalContent
 from permissions import AddPortalFolders
 from permissions import DeleteObjects
@@ -167,7 +166,6 @@ class PortalGenerator:
         # Set up some suggested role to permission mappings.
         mp = p.manage_permission
 
-        mp(AccessFuturePortalContent, ['Reviewer','Manager',], 1)
         mp(AddPortalContent,          ['Owner','Manager',],    1)
         mp(AddPortalFolders,          ['Owner','Manager',],    1)
         mp(ListPortalMembers,         ['Member','Manager',],   1)

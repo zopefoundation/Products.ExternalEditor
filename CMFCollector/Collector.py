@@ -30,7 +30,6 @@ from Products.CMFDefault.SkinnedFolder import SkinnedFolder
 
 import util
 
-from permissions import AccessFuturePortalContent
 from permissions import AccessInactivePortalContent
 from permissions import AddCollectorIssue
 from permissions import AddCollectorIssueFollowup
@@ -570,9 +569,6 @@ def addCollector(self, id, title='', description='', abbrev='',
                          roles=['Reviewer', 'Manager', 'Owner'],
                          acquire=1)
     it.manage_permission(AccessInactivePortalContent,
-                         roles=['Anonymous', 'Reviewer', 'Manager', 'Owner'],
-                         acquire=1)
-    it.manage_permission(AccessFuturePortalContent,
                          roles=['Anonymous', 'Reviewer', 'Manager', 'Owner'],
                          acquire=1)
     if REQUEST is not None:

@@ -25,7 +25,6 @@ from permissions import SetOwnProperties
 from permissions import MailForgottenPassword
 from permissions import RequestReview
 from permissions import ReviewPortalContent
-from permissions import AccessFuturePortalContent
 
 PORTAL_SKINS_TOOL_ID = 'portal_skins'
 
@@ -48,7 +47,6 @@ class PortalObjectBase(PortalFolder, SkinnableObjectManager):
         (MailForgottenPassword, ()),
         (RequestReview, ()),
         (ReviewPortalContent, ()),
-        (AccessFuturePortalContent, ()),
         )
 
     def getSkinsFolderName(self):

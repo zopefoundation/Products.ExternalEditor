@@ -34,9 +34,6 @@ AddPortalContent = core_permissions.AddPortalContent
 security.declarePublic('AccessInactivePortalContent')
 AccessInactivePortalContent = core_permissions.AccessInactivePortalContent
 
-security.declarePublic('AccessFuturePortalContent')
-AccessFuturePortalContent = core_permissions.AccessFuturePortalContent
-
 security.declarePublic('ListFolderContents')
 ListFolderContents = core_permissions.ListFolderContents
 

@@ -151,6 +151,3 @@ security.declarePublic('ReviewPortalContent')
 ReviewPortalContent = 'Review portal content'
 setDefaultRoles(ReviewPortalContent, ('Manager',))  # + Reviewer
 
-security.declarePublic('AccessFuturePortalContent')
-AccessFuturePortalContent = 'Access future portal content'
-setDefaultRoles(AccessFuturePortalContent, ('Manager',))  # + Reviewer

@@ -9,9 +9,6 @@ security = ModuleSecurityInfo('Products.CMFDefault.permissions')
 security.declarePublic('AccessContentsInformation')
 from Products.CMFCore.permissions import AccessContentsInformation
 
-security.declarePublic('AccessFuturePortalContent')
-from Products.CMFCore.permissions import AccessFuturePortalContent
-
 security.declarePublic('AddPortalContent')
 from Products.CMFCore.permissions import AddPortalContent
 
