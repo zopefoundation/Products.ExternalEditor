@@ -36,8 +36,7 @@ _marker=[]
 
 
 class DefaultDublinCoreImpl( PropertyManager ):
-    """
-        Mix-in class which provides Dublin Core methods
+    """ Mix-in class which provides Dublin Core methods.
     """
     __implements__ = DublinCore, CatalogableDublinCore, MutableDublinCore
 
@@ -98,12 +97,11 @@ class DefaultDublinCoreImpl( PropertyManager ):
         if creator and not creator in self.listCreators():
             self.creators = self.creators + (creator, )
 
-    # XXX Could this be simply protected by ModifyPortalContent ?
-    security.declarePrivate('setModificationDate')
+    security.declareProtected(ModifyPortalContent, 'setModificationDate')
     def setModificationDate(self, modification_date=None):
-        """
-            Set the date when the resource was last modified.
-            When called without an argument, sets the date to now.
+        """ Set the date when the resource was last modified.
+
+        When called without an argument, sets the date to now.
         """
         if modification_date is None:
             self.modification_date = DateTime()
@@ -247,8 +245,7 @@ class DefaultDublinCoreImpl( PropertyManager ):
     #  DublinCore utility methods
     #
     def content_type( self ):
-        """
-            WebDAV needs this to do the Right Thing (TM).
+        """ WebDAV needs this to do the Right Thing (TM).
         """
         return self.Format()
 
@@ -256,8 +253,7 @@ class DefaultDublinCoreImpl( PropertyManager ):
 
     security.declareProtected(View, 'isEffective')
     def isEffective( self, date ):
-        """
-            Is the date within the resource's effective range?
+        """ Is the date within the resource's effective range?
         """
         pastEffective = ( self.effective_date is None
                        or self.effective_date <= date )
@@ -407,8 +403,7 @@ class DefaultDublinCoreImpl( PropertyManager ):
                      , language=_marker
                      , rights=_marker
                      ):
-        """
-            Update the editable metadata for this resource.
+        """ Update the editable metadata for this resource.
         """
         if title is not _marker:
             self.setTitle( title )
@@ -445,8 +440,7 @@ class DefaultDublinCoreImpl( PropertyManager ):
                            , rights
                            , REQUEST
                            ):
-        """
-            Update metadata from the ZMI.
+        """ Update metadata from the ZMI.
         """
         self._editMetadata( title, subject, description, contributors
                           , effective_date, expiration_date

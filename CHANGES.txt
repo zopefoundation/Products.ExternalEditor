@@ -2,6 +2,8 @@ CMF 1.5alpha (unreleased)
 
   New Features
 
+    - DublinCore: setModificationDate is now guarded by 'ModifyPortalContent'.
+
     - zpt skin: Reimplemented 'folder_contents'.
       Uses a controller script instead of 'folder_copy', 'folder_cut',
       'folder_delete' and 'folder_paste' scripts. The result looks almost the
