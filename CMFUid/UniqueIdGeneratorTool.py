@@ -17,21 +17,13 @@ Provides support for generating unique ids.
 $Id$
 """
 
-import os
-import time, random, md5, socket
-
-from BTrees.Length import Length
-
-from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
-from Acquisition import Implicit, aq_base, aq_parent
-
+from BTrees.Length import Length
+from Globals import InitializeClass
 from OFS.SimpleItem import SimpleItem
 
-from Products.CMFCore.utils import getToolByName, UniqueObject
 from Products.CMFCore.ActionProviderBase import ActionProviderBase
-from Products.CMFCore.permissions import ManagePortal
-
+from Products.CMFCore.utils import UniqueObject
 from Products.CMFUid.interfaces import IUniqueIdGenerator
 
 
@@ -48,24 +40,24 @@ class UniqueIdGeneratorTool(UniqueObject, SimpleItem, ActionProviderBase):
     id = 'portal_uidgenerator'
     alternative_id = 'portal_standard_uidgenerator'
     meta_type = 'Unique Id Generator Tool'
-    
+
     security = ClassSecurityInfo()
-    
+
     security.declarePrivate('__init__')
     def __init__(self):
         """Initialize the generator
         """
-        # Using the Length implementation of the BTree.Length module as 
+        # Using the Length implementation of the BTree.Length module as
         # counter handles zodb conflicts for us.
         self._uid_counter = Length(0)
-    
+
     security.declarePrivate('__call__')
     def __call__(self):
         """See IUniqueIdGenerator.
         """
         self._uid_counter.change(+1)
         return self._uid_counter()
-        
+
     security.declarePrivate('convert')
     def convert(self, uid):
         """See IUniqueIdGenerator.
