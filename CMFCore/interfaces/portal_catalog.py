@@ -26,13 +26,20 @@ class portal_catalog(Interface):
 
     # searchResults inherits security assertions from ZCatalog.
     def searchResults(REQUEST=None, **kw):
-        '''Calls SiteIndex.searchResults() with extra arguments that
+        '''Calls ZCatalog.searchResults() with extra arguments that
         limit the results to what the user is allowed to see.
         '''
 
     # __call__ inherits security assertions from ZCatalog.
     def __call__(REQUEST=None, **kw):
         '''Same as searchResults().'''
+
+    def unrestrictedSearchResults(REQUEST=None, **kw):
+        '''Calls ZCatalog.searchResults() without any CMF specific
+        processing.
+
+        Permission -- Python only
+        '''
 
     def indexObject(object):
         """ Add to catalog.
