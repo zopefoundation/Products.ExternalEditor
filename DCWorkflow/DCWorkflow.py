@@ -26,11 +26,14 @@ from OFS.Folder import Folder
 from OFS.ObjectManager import bad_id
 
 # CMFCore
-from Products.CMFCore.WorkflowCore import WorkflowException, \
-     ObjectDeleted, ObjectMoved
-from Products.CMFCore.WorkflowTool import addWorkflowFactory
 from Products.CMFCore.CMFCorePermissions import ManagePortal
+from Products.CMFCore.interfaces.portal_workflow \
+        import WorkflowDefinition as IWorkflowDefinition
 from Products.CMFCore.utils import getToolByName
+from Products.CMFCore.WorkflowCore import ObjectDeleted
+from Products.CMFCore.WorkflowCore import ObjectMoved
+from Products.CMFCore.WorkflowCore import WorkflowException
+from Products.CMFCore.WorkflowTool import addWorkflowFactory
 
 # DCWorkflow
 from utils import _dtmldir, modifyRolesForPermission
@@ -54,6 +57,9 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
     workflow definition.
     UI methods are in WorkflowUIMixin.
     '''
+
+    __implements__ = IWorkflowDefinition
+
     meta_type = 'Workflow'
     title = 'DC Workflow Definition'
     _isAWorkflow = 1
@@ -250,11 +256,12 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
         return 0
 
     security.declarePrivate('doActionFor')
-    def doActionFor(self, ob, action, **kw):
+    def doActionFor(self, ob, action, comment='', **kw):
         '''
         Allows the user to request a workflow action.  This method
         must perform its own security checks.
         '''
+        kw['comment'] = comment
         sdef = self._getWorkflowStateOf(ob)
         if sdef is None:
             raise WorkflowException, 'Object is in an undefined state'

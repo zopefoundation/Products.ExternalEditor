@@ -1,9 +1,19 @@
-"""Currently all stub, no substance."""
-import unittest
+from unittest import main
+
+import Testing
+import Zope
+try:
+    Zope.startup()
+except AttributeError:
+    # for Zope versions before 2.6.1
+    pass
+
 from Products.CMFCore.tests.base.utils import build_test_suite
 
 def test_suite():
-    return unittest.TestSuite()
+    return build_test_suite('Products.DCWorkflow.tests',[
+        'test_DCWorkflow',
+        ])
 
 if __name__ == '__main__':
-    unittest.main(defaultTest='test_suite')
+    main(defaultTest='test_suite')
