@@ -83,8 +83,8 @@ class MembershipTool( BaseTool ):
         , action=Expression(text='string:${object_url}/addtoFavorites')
         , permissions=(View,)
         , category='user'
-        , condition=Expression(text= 'string:${portal/portal_membership'
-                                   + '/getHomeFolder}')
+        , condition=Expression(text= 'portal/portal_membership'
+                                   + '/getHomeFolder')
         , visible=1
         )
     , AI( id='mystuff'
