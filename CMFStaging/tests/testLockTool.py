@@ -22,8 +22,8 @@ from Acquisition import aq_base
 import Zope
 Zope.startup()
 from OFS.Folder import Folder
-from AccessControl.SecurityManagement import newSecurityManager, \
-     noSecurityManager
+from AccessControl.SecurityManagement \
+     import newSecurityManager, noSecurityManager
 from AccessControl.User import SimpleUser
 
 from Products.CMFStaging.LockTool import LockTool, LockingError

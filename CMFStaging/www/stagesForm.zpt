@@ -6,7 +6,10 @@
 
 <table tal:define="stages here/getStageItems">
 <th>
-  Stage ID
+  Stage name
+</th>
+<th>
+  Title
 </th>
 <th>
   Path (relative to portal)
@@ -15,12 +18,15 @@
 <tr tal:repeat="stage stages">
 <td><input type="text" name="stages.name:records" size="10"
      tal:attributes="value python: stage[0]" /></td>
-<td><input type="text" name="stages.path:records" size="40"
+<td><input type="text" name="stages.title:records" size="20"
      tal:attributes="value python: stage[1]" /></td>
+<td><input type="text" name="stages.path:records" size="40"
+     tal:attributes="value python: stage[2]" /></td>
 </tr>
 
 <tr>
 <td><input type="text" name="stages.name:records" size="10" /></td>
+<td><input type="text" name="stages.title:records" size="20" /></td>
 <td><input type="text" name="stages.path:records" size="40" /></td>
 </tr>
 

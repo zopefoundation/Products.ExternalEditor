@@ -26,6 +26,9 @@ from AccessControl import ClassSecurityInfo
 from Products.CMFCore.utils import UniqueObject, SimpleItemWithProperties
 from Products.CMFCore.CMFCorePermissions import ManagePortal
 
+from staging_utils import getPortal, verifyPermission, unproxied
+
+
 # Permission name
 UseVersionControl = 'Use version control'
 
@@ -68,45 +71,58 @@ class VersionsTool(UniqueObject, SimpleItemWithProperties):
         repo = aq_acquire(self, self.repository_name, containment=1)
         return repo
 
-    # unprotected methods
+    def _getBranchName(self, info):
+        parts = info.version_id.split('.')
+        if len(parts) > 1:
+            return parts[-2]
+        return 'mainline'
+
+    # public methods
 
     security.declarePublic('isUnderVersionControl')
-    def isUnderVersionControl(self, object):
-        """Returns a true value if the object is under version control."""
+    def isUnderVersionControl(self, obj):
+        """Returns a true value if the object is under version control.
+        """
+        obj = unproxied(obj)
         repo = self._getVersionRepository()
-        return repo.isUnderVersionControl(object)
-
+        return repo.isUnderVersionControl(obj)
 
     security.declarePublic('isCheckedOut')
-    def isCheckedOut(self, object):
-        """Returns a true value if the object is checked out."""
+    def isCheckedOut(self, obj):
+        """Returns a true value if the object is checked out.
+        """
+        obj = unproxied(obj)
         repo = self._getVersionRepository()
-        if not repo.isUnderVersionControl(object):
+        if not repo.isUnderVersionControl(obj):
             return 0
-        info = repo.getVersionInfo(object)
+        info = repo.getVersionInfo(obj)
         return (info.status == info.CHECKED_OUT)
 
     security.declarePublic('isResourceUpToDate')
-    def isResourceUpToDate(self, object, require_branch=0):
-        """Return true if a version-controlled resource is up to date."""
+    def isResourceUpToDate(self, obj, require_branch=0):
+        """Return true if a version-controlled resource is up to date.
+        """
+        obj = unproxied(obj)
         repo = self._getVersionRepository()
-        return repo.isResourceUpToDate(object, require_branch)
+        return repo.isResourceUpToDate(obj, require_branch)
 
     # protected methods
 
-    security.declareProtected(UseVersionControl, 'checkout')
-    def checkout(self, object):
+    security.declarePublic('checkout')
+    def checkout(self, obj):
         """Opens the object for development.
         
         Returns the object, which might be different from what was passed to
-        the method if the object was replaced."""
+        the method if the object was replaced.
+        """
+        verifyPermission(UseVersionControl, obj)
+        obj = unproxied(obj)
         repo = self._getVersionRepository()
         old_state = None
-        if not repo.isUnderVersionControl(object):
-            get_transaction().commit(1)  # Get _p_jar attributes set.
-            repo.applyVersionControl(object)
+        if not repo.isUnderVersionControl(obj):
+            repo.applyVersionControl(obj)
         elif self.auto_copy_forward:
-            info = repo.getVersionInfo(object)
+            info = repo.getVersionInfo(obj)
             stuck = (info.sticky and info.sticky[0] != 'B')
             if stuck:
                 # The object has a sticky tag.  Get it unstuck by
@@ -114,55 +130,71 @@ class VersionsTool(UniqueObject, SimpleItemWithProperties):
                 # has been checked out.
                 old_state = repo.getVersionOfResource(
                     info.history_id, info.version_id)
-                # Momentarily revert to the mainline.
-                object = repo.updateResource(object, 'mainline')
-                repo.checkoutResource(object)
+                # Momentarily revert to the branch.
+                obj = repo.updateResource(obj, self._getBranchName(info))
+                obj = repo.checkoutResource(obj)
 
-                # Copy the old state into the mainline object,
-                # minus __vc_info__.
+                # Copy the old state into the object, minus __vc_info__.
                 # XXX There ought to be some way to do this more cleanly.
-                object._p_changed = 1
-                for key in object.__dict__.keys():
+                obj._p_changed = 1
+                for key in obj.__dict__.keys():
                     if key != '__vc_info__':
                         if not old_state.__dict__.has_key(key):
-                            del object.__dict__[key]
-                for key in old_state.__dict__.keys():
+                            del obj.__dict__[key]
+                for key, value in old_state.__dict__.items():
                     if key != '__vc_info__':
-                        object.__dict__[key] = old_state.__dict__[key]
+                        obj.__dict__[key] = value
                 # Check in as a copy.
-                repo.checkinResource(
-                    object, 'Copied from revision %s' % info.version_id)
-
-        repo.checkoutResource(object)
-
-        return object
+                obj = repo.checkinResource(
+                    obj, 'Copied from revision %s' % info.version_id)
+        repo.checkoutResource(obj)
+        return None
 
 
-    security.declareProtected(UseVersionControl, 'checkin')
-    def checkin(self, object, message=''):
-        """Checks in a new version."""
-        # Make sure we copy the current data.
-        # XXX ZopeVersionControl tries to do this but isn't quite correct yet.
-        get_transaction().commit(1)
-
-        # Check in or add the object to the repository.
+    security.declarePublic('checkin')
+    def checkin(self, obj, message=''):
+        """Checks in a new version.
+        """
+        verifyPermission(UseVersionControl, obj)
+        obj = unproxied(obj)
         repo = self._getVersionRepository()
-        if not repo.isUnderVersionControl(object):
-            repo.applyVersionControl(object)
+        if not repo.isUnderVersionControl(obj):
+            repo.applyVersionControl(obj)
         else:
-            info = repo.getVersionInfo(object)
-            if info.status == info.CHECKED_OUT:
-                repo.checkinResource(object, message)
+            if (not repo.isResourceUpToDate(obj, require_branch=1)
+                and self.isCheckedOut(obj)):
+                # This is a strange state, but it can be fixed.
+                # Revert the object to the branch, replace the
+                # reverted state with the new state, and check in.
+                new_dict = obj.__dict__.copy()
+                # Uncheckout
+                obj = repo.uncheckoutResource(obj)
+                info = repo.getVersionInfo(obj)
+                obj = repo.updateResource(obj, self._getBranchName(info))
+                # Checkout
+                obj = repo.checkoutResource(obj)
+                # Restore the new state
+                for key in obj.__dict__.keys():
+                    if key != '__vc_info__':
+                        if not new_dict.has_key(key):
+                            del obj.__dict__[key]
+                for key, value in new_dict.items():
+                    if key != '__vc_info__':
+                        obj.__dict__[key] = value
+            repo.checkinResource(obj, message)
+        return None
 
 
-    security.declareProtected(UseVersionControl, 'getLogEntries')
-    def getLogEntries(self, object, only_checkins=0):
-        """Returns the log entries for an object as a sequence of
-        mappings."""
+    security.declarePublic('getLogEntries')
+    def getLogEntries(self, obj, only_checkins=0):
+        """Returns the log entries for an object as a sequence of mappings.
+        """
+        verifyPermission(UseVersionControl, obj)
+        obj = unproxied(obj)
         repo = self._getVersionRepository()
-        if not repo.isUnderVersionControl(object):
+        if not repo.isUnderVersionControl(obj):
             return []
-        entries = repo.getLogEntries(object)
+        entries = repo.getLogEntries(obj)
         res = []
         for entry in entries:
             a = entry.action
@@ -188,47 +220,57 @@ class VersionsTool(UniqueObject, SimpleItemWithProperties):
         return res
 
 
-    security.declareProtected(UseVersionControl, 'getVersionId')
-    def getVersionId(self, object):
-        """Returns the version ID of the current revision."""
+    security.declarePublic('getVersionId')
+    def getVersionId(self, obj):
+        """Returns the version ID of the current revision.
+        """
+        verifyPermission(UseVersionControl, obj)
+        obj = unproxied(obj)
         repo = self._getVersionRepository()
-        if repo.isUnderVersionControl(object):
-            return repo.getVersionInfo(object).version_id
+        if repo.isUnderVersionControl(obj):
+            return repo.getVersionInfo(obj).version_id
         else:
             return ''
 
-    security.declareProtected(UseVersionControl, 'getVersionIds')
-    def getVersionIds(self, object):
-        """Return the available version ids for an object."""
-        # yuck :(
+    security.declarePublic('getVersionIds')
+    def getVersionIds(self, obj):
+        """Returns the version IDs of all revisions for an object.
+        """
+        verifyPermission(UseVersionControl, obj)
+        obj = unproxied(obj)
         repo = self._getVersionRepository()
-        ids = repo.getVersionIds(object)
+        ids = repo.getVersionIds(obj)
         ids = map(int, ids)
         ids.sort()
         return map(str, ids)
 
-    security.declareProtected(UseVersionControl, 'getHistoryId')
-    def getHistoryId(self, object):
-        """Returns the version history ID of the object."""
+    security.declarePublic('getHistoryId')
+    def getHistoryId(self, obj):
+        """Returns the version history ID of the object.
+        """
+        verifyPermission(UseVersionControl, obj)
+        obj = unproxied(obj)
         repo = self._getVersionRepository()
-        return repo.getVersionInfo(object).history_id
+        return repo.getVersionInfo(obj).history_id
 
 
-    security.declareProtected(UseVersionControl, 'revertToVersion')
-    def revertToVersion(self, object, version_id):
+    security.declarePublic('revertToVersion')
+    def revertToVersion(self, obj, version_id):
         """Reverts the object to the given version.
 
         If make_new_revision, a new revision is created, so that
         the object's state can progress along a new line without
         making the user deal with branches, labels, etc.
         """
+        verifyPermission(UseVersionControl, obj)
+        obj = unproxied(obj)
         repo = self._getVersionRepository()
         # Verify the object is under version control.
-        repo.getVersionInfo(object)
-        if self.isCheckedOut(object):
+        repo.getVersionInfo(obj)
+        if self.isCheckedOut(obj):
             # Save the current data.
-            self.checkin(object, 'Auto-saved')
-        return repo.updateResource(object, version_id)
+            self.checkin(obj, 'Auto-saved')
+        repo.updateResource(obj, version_id)
 
 InitializeClass(VersionsTool)
 

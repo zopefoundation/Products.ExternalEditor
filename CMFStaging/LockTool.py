@@ -27,9 +27,10 @@ from Products.CMFCore.utils import UniqueObject, getToolByName, \
      SimpleItemWithProperties, _checkPermission
 from Products.CMFCore.CMFCorePermissions import ManagePortal, \
      ModifyPortalContent
-
 from webdav.WriteLockInterface import WriteLockInterface
 from webdav.LockItem import LockItem
+
+from staging_utils import verifyPermission
 
 # Permission names
 LockObjects = 'WebDAV Lock items'
@@ -38,8 +39,8 @@ UnlockObjects = 'WebDAV Unlock items'
 _wwwdir = os.path.join(os.path.dirname(__file__), 'www') 
 
 
-def pathOf(object):
-    return '/'.join(object.getPhysicalPath())
+def pathOf(obj):
+    return '/'.join(obj.getPhysicalPath())
 
 
 class LockingError(Exception):
@@ -82,72 +83,72 @@ class LockTool(UniqueObject, SimpleItemWithProperties):
     #
 
     security.declarePublic('lock')
-    def lock(self, object):
-        '''Locks an object'''
-        if not _checkPermission(LockObjects, object):
-            raise LockingError, 'Inadequate permissions to lock %s' % object
-        locker = self.locker(object)
+    def lock(self, obj):
+        """Locks an object.
+        """
+        verifyPermission(LockObjects, obj)
+        locker = self.locker(obj)
         if locker:
-            raise LockingError, '%s is already locked' % pathOf(object)
+            raise LockingError, '%s is already locked' % pathOf(obj)
 
         if self.auto_version:
             vt = getToolByName(self, 'portal_versions', None)
             if vt is not None:
-                if (vt.isUnderVersionControl(object)
-                    and not vt.isCheckedOut(object)):
-                    object = vt.checkout(object)
+                if (vt.isUnderVersionControl(obj)
+                    and not vt.isCheckedOut(obj)):
+                    vt.checkout(obj)
 
         user = getSecurityManager().getUser()
         lockitem = LockItem(user, timeout=(self.timeout_days * 86400))
-        object.wl_setLock(lockitem.getLockToken(), lockitem)
+        obj.wl_setLock(lockitem.getLockToken(), lockitem)
 
 
     security.declarePublic('breaklock')
-    def breaklock(self, object, message=''):
-        """emergency breaklock...."""
-        locker = self.locker(object)
-        if not _checkPermission(UnlockObjects, object):
-            raise LockingError, ("You cannot unlock %s:  lock is held by %s" % 
-                                 (pathOf(object), locker))
-        object.wl_clearLocks()
+    def breaklock(self, obj, message=''):
+        """Breaks the lock in an emergency.
+        """
+        locker = self.locker(obj)
+        verifyPermission(UnlockObjects, obj)
+        obj.wl_clearLocks()
         if self.auto_version:
             vt = getToolByName(self, 'portal_versions', None)
             if vt is not None:
-                vt.checkin(object, message)
+                vt.checkin(obj, message)
+
 
     security.declarePublic('unlock')
-    def unlock(self, object, message=''):
-        '''Unlocks an object'''
-        if not _checkPermission(UnlockObjects, object):
-            raise LockingError, "Inadequate permissions to unlock %s" % object
-
-        locker = self.locker(object)
+    def unlock(self, obj, message=''):
+        """Unlocks an object.
+        """
+        verifyPermission(UnlockObjects, obj)
+        locker = self.locker(obj)
         if not locker:
             raise LockingError, ("Unlocking an unlocked item: %s" %
-                                 pathOf(object))
+                                 pathOf(obj))
 
         user = getSecurityManager().getUser()
         if user.getId() != locker:
             raise LockingError, ("Cannot unlock %s: lock is held by %s" %
-                                 (pathOf(object), locker))
+                                 (pathOf(obj), locker))
 
         # According to WriteLockInterface, we shouldn't call
         # wl_clearLocks(), but it seems like the right thing to do anyway.
-        object.wl_clearLocks()
+        obj.wl_clearLocks()
 
         if self.auto_version:
             vt = getToolByName(self, 'portal_versions', None)
             if vt is not None:
-                vt.checkin(object, message)
+                vt.checkin(obj, message)
 
 
     security.declarePublic('locker')
-    def locker(self, object):
-        '''Returns the locker of an object'''
-        if not WriteLockInterface.isImplementedBy(object):
-            raise LockingError, "%s is not lockable" % pathOf(object)
+    def locker(self, obj):
+        """Returns the locker of an object.
+        """
+        if not WriteLockInterface.isImplementedBy(obj):
+            raise LockingError, "%s is not lockable" % pathOf(obj)
 
-        values = object.wl_lockValues()
+        values = obj.wl_lockValues()
         if not values:
             return ''
         for lock in values:
@@ -160,9 +161,10 @@ class LockTool(UniqueObject, SimpleItemWithProperties):
 
 
     security.declarePublic('isLockedOut')
-    def isLockedOut(self, object):
-        '''Returns a true value if the current user is locked out.'''
-        locker_id = self.locker(object)
+    def isLockedOut(self, obj):
+        """Returns a true value if the current user is locked out.
+        """
+        locker_id = self.locker(obj)
         if locker_id:
             uid = getSecurityManager().getUser().getId()
             if uid != locker_id:
@@ -171,56 +173,64 @@ class LockTool(UniqueObject, SimpleItemWithProperties):
 
 
     security.declarePublic('locked')
-    def locked(self, object):
-        '''Returns true if an object is locked.
+    def locked(self, obj):
+        """Returns true if an object is locked.
 
-        Also accepts non-lockable objects, always returning 0.'''
-        if not WriteLockInterface.isImplementedBy(object):
+        Also accepts non-lockable objects, always returning 0.
+        """
+        if not WriteLockInterface.isImplementedBy(obj):
             return 0
-        return not not self.locker(object)
+        return not not self.locker(obj)
+
 
     security.declarePublic('isLockable')
-    def isLockable(self, object):
-        """Return true if object supports locking, regardless of lock
-           state or whether the current user can actually lock."""
-        return WriteLockInterface.isImplementedBy(object)
+    def isLockable(self, obj):
+        """Return true if object supports locking.
+
+        Does not examine lock state or whether the current user can
+        actually lock.
+        """
+        return WriteLockInterface.isImplementedBy(obj)
+
 
     security.declarePublic('canLock')
-    def canLock(self, object):
-        """Returns true if the current user can lock the given object."""
-        if self.locked(object):
+    def canLock(self, obj):
+        """Returns true if the current user can lock the given object.
+        """
+        if self.locked(obj):
             return 0
-        if not WriteLockInterface.isImplementedBy(object):
+        if not WriteLockInterface.isImplementedBy(obj):
             return 0
-        if _checkPermission(LockObjects, object):
+        if _checkPermission(LockObjects, obj):
             return 1
         return 0
 
 
     security.declarePublic('canUnlock')
-    def canUnlock(self, object):
+    def canUnlock(self, obj):
         """Returns true if the current user can unlock the given object."""
-        if not self.locked(object):
+        if not self.locked(obj):
             return 0
-        if self.isLockedOut(object):
+        if self.isLockedOut(obj):
             return 0
-        if _checkPermission(UnlockObjects, object):
+        if _checkPermission(UnlockObjects, obj):
             return 1
         return 0
 
 
     security.declarePublic('canChange')
-    def canChange(self, object):
-        """Returns true if the current user can change the given object."""
-        if not WriteLockInterface.isImplementedBy(object):
-            if self.isLockedOut(object):
+    def canChange(self, obj):
+        """Returns true if the current user can change the given object.
+        """
+        if not WriteLockInterface.isImplementedBy(obj):
+            if self.isLockedOut(obj):
                 return 0
-        if not _checkPermission(ModifyPortalContent, object):
+        if not _checkPermission(ModifyPortalContent, obj):
             return 0
         vt = getToolByName(self, 'portal_versions', None)
         if vt is not None:
-            if (vt.isUnderVersionControl(object)
-                and not vt.isCheckedOut(object)):
+            if (vt.isUnderVersionControl(obj)
+                and not vt.isCheckedOut(obj)):
                 return 0
         return 1
 

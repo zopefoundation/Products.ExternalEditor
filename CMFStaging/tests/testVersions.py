@@ -17,15 +17,19 @@ $Id$
 """
 
 import unittest
+
 import Testing
-from Acquisition import aq_base
 import Zope
 Zope.startup()
+
+from Acquisition import aq_base
 from OFS.Folder import Folder
 from AccessControl.User import SimpleUser
-
-from Products.CMFStaging.VersionsTool import VersionsTool
+from AccessControl.SecurityManagement \
+     import newSecurityManager, noSecurityManager
 from Products.ZopeVersionControl.Utility import VersionControlError
+from Products.CMFStaging.VersionsTool import VersionsTool
+from Products.CMFStaging.tests.testLockTool import TestUser
 
 
 class Tests(unittest.TestCase):
@@ -45,12 +49,16 @@ class Tests(unittest.TestCase):
         self.root.content = Folder()
         self.root.content.id = 'content'
 
+        user = TestUser('sally')
+        newSecurityManager(None, user.__of__(self.root.acl_users))
+
 
     def tearDown(self):
         app = self.app
         if hasattr(app, 'testroot'):
             app._delObject('testroot')
         self.app._p_jar.close()
+        noSecurityManager()
 
 
     def testCheckinCheckout(self):
@@ -131,7 +139,7 @@ class Tests(unittest.TestCase):
         self.assertEqual(tuple(log), ())
 
         vt.checkin(content)
-        content = vt.checkout(content)
+        vt.checkout(content)
         vt.checkin(content)
 
         log = vt.getLogEntries(content, only_checkins=1)

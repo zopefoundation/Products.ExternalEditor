@@ -20,7 +20,7 @@ $Id$
 
 import os
 
-from Acquisition import aq_inner, aq_parent, aq_acquire
+from Acquisition import aq_base, aq_inner, aq_parent, aq_acquire
 from Globals import InitializeClass, DTMLFile
 from AccessControl import ClassSecurityInfo
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
@@ -28,6 +28,10 @@ from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from Products.CMFCore.utils import UniqueObject, getToolByName, \
      SimpleItemWithProperties
 from Products.CMFCore.CMFCorePermissions import ManagePortal
+
+from staging_utils import getPortal, verifyPermission, unproxied
+from staging_utils import getProxyTarget, getProxyReference, cloneByPickle
+
 
 # Permission name
 StageObjects = 'Use version control'
@@ -64,12 +68,12 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
          'label': 'Unlock and checkin before staging'},
         )
 
-    # _stages maps stage names to relative paths.
-    _stages = {
-        'dev':    'Stages/Development',
-        'review': 'Stages/Review',
-        'prod':   'Stages/Production'
-        }
+    # _stages maps stage names to paths relative to the portal.
+    _stages = (
+        ('dev',    'Development', '.'),
+        ('review', 'Review',      '../Review'),
+        ('prod',   'Production',  '../Production'),
+        )
 
     security.declareProtected(ManagePortal, 'manage_overview' )
     manage_overview = DTMLFile('explainStagingTool', _wwwdir)
@@ -78,30 +82,40 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
         repo = aq_acquire(self, self.repository_name, containment=1)
         return repo
 
+    def _getStage(self, portal, path):
+        if not path or path == ".":
+            return portal
+        else:
+            return portal.restrictedTraverse(path, None)
 
-    def _getObjectStages(self, object, get_container=0):
+    def _getObjectStages(self, obj, get_container=0):
         """Returns a mapping from stage name to object in that stage.
 
-        Objects not in a stage are represented as None."""
-        root = aq_parent(aq_inner(self))
+        Objects not in a stage are represented as None.
+        """
+        portal = aq_parent(aq_inner(self))
         stages = {}
         rel_path = None
-        ob_path = object.getPhysicalPath()
-        for stage_name, path in self._stages.items():
-            stage = root.restrictedTraverse(path, None)
+        ob_path = obj.getPhysicalPath()
+        for stage_name, stage_title, path in self._stages:
+            stage = self._getStage(portal, path)
             stages[stage_name] = stage
-            if stage is not None and object.aq_inContextOf(stage, 1):
+            try:
+                obj.aq_inContextOf
+            except:
+                import pdb; pdb.set_trace()
+            if stage is not None and obj.aq_inContextOf(stage, 1):
                 if rel_path is not None:
                     # Can't tell what stage the object is in!
-                    raise StagingError, "The stages overlap"
+                    raise StagingError("The stages overlap")
                 # The object is from this stage.
                 stage_path = stage.getPhysicalPath()
                 assert ob_path[:len(stage_path)] == stage_path
                 rel_path = ob_path[len(stage_path):]
 
         if rel_path is None:
-            raise StagingError, "Object %s is not in any stage" % (
-                '/'.join(ob_path))
+            raise StagingError("Object %s is not in any stage" % (
+                '/'.join(ob_path)))
 
         if get_container:
             # Get the container of the object instead of the object itself.
@@ -109,25 +123,26 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
             rel_path = rel_path[:-1]
 
         res = {}
-        for stage_name, path in self._stages.items():
+        for stage_name, stage_title, path in self._stages:
             stage = stages[stage_name]
             if stage is not None:
-                object = stage.restrictedTraverse(rel_path, None)
+                obj = stage.restrictedTraverse(rel_path, None)
             else:
-                object = None
-            res[stage_name] = object
+                obj = None
+            res[stage_name] = obj
         return res
 
 
-    def _getObjectVersionIds(self, object, include_status=0):
+    def _getObjectVersionIds(self, obj, include_status=0):
         repo = self._getVersionRepository()
-        stages = self._getObjectStages(object)
+        stages = self._getObjectStages(obj)
         res = {}
-        for stage_name, object in stages.items():
-            if object is None or not repo.isUnderVersionControl(object):
+        for stage_name, obj in stages.items():
+            u_obj = unproxied(obj)
+            if obj is None or not repo.isUnderVersionControl(u_obj):
                 res[stage_name] = None
             else:
-                info = repo.getVersionInfo(object)
+                info = repo.getVersionInfo(u_obj)
                 v = info.version_id
                 if include_status and info.status == info.CHECKED_OUT:
                     v = str(v) + '+'
@@ -135,82 +150,117 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
         return res
 
 
-    def _autoCheckin(self, object, message=''):
+    def _autoCheckin(self, obj, message=''):
         lt = getToolByName(self, 'portal_lock', None)
         if lt is not None:
-            if lt.locked(object):
-                lt.unlock(object)
+            if lt.locked(obj):
+                lt.unlock(obj)
         vt = getToolByName(self, 'portal_versions', None)
         if vt is not None:
-            if vt.isCheckedOut(object):
-                vt.checkin(object, message)
+            if vt.isCheckedOut(obj):
+                vt.checkin(obj, message)
 
 
-    security.declareProtected(StageObjects, 'isStageable')
-    def isStageable(self, object):
+    security.declarePublic('isStageable')
+    def isStageable(self, obj):
         """Returns a true value if the object can be staged."""
+        verifyPermission(StageObjects, obj)
         repo = self._getVersionRepository()
-        if not repo.isAVersionableResource(object):
+        if not repo.isAVersionableResource(unproxied(obj)):
             return 0
-        if not getattr(object, '_stageable', 1):
+        if not getattr(obj, '_stageable', 1):
             return 0
         # An object is stageable only if it is located in one of the stages.
-        root = aq_parent(aq_inner(self))
-        for stage_name, path in self._stages.items():
-            stage = root.restrictedTraverse(path, None)
-            if stage is not None and object.aq_inContextOf(stage, 1):
+        portal = aq_parent(aq_inner(self))
+        for stage_name, stage_title, path in self._stages:
+            stage = self._getStage(portal, path)
+            if stage is not None and obj.aq_inContextOf(stage, 1):
                 return 1
-        return 0      
+        return 0
 
 
-    security.declareProtected(StageObjects, 'getStageOf')
-    def getStageOf(self, object):
-        """Returns the stage ID the object is in the context of.
+    security.declarePublic('getStageOf')
+    def getStageOf(self, obj):
+        """Returns the stage name the object is in the context of.
         """
-        root = aq_parent(aq_inner(self))
-        for stage_name, path in self._stages.items():
-            stage = root.restrictedTraverse(path, None)
-            if stage is not None and object.aq_inContextOf(stage, 1):
+        verifyPermission(StageObjects, obj)
+        portal = aq_parent(aq_inner(self))
+        for stage_name, stage_title, path in self._stages:
+            stage = self._getStage(portal, path)
+            if stage is not None and obj.aq_inContextOf(stage, 1):
                 return stage_name
         return None
 
 
-    security.declareProtected(StageObjects, 'getObjectInStage')
-    def getObjectInStage(self, object, stage):
+    security.declarePublic('getObjectInStage')
+    def getObjectInStage(self, obj, stage_name):
         """Returns the version of the object in the given stage.
         """
-        stages = self._getObjectStages(object)
-        return stages[stage]
+        verifyPermission(StageObjects, obj)
+        stages = self._getObjectStages(obj)
+        return stages[stage_name]
 
 
-    security.declareProtected(StageObjects, 'updateStages')
-    def updateStages(self, object, from_stage, to_stages, message=''):
-        """Updates corresponding objects to match the version
-        in the specified stage."""
-        if from_stage and (
-            from_stage in to_stages or not self._stages.has_key(from_stage)):
-            raise StagingError, "Invalid from_stages or to_stages parameter."
+    security.declarePublic('updateStages')
+    def updateStages(self, obj, from_stage, to_stages, message=''):
+        """Backward compatibility wrapper.
 
-        repo = self._getVersionRepository()
-        container_map = self._getObjectStages(object, get_container=1)
+        Calls updateStages2().  Note that the source stage is
+        specified twice, first in the context of obj, second in
+        from_stage.  updateStages2() eliminates the potential
+        ambiguity by eliminating from_stage.
+        """
+        s = self.getStageOf(obj)  # Checks the StageObjects permission
+        if s != from_stage:
+            raise StagingError("Ambiguous source stage")
+        self.updateStages2(obj, to_stages, message)
 
-        self._checkContainers(object, to_stages, container_map)
-        if self.auto_checkin:
-            self._autoCheckin(object, message)
 
-        object_map = self._getObjectStages(object)
-        if from_stage:
-            source_object = object_map[from_stage]
+    security.declarePublic('updateStages2')
+    def updateStages2(self, obj, to_stages, message=''):
+        """Updates objects to match the version in the source stage.
+        """
+        from_stage = self.getStageOf(obj)  # Checks the StageObjects permission
+        if from_stage is None:
+            raise StagingError("Object %s is not in any stage" %
+                               '/'.join(obj.getPhysicalPath()))
+        if from_stage in to_stages or not to_stages:
+            raise StagingError("Invalid to_stages parameter")
+
+        if aq_base(unproxied(obj)) is not aq_base(obj):
+            # obj is a proxy.  Update both the reference and the target.
+            proxy = obj
+            obj = getProxyTarget(proxy)
         else:
-            # The default source stage is the stage where the object is now.
-            source_object = object
+            proxy = None
+
+        # Check containers first.
+        cmap = self._getObjectStages(obj, get_container=1)
+        self._checkContainers(obj, to_stages, cmap)
+        proxy_cmap = None
+        if proxy is not None:
+            # Check the containers of the reference also.
+            proxy_cmap = self._getObjectStages(proxy, get_container=1)
+            self._checkContainers(proxy, to_stages, proxy_cmap)
+
+        # Update the stages.
+        self._updateObjectStates(obj, cmap, to_stages, message)
+        if proxy is not None:
+            # Create and update the reference objects also.
+            self._updateReferences(proxy, proxy_cmap, to_stages)
+
+
+    def _updateObjectStates(self, source_object, container_map,
+                            to_stages, message):
+        """Internal: updates the state of an object in specified stages.
+        """
+        repo = self._getVersionRepository()
+        if self.auto_checkin:
+            self._autoCheckin(source_object, message)
+        object_map = self._getObjectStages(source_object)
         version_info = repo.getVersionInfo(source_object)
         version_id = version_info.version_id
         history_id = version_info.history_id
-
-        # Make sure we copy the current data.
-        # XXX ZopeVersionControl tries to do this but isn't quite correct yet.
-        get_transaction().commit(1)
 
         # Update and/or copy the object to the different stages.
         for stage_name, ob in object_map.items():
@@ -224,7 +274,7 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
                         # This can happen if a site doesn't yet exist on
                         # the stage.
                         p = '/'.join(source_object.getPhysicalPath())
-                        raise StagingError, (
+                        raise StagingError(
                             'The container for "%s" does not exist on "%s"'
                             % (p, stage_name))
                     # Make a copy and put it in the new place.
@@ -234,88 +284,155 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
                 else:
                     if not repo.isUnderVersionControl(ob):
                         p = '/'.join(ob.getPhysicalPath())
-                        raise StagingError, (
+                        raise StagingError(
                             'The object "%s", not under version control, '
                             'is in the way.' % p)
                     if repo.getVersionInfo(ob).history_id != history_id:
                         p = '/'.join(ob.getPhysicalPath())
                         p2 = '/'.join(source_object.getPhysicalPath())
-                        raise StagingError, (
+                        raise StagingError(
                             'The object "%s", backed by a different '
                             'version history than "%s", '
                             'is in the way.' % (p, p2))
                     repo.updateResource(ob, version_id)
 
 
-    security.declareProtected(StageObjects, 'removeStages')
-    def removeStages(self, object, stages):
-        """Removes the copies on the given stages."""
-        object_map = self._getObjectStages(object)
-        container_map = self._getObjectStages(object, get_container=1)
-        id = object.getId()
+    def _updateReferences(self, proxy, container_map, to_stages):
+        """Internal: creates and updates references.
+        """
+        # Note that version control is not used when staging
+        # reference objects.
+        ref = getProxyReference(proxy)
+        object_map = self._getObjectStages(proxy)
+        ref_id = ref.getId()
+        for stage_name, ob in object_map.items():
+            if stage_name in to_stages:
+                if ob is not None:
+                    # There is an object at the reference target.
+                    if type(aq_base(ob)) is not type(aq_base(proxy)):
+                        p = '/'.join(ob.getPhysicalPath())
+                        raise StagingError(
+                            'The object "%s", which is not a reference, '
+                            'is in the way.' % p)
+                    # Delete the reference.
+                    container = container_map[stage_name]
+                    container._delObject(ref_id)
+
+                # Copy the reference from the source stage.
+                container = container_map.get(stage_name, None)
+                if container is None:
+                    # This can happen if a site doesn't yet exist on
+                    # the stage.
+                    p = '/'.join(proxy.getPhysicalPath())
+                    raise StagingError(
+                        'The container for "%s" does not exist on "%s"'
+                        % (p, stage_name))
+                # Duplicate the reference.
+                ob = cloneByPickle(aq_base(ref))
+                container._setObject(ob.getId(), ob)
+
+
+    security.declarePublic('removeStages')
+    def removeStages(self, obj, stages):
+        """Removes the copies on the given stages.
+        """
+        # If the object is a reference or proxy, this removes only the
+        # reference or proxy; this is probably the right thing to do.
+        verifyPermission(StageObjects, obj)
+        object_map = self._getObjectStages(obj)
+        container_map = self._getObjectStages(obj, get_container=1)
+        id = obj.getId()
         for stage_name, container in container_map.items():
             if object_map.get(stage_name) is not None:
                 if container is not None and stage_name in stages:
                     container._delObject(id)
 
 
-    security.declareProtected(StageObjects, 'getVersionIds')
-    def getVersionIds(self, object, include_status=0):
-        """Retrieves object version identifiers in the different stages."""
-        return self._getObjectVersionIds(object, include_status)
+    security.declarePublic('getVersionIds')
+    def getVersionIds(self, obj, include_status=0):
+        """Retrieves object version identifiers in the different stages.
+        """
+        verifyPermission(StageObjects, obj)
+        return self._getObjectVersionIds(obj, include_status)
 
 
-    def _checkContainers(self, object, stages, containers):
+    def _checkContainers(self, obj, stages, containers):
         for stage in stages:
             if containers.get(stage) is None:
-                p = '/'.join(object.getPhysicalPath())
-                raise StagingError, (
+                p = '/'.join(obj.getPhysicalPath())
+                raise StagingError(
                     'The container for "%s" does not exist on "%s"'
                     % (p, stage))
 
 
-    security.declareProtected(StageObjects, 'checkContainers')
-    def checkContainers(self, object, stages):
-        """Verifies that the container exists for the object on the
-        given stages.  If not, an exception is raised.
+    security.declarePublic('checkContainers')
+    def checkContainers(self, obj, stages):
+        """Verifies that the container exists on the given stages.
+
+        If the container is missing on one of the stages, an exception
+        is raised.
         """
-        containers = self._getObjectStages(object, get_container=1)
-        self._checkContainers(object, stages, containers)
+        verifyPermission(StageObjects, obj)
+        containers = self._getObjectStages(obj, get_container=1)
+        self._checkContainers(obj, stages, containers)
         return 1
 
 
-    security.declareProtected(StageObjects, 'getURLForStage')
-    def getURLForStage(self, object, stage, relative=0):
-        """Returns the URL of the object on the given stage."""
-        stages = self._getObjectStages(object)
+    security.declarePublic('getURLForStage')
+    def getURLForStage(self, source, stage, relative=0):
+        """Returns the URL of the object on the given stage.
+
+        Besides using absolute_url(), also looks for public_url
+        properties on portal objects.  The public_url property is
+        useful for generating a public URL even if the current user is
+        accessing Zope through a private URL.
+
+        This method is particularly useful when generating URLs for
+        inclusion in an email notification regarding staging.
+        """
+        verifyPermission(StageObjects, source)
+        stages = self._getObjectStages(source)
         ob = stages[stage]
         if ob is not None:
-            return ob.absolute_url(relative)
+            url = ob.absolute_url(relative)
+            p = getPortal(ob, None)
+            if p is not None:
+                # Modify the start of the URL according to the portal's
+                # public_url property.
+                public_url = getattr(aq_base(p), 'public_url', None)
+                if public_url:
+                    orig_url = p.absolute_url(relative)
+                    if url.startswith(orig_url):
+                        url = public_url + url[len(orig_url):]
+            return url
         else:
             return None
 
 
     security.declareProtected(ManagePortal, 'manage_stagesForm')
     manage_stagesForm = PageTemplateFile('stagesForm', _wwwdir)
+    manage_stagesForm.__name__ = "manage_stagesForm"
 
 
     security.declareProtected(ManagePortal, 'getStageItems')
     def getStageItems(self):
-        lst = self._stages.items()
-        lst.sort()
-        return lst
+        """Returns the stage declarations (for the management UI.)
+        """
+        return self._stages
 
 
     security.declareProtected(ManagePortal, 'manage_editStages')
     def manage_editStages(self, stages=(), RESPONSE=None):
-        """Edits the stages."""
-        ss = {}
+        """Edits the stages.
+        """
+        ss = []
         for stage in stages:
             name = str(stage.name)
+            title = str(stage.title)
             path = str(stage.path)
-            if name and path:
-                ss[name] = path
-        self._stages = ss
+            if name:
+                ss.append((name, title, path))
+        self._stages = tuple(ss)
         if RESPONSE is not None:
             RESPONSE.redirect(
                 '%s/manage_stagesForm?manage_tabs_message=Stages+changed.'
@@ -323,3 +440,4 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
 
 
 InitializeClass(StagingTool)
+

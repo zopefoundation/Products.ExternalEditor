@@ -26,9 +26,11 @@ from AccessControl.SecurityManagement import newSecurityManager, \
      noSecurityManager
 
 from Products.CMFStaging.StagingTool import StagingTool, StagingError
+from Products.CMFStaging.tests.testLockTool import TestUser
 from Products.ZopeVersionControl.Utility import VersionControlError
 
-class Tests(unittest.TestCase):
+
+class StagingTests(unittest.TestCase):
 
     def setUp(self):
         # Set up an application with a repository, 3 stages, the tools,
@@ -50,28 +52,43 @@ class Tests(unittest.TestCase):
         self.stages.manage_addProduct['OFSP'].manage_addFolder('Production')
         self.root.manage_addProduct['CMFStaging'].manage_addTool(
             StagingTool.meta_type)
+        self.root.portal_staging._stages = (
+            ('dev',    'Development', 'Stages/Development'),
+            ('review', 'Review',      'Stages/Review'),
+            ('prod',   'Production',  'Stages/Production'),
+            )
+
         dev_stage = self.stages.Development
-        dev_stage.manage_addProduct['OFSP'].manage_addFolder('c1')
-        dev_stage.manage_addProduct['OFSP'].manage_addFolder('c2')
         dev_stage.manage_addProduct['OFSP'].manage_addFolder('nonv')
         self.dev_stage = dev_stage
         self.review_stage = self.stages.Review
         self.prod_stage = self.stages.Production
+        self._addContent()
 
+        user = TestUser('sally')
+        newSecurityManager(None, user.__of__(self.root.acl_users))
+
+
+    def _addContent(self):
+        # This method is overridden by the reference staging tests.
+        self.dev_stage.manage_addProduct['OFSP'].manage_addFolder('c1')
+        self.dev_stage.manage_addProduct['OFSP'].manage_addFolder('c2')
         repo = self.root.VersionRepository
-        repo.applyVersionControl(dev_stage.c1)
-        repo.applyVersionControl(dev_stage.c2)
+        repo.applyVersionControl(self.dev_stage.c1)
+        repo.applyVersionControl(self.dev_stage.c2)
 
 
     def tearDown(self):
-        app = self.app
-        if hasattr(app, 'testroot'):
-            app._delObject('testroot')
-            get_transaction().commit()
-        else:
-            get_transaction().abort()
-        self.conn.close()
         noSecurityManager()
+        app = self.app
+        try:
+            if hasattr(app, 'testroot'):
+                app._delObject('testroot')
+                get_transaction().commit()
+            else:
+                get_transaction().abort()
+        finally:
+            self.conn.close()
 
 
     def testStageable(self):
@@ -94,7 +111,7 @@ class Tests(unittest.TestCase):
         st = self.root.portal_staging
         self.assert_('c1' not in self.review_stage.objectIds())
 
-        st.updateStages(self.dev_stage.c1, 'dev', ['review'])
+        st.updateStages2(self.dev_stage.c1, ['review'])
         versions = st.getVersionIds(self.dev_stage.c1)
         self.assert_(versions['dev'])
         self.assert_(versions['review'])
@@ -102,13 +119,13 @@ class Tests(unittest.TestCase):
         self.assert_('c1' in self.review_stage.objectIds())
         self.assert_('c1' not in self.prod_stage.objectIds())
 
-        st.updateStages(self.dev_stage.c2, 'dev', ['review', 'prod'])
+        st.updateStages2(self.dev_stage.c2, ['review', 'prod'])
         versions = st.getVersionIds(self.dev_stage.c2)
         self.assert_(versions['dev'])
         self.assert_(versions['review'])
         self.assert_(versions['prod'])
 
-        st.updateStages(self.dev_stage.c1, 'dev', ['prod'])
+        st.updateStages2(self.dev_stage.c1, ['prod'])
         versions = st.getVersionIds(self.dev_stage.c1)
         self.assert_(versions['dev'])
         self.assert_(versions['review'])
@@ -119,27 +136,27 @@ class Tests(unittest.TestCase):
     def testUpdateStagesExceptions(self):
         st = self.root.portal_staging
         # "nonv" is not under version control.
-        self.assertRaises(VersionControlError, st.updateStages,
-                          self.dev_stage.nonv, 'dev', ['review'])
+        self.assertRaises(VersionControlError, st.updateStages2,
+                          self.dev_stage.nonv, ['review'])
         # Put something in the way and make sure it doesn't get overwritten.
         self.review_stage.manage_addProduct['OFSP'].manage_addFolder('c1')
-        self.assertRaises(StagingError, st.updateStages, self.dev_stage.c1,
-                          'dev', ['review'])
+        self.assertRaises(
+            StagingError, st.updateStages2, self.dev_stage.c1, ['review'])
         # Put the blocker under version control and verify it still doesn't
         # get overwritten, since it is backed by a different version history.
         repo = self.root.VersionRepository
         repo.applyVersionControl(self.review_stage.c1)
-        self.assertRaises(StagingError, st.updateStages, self.dev_stage.c1,
-                          'dev', ['review'])
+        self.assertRaises(
+            StagingError, st.updateStages2, self.dev_stage.c1, ['review'])
         # Move the blocker out of the way and verify updates can occur again.
         self.review_stage._delObject('c1')
-        st.updateStages(self.dev_stage.c1, 'dev', ['review'])
-        
+        st.updateStages2(self.dev_stage.c1, ['review'])
+
 
     def testRemoveStages(self):
         st = self.root.portal_staging
         self.assert_('c1' not in self.review_stage.objectIds())
-        st.updateStages(self.dev_stage.c1, 'dev', ['review'])
+        st.updateStages2(self.dev_stage.c1, ['review'])
         self.assert_('c1' in self.review_stage.objectIds())
         st.removeStages(self.dev_stage.c1, ['review'])
         self.assert_('c1' not in self.review_stage.objectIds())
@@ -183,8 +200,6 @@ class Tests(unittest.TestCase):
         self.assert_(lt.auto_version)
         self.assert_(st.auto_checkin)
 
-        from Products.CMFStaging.tests.testLockTool import TestUser
-
         user = TestUser('andre')
         newSecurityManager(None, user.__of__(self.root.acl_users))
 
@@ -192,7 +207,7 @@ class Tests(unittest.TestCase):
         # Lock with auto checkout
         lt.lock(self.dev_stage.c1)
         # Update with auto unlock and checkin
-        st.updateStages(self.dev_stage.c1, 'dev', ['review'])
+        st.updateStages2(self.dev_stage.c1, ['review'])
         versions = st.getVersionIds(self.dev_stage.c1)
         self.assertEqual(versions['dev'], versions['review'])
         self.assert_(not versions['prod'])
@@ -208,7 +223,7 @@ class Tests(unittest.TestCase):
 
         # Publish c1.
         # Unlocked and checked in already
-        st.updateStages(self.dev_stage.c1, 'dev', ['review', 'prod'])
+        st.updateStages2(self.dev_stage.c1, ['review', 'prod'])
         versions = st.getVersionIds(self.dev_stage.c1)
         self.assertEqual(versions['dev'], wanted_published)
         self.assertEqual(versions['dev'], versions['review'])
@@ -218,7 +233,7 @@ class Tests(unittest.TestCase):
 
 def test_suite():
     return unittest.TestSuite((
-        unittest.makeSuite(Tests),
+        unittest.makeSuite(StagingTests),
         ))
 
 if __name__ == '__main__':
