@@ -93,8 +93,8 @@ class RegistrationTool (RegistrationTool, ActionProviderBase):
             if not self.isMemberIdAllowed(username):
                 return 'The login name you selected is already ' \
                        'in use or is not valid. Please choose another.'
-            if not props.get('email', ''):
-                return 'You must enter a valid email address.'
+        if not props.get('email', ''):
+            return 'You must enter a valid email address.'
         return None
 
     security.declarePublic( 'mailPassword' )
@@ -147,5 +147,18 @@ class RegistrationTool (RegistrationTool, ActionProviderBase):
         host.send( mail_text )
 
         return self.mail_password_response( self, self.REQUEST )
+
+    security.declareProtected(CMFCorePermissions.ManagePortal, 'editMember')
+    def editMember(self,member_id,properties=None,password=None,roles=None,domains=None):
+        """Edit a users properties, and security settings
+        Checks should be done before this method is called using
+        testPropertiesValidity and testPasswordValidity"""
+        
+        member = getToolByName(self, 'portal_membership').getMemberById(member_id)
+        member.setMemberProperties(properties)
+        member.setSecurityProfile(password,roles,domains)
+
+        return member
+        
 
 InitializeClass(RegistrationTool)
