@@ -283,11 +283,11 @@ STI_SCRIPT = """\
 ##bind namespace=
 ##bind script=script
 ##bind subpath=traverse_subpath
-##parameters=container, id
+##parameters=folder, id
 ##title=
 ##
-product = container.manage_addProduct['FooProduct']
+product = folder.manage_addProduct['FooProduct']
 product.addFoo(id)
-item = getattr(container, id)
+item = getattr(folder, id)
 return item
 """
