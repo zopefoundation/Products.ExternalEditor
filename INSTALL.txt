@@ -33,7 +33,10 @@ Installing CMF 1.5.0alpha
         $ ln -s /usr/local/zope/CMF-1.5.0alpha/CMFCore .
         $ ln -s /usr/local/zope/CMF-1.5.0alpha/CMFDefault .
         $ ln -s /usr/local/zope/CMF-1.5.0alpha/CMFTopic .
+        $ ln -s /usr/local/zope/CMF-1.5.0alpha/CMFActionIcons .
         $ ln -s /usr/local/zope/CMF-1.5.0alpha/CMFCalendar .
+        $ ln -s /usr/local/zope/CMF-1.5.0alpha/CMFSetup .
+        $ ln -s /usr/local/zope/CMF-1.5.0alpha/CMFUid .
         $ ln -s /usr/local/zope/CMF-1.5.0alpha/DCWorkflow .
 
        or, as a shortcut::
