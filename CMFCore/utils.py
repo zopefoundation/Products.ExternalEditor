@@ -388,15 +388,6 @@ class SimpleItemWithProperties (PropertyManager, SimpleItem):
         form = PropertyManager.manage_propertiesForm.__of__(self)
         return form(self, REQUEST, *args, **my_kw)
 
-    security.declarePublic('propertyLabel')
-    def propertyLabel(self, id):
-        """Return a label for the given property id
-        """
-        for p in self._properties:
-            if p['id'] == id:
-                return p.get('label', id)
-        return id
-
 InitializeClass( SimpleItemWithProperties )
 
 
