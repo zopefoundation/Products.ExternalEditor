@@ -427,8 +427,11 @@ class DiscussionItemContainer( Persistent, Implicit, Traversable ):
         a = result.append
         for key, value in self._container.items():
             if value.in_reply_to == in_reply_to:
-                a( key )
+                a( ( key, value ) )
 
-        return result
+        result.sort( lambda a, b: cmp(a[1].creation_date, b[1].creation_date) )
+
+        return [ x[0] for x in result ]
+
 
 InitializeClass( DiscussionItemContainer )
