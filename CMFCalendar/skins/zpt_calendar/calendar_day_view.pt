@@ -32,7 +32,7 @@
      <tr>
 
        <td class="heading" colspan="5" nowrap>
-         <a href="#" tal:attributes="href event/getURL" tal:content="event/title">
+         <a href="#" tal:attributes="href event/getURL" tal:content="event/Title">
            event title
          </a>
        </td>     
