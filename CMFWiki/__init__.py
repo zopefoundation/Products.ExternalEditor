@@ -1,5 +1,5 @@
 import CMFWikiPage
-from CMFWikiPermissions import Create
+from permissions import Create
 
 from Products.CMFCore import utils
 from Products.CMFCore.DirectoryView import registerDirectory
