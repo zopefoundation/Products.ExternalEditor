@@ -21,25 +21,8 @@ from Products.PluggableAuthService.tests.conformance \
 from Products.PluggableAuthService.tests.conformance \
     import IRoleAssignerPlugin_conformance
 
-from Products.PluggableAuthService.tests.test_PluggableAuthService \
-    import FauxContainer
-
-class FauxPAS( FauxContainer ):
-
-    def __init__( self ):
-        self._id = 'acl_users'
-        
-    def searchPrincipals( self, **kw ):
-        id = kw.get( 'id' )
-        return [ { 'id': id } ]
-
-class DummyUser:
-
-    def __init__( self, id ):
-        self._id = id
-
-    def getId( self ):
-        return self._id
+from Products.PluggableAuthService.plugins.tests.helpers \
+     import FauxPAS, FauxSmartPAS, DummyUser
 
 class ZODBRoleManagerTests( unittest.TestCase
                           , IRolesPlugin_conformance
@@ -264,7 +247,7 @@ class ZODBRoleManagerTests( unittest.TestCase
                          , () )
 
     def test_assignRoleToPrincipal_nonesuch( self ):
-        
+
         from Products.PluggableAuthService.tests.test_PluggableAuthService \
             import FauxRoot
 
@@ -274,7 +257,7 @@ class ZODBRoleManagerTests( unittest.TestCase
         self.assertRaises( KeyError, zrm.assignRoleToPrincipal, 'test', 'foo' )
 
     def test_assignRoleToPrincipal_user( self ):
-        
+
         from Products.PluggableAuthService.tests.test_PluggableAuthService \
             import FauxRoot
 
@@ -301,7 +284,7 @@ class ZODBRoleManagerTests( unittest.TestCase
         self.failUnless( 'test2' in roles )
 
     def test_assignRoleToPrincipal_new( self ):
-        
+
         root = FauxPAS()
         zrm = self._makeOne( id='assign_new' ).__of__( root )
 
@@ -318,7 +301,7 @@ class ZODBRoleManagerTests( unittest.TestCase
         self.assertEqual( assigned[0], 'foo' )
 
     def test_assignRoleToPrincipal_already( self ):
-        
+
         root = FauxPAS()
         zrm = self._makeOne( id='assign_already' ).__of__( root )
 
@@ -334,8 +317,34 @@ class ZODBRoleManagerTests( unittest.TestCase
         self.assertEqual( len( assigned ), 1 )
         self.assertEqual( assigned[0], 'foo' )
 
+    def test_assignRoleBeforeRemovingPrincipal( self ):
+
+        root = FauxSmartPAS()
+        root.user_ids['foo'] = 'foo'
+
+        zrm = self._makeOne( id='assign_before_remove' ).__of__( root )
+
+        zrm.addRole( 'test' )
+        self.assertEqual( len( zrm.listAssignedPrincipals( 'test' ) ), 0 )
+
+        new = zrm.assignRoleToPrincipal( 'test', 'foo' )
+
+        self.failUnless( new )
+
+        assigned = [x[1] for x in zrm.listAssignedPrincipals( 'test' )]
+
+        self.assertEqual( len( assigned ), 1 )
+        self.assertEqual( assigned[0], 'foo' )
+
+        del root.user_ids['foo']
+
+        assigned = [x[1] for x in zrm.listAssignedPrincipals( 'test' )]
+
+        self.assertEqual( len( assigned ), 1 )
+        self.assertEqual( assigned[0], '<foo: not found>' )
+
     def test_removeRoleFromPrincipal_nonesuch( self ):
-        
+
         from Products.PluggableAuthService.tests.test_PluggableAuthService \
             import FauxRoot
 
@@ -346,7 +355,7 @@ class ZODBRoleManagerTests( unittest.TestCase
                          , 'test', 'foo' )
 
     def test_removeRoleFromPrincipal_existing( self ):
-        
+
         root = FauxPAS()
         zrm = self._makeOne( id='remove_existing' ).__of__( root )
 
@@ -373,7 +382,7 @@ class ZODBRoleManagerTests( unittest.TestCase
         self.failUnless( 'baz' in assigned )
 
     def test_removeRoleFromPrincipal_noop( self ):
-        
+
         root = FauxPAS()
         zrm = self._makeOne( id='remove_noop' ).__of__( root )
 
@@ -390,7 +399,7 @@ class ZODBRoleManagerTests( unittest.TestCase
         removed = zrm.removeRoleFromPrincipal( 'test', 'bar' )
 
         self.failIf( removed )
-        
+
     def test_updateRole_nonesuch( self ):
 
         from Products.PluggableAuthService.tests.test_PluggableAuthService \
@@ -425,7 +434,7 @@ class ZODBRoleManagerTests( unittest.TestCase
         self.assertEqual( info[ 'description' ], 'Updated description' )
 
     def test_removeRole_then_addRole( self ):
-        
+
         from Products.PluggableAuthService.tests.test_PluggableAuthService \
             import FauxRoot
 
