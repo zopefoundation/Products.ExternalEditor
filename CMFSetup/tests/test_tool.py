@@ -206,9 +206,14 @@ class SetupToolTests( TestBase
         registry = tool.getImportStepRegistry()
         registry.registerStep( 'simple', '1', _uppercaseSiteTitle )
 
-        message = tool.runImportStep( 'simple' )
+        result = tool.runImportStep( 'simple' )
 
-        self.assertEqual( message, 'Updated title' )
+        self.assertEqual( len( result[ 'steps' ] ), 1 )
+
+        self.assertEqual( result[ 'steps' ][ 0 ], 'simple' )
+        self.assertEqual( result[ 'messages' ][ 'simple' ]
+                        , 'Uppercased title' )
+
         self.assertEqual( site.title, TITLE.upper() )
 
     def test_runImportStep_dependencies( self ):
@@ -223,7 +228,18 @@ class SetupToolTests( TestBase
         registry.registerStep( 'dependent', '1'
                              , _uppercaseSiteTitle, ( 'dependable', ) )
 
-        message = tool.runImportStep( 'dependent' )
+        result = tool.runImportStep( 'dependent' )
+
+        self.assertEqual( len( result[ 'steps' ] ), 2 )
+
+        self.assertEqual( result[ 'steps' ][ 0 ], 'dependable' )
+        self.assertEqual( result[ 'messages' ][ 'dependable' ]
+                        , 'Underscored title' )
+
+        self.assertEqual( result[ 'steps' ][ 1 ], 'dependent' )
+        self.assertEqual( result[ 'messages' ][ 'dependent' ]
+                        , 'Uppercased title' )
+        self.assertEqual( site.title, TITLE.replace( ' ', '_' ).upper() )
 
     def test_runImportStep_skip_dependencies( self ):
 
@@ -237,9 +253,14 @@ class SetupToolTests( TestBase
         registry.registerStep( 'dependent', '1'
                              , _uppercaseSiteTitle, ( 'dependable', ) )
 
-        message = tool.runImportStep( 'dependent', run_dependencies=False )
+        result = tool.runImportStep( 'dependent', run_dependencies=False )
 
-        self.assertEqual( message, 'Updated title' )
+        self.assertEqual( len( result[ 'steps' ] ), 1 )
+
+        self.assertEqual( result[ 'steps' ][ 0 ], 'dependent' )
+        self.assertEqual( result[ 'messages' ][ 'dependent' ]
+                        , 'Uppercased title' )
+
         self.assertEqual( site.title, TITLE.upper() )
 
     def test_runImportStep_default_purge( self ):
@@ -251,9 +272,12 @@ class SetupToolTests( TestBase
         registry = tool.getImportStepRegistry()
         registry.registerStep( 'purging', '1', _purgeIfRequired )
 
-        message = tool.runImportStep( 'purging' )
+        result = tool.runImportStep( 'purging' )
 
-        self.assertEqual( message, 'Purged' )
+        self.assertEqual( len( result[ 'steps' ] ), 1 )
+        self.assertEqual( result[ 'steps' ][ 0 ], 'purging' )
+        self.assertEqual( result[ 'messages' ][ 'purging' ], 'Purged' )
+        self.failUnless( site.purged )
 
     def test_runImportStep_explicit_purge( self ):
 
@@ -264,9 +288,12 @@ class SetupToolTests( TestBase
         registry = tool.getImportStepRegistry()
         registry.registerStep( 'purging', '1', _purgeIfRequired )
 
-        message = tool.runImportStep( 'purging', purge_old=True )
+        result = tool.runImportStep( 'purging', purge_old=True )
 
-        self.assertEqual( message, 'Purged' )
+        self.assertEqual( len( result[ 'steps' ] ), 1 )
+        self.assertEqual( result[ 'steps' ][ 0 ], 'purging' )
+        self.assertEqual( result[ 'messages' ][ 'purging' ], 'Purged' )
+        self.failUnless( site.purged )
 
     def test_runImportStep_skip_purge( self ):
 
@@ -277,9 +304,12 @@ class SetupToolTests( TestBase
         registry = tool.getImportStepRegistry()
         registry.registerStep( 'purging', '1', _purgeIfRequired )
 
-        message = tool.runImportStep( 'purging', purge_old=False )
+        result = tool.runImportStep( 'purging', purge_old=False )
 
-        self.assertEqual( message, 'Unpurged' )
+        self.assertEqual( len( result[ 'steps' ] ), 1 )
+        self.assertEqual( result[ 'steps' ][ 0 ], 'purging' )
+        self.assertEqual( result[ 'messages' ][ 'purging' ], 'Unpurged' )
+        self.failIf( site.purged )
 
     def test_runImportStep_consistent_context( self ):
 
@@ -293,20 +323,115 @@ class SetupToolTests( TestBase
         registry.registerStep( 'dependent', '1'
                              , _uppercaseSiteTitle, ( 'purging', ) )
 
-        message = tool.runImportStep( 'dependent', purge_old=False )
+        result = tool.runImportStep( 'dependent', purge_old=False )
+        self.failIf( site.purged )
+
+    def test_runAllImportSteps_empty( self ):
+
+        TITLE = 'original title'
+        site = self._makeSite( TITLE )
+        tool = self._makeOne().__of__( site )
+
+        result = tool.runAllImportSteps()
+        
+        self.assertEqual( len( result[ 'steps' ] ), 0 )
+
+    def test_runAllImportSteps_sorted_default_purge( self ):
+
+        TITLE = 'original title'
+        site = self._makeSite( TITLE )
+        tool = self._makeOne().__of__( site )
+
+        registry = tool.getImportStepRegistry()
+        registry.registerStep( 'dependable', '1'
+                             , _underscoreSiteTitle, ( 'purging', ) )
+        registry.registerStep( 'dependent', '1'
+                             , _uppercaseSiteTitle, ( 'dependable', ) )
+        registry.registerStep( 'purging', '1'
+                             , _purgeIfRequired )
+
+        result = tool.runAllImportSteps()
+        
+        self.assertEqual( len( result[ 'steps' ] ), 3 )
+
+        self.assertEqual( result[ 'steps' ][ 0 ], 'purging' )
+        self.assertEqual( result[ 'messages' ][ 'purging' ]
+                        , 'Purged' )
+
+        self.assertEqual( result[ 'steps' ][ 1 ], 'dependable' )
+        self.assertEqual( result[ 'messages' ][ 'dependable' ]
+                        , 'Underscored title' )
+
+        self.assertEqual( result[ 'steps' ][ 2 ], 'dependent' )
+        self.assertEqual( result[ 'messages' ][ 'dependent' ]
+                        , 'Uppercased title' )
+
+        self.assertEqual( site.title, TITLE.replace( ' ', '_' ).upper() )
+        self.failUnless( site.purged )
+
+    def test_runAllImportSteps_sorted_explicit_purge( self ):
+
+        TITLE = 'original title'
+        site = self._makeSite( TITLE )
+        tool = self._makeOne().__of__( site )
+
+        registry = tool.getImportStepRegistry()
+        registry.registerStep( 'dependable', '1'
+                             , _underscoreSiteTitle, ( 'purging', ) )
+        registry.registerStep( 'dependent', '1'
+                             , _uppercaseSiteTitle, ( 'dependable', ) )
+        registry.registerStep( 'purging', '1'
+                             , _purgeIfRequired )
+
+        result = tool.runAllImportSteps( purge_old=True )
+        
+        self.assertEqual( len( result[ 'steps' ] ), 3 )
+
+        self.assertEqual( result[ 'steps' ][ 0 ], 'purging' )
+        self.assertEqual( result[ 'messages' ][ 'purging' ]
+                        , 'Purged' )
+
+        self.assertEqual( result[ 'steps' ][ 1 ], 'dependable' )
+        self.assertEqual( result[ 'steps' ][ 2 ], 'dependent' )
+        self.failUnless( site.purged )
+
+    def test_runAllImportSteps_sorted_skip_purge( self ):
+
+        TITLE = 'original title'
+        site = self._makeSite( TITLE )
+        tool = self._makeOne().__of__( site )
+
+        registry = tool.getImportStepRegistry()
+        registry.registerStep( 'dependable', '1'
+                             , _underscoreSiteTitle, ( 'purging', ) )
+        registry.registerStep( 'dependent', '1'
+                             , _uppercaseSiteTitle, ( 'dependable', ) )
+        registry.registerStep( 'purging', '1'
+                             , _purgeIfRequired )
+
+        result = tool.runAllImportSteps( purge_old=False )
+        
+        self.assertEqual( len( result[ 'steps' ] ), 3 )
+
+        self.assertEqual( result[ 'steps' ][ 0 ], 'purging' )
+        self.assertEqual( result[ 'messages' ][ 'purging' ]
+                        , 'Unpurged' )
+
+        self.assertEqual( result[ 'steps' ][ 1 ], 'dependable' )
+        self.assertEqual( result[ 'steps' ][ 2 ], 'dependent' )
         self.failIf( site.purged )
 
 def _underscoreSiteTitle( context ):
 
     site = context.getSite()
     site.title = site.title.replace( ' ', '_' )
-    return 'Updated title'
+    return 'Underscored title'
 
 def _uppercaseSiteTitle( context ):
 
     site = context.getSite()
     site.title = site.title.upper()
-    return 'Updated title'
+    return 'Uppercased title'
 
 def _purgeIfRequired( context ):
 

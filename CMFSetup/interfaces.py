@@ -301,6 +301,13 @@ class ISetupTool( Interface ):
 
         o If 'run_dependencies' is True, then run any out-of-date
           dependency steps first.
+
+        o Return a mapping, with keys:
+
+          'steps' -- a sequence of IDs of the steps run.
+
+          'messages' -- a dictionary holding messages returned from each
+            step
         """
 
     def runAllImportSteps( purge_old=True ):
@@ -310,6 +317,13 @@ class ISetupTool( Interface ):
         o If 'purge_old' is True, then run each step after purging any
           "old" setup first (this is the responsibility of the step,
           which must check the context we supply).
+
+        o Return a mapping, with keys:
+
+          'steps' -- a sequence of IDs of the steps run.
+
+          'messages' -- a dictionary holding messages returned from each
+            step
         """
 
     def runExportStep( step_id ):

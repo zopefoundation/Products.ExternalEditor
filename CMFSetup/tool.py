@@ -121,21 +121,38 @@ class SetupTool( UniqueObject, Folder ):
 
         dependencies = info.get( 'dependencies', () )
 
+        messages = {}
+        steps = []
         if run_dependencies:
-            already = {}
             for dependency in dependencies:
 
-                if already.get( dependency ) is None:
-                    self._doRunImportStep( dependency, context )
-                    already[ dependency ] = 1
+                if dependency not in steps:
+                    message = self._doRunImportStep( dependency, context )
+                    messages[ dependency ] = message
+                    steps.append( dependency )
 
-        return self._doRunImportStep( step_id, context )
+        message = self._doRunImportStep( step_id, context )
+        messages[ step_id ] = message
+        steps.append( step_id )
+
+        return { 'steps' : steps, 'messages' : messages }
 
     security.declareProtected( ManagePortal, 'runAllSetupSteps')
     def runAllImportSteps( self, purge_old=True ):
 
         """ See ISetupTool.
         """
+        profile_path = self._getFullyQualifiedProfileDirectory()
+        context = ImportContext( self, profile_path, purge_old )
+
+        steps = self._import_registry.sortSteps()
+        messages = {}
+
+        for step in steps:
+            message = self._doRunImportStep( step, context )
+            messages[ step ] = message
+
+        return { 'steps' : steps, 'messages' : messages }
 
     security.declareProtected( ManagePortal, 'runExportStep')
     def runExportStep( self, step_id ):
@@ -217,6 +234,9 @@ class SetupTool( UniqueObject, Folder ):
         """ Run a single import step, using a pre-built context.
         """
         handler = self._import_registry.getStep( step_id )
+
+        if handler is None:
+            raise ValueError( 'Invalid import step: %s' % step_id )
 
         return handler( context )
 
