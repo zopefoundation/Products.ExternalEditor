@@ -92,7 +92,23 @@ class IChallengePlugin( Interface ):
 
     def challenge( request, response, **kw ):
 
-        """ Scribble on the response in some appropriate way.
+        """ Raise an exception
+        
+        With Zope 2 there are only two ways to initiate a challenge.
+        
+        o raise Unauthorized, message
+        
+        o raise Redirect, url
+        
+        The default challenge response is the raise Unauthorized. 
+        A challenge plugin is therefore only needed if a Redirect 
+        (for example to a login-form) is desired. 
+        
+        The plugin gets request and response so that it can choose to
+        only challenge during certain circumstances. If the plugin
+        does not raise an exception, the next challenge plugin will 
+        be called. If no plugins raise the exception, Unauthorized
+        will be raised.
         """
 
 class ICredentialsUpdatePlugin( Interface ):
