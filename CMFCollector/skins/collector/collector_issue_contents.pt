@@ -28,13 +28,19 @@
 
   <div metal:define-macro="transcript">
 
-    <table>
+    <table tal:define="entries here/action_number;
+                       ending python: (entries == 1 and 'y') or 'ies'">
 
       <tr>
         <th colspan="2" align="left">
           <font size="+1">
             Issue <span tal:replace="here/id">ID</span> Transcript
           </font>
+        </th>
+      </tr>
+      <tr>
+        <th colspan="2" align="left">
+          <span tal:replace="python: '%d entr%s' % (entries, ending)"></span>
         </th>
       </tr>
       <tr>
