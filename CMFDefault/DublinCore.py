@@ -360,7 +360,6 @@ class DefaultDublinCoreImpl( PropertyManager ):
         self.setFormat( format )
         self.setLanguage( language )
         self.setRights( rights )
-        self.reindexObject()
 
     security.declareProtected( CMFCorePermissions.ModifyPortalContent
                              , 'manage_metadata' )
@@ -419,4 +418,5 @@ class DefaultDublinCoreImpl( PropertyManager ):
                      , language=language
                      , rights=rights
                      )
+        self.reindexObject()
 InitializeClass(DefaultDublinCoreImpl)

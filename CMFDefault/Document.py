@@ -105,8 +105,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
         self.title = title
         self.description = description
         self.text = text
-        self.text_format = text_format
-        self._edit( text_format=text_format, text=text )
+        self.setFormat(value=text_format)
 
     security.declareProtected(CMFCorePermissions.ModifyPortalContent,
                               'manage_edit')
@@ -124,17 +123,12 @@ class Document(PortalContent, DefaultDublinCoreImpl):
                 + '?manage_tabs_message=Document+updated'
                 )
 
-    def _edit(self, text_format, text, file='', safety_belt=''):
+    def _edit(self, text, text_format='', safety_belt=''):
         """ Edit the Document - Parses headers and cooks the body"""
-        self.text = text
         headers = {}
-        if file and (type(file) is not type('')):
-            contents=file.read()
-            if contents:
-                text = self.text = contents
-
-        headers, body, cooked, format = self.handleText(text, text_format)
-
+        level = self._stx_level
+        if not text_format:
+            text_format = self.text_format
         if not safety_belt:
             safety_belt = headers.get('SafetyBelt', '')
         if not self._safety_belt_update(safety_belt=safety_belt):
@@ -144,11 +138,40 @@ class Document(PortalContent, DefaultDublinCoreImpl):
                    " browser 'back' button, but will have to apply them"
                    " to a freshly fetched copy.)")
             raise 'EditingConflict', msg
+        if text_format == 'html':
+            self.text = self.cooked_text = text
+        else:
+            cooked = _format_stx(text=text, level=level)
+            self.cooked_text = cooked
+            self.text = text
 
-        self.text_format = format
-        self.cooked_text = cooked
-        self.text = body
+    security.declareProtected( CMFCorePermissions.ModifyPortalContent, 'edit' )
+    def edit( self
+            , text_format
+            , text
+            , file=''
+            , safety_belt=''
+            ):
+        """
+        *used to be WorkflowAction(_edit)
+        To add webDav support, we need to check if the content is locked, and if
+        so return ResourceLockedError if not, call _edit.
 
+        Note that this method expects to be called from a web form, and so
+        disables header processing
+        """
+        self.failIfLocked()
+        if file and (type(file) is not type('')):
+            contents=file.read()
+            if contents:
+                text = self.text = contents
+        text = bodyfinder(text)
+        self.setFormat(value=text_format)
+        self._edit(text=text, text_format=text_format, safety_belt=safety_belt)
+        self.reindexObject()
+
+    security.declareProtected(CMFCorePermissions.ModifyPortalContent, 'setMetadata')
+    def setMetadata(self, headers):
         headers['Format'] = self.Format()
         new_subject = keywordsplitter(headers)
         headers['Subject'] = new_subject or self.Subject()
@@ -156,7 +179,6 @@ class Document(PortalContent, DefaultDublinCoreImpl):
         for key, value in self.getMetadataHeaders():
             if key != 'Format' and not haveheader(key):
                 headers[key] = value
-        
         self._editMetadata(title=headers['Title'],
                           subject=headers['Subject'],
                           description=headers['Description'],
@@ -168,29 +190,6 @@ class Document(PortalContent, DefaultDublinCoreImpl):
                           rights=headers['Rights'],
                           )
 
-    security.declareProtected( CMFCorePermissions.ModifyPortalContent, 'edit' )
-    def edit( self
-            , text_format
-            , text
-            , file=''
-            , safety_belt=''
-            , FIRST_LINE_COLON=re.compile( r'^.*:.*' )
-            ):
-        """
-        *used to be WorkflowAction(_edit)
-        To add webDav support, we need to check if the content is locked, and if
-        so return ResourceLockedError if not, call _edit.
-
-        Note that this method expects to be called from a web form, and so
-        disables header processing
-        """
-        self.failIfLocked()
-        if text_format == 'structured-text' and FIRST_LINE_COLON.match( text ):
-            # WAAAA! Inject line to disable header munging.
-            text = '\n%s' % text
-
-        self._edit(text_format, text, file, safety_belt)
-
     security.declarePrivate('guessFormat')
     def guessFormat(self, text):
         """ Simple stab at guessing the inner format of the text """
@@ -201,12 +200,9 @@ class Document(PortalContent, DefaultDublinCoreImpl):
     def handleText(self, text, format=None, stx_level=None):
         """ Handles the raw text, returning headers, body, cooked, format """
         headers = {}
-        body = cooked = text
         level = stx_level or self._stx_level
-
         if not format:
             format = self.guessFormat(text)
-
         if format == 'html':
             parser = SimpleHTMLParser()
             parser.feed(text)
@@ -215,13 +211,12 @@ class Document(PortalContent, DefaultDublinCoreImpl):
                 headers['Title'] = parser.title
             bodyfound = bodyfinder(text)
             if bodyfound:
-                cooked = body = bodyfound
+                body = bodyfound
         else:
             headers, body = parseHeadersBody(text, headers)
-            cooked = _format_stx(text=body, level=level)
             self._stx_level = level
 
-        return headers, body, cooked, format
+        return headers, body, format
             
     security.declarePublic( 'getMetadataHeaders' )
     def getMetadataHeaders(self):
@@ -334,7 +329,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
                              'setFormat' )
     def setFormat(self, value):
         value = str(value)
-        if value == 'text/html':
+        if value == 'text/html' or value == 'html':
             self.text_format = 'html'
         else:
             self.text_format = 'structured-text'
@@ -355,7 +350,10 @@ class Document(PortalContent, DefaultDublinCoreImpl):
         else: self.setFormat('text/plain')
 
         try:
-            self._edit(text_format=self.text_format, text=body)
+            headers, body, format = self.handleText(text=body)
+            safety_belt = headers.get('SafetyBelt', '') 
+            self.setMetadata(headers)
+            self._edit(text=body, safety_belt=safety_belt)
         except 'EditingConflict', msg:
             # XXX Can we get an error msg through?  Should we be raising an
             #     exception, to be handled in the FTP mechanism?  Inquiring
@@ -369,12 +367,13 @@ class Document(PortalContent, DefaultDublinCoreImpl):
             return RESPONSE
 
         RESPONSE.setStatus(204)
+        self.reindexObject()
         return RESPONSE
 
     _htmlsrc = (
         '<html>\n <head>\n'
         ' <title>%(title)s</title>\n'
-        '%(metatags)s\n'
+       '%(metatags)s\n'
         ' </head>\n'
         ' <body>\n%(body)s\n </body>\n'
         '</html>\n'

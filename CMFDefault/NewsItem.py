@@ -86,7 +86,8 @@ class NewsItem( Document ):
 
     security = ClassSecurityInfo()
 
-    def _edit( self, text, description=None, text_format=None ):
+    security.declareProtected( CMFCorePermissions.ModifyPortalContent, 'edit' )
+    def edit( self, text, description=None, text_format=None ):
         """
             Edit the News Item
         """
@@ -94,10 +95,7 @@ class NewsItem( Document ):
             text_format = getattr(self, 'text_format', 'html')
         if description is not None:
             self.setDescription( description )
-        Document._edit( self, text_format, text )
-
-    security.declareProtected( CMFCorePermissions.ModifyPortalContent, 'edit' )
-    edit = WorkflowAction( _edit )
+        Document.edit( self, text_format, text )
 
 
 Globals.InitializeClass( NewsItem )

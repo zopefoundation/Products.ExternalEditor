@@ -1,4 +1,5 @@
 import unittest, string, re
+from utils import fakeRequest, fakeResponse
 from Products.CMFDefault.Document import Document
 #" 
 DOCTYPE = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">'''
@@ -127,15 +128,18 @@ class DocumentTests(unittest.TestCase):
         get_transaction().abort()
 
     def test_Empty(self):
-        d = Document('foo')
+        d = Document('foo', text_format='structured-text')
         assert d.title == ''
         assert d.description == ''
         assert d.text == ''
         assert d.text_format == 'structured-text'
         assert d._stx_level == 1
 
-    def test_BasicHtml(self):
-        d = Document('foo', text=BASIC_HTML)
+    def test_BasicHtmlPUT(self):
+        REQUEST = fakeRequest()
+        REQUEST['BODY'] = BASIC_HTML
+        d = Document('foo')
+        d.PUT(REQUEST, RESPONSE=fakeResponse())
         assert d.Format() == 'text/html'
         assert d.title == 'Title in tag'
         assert string.find(d.text, '</body>') == -1
@@ -159,8 +163,10 @@ class DocumentTests(unittest.TestCase):
             ]
 
     def test_UpperedHtml(self):
+        REQUEST=fakeRequest()
+        REQUEST['BODY'] = string.upper(BASIC_HTML)
         d = Document('foo')
-        d.edit(text_format='', text=string.upper(BASIC_HTML))
+        d.PUT(REQUEST, RESPONSE=fakeResponse())
         assert d.Format() == 'text/html'
         assert d.title == 'TITLE IN TAG'
         assert string.find(d.text, '</BODY') == -1
@@ -168,33 +174,38 @@ class DocumentTests(unittest.TestCase):
         assert len(d.Contributors()) == 3
 
     def test_EntityInTitle(self):
+        REQUEST=fakeRequest()
+        REQUEST['BODY'] = ENTITY_IN_TITLE 
         d = Document('foo')
-        d.edit(text_format='html', text=ENTITY_IN_TITLE)
+        d.PUT(REQUEST, RESPONSE=fakeResponse())
         assert d.title == '&Auuml;rger', "Title '%s' being lost" % (
             d.title )
 
     def test_HtmlWithDoctype(self):
+        REQUEST=fakeRequest()
         d = Document('foo')
-        html = '%s\n%s' % (DOCTYPE, BASIC_HTML)
-        d.edit(text_format='', text=html)
+        REQUEST['BODY'] = '%s\n%s' % (DOCTYPE, BASIC_HTML)
+        d.PUT(REQUEST, RESPONSE=fakeResponse())
         assert d.Description() == 'Describe me'
 
     def test_HtmlWithoutNewlines(self):
+        REQUEST=fakeRequest()
         d = Document('foo')
-        html = string.join(string.split(BASIC_HTML, '\n'), '')
-        d.edit(text_format='', text=html)
+        REQUEST['BODY'] = string.join(string.split(BASIC_HTML, '\n'), '')
+        d.PUT(REQUEST, RESPONSE=fakeResponse())
         assert d.Format() == 'text/html'
         assert d.Description() == 'Describe me'
 
     def test_BigHtml(self):
+        REQUEST = fakeRequest()
         d = Document('foo')
         s = []
         looper = '<li> number %s</li>'
         for i in range(12000): s.append(looper % i)
         body = '<ul>\n%s\n</ul>' % string.join(s, '\n')
-        html = HTML_TEMPLATE % {'title': 'big document',
+        REQUEST['BODY'] = HTML_TEMPLATE % {'title': 'big document',
                                 'body': body}
-        d.edit(text_format=None, text=html)
+        d.PUT(REQUEST, RESPONSE=fakeResponse())
         assert d.CookedBody() == body
 
     def test_BigHtml_via_upload(self):
@@ -207,22 +218,23 @@ class DocumentTests(unittest.TestCase):
                                 'body': body}
         from StringIO import StringIO
         file = StringIO( html )
-        d.edit(text_format=None, text='', file=file)
+        d.edit(text_format='html', text='', file=file)
         assert d.CookedBody() == body
         
 
     def test_EditStructuredTextWithHTML(self):
         d = Document('foo')
-        d.edit(text_format=None, text=STX_WITH_HTML)
+        d.edit(text_format='structured-text', text=STX_WITH_HTML)
         
         assert d.Format() == 'text/plain', "%s != %s" % (
             d.Format(), 'text/plain')
 
     def test_StructuredText(self):
+        REQUEST=fakeRequest()
+        REQUEST['BODY'] = BASIC_STRUCTUREDTEXT
         d = Document('foo')
+        d.PUT(REQUEST, RESPONSE=fakeResponse())
         assert hasattr(d, 'cooked_text')
-        d._edit(text_format='structured-text', text=BASIC_STRUCTUREDTEXT)
-        
         assert d.Format() == 'text/plain'
         assert d.Title() == 'My Document'
         assert d.Description() == 'A document by me'
@@ -246,7 +258,8 @@ class DocumentTests(unittest.TestCase):
             ]
 
     def test_STX_Levels(self):
-        d = Document('foo', text=BASIC_STRUCTUREDTEXT)
+        d = Document('foo')
+        d.edit(text_format='structured-text', text=BASIC_STRUCTUREDTEXT)
         assert d._stx_level == 1
 
         ct = d.CookedBody()
@@ -269,26 +282,33 @@ class DocumentTests(unittest.TestCase):
         assert string.find(d.CookedBody(), '<h2') >= 0
 
     def test_Init(self):
-        d = Document('foo', text=BASIC_STRUCTUREDTEXT)
+        REQUEST=fakeRequest()
+        REQUEST['BODY']=BASIC_STRUCTUREDTEXT
+        d = Document('foo')
+        d.PUT(REQUEST, RESPONSE=fakeResponse())
         assert d.Format() == 'text/plain'
         assert d.Title() == 'My Document'
         assert d.Description() == 'A document by me'
         assert len(d.Contributors()) == 3
         assert string.find(d.cooked_text, '<p>') >= 0
 
-        d = Document('foo', text=BASIC_HTML)
+        d = Document('foo', text='')
+        REQUEST['BODY']=BASIC_HTML
+        d.PUT(REQUEST, RESPONSE=fakeResponse())
         assert d.Format() == 'text/html'
         assert d.Title() == 'Title in tag'
         assert len(d.Contributors()) == 3
 
-        d = Document('foo', title='Foodoc')
+        d = Document('foo', text_format='structured-text', title='Foodoc')
         assert d.text == ''
         assert d.title == 'Foodoc'
         assert d.Format() == 'text/plain'
     
     def test_STX_NoHeaders( self ):
+        REQUEST=fakeRequest()
+        REQUEST['BODY']=STX_NO_HEADERS
         d = Document('foo')
-        d._editMetadata( title="Plain STX"
+        d.editMetadata( title="Plain STX"
                        , description="Look, Ma, no headers!"
                        , subject=( "plain", "STX" )
                        )
@@ -299,7 +319,7 @@ class DocumentTests(unittest.TestCase):
         assert 'plain' in d.Subject()
         assert 'STX' in d.Subject()
 
-        d.edit(text_format='structured-text', text=STX_NO_HEADERS)
+        d.PUT(REQUEST, RESPONSE=fakeResponse())
         
         assert d.Format() == 'text/plain'
         assert d.Title() == 'Plain STX'
@@ -310,7 +330,7 @@ class DocumentTests(unittest.TestCase):
     
     def test_STX_NoHeaders_but_colon( self ):
         d = Document('foo')
-        d._editMetadata( title="Plain STX"
+        d.editMetadata( title="Plain STX"
                        , description="Look, Ma, no headers!"
                        , subject=( "plain", "STX" )
                        )
@@ -320,7 +340,7 @@ class DocumentTests(unittest.TestCase):
     
     def test_ZMI_edit( self ):
         d = Document('foo')
-        d._editMetadata( title="Plain STX"
+        d.editMetadata( title="Plain STX"
                        , description="Look, Ma, no headers!"
                        , subject=( "plain", "STX" )
                        )
@@ -333,8 +353,10 @@ class DocumentTests(unittest.TestCase):
 class TestFTPGet( unittest.TestCase ):
 
     def testHTML( self ):
+        REQUEST=fakeRequest()
+        REQUEST['BODY']=SIMPLE_HTML
         d = Document( 'foo' )
-        d._edit( text_format="html", text=SIMPLE_HTML )
+        d.PUT(REQUEST, RESPONSE=fakeResponse())
 
         simple_lines = string.split( SIMPLE_HTML, '\n' )
         get_lines = string.split( d.manage_FTPget(), '\n' )
@@ -378,8 +400,10 @@ class TestFTPGet( unittest.TestCase ):
             assert header in get_headers, [header, get_headers]
 
     def testSTX( self ):
+        REQUEST=fakeRequest()
+        REQUEST['BODY']=SIMPLE_STRUCTUREDTEXT
         d = Document( 'foo' )
-        d._edit( text_format="structured-text", text=SIMPLE_STRUCTUREDTEXT )
+        d.PUT(REQUEST, RESPONSE=fakeResponse())
 
         simple_lines = string.split( SIMPLE_STRUCTUREDTEXT, '\n' )
         get_lines = string.split( d.manage_FTPget(), '\n' )
