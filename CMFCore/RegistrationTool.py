@@ -126,7 +126,7 @@ class RegistrationTool (UniqueObject, SimpleItem, ActionProviderBase):
         return member
 
     import re
-    __ALLOWED_MEMBER_ID_PATTERN = re.compile( "[A-Za-z][A-Za-z0-9_]*" )
+    __ALLOWED_MEMBER_ID_PATTERN = re.compile( "^[A-Za-z][A-Za-z0-9_]*$" )
     security.declareProtected(AddPortalMember, 'isMemberIdAllowed')
     def isMemberIdAllowed(self, id):
         '''Returns 1 if the ID is not in use and is not reserved.
