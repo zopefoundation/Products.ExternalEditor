@@ -30,6 +30,7 @@ from FSObject import BadFile
 from utils import expandpath, minimalpath
 from zLOG import LOG, ERROR
 from sys import exc_info
+from types import StringType
 
 _dtmldir = os.path.join( package_home( globals() ), 'dtml' )
 
@@ -256,8 +257,10 @@ class DirectoryRegistry:
     def getTypeByMetaType(self, mt):
         return self._meta_types.get(mt, None)
 
-    def registerDirectory(self, name, parent_globals, subdirs=1):
-        filepath = path.join(package_home(parent_globals), name)
+    def registerDirectory(self, name, _prefix, subdirs=1):
+        if not isinstance(_prefix, StringType):
+            _prefix = package_home(_prefix)
+        filepath = path.join(_prefix, name)
         self.registerDirectoryByPath(filepath, subdirs)
 
     def registerDirectoryByPath(self, filepath, subdirs=1):
@@ -438,7 +441,7 @@ def createDirectoryView(parent, filepath, id=None):
     ob = DirectoryView(id, filepath)
     parent._setObject(id, ob)
 
-def addDirectoryViews(ob, name, parent_globals):
+def addDirectoryViews(ob, name, _prefix):
     '''
     Adds a directory view for every subdirectory of the
     given directory.
@@ -447,7 +450,9 @@ def addDirectoryViews(ob, name, parent_globals):
     # Note that registerDirectory() still needs to be called
     # by product initialization code to satisfy
     # persistence demands.
-    fp = path.join(package_home(parent_globals), name)
+    if not isinstance(_prefix, StringType):
+        _prefix = package_home(_prefix)
+    fp = path.join(_prefix, name)
     filepath = minimalpath(fp)
     info = _dirreg.getDirectoryInfo(filepath)
     if info is None:

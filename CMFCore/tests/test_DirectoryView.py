@@ -4,18 +4,28 @@ from Products.CMFCore.DirectoryView import \
      registerDirectory,addDirectoryViews,DirectoryViewSurrogate
 from Globals import package_home, DevelopmentMode
 from Acquisition import Implicit
+import os
 from os import remove, mkdir, rmdir
 from os.path import join
 from shutil import copy2
 
+try:
+    __file__
+except NameError:
+    # Test was called directly, so no __file__ global exists.
+    _prefix = os.path.abspath(os.curdir)
+else:
+    # Test was called by another test.
+    _prefix = os.path.abspath(os.path.dirname(__file__))
+
 # the path of our fake skin
-skin_path_name = join(package_home(globals()),'fake_skins','fake_skin')
+skin_path_name = join(_prefix, 'fake_skins', 'fake_skin')
 
 class DirectoryViewTests1( TestCase ):
 
     def test_registerDirectory( self ):
         """ Test registerDirectory  """
-        registerDirectory('fake_skins', globals())
+        registerDirectory('fake_skins', _prefix)
 
 class Dummy(Implicit):
     """
@@ -29,9 +39,9 @@ class Dummy(Implicit):
 class DirectoryViewTests2( TestCase ):
 
     def setUp( self ):
-        registerDirectory('fake_skins', globals())
+        registerDirectory('fake_skins', _prefix)
         ob = self.ob = Dummy()
-        addDirectoryViews(ob, 'fake_skins', globals())
+        addDirectoryViews(ob, 'fake_skins', _prefix)
 
     def test_addDirectoryViews( self ):
         """ Test addDirectoryViews  """
@@ -60,9 +70,9 @@ if DevelopmentMode:
     def setUp( self ):
         
         # initialise skins
-        registerDirectory('fake_skins', globals())
+        registerDirectory('fake_skins', _prefix)
         ob = self.ob = Dummy()
-        addDirectoryViews(ob, 'fake_skins', globals())
+        addDirectoryViews(ob, 'fake_skins', _prefix)
 
         # add a method to the fake skin folder
         f = open(test2path,'w')
