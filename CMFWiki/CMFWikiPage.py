@@ -316,8 +316,12 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
             # Actually contained within the folder:
             return '<a href="%s">%s</a>' % (quote(m), m)
         elif hasattr(folder, m):
-            # Obtained by acquisition - make sure to use the real URL:
             obj = getattr(folder, m)
+            if not hasattr(obj, 'absolute_url'):
+                # Whoops!  Probly an acquired method, which we do *not* want
+                # to shadow (or people could create infinite recursions).
+                return '%s<font color="red"><sup>x</sup></font>' % m
+            # Obtained by acquisition - make sure to use the real URL:
             return '<a href="%s">%s</a>' % (obj.absolute_url(), m)
 
         # otherwise, provide a suitable creation link
@@ -375,6 +379,10 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
         elif hasattr(folder, m):
             # Obtained by acquisition - make sure to use the real URL:
             obj = getattr(folder, m)
+            if not hasattr(obj, 'absolute_url'):
+                # Whoops!  Probly an acquired method, which we do *not* want
+                # to shadow (or people could create infinite recursions).
+                return '%s<font color="red"><sup>x</sup></font>' % m + e
             return '<a href="%s">%s</a>' % (obj.absolute_url(), m) + e
 
         # otherwise, provide a suitable creation link
