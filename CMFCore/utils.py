@@ -540,6 +540,21 @@ def _format_stx( text, level=1 ):
     html = CMFHtmlWithImages( doc, level )
     return html
 
+### Metadata Keyword splitter utilities
+import re, string, operator
+KEYSPLITRE = re.compile(r'[,;]')
+def keywordsplitter(headers,
+                    names=('Subject', 'Keywords',),
+                    splitter=KEYSPLITRE.split):
+    """ Splits keywords out of headers, keyed on names.  Returns list. """
+    out = []
+    for head in names:
+        keylist = splitter(headers.get(head, ''))
+        keylist = map(string.strip, keylist)
+        out.extend(filter(operator.truth, keylist))
+    return out
+    
+
 if 0:
     # Hopefully we can use this.
 
