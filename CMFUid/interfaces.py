@@ -27,6 +27,51 @@ from Products.CMFCore.interfaces.IOpaqueItems \
 class UniqueIdError(Exception): pass
 
 
+class IUniqueIdGenerator(Interface):
+    """Generate a unique id.
+    """
+    
+    def __call__():
+        """Return a unique id value.
+        """
+
+
+class IUniqueIdAnnotationManagement(Interface):
+    """Manage unique id annotations.
+    """
+    
+    def __call__(obj, id):
+        """Attach an unique id attribute of 'id' to the passed object.
+        
+        Return a unique id object implementing 'IUniqueIdAnnotation'.
+        """
+
+class IUniqueIdAnnotation(ICallableOpaqueItem, ICallableOpaqueItemEvents):
+    """Opaque unique id item handling adding, copying, and deletion events.
+    """
+    
+    def setUid(uid):
+        """Set the uid value the unique id annotation shall return.
+        """
+
+
+class IUniqueIdSet(Interface):
+    """(Un)register unique ids on objects.
+    """
+
+    def register(obj):
+        """Register the object and return the unique id generated for it.
+        
+        If the object is already registered, its unique id is returned 
+        anyway.
+        """
+
+    def unregister(obj):
+        """Remove the object from the indexes.
+        
+        UniqueIdError is raised if object was not registered previously.
+        """
+
 class IUniqueIdQuery(Interface):
     """Querying unique ids.
     """
@@ -55,86 +100,83 @@ class IUniqueIdQuery(Interface):
         If no object exist with the given unique id, a UniqueIdError is raised.
         """
 
+# This is the main API for playing with unique ids
+class IUniqueIdHandler(IUniqueIdSet, IUniqueIdQuery):
+    """Handle registering, querying unique ids and objects.
+    """
 
+# This is a secondary API enhancement
 class IUniqueIdBrainQuery(Interface):
     """Querying unique ids returning brains for efficiency sake.
+    
+    Returning a brain is more efficient than returning the object.
+    A brain usually exposes only parts of the object and should only 
+    be read from. 
+    
+    If the implementing class doesn't support returning a catalog 
+    brain it may fallback to return the object. To be entirely
+    compatible it must implement the (non existing) interface 
+    catalog brains implement.
     """
     
     def queryBrain(uid, default=None):
-        """Return the object with the given uid.
+        """Return the brain of object with the given uid.
         
-        If no object exist with the given unique id, the default value is 
-        returned.
-        
-        Returning a brain is more efficient than returning the object.
-        A brain usually exposes only parts of the object and should only 
-        be read from. 
-        
-        If the implementing class doesn't support returning a catalog 
-        brain it may fallback to return the object.
+        If no object exist with the given unique id, the default value
+        is returned.
         """
         
     def getBrain(uid):
         """Return a brain of the object with the given uid.
         
-        If no object exist with the given unique id, a UniqueIdError is raised.
-        
-        Returning a brain is more efficient than returning the object.
-        A brain usually exposes only parts of the object and should only 
-        be read from. 
-        
-        If the implementing class doesn't support returning a catalog 
-        brain it may fallback to return the object.
+        If no object exist with the given unique id, a UniqueIdError 
+        is raised.
         """
 
-
-class IUniqueIdSet(Interface):
-    """(Un)register unique ids on objects.
-    """
-
-    def register(obj):
-        """Register the object and return the unique id generated for it.
-        
-        If the object is already registered, its unique id is returned 
-        anyway.
-        """
-
-    def unregister(obj):
-        """Remove the object from the indexes.
-        
-        UniqueIdError is raised if object was not registered previously.
-        """
-
-# Main API for playing with unique ids
-class IUniqueIdHandler(IUniqueIdSet, IUniqueIdQuery, IUniqueIdBrainQuery):
-    """Handle registering, querying unique ids and objects.
-    """
-
-
-class IUniqueIdGenerator(Interface):
-    """Generate a unique id.
+# This is another secondary API enhancement
+class IUniqueIdUnrestrictedQuery(Interface):
+    """Querying unique ids unrestricted.
+    
+    The below methods return not yet effective and already expired 
+    objects regardless of the roles the caller has.
+    
+    CAUTION: Care must be taken not to open security holes by exposing 
+    this to non authorized callers!
+    
+    Returning a brain is more efficient than returning the object.
+    A brain usually exposes only parts of the object and should only 
+    be read from. 
+    
+    If the implementing class doesn't support returning a catalog 
+    brain it may fallback to return the object. To be entirely
+    compatible it must implement the (non existing) interface 
+    catalog brains implement.
     """
     
-    def __call__():
-        """Return a unique id value.
-        """
-
-
-class IUniqueIdAnnotation(ICallableOpaqueItem, ICallableOpaqueItemEvents):
-    """Opaque unique id item handling adding, copying, and deletion events.
-    """
-    
-    def setUid(uid):
-        """Set the uid value the unique id annotation shall return.
-        """
-
-
-class IUniqueIdAnnotationManagement(Interface):
-    """Manage unique id annotations.
-    """
-    
-    def __call__(obj, id):
-        """Attach an unique id attribute of 'id' to the passed object.
+    def unrestrictedQueryObject(uid, default=None):
+        """Return the object with the given uid.
         
-        Return a unique id object implementing 'IUniqueIdAnnotation'.
+        If no object exist with the given unique id, the default value 
+        is returned.
+        """
+        
+    def unrestrictedGetObject(uid):
+        """Return a brain of the object with the given uid.
+        
+        If no object exist with the given unique id, a UniqueIdError 
+        is raised.
+        """
+
+    def unrestrictedQueryBrain(uid, default=None):
+        """Return the brain of the object with the given uid.
+        
+        If no object exist with the given unique id, the default value
+        is returned.
+        """
+        
+    def unrestrictedGetBrain(uid):
+        """Return a brain of the object with the given uid.
+        
+        If no object exist with the given unique id, a UniqueIdError 
+        is raised.
         """
