@@ -56,8 +56,11 @@
   <th align="right"> Collector Email
   </th>
   <td colspan="2"
-      tal:define="email python: getattr(here, 'email',
-                                        getattr(member, 'email', ''))">
+      tal:define="getpropemail python: hasattr(member, 'getProperty')
+                                       and member.getProperty('email', '');
+                  attremail python: getattr(member, 'email', '');
+                  email python: getattr(here, 'email', 
+                                        getpropemail or attremail)">
           <input type="text" name="email" size=30
                  value="EMAIL"
                  tal:attributes="value email">
