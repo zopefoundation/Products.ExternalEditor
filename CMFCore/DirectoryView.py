@@ -38,7 +38,7 @@ _dtmldir = path.join( package_home( globals() ), 'dtml' )
 __reload_module__ = 0
 
 # Ignore version control subdirectories
-ignore = ('CVS', 'SVN', '.', '..')
+ignore = ('CVS', 'SVN', '.', '..', '.svn')
 
 # and special names.
 def _filtered_listdir(path):
