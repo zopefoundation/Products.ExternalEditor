@@ -1,0 +1,145 @@
+External Editor Change Log
+
+    - Added the man page from the Debian distro. Thanks go out to
+      Federico Sevilla III and Andreas Tille
+
+  11/02/02 - 0.6 Release
+
+    - Built Windows helper app using Python 2.2.2 and PythonWin 148.
+
+    - The externalEdit_ object now accepts a path argument to the object to
+      edit, allowing URLs like: http://zope/externalEdit_?path=/some/object.
+      This allows external editor to play better with applications making use
+      of traversal magic of their own. Thanks to Tres Seaver.
+
+    - Fixed NameError bug in unlock retry code. Thanks to Federico Sevilla III.
+
+    - Added a workaround for non-compliant SSL servers. The software now
+      silently ignores "EOF occurred in violation of protocol" errors coming
+      from httplib. Thanks to Christopher Deckard.
+
+    - Removed stderr writes to cure "Invalid File Descriptor" errors on
+      Windows. Thanks to Martijn Peters.
+
+    - Added Photoshop plugin (win32)
+
+    - Added HomeSite plugin (win32)
+
+    - Added win32 editor plugin support for the helper application.
+
+  8/19/02 - 0.5 Release
+
+    - Added patch for Zope find template so that you can use external editor
+      directly from find results in the ZMI. Thanks to Jim Washington.
+
+    - Factored out external editor link generator. Product now registers
+      a global method "externalEditLink_" which can be called to generate
+      the external editor icon link for any object.
+
+    - External editing is now governed by the "Use external editor" permission
+      to allow non-managers to use it. Users must also have the permissions to
+      edit/modify the objects they edit, plus do WebDAV locking if desired.
+      Thanks to Reineke and others.
+
+    - Unix editor command line parsing is much more robust now and properly
+      handles quoted arguments. You can also specify the "$1" placeholder in the
+      editor command to denote where the content file name is inserted. If
+      omitted it is appended to the end of the command line. "%1" continues to
+      work similarly for Windows. Thanks to Marc St-Jean.
+
+    - Fixed bug editing large (chunked) files and images. External editor now
+      streams their data properly to the client. Thanks to all the users who
+      reported various symptoms of this bug.
+
+    - Fixed bug editing objects inside a Squishdot site. Thanks to Kevin Salt.
+
+    - Added the capability to borrow exising DAV locks. This allows external
+      editor to play well with other systems using locks, such as CMFStaging. A
+      new configuration flag, always_borrow_locks can be set to suppress the
+      borrow lock warning dialog when editing.
+
+    - Fixed auth bug when product was used with mysqlUserFolder. Thanks to
+      ViNiL.
+
+  6/30/02 - 0.4.2 Release (affects win32 binary only)
+
+    - Added SSL support to Windows binary package. Thanks to Federico 
+      Sevilla III
+
+  6/29/02 - 0.4.1 Release
+
+    - Fixed dangling dav lock bug on fatal errors. Thanks to Marc St-Jean.
+
+    - Fixed content_type bug, now checks if it is callable. Thanks to Arnaud 
+      Bienvenu.
+
+    - Fixed bug with editing binary data on Windows. Thanks to Eric Kamm.
+
+    - Fixed bug setting the editor on Posix platforms.
+
+  6/24/02 - 0.4 Release
+
+    - Added --version command line argument
+
+    - Made manage_FTPget the default source for the editable content, instead
+      of document_src which was broken for CMF Wiki Pages.
+
+    - Fixed Windows "body_file" bug.
+
+    - Added binary build support for Windows using py2exe and Inno setup.
+
+    - Fixed Windows config file locator. It now looks in the program directory
+      and then the user's home directory (if specified)
+
+    - Fixed bug in Windows registry editor lookup.
+
+  6/16/02 - 0.3 Release
+
+    - Improved behavior when saving after lock attempts fail.
+
+    - Now works on Windows (applause) using Pythonwin. Much overall
+      refactoring to abstract process control. Thanks to Oliver Deckmyn,
+      Gabriel Genellina and Arno Gross for testing, patches and suggestions.
+
+    - Added "temp_dir" configuration option for specifying a different
+      temp file directory then the OS default. Also further improved 
+      temp file name generation.
+
+    - Added support for domain specific configuration options.
+
+    - Fixed trailing newline bug in encoded auth data coming from
+      CookieCrumbler. Thanks to Harald Koschinski.
+
+    - You can now pass command line arguments to the editor in the config file,
+      or wrap the editor in an xterm without using a shell script.
+      
+    - Rewrote "Editor did not launch" error message so it makes more sense.
+
+    - Fixed https detection bug. External editor is now tested and working with
+      https. Many thanks to Hans-Dieter Stich and Martin Grönemeyer for their 
+      assistance and ideas.
+
+    - Made it possible to edit objects that are methods of ZClasses. Thanks to
+      Jim Washington
+
+    - Refactored link generation code in manage_main so that it uses
+      the parent's absolute_url rather than URL1. Thanks to
+      Jim Washington
+
+    - Removed implicit save in Configuration class destructor
+
+    - Added caching headers to prevent client-side caching of edit data.
+      Thanks to Gabriel Genellina for pointing this out.
+
+    - Added improved support for editing CMF documents
+
+    - Eliminated spurious "Editor did not launch" errors on short sessions
+      or when other errors occurred.
+
+  5/16/02 - 0.2 Release
+
+    - Fixed product uninstallation bug
+
+  5/15/02 - 0.1
+
+    - Initial release
