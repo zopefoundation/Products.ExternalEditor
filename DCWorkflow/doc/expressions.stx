@@ -1,0 +1,23 @@
+
+Expressions in DCWorkflow use the same convention as DTML expressions.
+The underscore character provides access to certain Python modules and
+builtins.  In addition to what is provided by DTML expressions, the
+following names are also available.
+
+- All scripts defined using the 'Scripts' tab.
+
+- 'object' is the object being modified by workflow.
+
+- 'workflow' is the workflow definition object.
+
+- 'transition' is the ID of the transition being executed.
+
+- 'new_state' is the ID of the destination state of the transition.
+
+- 'kwargs' is the keyword arguments passed to the doActionFor() method.
+
+- 'getHistory', a function that returns a copy of the object's workflow
+   history.
+
+- All status variables, including the current state.
+

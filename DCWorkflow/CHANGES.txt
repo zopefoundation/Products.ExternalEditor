@@ -1,0 +1,13 @@
+Version 0.2
+
+- As suggested by Seb Bacon, simplified by making transitions trigger on
+their own IDs.  Thanks!
+ 
+- Added script invocation just before execution of a transition.  Scripts
+are passed an expression namespace as the first parameter.
+ 
+- Replaced the name "action_or_method" with "transition".
+
+Version 0.1
+
+- Initial release.
