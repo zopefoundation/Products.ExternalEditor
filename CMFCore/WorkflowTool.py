@@ -577,29 +577,6 @@ class WorkflowTool(UniqueObject, Folder, ActionProviderBase):
                 res.append(wf)
         return res
 
-    security.declarePrivate('wrapWorkflowMethod')
-    def wrapWorkflowMethod(self, ob, method_id, func, args, kw):
-
-        """ To be invoked only by WorkflowCore.
-            Allows a workflow definition to wrap a WorkflowMethod.
-        """
-        wf = None
-        wfs = self.getWorkflowsFor(ob)
-        if wfs:
-            for w in wfs:
-                if (hasattr(w, 'isWorkflowMethodSupported')
-                    and w.isWorkflowMethodSupported(ob, method_id)):
-                    wf = w
-                    break
-        else:
-            wfs = ()
-        if wf is None:
-            # No workflow wraps this method.
-            return func(*args, **kw)
-        return self._invokeWithNotification(
-            wfs, ob, method_id, wf.wrapWorkflowMethod,
-            (ob, method_id, func, args, kw), {})
-
     #
     #   Helper methods
     #

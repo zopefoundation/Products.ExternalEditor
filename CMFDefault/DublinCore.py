@@ -468,7 +468,6 @@ class DefaultDublinCoreImpl( PropertyManager ):
                    , rights=''
                     ):
         """
-        used to be:  editMetadata = WorkflowAction(_editMetadata)
         Need to add check for webDAV locked resource for TTW methods.
         """
         # as per bug #69, we cant assume they use the webdav

@@ -152,7 +152,6 @@ class Document(PortalContent, DefaultDublinCoreImpl):
             , safety_belt=''
             ):
         """
-        *used to be WorkflowAction(_edit)
         To add webDav support, we need to check if the content is locked, and if
         so return ResourceLockedError if not, call _edit.
 

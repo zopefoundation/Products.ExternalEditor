@@ -56,16 +56,6 @@ Initiated by user action
 </tr>
 
 <tr>
-<th></th>
-<td>
-<dtml-let checked="trigger_type==2 and 'checked' or ' '">
-<input type="radio" name="trigger_type" value="2" &dtml-checked; />
-Initiated by WorkflowMethod
-</dtml-let>
-</td>
-</tr>
-
-<tr>
 <th align="left">Script (before)</th>
 <td>
 <select name="script_name">

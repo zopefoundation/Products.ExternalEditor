@@ -22,7 +22,6 @@ from AccessControl import ClassSecurityInfo
 from webdav.Lockable import ResourceLockedError
 
 from Products.CMFCore.PortalContent import PortalContent
-from Products.CMFCore.WorkflowCore import WorkflowAction
 from Products.CMFCore.utils import keywordsplitter
 from Products.CMFCore.utils import contributorsplitter
 
@@ -151,8 +150,6 @@ class Link( PortalContent
         """ Update and reindex. """
         self._edit( remote_url )
         self.reindexObject()
-
-    edit = WorkflowAction( edit )
 
     security.declareProtected(View, 'SearchableText')
     def SearchableText(self):

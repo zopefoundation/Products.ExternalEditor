@@ -31,7 +31,6 @@ from Expression import Expression
 
 TRIGGER_AUTOMATIC = 0
 TRIGGER_USER_ACTION = 1
-TRIGGER_WORKFLOW_METHOD = 2
 
 
 class TransitionDefinition (SimpleItem):

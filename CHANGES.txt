@@ -6,4 +6,4 @@ After 1.5.0beta
 
   Bugs Fixed
 
-    - Bug
+    - Workflow: Removed deprecated WorkflowMethod machinery.

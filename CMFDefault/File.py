@@ -21,7 +21,6 @@ from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
 
 from Products.CMFCore.PortalContent import PortalContent
-from Products.CMFCore.WorkflowCore import WorkflowAction
 
 from DublinCore import DefaultDublinCoreImpl
 from permissions import View
@@ -217,8 +216,6 @@ class File( OFS.Image.File
         """ Update and reindex. """
         self._edit( precondition, file )
         self.reindexObject()
-
-    edit = WorkflowAction(edit)
 
     security.declareProtected(View, 'download')
     def download(self, REQUEST, RESPONSE):

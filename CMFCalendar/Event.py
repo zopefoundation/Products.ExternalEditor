@@ -21,7 +21,6 @@ from AccessControl import ClassSecurityInfo
 from webdav.Lockable import ResourceLockedError
 
 from Products.CMFCore.PortalContent import PortalContent
-from Products.CMFCore.WorkflowCore import WorkflowAction
 from Products.CMFCore.utils import keywordsplitter
 from Products.CMFCore.utils import contributorsplitter
 
@@ -249,7 +248,6 @@ class Event(PortalContent, DefaultDublinCoreImpl):
         if event_url is not None:
             self.event_url = event_url
         self.reindexObject()
-    edit = WorkflowAction(edit) 
 
     security.declarePublic('buildTimes')
     def buildTimes(self):

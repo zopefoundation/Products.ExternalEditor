@@ -14,11 +14,6 @@
 
 $Id$
 """
-from Acquisition import aq_base
-from MethodObject import Method
-
-from utils import getToolByName
-
 
 class WorkflowException( Exception ):
 
@@ -54,39 +49,3 @@ class ObjectMoved( Exception ):
 
     def getNewObject(self):
         return self._ob
-
-
-class WorkflowMethod( Method ):
-
-    """ Wrap a method to workflow-enable it.
-    """
-    _need__name__=1
-
-    def __init__(self, method, id=None, reindex=1):
-        self._m = method
-        if id is None:
-            id = method.__name__
-        self._id = id
-        # reindex ignored since workflows now perform the reindexing.
-
-    def __call__(self, instance, *args, **kw):
-
-        """ Invoke the wrapped method, and deal with the results.
-        """
-        wf = getToolByName(instance, 'portal_workflow', None)
-        if wf is None or not hasattr(wf, 'wrapWorkflowMethod'):
-            # No workflow tool found.
-            try:
-                res = self._m(instance, *args, **kw)
-            except ObjectDeleted, ex:
-                res = ex.getResult()
-            else:
-                if hasattr(aq_base(instance), 'reindexObject'):
-                    instance.reindexObject()
-        else:
-            res = wf.wrapWorkflowMethod(instance, self._id, self._m,
-                                        (instance,) + args, kw)
-        return res
-
-# Backward compatibility.
-WorkflowAction = WorkflowMethod

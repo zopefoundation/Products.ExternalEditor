@@ -36,7 +36,7 @@ from utils import _getNodeAttributeBoolean
 from utils import _coalesceTextNodeChildren
 from utils import _extractDescriptionNode
 
-TRIGGER_TYPES = ( 'AUTOMATIC', 'USER', 'WORKFLOW_METHOD' )
+TRIGGER_TYPES = ( 'AUTOMATIC', 'USER' )
 
 #
 #   Configurator entry points
