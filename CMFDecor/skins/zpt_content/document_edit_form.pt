@@ -6,8 +6,8 @@
 <div class="Desktop">
 
 
-<span tal:replace="request/message"
-   tal:condition="request/message|nothing"><hr></span>
+<div class="DesktopStatusBar" tal:content="request/portal_status_message|nothing">
+ <hr></div>
 
 <div class="Document">
 

@@ -19,9 +19,9 @@
 	   <p> You must submit a valid email address. This address will be used to send you your randomly-generated password.  
 	   Once you have logged in with this password, you may change it to anything you like.</p>
 	   </span>
-<div class="ErrorMessage"
-     tal:replace="request/error"
-     tal:condition="error|nothing"><hr>
+<div class="error"
+     tal:replace="request/error|nothing">
+     <hr>
 </div>
 <form action="register" method="POST">
 
@@ -67,7 +67,7 @@
   </td>
  </tr>
  <tr>
-  <th> Mail Password? 
+  <th> Mail Password?
   </th>
   <td>
    <input type="checkbox" name="mail_me" size="30" id="cb_mailme" />
@@ -85,9 +85,11 @@
  </tr>
 </table>
 </form>
+
 </div>
 </div>
 </div>
 </div>
+
 </body>
 </html>
