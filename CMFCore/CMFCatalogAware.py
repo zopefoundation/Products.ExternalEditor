@@ -164,9 +164,8 @@ class CMFCatalogAware(Base):
             Add self to the catalog.
             (Called when the object is created or moved.)
         """
-        if aq_base(container) is not aq_base(self):
-            self.indexObject()
-            self.__recurse('manage_afterAdd', item, container)
+        self.indexObject()
+        self.__recurse('manage_afterAdd', item, container)
 
     def manage_afterClone(self, item):
         """
@@ -181,9 +180,8 @@ class CMFCatalogAware(Base):
             Remove self from the catalog.
             (Called when the object is deleted or moved.)
         """
-        if aq_base(container) is not aq_base(self):
-            self.__recurse('manage_beforeDelete', item, container)
-            self.unindexObject()
+        self.__recurse('manage_beforeDelete', item, container)
+        self.unindexObject()
 
     def __recurse(self, name, *args):
         """
