@@ -13,7 +13,8 @@
 Search results
 </div>
 
-<input type="submit" name="workspace_add:action" value="Add to workspace"
+<input type="submit" name="workspace_add_references:action"
+       value="Add to workspace"
        tal:condition="batch_info/total" />
 &nbsp;
 <input type="submit" name="workspace_view:action" value="Search again" />

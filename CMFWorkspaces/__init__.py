@@ -15,17 +15,28 @@ __doc__='''CMFWorkspaces Product Initialization
 $Id$'''
 __version__='$Revision$'[11:-2]
 
+import sys
+
 from Products.CMFCore import utils
 from Products.CMFCore.DirectoryView import registerDirectory
 
-import Workspace
+import Workspace, OrganizationTool
 
 
 registerDirectory('skins', globals())
 
+tools = (
+    OrganizationTool.OrganizationTool,
+    )
+
+
+this_module = sys.modules[ __name__ ]
+z_tool_bases = utils.initializeBasesPhase1(tools, this_module)
+
 
 def initialize(context):
 
+    utils.initializeBasesPhase2(z_tool_bases, context)
     context.registerBaseClass(Workspace.Workspace)
 
     ADD_FOLDERS_PERMISSION = 'Add portal folders'
@@ -36,6 +47,9 @@ def initialize(context):
         permission=ADD_FOLDERS_PERMISSION,
         extra_constructors=(Workspace.addWorkspace,),
         fti=Workspace.factory_type_information
-        ).initialize( context )
+        ).initialize(context)
 
+    utils.ToolInit('CMFWorkspaces Tool', tools=tools,
+                   product_name='CMFWorkspaces', icon='tool.gif',
+                   ).initialize(context)
 

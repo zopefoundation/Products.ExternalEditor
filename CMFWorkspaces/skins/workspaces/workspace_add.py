@@ -1,19 +1,9 @@
-##parameters=selected_items=(), RESPONSE=None
-##title=Add listed paths to a workspace.
+##parameters=type_name, RESPONSE
+##title=Redirect to the form for adding the given type.
 
-count = 0
-for path in selected_items:
-    object = context.restrictedTraverse(path)
-    context.addReference(object)
-    count += 1
-
-if count == 1:
-    message = "Added+1+reference."
+if not type_name:
+    url = context.absolute_url() + '/workspace_view'
 else:
-    message = "Added+%d+references." % count
+    url = context.portal_organization.getAddFormURL(type_name)
 
-if RESPONSE is not None:
-    RESPONSE.redirect("%s/%s?portal_status_message=%s" %
-                      (context.absolute_url(),
-                       'workspace_view',
-                       message))
+RESPONSE.redirect(url)

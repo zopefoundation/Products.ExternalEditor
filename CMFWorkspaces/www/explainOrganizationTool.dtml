@@ -1,0 +1,10 @@
+<dtml-var manage_page_header>
+<dtml-var manage_tabs>
+
+<h3> <code>portal_organization</code> Tool </h3>
+
+<p> This tool specifies locations for new content.  Workspaces use this tool
+    to display the list of addable content types.
+</p>
+
+<dtml-var manage_page_footer>

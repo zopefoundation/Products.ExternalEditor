@@ -27,6 +27,7 @@ $Id$
 
 import os
 
+from Acquisition import aq_inner, aq_parent
 from Globals import InitializeClass, DTMLFile
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from OFS.SimpleItem import SimpleItem
@@ -47,6 +48,8 @@ class OrganizationTool(UniqueObject, SimpleItem):
                      , { 'label': 'Placement', 'action': 'manage_placement' },
                      ) + SimpleItem.manage_options
 
+    _types = {}  # type name -> (location, skin name)
+
     #
     #   ZMI methods
     #
@@ -60,22 +63,53 @@ class OrganizationTool(UniqueObject, SimpleItem):
     #   'OrganizationTool' interface methods
     #
 
-    security.declarePublic('listAddableTypes' )
+    security.declarePublic('listAddableTypes')
     def listAddableTypes(self):
-        """Returns the list of types that can be added without specifying
-        a location beforehand."""
-        return ('Document', 'File')
+        """Returns a list of types."""
+        return self._types.keys()
 
 
-    security.declarePublic('getAddFormURLs' )
-    def getAddFormURLs(self):
-        """Returns an object that maps type name to add form URL.
+    security.declarePublic('getAddFormURL')
+    def getAddFormURL(self, type_name):
+        """Returns the URL to visit to add an object of the given type.
         """
         base = aq_parent(aq_inner(self)).absolute_url()
-        return {
-            'Document': base + '/Documents/document_add_form',
-            'File': base + '/Files/file_add_form',
-            }
+        location, skin_name = self._types[str(type_name)]
+        if not location.startswith('/'):
+            location = '/' + location
+        if not location.endswith('/'):
+            location = location + '/'
+        return base + location + skin_name
+
+
+    security.declareProtected(ManagePortal, 'getLocationInfo')
+    def getLocationInfo(self):
+        """Returns the list of types, locations, and skin names.
+        """
+        base = aq_parent(aq_inner(self)).absolute_url()
+        res = []
+        items = self._types.items()
+        items.sort()
+        for key, (location, skin_name) in items:
+            res.append({'type': key,
+                        'location': location,
+                        'skin_name': skin_name,})
+        return res
+
+
+    security.declareProtected(ManagePortal, 'setLocationInfo')
+    def setLocationInfo(self, info, RESPONSE=None):
+        """Sets the list of types, locations, and skin names.
+        """
+        types = {}
+        for r in info:
+            t = str(r.type)
+            if t:
+                types[t] = (str(r.location), str(r.skin_name))
+        self._types = types
+        if RESPONSE is not None:
+            RESPONSE.redirect(self.absolute_url() + '/manage_placement?' +
+                              'manage_tabs_message=Saved+changes.')
 
 
 InitializeClass(OrganizationTool)
