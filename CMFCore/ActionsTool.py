@@ -14,6 +14,7 @@
 """Basic action list tool.
 
 $Id$
+"""
 __version__='$Revision$'[11:-2]
 
 

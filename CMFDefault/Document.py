@@ -24,6 +24,7 @@ from Products.CMFCore.PortalContent import NoWL, ResourceLockedError
 from Products.CMFCore import CMFCorePermissions
 from Products.CMFCore.WorkflowCore import WorkflowAction
 from Products.CMFCore.utils import _format_stx, keywordsplitter
+from DefaultDublinCoreImpl import DefaultDublinCoreImpl
 from utils import parseHeadersBody, formatRFC822Headers
 from utils import SimpleHTMLParser, bodyfinder, _dtmldir
 
