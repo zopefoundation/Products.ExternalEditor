@@ -17,17 +17,20 @@ $Id$
 
 import Globals
 from AccessControl import ClassSecurityInfo, getSecurityManager
-from OFS.DTMLMethod import DTMLMethod, decapitate, guess_content_type
 from AccessControl.DTML import RestrictedDTML
 from AccessControl.Role import RoleManager
 from OFS.Cache import Cacheable
+from OFS.DTMLMethod import DTMLMethod, decapitate, guess_content_type
 
-from utils import _dtmldir, _setCacheHeaders
+from DirectoryView import registerFileExtension
+from DirectoryView import registerMetaType
+from FSObject import FSObject
 from permissions import FTPAccess
 from permissions import View
 from permissions import ViewManagementScreens
-from DirectoryView import registerFileExtension, registerMetaType, expandpath
-from FSObject import FSObject
+from utils import _dtmldir
+from utils import _setCacheHeaders
+from utils import expandpath
 
 
 _marker = []  # Create a new marker object.

@@ -3,30 +3,25 @@
 # This Software is released under the MIT License:
 # http://www.opensource.org/licenses/mit-license.html
 # See license.txt for more details.
-#
-# $Id$
-
-""" (not yet)Customizable ZSQL methods that come from the filesystem.
+""" (not yet) Customizable ZSQL methods that come from the filesystem.
 
 $Id$
 """
 
 import Globals
 from AccessControl import ClassSecurityInfo
-from zLOG import LOG,ERROR
-
+from Acquisition import ImplicitAcquisitionWrapper
 from Products.ZSQLMethods.SQL import SQL
+from zLOG import LOG, ERROR
 
-from permissions import View
-from permissions import ViewManagementScreens
 from DirectoryView import registerFileExtension
 from DirectoryView import registerMetaType
-from DirectoryView import expandpath
 from FSObject import FSObject
-
+from permissions import View
+from permissions import ViewManagementScreens
 from utils import _dtmldir
+from utils import expandpath
 
-import Acquisition
 
 class FSZSQLMethod(SQL, FSObject):
     """FSZSQLMethods act like Z SQL Methods but are not directly
@@ -44,13 +39,13 @@ class FSZSQLMethod(SQL, FSObject):
 
     # Use declarative security
     security = ClassSecurityInfo()
-    
+
     security.declareObjectProtected(View)
-    
+
     # Make mutators private
     security.declarePrivate('manage_main','manage_edit','manage_advanced','manage_advancedForm')
     manage=None
-    
+
     security.declareProtected(ViewManagementScreens, 'manage_customise')
     manage_customise = Globals.DTMLFile('custzsql', _dtmldir)
 
@@ -95,16 +90,16 @@ class FSZSQLMethod(SQL, FSObject):
             parameters[pair[0].strip().lower()]=pair[1].strip()
 
         # check for required an optional parameters
-        try:            
+        try:
             title =         parameters.get('title','')
             connection_id = parameters.get('connection id',parameters['connection_id'])
             arguments =     parameters.get('arguments','')
             max_rows =      parameters.get('max_rows',1000)
             max_cache =     parameters.get('max_cache',100)
-            cache_time =    parameters.get('cache_time',0)            
+            cache_time =    parameters.get('cache_time',0)
         except KeyError,e:
             raise ValueError,"The '%s' parameter is required but was not supplied" % e
-        
+
         self.manage_edit(title,
                          connection_id,
                          arguments,
@@ -123,11 +118,10 @@ class FSZSQLMethod(SQL, FSObject):
         # Provide an opportunity to update the properties.
         def __of__(self, parent):
             try:
-                self = Acquisition.ImplicitAcquisitionWrapper(self, parent)
+                self = ImplicitAcquisitionWrapper(self, parent)
                 self._updateFromFS()
                 return self
             except:
-                from zLOG import LOG, ERROR
                 import sys
                 LOG('FS Z SQL Method',
                     ERROR,
