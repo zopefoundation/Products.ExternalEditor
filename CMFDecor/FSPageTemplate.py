@@ -158,6 +158,11 @@ class FSPageTemplate(FSObject, Script, PageTemplate):
 
     security.declareProtected(View, '__call__')
 
+    def pt_macros(self):
+        # Tie in on an opportunity to auto-reload
+        self._updateFromFS()
+        return FSPageTemplate.inheritedAttribute('pt_macros')(self)
+
     def pt_render(self, source=0, extra_context={}):
         # Tie in on an opportunity to auto-reload
         self._updateFromFS()
