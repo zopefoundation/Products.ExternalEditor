@@ -166,9 +166,9 @@
 
             <span tal:condition="not: numcmts"
                   tal:replace="nothing">
-            </span><span tal:condition="item/listSupporters|nothing">,
+            </span><span tal:condition="item/assigned_to|nothing">,
               Assigned: 
-              <span tal:content="python: ', '.join(item.listSupporters())">
+              <span tal:content="python: ', '.join(item.assigned_to)">
                 SUPPORTERS
               </span>
             </span>
@@ -263,7 +263,7 @@
             <td align="center">
               <select name="supporters:list:ignore_empty" multiple size="SIZE"
                       tal:define="values python:
-                                         ordered(uniquevals('listSupporters'),
+                                         ordered(uniquevals('assigned_to'),
                                                  here.supporters)"
                       tal:attributes="size python: min(max(len(values), 3),
                                                        5)">
@@ -299,7 +299,7 @@
           <tr>
             <td align="center">
               <select name="topics:list:ignore_empty" multiple size="SIZE"
-                    tal:define="values python: ordered(uniquevals('getTopic'),
+                    tal:define="values python: ordered(uniquevals('topic'),
                                                        here.topics)"
                     tal:attributes="size python: min(max(len(values), 3), 5)">
                 <option value=""
@@ -315,7 +315,7 @@
             <td align="center">
               <select name="classifications:list:ignore_empty" multiple size="SIZE"
                       tal:define="values python: 
-                                         ordered(uniquevals('getClassification'),
+                                         ordered(uniquevals('classification'),
                                                  here.classifications)"
                       tal:attributes="size python: min(max(len(values), 3),
                                                        5)">
@@ -333,7 +333,7 @@
             <td align="center">
               <select name="importances:list:ignore_empty" multiple size="SIZE"
                       tal:define="values python: 
-                                         ordered(uniquevals('getImportance'),
+                                         ordered(uniquevals('importance'),
                                                  here.importances)"
                       tal:attributes="size python: min(max(len(values), 3), 
                                                        5)">

@@ -172,38 +172,48 @@ class Collector(SkinnedFolder):
         return str(lastid)
 
     security.declareProtected(AddCollectorIssue, 'add_issue')
-    def add_issue(self, id=None, title=None, description=None):
+    def add_issue(self,
+                  title=None,
+                  description=None,
+                  security_related=None,
+                  submitter_name=None,
+                  submitter_email=None,
+                  kibitzers=None,
+                  topic=None,
+                  importance=None,
+                  classification=None,
+                  version_info=None,
+                  assignees=None,
+                  file=None, fileid=None, filetype=None):
         """Create a new collector issue."""
-        if id is None:
-            id = self.new_issue_id()
-
-        self._setObject( id, CollectorIssue( id
-                                           , title=title
-                                           , description=description
-                                           ) )
-        issue = getattr( self, id )
-        return id, issue
+        id = self.new_issue_id()
+        submitter_id = str(getSecurityManager().getUser())
+        
+        err = addCollectorIssue(self,
+                                id,
+                                title=title,
+                                description=description,
+                                submitter_id=submitter_id,
+                                submitter_name=submitter_name,
+                                submitter_email=submitter_email,
+                                kibitzers=kibitzers,
+                                topic=topic,
+                                classification=classification,
+                                security_related=security_related,
+                                importance=importance,
+                                version_info=version_info,
+                                assignees=assignees,
+                                file=file, fileid=fileid, filetype=filetype)
+        return id, err
 
 
     security.declareProtected(ManageCollector, 'edit')
-<<<<<<< Collector.py
-    def edit(self,
-             title=None,
-             description=None,
-             abbrev=None,
-             email=None,
-             managers=None,
-             supporters=None,
-             dispatching=None,
-=======
     def edit(self, title=None, description=None,
              abbrev=None, email=None,
              managers=None, supporters=None, dispatching=None,
              participation=None,
->>>>>>> 1.26
              state_email=None,
-             topics=None,
-             classifications=None,
+             topics=None, classifications=None,
              importances=None,
              version_info_spiel=None):
 

@@ -186,7 +186,7 @@ class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
         user = _getAuthenticatedUser(self)
         kw[ 'allowedRolesAndUsers' ] = self._listAllowedRolesAndUsers( user )
 
-        if 0 and not _checkPermission(
+        if not _checkPermission(
             CMFCorePermissions.AccessInactivePortalContent, self ):
             base = aq_base( self )
             now = DateTime()
