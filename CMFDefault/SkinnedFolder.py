@@ -145,6 +145,9 @@ class SkinnedFolder( PortalFolder ):
         else:
             return view()
 
+    security.declareProtected( CMFCorePermissions.View, 'view' )
+    view = __call__
+
     index_html = None  # This special value informs ZPublisher to use __call__
 
     security.declareProtected( CMFCorePermissions.View, 'Creator' )
