@@ -109,6 +109,7 @@ class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
         #   Return a list of ( index_name, type ) pairs for the initial
         #   index set.
         #   Creator is deprecated and may go away, use listCreators!
+        #   meta_type is deprecated and may go away, use portal_type!
         return ( ('Title', 'TextIndex')
                , ('Subject', 'KeywordIndex')
                , ('Description', 'TextIndex')

@@ -180,6 +180,8 @@ CMF 1.5alpha (unreleased)
 
   Bug Fixes
 
+    - CatalogTool: Marked the 'meta_type' index as deprecated.
+
     - PortalFolder: Marked the 'spec' argument as deprecated.
       Use the 'filter' argument with 'portal_type' instead for contentItems(),
       contentIds(), contentValues() and listFolderContents().
