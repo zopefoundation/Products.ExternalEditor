@@ -23,7 +23,7 @@ import time, random, md5, socket
 
 from BTrees.Length import Length
 
-from Globals import InitializeClass, Persistent
+from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
 from Acquisition import Implicit, aq_base, aq_parent
 
