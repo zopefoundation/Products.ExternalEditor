@@ -307,15 +307,20 @@ class SkinsTool(UniqueObject, SkinsContainer, PortalFolder):
                 cookie = req.cookies.get(self.request_varname, None)
                 if cookie != mskin:
                     resp = req.RESPONSE
-                    expires = (DateTime('GMT') + 365).rfc822()
-                    resp.setCookie(self.request_varname, mskin,
-                                   path='/', expires=expires)
+                    # *Don't* make the cookie persistent!
+                    resp.setCookie( self.request_varname, mskin, path='/' )
                     # Ensure updateSkinCookie() doesn't try again
                     # within this request.
                     req.cookies[self.request_varname] = mskin
                     req[self.request_varname] = mskin
                     return 1
         return 0
+
+    security.declareProtected( 'View', 'clearSkinCookie' )
+    def clearSkinCookie(self):
+        req = self.REQUEST
+        resp = req.RESPONSE
+        resp.expireCookie( self.request_varname, path='/' )
 
     security.declareProtected(ManagePortal, 'addSkinSelection')
     def addSkinSelection(self, skinname, skinpath, test=0, make_default=0):

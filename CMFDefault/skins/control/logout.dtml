@@ -1,2 +1,5 @@
-<dtml-call "REQUEST['RESPONSE'].expireCookie('__ac', path='/')">
-<dtml-call "REQUEST['RESPONSE'].redirect(URL1+'/logged_out')">
+<dtml-if portal_skins>
+  <dtml-call expr="portal_skins.clearSkinCookie()">
+</dtml-if>
+<dtml-call expr="REQUEST['RESPONSE'].expireCookie('__ac', path='/')">
+<dtml-call expr="REQUEST['RESPONSE'].redirect(URL1+'/logged_out')">
