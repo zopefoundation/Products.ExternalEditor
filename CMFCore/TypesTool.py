@@ -458,7 +458,7 @@ class FactoryTypeInformation (TypeInformation):
         return (m is not None)
 
     security.declarePublic('constructInstance')
-    def constructInstance( self, container, id ):
+    def constructInstance( self, container, id, *args, **kw ):
         """
         Build a "bare" instance of the appropriate type in
         'container', using 'id' as its id.  Return the URL
@@ -470,7 +470,7 @@ class FactoryTypeInformation (TypeInformation):
         if m is None:
             raise 'Unauthorized', ('Cannot create %s' % self.id)
         id = str(id)
-        m(id=id)
+        apply(m, (id,) + args, kw)
         ob = container._getOb(id)
         if hasattr(ob, '_setPortalTypeName'):
             ob._setPortalTypeName(self.id)
@@ -512,7 +512,7 @@ class ScriptableTypeInformation( TypeInformation ):
         return 1
 
     security.declarePublic('constructInstance')
-    def constructInstance( self, container, id ):
+    def constructInstance( self, container, id, *args, **kw ):
         """
         Build a "bare" instance of the appropriate type in
         'container', using 'id' as its id.  Return the URL
@@ -526,7 +526,7 @@ class ScriptableTypeInformation( TypeInformation ):
         constructor = aq_base(constructor).__of__( container )
 
         id = str(id)
-        ob = constructor( container, id )
+        ob = apply(constructor, (container, id) + args, kw)
         if hasattr(ob, '_setPortalTypeName'):
             ob._setPortalTypeName(self.id)
         return '%s/%s' % ( ob.absolute_url(), self.immediate_view )
@@ -700,7 +700,8 @@ class TypesTool( UniqueObject, OFS.Folder.Folder ):
 
     
     security.declarePublic('constructContent')
-    def constructContent( self, type_name, container, id, RESPONSE=None ):
+    def constructContent( self, type_name, container, id,
+                          RESPONSE=None, *args, **kw ):
         """
             Build an instance of the appropriate content class in
             'container', using 'id'.
@@ -709,7 +710,8 @@ class TypesTool( UniqueObject, OFS.Folder.Folder ):
         if info is None:
             raise 'ValueError', 'No such content type: %s' % contentType
         
-        immediate_url = info.constructInstance( container, id )
+        immediate_url = apply(info.constructInstance,
+                              (container, id) + args, kw)
 
         if RESPONSE is not None:
             RESPONSE.redirect( immediate_url )
