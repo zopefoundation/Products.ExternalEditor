@@ -81,7 +81,7 @@ class PortalFolderTests( SecurityTest ):
         try: root._delObject('test')
         except AttributeError: pass
         root._setObject( 'test', PortalFolder( 'test','' ) )
-    
+
     def test_deletePropagation( self ):
 
         test = self.root.test
@@ -199,7 +199,12 @@ class PortalFolderTests( SecurityTest ):
         assert 'foo' in catalog.uniqueValuesFor( 'id' )
         assert has_path( catalog._catalog, '/test/folder/sub/foo' )
 
-        folder.manage_renameObject( id='sub', new_id='new_sub' )
+        # WAAAA! must get _p_jar set
+        old, sub._p_jar = sub._p_jar, self.root._p_jar
+        try:
+            folder.manage_renameObject( id='sub', new_id='new_sub' )
+        finally:
+            sub._p_jar = old
         assert 'foo' in catalog.uniqueValuesFor( 'id' )
         assert len( catalog ) == 1
         assert has_path( catalog._catalog, '/test/folder/new_sub/foo' )
@@ -217,8 +222,13 @@ class PortalFolderTests( SecurityTest ):
         sub2.all_meta_types.extend( sub2.all_meta_types )
         sub2.all_meta_types.extend( extra_meta_types() )
 
-        cookie = folder.manage_cutObjects( ids=['bar'] )
-        sub2.manage_pasteObjects( cookie )
+        # WAAAA! must get _p_jar set
+        old, bar._p_jar = sub._p_jar, self.root._p_jar
+        try:
+            cookie = folder.manage_cutObjects( ids=['bar'] )
+            sub2.manage_pasteObjects( cookie )
+        finally:
+            bar._p_jar = old
 
         assert 'foo' in catalog.uniqueValuesFor( 'id' )
         assert 'bar' in catalog.uniqueValuesFor( 'id' )
@@ -292,7 +302,6 @@ class PortalFolderTests( SecurityTest ):
         #
         #   Does copy / paste work?
         #
-        #import pdb; pdb.set_trace()
         test = self.root.test
 
         self.root._setObject( 'portal_types', TypesTool() )
@@ -313,6 +322,8 @@ class PortalFolderTests( SecurityTest ):
         sub3 = test.sub3
 
         sub1._setObject( 'dummy', DummyContent( 'dummy', catalog=1 ) )
+        dummy = sub1.dummy
+
         assert 'dummy' in sub1.objectIds()
         assert 'dummy' in sub1.contentIds()
         assert not 'dummy' in sub2.objectIds()
@@ -325,7 +336,6 @@ class PortalFolderTests( SecurityTest ):
 
         cookie = sub1.manage_copyObjects( ids = ( 'dummy', ) )
         # Waaa! force sub2 to allow paste of Dummy object.
-        #import pdb; pdb.set_trace()
         sub2.all_meta_types = []
         sub2.all_meta_types.extend( sub2.all_meta_types )
         sub2.all_meta_types.extend( extra_meta_types() )
@@ -340,12 +350,17 @@ class PortalFolderTests( SecurityTest ):
         assert has_path( catalog._catalog, '/test/sub2/dummy' )
         assert not has_path( catalog._catalog, '/test/sub3/dummy' )
 
-        cookie = sub1.manage_cutObjects( ids = ( 'dummy', ) )
-        # Waaa! force sub2 to allow paste of Dummy object.
-        sub3.all_meta_types = []
-        sub3.all_meta_types.extend( sub3.all_meta_types )
-        sub3.all_meta_types.extend( extra_meta_types() )
-        sub3.manage_pasteObjects( cookie )
+        # WAAAA! must get _p_jar set
+        old, dummy._p_jar = dummy._p_jar, self.root._p_jar
+        try:
+            cookie = sub1.manage_cutObjects( ids = ( 'dummy', ) )
+            # Waaa! force sub2 to allow paste of Dummy object.
+            sub3.all_meta_types = []
+            sub3.all_meta_types.extend( sub3.all_meta_types )
+            sub3.all_meta_types.extend( extra_meta_types() )
+            sub3.manage_pasteObjects( cookie )
+        finally:
+            dummy._p_jar = old
         assert not 'dummy' in sub1.objectIds()
         assert not 'dummy' in sub1.contentIds()
         assert 'dummy' in sub2.objectIds()
