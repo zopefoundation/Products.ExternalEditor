@@ -88,7 +88,7 @@ Chapter 3: Using the CMF
       To navigate the CMF site you'll normally use the site's normal
       navigation controls. As a CMF member you can navigate the site
       in the same way that anonymous site visitors do. You can use
-      navigational links and search facilities. 
+      navigational links and search facilities.
 
       In addition to normal site navigation, you can navigate the site
       using links in the action box.
@@ -107,29 +107,156 @@ Chapter 3: Using the CMF
 
       Content is arranged in folders. The objects you see in your
       member area are contained in your member folder. You can create
-      folders inside your member folder. In fact you can think of your
-      entire site as a collection of objects within folders.
+      sub-folders inside your member folder. In fact you can think of
+      the entire site as a collection of objects within folders. 
+
+    Using Folders
 
       Create a new folder in your member folder by clicking the
       "New..." button. Select "Folder" from the list of objects and
       type "myFolder" into the "ID" field. Then click the "Add"
-      button.
+      button. Next you'll be taken to a page where you can provide a
+      title and a description for your folder. Give the folder a title
+      of "example folder", and click the "Change" button. Zope should
+      inform you that the folder has been changed.
+
+      Now click the "My Stuff" link again. Notice that you now have a
+      folder named "myFolder" in your member area. Click on the
+      "myFolder" folder to see what's inside it. The folder is empty,
+      but it does have a link (shown as a folder with an up arrow)
+      which allows you to return to its parent (in this case your
+      member folder).
       
-      XXX
+      Now you know how to navigate between folders. Click on a folder
+      to enter it, and click on its parent link to return to the
+      enclosing folder.
 
     Cutting and Pasting
 
+      Return to your member area by clicking the "My Stuff"
+      link. Notice that the objects in your member folder have check
+      boxes next to them. These controls let you select
+      objects. Select the "myFolder" folder that you created in the
+      last section. Now click the "Copy" button. Zope should inform
+      you that it successfully copied the folder. Now click the
+      "Paste" button. You should now have a "copy_of_myFolder"
+      folder. Select the copied folder and click the "Rename"
+      button. Rename the folder to "anotherFolder" and click the "Ok"
+      button. 
+
+      When you copy and paste objects you get a complete copy of the
+      object including it's properties and sub-objects. For example,
+      notice that the copied folder has the same title as the
+      orginal. If the original folder had contained other objects, the
+      copy would have had copies of them as well.
+
+      The "Cut" button lets you copy an object and delete it from its
+      original location. Select the "anotherFolder" folder and
+      click "Cut". Zope tells you that the object has been cut, but it
+      does not disappear. Now enter the "myFolder" folder and click
+      the "Paste" button. The cut folder is now inside the "myFolder"
+      folder. Return to your member folder and notice that the cut
+      folder is now gone.
+
+      The "Delete" button allows you to remove an object without
+      copying it. Select the "myFolder" folder and click "Delete". The
+      folder disappears. You **cannot** click "Paste" to get the
+      folder back. You can however use "undo" to get the folder back.
+
     Undo
 
-    Content and Workflow Actions
+      You can recover from mistakes with the undo facility. Click the
+      "Undo" link. You'll be taken to a page that lists
+      transactions. Each transaction is a collection of changes made
+      by a person. Select the last transaction (it will have a name
+      like "/Site/folder_delete" and click the "Undo" button. Zope
+      will tell you that the transaction was undone. Now notice that
+      your folder has returned.
+
+      You can undo all kinds of actions, not just those related to
+      moving objects around. For example suppose you made a new item
+      public, and as a result it appeared on the site's home page. You
+      could make the new item private again, with undo. Undo reverts
+      all changes that are part of a transaction (for example changing
+      the news item's status as well as removing it from the home
+      page) at once.
+
+    Favorites
+
+      The "Favorites" feature lets you manage personal bookmarks for
+      your site. Favorites give you a way to quickly navigate your
+      site.
+
+      Enter the "myFolder" folder you created earlier in this
+      chapter. Then enter the contained "anotherFolder" folder. Now
+      click the "Add to Favorites" link. You just created a shortcut
+      to this folder. Notice that you now have a "My Favorites" link
+      in the action box. Return to your member folder by clicking the
+      "My Stuff" link. Notice that you now have a "Favorites" folder
+      in your member folder. This folder holds your book marks.
+
+      To visit a favorite, click the "My Favorites" link. You'll be
+      taken to your Favorites folder. In this folder you'll see links
+      to all your favorites. Favorites are automatically given Id's by
+      Zope which have names like "fav_1007078408". Click on the
+      favorite. You'll be taken to a page that shows the URL of your
+      favorite. To visit the favorite, click on the URL. Notice that
+      the URL in your browser's location box changes. In this case the
+      appearance of page doesn't differ from the appearance of your
+      home page.
+
+    Other Actions
+
+      In the next chapter you'll learn about the other actions that
+      you see in your action box.
+
+      XXX does more need to be elaborated here?
 
   Using Services
 
+    The CMF provides a many services to your site. Here you'll learn
+    about publicly available services: search and discussion. In the
+    next chapter you'll find out about management services such as
+    workflow.
+
     Searching
+
+      You can easily locate content on a CMF site using the search
+      service. All CMF content is searchable. The CMF provides easy to
+      use and powerful searching.
+
+      Type your username into the search box in the upper right corner
+      of the page and click the "Go" button. You should see your home
+      page document in the search results.
+
+      Now click the "search" link at the top of the page to perform an
+      advanced search. You'll be taken to a page where you can provide
+      detailed information about what you're looking for. All CMF
+      content is indexed using its full text as well as its metadata
+      (title, description, author, etc.) This allows you to perform
+      very precise searches.
+
+      The search service won't return content that you aren't
+      priveledged to see. In the next chapter you'll learn about how
+      access to content protected. The search results are tailored to
+      the user doing the search to ensure that security settings are
+      respected.
+
+      XXX is this true, or are private items simply not catalogged?
 
     Using Discussion
 
+      XXX doesn't seem to be turned on by default. The discussion tool
+      offers no knobs. Argh.
+
   Conclusion
 
+    The CMF is structured around two central ideas: content and
+    services. Content consists of objects located in folders. You can
+    perform actions on content using links in your actions box. You
+    can invoke services either through action box links or site likes
+    like search. In the next chapter you'll learn more about content.
   
-  
+
+
+  XXX how many screen shots should there be in this chapter?  
