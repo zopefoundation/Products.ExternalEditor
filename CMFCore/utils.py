@@ -596,8 +596,8 @@ def keywordsplitter( headers
 security.declarePublic('normalize')
 def normalize(p):
     # the weird .replace is needed to help normpath
-    # when deadling with Windows paths under *nix
-    return os_path.normcase(os_path.normpath(p.replace('\\','/')))
+    # when dealing with Windows paths under *nix
+    return os_path.normpath(p.replace('\\','/'))
 
 separators = (os.sep, os.altsep)
 

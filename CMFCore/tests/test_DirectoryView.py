@@ -82,8 +82,8 @@ class DirectoryViewPathTests( TestCase ):
     def test_registerDirectoryMinimalPath(self):
         from Products.CMFCore.DirectoryView import _dirreg
         from os.path import join
-        self.failUnless(_dirreg._directories.has_key(join('cmfcore','tests','fake_skins','fake_skin')),_dirreg._directories.keys())
-        self.assertEqual(self.ob.fake_skin.getDirPath(),join('cmfcore','tests','fake_skins','fake_skin'))
+        self.failUnless(_dirreg._directories.has_key(join('CMFCore','tests','fake_skins','fake_skin')),_dirreg._directories.keys())
+        self.assertEqual(self.ob.fake_skin.getDirPath(),join('CMFCore','tests','fake_skins','fake_skin'))
     
 class DirectoryViewTests( FSDVTest ):
 
