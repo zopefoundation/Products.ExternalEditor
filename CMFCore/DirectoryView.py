@@ -245,7 +245,11 @@ class DirectoryInformation:
                 else:
                     name = entry
                     ext = ''
-                if not name or bad_id(entry) != -1 or name == 'REQUEST':
+                if not name or name == 'REQUEST':
+                    # Not an allowable id.
+                    continue
+                mo = bad_id(name)
+                if mo is not None and mo != -1:  # Both re and regex formats
                     # Not an allowable id.
                     continue
                 t = None

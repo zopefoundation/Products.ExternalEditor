@@ -144,7 +144,6 @@ class FSPythonScript (FSObject, Script):
         try: data = file.read()
         finally: file.close()
         self._write(data)
-        self._makeFunction(1)
 
     def _validateProxy(self, roles=None):
         pass
@@ -191,30 +190,50 @@ class FSPythonScript (FSObject, Script):
       'ZScriptHTML_tryForm', 'PrincipiaSearchSource',
       'document_src', 'params', 'body')
 
-    # We can't use PythonScript as a base class since there are
-    # many ways to modify it.  Instead, we copy methods. :-/
-    ZScriptHTML_tryParams = PythonScript.ZScriptHTML_tryParams
-    _checkCBlock = PythonScript._checkCBlock
-    _newfun = PythonScript._newfun
-    _makeFunction = PythonScript._makeFunction
-    _metadata_map = PythonScript._metadata_map
-    read = PythonScript.read
-    document_src = PythonScript.document_src
-    PrincipiaSearchSource = PythonScript.PrincipiaSearchSource
-    params = PythonScript.params
-    body = PythonScript.body
-    get_size = PythonScript.get_size
+    def ZScriptHTML_tryParams(self):
+        """Parameters to test the script with."""
+        param_names = []
+        for name in self._params.split(','):
+            name = name.strip()
+            if name and name[0] != '*':
+                param_names.append(name.split('=', 1)[0])
+        return param_names
+
+    def read(self):
+        ps = PythonScript(self.id)
+        ps._body = self._body
+        ps._params = self._params
+        return ps.read()
+        
+    def document_src(self, REQUEST=None, RESPONSE=None):
+        """Return unprocessed document source."""
+
+        if RESPONSE is not None:
+            RESPONSE.setHeader('Content-Type', 'text/plain')
+        return self.read()
+
+    def PrincipiaSearchSource(self):
+        "Support for searching - the document's contents are searched."
+        return "%s\n%s" % (self._params, self._body)
+
+    def params(self): return self._params
+    def body(self): return self._body
+    def get_size(self): return len(self._body)
 
     security.declareProtected(FTPAccess, 'manage_FTPget')
-    manage_FTPget = PythonScript.manage_FTPget
+    def manage_FTPget(self):
+        "Get source for FTP download"
+        self.REQUEST.RESPONSE.setHeader('Content-Type', 'text/plain')
+        return self.read()
 
-    _write = PythonScript.write
-
-    def ZCacheable_invalidate(self):
-        # Waaa
-        pass
-
-    _p_changed = 0  # _write() expects this.  :-(
+    def _write(self, text):
+        ps = PythonScript(self.id)
+        ps.write(text)
+        ps._makeFunction()
+        self._v_f = ps._v_f
+        self._body = ps._body
+        self._params = ps._params
+        self.func_code = ps.func_code
     
 
 Globals.InitializeClass(FSPythonScript)
