@@ -1,0 +1,1548 @@
+The Zope Content Managment Framework
+
+  Introduction
+
+    Web sites today have become sophisticated, dynamic experiences
+    that provide powerful services. At the same time, businesses want
+    new ways to leverage brand and engage customers, usually on a very
+    large scale. Yet with the explosion of content on websites,
+    managing the daily flow has become a very expensive, brittle
+    proposition.
+
+    This is the market that content management systems (CMS) are ideal for. 
+    The Content Management Framework (CMF) from Zope Corporation is designed 
+    to solve these content management issues by delivering the following 
+    benefits:
+
+      - Superior speed to market for applications and content.
+
+      - Dramatically decrease website staff workload by safe delegation 
+        of content authoring.
+
+      - Powerful searches using sophisticated organization of content.
+
+    The CMF is designed as a framework of components for the Zope 
+    application server. This approach to content management is "both buy 
+    and build", as it delivers an extremely extensible foundation for 
+    customization as well as providing useful tools "out of the box".
+
+    In the CMF worldview, everything is content. This applies to 
+    traditional things such as HTML pages. But it also applies to dynamic 
+    information such as posts in a threaded discussion or calendar events. 
+    It also means that images, dowloadable executables, logic in scripts, 
+    etc. are also content.
+
+    The goal of the CMF is to unify the management of content and apply a 
+    suite of services. These services include cataloging, workflow, and 
+    syndication. The CMF works hard to allow authors to use common tools
+    such as Adobe GoLive, Dreamweaver and MS Office to produce content 
+    by supporting standard protocols such as FTP and WebDAV. Specific tools 
+    are not required, however, as everything in CMF can be done using only 
+    a Web browser.
+
+    <font color="red">Note - find more intro material to put here</font>
+
+
+  Building and managing a CMF site
+
+    Initial setup and design of a CMF site is performed by a highly
+    privileged user referred to as the "Site Manager". The Site Manager
+    is responsible for the overall configuration and organization of a 
+    CMF site, and sets site-wide policies for things such as security, 
+    workflow, metadata and syndication.
+
+
+Creating a CMF site
+
+        
+        
+          The top-level concept in the CMF is the idea of a "CMF Site". A CMF 
+          site is a content-oriented Web site with specific business goals, 
+          workflows, collaborations and audiences (content consumers). 
+        
+          The "CMF Site" object is used in Zope to represent and manage a CMF 
+          Web site. The CMF Site object acts as a container for site components 
+          and content, and provides interfaces for configuring the functionality
+          of the site.
+        
+          To create a new CMF Site object, you must be logged into the Zope 
+          management interface (ZMI). You must also have the "Add CMF Sites" 
+          permission in the Zope Folder where you want to create the new site.
+        
+          From the ZMI, select "CMF Site" from the add list and click the "Add" 
+          button. This will bring up the "Add CMF Site" Web form. The elements on 
+          the add form are:
+        
+            - **Id** -- The id to be used for the new CMF Site object. This id 
+              will appear in urls to the site and its subobjects. The id field 
+              is a required field.
+        
+            - **Title** -- The title to be used for the new CMF Site object. The 
+              title provides a more human-friendly label for the site object.
+              Providing a title is optional, but recommended.
+        
+            - **Membership Source** -- The source of member information to be 
+              used by the new CMF Site. The default for this field is "Create 
+              a new user folder in the CMF Site". This option will create a 
+              new User Folder in the CMF Site to be used as the source of member
+              data. You may also select "I have an existing user folder and want
+              to use it instead". In this case, the CMF Site will draw its member
+              information from a User Folder that already exists in the Zope 
+              object heirarchy above the new CMF Site.
+        
+            - **Description** -- A short description of the site. This description
+              may be made available with syndicated content and may be used by 
+              some of the default user interface elements of the site. Providing 
+              a description is optional, but recommended.
+        
+          After completing the Web form, click the "Add" button to create the 
+          new CMF Site object. After submitting the form, the right frame of 
+          the ZMI should contain an administrative "welcome" page of the new CMF 
+          site. The welcome page provides links to:
+        
+            - **The site configuration form** -- This form allows you manage 
+              sitewide policies and configuration options. This should be your
+              first stop after creating a CMF Site object.
+        
+            - **The management interface** -- The Zope management interface (ZMI)
+              for CMF Site objects provides management-level access to the individual 
+              components of the site and provides for more advanced configuration 
+              options.
+        
+            - **The site home page** -- The default homepage of the new CMF site. 
+              This is what visitors and members of the site will initially see 
+              when they access the site through the Web.
+        
+          Now that the basic CMF Site object has been created, you should visit
+          the site configuration form to continue setting up the new site.
+        
+
+
+Configuring a CMF site
+
+        
+        
+          The "site configuration form" of a CMF Site object provides a simple 
+          way to set and change the sitewide configuration options and policies 
+          for a CMF site. Theses options include some of the information that was 
+          provided when the CMF Site was created (such as site title and 
+          description), as well as other options that were given defaults when 
+          the CMF site was created.
+        
+          A user logged into the CMF site who has the "Change configuration" 
+          permission will see a "Reconfigure site" link in the actions box. 
+          Clicking the "Reconfigure site" link will bring up the site configuration 
+          form.
+        
+          The configuration options available from the site configuration form
+          are:
+        
+            - **Site 'From' Name** -- The name to be used as the (apparent) 
+              sender when the site generates email. The site may generate email 
+              to provide information to new members, or to notify members of various 
+              events. The default value for this name is 'Site Administrator'. A 
+              value for this field is required in order to send mail from the site.
+        
+            - **Site 'From' Address** -- The email address used as the (apparent) 
+              return address when the site generates email. The default value for 
+              the from address is 'postmaster@localhost'. A value for this field 
+              is required in order to send mail from the site.
+        
+            - **SMTP Server** -- The address of the SMTP (outgoing mail) server 
+              to be used when the site generates email. The default value for 
+              the SMTP server address is 'localhost', which presumes that you 
+              have an SMTP server running on the same machine as the Zope 
+              software. A valid SMTP server address is required in order to 
+              send mail from the site.
+        
+            - **Site Title** -- The title of the site that appears at the top of
+              all site pages (when using the default site skins). Providing a 
+              title is optional, but recommended.
+        
+            - **Site Description** -- A short description of the site. This 
+              description may be made available with syndicated content and may 
+              be used by some of the default user interface elements of the site. 
+              Providing a description is optional, but recommended.
+        
+            - **Password Policy** -- The password policy configuration option 
+              allows you to choose the way that the site handles passwords when 
+              members register with the site.
+        
+              If you select "Generate an email member's initial password" the 
+              site will randomly generate an initial password that members must 
+              use to log into the site and email that password to the address 
+              provided by the member. This option may be preferred if you want 
+              to verify a prospective member's email address before granting 
+              membership to the site.
+        
+              If you select "Allow members to select their initial password" 
+              (the default), the site will allow new members to enter their 
+              own password at registration time.
+        
+          After making changes to the site configuration options, click the 
+          "Change" button to save the changes.
+        
+
+
+Creating CMF Folders
+
+        
+        
+          Folders may used in CMF to help organize content. Folders may contain 
+          any kind of content object, including subfolders.
+        
+          To create a new Folder at a given place in the site heirarchy, navigate
+          to the place where you want to add the new Folder, then click the 
+          "Folder Contents" link in the actions box. This will bring up the 
+          "desktop" view of the current Folder, listing the content objects 
+          and subfolders. In the desktop view, click the "New..." button.
+        
+          You will now see the "Add Content" form. This form provides a list of 
+          the kinds of objects you can add at this location (based on the 
+          permissions you have), and descriptions of the available objects. 
+          Note that you must have the "Add portal folders" permission to add 
+          new Folders to the CMF site.
+        
+          Select "Folder" from the listing, enter an id for the new folder in 
+          the "id" field located below the listing of available object, and 
+          click the "Add" button to add the new Folder.
+        
+          After submitting the add form, you will be taken to the "desktop" view
+          of the newly created Folder.  
+        
+
+
+Configuring allowed content types
+
+        
+        
+          The site manager of a CMF site can control what types of content 
+          may be created by users of the site. The normal way of doing this 
+          is to restrict the types of content that can be created in CMF folders, 
+          which provide the structure of the site. You may, for example, decide 
+          that site users should only be able to create documents, images and 
+          subfolders on the site.
+        
+          To implement this policy, visit the CMF Site object in the ZMI and 
+          click on the "Types Tool" (named "portal_types") in the contents 
+          listing of the site object. Click on the "Contents" tab of the Types 
+          Tool to see the listing of available content types for your site.
+        
+          Each type in the Types Tool has a "Properties" page that allows you 
+          to configure certain options for that type. Types that are logically 
+          "containers" (as CMF folders are), provide an option on the properties
+          page to restrict the types of content that may be created in objects 
+          of that type.
+        
+          To make our restriction for CMF Folders, click on the "Folder" link 
+          in the content type listing of the Types Tool. This will take you to 
+          the Properties view of the CMF Folder type. Among other properties of 
+          the type, you will see a field called "Allowed content types". Opposite
+          the field label is a multiple selection list containing each of the 
+          types installed on your site. To arrange for folders to only contain 
+          documents, images and other subfolders, select Document, Image and 
+          Folder from the multiple select list and click the "Save Changes" 
+          button.
+        
+          You may use this same approach to restrict the contents of other 
+          container types on your site.
+        
+
+
+Creating a CMF Topic
+
+        
+        
+          One of the ways you can manage the structure of a CMF site is by using
+          CMF Topics.  Often a site is comprised of a large amount
+          of content through which visitors are able to navigate.  A Topic
+          allows you to create a dynamic view onto the available content
+          enabling visitors to "drill down" into that content.
+        
+          Topic objects define a set of search criteria. Those criteria are 
+          applied to the content catalog to produce a virtual list of content 
+          that appear "in" that Topic (though that content is not actually 
+          physically contained in the Topic object). The search criteria for 
+          a topic may be based on any of the data or metadata of your site 
+          content.
+        
+          One common and useful piece of metadata that can be used effectively 
+          by Topics is "Subject". The "Subject" property is usually configured 
+          to allow a set of categories to be associated with a piece of content 
+          at the time it is created. If content creators consistently select 
+          appropriate categories for content as it is created, a Topic can be 
+          used to provide site visitors categorized views of your site. A standard
+          pattern is to create a number of Topics that each correspond to a 
+          particular category.
+        
+          Another example of a useful Topic is one which filters your site 
+          content by creation or modification date in order to display all
+          recently changed content.
+        
+          To create a new Topic, navigate to the place where you want to add 
+          the new Topic, then click the "Folder Contents" link in the actions box. 
+          This will bring up the "desktop" view of the current Folder. From the 
+          desktop view, click the "New..." button.
+        
+          You will now see the "Add Content" form. This form provides a list of 
+          the kinds of objects you can add at this location (based on the 
+          permissions you have), and descriptions of the available objects. 
+          Note that you must have the "Add portal topics" permission to add Topic
+          objects.
+        
+          Select "Topic" from the listing, enter an id for the new Topic in 
+          the "id" field located below the listing of available object, and 
+          click the "Add" button to add the new Topic.
+        
+          After submitting the add form, you will be taken to the "Edit Topic" 
+          form of the newly created Topic. The Topic edit form allows you to 
+          provide some basic information about the Topic:
+        
+            - **Title** -- The title to be used for the Topic. The title
+              provides a more human-friendly label for the Topic and appears 
+              in the default pages that display the Topic. Providing a title 
+              is optional, but recommended.
+        
+            - **Description** -- A short description of the Topic. This description
+              may be made available with syndicated content and may be used by 
+              some of the default user interface elements of the site. Providing 
+              a description is optional, but recommended.
+        
+            - **Acquire criteria from parent** -- This checkbox determines whether
+              the search criteria of this topic should be joined with the search 
+              criteria of containing Topic objects when constructing the virtual
+              contents list. Selecting this option (the default) allows you to 
+              provide progressively narrower drill-down views of your content by 
+              building a heirarchy of Topics that refine the searches of higher 
+              level Topics.
+        
+          Click the "Change" button to save the changes to the Topic object.
+          After clicking "Change," you will see the default view of your new
+          Topic (the list of content which match the Topic's criteria and
+          the list of the Topic's criteria).  Note that since you have not yet
+          defined any criteria, the Topic will match all content objects in the 
+          site content catalog.
+        
+
+
+Configuring CMF Topics
+
+        
+        
+          After you have created a Topic, you need to define search criteria 
+          for the Topic so that visitors will see an appropriate virtual contents 
+          list when they view the Topic. By default no search criteria are 
+          defined, which means that the virtual contents list of the Topic will 
+          include all content in the site content catalog.
+        
+          To begin defining the search criteria for a Topic, visit the Topic in 
+          your Web browser and click the "Criteria" link in the action box. This
+          will bring up the "Topic Criteria" form. This form is made up of two 
+          parts. The top part of the form shows the search criteria already 
+          defined for the Topic, and allows you to change or delete existing 
+          criteria. The bottom of the form allows you to add new criteria.
+        
+          Let's look at adding new criteria first. At the bottom of the form 
+          are two drop-down lists:
+        
+            - **Field Id** -- This field allows you select the content attribute
+              to which the search criterion applies. This drop-down includes all 
+              of the standard metadata attributes of content objects, as well as 
+              "Searchable Text". If you select "Searchable Text" the criteria 
+              will be applied against the full text of content objects on the site.
+        
+            - **Criteria Type** -- The type of the value to search for in the search
+              criterion. Options for this field are:
+        
+              - **String Criterion** -- The value to search for is a string.
+        
+              - **Integer Criteron** -- The value to search for is an integer. This
+                may be used to match against integer content attributes.
+        
+              - **List Criterion** -- Match against the selected attribute using a 
+                sequence of (string) values. When using a list criterion, an "OR" 
+                search is performed, matching content where the selected field 
+                matches any of the specified values.
+        
+              - **Friendly Date** -- Match against the selected attribute using a 
+                date rule (such as "less than 10 days old"). This option is useful 
+                for providing views of what's new on the site. This criterion type 
+                may only be applied against date typed content attributes (such as 
+                'created', 'modified' or 'effective').
+        
+          Once you have selected the field id and criterion type, click the "Add" 
+          button to add the search criterion. The new criterion will now appear 
+          at the top of the form along with any other criteria that you have 
+          already added.
+        
+          After you have added a criterion, you can provide the value or values
+          to be used in the search in the "Value" field of the criterion. For 
+          string, criterion, simply enter the value to search for in the text box 
+          provided. For integer criterion, you may enter a value as well as 
+          select a modifier (minimum, maximum, or both, meaning exact match).
+        
+          For list criterion, enter each of the values to search for (one per line) 
+          in the textbox for that criterion. 
+        
+          For "friendly date" criterion, compose the appropriate search rule using 
+          the drop-down lists provided. Remember that the friendly date search 
+          constrains matches based on this rule relative to the time the search 
+          is performed. For example, if you specify "At the most: 5 days old" for 
+          a date criterion against the "modified" attribute of content objects, 
+          the Topic will always contain those content objects modified within the 
+          last five days, measuring from the time the Topic is being viewed.
+        
+          You may define any number of criteria for a Topic, which are applied 
+          together (as an "AND" search) to constrain the virtual contents of the 
+          Topic. Remember that if you selected "Acquire criteria from parent" on 
+          the edit form for the Topic, the criteria of your Topic will also be 
+          ANDed with the criteria of containing Topic to produce the contents.
+        
+          When you are finished adding or changing the values for your defined 
+          criteria, click the "Save Changes" button to save your changes. If 
+          you want to remove one or more criteria, select the checkbox to the 
+          left of the criteria you wish to delete and click the "Delete selected"
+          button.
+        
+
+
+Configuring security policies
+
+        
+        
+          Access to CMF content objects can be "public" (unrestricted) or 
+          restricted to particular users based on permission settings. CMF 
+          objects use Zope's flexible mechanisms for defining security 
+          policies, which allows you to provide powerful features to your users 
+          and allow large groups of people to safely work together to maintain 
+          your site.
+        
+          You must have the "View management screens" permission as well as the 
+          "Manage permissions" permission to manage security for CMF objects. You
+          need the "View management screens" permission because the CMF does not 
+          provide a specific interface to security information. You use the Zope 
+          management interface (ZMI) to control access to CMF objects.
+        
+          To access the ZMI for a CMF object, visit the url of the object with 
+          the string '/manage_workspace' appended in your Web browser. For example, 
+          to view the ZMI for a content object at the url: 
+          '/Sports/TopStories.html', you would visit:
+          '/Sports/TopStories.html/manage_workspace' in your browser. This will 
+          bring up the standard tabbed Zope interface. Select the "Security" tab 
+          to view and modify the security settings for the object.
+        
+          Managing security and using the ZMI to set and change security policies 
+          is covered in depth in the standard Zope documentation in 
+          "Chapter 6: Users and Security", 
+          http://www.zope.org/Members/michel/ZB/Security.dtml .
+        
+
+
+Associating workflow with content types
+
+        
+        
+          Different types of content may be published according to different
+          business rules and processes on a CMF site. In the CMF, Workflow 
+          objects represent the different sets of processes applied to 
+          different types of content.
+        
+          Workflow objects are defined by workflow designers in the CMF Workflow 
+          Tool. Once workflows have been defined in the Workflow Tool, a site 
+          manager can then associate one or more of those workflows with particular 
+          CMF content types. 
+        
+          The CMF comes with a default workflow that is associated with all 
+          of the built-in content types "out of the box". The default workflow 
+          is a simple review / publish workflow that requires a review to check 
+          content before it is made generally visible on the site.
+        
+          To change the workflow associations among the types of content on 
+          your site, visit the Zope management interface of the CMF Site object
+          that represents your site. The "Contents" view a CMF Site object lists 
+          a number of "tool" objects, including the Workflow Tool which is named
+          "portal_workflow" in the contents listing. Click on the "portal_workflow" 
+          tool to navigate the Workflow Tool.
+        
+          Now you should be looking at the "Overview" tab of the Workflow Tool. 
+          This page provides a basic description of the tool. To view the current 
+          set of associations between workflows and content types, click the 
+          "Workflows" tab.
+        
+          This will bring up a form with two columns. On the left are listed the 
+          content types in use on your site. On the right of each is a textbox 
+          containing the name or names of the workflows associated with that 
+          content type.
+        
+          To change the workflow association for a content type, type the name 
+          of the workflow to use in the textbox and click the "Change" button. 
+          If you wish to specify multiple workflows for a particular content 
+          type, type the names of the workflows to use in the textbox, separated 
+          by commas. If you need to find out the names of the workflows that are
+          currently defined in the Workflow Tools, click on the "Contents" tab of
+          the tools, which will list the available Workflow objects.
+        
+          If you have never changed the workflow associations for your content 
+          types, the value will be the special value "(Default)". Note that there
+          is also an entry "(Default)" at the bottom of the left-hand column listing 
+          the available content types. This is a convenience that lets you easily 
+          change the "default" workflow to be used without having to update the 
+          value for every content type individually. The content types whose value 
+          is '(Default)' will use the workflow named by the '(Default)' item at 
+          the bottom of the form.
+        
+          After you have finished changing workflow operations, you must click 
+          the "Update security settings" button at the bottom of the workflow 
+          mapping form. Workflow often has side effects on the security settings 
+          of the objects they are associated with that need to be reconciled 
+          when the workflow mappings change. Doing the reconciliation is 
+          a potentially time-consuming operation, so rather than slow down the 
+          process of re-mapping workflow by doing it for each item changed, you 
+          click "Update security settings" when you are done making changes to 
+          the workflow associations.
+        
+
+
+Configuring metadata policies
+
+        
+        
+          Content objects in the CMF support rich metadata. The CMF supports 
+          the Dublic Core metadata standard, and instances of all of the builtin 
+          CMF content types are associated with Dublin Core metadata. Content 
+          objects provide Web forms that allow content creators to enter and 
+          maintain metadata for their content.
+        
+          As a site manager, the CMF also gives some metadata configuration 
+          options to make the use of metadata more effective for your site.
+        
+          To change the metadata policies for the content types used on 
+          your site, visit the Zope management interface of the CMF Site object
+          that represents your site. From the "Contents" view of the site object,
+          click on the "portal_metadata" tool to navigate the Metadata Tool.
+        
+          Now you should be looking at the "Overview" tab of the Metadata Tool. 
+          This page provides a basic description of the tool. To view the current 
+          metadata policies for your content types, click the "Elements" tab.
+        
+          This will bring up the metadata policies form. The top row of the 
+          form (labeled "Element"), is a set of hyperlinks for each metadata 
+          element that is available to be configured. This list includes 
+          "Description", "Format", "Language", "Rights", "Subject" and "Title" 
+          on a normal CMF site. This top row allows you to select which metadata 
+          element you are configuring. The metadata element that is *not* a 
+          hyperlink is the one that you are currently working on. To work on a 
+          different metadata element, click on the name of that element.
+        
+          When you first visit the metadata policies form, the first metadata 
+          element in the top row ("Description") will be selected. The rest of 
+          the form is divided into sections. The sections represent the current 
+          settings for the selected metadata element for different content types 
+          in the system.
+        
+          If you have never changed the settings for a metadata element, you will 
+          see two sections. In the first section, the name of the content type is 
+          '<default>', which means this setting will apply to all content types 
+          for which you have not defined explicit settings for the currently 
+          selected metadata element. At the bottom of the form, the last section
+          (headed "<new type>") allows you to add settings for a specific content 
+          type.
+        
+          To add settings for a content type, select the content type that your 
+          settings will apply to from the "Content Type" dropdown list. The 
+          rest of the fields in each section allow you to actually set the policy 
+          for the selected metadata element:
+        
+            - **Required** -- This determines whether content creators are 
+              required to supply a value for the selected metadata element.
+              Check the box to require a value.
+        
+            - **Default** -- The default value to be used for the metadata 
+              element.
+        
+            - **Supply Default** -- This option determines whether the edit 
+              forms for content should pre-fill the form field for the metadata 
+              element with the defined default value.
+        
+            - **Vocabulary** -- The vocabulary option allows you to restrict the 
+              possible values for a metadata element to a set of predefined options. 
+              If a vocabulary is defined for a metadata element, the content edit 
+              forms will show a drop-down box with the defined vocabulary items 
+              rather than allow free text entry. To supply the vocabulary for a 
+              metadata element, enter the possible values to be displayed to 
+              content authors (one per line) in the textbox provided.
+        
+            - **Enforce Vocabulary** - This option determines whether the allowed 
+              value for the metadata element is restricted to those that are 
+              defined in the vocabulary.
+              
+          Once you have finished choosing the settings, click the "Add" button 
+          to save your settings for that content type.
+        
+          You may also edit the settings that you have already defined for content 
+          types. Make the changes in the sections for each content type you want 
+          to change and click the "Update" button to save these changes.
+        
+
+
+Configuring syndication policies
+
+        
+        
+          Syndication is the process by which a site is able to share information 
+          with other sites. The AP news service, for example, allows newspapers and 
+          other media to recieve news stories which they can publish with their
+          own presentation without actually generating the content in-house. 
+        
+          Content syndication in the CMF allows you to make content available to 
+          other sites. The Syndication Tool allows site managers to control 
+          sitewide syndication of content.
+        
+          Syndicated content is made available in RSS format for folders where 
+          syndication has been enabled. The DTML Method objects that control 
+          the RSS formatting for RSS feeds are located in the "generic" skin:
+        
+            - RSS.dtml
+        
+            - itemRSS.dtml
+        
+            - rssBody.dtml
+        
+            - rssDisabled
+        
+          Advanced users with a knowledge of the RSS format may edit these 
+          DTML Methods to customize the RSS output.
+        
+          Before content can be syndicated from a site, the site manager must 
+          enable syndication using the Syndication Tool. To access this tool,
+          visit the Zope management interface of the CMF Site object
+          that represents your site. From the "Contents" view of the site object,
+          click on the "portal_syndication" tool to navigate to the Syndication 
+          Tool.
+        
+          Now you should be looking at the "Overview" tab of the Syndication Tool. 
+          This page provides a basic description of the tool. To view the current 
+          syndication policy for the site, click the "Properties" tab.
+        
+          If you have never visited the Syndication Tool before, syndication is 
+          disabled for the site and you will see a single button "Enable 
+          syndication". To enable syndication, click the "Enable syndication" 
+          button.
+        
+          Once you have enabled syndication, the "Properties" form will display 
+          the sitewide syndication properties:
+        
+            - **Update Period** -- Describes the period over which the channel 
+              feed is updated. Acceptable values are: hourly, daily, weekly, 
+              monthly, yearly. If omitted, daily is assumed.
+        
+            - **Update Frequency** -- Used to describe the frequency of updates 
+              in relation to the update period. A positive integer indicates how 
+              many times in that period the channel is updated. For example, an 
+              updatePeriod of daily, and an updateFrequency of 2 indicates the 
+              channel format is updated twice daily. If omitted a value of 1 is 
+              assumed.
+        
+            - **Update Base** -- Defines a base date to be used in concert with 
+              updatePeriod and updateFrequency to calculate the publishing schedule. 
+              By default the sitewide date is the DateTime of the tool 
+              initialization. The date format should be of the form: 
+              'yyyy-mm-ddThh:mm'.
+        
+            - **Max Items** -- Defines the max number of items which are included 
+              in the syndication feed. The RSS specification recommends this not 
+              exceed 15, which is the default.
+        
+          Click "Save" to save your changes to the sitewide syndication policy. 
+          If you later decide you want to disable content syndication, you can 
+          visit the "Properties" tab of the Syndication Tool and click the 
+          "Disable syndication" button.
+        
+          Once syndication has been enabled in the Syndication Tool, CMF folders 
+          will be syndicateable. A new "Syndication" action will become available 
+          in the actions box of folders. You can click on the "Syndication" link 
+          in the actions box of a folder to enable syndication for that Folder.
+        
+          For example, let's say you have a '/news' folder on your site containing
+          various News Items. After sitewide syndication has been enabled, you 
+          can enable syndication for the '/news' folder using the "Syndication" 
+          link in the action box. After that, you can visit the url to your 
+          news folder and append 'RSS' to obtain the RSS feed: 
+          'http://www.example.com/news/RSS'.
+        
+
+
+Configuring discussion policies
+
+        
+        
+          Most content objects in the CMF support "discussions" which allow 
+          site visitors to post comments and feedback to site content. When 
+          discussion is enabled for a content type, members of the site will 
+          see a "Reply" link in the actions box when they view a piece of 
+          discussable content. Members can click the "Reply" link to add a 
+          Discussion Item to the content. A Discussion Item is a document 
+          that is a reply to other content.
+        
+          The Discussion Tool (found the contents view of your CMF Site object
+          in the ZMI) actually implements discussability for content types on 
+          the site, but in this case you do not visit the Discussion Tool 
+          directly to enable discussion of content. Instead, you use the 
+          "Types Tool" (also found in the contents view of the CMF Site object 
+          in the ZMI) to enable or disable discussability. This allows to set 
+          discussion policies so that only certain types of content allow 
+          discussion.
+        
+          To enable discussion for a content type, navigate to the Types Tool 
+          in the ZMI. Select the "Contents" tab, which will list the content 
+          types defined for your site. Next, click on the name of the content 
+          type in the listing that you want to configure.
+        
+          This will bring up the Type Information form for that content type.
+          At the bottom of the form is an "Allow Discussion?" checkbox. To 
+          enable discussion for the selected content type, check the box and 
+          click "Save Changes". To disable discussion, deselect the box and 
+          click "Save Changes".
+        
+
+
+
+  Managing site membership
+
+    Visitors that have registered with a CMF site and received a user 
+    name and password are referred to as "Members" of the site. Members 
+    are known by the system and often have higher privileges than unknown 
+    visitors to the site. Depending on the site configuration, members may 
+    be able to contribute their own content for review and publication, 
+    comment on existing site content or help in the reviewing and publication
+    of content for a sub-web or community.
+
+
+Adding members to the site
+
+        <font color="red">[ Not yet done ]</font>
+        
+
+
+Changing member information
+
+        
+          **Actor**: Membership Manager
+        
+          - Roles on user
+        
+          - Local Roles on Folder
+        
+
+
+Browsing the member roster
+
+        <font color="red">[ Not yet done ]</font>
+        
+
+
+Revoking membership
+
+        <font color="red">[ Not yet done ]</font>
+        
+
+
+
+  Designing the user interface for your site
+
+    The CMF provides powerful tools for customizing the look and feel 
+    of the content of your site. "Skins" are sets of templates and 
+    script objects that work together to provide the presentation of 
+    site content.
+
+
+Changing site appearance
+
+        <font color="red">[ Not yet done ]</font>
+        
+
+
+Changing site behavior
+
+        <font color="red">[ Not yet done ]</font>
+        
+
+
+Changing the default skin
+
+        <font color="red">[ Not yet done ]</font>
+        
+
+
+Creating new skins
+
+        <font color="red">[ Not yet done ]</font>
+        
+
+
+
+  Implementing workflows for content
+
+    Content objects in the CMF can be associated with Workflow objects. 
+    Workflow objects define the rules for how content is produced, 
+    reviewed and ultimately published.
+
+
+Creating new workflows
+
+        
+        To create a new workflow, visit the 'Contents' tab of your
+        portal_workflow tool and click 'Add Workflow'.  Enter an ID
+        and choose from the list of workflow types.  If this is the
+        first time you're setting up a workflow, choose
+        "Web-configurable workflow [Classic]" to get a workflow like
+        the default workflow.  Then press the "Add" button.
+        
+
+
+Modifying existing workflows
+
+        You must have management privileges to change workflows.
+        
+
+
+
+  Creating content
+
+    The CMF enables members to create content for a site, subject to the 
+    security and workflow policies that have been put in place. Different 
+    members may be able to create different types of content, based on 
+    their roles in the system.
+
+
+Viewing personal content
+
+        
+        Many times content creators will be required to revist content
+        items for updating the content or performing some other series
+        of editing tasks.  The following steps walk you through
+        searching for all of the content in the CMF you have created.
+        
+        First, click the 'search' link in the top navigation bar. The
+        'search' link takes you to the advanced search page from which
+        you will perform your query to obtain a list of content you
+        have created.
+        
+        Second, enter your login name in the form field labled
+        *Creator*.  Make sure you spell it exactly as you type it when
+        you login to the CMF.
+        
+        Third, click the search button at the bottom of the page.  All
+        of the content you have personally created will be returned in
+        a list from which you can browse and view your content.
+
+
+Creating content objects
+
+        
+          CMF Sites are comprised of content; to add content to your
+          CMF site you will need to create content objects.  There are
+          several stock content objects which come with the CMF.  The
+          stock content types are Document, Image, File, Link, and
+          Favorites.
+        
+          To add a content object in the CMF, you will need to
+          navigate to a location with the site you have the
+          appropriate privelages to create content.  This could range
+          from a specific folder in your CMF which has been configured
+          by your CMF administrator or by selecting the 'My Stuff'
+          link from your navigation bar.
+        
+          Once you have identified the location you wish to add your
+          content object, select the 'Folder contents' link from the
+          action's menu on the left side of your browser window.  You
+          will be presented with the content add form.
+        
+          The content add form provides a list of the content types
+          you have permission to add at this location within the CMF.
+          For this example, we are going to use a Document as our
+          sample content type to add.  Select Document from the list,
+          and enter an ID for the document in the form field labled
+          **ID** at the bottom of the content add form.  Click the Add
+          button to complete the first stage of creating your document
+          object.
+        
+          After submitting the add form, you will proceed to the
+          'Standard Resource Metadata' edit form.  This metadata form
+          is common across all of the default content types which come
+          stock with the CMF.  This form is where you will enter basic
+          metadata about your new content type.
+        
+        
+            - Title -- A string used to identify your content; a title
+            provides a more human-friendly lable for the document.
+            The title displays in the view of the document, as well as
+            various other places throughout the CMF (e.g. search
+            results).
+        
+            - Description -- A short summary of the content.
+        
+            - Subject -- A list of keywords which is used in
+            cataloging your content.
+        
+          After entering the title, your content's description, and a
+          subject or list of subjects, you have 3 options to proceed:
+        
+            - Change - Commit your changes and return to the 'Standard
+            Resource Metadata' form.
+        
+            - Change and Edit - Commit your changes and proceed to the
+            edit form for adding the "body" of your content.  The edit
+            form is not shared across the different content types and
+            will be discussed in more detail below.
+        
+            - Change and View - Commit your changes and proceed to viewing your new piece of content.
+        
+          **Note** although there are 3 options to proceed, to
+          complete adding your content, the logical processions is
+          selecting 'Change and Edit' from the 'Standard Resource
+          Metadata' form.
+        
+        After selecting 'Change and Edit', you proceed onto the edit
+        form for your document.  The docuemtn edit form consists of 2
+        options.  The first option, 'File Upload', allows you to
+        author your content offline and upload it to the CMF through
+        your web browser.  The second option consists of a 'Body'
+        textarea form field.  Here you are able to edit and add your
+        content through your web browser.  The following list is a
+        short description of the stock content type edit forms:
+        
+            - 'Body Textarea/File Upload' edit form (Documents) 
+        
+            - 'Lead-in/Body' edit form (News Item)
+        
+            - 'File Upload' edit form (Files, Images)
+        
+            - 'Simple' edit form (Link, Favorite, Event)
+        
+          After you fillout the edit form, select change the change
+          button.  This concludes creating a content object in the
+          CMF.  Depending on your site's buisness rules, you could be
+          required to submit your new content through a workflow or
+          series of workflows.
+
+
+Managing content metadata
+
+        
+        The metadata is an integral part of a content object.  For
+        example, metadata can allow you to ensure users can locate it
+        via the advanced searching mechanism of the CMF.  It also
+        allows you to set a content object's effective date range, so
+        that the content only shows on your site during it's effective
+        date range.  As described below, you will see there are
+        important facets to managing your content's metadata and
+        keeping it updated.
+        
+        To edit a content item's metadata you will need to navigate to
+        the content item and view it.  After viewing it, you will
+        click the 'Metadata' link from the actions box.  After
+        clicking the 'Metadata' link, you will proceed to the
+        'Standard Resource Metadata' form we discussed earlier in
+        describing how to create a content object.  On the 'Standard
+        Resource Metadata' form, you will click the 'Edit all
+        metadata' link on the upper right side of this form.
+        
+        After clicking the 'Edit all metadata' link, you will proceed
+        to the 'Full Resource Metadata' form from which you have the
+        opportunity to edit all the content item's metadata.  You will
+        recognize several fields on the form from the 'Standard
+        Resource Metadata' form (i.e. Title, Description, and
+        Subject), but there are also 6 new items which we will discuss
+        below.  The possible metadata elements you are able to modify
+        are as follows:
+        
+            - Title -- A string used to identify your content; a title
+            provides a more human-friendly lable for the document. The
+            title displays in the view of the document, as well as
+            various other places throughout the CMF (e.g. search
+            results).
+        
+            -  Description  --  A short summary, an abstract, or a
+            table-of-contents for your content item.
+        
+            - Subject -- A list of keywords which is used in
+            cataloging your content.
+        
+            - Contributors -- Used to convey others besides the
+            Creator who have contributed to the content.
+        
+            - Effective Date -- The date when the content is effective
+            to be publically displayed on the CMF site.  It this is
+            left None, the content is considered to be always
+            effective.
+        
+            - Expiration Date -- The date when the content is to
+            expire from being publically displayed on the CMF site.
+            It defaults to an extreme date in the future to ensure it
+            is by default, never expired.
+        
+            - Format -- The kind of physical representation of the
+            content item, for example, 'text/html'.
+        
+            - Language -- An abbreviation of the language the content
+            item is wirtten in, for example, 'en', 'de, etc...
+          
+            - Rights -- A copyright and other IP information related
+            to the content item.
+        
+        After you have made the necessary updates for your content
+        item, you next click the Change button.  After clicking the
+        Change button, you proceed to the 'Standard Resource Metadata'
+        form with a notification message your changes have been
+        sucessfull(1).
+        
+        **Notes:** 1. This seems like a strange procession, we should
+        most likely redirect to the full_metadata_editform rather then
+        the short edit form.
+        
+        
+        
+
+
+Updating content
+
+        
+        After you have performed your site query to obtain a list of
+        content you have created, you are returned a list from which
+        you can view and browse all the content you have created in
+        the CMF.  Once you have identified which piece of content you
+        wish to update, click on it's title from the list and navigate
+        to it.
+        
+        After selecting the piece of content you wish to update, you
+        are taken to the 'view' of the content.  From the view, select
+        'Edit' from the actions box.  The 'Edit' link will take you to
+        the edit form for your particular piece of content you wish to
+        edit.  For this example, we will be using a document as our
+        sample, but the following list gives a short description of
+        the edit forms for the stock CMF content objects you may be
+        editing:
+        
+            - 'Body Textarea/File Upload' edit form (Documents) 
+        
+            - 'Lead-in/Body' edit form (News Item)
+        
+            - 'File Upload' edit form (Files, Images)
+        
+            - 'Simple' edit form (Link, Favorite, Event)
+        
+        After you click the 'Edit' link from the actions box, you will
+        proceed to the document edit form.  As when you created your
+        document, this edit form gives your two possible options for
+        editing your content.  If you have made your changes to the
+        content in an editor on your local machine, select the file
+        upload functionality.  Click the browse button and navigate to
+        the place you edited it on your local machine.  Select the
+        updated content and select ok.
+        
+        You can also choose to make your changes to the content in
+        your web browser through the web by using the textarea form.
+        To make your changes through the web, find the area(s) in your
+        document which require editing in the textarea.  Enter the
+        changes you wish to make to the content and click the change
+        button.
+        
+        Your changes will be saved, and a change notification will be
+        displayed on the edit form confirming your changes have
+        succeeded.  If you wish to view your changes, click the 'View'
+        link from the actions box and view your content with the
+        changes in place.  You can repeat the above steps as necessary
+        to update your content, each change happening live to what you
+        will see on your CMF site.
+
+
+Undoing changes
+
+        
+        
+        If you have modified or removed content and realize you have
+        made an error, you have the opportunity to undo your
+        transaction.  There are some cases which make content objects
+        undoable, but for this example we are going to assume no
+        transactions have made the change you wish to undo undoable.
+        We will assume you immediately realized you updated some
+        content accidentally and wish to return it to it's premodified
+        state.
+        
+        
+        To undo an action, select 'Undo' from your actions box.  You
+        will proceed to the undo form which lists the transaction you
+        wish to undo.  Select the checkbox next to the transaction
+        which you wish to undo (e.g. manage_edit or manage_delete).
+        
+        To complete the undo, click the undo button.  You will
+        redirect to the undo list with a notification your change has
+        been undone.  In the case your transaction is undoable, you
+        will recieve a notification message indicating so.  As
+        mentioned above, it's possible that a transaction is undoable.
+        This results from other transactions effecting the object you
+        are trying to undo; in which case you must also undo the
+        transactions prior to the one you are attempting to undo.
+
+
+Removing content
+
+        
+        Often times it's necessary to remove content from your site;
+        either when it's obsolete or no longer needed.  To remove
+        content from the CMF, you will need to identify the piece of
+        content you wish to remove from the CMF.  You can do this by
+        searching for the content, navigating to the content directly
+        or navigating to the folder which contains your content
+        directly.  If you directly navigate to the content, select the
+        'Folder contents' link from your actions box.
+        
+        Content is batched in the folder contents view, so if you have
+        more then the default number of items in a folder, you might
+        need to browse through the folder's contents to find the item
+        you wish to remove from the CMF.  To do this, use the 'Next'
+        and 'Previous' links at the bottom of the folder contents
+        listing.  After identifying the the piece of content you wish
+        to remove and select the check box next to it's ID.
+        
+        To remove the selected content, click the delete button at the
+        bottom of the folder contents view form.  After clicking the
+        delete button, the content has been deleted from the CMF.  You
+        will be redirected to the folder contents listing with a
+        notification message your content removal has been successful.
+
+
+Publishing content
+
+        
+          After you have created your content for your web site, you
+          need to submit it through the publication workflow to allow
+          site visitors to see it.  To submit your content for
+          publication, navigate to the piece of content you wish to
+          submit for publication.
+        
+          This may be down by selecting 'Folder contents' from your
+          actions box or by directly navigating to it by putting it's
+          URL into your web browser.  Once you have selected the
+          content you wish to submit for publication, select the
+          'Submit' link from your actions box.  The submit action is
+          visible while you are viewing a piece of content you have
+          the appropriate permissions to submit for review.
+        
+          After you have selected the 'Submit' link, you will proceed
+          to the 'Content Submit' form where you enter comments
+          regarding the content you wish to submit for publication.
+          After entering any relevant comments, select the 'Submit'
+          button.
+        
+          Your content has now been submitted for publication.  Your
+          content is now in the 'Pending' state.  Site reviewers will
+          be notified your content is pending review and have the
+          opportunity to publish it live on your website or reject it.
+          In this state, you also have the ability to 'Retract' if for
+          further editing, after which you can follow the above
+          process to re-submit it for publication.
+
+
+Controlling access to content
+
+        
+        
+        If you find that you require to collaborate with other content
+        contributors, you have the ability to give them roles within a
+        folder you own.  By modifying a users local roles allows them
+        to add, update, and contribute content with any number of
+        other CMF content contributors in that given location, without
+        having to give them permissions in other areas of the CMF
+        you'd prefer them not to.
+        
+        To give another content contributor local roles, navigate to a
+        folder where you wish to give them local roles.  You can also
+        navigate to a content item and select the 'Folder contents'
+        link from the actions box.  From the folder contents form, you
+        select 'Set local roles' from the actions box.
+        
+        The 'Set local roles' action takes you to the manage local
+        roles form; from which you can add or delete users who have
+        additional roles in this location.  To add a user to have
+        additional local roles in this location, enter the name or
+        email address of the user which you wish to assign local roles
+        in the folder into the form field labled **search term**.
+        Make sure you have selected the appropriate drop down which
+        corresponds to the search term you have entered (i.e. if you
+        choose to search for a user with their email, make sure you
+        select 'Email Address' from the **Search by** drop down).
+        
+        By clikcing the Search button, you will be returned a list of
+        user's matching your query.  Select the checkbox corresponding
+        to the user(s) from the list returned by your search.  Next,
+        Select the role you'd like to give them from the drop down
+        menu labled **Role to Assign**.
+        
+        Click Assign Roles button to complete the process of adding
+        the local roles to the user(s) you selected from your search
+        query.  You will be returned to the manage local roles form
+        with a notification indicating the user(s) have now been added
+        the roles you've choosen to assign.
+
+
+
+  Reviewing content
+
+    "Reviewers" are members of the site who are responsible for
+    ensuring the quality of site content. Members with review
+    responsibility participate in the workflow of content publishing
+    by checking and approving (or rejecting) the content for
+    publication. Publication of content makes it visible to all
+    visitors of the site (subject to any security setting made on the
+    content).
+
+
+Browsing content submitted for review
+
+        
+        If you are tasked with reviewing content submitted for
+        publication from your site's content contributors, you are
+        easily notified when you need to browse the items which are
+        pending review.
+        
+        If items are in the pending state, you will see a link in your
+        actions box, indicating items are pending review.  To browse
+        the content which has been submitted for review, select the
+        link which is displayed in your actions box similiarly to the
+        following example: 'Pending review (10)'.  In this example, it
+        indicates there are 10 item awaiting review in the pending
+        queue.
+        
+        After clicking the link, you proceed to the pending review
+        queue which lists all the content which is awaiting
+        publishing.  You can browse the content from this list.  The
+        title, content type, creation date, and a short description is
+        displayed for each item in the pending review queue.  From
+        this list, you are able to browse directly to the content by
+        clicking on it's title from the results query.
+
+
+Approving content for publication
+
+        
+        After you've browsed a list of content items pending review,
+        you can browse directly to reviewing a piece of content by
+        selecting the item from the list of content pending review.
+        
+        
+        After reviewing the content, if you determine you wish to
+        publish it live on your CMF site, from the actions box, select
+        the 'Publish' link.  Selecting the 'Publish' link takes you to
+        the content publish form.  Here you have the option of
+        entering comments which are attributed to the your publishing
+        of the content.  Enter comments as appropriate and select the
+        Publish this item button.
+        
+        After selecting the Publish this item button, you are
+        redirected the 'View' of the content object with a
+        notification it's status has now been changed.  If you have
+        additional items requiring review, you can repeat the process
+        until you no longer have items in the review queue.
+
+
+Rejecting content
+
+        <font color="red">[ Not yet done ]</font>
+        
+
+
+
+  Using the default CMF site
+
+    The CMF provides an "out-of-the-box" Web site that provides many
+    commonly needed site features automatically. The default site
+    provides a basic site skin for common look and feel, member
+    registration and login management and tools to perform full-text
+    and fielded searches on site content.
+
+
+Becoming a site member
+
+        
+        
+          Becoming a member of a site allows you to access the
+          additional services of the site. Often this includes a
+          personal online work area (your "desktop"), the ability
+          create and submit your own content for publication and the
+          ability to personalize the look and behavior of the site to
+          better meet your needs.
+        
+          Note that different sites have different purposes, and the
+          specific services available to site members depends on the
+          choices of the site administrators. By default, a CMF site
+          provides members with a private "desktop", the ability to
+          create certain types of basic content and the ability to
+          select the visual style of the site that they see.
+        
+          To become a member of a site, visit the site homepage and
+          click on the "Join" link in the menu located on the left
+          side of the page.
+        
+          Clicking the "Join" link will take you to a form. Complete
+          the fields on the form and click the "Register" button to
+          become a registered member of the site.
+        
+          The exact information required by the registration form will
+          vary from site to site. The form for a default CMF site
+          requires visitors to provide at least a login name, a
+          password and a valid email address to become a member. The
+          default form also gives you an option to have the password
+          you provided at registration time emailed to you for future
+          reference.
+        
+          After submitting the member registration form, you should
+          see a page informing you that you have successfully been
+          registered as a site member. This page also provides a link
+          that you can use to log into the site immediately.
+        
+
+
+Logging in to the site
+
+        
+        
+          Visitors to a site who have registered as members must login
+          to the site to use member-only services.
+        
+          To login to the site, visit the homepage of the site and
+          click the "Log in" link on the menu (located at the left of
+          the page in a default CMF site).
+        
+          The "Log in" link will take you to a form where you may
+          enter your username and password for the site. You may also
+          select the "remember by name" checkbox and the site will
+          fill in your username on the form for you the next time you
+          login.
+        
+          Once you have entered your name and password, click the
+          "Login" button to login to the site. You should then see a
+          message letting you know that you have been successfully
+          logged in. If you did not type your username or password
+          correctly, you will see a page telling you that the login
+          did not succeed.
+        
+
+
+The site homepage
+
+        
+          You can browse the homepage of the CMF via 2 
+        access methods.
+        
+            - Directly entering the site's homepage url.
+        
+            - Selecting the 'home' link from the top navigation bar.
+        
+        After you have accessed the site's homepage, you can browse
+        the content published there (e.g. 10 most recent News
+        Announcements, etc...)
+
+
+Personalization options
+
+        
+        
+        There are times when you are required to change your
+        preferences for your account within a CMF site, for example
+        your email address has changed or you want to try out the new
+        nifty site skin that has just been announced.  To change your
+        preferences, click the 'Preferences' link in your top user
+        actions bar.  This link takes you to the personalization form.
+        
+        On the personalization form, you have the option of modifying
+        the any of the following:
+        
+            - Email address -- Your contact email address the site
+            administrator will use in contacting you when necessary.
+        
+            - Listing status (off/on) -- Determines if you're login
+            name is visible to other members when they select the
+            'members' link from the navigation bar or view the site
+            roster.
+        
+            - Skin -- The 'look and feel' skin which is applied around
+            the content of the site.  The skin effects your 'view'
+            while navigating the site.
+        
+        While viewing the personalization form, make the necessary
+        adjustments to your e-mail, listing status, and/or skin
+        preferences and select the change button.  You will return to
+        the personalization form with a notification indicating your
+        preferences have been changed sucessfully.
+        
+
+
+Searching site content
+
+        
+        To find content on a CMF site, you often need to conduct a
+        search query to return a list of content items which meet a
+        group of search conditions to narrow down the returned search
+        results.  To search the site for information, you have 2
+        different options.
+        
+            - Quick Search
+        
+            - Advanced Search
+        
+        If you choose to search the site via the quick search feature,
+        enter the keyword (s) in the search text box in your top
+        navigation bar and select the go button.  This allows you to
+        search the content cataloged on the site only via the keywords
+        you've choosen to enter into the quick search field.  After
+        selecting the go button, you proceed to the search results
+        list which displays the results of your query.  The advanced
+        search form is discussed in more detail next.
+        
+        If you would like to further parameterize your search or
+        strictly limit your search to only content of a spefic type,
+        you will want to use the advanced search capabilities of the
+        CMF.  To access the advanced search form, click the 'search'
+        link in the top navigation bar.  This will take you to the
+        advanced search form.  Enter your search criteria and select
+        the search button.  The advanced search form allows you to
+        search for content based upon any combination of the
+        following:
+        
+            - Full text search -- The full text search searches for
+            your keyword(s) in the fulltext of the content item, for
+            example the entire body of a document.
+        
+            - Title -- The title searches for your keyword(s) only in
+            the title of a content items.
+        
+            - Subject -- The subject search locates content items
+            which match your keyword(s) found in the subject of
+            content items.
+        
+            - Description -- The description search locates content
+            items which match your keyword(s) found in the description
+            of content items.
+        
+            - Confined date range for new items -- This date range
+            search allows you to only return content items which are
+            new since a specific period; for example only search for
+            items which have been created in the past month.
+        
+            - Type of content you are interestded in -- Searching by
+            content type allows you to only search for content which
+            you are interested in.  For example, you might only wish
+            to view News Items which have the word 'convention'
+            mentioned in their description.
+        
+            - Creator -- Searching by creator allows you to narrow
+            your search down to only content items created by the
+            content creator id you enter into this field.
+        
+        After defining the parameters for your search, click the
+        Search button.  You will proceed to the search results,
+        listing those content objects found which meet the conditions
+        of your search.  From the search results page, you can browse
+        content on the site by title, description, type and the date
+        the content item was last modified.
+        
+        It's possible for your search query to be too restrictive and
+        no content is found which meets your search conditions.  You
+        might wish to return to the advanced search form and alter
+        your query parameters to be less restrictive.
+        
+
+
+Browsing topics
+
+        <font color="red">[ Not yet done ]</font>
+        
+
+
+Providing feedback on content
+
+        
+        There are various reasons why you might wish to comment on a
+        piece of content posted on a CMF site.  You might wish to
+        contribute content, ask a question, or engage in a discussion
+        with other users who visit the CMF site.
+        
+        To provide feedback on a piece of content, you must first
+        navigate to the item you wish to comment upon.  After viewing
+        the content and you decide you wish to provide a comment on
+        it, select the 'Reply' link from the actions box.
+        
+        After selecting the 'Reply' link, you will proceed to the
+        feedback form for the content you have choosen to provide
+        feedback upon.  Next, you need to enter your comment into the
+        textarea labled **Reply body**.
+        
+        After entering your comment or reply, you can either select
+        the 'preview' or 'reply' button to proceed.  If you click the
+        reply button, your comment is appended to the content at the
+        bottom.  If you click the preview button, you are able to
+        preview your comment before committing it.  After previewing
+        your comment, you can click the review button to commit your
+        comment to the content item or click the edit button to edit
+        your comment.  After editing your comment, you can then go
+        through the preview process again by clicking the preview
+        button or commit it by clicking the reply button.
+
+
+
+  Advanced customization
+
+    The CMF provides many ways for site developers to significantly 
+    customize or extend a CMF-based site. The current version of this 
+    document does not go into detail on advanced development topics. 
+
+    Advanced developers should visit the "CMF development site",
+    http://cmf.zope.org for more information on resources to help site 
+    developers with advanced customization.
+
+
+  Glossary
+
+    **Site Manager** -- The actor responsible for implementing site 
+    policies such as security, workflow associations, metadata and 
+    syndication policies. The Site Manager is also responsible for
+    the overall organizational structure of the site.
+
+    **Membership Manager** -- The actor responsible for managing who
+    has access to a site (particularly back-end line of business 
+    users), and controls the privileges and properties of users. 
+
+    **Site Developer** -- The actor responsible for implementing new
+    functionality for a site and making changes to existing site 
+    capabilities. This is a "programmer" type of role, and users 
+    acting the Site Developer capacity are technical people.
+
+    **Add-on Developer** -- The actor responsible for implementing 
+    new functionality that is suitable for distribution to one or 
+    more sites. **
+
+    **Site Designer** -- The Site Designer is responsible for producing
+    and maintaining the "look and feel" of a site. This includes 
+    graphics, layout, navigation and other human factors.
+
+    **Workflow Designer** -- The Workflow Designer is responsible for 
+    defining new workflows and customizing existing workflows to meet 
+    business goals.
+
+    **Content Creator** -- Content Creators are responsible for producing 
+    and maintaining the actual content of a site. 
+
+    **Reviewer** --  The actor responsible for ensuring the quality and
+    correctness of site content.
+
+    **Site Visitor** -- A Site Visitor is an "end user" of the
+    site. The visitor may or may not have an identity known to the
+    system. Visitors with a known identity are referred to as
+    "Members" of the site, and often can do more on a site than
+    visitors without a known identity ("Guests"). Member visitors
+    often have a participatory role on the site. Site Visitors have
+    some general goals that are applicable to most sites, but many of
+    the specific goals and expectations of Site Visitors are dependent
+    upon the specific CMF site.
