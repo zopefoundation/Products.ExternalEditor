@@ -144,13 +144,13 @@
            </td>
          </tr>
 
-         <tr>
+         <tr tal:define="actions here/action_number">
            <td> </td>
            <td>
              <em><span metal:define-slot="issue_submitter_id_slot"
                         tal:content="here/submitter_id">ID</span></em>
            </td>
-           <td tal:define="actions here/action_number" align="right">
+           <td align="right">
              Last update:
            </td>
            <td>
