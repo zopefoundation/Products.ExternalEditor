@@ -57,6 +57,9 @@
 
  - Implemented 'portal_metadata' tool (dogbowl proposal).
 
+ - Deprecated the CMFDefault.File.download method; the method is no longer
+   needed.
+
 1.0 final (2001/03/29)
 
  - Removed embedded spaces in 'portal_status_message' strings

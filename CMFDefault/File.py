@@ -228,18 +228,21 @@ class File( OFS.Image.File
     edit = WorkflowAction(edit)
 
     def download(self, REQUEST, RESPONSE):
-        """
-        Download this item.  Calls OFS.Image.File.index_html to perform the
-        actual transfer after first setting Content-Disposition to suggest
-        a filename.
+        """Download this item.
+        
+        Calls OFS.Image.File.index_html to perform the actual transfer after
+        first setting Content-Disposition to suggest a filename.
+        
+        This method is deprecated, use the URL of this object itself. Because
+        the default view of a File object is to download, rather than view,
+        this method is obsolete. Also note that certain browsers do not deal
+        well with a Content-Disposition header.
+
         """
 
         RESPONSE.setHeader('Content-Disposition',
                            'attachment; filename=%s' % self.getId())
         return OFS.Image.File.index_html(self, REQUEST, RESPONSE)
-
-    index_html = download
-
 
 Globals.default__class_init__(File)
 

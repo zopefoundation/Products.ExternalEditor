@@ -13,7 +13,7 @@
 <b>Description</b>: <dtml-var name="description" newline_to_br>
 </p>
 
-<a href="download">Download &dtml-title;</a>
+<a href="&dtml-absolute_url;">Download &dtml-title;</a>
 
 <div class="Discussion">
 
