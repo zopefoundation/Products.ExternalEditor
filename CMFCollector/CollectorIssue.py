@@ -13,6 +13,8 @@
 collector transcript and various parts."""
 
 import os, urllib, string, re
+import smtplib
+
 from DateTime import DateTime
 from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo, getSecurityManager
@@ -149,9 +151,6 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         if modification_date is None:
             modification_date = self.creation_date
         self.modification_date = modification_date
-
-        contained.do_action('request', description, assignees,
-                            file, fileid, filetype)
 
     def _set_submitter_specs(self, submitter_id,
                              submitter_name, submitter_email):
@@ -365,9 +364,10 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
                             or '')
                          + transcript.EditableBody())
         self.reindexObject()
-        self._send_update_notice(action, username,
-                                 orig_status, additions, removals,
-                                 file=file, fileid=fileid)
+        got = self._send_update_notice(action, username,
+                                       orig_status, additions, removals,
+                                       file=file, fileid=fileid)
+        return got
 
     def _supporters_diff(self, orig_supporters):
         """Indicate supporter roster changes, relative to orig_supporters.
@@ -491,7 +491,12 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
                           body=body,
                           candidates=candidates)
             mh = self.MailHost
-            mh.send(message)
+            try:
+                mh.send(message)
+            except:
+                import sys
+                err = sys.exc_info()
+                return "Email notice error: '%s'"  % str(err[1])
 
     def _process_file(self, file, fileid, filetype, comment):
         """Upload file to issue if it is substantial (has a name).
@@ -717,9 +722,9 @@ def addCollectorIssue(self,
                       assignees=None,
                       file=None, fileid=None, filetype=None,
                       REQUEST=None):
-    """
-    Create a new issue in the collector.
-    """
+    """Create a new issue in the collector.
+
+    We return a string indicating any errors, or None if there weren't any."""
 
     it = CollectorIssue(id=id,
                         container=self,
@@ -736,4 +741,8 @@ def addCollectorIssue(self,
                         version_info=version_info,
                         assignees=assignees,
                         file=file, fileid=fileid, filetype=filetype)
-    return id
+    it = self._getOb(it.id)
+    got = it.do_action('request', description, assignees,
+                       file, fileid, filetype)
+
+    return got
