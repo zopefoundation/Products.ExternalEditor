@@ -28,8 +28,7 @@ from ContainerTab import ContainerTab
 from Guard import Guard
 from utils import _dtmldir
 from string import split, strip, join
-
-StringType = type('')
+from types import TupleType
 
 class WorklistDefinition (SimpleItem):
     meta_type = 'Worklist'
@@ -78,7 +77,7 @@ class WorklistDefinition (SimpleItem):
     def getVarMatch(self, id):
         if self.var_matches:
             matches = self.var_matches.get(id, ())
-            if type(matches) is StringType:
+            if not isinstance(matches, TupleType):
                 # Old version, convert it.
                 matches = (matches,)
                 self.var_matches[id] = matches
