@@ -110,7 +110,7 @@ class FSPropertiesObject (FSObject, PropertyManager):
             try:
                 propname, proptv = split( line, ':' )
                 #XXX multi-line properties?
-                proptype, propvstr = split( proptv, '=' )
+		proptype, propvstr = proptv.split( '=', 1 ) # split( proptv, '=' )
                 propname = strip(propname)
                 proptv = strip(proptv)
                 propvstr = strip(propvstr)
