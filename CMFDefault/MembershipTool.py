@@ -16,6 +16,7 @@ $Id$
 """
 
 from AccessControl import ClassSecurityInfo
+from Acquisition import aq_base
 from Acquisition import aq_inner
 from Acquisition import aq_parent
 from Globals import DTMLFile
@@ -180,7 +181,7 @@ class MembershipTool( BaseTool ):
         """ Create a member area for 'member_id'.
         """
         members = self.getMembersFolder()
-        if members is not None and member_id not in members.objectIds():
+        if members is not None and not hasattr( aq_base(members), member_id ):
             f_title = "%s's Home" % member_id
             members.manage_addPortalFolder( id=member_id, title=f_title )
             f=getattr(members, member_id)

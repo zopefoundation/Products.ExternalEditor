@@ -16,8 +16,6 @@ from Products.CMFDefault.MembershipTool import MembershipTool
 class DummyFolder(DummyFolderBase):
     def manage_addPortalFolder(self, id, title=''):
         self._setObject( id, DummyFolder() )
-    def objectIds(self):
-        return self._objects.keys()
     def changeOwnership(self, user):
         pass
     def manage_setLocalRoles(self, userid, roles):
