@@ -447,7 +447,6 @@ class MembershipTool (UniqueObject, SimpleItem):
             for source in acl_users.UserSourcesGroup.objectValues():
                 if hasattr(source, 'addUser'):
                     source.__of__(self).addUser(id, password, roles, domains)
-                    return
             raise "Can't add Member", "No supported UserSources"
 
         if properties is not None:
