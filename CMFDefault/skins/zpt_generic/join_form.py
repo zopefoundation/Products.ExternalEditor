@@ -1,6 +1,4 @@
-## Script (Python) "join_control"
-##parameters=member_id='', member_email='', password='', confirm='', send_password='', add='', cancel='', **kw
-##title=
+##parameters=b_start=0, member_id='', member_email='', password='', confirm='', send_password='', add='', cancel=''
 ##
 from Products.CMFCore.utils import getToolByName
 from Products.CMFDefault.permissions import ManageUsers
@@ -19,31 +17,31 @@ is_usermanager = mtool.checkPermission(ManageUsers, mtool)
 form = context.REQUEST.form
 if add and \
         context.validatePassword(**form) and \
-        context.members_add(**form) and \
-        context.setRedirect(rtool, 'user/join', **kw):
+        context.members_add_control(**form) and \
+        context.setRedirect(rtool, 'user/join', b_start=b_start):
     return
 elif cancel and \
-        context.setRedirect(mtool, 'global/manage_members', **kw):
+        context.setRedirect(mtool, 'global/manage_members', b_start=b_start):
     return
 
 
-control = {}
+options = {}
 
 if context.REQUEST.get('portal_status_message', '') == 'Success!':
     is_anon = False
     is_newmember = True
 
-control['title'] = is_usermanager and 'Register Member' or 'Become a Member'
-control['member_id'] = member_id
-control['member_email'] = member_email
-control['password'] = is_newmember and context.REQUEST.get('password', '') or ''
-control['send_password'] = send_password
-control['portal_url'] = portal_url
-control['isAnon'] = is_anon
-control['isAnonOrUserManager'] = is_anon or is_usermanager
-control['isNewMember'] = is_newmember
-control['isOrdinaryMember'] = not (is_anon or is_newmember or is_usermanager)
-control['validate_email'] = validate_email
+options['title'] = is_usermanager and 'Register Member' or 'Become a Member'
+options['member_id'] = member_id
+options['member_email'] = member_email
+options['password'] = is_newmember and context.REQUEST.get('password', '') or ''
+options['send_password'] = send_password
+options['portal_url'] = portal_url
+options['isAnon'] = is_anon
+options['isAnonOrUserManager'] = is_anon or is_usermanager
+options['isNewMember'] = is_newmember
+options['isOrdinaryMember'] = not (is_anon or is_newmember or is_usermanager)
+options['validate_email'] = validate_email
 
 buttons = []
 if is_newmember:
@@ -53,7 +51,7 @@ else:
     target = rtool.getActionInfo('user/join')['url']
     buttons.append( {'name': 'add', 'value': 'Register'} )
     buttons.append( {'name': 'cancel', 'value': 'Cancel'} )
-control['form'] = { 'action': target,
+options['form'] = { 'action': target,
                     'listButtonInfos': tuple(buttons) }
 
-return control
+return context.join_template(**options)

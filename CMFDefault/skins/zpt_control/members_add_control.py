@@ -1,4 +1,3 @@
-## Script (Python) "members_add"
 ##parameters=member_id, password, member_email, send_password=False, **kw
 ##title=Add a member
 ##

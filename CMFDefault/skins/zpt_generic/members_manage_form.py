@@ -1,9 +1,8 @@
-## Script (Python) "members_manage_control"
-##parameters=ids=(), members_new='', members_delete='', **kw
-##title=
+##parameters=b_start=0, ids=(), members_new='', members_delete=''
 ##
 from ZTUtils import Batch
 from Products.CMFCore.utils import getToolByName
+from Products.CMFDefault.utils import html_marshal
 
 mtool = getToolByName(script, 'portal_membership')
 rtool = getToolByName(script, 'portal_registration')
@@ -12,21 +11,17 @@ rtool = getToolByName(script, 'portal_registration')
 form = context.REQUEST.form
 if members_delete and \
         context.validateMemberIds(**form) and \
-        context.members_delete(**form) and \
-        context.setRedirect(mtool, 'global/manage_members', **kw):
+        context.members_delete_control(**form) and \
+        context.setRedirect(mtool, 'global/manage_members', b_start=b_start):
     return
 elif members_new and \
-        context.setRedirect(rtool, 'user/join', **kw):
+        context.setRedirect(rtool, 'user/join', b_start=b_start):
     return
 
 
-control = {}
+options = {}
 
 target = mtool.getActionInfo('global/manage_members')['url']
-
-b_start = kw.pop('b_start', 0)
-if b_start:
-    kw['b_start'] = b_start
 
 members = mtool.listMembers()
 batch_obj = Batch(members, 25, b_start, orphan=0)
@@ -43,14 +38,18 @@ for member in batch_obj:
                    'home': member_home } )
 navigation = context.getBatchNavigation(batch_obj, target,
                                         'member', 'members')
-control['batch'] = { 'listItemInfos': tuple(items),
+options['batch'] = { 'listItemInfos': tuple(items),
                      'navigation': navigation }
 
+hidden_vars = []
+for name, value in html_marshal(b_start=b_start):
+    hidden_vars.append( {'name': name, 'value': value} )
 buttons = []
 buttons.append( {'name': 'members_new', 'value': 'New...'} )
 if items:
     buttons.append( {'name': 'members_delete', 'value': 'Delete'} )
-control['form'] = { 'action': target,
+options['form'] = { 'action': target,
+                    'listHiddenVarInfos': tuple(hidden_vars),
                     'listButtonInfos': tuple(buttons) }
 
-return control
+return context.members_manage_template(**options)

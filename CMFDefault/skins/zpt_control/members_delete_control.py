@@ -1,4 +1,3 @@
-## Script (Python) "members_delete"
 ##parameters=ids, **kw
 ##title=Delete members
 ##
