@@ -393,10 +393,13 @@ class MembershipTool(UniqueObject, Folder, ActionProviderBase):
         """ What local roles can I assign?
         """
         member = self.getAuthenticatedMember()
+        member_roles = member.getRolesInContext(obj)
         if _checkPermission(ManageUsers, obj):
             local_roles = self.getPortalRoles()
+            if 'Manager' not in member_roles:
+                 local_roles.remove('Manager')
         else:
-            local_roles = [ role for role in member.getRolesInContext(obj)
+            local_roles = [ role for role in member_roles
                             if role not in ('Member', 'Authenticated') ]
         local_roles.sort()
         return tuple(local_roles)

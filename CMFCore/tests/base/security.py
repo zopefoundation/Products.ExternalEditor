@@ -35,6 +35,10 @@ class OmnipotentUser( Implicit ):
     def allowed( self, object, object_roles=None ):
         return 1
 
+    def getRolesInContext(self, object):
+        return ('Manager',)
+
+
 class UserWithRoles( Implicit ):
     """
       User with roles specified in constructor
