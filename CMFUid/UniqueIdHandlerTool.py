@@ -49,7 +49,7 @@ class UniqueIdHandlerTool(UniqueObject, SimpleItem, ActionProviderBase):
     meta_type = 'Unique Id Handler Tool'
     
     # make the uid attribute name available for the unit tests
-    # not meant to be altered!!!
+    # not meant to be altered as long you don't know what you do!!!
     UID_ATTRIBUTE_NAME = UID_ATTRIBUTE_NAME
     
     # make the exception class available through the tool
@@ -98,17 +98,17 @@ class UniqueIdHandlerTool(UniqueObject, SimpleItem, ActionProviderBase):
         """
         uid = self.queryUid(obj, default=None)
         if uid is None:
-            UID_ATTRIBUTE_NAME = self.UID_ATTRIBUTE_NAME
+            # attach a unique id annotation to the object
+            anno_tool = getToolByName(self, 'portal_uidannotation')
+            annotation = anno_tool(obj, self.UID_ATTRIBUTE_NAME)
+            
+            # initialize the annotation with a (new) unique id
             generator = getToolByName(self, 'portal_uidgenerator')
             uid = generator()
-            setattr(obj, UID_ATTRIBUTE_NAME, uid)
-            uid.setId(UID_ATTRIBUTE_NAME)
+            annotation.setUid(uid)
             
             # reindex the object
             self._reindexObject(obj)
-
-            # return uid not uid object
-            uid = uid()
             
         return uid
     
