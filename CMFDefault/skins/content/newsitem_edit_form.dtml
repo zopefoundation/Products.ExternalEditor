@@ -30,12 +30,12 @@
           <label for="cb_structuredtext">structured-text</label>
    <input type="radio" name="text_format" value="plain"
           <dtml-if "text_format=='plain'">checked</dtml-if>
-	  id="cb_html" />
-	  <label for="cb_html">plain text</label>
+          id="cb_html" />
+          <label for="cb_html">plain text</label>
    <input type="radio" name="text_format" value="html"
           <dtml-if "text_format=='html'">checked</dtml-if>
-	  id="cb_html" />
-	  <label for="cb_html">html</label>
+          id="cb_html" />
+          <label for="cb_html">html</label>
   </td>
  </tr>
 
@@ -58,8 +58,8 @@
  <tr>
   <th> <br> </td>
   <td>
-    <input type="submit" name="choice" value=" Change ">
-    <input type="submit" name="choice" value=" Change and View ">
+   <input type="submit" name="change" value=" Change ">
+   <input type="submit" name="change_and_view" value=" Change and View ">
   </td>
  </tr>
 

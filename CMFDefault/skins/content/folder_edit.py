@@ -1,5 +1,5 @@
 ## Script (Python) "folder_edit"
-##parameters=title, description, choice=' Change '
+##parameters=title, description, change_and_view=''
 ##title=Edit a folder
  
 context.edit( title=title,
@@ -7,7 +7,7 @@ context.edit( title=title,
 
 qst='portal_status_message=Folder+changed.'
 
-if choice == ' Change and View ':
+if change_and_view:
     target_action = context.getTypeInfo().getActionById( 'view' )
 else:
     target_action = context.getTypeInfo().getActionById( 'edit' )

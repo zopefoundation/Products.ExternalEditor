@@ -1,12 +1,12 @@
 ## Script (Python) "link_edit"
-##parameters=remote_url, choice=' Change '
+##parameters=remote_url, change_and_view=''
 ##title=Edit a link
  
 context.edit(remote_url=remote_url)
 
 qst='portal_status_message=Link+changed.'
 
-if choice == ' Change and View ':
+if change_and_view:
     target_action = context.getTypeInfo().getActionById( 'view' )
 else:
     target_action = context.getTypeInfo().getActionById( 'edit' )

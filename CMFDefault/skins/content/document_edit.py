@@ -1,5 +1,5 @@
 ## Script (Python) "document_edit"
-##parameters=text_format, text, file='', SafetyBelt='', choice=' Change '
+##parameters=text_format, text, file='', SafetyBelt='', change_and_view=''
 ##title=Edit a document
 try:
     from Products.CMFDefault.utils import scrubHTML
@@ -11,7 +11,7 @@ try:
                 )
     qst='portal_status_message=Document+changed.'
 
-    if choice == ' Change and View ':
+    if change_and_view:
         target_action = context.getTypeInfo().getActionById( 'view' )
     else:
         target_action = context.getTypeInfo().getActionById( 'edit' )

@@ -25,6 +25,15 @@ CMF 1.4 alpha
 
   New Features
 
+    - zpt skins (CMFDefault): Added i18n attributes.
+      See INSTALL.txt for installing internationalization support.
+      (Collector #122, thanks to Gitte Wange for her contribution)
+
+    - zpt skins (CMFDefault): Added 'zpt_content/transition_form.pt'.
+      'content_*_form.pt' now use this template.
+
+    - skins (CMFDefault): Made scripts independent of submit button 'values'.
+
     - utils: Changed behavior of 'StrippingParser' and 'scrubHTML'.
       They now close empty tags.
       (Collector #108, thanks to 'tanghus' for the patch)

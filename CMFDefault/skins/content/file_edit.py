@@ -1,5 +1,5 @@
 ## Script (Python) "file_edit"
-##parameters=precondition='', file='', choice=' Change '
+##parameters=precondition='', file='', change_and_view=''
 ##title=Edit a file
  
 context.edit(
@@ -8,7 +8,7 @@ context.edit(
 
 qst='portal_status_message=File+changed.'
 
-if choice == ' Change and View ':
+if change_and_view:
     target_action = context.getTypeInfo().getActionById( 'view' )
 else:
     target_action = context.getTypeInfo().getActionById( 'edit' )

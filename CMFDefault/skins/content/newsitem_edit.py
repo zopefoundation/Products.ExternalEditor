@@ -1,5 +1,5 @@
 ## Script (Python) "newsitem_edit"
-##parameters=text, description, text_format=None, choice=' Change '
+##parameters=text, description, text_format=None, change_and_view=''
 ##title=Edit a news item
 try:
     from Products.CMFDefault.utils import scrubHTML
@@ -10,7 +10,7 @@ try:
 
     qst='portal_status_message=News+Item+changed.'
 
-    if choice == ' Change and View ':
+    if change_and_view:
         target_action = context.getTypeInfo().getActionById( 'view' )
     else:
         target_action = context.getTypeInfo().getActionById( 'edit' )
