@@ -63,7 +63,7 @@
                 ><dtml-let item=sequence-item
                 ><dtml-unless expr="item in allowedSubjects"
                 ><dtml-var sequence-item>
-                </dtml-unless></dtml-let></dtml-in></textarea>
+</dtml-unless></dtml-let></dtml-in></textarea>
    <dtml-comment>
        Comment out / delete this to ignore controlled vocabulary 
        for Subject.
