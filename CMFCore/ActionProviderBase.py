@@ -15,7 +15,7 @@
 $Id$
 """
 
-from Globals import DTMLFile
+from Globals import DTMLFile, InitializeClass
 from AccessControl import ClassSecurityInfo
 
 from ActionInformation import ActionInformation
@@ -276,3 +276,5 @@ class ActionProviderBase:
                                 , category=category
                                 , visible=visible
                                 )
+
+InitializeClass(ActionProviderBase)
