@@ -14,9 +14,9 @@ The Zope Content Managment Framework
 
   Using the CMF
 
-    - Accounts - how to create an account, log in, log out, etc.
+    - Accounts - how to create an account, preferences, log in, log out, etc.
 
-    - Getting around - how to use navigation, actions box, etc.
+    - Getting around - how to use navigation, member folder, actions box, etc.
 
     - Using Services - use of pubic services: search, discussion, etc.
 
