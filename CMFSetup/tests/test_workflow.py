@@ -16,6 +16,11 @@ from common import BaseRegistryTests
 
 class DummyWorkflowTool( Folder ):
 
+    def __init__( self, id='portal_workflow' ):
+        Folder.__init__( self, id )
+        self._default_chain = ()
+        self._chains_by_type = {}
+
     def getWorkflowIds( self ):
 
         return self.objectIds()
@@ -447,10 +452,6 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
 
         site = self._initSite()
 
-        configurator = self._makeOne( site ).__of__( site )
-
-        self.assertEqual( len( configurator.listWorkflowInfo() ), 0 )
-
         WF_ID_NON = 'non_dcworkflow'
         WF_TITLE_NON = 'Non-DCWorkflow'
         WF_ID_DC = 'dcworkflow'
@@ -482,6 +483,120 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
                         , DCWorkflowDefinition.meta_type )
         self.assertEqual( dc_info[ 'filename' ]
                         , 'workflows/%s/definition.xml' % WF_ID_DC )
+
+    def test_listWorkflowChains_no_default( self ):
+
+        site = self._initSite()
+        configurator = self._makeOne( site ).__of__( site )
+
+        chains = configurator.listWorkflowChains()
+
+        default_chain = [ x[1] for x in chains if x[0] is None ][0]
+        self.assertEqual( len( default_chain ), 0 )
+
+    def test_listWorkflowChains_with_default( self ):
+
+        site = self._initSite()
+        site.portal_workflow._default_chain = ( 'foo', 'bar' )
+        configurator = self._makeOne( site ).__of__( site )
+
+        chains = configurator.listWorkflowChains()
+
+        self.assertEqual( chains[ 0 ][ 0 ], None )
+        default_chain = chains[ 0 ][ 1 ]
+        self.assertEqual( len( default_chain ), 2 )
+        self.assertEqual( default_chain[ 0 ], 'foo' )
+        self.assertEqual( default_chain[ 1 ], 'bar' )
+
+    def test_listWorkflowChains_no_overrides( self ):
+
+        site = self._initSite()
+        configurator = self._makeOne( site ).__of__( site )
+
+        chains = configurator.listWorkflowChains()
+
+        self.assertEqual( len( chains ), 1 )
+
+    def test_listWorkflowChains_with_overrides( self ):
+
+        site = self._initSite()
+        site.portal_workflow._chains_by_type[ 'qux' ] = ( 'foo', 'bar' )
+        configurator = self._makeOne( site ).__of__( site )
+
+        chains = configurator.listWorkflowChains()
+
+        self.assertEqual( len( chains ), 2 )
+
+        self.assertEqual( chains[ 0 ][ 0 ], None )
+        default_chain = chains[ 0 ][ 1 ]
+        self.assertEqual( len( default_chain ), 0 )
+
+        self.assertEqual( chains[ 1 ][ 0 ], 'qux' )
+        qux_chain = chains[ 1 ][ 1 ]
+        self.assertEqual( len( qux_chain ), 2 )
+        self.assertEqual( qux_chain[ 0 ], 'foo' )
+        self.assertEqual( qux_chain[ 1 ], 'bar' )
+
+    def test_listWorkflowChains_default_chain_plus_overrides( self ):
+
+        site = self._initSite()
+        site.portal_workflow._default_chain = ( 'foo', 'bar' )
+        site.portal_workflow._chains_by_type[ 'qux' ] = ( 'baz', )
+        configurator = self._makeOne( site ).__of__( site )
+
+        chains = configurator.listWorkflowChains()
+
+        self.assertEqual( chains[ 0 ][ 0 ], None )
+        default_chain = chains[ 0 ][ 1 ]
+        self.assertEqual( len( default_chain ), 2 )
+        self.assertEqual( default_chain[ 0 ], 'foo' )
+        self.assertEqual( default_chain[ 1 ], 'bar' )
+
+        self.assertEqual( chains[ 1 ][ 0 ], 'qux' )
+        qux_chain = chains[ 1 ][ 1 ]
+        self.assertEqual( len( qux_chain ), 1 )
+        self.assertEqual( qux_chain[ 0 ], 'baz' )
+
+    def test_generateToolXML_empty( self ):
+
+        site = self._initSite()
+        configurator = self._makeOne( site ).__of__( site )
+        self._compareDOM( configurator.generateToolXML(), _EMPTY_TOOL_EXPORT )
+
+    def test_generateToolXML_default_chain_plus_overrides( self ):
+
+        site = self._initSite()
+        site.portal_workflow._default_chain = ( 'foo', 'bar' )
+        site.portal_workflow._chains_by_type[ 'qux' ] = ( 'baz', )
+
+        configurator = self._makeOne( site ).__of__( site )
+
+        self._compareDOM( configurator.generateToolXML()
+                        , _OVERRIDE_TOOL_EXPORT )
+
+    def test_generateToolXML_mixed( self ):
+
+        site = self._initSite()
+
+        WF_ID_NON = 'non_dcworkflow'
+        WF_TITLE_NON = 'Non-DCWorkflow'
+        WF_ID_DC = 'dcworkflow'
+        WF_TITLE_DC = 'DCWorkflow'
+
+        site = self._initSite()
+
+        wf_tool = site.portal_workflow
+        nondcworkflow = DummyWorkflow( WF_TITLE_NON )
+        nondcworkflow.title = WF_TITLE_NON
+        wf_tool._setObject( WF_ID_NON, nondcworkflow )
+
+        dcworkflow = self._initDCWorkflow( WF_ID_DC )
+        dcworkflow.title = WF_TITLE_DC
+
+        configurator = self._makeOne( site ).__of__( site )
+
+        self._compareDOM( configurator.generateToolXML(), _NORMAL_TOOL_EXPORT )
+
 
 
 _WF_PERMISSIONS = \
@@ -696,6 +811,50 @@ _WF_SCRIPTS = \
                     , _AFTER_KILL_SCRIPT
                     )
 }
+
+_EMPTY_TOOL_EXPORT = """\
+<?xml version="1.0"?>
+<workflow-tool>
+ <bindings>
+  <default>
+  </default>
+ </bindings>
+</workflow-tool>
+"""
+
+_OVERRIDE_TOOL_EXPORT = """\
+<?xml version="1.0"?>
+<workflow-tool>
+ <bindings>
+  <default>
+   <bound-workflow workflow_id="foo" />
+   <bound-workflow workflow_id="bar" />
+  </default>
+  <type type_id="qux">
+   <bound-workflow workflow_id="baz" />
+  </type>
+ </bindings>
+</workflow-tool>
+"""
+
+_NORMAL_TOOL_EXPORT = """\
+<?xml version="1.0"?>
+<workflow-tool>
+ <workflow
+    workflow_id="non_dcworkflow"
+    meta_type="Dummy Workflow"
+    />
+ <workflow
+    workflow_id="dcworkflow"
+    filename="workflows/dcworkflow/definition.xml"
+    meta_type="Workflow"
+    />
+ <bindings>
+  <default>
+  </default>
+ </bindings>
+</workflow-tool>
+"""
 
 
 def test_suite():

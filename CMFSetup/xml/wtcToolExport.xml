@@ -2,11 +2,32 @@
 <workflow-tool
         xmlns:tal="http://xml.zope.org/namespaces/tal">
  <workflow
-        id="WORKFLOW_ID"
+        workflow_id="WORKFLOW_ID"
         meta_type="META_TYPE"
         tal:repeat="workflow here/listWorkflowInfo"
-        tal:attributes="id workflow/id;
+        tal:attributes="workflow_id workflow/id;
                         meta_type workflow/meta_type;
                         filename workflow/filename | default;
                        " />
+ <bindings
+        tal:define="chains here/listWorkflowChains;
+                    default_chain python: chains[ 0 ][ 1 ];
+                    overrides python: chains[ 1: ];
+                   ">
+  <default>
+   <bound-workflow
+        workflow_id="WORKFLOW_ID"
+        tal:repeat="bound default_chain"
+        tal:attributes="workflow_id bound" />
+  </default>
+  <type 
+        type_id="TYPE_ID"
+        tal:repeat="binding overrides"
+        tal:attributes="type_id python: binding[ 0 ]">
+   <bound-workflow
+        workflow_id="WORKFLOW_ID"
+        tal:repeat="bound python: binding[ 1 ]"
+        tal:attributes="workflow_id bound" />
+  </type>
+ </bindings>
 </workflow-tool>

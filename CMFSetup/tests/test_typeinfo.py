@@ -215,13 +215,13 @@ class TypeInfoConfiguratorTests( _TypeInfoSetup ):
 
         site = self._initSite()
         configurator = self._makeOne( site ).__of__( site )
-        self._compareDOM( configurator.generateToolXML(), _EMPTY_EXPORT )
+        self._compareDOM( configurator.generateToolXML(), _EMPTY_TOOL_EXPORT )
 
     def test_generateToolXML_normal( self ):
 
         site = self._initSite( _TI_LIST )
         configurator = self._makeOne( site ).__of__( site )
-        self._compareDOM( configurator.generateToolXML(), _NORMAL_EXPORT )
+        self._compareDOM( configurator.generateToolXML(), _NORMAL_TOOL_EXPORT )
 
     def test_generateToolXML_explicit_filename( self ):
 
@@ -248,7 +248,7 @@ class TypeInfoConfiguratorTests( _TypeInfoSetup ):
         site = self._initSite()
         configurator = self._makeOne( site ).__of__( site )
 
-        id_file_list = configurator.parseToolXML( _EMPTY_EXPORT )
+        id_file_list = configurator.parseToolXML( _EMPTY_TOOL_EXPORT )
         self.assertEqual( len( id_file_list ), 0 )
 
     def test_parseToolXML_normal( self ):
@@ -256,7 +256,7 @@ class TypeInfoConfiguratorTests( _TypeInfoSetup ):
         site = self._initSite()
         configurator = self._makeOne( site ).__of__( site )
 
-        id_file_list = configurator.parseToolXML( _NORMAL_EXPORT )
+        id_file_list = configurator.parseToolXML( _NORMAL_TOOL_EXPORT )
         self.assertEqual( len( id_file_list ), 2 )
 
         self.assertEqual( id_file_list[ 0 ][ 0 ], 'foo' )
@@ -407,13 +407,13 @@ for original in _TI_LIST:
     duplicate[ 'id' ] = '%s object' % original[ 'id' ]
     _TI_LIST_WITH_FILENAME.append( duplicate )
 
-_EMPTY_EXPORT = """\
+_EMPTY_TOOL_EXPORT = """\
 <?xml version="1.0"?>
 <types-tool>
 </types-tool>
 """
 
-_NORMAL_EXPORT = """\
+_NORMAL_TOOL_EXPORT = """\
 <?xml version="1.0"?>
 <types-tool>
  <type id="foo" />
@@ -549,7 +549,7 @@ class Test_exportTypesTool( _TypeInfoSetup ):
         self.assertEqual( len( context._wrote ), 1 )
         filename, text, content_type = context._wrote[ 0 ]
         self.assertEqual( filename, 'typestool.xml' )
-        self._compareDOM( text, _EMPTY_EXPORT )
+        self._compareDOM( text, _EMPTY_TOOL_EXPORT )
         self.assertEqual( content_type, 'text/xml' )
 
     def test_normal( self ):
@@ -564,7 +564,7 @@ class Test_exportTypesTool( _TypeInfoSetup ):
 
         filename, text, content_type = context._wrote[ 0 ]
         self.assertEqual( filename, 'typestool.xml' )
-        self._compareDOM( text, _NORMAL_EXPORT )
+        self._compareDOM( text, _NORMAL_TOOL_EXPORT )
         self.assertEqual( content_type, 'text/xml' )
 
         filename, text, content_type = context._wrote[ 1 ]
@@ -612,7 +612,7 @@ class Test_importTypesTool( _TypeInfoSetup ):
         self.assertEqual( len( tool.objectIds() ), 2 )
 
         context = DummyImportContext( site )
-        context._files[ 'typestool.xml' ] = _EMPTY_EXPORT
+        context._files[ 'typestool.xml' ] = _EMPTY_TOOL_EXPORT
 
         from Products.CMFSetup.typeinfo import importTypesTool
         importTypesTool( context )
@@ -627,7 +627,7 @@ class Test_importTypesTool( _TypeInfoSetup ):
         self.assertEqual( len( tool.objectIds() ), 2 )
 
         context = DummyImportContext( site, True )
-        context._files[ 'typestool.xml' ] = _EMPTY_EXPORT
+        context._files[ 'typestool.xml' ] = _EMPTY_TOOL_EXPORT
 
         from Products.CMFSetup.typeinfo import importTypesTool
         importTypesTool( context )
@@ -642,7 +642,7 @@ class Test_importTypesTool( _TypeInfoSetup ):
         self.assertEqual( len( tool.objectIds() ), 2 )
 
         context = DummyImportContext( site, False )
-        context._files[ 'typestool.xml' ] = _EMPTY_EXPORT
+        context._files[ 'typestool.xml' ] = _EMPTY_TOOL_EXPORT
 
         from Products.CMFSetup.typeinfo import importTypesTool
         importTypesTool( context )
@@ -657,7 +657,7 @@ class Test_importTypesTool( _TypeInfoSetup ):
         self.assertEqual( len( tool.objectIds() ), 0 )
 
         context = DummyImportContext( site )
-        context._files[ 'typestool.xml' ] = _NORMAL_EXPORT
+        context._files[ 'typestool.xml' ] = _NORMAL_TOOL_EXPORT
         context._files[ 'types/foo.xml' ] = _FOO_EXPORT % 'foo'
         context._files[ 'types/bar.xml' ] = _BAR_EXPORT % 'bar'
 

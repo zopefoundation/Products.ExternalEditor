@@ -148,6 +148,13 @@ class WorkflowToolConfigurator( Implicit ):
 
         return workflow_info
 
+    security.declareProtected( ManagePortal, 'generateToolXML' )
+    def generateToolXML( self ):
+
+        """ Pseudo API.
+        """
+        return self._toolConfig()
+
     security.declareProtected( ManagePortal, 'listWorkflowInfo' )
     def listWorkflowInfo( self ):
 
@@ -159,9 +166,38 @@ class WorkflowToolConfigurator( Implicit ):
         return [ self.getWorkflowInfo( workflow_id )
                     for workflow_id in workflow_tool.getWorkflowIds() ]
 
+    security.declareProtected( ManagePortal, 'listWorkflowChains' )
+    def listWorkflowChains( self ):
+
+        """ Return a sequence of tuples binding workflows to each content type.
+
+        o Tuples are in the format, '( type_id, [ workflow_id ] )'.
+
+        o The default chain will be first in the list, with None for the
+          'type_id'.
+
+        o The list will only include type-specific chains for types which
+          do not use the default chain.
+        """
+        workflow_tool = getToolByName( self._site, 'portal_workflow' )
+
+        result = [ ( None, workflow_tool._default_chain ) ]
+        overrides = workflow_tool._chains_by_type.items()
+        overrides.sort()
+
+        result.extend( overrides )
+
+        return result
+
     #
     #   Helper methods
     #
+    security.declarePrivate( '_toolConfig' )
+    _toolConfig = PageTemplateFile( 'wtcToolExport.xml'
+                                  , _xmldir
+                                  , __name__='toolConfig'
+                                  )
+
     security.declarePrivate( '_extractDCWorkflowInfo' )
     def _extractDCWorkflowInfo( self, workflow, workflow_info ):
 
