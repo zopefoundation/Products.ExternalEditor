@@ -12,12 +12,11 @@
 # FOR A PARTICULAR PURPOSE.
 # 
 ##############################################################################
-"""$Id$
-"""
+"""Zope External Editor Helper Application by Casey Duncan
 
-# Zope External Editor Helper Application by Casey Duncan
+$Id$"""
 
-__version__ = '0.7'
+__version__ = '0.8'
 
 import sys, os, re
 import traceback
