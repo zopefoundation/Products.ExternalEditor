@@ -87,6 +87,7 @@ import Topic
 import SimpleStringCriterion
 import SimpleIntCriterion
 import ListCriterion
+import DateCriteria
 import Products.CMFCore
 
 from ZClasses import createZClassForBase
