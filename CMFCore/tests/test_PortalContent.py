@@ -33,7 +33,7 @@ class TestContentCopyPaste(RequestTest):
         try:
             newSecurityManager(None, UnrestrictedUser('manager', '', ['Manager'], []))
             factory = self.root.manage_addProduct['CMFSetup'].addConfiguredSite
-            factory('cmf', 'default')
+            factory('cmf', 'default', snapshot=False)
             self.site = self.root.cmf
             get_transaction().commit(1) # Make sure we have _p_jars
         except:
