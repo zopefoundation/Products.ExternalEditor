@@ -23,7 +23,7 @@
 
 <h2> Backlinks and Nesting Information </h2>
 
-<p> <a href="thispage" tal:attributes="href thispage"
+<p> <a href="thispage" tal:attributes="href here/wiki_page_url"
     ><span tal:replace="thispage">thispage</span></a>
     is linked on the following pages:
 </p>
@@ -51,7 +51,8 @@
                               disabled python: not mover">
   </td>
   <td> <a href="../thispage"
-          tal:attributes="href python: '../%s' % link['pageid']"
+          tal:attributes="href python: '%s/%s' % (here.wiki_base_url(),
+                                                  link['pageid'])"
           tal:content="link/pageid"
        >referrer</a>
   </td>
