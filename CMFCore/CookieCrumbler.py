@@ -31,6 +31,12 @@ from CMFCorePermissions import ModifyCookieCrumblers
 from CMFCorePermissions import ViewManagementScreens
 from utils import SimpleItemWithProperties
 
+try:
+    from zExceptions import Redirect
+except ImportError:
+    # Pre Zope 2.7
+    Redirect = 'Redirect'
+
 
 # Constants.
 ATTEMPT_NONE = 0       # No attempt at authentication
@@ -251,7 +257,7 @@ class CookieCrumbler (SimpleItemWithProperties):
         # Redirect if desired.
         url = self.getUnauthorizedURL()
         if url is not None:
-            raise 'Redirect', url
+            raise Redirect, url
         # Fall through to the standard unauthorized() call.
         resp.unauthorized()
 
