@@ -2,21 +2,25 @@
 
 <h3><dtml-var "REQUEST.form['title']"></h3>
 
-<dtml-var content_byline>
-
 <dtml-var "REQUEST.form['text']" fmt="structured-text">
 
 <form method="POST" action="<dtml-var expr="absolute_url() + '/talkback'">">
- <input type="hidden" name="title" value="<dtml-var "REQUEST.form['title']" html_quote>">
- <input type="hidden" name="text" value="<dtml-var "REQUEST.form['text']" html_quote>">
+ <input type="hidden" name="title"
+        value="<dtml-var "REQUEST.form['title']" html_quote>">
+ <input type="hidden" name="text"
+        value="<dtml-var "REQUEST.form['text']" html_quote>">
  <input type="hidden" name="title_override"
-                                   value="<dtml-var "REQUEST.form['title']" html_quote>">
+        value="<dtml-var "REQUEST.form['title']" html_quote>">
  <input type="hidden" name="text_override"
-                                  value="<dtml-var "REQUEST.form['text']" html_quote>">
+        value="<dtml-var "REQUEST.form['text']" html_quote>">
+ <dtml-let member="portal_membership.getAuthenticatedMember()">
+  <input type="hidden" name="Creator" value="&dtml-member;">
+ </dtml-let>
  <table><tr>
   <td width="15%"></td>
   <td>
-   <input type="submit" value="Edit" name="&dtml-id;/discussion_reply_form:method">
+   <input type="submit" value="Edit"
+          name="&dtml-id;/discussion_reply_form:method">
    <input type="submit" value="Reply" name="createReply:method">
   </td>
  </tr></table>
