@@ -1,6 +1,4 @@
-<html xmlns:tal="http://xml.zope.org/namespaces/tal"
-      xmlns:metal="http://xml.zope.org/namespaces/metal"
-      metal:use-macro="here/main_template/macros/master">
+<html metal:use-macro="here/main_template/macros/master">
 <body>
 <div metal:fill-slot="main" i18n:domain="cmf_default">
 
@@ -15,7 +13,7 @@
 <br />
  Then visit the
   <a href="/manage"
- 	 tal:attributes="href string:${here/portal_url}/manage"
+     tal:attributes="href string:${here/portal_url}/manage"
   >management interface</a> and the
   <a href="/"
      tal:attributes="href string:${here/portal_url}/">home page</a>.

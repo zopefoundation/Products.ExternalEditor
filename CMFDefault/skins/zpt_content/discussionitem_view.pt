@@ -1,14 +1,12 @@
-<html xmlns:tal="http://xml.zope.org/namespaces/tal"
-      xmlns:metal="http://xml.zope.org/namespaces/metal"
-      metal:use-macro="here/main_template/macros/master">
+<html metal:use-macro="here/main_template/macros/master">
 <head>
- <metal:block fill-slot="base"
+ <metal:slot fill-slot="base"
  ><tal:span tal:replace="structure here/getBaseTag"
-/></metal:block>
+/></metal:slot>
 </head>
 <body>
 
-<div metal:fill-slot="header">
+<metal:slot metal:fill-slot="header">
 
   <h1 id="DesktopTitle"
       tal:content="here/Title">Document Title</h1>
@@ -19,9 +17,9 @@
 
   <div metal:use-macro="here/content_byline/macros/byline">By Me</div>
 
-</div>
+</metal:slot>
 
-<div metal:fill-slot="main">	  
+<metal:slot metal:fill-slot="main">
 
   <div id="DiscussionAbove">
    <span tal:replace="structure here/aboveInThread"></span>
@@ -34,7 +32,7 @@
         tal:condition="here/viewThreadsAtBottom|nothing">Dicussions</span>
   </div>
 
-</div>
+</metal:slot>
 
 </body>
 </html>
