@@ -3,6 +3,7 @@
    xmlns:metal="http://xml.zope.org/namespaces/metal"
    xmlns:i18n="http://xml.zope.org/namespaces/i18n"
    tal:define="control python: here.members_manage_control(**request.form)"
+   tal:condition="control"
 ><html metal:use-macro="here/main_template/macros/master">
 <body>
 

@@ -54,6 +54,7 @@ elif cancel:
     else:
         target = portal_url
     context.REQUEST.RESPONSE.redirect(target)
+    return None
 
 if message:
     context.REQUEST.set('portal_status_message', message)

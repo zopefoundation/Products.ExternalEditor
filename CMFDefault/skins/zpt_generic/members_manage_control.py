@@ -25,6 +25,7 @@ if members_delete:
 elif members_new:
     target = '%s/join_form' % portal_url
     context.REQUEST.RESPONSE.redirect(target)
+    return None
 
 if message:
     context.REQUEST.set('portal_status_message', message)
