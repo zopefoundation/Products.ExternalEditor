@@ -45,7 +45,7 @@
 	   <tr align="top"
 	       tal:repeat="items batch">
         <td align="left" width="5" NOWRAP
-		     tal:define="folderish exists: items/isPrincipiaFolderish;
+		     tal:define="folderish items/isPrincipiaFolderish;
 		               portalish items/isPortalContent|nothing;
 					   global methodID python: folderish and 'folder_contents' or (portalish and 'view' or '');
 					   global icon items/getIcon|items/icon|nothing">

@@ -8,29 +8,6 @@
 				  object_actions python:(actions['object'] + actions['workflow']);
 				  global_actions python:actions['global']">
 <table class="ActionBox" width="100%">
-
- <tr class=""
-     tal:attributes="class AuthClass">
-  <td class="ActionTitle"
-      tal:content="uname">
-   <img src="" align="left" alt="User"
-        tal:attributes="src python:'%s/p_/User_icon' % (here.portal_url())">
-   UserName
-  </td>
- </tr>
- <tr class=""
-     tal:attributes="class AuthClass">
-  <td>
-   <span tal:repeat="action user_actions"><a href="" tal:attributes="href action/url" tal:content="action/name">Action</a><br></span>
-  </td>
- </tr>
- <tr class=""
-     tal:attributes="class AuthClass"
-	 tal:condition="folder_actions">
-  <td> 
-    <span tal:repeat="action folder_actions"><a href="" tal:attributes="href action/url" tal:content="action/name">Action</a><br></span>
-  </td>
- </tr>
  <tbody tal:condition="object_actions">
  <tr class=""
      tal:attributes="class AuthClass">
@@ -53,6 +30,13 @@
   </td>
  </tr>
 </tbody>
+<tr class=""
+     tal:attributes="class AuthClass"
+	 tal:condition="folder_actions">
+  <td> 
+    <span tal:repeat="action folder_actions"><a href="" tal:attributes="href action/url" tal:content="action/name">Action</a><br></span>
+  </td>
+ </tr>
  <tr class=""
      tal:attributes="class AuthClass"
 	 tal:condition="global_actions">

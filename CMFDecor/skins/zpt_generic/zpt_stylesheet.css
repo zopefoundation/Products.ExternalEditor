@@ -1,0 +1,423 @@
+body {
+    background-color: #FFFFFF;
+    color: #000000;
+    font-family:  Verdana, Helvetica, sans-serif;
+    font-size:  80%;
+    margin-top: 0;
+    margin-left:0;
+    margin-right:0;
+    margin-bottom:0;
+}
+
+a:link {
+    text-decoration: none;
+    color: #FFFFFF;
+}
+
+a:visited { 
+    text-decoration: none;
+    color: #FFFFFF;
+}
+
+a:active {
+    color: #FFFFFF;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: none;
+    color: #000066;
+}
+
+p {
+    font-size: 80%;
+    background-color:  #FFFFFF;
+    color:  #000000;
+}
+
+td {
+    font-size: 100%;
+    font-family:  Verdana, Helvetica, sans-serif;
+    color:  #000000;
+}
+
+h1 {
+    font-size:  120%;
+    font-weight:  bold;
+    color:  #000000;
+}
+
+h2 {
+    font-size:  115%;
+    background-color: #FFFFFF;
+    color:  #000000;
+}
+
+h3 {
+    font-size:  110%;
+    background-color: #FFFFFF;
+    color:  #000000;
+}
+
+.invisible {
+  font-size: 80%;
+  color: #FFFFFF;
+}
+
+.mild {
+    color: #7f7f7f;
+}
+
+.DesktopStatusBar{
+  font-size: 100%;
+  font-family: Arial, Verdana, Helvetica, sans-serif;
+  color: #ff0000;
+}
+
+table {
+    width: 100%;
+    border: 0;
+}
+
+table.Masthead {
+    background-color: #336699;
+}
+
+tr.Masthead td.PortalLogo {
+    background-color: #336699;
+    text-align: left;
+    vertical-align: middle;
+}
+
+table.Masthead tr.Masthead td.PortalTitle {
+    text-align: left;
+    color: #000000
+    vertical-align: middle;
+    font-size: 120%;
+    font-weight: bold;
+    margin-left: 1em;
+}
+
+table.Masthead tr.Navhead {
+    background-color: #336699;
+}
+
+table.Masthead tr.Masthead td.NavBar {
+    color: #FFFFFF;
+    font-size: 100%;
+    font-weight: normal;
+    text-align: right;
+    vertical-align: middle;
+}
+
+table.Masthead tr.Masthead td.NavBar a:link {
+    font-size: 80%;
+    font-weight: normal;
+    color: #FFFFFF;
+    text-decoration: none;
+}
+
+table.Masthead tr.Masthead td.NavBar a:visited {
+    font-size: 80%;
+    font-weight: normal;
+    color: #FFFFFF;
+    text-decoration: none;
+}
+
+table.Masthead tr.Masthead td.NavBar a:active {
+    font-size: 80%;
+    font-weight: normal;
+    color: #FFFFFF;
+    text-decoration: none;
+}
+
+table.Masthead tr.Masthead td.NavBar a:hover {
+    font-size: 80%;
+    font-weight: normal;
+    color: #5599CC;
+    text-decoration: none;
+}
+td.SideBar {
+    width: 15%;
+    vertical-align: top;
+}
+
+table.MemberActionBox {
+    color: #000000;
+    font-family: Verdana, Helvetica, sans-serif;
+    border-top: solid #AAAAAA;
+    border-top-width: thin;
+    background-color: #5599CC;
+}
+
+
+table.MemberActionBox tr td {
+    color: #000000;
+    font-size: 70%;
+}
+
+table.MemberActionBox tr td.ActionTitle {
+    font-weight: bold;
+}
+
+
+table.MemberActionBox tr.MemberActions td.MemberActionsList {
+    color: #AAAAAA;
+}
+
+table.MemberActionBox tr.MemberActions td a:link {
+    color: #FFFFFF;
+    text-decoration:  none;
+}
+
+table.MemberActionBox tr.MemberActions td a:visited {
+    color: #FFFFFF;
+    text-decoration:  none;
+}
+
+table.MemberActionBox tr.MemberActions td a:active{
+    color: #FFFFFF;
+    text-decoration:  none;
+}
+
+table.MemberActionBox tr.MemberActions td a:hover{
+    color: #336699;
+    text-decoration:  none;
+}
+
+table.ActionBox {
+    font-family: Verdana, Helvetica, sans-serif;
+    border-top: solid #CCCCCC;
+    border-top-width: thick;
+    background-color: #CCCCCC;
+}
+
+table.ActionBox tr td {
+    font-size: 70%;
+}
+
+table.ActionBox tr td.ActionTitle {
+    font-weight: bold
+}
+
+table.ActionBox tr.MemberActions {
+    background-color: #CCCCCC;
+    vertical-align: top;
+}
+
+table.ActionBox tr.MemberActions td {
+    color: #000000;
+}
+
+table.ActionBox tr.MemberActions td a:link {
+    color: #336699;
+    text-decoration:  none;
+}
+
+table.ActionBox tr.MemberActions td a:visited {
+    color: #336699;
+    text-decoration:  none;
+}
+
+table.ActionBox tr.MemberActions td a:active{
+    color: #336699;
+    text-decoration:  none;
+}
+
+table.ActionBox tr.MemberActions td a:hover{
+    color: #000066;
+    text-decoration:  none;
+}
+
+.aTitle { font-family: Verdana, Helvetica, sans-serif; font-weight: bold; font-size: 25px; }
+
+td.Desktop {
+    vertical-align: top;
+}
+
+td.Desktop table tr {
+    vertical-align: top;
+}
+
+div.Description {
+    font-size: 80%;
+    font-family: Verdana, Helvetica, sans-serif;
+    text-indent: 20px;
+    right-margin: 8px;
+}
+
+div.Desktop {
+    font-size: 80%;
+    font-family: Verdana, Helvetica, sans-serif;
+}
+
+div.Desktop p {
+    font-size: 80%;
+    margin-right: 10px;
+    font-family: Verdana, Helvetica, sans-serif;
+    text-indent: 4px;    
+}
+
+div.Desktop h1 {
+    font-size: 120%;
+    margin-right:100pt;
+    font-family: Verdana, Helvetica, sans-serif;
+}
+
+div.Desktop a:link {
+    text-decoration: hover;
+    color: #336699;
+}
+
+div.Desktop a:visited {
+    text-decoration: hover;
+    color: #336699;
+}
+
+div.Desktop a:active {
+    text-decoration: hover;
+    color: #FF0000;
+}
+
+div.Desktop a:hover {
+    text-decoration: underline;
+    color: #000066;
+}
+
+div.AuthWarning {
+    text-align: center;
+    font-style: italic;
+}
+
+div.AuthWarning table {
+    border: 0;
+}
+
+div.AuthWarning tr.Hot {
+    color: #FF0000;
+}
+
+div.Error {
+    color:  #FF0000;
+}
+
+p.DesktopStatusBar {
+    font-size: 80%;
+    font-family: Arial, Verdana, Helvetica, sans-serif;
+    font-style: italic;
+    font-weight: bold;
+}
+
+table.FormLayout {
+    width: 80%;
+}
+
+table.FormLayout tr {
+    vertical-align: top;
+}
+
+table.FormLayout tr th.TextField {
+    vertical-align: top;
+}
+
+table.FormLayout tr td.TextField {
+    vertical-align: top;
+}
+
+table.FormLayout th {
+    text-align: right;
+}
+
+table.FormLayout dl.FieldHelp dd {
+    font-size: 70%;
+}
+
+table.ContentsList tr td {
+    font-size: 100%;
+}
+
+table.ContentsList tr td img {
+    border: 0;
+}
+
+table.SearchResults {
+    width: auto;
+}
+
+table.SearchResults tr th {
+    text-align: left;
+}
+
+table.SearchResults tr td img {
+    border: 0;
+}
+
+table.Wizard {
+    width: auto;
+}
+
+table.Wizard tr {
+    vertical-align: top;
+}
+
+table.Wizard tr th {
+    text-align: right;
+}
+
+div.NewsBar {
+    text-align: right;
+}
+
+table.NewsItems {
+    border: 0;
+}
+
+
+td.NewsBorder {
+    background-color: #336699;
+}
+
+td.NewsListing {
+    background-color: #336699;
+    color:  #FFFFFF;
+}
+
+.NewsLeadin {
+    background-color: #FFFFFF;
+    color:  #336699;
+}
+
+.NewsByLine {
+    background-color:  #336699;
+    color:  #FFFFFF;
+}
+
+.NewsDateline {
+    background-color:  #336699;
+    color:  #FFFFFF;
+}
+
+td.NewsTitle {
+    background-color: #336699;
+    color: #FFFFFF;
+    text-align: center;
+    font-size: 90%;
+    font-weight: bold;
+}
+
+tr.NewsItemRow td {
+    background-color: #AAAAAA;
+    font-size: 70%;
+}
+
+p.NewsHeadline {
+    background-color:  #336699;
+}
+td.ListName {
+    background-color:  #336699;
+    color: #FFFFFF;
+    font-weight: bold;
+}
+td.ListDefinition {
+    font-style: italic;
+}

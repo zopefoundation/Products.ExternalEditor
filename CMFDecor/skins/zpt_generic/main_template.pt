@@ -1,36 +1,99 @@
 <html metal:define-macro="master">
  <head>
   <title tal:define="ob_title here/Title; portal_title container/title" tal:content="string:${portal_title}: ${ob_title}">The title</title>
-  <div tal:replace="structure container/css_inline_or_link"/>
- </head>
- <body>
-  <div metal:use-macro="container/standard_top_bar/macros/top_bar"/>
+  
+<link rel="stylesheet" href="zpt_stylesheet.css" type="text/css"
+      tal:attributes="href here/zpt_stylesheet/absolute_url">
 
-  <table width="100%" border="0" cellpadding="0" cellspacing="0">
-   <tr>
-   <!-- Vertical whitespace -->
-   <td colspan="4"><br/></td>
-   </tr>
+</head> <body> 
+<div metal:define-macro="top_bar">
+ <!-- Top bar -->
+ <table width="100%" border="0" cellpadding="0" cellspacing="0">
+ <tr><td colspan="3" witdth="100%">
+ <!-- hack around netscape 4.x to ensure top table is solid black -->
+ <table class="Masthead" cellspacing="0" cellpadding="0" border="0" width="100%">
+ <tr class="Masthead">
 
-   <tr valign="top">
-   <td class="SideBar" width="15%" align="left" valign="top">
-   <span metal:use-macro="container/actions_box/macros/actions">Actions box</span>
-   </td>
+            <form action="search" method="GET"
+       tal:define="portal_url container/portal_url"
+       tal:attributes="action string:${portal_url}/search">
+	          <td class="PortalLogo" align="left" valign="middle" width="1%" height="32"> 
+                <a href="." tal:attributes="href container/portal_url"><img src="../zpt_images/Zope_logo.gif" alt="Zope Logo" border="0" width="87" height="38"
+																																	 tal:attributes="src string:Zope_logo.gif"></a> 
+              </td>
 
-   <!-- Horizontal whitespace -->
-   <td width="1%">&nbsp;</td>
+            <td class="PortalTitle" width="29%" align="left" valign="middle" height="32"> 
+              <span tal:define="portal_title container/title" tal:content="string:${portal_title}">Site Title</span>
+ </td>
 
-   <td class="Desktop" colspan="2" width="84%" valign="top">
-
-   <p tal:condition="request/portal_status_message|nothing" tal:content="request/portal_status_message" class="DesktopStatusBar"></p>
-
-   <div tal:condition="exists:here/localHeader" replace="structure here/localHeader"/>
-   <div metal:define-slot="main"/>
-   <div tal:condition="exists:here/localFooter" replace="structure here/localFooter"/>
-
+            <td class="NavBar" align="right" valign="middle" width="70%" wrap="no" height="32"> 
+ <a href="." tal:attributes="href portal_url">home</a>&nbsp;
+ <a href="roster"
+    tal:attributes="href string:${portal_url}/Members">members</a>&nbsp;
+ <a href="recent_news"
+    tal:attributes="href string:${portal_url}/recent_news">news</a>&nbsp;
+ <a href="search_form"
+    tal:attributes="href string:${portal_url}/search_form">search</a>
+ <input name="SearchableText" size="16">
+                <input border="0" type="image" name="go" src="../../CMFDefault/skins/Images/go.gif" align="middle" width="20" height="20"
+				       tal:attributes="src string:go.gif">
+                 &nbsp;
+ </td>
+    </form>
+ </tr>
+ </table>
+ </td></tr></table>
+</div>
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tr><td colspan="4">
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" class="MemberActionBox">
+   <tr class="MemberActions"
+     tal:define="global isAnon python:here.portal_membership.isAnonymousUser();
+	 uname python: isAnon and 'Guest' or here.portal_membership.getAuthenticatedMember().getUserName();
+	 global actions python:here.portal_actions.listFilteredActionsFor(here);
+	 user_actions python:actions['user']">
+     <td class="ActionTitle"
+         tal:content="uname">
+         UserName
+     </td>
+	 <td class="MemberActionsList" align="right">
+   <span tal:repeat="action user_actions"><a href="" tal:attributes="href action/url" tal:content="action/name">Action List</a> | </span>
   </td>
   </tr>
   </table>
-
+</td></tr>
+   <tr valign="top">
+   <td class="ActionBox" width="15%" align="left" valign="top" tal:condition="python: not isAnon">
+   <span metal:use-macro="container/actions_box/macros/actions">
+   <!--everything below here is replaced, just here for view of actions_box -->
+   <table class="ActionBox" width="100%">
+ <tr class="AuthClass">
+          <td class="ActionTitle">
+		  <img src="../../CMFDefault/skins/Images/UpFolder_icon.gif" align="left" alt="Holder Image" width="16" height="16"> ObjectID 
+          </td>
+ </tr>
+ <tr class="AuthClass">
+  <td> 
+    Status:  Private<br>
+    <a href="">Object Action</a><br>
+  </td>
+ </tr>
+  </table>
+  <!--end replacement -->
+   </span>
+   </td>
+   <td width="1%">&nbsp;</td>
+   <td class="Desktop" colspan="" width="84%" valign="top" tal:attributes="colspan python: not isAnon and '2' or '3'">
+   <table cellpadding="5">
+   <tr>
+   <td class="Desktop" width="100%" valign="top">
+   <p tal:condition="request/portal_status_message|nothing" tal:content="request/portal_status_message" class="DesktopStatusBar"></p>
+   <div metal:define-slot="main"/>
+   </td>
+   </tr>
+   </table>
+  </td>
+  </tr>
+  </table>
  </body>
 </html>
