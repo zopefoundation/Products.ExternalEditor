@@ -105,9 +105,41 @@ class MemberDataTool (UniqueObject, SimpleItem, PropertyManager, ActionProviderB
         return [{ 'member_count' : member_count,
                   'orphan_count' : orphan_count }]
 
+    security.declarePrivate('searchMemberData')
+    def searchMemberData(self, search_param, search_term, attributes=()):
+        """ Search members. """
+        res = []
+
+        if not search_param:
+            return res
+
+        membership = getToolByName(self, 'portal_membership')
+
+        if len(attributes) == 0:
+            attributes = ('id', 'email')
+
+        if search_param == 'username':
+            search_param = 'id'
+
+        for user_wrapper in self._members.values():
+            u = membership.getMemberById(user_wrapper.id)
+            searched = u.getProperty(search_param, None)
+            if searched is not None and searched.find(search_term) != -1:
+                user_data = {}
+
+                for desired in attributes:
+                    if desired == 'id':
+                        user_data['username'] = u.getProperty(desired, '')
+                    else:
+                        user_data[desired] = u.getProperty(desired, '')
+
+                res.append(user_data)
+
+        return res
+
     security.declarePrivate( 'searchMemberDataContents' )
     def searchMemberDataContents( self, search_param, search_term ):
-        """ Search members """
+        """ Search members. This method will be deprecated soon. """
         res = []
 
         if search_param == 'username':

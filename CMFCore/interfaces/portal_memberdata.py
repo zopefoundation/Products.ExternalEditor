@@ -55,6 +55,16 @@ class portal_memberdata(Interface):
         and delete anything not in acl_users
         '''
 
+    ## searchMemberData__roles__ = ()  # Private.
+    def searchMemberData(search_param, search_term, attributes=()):
+        '''
+        Returns a sequence of dictionaries containing data for members
+        that match the query as expressed by search_param and search_term.
+        The contents of each member data mapping can be influenced by
+        passing in a sequence of desired attributes, by default the only
+        data returned is the username and the email address.
+        '''
+
 class MemberData(Interface):
     """ MemberData interface.
     """

@@ -356,7 +356,7 @@ class MembershipTool (UniqueObject, SimpleItem, ActionProviderBase):
         """ Search the membership """
         md = getToolByName( self, 'portal_memberdata' )
 
-        return md.searchMemberDataContents( search_param, search_term )
+        return md.searchMemberData( search_param, search_term )
 
         
     security.declareProtected(View, 'getCandidateLocalRoles')
