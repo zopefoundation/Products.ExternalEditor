@@ -2,6 +2,8 @@ External Editor Change Log
 
   Next release
   
+    - Add ZMI support for Zope 2.7's ordered folder objects.      
+  
     - Fix bug detecting basic auth info from older versions of CookieCrumber.
       Thanks to David D. Smith and Federico Sevilla III.
     
