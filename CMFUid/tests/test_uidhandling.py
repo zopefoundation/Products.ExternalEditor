@@ -1,0 +1,117 @@
+##############################################################################
+#
+# Copyright (c) 2002 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE
+#
+##############################################################################
+"""Test the unique id handling.
+
+$Id$
+"""
+__version__ = "$Revision$"
+
+from unittest import TestCase, TestSuite, makeSuite, main
+import Testing
+import Zope
+Zope.startup()
+
+from Products.CMFCore.tests.base.testcase import SecurityTest
+
+from Products.CMFCore.tests.base.dummy import DummyContent
+from Products.CMFCore.tests.base.dummy import DummyFolder
+from Products.CMFCore.tests.base.dummy import DummySite
+
+from Products.CMFCore.CatalogTool import CatalogTool
+
+from Products.CMFUid.interfaces import IUniqueIdHandler
+from Products.CMFUid.UniqueIdGeneratorTool import UniqueIdGeneratorTool
+from Products.CMFUid.UniqueIdHandlerTool import UniqueIdHandlerTool
+
+def setupIndexes(catalog, uid_attr_name):
+    indexes = [id[0] for id in catalog.enumerateIndexes()]
+    columns = catalog.enumerateColumns()
+    catalog.manage_delIndex(indexes)
+    catalog.manage_delColumn(columns)
+    
+    catalog.addIndex(uid_attr_name, 'FieldIndex')
+    catalog.addColumn(uid_attr_name)
+
+
+class UniqueIdHandlerTests(SecurityTest):
+
+    def setUp(self):
+        SecurityTest.setUp(self)
+        self.root._setObject('portal_catalog', CatalogTool())
+        self.root._setObject('portal_uidgenerator', UniqueIdGeneratorTool())
+        self.root._setObject('portal_uidhandler', UniqueIdHandlerTool())
+        self.root._setObject('dummy', DummyContent(id='dummy'))
+        self.uid_attr_name = self.root.portal_uidhandler._UID_ATTRIBUTE_NAME
+        setupIndexes(self.root.portal_catalog, self.uid_attr_name)
+    
+    def test_interface(self):
+        handler = UniqueIdHandlerTool()
+        IUniqueIdHandler.isImplementedBy(handler)
+    
+    def test_getUidOfNotYetRegisteredObject(self):
+        handler = self.root.portal_uidhandler
+        dummy = self.root.dummy
+        
+        self.assertEqual(handler.queryUid(dummy, None), None)
+        self.assertRaises(KeyError, handler.getUid, dummy)
+    
+    def test_getInvalidUid(self):
+        handler = self.root.portal_uidhandler
+        dummy = self.root.dummy
+        
+        self.assertEqual(handler.queryObject(100, None), None)
+        self.assertRaises(KeyError, handler.getObject, 100)
+    
+        uid = handler.register(dummy)
+        self.assertEqual(handler.queryObject(uid+1, None), None)
+        self.assertRaises(KeyError, handler.getObject, uid+1)
+    
+    def test_getUidOfRegisteredObject(self):
+        handler = self.root.portal_uidhandler
+        dummy = self.root.dummy
+        
+        uid = handler.register(dummy)
+        self.assertEqual(handler.getUid(dummy), uid)
+    
+    def test_getRegisteredObjectByUid(self):
+        handler = self.root.portal_uidhandler
+        dummy = self.root.dummy
+        
+        uid = handler.register(dummy)
+        self.assertEqual(handler.getObject(uid), dummy)
+    
+    def test_getUnregisteredObject(self):
+        handler = self.root.portal_uidhandler
+        dummy = self.root.dummy
+        
+        uid = handler.register(dummy)
+        handler.unregister(dummy)
+        self.assertEqual(handler.queryObject(uid, None), None)
+        self.assertRaises(KeyError, handler.getObject, uid)
+
+    def test_getUidOfUnregisteredObject(self):
+        handler = self.root.portal_uidhandler
+        dummy = self.root.dummy
+        
+        uid = handler.register(dummy)
+        handler.unregister(dummy)
+        self.assertEqual(handler.queryUid(dummy, None), None)
+        self.assertRaises(KeyError, handler.getUid, dummy)
+
+def test_suite():
+    return TestSuite((
+        makeSuite(UniqueIdHandlerTests),
+        ))
+
+if __name__ == '__main__':
+    main(defaultTest='test_suite')
