@@ -12,6 +12,15 @@ CMF Collector Update Notes
   See KNOWN_PROBLEMS.txt for currently obtaining bugs and problems to
   be aware of.
 
+  Version 0.9b, Nov 1, 2001
+
+    - Accommodation for recent (two days ago) DCWorkflow changes -
+      backwards compatable with prior DCWorkflow version, but
+      necessary for operation with new (DCWorkflow.py 1.12 and later).
+
+      See the checkin notice for details:
+     http://cvs.zope.org/CMF/CMFCollector/collector_issue_workflow.zexp#rev1.10
+
   Version 0.9b, Oct 28, 2001
 
     I believe we're now feature-complete for v 0.9, hence the beta
