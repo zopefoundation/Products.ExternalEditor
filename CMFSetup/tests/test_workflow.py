@@ -1948,6 +1948,34 @@ class Test_importWorkflow( _WorkflowSetup
                         , ( WF_ID_NON % 3, )
                         )
 
+    def test_from_empty_dcworkflow( self ):
+
+        WF_ID = 'dcworkflow'
+        WF_TITLE = 'DC Workflow'
+        WF_INITIAL_STATE = 'closed'
+
+        site = self._initSite()
+        wf_tool = site.portal_workflow
+
+        wf_tool._default_chain = ()
+        wf_tool._chains_by_type.clear()
+        self.assertEqual( len( wf_tool.objectIds() ), 0 )
+
+        context = DummyImportContext( site )
+        context._files[ 'workflows.xml' ] = _NORMAL_TOOL_EXPORT
+        context._files[ 'workflows/dcworkflow/definition.xml'
+                      ] = ( _NORMAL_WORKFLOW_EXPORT
+                            % { 'workflow_id' : WF_ID
+                              , 'title' : WF_TITLE
+                              , 'initial_state' : WF_INITIAL_STATE
+                              , 'workflow_filename' : WF_ID.replace(' ', '_')
+                              } )
+
+        from Products.CMFSetup.workflow import importWorkflowTool
+        importWorkflowTool( context )
+
+        self.assertEqual( len( wf_tool.objectIds() ), 1 )
+
 def test_suite():
     return unittest.TestSuite((
         unittest.makeSuite( WorkflowToolConfiguratorTests ),

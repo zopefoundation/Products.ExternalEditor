@@ -92,6 +92,8 @@ def importWorkflowTool( context ):
                 , scripts
                 ) = wtc.parseWorkflowXML( wf_text )
 
+                workflow_id = str( workflow_id ) # No unicode!
+
                 tool._setObject( workflow_id
                                , DCWorkflowDefinition( workflow_id ) )
 
