@@ -132,9 +132,6 @@ class Document(PortalContent, DefaultDublinCoreImpl):
     def _edit(self, text, text_format='', safety_belt=''):
         """ Edit the Document and cook the body.
         """
-        level = self._stx_level
-        if not text_format:
-            text_format = self.text_format
         if not self._safety_belt_update(safety_belt=safety_belt):
             msg = ("Intervening changes from elsewhere detected."
                    " Please refetch the document and reapply your changes."
@@ -142,14 +139,17 @@ class Document(PortalContent, DefaultDublinCoreImpl):
                    " browser 'back' button, but will have to apply them"
                    " to a freshly fetched copy.)")
             raise EditingConflict(msg)
+
+        self.text = text
+
+        if not text_format:
+            text_format = self.text_format
         if text_format == 'html':
-            self.text = self.cooked_text = text
+            self.cooked_text = text
         elif text_format == 'plain':
-            self.text = text
-            self.cooked_text = html_quote(text).replace('\n','<br />')
+            self.cooked_text = html_quote(text).replace('\n', '<br />')
         else:
-            self.cooked_text = format_stx(text=text, level=level)
-            self.text = text
+            self.cooked_text = format_stx(text=text, level=self._stx_level)
 
     security.declareProtected(ModifyPortalContent, 'edit')
     def edit( self

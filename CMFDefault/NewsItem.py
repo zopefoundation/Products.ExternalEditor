@@ -15,14 +15,14 @@
 $Id$
 """
 
-from Globals import InitializeClass
-from Document import Document
-from utils import parseHeadersBody
-
-from Products.CMFCore.CMFCorePermissions import View
-from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
 from AccessControl import ClassSecurityInfo
-from Products.CMFCore.WorkflowCore import WorkflowAction
+from Globals import InitializeClass
+
+from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
+from Products.CMFCore.CMFCorePermissions import View
+
+from Document import Document
+
 
 factory_type_information = (
   { 'id'             : 'News Item'
@@ -76,6 +76,7 @@ def addNewsItem( self
               )
     self._setObject(id, o)
 
+
 class NewsItem( Document ):
     """
         A News Item
@@ -99,6 +100,4 @@ class NewsItem( Document ):
             self.setDescription( description )
         Document.edit( self, text_format, text )
 
-
 InitializeClass( NewsItem )
-
