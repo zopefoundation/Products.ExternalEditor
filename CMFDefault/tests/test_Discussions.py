@@ -36,7 +36,7 @@ class DiscussionTests( unittest.TestCase ):
         self._policy = UnitTestSecurityPolicy()
         self._oldPolicy = SecurityManager.setSecurityPolicy(self._policy)
         self.connection = Zope.DB.open()
-        self.root = self.connection.root()[ 'Application' ]
+        self.root = root = self.connection.root()[ 'Application' ]
         self.root._setObject( 'portal_discussion', DiscussionTool() )
         self.discussion_tool = self.root.portal_discussion
         self.root._setObject( 'portal_catalog', CatalogTool() )
@@ -47,6 +47,10 @@ class DiscussionTests( unittest.TestCase ):
         self.workflow_tool = self.root.portal_workflow
         self.root._setObject( 'portal_types', TypesTool() )
         types_tool = self.types_tool = self.root.portal_types
+        try: root._delObject('test')
+        except AttributeError: pass
+        root._setObject( 'test', Document( 'test' ) )
+            
     
     def tearDown( self ):
         del self.types_tool
@@ -62,7 +66,6 @@ class DiscussionTests( unittest.TestCase ):
 
     def test_policy( self ):
 
-        self.root._setObject( 'test', Document( 'test' ) )
         test = self.root.test
         self.assertRaises( DiscussionNotAllowed
                          , self.discussion_tool.getDiscussionFor
@@ -107,7 +110,6 @@ class DiscussionTests( unittest.TestCase ):
         assert test.talkback
     
     def test_nestedReplies( self ):
-        self.root._setObject( 'test', Document( 'test' ) )
         test = self.root.test
         test.allow_discussion = 1
         talkback = self.discussion_tool.getDiscussionFor( test )
@@ -157,7 +159,6 @@ class DiscussionTests( unittest.TestCase ):
 
     def test_itemCatloguing( self ):
 
-        self.root._setObject( 'test', Document( 'test' ) )
         test = self.root.test
         catalog = self.catalog_tool._catalog
         test.allow_discussion = 1
@@ -191,7 +192,6 @@ class DiscussionTests( unittest.TestCase ):
 
     def test_deletePropagation( self ):
 
-        self.root._setObject( 'test', Document( 'test' ) )
         test = self.root.test
 
         test.allow_discussion = 1

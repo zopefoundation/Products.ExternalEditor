@@ -84,8 +84,11 @@ class PortalFolderTests( unittest.TestCase ):
         self._policy = UnitTestSecurityPolicy()
         self._oldPolicy = SecurityManager.setSecurityPolicy(self._policy)
         self.connection = Zope.DB.open()
-        self.root = self.connection.root()[ 'Application' ]
+        self.root = root = self.connection.root()[ 'Application' ]
         newSecurityManager( None, UnitTestUser().__of__( self.root ) )
+        try: root._delObject('test')
+        except AttributeError: pass
+        root._setObject( 'test', PortalFolder( 'test','' ) )
     
     def tearDown( self ):
         get_transaction().abort()
@@ -95,8 +98,6 @@ class PortalFolderTests( unittest.TestCase ):
 
     def test_deletePropagation( self ):
 
-        test = PortalFolder( 'test', '' )
-        self.root._setObject( 'test', test )
         test = self.root.test
         foo = DummyContent( 'foo' )
 
@@ -120,8 +121,6 @@ class PortalFolderTests( unittest.TestCase ):
 
     def test_manageDelObjects( self ):
 
-        test = PortalFolder( 'test', '' )
-        self.root._setObject( 'test', test )
         test = self.root.test
         foo = DummyContent( 'foo' )
 
@@ -136,7 +135,6 @@ class PortalFolderTests( unittest.TestCase ):
         # Test is a new object does get cataloged upon _setObject
         # and uncataloged upon manage_deleteObjects
         #
-        self.root._setObject( 'test', PortalFolder( 'test', '' ) )
         test = self.root.test
 
         self.root._setObject( 'portal_types', TypesTool() )
@@ -165,7 +163,6 @@ class PortalFolderTests( unittest.TestCase ):
         #   is not being uncatalogued.  Try creating a subfolder with
         #   content object, and test.
         #
-        self.root._setObject( 'test', PortalFolder( 'test', '' ) )
         test = self.root.test
 
         self.root._setObject( 'portal_types', TypesTool() )
@@ -195,7 +192,6 @@ class PortalFolderTests( unittest.TestCase ):
         #
         #   Does the catalog stay synched when folders are moved?
         #
-        self.root._setObject( 'test', PortalFolder( 'test', '' ) )
         test = self.root.test
 
         self.root._setObject( 'portal_types', TypesTool() )
@@ -247,11 +243,9 @@ class PortalFolderTests( unittest.TestCase ):
         #
         #   Does MKDIR/MKCOL intercept work?
         #
-        test = PortalFolder( 'test', '' )
-        test._setPortalTypeName( 'Folder' )
-        self.root._setObject( 'test', test )
-        self.root.reindexObject = lambda: 0
         test = self.root.test
+        test._setPortalTypeName( 'Folder' )
+        self.root.reindexObject = lambda: 0
 
         self.root._setObject( 'portal_types', TypesTool() )
         types_tool = self.root.portal_types
@@ -309,8 +303,6 @@ class PortalFolderTests( unittest.TestCase ):
         #   Does copy / paste work?
         #
         #import pdb; pdb.set_trace()
-        test = PortalFolder( 'test', '' )
-        self.root._setObject( 'test', test )
         test = self.root.test
 
         self.root._setObject( 'portal_types', TypesTool() )
