@@ -186,7 +186,10 @@ class ExternalEditor:
     def __del__(self):
         if getattr(self, 'clean_up', 1) and hasattr(self, 'content_file'):
             # for security we always delete the files by default
-            os.remove(self.content_file)
+	    try:
+                os.remove(self.content_file)
+            except OSError:
+                pass     
 
         if self.did_lock:
             # Try not to leave dangling locks on the server
@@ -544,6 +547,7 @@ title = 'Zope External Editor'
 ## Platform specific declarations ##
 
 if win32:
+    import Plugins # Assert dependancy
     from win32ui import MessageBox
     from win32process import CreateProcess, GetExitCodeProcess, STARTUPINFO
     from win32event import WaitForSingleObject
