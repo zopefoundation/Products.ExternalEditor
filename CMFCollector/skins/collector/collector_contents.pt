@@ -57,15 +57,13 @@
       <tbody tal:repeat="itemnum python: range(len(batch))">
 
         <tr tal:define="global item python: batch[itemnum];
-                        global itemattrs python:
-                               here.collector_issue_subject_attrs(item);
                         itemurl item/getURL;
                         itemtype item/Type|nothing;
                         icon item/getIcon|item/icon|nothing">
 
           <td>
              <a href=""
-                tal:attributes="href item/getURL">
+                tal:attributes="href itemurl">
                 <img src="" alt="Issue" border="0"
                      tal:condition="icon"
                      tal:attributes="src icon">
@@ -75,12 +73,12 @@
           </td>
 
           <td>
-            <a href="ITEMURL" tal:attributes="href item/getURL">
+            <a href="ITEMURL" tal:attributes="href itemurl">
               <span tal:replace="item/id">ID</span> </a>
           </td>
 
           <td NOWRAP>
-            <a href="ITEMURL" tal:attributes="href item/getURL">
+            <a href="ITEMURL" tal:attributes="href itemurl">
               <b><span tal:condition="item/Title"
                        tal:replace="python:
                                      item.Title[:TITLELEN]
@@ -90,25 +88,22 @@
 
           <td NOWRAP>
             <span tal:replace="python: '%s/%s'
-                                       % (cap(itemattrs['topic']),
-                                          cap(itemattrs['classification']))">
+                                       % (item.topic, item.classification)">
               TOPIC/CLASSIFICATION
             </span>
-            <span tal:replace="python: '%s/%s'
-                                       % (cap(itemattrs['importance']),
-                                          cap(itemattrs['severity']))">
-              Importance/Severity
+            <span tal:replace="item/importance">
+              Importance
             </span>
           </td>
 
         </tr>
 
-        <tr tal:define="numcmts python: int(itemattrs['action_number'])-1;
+        <tr tal:define="numcmts python: int(item.action_number)-1;
                         plrlcmts python: (numcmts != 1) and 's' or '';
-                        numuploads python: int(itemattrs['upload_number']);
+                        numuploads python: int(item.upload_number);
                         plrluploads python: (numuploads != 1) and 's' or '';
-                        security python: int(itemattrs['security_related']);
-                        confidential python: split(item.review_state, '_')[-1]
+                        security python: item.security_related;
+                        confidential python: split(item.status, '_')[-1]
                                              == 'confidential'">
           <td> <font color="gray"> # </font> </td>
           <td>
@@ -127,7 +122,7 @@
                                         (security and 'brown' or 'black')">
               <em>
                 <span tal:content="python: (confidential and '(' or '')
-                                           + cap(split(item.review_state,
+                                           + cap(split(item.status,
                                                        '_')[0])
                                            + (confidential and ')' or '')">
                   STATUS</span>
@@ -136,7 +131,7 @@
 
             From
             <span tal:replace="item/Creator|nothing">SUBMITTER ID</span
-              ><span tal:condition="numcmts">,</span>
+              ><span tal:condition="numcmts">.</span>
             <span tal:condition="not: item/Creator|nothing">
               <em>???</em></span>
 
@@ -150,9 +145,11 @@
             <span tal:condition="numuploads">
               <span tal:replace="numuploads">NUM ARTIFACTS</span>
               upload<span tal:replace="plrluploads">S?
-            </span></span><span tal:condition="itemattrs/assigned_to|nothing">,
+            </span></span><span tal:condition="item/assigned_to|nothing">,
               Assigned: 
-              <span tal:content="itemattrs/assigned_to">SUPPORTERS</span>
+              <span tal:content="python: ', '.join(item.assigned_to)">
+                SUPPORTERS
+              </span>
             </span>
           </td>
 
@@ -164,10 +161,8 @@
           <td> </td>
           <td> </td>
           <td colspan="3">
-            Submitted
             <span tal:replace="python: crdate.aCommon()">CREATEDATE
-              </span><span tal:condition="python: datesdiff">,
-              Last Mod:
+              </span><span tal:condition="python: datesdiff"> ...
                 <span tal:replace="python: moddate.aCommon()">
                   MODDATE</span>
             </span>
@@ -196,8 +191,9 @@
     <form action="RETURNHERE" method="get"
           tal:attributes="action python: here.absolute_url()
                                          + '/collector_contents'"
-          tal:define="uniqueValuesFor python:
-                                      here.portal_catalog.uniqueValuesFor">
+          tal:define="uniquevals python:
+                                 here.get_internal_catalog().uniqueValuesFor;
+                      ordered nocall: here/collector_ordered_traits">
       <input type="hidden" name="searching" value="yep">
 
         <table>
@@ -237,7 +233,7 @@
             </td>
             <td align="center">
               <select name="Creator:list" multiple size="SIZE"
-                      tal:define="values python: uniqueValuesFor('Creator')"
+                      tal:define="values python: uniquevals('Creator')"
                       tal:attributes="size python: min(max(len(values), 3), 
                                                        5)">
                 <span tal:repeat="creator values">
@@ -253,7 +249,9 @@
             </td>
             <td align="center">
               <select name="supporters:list" multiple size="SIZE"
-                      tal:define="values python: here.supporters"
+                      tal:define="values python:
+                                         ordered(uniquevals('assigned_to'),
+                                                 here.supporters)"
                       tal:attributes="size python: min(max(len(values), 3),
                                                        5)">
                 <span tal:repeat="supporter values">
@@ -284,13 +282,13 @@
           <tr>
             <th align="center"> Topic </th>
             <th align="center"> Classification </th>
-            <th align="center"> Severity </th>
             <th align="center"> Importance </th>
           </tr>
           <tr>
             <td align="center">
               <select name="topics:list" multiple size="SIZE"
-                    tal:define="values python: here.topics"
+                    tal:define="values python: ordered(uniquevals('topic'),
+                                                       here.topics)"
                     tal:attributes="size python: min(max(len(values), 3), 5)">
                 <span tal:repeat="topic values">
                   <option value=""
@@ -305,7 +303,9 @@
             </td>
             <td align="center">
               <select name="classifications:list" multiple size="SIZE"
-                      tal:define="values python: here.classifications"
+                      tal:define="values python: 
+                                         ordered(uniquevals('classification'),
+                                                 here.classifications)"
                       tal:attributes="size python: min(max(len(values), 3),
                                                        5)">
                 <span tal:repeat="classification values">
@@ -322,7 +322,9 @@
             </td>
             <td align="center">
               <select name="importances:list" multiple size="SIZE"
-                      tal:define="values python: here.importances"
+                      tal:define="values python: 
+                                         ordered(uniquevals('importance'),
+                                                 here.importances)"
                       tal:attributes="size python: min(max(len(values), 3), 
                                                        5)">
                 <span tal:repeat="importance values">
@@ -337,23 +339,7 @@
                 </span>
              </select>
           </td>
-            <td align="center">
-              <select name="severities:list" multiple size="SIZE"
-                      tal:define="values python: here.severities"
-                      tal:attributes="size python: min(max(len(values), 3), 
-                                                       5)">
-                <span tal:repeat="severity values">
-                  <option value=""
-                          tal:attributes="
-                              value severity;
-                              selected python: severity
-                                               in request.get('severities', 
-                                                              [])"
-                          tal:content="severity">
-                  </option>
-                </span>
-             </select>
-          </td>
+
         </tr>
       </table>
 
