@@ -232,6 +232,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
              classification=None,
              importance=None,
              version_info=None,
+             stealthy=None,
              comment=None,
              text=None):
         """Update the explicitly passed fields."""
@@ -287,13 +288,17 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         else:
             comment = ''
 
-        transcript.edit(self.TRANSCRIPT_FORMAT,
-                         self._entry_header('Edit', username)
-                         + "\n\n"
-                         + " Changes: " + ", ".join(changes)
-                         + comment
-                         + ((self.action_number > 1) and "\n" + RULE + "\n")
-                         + transcript.EditableBody())
+        if not stealthy:
+            transcript.edit(self.TRANSCRIPT_FORMAT,
+                            self._entry_header('Edit', username)
+                            + "\n\n"
+                            + " Changes: " + ", ".join(changes)
+                            + comment
+                            + ((self.action_number > 1) and "\n" + RULE + "\n")
+                            + transcript.EditableBody())
+        else:
+            transcript.edit(self.TRANSCRIPT_FORMAT,
+                            transcript.EditableBody())            
         self.reindexObject()
         self._send_update_notice('Edit', username)
         return ", ".join(changes)

@@ -17,6 +17,7 @@ changed = context.edit(title=REQGET('title'),
                        classification=REQGET('classification'),
                        importance=REQGET('importance'),
                        version_info=REQGET('version_info'),
+                       stealthy=REQGET('stealthy'),
                        comment=REQGET('comment'),
                        text=REQGET('text'))
 
