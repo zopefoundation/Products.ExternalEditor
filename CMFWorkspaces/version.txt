@@ -1,1 +1,1 @@
-CMFWorkspaces-0.10
+CMFWorkspaces-0.9.1

@@ -1,0 +1,19 @@
+CMFWorkspaces Changelog
+
+  CMFWorkspaces 0.9.1 (2005/01/19)
+
+    - CVS-only release
+
+    - CVS tag CMFWorkspaces-0_10
+
+    - Clean up imports
+    
+    - Use new-style local permissions
+
+    - Licence under ZPL 2.1
+
+  CMFWorkspaces 0.9 (2003/10/09)
+
+    - Initial release, CVS only
+    
+    - CVS tag CMFWorkspaces-0_9
