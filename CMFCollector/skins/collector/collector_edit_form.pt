@@ -172,6 +172,56 @@
   </td>
  </tr>
 
+ <tr valign="top">
+  <th align="right"> Participation Mode
+  </th>
+  <td colspan="3">
+          <table>
+            <tr>
+              <td NOWRAP>
+                <input type="radio" name="participation:string" value="staff"
+                       tal:attributes="checked python: here.participation
+                                                       == 'staff'">
+                  Staff
+              </td>
+              <td>
+                <font color="gray" size="-1">
+                  Only collector staff and issue requester participate in an
+                  issue
+                </font>
+              </td>
+            </tr>
+            <tr>
+              <td NOWRAP>
+                <input type="radio" name="participation:string"
+                       value="authenticated"
+                       tal:attributes="checked python: here.participation
+                                                       == 'authenticated'">
+                  Authenticated
+              </td>
+              <td>
+                <font color="gray" size="-1">
+                  Any non-anonymous visitors can participate
+                </font>
+              </td>
+            </tr>
+            <tr>
+              <td NOWRAP>
+                <input type="radio" name="participation:string" value="anyone"
+                       tal:attributes="checked python: here.participation
+                                                       == 'anyone'">
+                  Anyone
+              </td>
+              <td>
+                <font color="gray" size="-1">
+                  Anyone, including anonymous visitors, can chime in
+                </font>
+              </td>
+            </tr>
+          </table>
+  </td>
+ </tr>
+
  <tr>
    <th> Notifications </th>
    <td colspan="3">
@@ -266,8 +316,9 @@
   <th> Reinstate catalog </th>
   <td colspan="4">
     <font color="gray" size="-1">
-      Rarely, product updates require internal catalog reinit and reindex.
-      Collector product RELEASE_NOTES.txt will indicate when necessary.
+      Occasionally, product updates require internal catalog reinit and
+      reindex and other existing-issue adjustment.  Collector product
+      RELEASE_NOTES.txt will indicate when necessary.
     </font>
     <br>
     <input type="radio" name="recatalog:int" value="0" CHECKED>No
