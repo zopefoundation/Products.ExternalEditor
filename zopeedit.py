@@ -360,13 +360,14 @@ class ExternalEditor:
             
             response = NullResponse()
             response.reason = sys.exc_info()[1]
+            sys.stderr.write('\n -- Zope Request Traceback --\n')
+            traceback.print_exc(file=sys.stderr)
+            
             try:
                 response.status, response.reason = response.reason
             except:
                 response.status = 0
             
-            sys.stderr.write('\n -- Zope Request Traceback --\n')
-            traceback.print_exc(file=sys.stderr)
             return response
 
 title = 'Zope External Editor'
