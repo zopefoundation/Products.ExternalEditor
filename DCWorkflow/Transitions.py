@@ -42,6 +42,7 @@ class TransitionDefinition (SimpleItem):
     security.declareObjectProtected(ManagePortal)
 
     title = ''
+    description = ''
     new_state_id = ''
     trigger_type = TRIGGER_USER_ACTION
     guard = None
@@ -107,7 +108,7 @@ class TransitionDefinition (SimpleItem):
                                      manage_tabs_message=manage_tabs_message,
                                      )
 
-    def setProperties(self, title, new_state_id,
+    def setProperties(self, title, description, new_state_id,
                       trigger_type=TRIGGER_USER_ACTION, script_name='',
                       after_script_name='',
                       actbox_name='', actbox_url='',
@@ -116,6 +117,7 @@ class TransitionDefinition (SimpleItem):
         '''
         '''
         self.title = str(title)
+        self.description = str(description)
         self.new_state_id = str(new_state_id)
         self.trigger_type = int(trigger_type)
         self.script_name = str(script_name)

@@ -5,8 +5,9 @@ Transitions Tab
  transitions, and rename and delete existing transitions.
 
  The list of existing transitions also displays a summary of each
- transition's title, destination state, trigger, guards, and action box
- entry. You can click through each transition to access their details.
+ transition's title, description, destination state, trigger, guards, 
+ and action box entry. You can click through each transition to access 
+ their details.
 
  Within a transition's properties tab you can set the title, and 
  a collection of properties the define the transtion's behaviour, as
