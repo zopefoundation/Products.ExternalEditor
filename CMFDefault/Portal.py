@@ -278,6 +278,9 @@ class PortalGenerator:
         id = 'default_workflow'
         tool._setObject(id, DefaultWorkflowDefinition(id))
 
+        #   These objects don't participate in workflow by default.
+        tool.setChainForPortalTypes( ( 'Folder', 'Topic' ), () )
+
     def setup(self, p, create_userfolder):
         self.setupTools(p)
         self.setupMailHost(p)

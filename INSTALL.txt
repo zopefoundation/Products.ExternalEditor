@@ -96,6 +96,12 @@ Upgrading from versions earlier than CMF 1.3-beta2
       In the Indexes tab of the 'portal_catalog' tool, select the two
       new indexes ("path" and "portal_type") and click "Reindex".
 
+  Remove Unwanted Workflow Bindings
+
+      In the Workflows tabl of the 'portal_workflow' tool, clear the
+      "(Default)" value from the input fields for the "Folder" and
+      "Topic" types and click "Change".
+
 Upgrading from CMF 1.0
 
   Create and Configure New tools
