@@ -34,7 +34,6 @@ from webdav.LockItem import LockItem
 # Permission names
 LockObjects = 'WebDAV Lock items'
 UnlockObjects = 'WebDAV Unlock items'
-BreakLock = 'Manage portal'
 
 _wwwdir = os.path.join(os.path.dirname(__file__), 'www') 
 
