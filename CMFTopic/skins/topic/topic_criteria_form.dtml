@@ -11,14 +11,14 @@
 <dtml-in listCriteria>
  <dtml-var expr="_[getEditForm()]">
 </dtml-in>
-<input type="submit" name="deleteCriteria:action" value=" Delete selected ">
+<input type="submit" name="topic_deleteCriteria:action" value=" Delete selected ">
 &nbsp;&nbsp;
-<input type="submit" name="editCriteria:action" value=" Save changes ">
+<input type="submit" name="topic_editCriteria:action" value=" Save changes ">
 <input type="hidden" name=":default_action" value="editCriteria">
 </form>
 
 
-<form action="&dtml-absolute_url;/addCriteria" method="post">
+<form action="&dtml-absolute_url;/topic_addCriterion" method="post">
 <h2> Add New Topic Criteria: </h2>
 <table class="FormLayout">
  <tr valign="top">

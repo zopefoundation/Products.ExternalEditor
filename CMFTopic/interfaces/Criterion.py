@@ -124,6 +124,16 @@ class Criterion(Interface.Base):
         Editforms should be specific to their type of criteria.
         """
 
+    def apply(self, command):
+        """\
+        To make it easier to apply values from the rather dynamic
+        Criterion edit form using Python Scripts, apply takes a
+        mapping object as a default and applies itself to self.edit.
+
+        It's basically a nice and protected wrapper around
+        apply(self.edit, (), command).
+        """
+
     def edit(self, **kw):
         """\
         The signature of this method should be specific to the

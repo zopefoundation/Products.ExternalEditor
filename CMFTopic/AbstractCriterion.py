@@ -99,6 +99,15 @@ class AbstractCriterion(Persistent, Item, Implicit):
 
     security = ClassSecurityInfo()
 
+    security.declareProtected(ChangeTopics, 'apply')
+    def apply(self, command):
+        """\
+        command is expected to be a dictionary.  It gets applied
+        to self.edit, and exists to make using Python Scripts
+        easier.
+        """
+        apply(self.edit, (), command)
+
     security.declareProtected(ChangeTopics, 'editableAttributes')
     def editableAttributes(self):
         """\

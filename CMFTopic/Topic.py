@@ -224,8 +224,7 @@ class Topic(PortalFolder):
         return self.objectValues(self.meta_type)
 
     security.declareProtected(TopicPermissions.ChangeTopics, 'edit')
-    def edit(self, acquireCriteria, title=None, description=None,
-             REQUEST=None):
+    def edit(self, acquireCriteria, title=None, description=None):
         """\
         Enable the acquisition of criteria from parent topics, and update
         other meta data about the Topic.
@@ -234,9 +233,7 @@ class Topic(PortalFolder):
         if title is not None: self.title = title
         self.description = description
         
-        if REQUEST is not None:
-            REQUEST['RESPONSE'].redirect('%s/topic_view' % self.absolute_url())
-    
+
     security.declareProtected(CMFCorePermissions.View, 'buildQuery')
     def buildQuery(self):
         """ Uses the criteria objects to construct a catalog query. """
@@ -268,7 +265,7 @@ class Topic(PortalFolder):
 
     ### Criteria adding/editing/deleting
     security.declareProtected(TopicPermissions.ChangeTopics, 'addCriteria')
-    def addCriteria(self, field, criteria_type, REQUEST=None):
+    def addCriteria(self, field, criteria_type):
         """ Create a new search criteria in this topic """
         crit = None
         newid = 'crit__%s' % field
@@ -282,82 +279,29 @@ class Topic(PortalFolder):
         
         self._setObject(newid, crit)
 
-        if REQUEST is not None:
-            message = urllib.quote_plus('New criteria added.')
-            REQUEST['RESPONSE'].redirect(
-                '%s/topic_criteria?portal_status_message=%s' % (
-                self.absolute_url(), message)
-                )
-
-    security.declareProtected(TopicPermissions.ChangeTopics, 'deleteCriteria')
-    def deleteCriteria(self, criterion_ids=[], REQUEST=None):
+    security.declareProtected(TopicPermissions.ChangeTopics, 'deleteCriterion')
+    def deleteCriterion(self, criterion_id):
         """ Delete selected criteria """
-        for cid in criterion_ids:
-            self._delObject(cid)
+        if type(criterion_id) is type(''):
+            self._delObject(criterion_id)
+        elif type(criterion_id) in (type(()), type([])):
+            for cid in criterion_id:
+                self._delObject(cid)
 
-        if REQUEST is not None:
-            message = urllib.quote_plus('Criteria deleted.')
-            REQUEST['RESPONSE'].redirect(
-                '%s/topic_criteria?portal_status_message=%s' % (
-                self.absolute_url(), message)
-                )
-
-    security.declareProtected(TopicPermissions.ChangeTopics, 'editCriteria')
-    def editCriteria(self, criteria=[], REQUEST=None):
-        """\
-        Save changes to the list of criteria.  This is done by going over
-        the submitted criteria records and comparing them against the
-        criteria object's editable attributes.  A 'command' object is
-        built to send to the Criteria objects 'edit' command.
-        """
-        for rec in criteria:
-            crit = self._getOb(rec.id)
-            command = {}
-            for attr in crit._editableAttributes:
-                tmp = getattr(rec, attr, None)
-                # Due to having multiple radio buttons on the same page
-                # with the same name, but belonging to different records,
-                # they needed to be associated with different ids.
-                if tmp is None:
-                    tmp = getattr(rec, '%s__%s' % (attr, rec.id), None)
-                
-                command[attr] = tmp
-            apply(crit.edit, (), command)
-
-        if REQUEST is not None:
-            message = urllib.quote_plus('Changes saved.')
-            REQUEST['RESPONSE'].redirect(
-                '%s/topic_criteria?portal_status_message=%s' % (
-                self.absolute_url(), message)
-                )
+    security.declarePublic(CMFCorePermissions.View, 'getCriterion')
+    def getCriterion(self, criterion_id):
+        """ Get the criterion object """
+        return self._getOb(criterion_id)
 
     security.declareProtected(TopicPermissions.AddTopics, 'addSubtopic')
-    def addSubtopic(self, id, REQUEST=None):
+    def addSubtopic(self, id):
         """ Add a new subtopic """
-        types = utils.getToolByName(self, 'portal_types')
-        topictype = types.getTypeInfo('Topic')
-
+        topictype = self.getTypeInfo()
         topictype.constructInstance(self, id)
 
-        if REQUEST is not None:
-            action = topictype.getActionById('subtopics')
-            url = '%s/%s?portal_status_message=%s' % (
-                self.absolute_url(), action,
-                urllib.quote_plus("Subtopic '%s' added" % id ))
-            REQUEST['RESPONSE'].redirect(url)
-        else:
-            return self._getOb(id)
+        return self._getOb(id)
 
 
 # Intialize the Topic class, setting up security.
 InitializeClass(Topic)
 
-# Waah.  This seems to be the only way to get the icon in correctly
-##from Products.CMFCore.register import registerPortalContent
-##registerPortalContent(
-##    Topic,
-##    meta_type='Portal Topic',
-##    icon = 'images/topic.gif',
-##    permission = TopicPermissions.AddTopics,
-##    productGlobals = globals(),
-##    )

@@ -4,7 +4,7 @@
 
 <div class="Topic">
 
-<h2> Edit Topic: <dtml-var getId> </h2>
+<h2> Edit Topic: <dtml-var id> </h2>
 
 <form action="&dtml-absolute_url;" method="post">
 <table class="FormLayout">
@@ -13,7 +13,7 @@
   <th align="right"> Title: </th>
   <td><input type="text" name="title" value="&dtml-title;" size="30" /></td>
  </tr>
- <tr valign="top">
+ <tr valign="top"
   <th align="right"> Description: </th>
   <td><textarea name="description:test" rows="5" cols="65"
        >&dtml-Description;</textarea></td>
@@ -35,7 +35,7 @@
  <tr valign="top">
   <td> <br> </td>
   <td>
-   <input type="submit" name="edit:method" value="Change">
+   <input type="submit" name="topic_editTopic:action" value="Change">
   </td>
  </tr>
 

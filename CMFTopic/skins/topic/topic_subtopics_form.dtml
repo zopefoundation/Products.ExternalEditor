@@ -31,21 +31,21 @@
  <tr valign="top">
   <td> <br> </td>
   <td>
-   <input type="submit" name="folder_rename_form:method" value="Rename">
-   <input type="submit" name="folder_cut:method" value="Cut">
-   <input type="submit" name="folder_copy:method" value="Copy">
-   <input type="submit" name="folder_paste:method" value="Paste">
-   <input type="submit" name="folder_delete:method" value="Delete">
+   <input type="submit" name="folder_rename_form:action" value="Rename">
+   <input type="submit" name="folder_cut:action" value="Cut">
+   <input type="submit" name="folder_copy:action" value="Copy">
+   <input type="submit" name="folder_paste:action" value="Paste">
+   <input type="submit" name="folder_delete:action" value="Delete">
   </td>
  </tr>
 
 </table>
 </form>
 
-<form action="addSubtopic" method="get">
+<form action="topic_addSubtopic" method="get">
 <h2> Add subtopic: </h2>
 <p><strong>Id: </strong>
-<input type="text" name="id" size="30" /><br />
+<input type="text" name="new_id" size="30" /><br />
 <input type="submit" value=" Add " /></p>
 </form>
 
