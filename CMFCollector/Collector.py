@@ -96,8 +96,11 @@ class Collector(SkinnedFolder):
     # for all notifications occuring within that state.
     state_email = {}
 
+    batch_size = 10
+
     _properties=({'id':'title', 'type': 'string', 'mode':'w'},
                  {'id':'last_issue_id', 'type': 'int', 'mode':'w'},
+                 {'id':'batch_size', 'type': 'int', 'mode':'w'},
                  )
 
     def __init__(self, id, title='', description='', abbrev='',
