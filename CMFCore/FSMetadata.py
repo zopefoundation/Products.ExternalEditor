@@ -65,12 +65,22 @@ class FSMetadata:
     # private API
     def _readMetadata(self):
         """ Read the new file format using ConfigParser """
-        cfg = CMFConfigParser()
-        cfg.read(self._filename + '.metadata')
+        self._properties = {}
+        self._security = {}
+        
+        try:
+            cfg = CMFConfigParser()
+            cfg.read(self._filename + '.metadata')
 
-        # the two sections we care about
-        self._properties = self._getSectionDict(cfg, 'default')
-        self._security = self._getSectionDict(cfg, 'security', self._securityParser)
+            # the two sections we care about
+            self._properties = self._getSectionDict(cfg, 'default')
+            self._security = self._getSectionDict(cfg, 'security', self._securityParser)
+        except:
+            LOG('FSMetadata',
+                 ERROR,
+                'Error parsing .metadata file',
+                 error=exc_info())
+        
         # to add in a new value such as proxy roles,
         # just add in the section, call it using getSectionDict
         # if you need a special parser for some whacky
