@@ -105,7 +105,7 @@ def createExprContext(sci):
         'nothing':      None,
         'root':         wf.getPhysicalRoot(),
         'request':      getattr( ob, 'REQUEST', None ),
-        'modules':      SecrueModuleImporter,
+        'modules':      SecureModuleImporter,
         'user':         getSecurityManager().getUser(),
         'state_change': sci,
         'transition':   sci.transition,
