@@ -161,27 +161,45 @@ class FSPropertiesObject (FSObject, PropertyManager):
         """
 
         fp = expandpath(self._filepath)
+
         file = open(fp, 'rb')
-        try: lines = file.readlines()
-        finally: file.close()
+        try:
+            lines = file.readlines()
+        finally:
+            file.close()
+
         map = []
+        lino=0
+
         for line in lines:
-            propname, proptv = split( line, ':' )
-            #XXX multi-line properties?
-            proptype, propvstr = split( proptv, '=' )
-            propname = strip(propname)
-            proptv = strip(proptv)
-            propvstr = strip(propvstr)
-            converter = get_converter( proptype, lambda x: x )
-            propvalue = converter( strip( propvstr ) )
-            # Should be safe since we're loading from
-            # the filesystem.
-            setattr(self, propname, propvalue)
-            map.append({'id':propname,
-                        'type':proptype,
-                        'mode':'',
-                        'default_value':propvalue,
-                        })
+
+            lino = lino + 1
+            line = strip( line )
+
+            if not line or line[0] == '#':
+                continue
+
+            try:
+                propname, proptv = split( line, ':' )
+                #XXX multi-line properties?
+                proptype, propvstr = split( proptv, '=' )
+                propname = strip(propname)
+                proptv = strip(proptv)
+                propvstr = strip(propvstr)
+                converter = get_converter( proptype, lambda x: x )
+                propvalue = converter( strip( propvstr ) )
+                # Should be safe since we're loading from
+                # the filesystem.
+                setattr(self, propname, propvalue)
+                map.append({'id':propname,
+                            'type':proptype,
+                            'mode':'',
+                            'default_value':propvalue,
+                            })
+            except:
+                import pdb; pdb.set_trace()
+                raise ValueError, ( 'Error processing line %s of %s:\n%s'
+                                  % (lino,fp,line) )
         self._properties = tuple(map)            
 
     if Globals.DevelopmentMode:
