@@ -45,4 +45,13 @@
  
  
  </export-step>
+ <export-step id="workflows"
+              handler="Products.CMFSetup.workflow.exportWorkflowTool"
+              title="Workflow Tool">
+  
+  
+  Export workflow tool's workflow definitions and supporting scripts.
+ 
+ 
+ </export-step>
 </export-steps>

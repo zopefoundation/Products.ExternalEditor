@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<workflow-tool>
+ <workflow workflow_id="default_workflow"
+           meta_type="Workflow"
+           filename="workflows/default_workflow/definition.xml"/>
+ <bindings>
+  <default>
+   <bound-workflow workflow_id="default_workflow"/>
+  </default>
+  <type type_id="Folder">
+  </type>
+  <type type_id="Topic">
+  </type>
+ </bindings>
+</workflow-tool>

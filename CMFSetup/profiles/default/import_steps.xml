@@ -36,4 +36,13 @@
  
  
  </import-step>
+ <import-step id="typeinfo" version="20040624-01"
+              handler="Products.CMFSetup.workflow.importWorkflowTool"
+              title="Workflow Tool">
+  
+  
+  Import workflow tool's workflow definitions and supporting scripts.
+ 
+ 
+ </import-step>
 </import-steps>
