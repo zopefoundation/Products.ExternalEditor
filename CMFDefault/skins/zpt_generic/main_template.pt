@@ -6,7 +6,7 @@
                   portal_object utool/getPortalObject;
                   portal_title portal_object/Title;
                   object_title here/Title;
-                  portal_url here/portal_url;
+                  portal_url utool;
                   member mtool/getAuthenticatedMember;
                   isAnon mtool/isAnonymousUser;
                   actions python: atool.listFilteredActionsFor( here );
@@ -48,7 +48,7 @@
         tal:attributes="action string:${portal_url}/search">
 
    <td id="PortalLogo">
-    <a href="." tal:attributes="href portal_url"
+    <a href="." tal:attributes="href string:${portal_url}/"
     ><img src="Zope_logo.gif" alt="Zope Logo"
           border="0" width="87" height="38"
           tal:attributes="src string:${portal_url}/Zope_logo.gif"></a> 
@@ -59,7 +59,7 @@
    </td>
 
    <td id="NavBar">
-    <a href="." tal:attributes="href portal_url">home</a>&nbsp;
+    <a href="." tal:attributes="href string:${portal_url}/">home</a>&nbsp;
     <a href="roster"
        tal:attributes="href string:${portal_url}/Members">members</a>&nbsp;
     <a href="recent_news"

@@ -11,6 +11,7 @@
 <div metal:fill-slot="main">
 
  <div tal:define="p_props here/portal_properties;
+                  p_url here/portal_url;
                   mtool here/portal_membership;
                   isAnon mtool/isAnonymousUser|nothing;
                   member mtool/getAuthenticatedMember;
@@ -60,13 +61,13 @@
        Please use the form below to change your password.</p>
 
     <form action="change_password" method="post"
-          tal:attributes="action string:${here/portal_url}/change_password"
+          tal:attributes="action string:${p_url}/change_password"
     >
      <input type="hidden" name="user" value=""
             tal:attributes="value member">
      <input type="hidden" name="domains:tokens" value="">
      <input type="hidden" name="redirect" value=""
-            tal:attributes="value p_props/portal_url">
+            tal:attributes="value string:${p_url}/">
 
      <table>
 

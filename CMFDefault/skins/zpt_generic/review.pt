@@ -10,6 +10,7 @@
                  def_start string:0;
                  bstart request/b_start | def_start;
                  batch python: Batch( results, 25, int( bstart ), orphan=0 );
+                 purl here/portal_url;
                 ">
 
 <div tal:condition="results">
@@ -17,7 +18,7 @@
 <h1> Items pending review </h1>
 
 <form action="/" method="GET"
-      tal:attributes="action here/portal_url"
+      tal:attributes="action string:${purl}/"
 >
 
 <table class="SearchResults">
@@ -46,7 +47,7 @@
    <a href="url"
       tal:attributes="href objURL"
    ><img border="0" src="icon" alt="Type" title="Type"
-         tal:attributes="src string:${here/portal_url}/${item/getIcon};
+         tal:attributes="src string:${purl}/${item/getIcon};
                          alt item/Type|nothing;
                          title item/Type|nothing;
                         "></a>

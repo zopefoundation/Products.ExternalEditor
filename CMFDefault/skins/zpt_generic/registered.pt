@@ -2,7 +2,9 @@
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       metal:use-macro="here/main_template/macros/master">
 <body>
-<div metal:fill-slot="main">
+<div metal:fill-slot="main"
+     tal:define="purl here/portal_url;"
+>
 
 <div class="Desktop"
      tal:define="pprops here/portal_properties; ve pprops/validate_email">
@@ -11,17 +13,26 @@
 
 <p> You have been registered as a member. </p>
 
-<p tal:condition="ve"> You will receive an email shortly containing your password 
-    and instructions on how to activate your membership. </p>
+<p tal:condition="ve"> You will receive an email shortly containing
+    your password and instructions on how to activate your membership.
+</p>
 
 <p tal:condition="python:not(ve)"> You can log on immediately by clicking
     <a href=""
-	   tal:define="pss modules/Products.PythonScripts.standard; uname request/username; username python:pss.url_quote(uname); pword request/password; password python:pss.url_quote(pword)"
-	   tal:attributes="href python: here.portal_url() + '/logged_in?__ac_name=' + username + '&__ac_password=' + password">here</a>.  
+	   tal:define="pss modules/Products.PythonScripts.standard;
+                   uname request/username;
+                   u python:pss.url_quote(uname);
+                   pword request/password;
+                   p python:pss.url_quote(pword);
+                  "
+	   tal:attributes="
+        href string:${purl}/logged_in?__ac_name=${u}&__ac_password=${p}"
+     >here</a>.  
 </p>
 
 <p> 
-<a href="" tal:attributes="href python:here.portal_url() + '/index_html'">Return to homepage</a> 
+<a href=""
+   tal:attributes="href string:${purl}/">Return to homepage</a> 
 </p>
 </div>
 </div>

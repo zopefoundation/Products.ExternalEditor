@@ -29,7 +29,7 @@
    <p><a href="password_form">Click here</a> to change your password.</p>
 
    <form action="personalize" method="post"
-         tal:attributes="action string:${here/portal_url}/personalize"
+         tal:attributes="action string:${purl}/personalize"
    >
     <table class="FormLayout">
 
