@@ -83,7 +83,7 @@
              TOPIC/CLASSIFICATION</span>
           </td>
           <td NOWRAP
-              tal:define="numcmts python: item.comment_number;
+              tal:define="numcmts python: item.action_number;
                           plrlcmts python: (numcmts != 1) and 's' or '';
                           numarts python: len(item.objectIds())-1;
                           plrlarts python: (numarts != 1) and 's' or ''">
