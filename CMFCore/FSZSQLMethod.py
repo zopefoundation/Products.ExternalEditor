@@ -64,8 +64,9 @@ class FSZSQLMethod(SQL, FSObject):
         s.manage_advanced(self.max_rows_,
                           self.max_cache_,
                           self.cache_time_,
-                          '',
-                          '')
+                          self.class_name_,
+                          self.class_file_,
+                          connection_hook=self.connection_hook)
         return s
 
     def _readFile(self, reparse):
@@ -88,28 +89,32 @@ class FSZSQLMethod(SQL, FSObject):
             if len(pair)!=2:
                 continue
             parameters[pair[0].strip().lower()]=pair[1].strip()
-
-        # check for required an optional parameters
+        
+        # check for required parameters
         try:
-            title =         parameters.get('title','')
-            connection_id = parameters.get('connection id',parameters['connection_id'])
-            arguments =     parameters.get('arguments','')
-            max_rows =      parameters.get('max_rows',1000)
-            max_cache =     parameters.get('max_cache',100)
-            cache_time =    parameters.get('cache_time',0)
+            connection_id =   ( parameters.get('connection id', '') or
+                                parameters['connection_id'] )
         except KeyError,e:
             raise ValueError,"The '%s' parameter is required but was not supplied" % e
 
-        self.manage_edit(title,
-                         connection_id,
-                         arguments,
-                         template=data)
+        # Optional parameters
+        title =           parameters.get('title','')
+        arguments =       parameters.get('arguments','')
+        max_rows =        parameters.get('max_rows',1000)
+        max_cache =       parameters.get('max_cache',100)
+        cache_time =      parameters.get('cache_time',0)
+        class_name =      parameters.get('class_name','')
+        class_file =      parameters.get('class_file','')
+        connection_hook = parameters.get('connection_hook',None)
+
+        self.manage_edit(title, connection_id, arguments, template=data)
 
         self.manage_advanced(max_rows,
                              max_cache,
                              cache_time,
-                             '', # don't really see any point in allowing
-                             '') # brain specification...
+                             class_name,
+                             class_file,
+                             connection_hook=connection_hook)
 
         # do we need to do anything on reparse?
 

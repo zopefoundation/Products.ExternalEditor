@@ -1,0 +1,15 @@
+<dtml-comment>
+title : This is a title
+connection id : testconn
+arguments : id
+max_rows : 1000
+max_cache : 100
+cache_time : 10
+class_name : MyRecord
+class_file : CMFCore.TestRecord
+connection_hook : MyHook
+</dtml-comment>
+FROM test_table
+SELECT *
+WHERE <dtml-sqltest id type="string">
+
