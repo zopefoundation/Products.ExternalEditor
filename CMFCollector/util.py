@@ -119,13 +119,14 @@ def format_webtext(text,
 
     in_pre = at_literal = 0
     got = []
+
+    text = html_quote_nonURLs(text)
+
     for l in text.split('\n'):
 
         if not l:
             got.append(l)
             continue
-
-        l = html_quote(l.expandtabs())
 
         at_literal = (l.startswith(" ") or l.startswith("&gt;"))
 
@@ -150,6 +151,37 @@ def format_webtext(text,
                 in_pre = 1
             
     return "<br>\n".join(got)
+
+def html_quote_nonURLs(text):
+    """html_quote everything in text except for URLs."""
+    urlmatches = list_search_hits(text, urlexp)
+    if not urlmatches:
+        return html_quote(text)
+    else:
+        got = []
+        cursor = 0
+        for m in urlmatches:
+            curstart, curend = m.start(), m.end()
+            got.append(html_quote(text[cursor:curstart]))
+            got.append(text[curstart:curend])
+            cursor = curend
+        if cursor < len(text):
+            got.append(html_quote(text[cursor:]))
+    return "".join(got)
+
+def list_search_hits(text, exprobj):
+    """Return a list of match objects for non-overlapping text hits."""
+    cursor = 0
+    got = []
+    while 1:
+        hit = exprobj.search(text, cursor)
+        if hit:
+            cursor = hit.end()
+            got.append(hit)
+        else:
+            break
+    return got
+
 
 # Match group 1 is citation prefix, group 2 is leading whitespace:
 cite_prefixexp = re.compile('([\s>]*>)?([\s]*)')
