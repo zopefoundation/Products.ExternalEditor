@@ -406,6 +406,21 @@ class TypeInformation (SimpleItemWithProperties):
         """
         return map( lambda x: x.copy(), list( self._actions ) )
 
+    security.declarePrivate('_finishConstruction')
+    def _finishConstruction(self, ob):
+        """
+            Finish the construction of a content object.
+            Set its portal_type, insert it into the workflows.
+        """
+        if hasattr(ob, '_setPortalTypeName'):
+            ob._setPortalTypeName(self.getId())
+            ob.reindexObject(idxs=['portal_type', 'Type'])
+
+        if hasattr(aq_base(ob), 'notifyWorkflowCreated'):
+            ob.notifyWorkflowCreated()
+
+        return ob
+
 InitializeClass( TypeInformation )
 
 
@@ -457,8 +472,7 @@ class FactoryTypeInformation (TypeInformation):
     def constructInstance( self, container, id, *args, **kw ):
         """
         Build a "bare" instance of the appropriate type in
-        'container', using 'id' as its id.  Return the URL
-        of its "immediate" view (typically the metadata form).
+        'container', using 'id' as its id.  Return the object.
         """
         # Get the factory method, performing a security check
         # in the process.
@@ -478,14 +492,7 @@ class FactoryTypeInformation (TypeInformation):
         id = apply( m, args, kw ) or id  # allow factory to munge ID
         ob = container._getOb( id )
 
-        if hasattr(ob, '_setPortalTypeName'):
-            ob._setPortalTypeName(self.getId())
-
-        wf = getToolByName(ob, 'portal_workflow', None)
-        if wf is not None:
-            wf.notifyCreated(ob)
-
-        return ob
+        return self._finishConstruction(ob)
 
 InitializeClass( FactoryTypeInformation )
 
@@ -525,8 +532,7 @@ class ScriptableTypeInformation( TypeInformation ):
     def constructInstance( self, container, id, *args, **kw ):
         """
         Build a "bare" instance of the appropriate type in
-        'container', using 'id' as its id.  Return the URL
-        of its "immediate" view (typically the metadata form).
+        'container', using 'id' as its id.  Return the object.
         """
         if not self.isConstructionAllowed(container):
             raise Unauthorized
@@ -538,14 +544,7 @@ class ScriptableTypeInformation( TypeInformation ):
         id = str(id)
         ob = apply(constructor, (container, id) + args, kw)
 
-        if hasattr(ob, '_setPortalTypeName'):
-            ob._setPortalTypeName(self.getId())
-
-        wf = getToolByName(ob, 'portal_workflow', None)
-        if wf is not None:
-            wf.notifyCreated(ob)
-
-        return ob
+        return self._finishConstruction(ob)
 
 InitializeClass( ScriptableTypeInformation )
 
@@ -801,9 +800,6 @@ class TypesTool( UniqueObject, OFS.Folder.Folder, ActionProviderBase ):
             raise Unauthorized,info
 
         ob = apply(info.constructInstance, (container, id) + args, kw)
-
-        # reindex after _setPortalTypeName has been called.
-        ob.reindexObject()
 
         if RESPONSE is not None:
             immediate_url = '%s/%s' % ( ob.absolute_url()
