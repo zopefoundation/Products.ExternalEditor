@@ -1,361 +1,122 @@
-1.1 final
+1.2 alpha
 
  New features
 
-  - Landed "skinned folder" module, which permits creation of
-    "folderish" types with customized replacements for 'index_html'.
+  - (__future__) Fleshed out CMFDecor product, which adds Zope
+    Page Templates skins to the CMFSite and content objects of
+    CMFDefault; added CMFDecor to the core set of CMF products.
 
-  - Added 'run_all_tests' script, to simplify running all unit
-    tests for CMF-related products.
+    Note that the CMFDecor skin is the one which will be
+    receiving all our development focus:  we will fix bugs in the
+    DTML skins, but are not likely to invest significant effort
+    in upgrading it.
 
-  - Factored out index and column lists, to ease customization
-    (Tracker #289)
+  - (__future__) Added DCWorkflow (through-the-web configurable
+    workflows) to the core set of CMF products.
 
-  - Modified DefaultDublinCoreImpl#setContributors() to use new
-    tuplize functionality (the ability to pass in a different
-    splitter function).  If a string is passed in to
-    setContributors(), it gets split on semicolons.  This allows
-    setting of contributor strings to be like
+  - Add ZMI tab to DirectoryView to allow re-basing the
+    filesystem path.
 
-     "Doe, John E (john@doe.a.deer); The Mertz Family Foundation; PBS"
+  - Added "breadcrumbs" to CMFDecor skins.
 
-    If one so deeply and dearly desired.  (The above would turn
-    into a three element tuple).
+  - Added initial support for WebDAV locaking to PortalContent.
 
-  - Made it possible to map "normal" Zope objects as content
-    (Tracker #283):
+  - Added SortCriterion to list of criterion types for Topics,
+    to permit sorting of results.
 
-    o Skin and tool code which used to query the object
-      for its Type in order to then ask the types tool for a
-      TypeInfo object now just asks the types tool for type
-      TypeInfo object directly.
-   
-    o Modified the TypesTool interface to signal that passing an
-      object to 'getTypeInfo' is acceptable, with the semantic
-      that the tool will attempt to find a TypeInfo object based
-      on the tool's type or metatype.
+  - Add scarecrow assertions for the CMF-centric interfaces, and
+    made the actual interfaces compatible with the standard
+    Zope Interface package.
 
-  - Expanded signature of Document.CookedBody to change the
-    header levels Structured Text starts rendering at, and
-    whether to preserve those changes, following the following
-    logic:
+  - Made FSSTXMethod display skinnable, and added ZPT version.
 
-      If the format is html, and 'stx_level' is not passed in or
-      is the same as the object's current settings, return the
-      cached cooked text.  Otherwise, recook.  If we recook and
-      'setlevel' is true, then set the recooked text and
-      stx_level on the object.
+  - Added 'visible' attribute to TypeInformation actions, to
+    permit indirection (via 'getActionById') without exposing the
+    action in the CMF UI.
+
+  - Extendd MetadataTool to allow adding / removing element specs
+    (i.e., it can now manage policies for "custom" schemas, as
+    well as Dublin Core).
 
  Bug fixes
 
-  - Hardened DirectoryView against objects which raise exceptions
-    during initial reads (typically due to permission problems);
-    these objects now capture and log the exception, and create
-    a BadFile object which allows browsing the traceback via the
-    ZMI (Tracker #317).
+  - Made Topic directly publishable (like PortalContent), using its
+    'view' action (or the first action found, if view is not present).
 
-  - Stopped polluting the browser with persistent skin cookie;
-    clear it as well on logout (Tracker #304).
+  - Set title for newly-created member folders;  fixes
+    breadcrumbs that expect a title on the object.
 
-  - Cleaned up folder content filtering (Tracker #298, thanks
-    to Chris Withers for the patch).
+  - Allow URLs with query strings in StructuredText links.
 
-  - Implement new "List folder contents" permission (Tracker
-    #320), to prevent non-privileged users from being able to
-    browse 'folder_contents' (permission is by default mapped
-    to 'Owner' and 'Manager').
-
-    Note that this is really only a UI change:
-    'PortalFolder.contentIds', 'PortalFolder.contentValues', and
-    'PortalFolder.contentItems' are still public, to allow for
-    reasonable "site map" views on folders.
-
-  - Use saner type ID listing in 'search_form' (Tracker #324).
-
-  - Rewired "POST target" skin methods, replacing filesystem-based
-    DTML Methods with filesystem-based Python Scripts (from
-    Tracker #301 -- thanks to Chris Withers).
-
-  - Implemented *LARGE* patch to CMFDefault.DiscussionItem and
-    CMFDefault.DiscussionTool, plus removal of
-    CMFDefault.Discussions:  changed threading strategy to remove
-    dependency on the path of the "host" content object.  Includes
-    an ExternalMethod, CMFDefault/Extensions/update_discussion.py,
-    which must be run to convert existing content which contains
-    discussion.
-
-  - Overrode DublinCore's isEffective in CMFCalendar.Event to
-    always return true;  this change prevents blocking view of
-    the event by standard_html_header.
-
-  - Updated INSTALL.txt to note that:
-
-     o Use with Zope 2.4.0a1 is *not* recommended.
-
-     o CMFDecor requires Zope Page Templates (Tracker #291).
-
-    and to describe upgrade process from CMF 1.0.
-
-  - Fixed typo in 'Unauthorized' exception raised by
-    'PortalContent._getDefaultView'.
-
-  - Made all content types findable by catalog (Tracker #286).
-
-  - Ensured that ContentTypeRegistry's "Test" tab doesn't puke if
-    no MIMEtype is entered, or if one is entered which doesn't
-    have a '/' in it (Tracker #292).
-
-  - Suppressed overwrite of Subject when no 'Subject' or
-    'Keywords' headers were present (Tracker #294).
-
-  - Ensured that 'Type' is indexed in newly-created
-    'portal_catalog'.
-
-  - Fixed acquisition stripping in PortalContent.objectItems().
-
-  - Modified CMFDefault.DublinCore.getMetadataHeaders() to join
-    Subject by commas, instead of spaces.  Since we parse/split
-    Subject on commas or semicolons now when a document is saved
-    by FTP or WebDAV, we need to feed it out in the same format.
-
-  - Fleshed out security declarations for 'portal_metadata' tool.
-
-  - Corrected pathname of 'MemberDataTool.memberdataContents' to
-    account for use of '_dtmldir' (thanks to Ricardo Newbery for
-    the patch!).
-
-  - Fixed buglet resulting from uninitialized local in
-    'PortalContent.objectItems' (thanks to Seb Bacon for the
-    patch).
-
-  - Modified stock 'search_form' to query 'Type' rather than
+  - Update 'news_box' to search based on 'Type', rather than
     'meta_type'.
 
-  - Removed debugging / "paranoia" print statements (thanks to
-    Chris Withers for the patches).
+  - Fix 'SkinnedFolder.Creator()' to call 'getOwner()' with
+    info argument.
 
-1.1 beta (2001/06/01)
+  - Made CookieCrumbler check for 'WEBDAV_SOURCE_PORT'
+    environment variable (supplied by Zope 2.4.1+), and bail on
+    intercepting authentication if found.
 
- New features
+  - Included 'Owner' in list of significant roles returned by
+    'MembershipTool.getPortalRoles' (e.g., so that the
+   "Local Roles" interface can allow assignment of it).
 
-  - Added CMFCore.utils.keywordsplitter to construct 'Subject'
-    dublin core header from both 'Keywords' and 'Subject' headers
-    passed in (meta tags/rfc822).
+  - Allow users with local role of "Reviewer" to see the "pending
+    review" action.
 
-  - CMF Document now uses StructuredTextNG for structured text
-    handling.  Nicely enough, it uses the "with images" features, and
-    also enables named and inner links.
+  - Made TypesTool, rather than individual type objects,
+    responsible for generating "immediate view" URL;  type
+    objects now return the newly-created object, which makes
+    scripting them much simpler.
 
-  - CMF Document exposes two new accessor methods for getting at the
-    "cooked" and editable body, 'CookedBody()', and 'EditableBody()'.
-    Using the 'cooked_text' and 'text' instance attributes should be
-    considered deprecated.
+  - Remove fossilized reference to 'getSecurityManager' from
+    'PortalContent._verifyActionPermissions'.
 
-  - Added new "exemplar" content product, CMFCalendar, which
-    (for now) adds a simple content object, Event.  This product
-    serves a similar didactic purpose as CMFTopic (which is now
-    "in the core"):  it shows how to build new content types as
-    filesystem products.
+  - Modified the redirect after "Add to Favorites" to us the
+    view action, rather than 'view'.
 
-  - Implemented improved "safety belt" for concurrent Document
-    editing.  See the dogbowl proposal,
-     http://cmf.zope.org/rqmts/proposals/ContentSafetyBelt
+  - Fixed 'Document.guessFormat()' to use
+    'utils.html_headcheck()' instead of 'bodyfinder' regex to
+    detect structured text versus html;  avoids recursion limit
+    for large HTML files.
 
-  - Added new filesystem-based skin method type, FSSTXMethod, for
-    creating "methods" which render STX.
+  - Removed spurious 'afterCreate' protocol for content objects.
 
-  - Exposed "controlled vocabulary" for Subject in
-    'metadata_edit_form'.
+  - Added mapping of 'css' file extension to FSDTMLMethods.
 
-  - Gave 'portal_skins' tool its own PUT_factory (Tracker #238).
-    Allows site builder to create skin methods via WebDAV/FTP,
-    including ZPT, PythonScripts, etc.
+  - Modifed PortalFolder.listFolderContents to handle
+    permission-based filtering; duplicates what skip_unauthorized
+    is doing in DocumentTemplate/DT_IN.py (but works for ZPT as
+    well).
 
-  - Implemented "outbound" segment of the "Syndication tool"
-    proposal, q.v.,
-     http://cmf.zope.org/CMF/Members/andrew/folderRSS
+  - Modified CMFDefault.RegistrationTool.addMember to avoid
+    flunking validation if properties are not passed (Tracker
+    #335).
 
-  - Made 'PUT_factory' use new 'content_type_registry' tool.
+  - Applied patch from Chris Withers to 'register' skin method;
+    the patch which avoids quoting problems for the error message
+    if a problem occurs (Tracker #339).
 
-  - Made 'PUT_factory' use 'invokeFactory', so that objects
-    created via PUT have their 'portal_type' set properly.
+  - Added 'DiscussionItem.replyCount' (Tracker #328).
+    'DiscussionItem.hasReplies' now returns only a boolean value.
+    Standard skins don't call 'replyCount' due to performance
+    concerns.
 
-  - Added ContentTypeRegistry class and related predicates for
-    mapping PUT requests (name,content_type,body) to type object
-    names.
+  - Factored content filtering logic into a Python Script.
 
-  - Allowed Reviewers to "retract" published content owned by
-    others.
+  - Improved handling of multiple rename targets (thanks to Chris
+    Withers for the patch.)
 
-  - Added "Overview" ZMI view to tools.
+  - Completed conversion of form targets from DTML Methods to
+    Python Scripts.
 
-  - Added "Dublin Core" ZMI view to PortalContent;  added an
-    editing view for Document and derivatives.
+  - Improved compatibility with Zope 2.4:
 
-  - Added "drop-in" workflow objects to the WorkflowTool,
-    including the ability to map workflows onto content types.
+    o support for new "restricted execution" mode;
 
-  - Changed CMFDefault.Portal to install CMF Topic by default
-    when building a new CMF Site.
-
-  - Added a new criteria type, *FriendlyDateCriterion*, to
-    CMFTopic for building queries like 'When effective_date is
-    less than five days old'.
-
-  - Implemented 'portal_metadata' tool.  See the dogbowl
-    proposal,
-    http://cmf.zope.org/rqmts/proposals/completed/metadata_tool. 
-
-  - Extended DirectoryView objects to reload when the directory
-    they represent has changed, if Zope is running in debug mode.
-
-  - Added hooks to CookieCrumbler to permit site managers to
-    customize seting/expiring of the authentication cookie by
-    adding PythonScripts; two default filesystem implementations
-    are in CMFDefault's "control" skin.
-
-  - Extended TypesTool to deal appropriately with DTML factory
-    methods (e.g., for ZClasses).
-
-  - Made FSDTMLMethods searchable from the ZMI (Issue PTK(251)[]).
-
- Bug Fixes
-
-  - Added 'manage_beforeDelete' to DiscussionItemContainer class,
-    and propagated to it from content deletion (Tracker #269).
-
-  - Only display the "join" action if the user has the "Add
-    portal member" permission.
-
-  - Check for appropriate REQUEST variables before invoking
-    CopySupport machinery, return a nice 'portal_status_message'
-    instead of allowing the traceback to kick in (Tracker #247).
-
-  - Initialize default DublinCore metadata for the site, so that
-    *some* value is available everywhere (Tracker #285).
-
-  - Add module-level globals aliases, to permit other products
-    to use elements of skins (Tracker #273).
-
-  - Replaced 'metadata_edit' DTMLMethod with PythonScript.
-
-  - Updated 'metadata_edit' to avoid clearing values not passed
-    in REQUEST (Tracker #268).
-
-  - Removed spurious whitespace being added to Subject.
-
-  - Fixed FSPythonScript to open file in text mode, so that
-    Windows verstions with CR don't cause the parser to choke
-    (Tracker #284).
-
-  - Simplified login-disabling logic in CookieCrumbler.
-
-  - Added '<base>' tag to headers of Document, NewsItem, and
-    DiscussionItem so that relative links work properly.
-
-  - Fixed the ActionsTool to suppress adding a trailing '/' to
-    "empty" action URL's.
-
-  - Fixed Document's content type sniffing to deal with odd case
-    in which "entire" HTML document was embedded as an STX
-    example.
-
-  - Replaced literal string permissins with "named permissions",
-    imported from modules in most places. (Please report any
-    which escaped!)
-
-  - Moved 'factory_type_information' registry entries back out
-    to the relevant modules (instead of lumping them in
-    CMFDefault.Portal).
-
-  - Simplified NewsItem to "Document with a twist" (NewsItems now
-    inherit lots of useful behavior from Document.
-
-  - Aliased DublinCore's Format() as 'content_type', so that
-    Zope's WebDAV support will do the Right Thing (TM) when
-    handling a PROPFIND.
-
-  - Suppressed "eager redirect" behavior in CookieCrumbler for
-    FTP or WebDAV (note that WebDAV fix only works for "extra"
-    HTTP methods; GET/PUT/POST still redirect).
-
-  - Made sure to update the catalog when a content object's
-    parent is deleted / moved (Tracker #261).
-
-  - Fixed lossage to File objects when no upload supplied
-    (Tracker #271).
-
-  - Fixed "Add to Favorites" when applied to Folders.
-
-  - Suppressed "Members" link in topbar (pointed to 'roster' method)
-    for users who would not be able to see it.
-
-  - Fixed irritating bugs in setting of skin-selection cookie.
-
-  - Removed ugly '_mimetype_registry' hack for 'PUT_factory'.
-
-  - Fixed a bug in CMFDefault.Document with PUT that only affected
-    FTP: when a StructuredText document that contained a full HTML
-    example (complete with <html>, <head>, and <body> tags) in its
-    body, it would pass the "does it smell like HTML" test and throw
-    everything away that wasn't inside the first matching pair of
-    <body> tags it found.  Funnily enough, this bug was exposed when
-    trying to save an article about how to use FTP with Zope and the
-    CMF that contained such an example.
-
-  - Fixed glitch caused by '<dtml-return>' in
-    CMFDefault/skins/control/reconfig.dtml.  Thanks to Hans de Wit
-    <hw@scp.nl> for reporting this!
-
-  - Allowed 'portal_type' to be a method, as well as an attribute
-    (eases ZClass-as-content).
-
-  - Fixed search form to pass 'created' instead of 'date' (probably
-    need 'modified', too);  also, added selection list for 'Subject',
-    and fixed the "Last Month" option value.
-
-  - Fixed non-import in CMFCore/WorkflowCore.py (Tracker #239,
-    thanks to 'snej' for the patch).
-
-  - Updated CatalogTool to handle searchable vs. displayable DublinCore
-    dates properly.
-
-  - Replaced usage of .id with .getId() all through the CMF, to
-    conform with the new SimpleItem API. Thanks to Jens Quade
-    <jq@jquade.de> for pointing this out. (Issue PTK(241)[]).
-
-  - Extended 'index_html' to render portal description using STX
-    (Tracker #246).
-
-  - Updated CMFDefault skins to use Contentish.getIcon, including
-    the portal catalog. This greatly simplifies using ZClasses as
-    content. In CMFDefault/scripts you will find
-    'convertCatalogGetIconColumn.pys), a Python Script that will
-    convert your existing Catalog to use 'getIcon' instead of
-    'icon' (Issue PTK(244)[]). Also, synched interface definition
-    to show the 'relative_to_portal' argument.
-
-  - Extended 'folder_factories' to filter type objects using
-    'isConstructionAllowed' in 'PortalFolder.allowedContentTypes'
-    (Tracker #249).
-
-  - Fixed display of replies on discussion items.
-
-  - Made appropriate use of 'portal_url', instead of BASEPATH
-    ad hockery, in skin methods (Tracker #259).
-
-  - Synched interface definition of 'Contentish.getIcon' with
-    reality (documented 'relative' parameter).
-
-  - Fixed "Ever" entry in 'search_form' to use a value safe in
-    timezones east of GMT (Tracker #236).
-
-  - Deprecated the CMFDefault.File.download method; it is still
-    available, but is no longer called by the current CMF skin,
-    nor is index_html aliased to it.
-
-    The method was necessary when the "View' method was the
-    default action when calling the URL of the File object, this
-    is no longer the case. The setting of the Content-Disposition
-    header is not needed when using the absolute URL of the
-    object, and causes certain browsers to misbehave.
+    o support for new catalog initialization API.
+  
+    o updated 'test_all' unit test drivers to use standard
+      'unittest' module from Python 2.1 (it no longer has
+      'JUnitTestTextRunner' class).
