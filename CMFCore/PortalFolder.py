@@ -394,6 +394,11 @@ class PortalFolder(DynamicType, CMFCatalogAware, OrderedFolder):
         if id == 'index_html':
             return
 
+        # Another exception: Must allow "syndication_information" to enable
+        # Syndication...
+        if id == 'syndication_information':
+            return
+
         # This code prevents people other than the portal manager from
         # overriding skinned names and tools.
         if not getSecurityManager().checkPermission(ManagePortal, self):
