@@ -586,7 +586,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
                 + self.importance + ' '
                 + self.severity + ' '
                 + self.status() + ' '
-                + self.resolution + ' '
+                + (self.resolution or '') + ' '
                 + self.reported_version + ' '
                 + self.other_version_info + ' '
                 + ((self.security_related and 'security_related') or ''))
