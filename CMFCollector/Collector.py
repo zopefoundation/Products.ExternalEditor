@@ -347,7 +347,7 @@ class Collector(SkinnedFolder):
         if hasattr(self, 'stub'):
             sample = self['stub']
         else:
-            sample = CollectorIssue('stub', self)
+            sample = CollectorIssue('stub', self, invisible=1)
         for wf in self.portal_workflow.getWorkflowsFor(sample):
             got.extend([x.id for x in wf.states.values()])
         got.sort()
