@@ -11,4 +11,6 @@ else:
 
 setup(name='zopeedit', 
       scripts=['zopeedit.py'],
+      windows=['zopeedit.py'],
+      options={"py2exe": {"packages": ["encodings", "Plugins", "win32com"]}},
       packages=packages)
