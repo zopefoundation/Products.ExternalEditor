@@ -21,6 +21,7 @@ from context import SnapshotExportContext
 from registry import ImportStepRegistry
 from registry import ExportStepRegistry
 
+from utils import _resolveDottedName
 from utils import _wwwdir
 
 
@@ -430,7 +431,25 @@ class SetupTool( UniqueObject, Folder ):
         xml = f.read()
         f.close()
 
-        self._import_registry.parseXML( xml, encoding )
+        info_list = self._import_registry.parseXML( xml, encoding )
+
+        for step_info in info_list:
+
+            id = step_info[ 'id' ]
+            version = step_info[ 'version' ]
+            handler = _resolveDottedName( step_info[ 'handler' ] )
+
+            dependencies = tuple( step_info.get( 'dependencies', () ) )
+            title = step_info.get( 'title', id )
+            description = ''.join( step_info.get( 'description', [] ) )
+
+            self._import_registry.registerStep( id=id
+                                              , version=version
+                                              , handler=handler
+                                              , dependencies=dependencies
+                                              , title=title
+                                              , description=description
+                                              )
 
     security.declarePrivate( '_updateExportStepsRegistry' )
     def _updateExportStepsRegistry( self, encoding ):
@@ -443,7 +462,21 @@ class SetupTool( UniqueObject, Folder ):
         xml = f.read()
         f.close()
 
-        self._export_registry.parseXML( xml, encoding )
+        info_list = self._export_registry.parseXML( xml, encoding )
+
+        for step_info in info_list:
+
+            id = step_info[ 'id' ]
+            handler = _resolveDottedName( step_info[ 'handler' ] )
+
+            title = step_info.get( 'title', id )
+            description = ''.join( step_info.get( 'description', [] ) )
+
+            self._export_registry.registerStep( id=id
+                                              , handler=handler
+                                              , title=title
+                                              , description=description
+                                              )
 
     security.declarePrivate( '_doRunImportStep' )
     def _doRunImportStep( self, step_id, context ):

@@ -205,23 +205,7 @@ class ImportStepRegistry( Implicit ):
         parser = _ImportStepRegistryParser( encoding )
         parseString( text, parser )
 
-        for step_info in parser._parsed:
-
-            id = step_info[ 'id' ]
-            version = step_info[ 'version' ]
-            handler = _resolveDottedName( step_info[ 'handler' ] )
-
-            dependencies = tuple( step_info.get( 'dependencies', () ) )
-            title = step_info.get( 'title', id )
-            description = ''.join( step_info.get( 'description', [] ) )
-
-            self.registerStep( id=id
-                             , version=version
-                             , handler=handler
-                             , dependencies=dependencies
-                             , title=title
-                             , description=description
-                             )
+        return parser._parsed
 
     #
     #   Helper methods
@@ -394,20 +378,7 @@ class ExportStepRegistry( Implicit ):
         parser = _ExportStepRegistryParser( encoding )
         parseString( text, parser )
 
-
-        for step_info in parser._parsed:
-
-            id = step_info[ 'id' ]
-            handler = _resolveDottedName( step_info[ 'handler' ] )
-
-            title = step_info.get( 'title', id )
-            description = ''.join( step_info.get( 'description', [] ) )
-
-            self.registerStep( id=id
-                             , handler=handler
-                             , title=title
-                             , description=description
-                             )
+        return parser._parsed
 
     #
     #   Helper methods
@@ -453,13 +424,15 @@ class _ImportStepRegistryParser( HandlerBase ):
             self._pending = dict( [ ( k, self._extract( attrs, k ) )
                                     for k in attrs.keys() ] )
 
+            self._pending[ 'dependencies' ] = []
+
         elif name == 'dependency':
 
             if not self._pending:
                 raise ValueError, 'Dependency outside of step'
 
             depended = self._extract( attrs, 'step' )
-            self._pending.setdefault( 'dependencies', [] ).append( depended )
+            self._pending[ 'dependencies' ].append( depended )
 
         else:
             raise ValueError, 'Unknown element %s' % name
@@ -479,6 +452,12 @@ class _ImportStepRegistryParser( HandlerBase ):
 
             if self._pending is None:
                 raise ValueError, 'No pending step!'
+
+            deps = tuple( self._pending[ 'dependencies' ] )
+            self._pending[ 'dependencies' ] = deps
+
+            desc = ''.join( self._pending[ 'description' ] )
+            self._pending[ 'description' ] = desc
 
             self._parsed.append( self._pending )
             self._pending = None
@@ -533,6 +512,9 @@ class _ExportStepRegistryParser( HandlerBase ):
 
             if self._pending is None:
                 raise ValueError, 'No pending step!'
+
+            desc = ''.join( self._pending[ 'description' ] )
+            self._pending[ 'description' ] = desc
 
             self._parsed.append( self._pending )
             self._pending = None

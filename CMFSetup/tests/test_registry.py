@@ -493,11 +493,9 @@ class ImportStepRegistryTests( BaseRegistryTests
                              , description='One small step'
                              )
 
-        registry.parseXML( _EMPTY_IMPORT_XML )
+        info_list = registry.parseXML( _EMPTY_IMPORT_XML )
 
-        self.assertEqual( len( registry.listSteps() ), 0 )
-        self.assertEqual( len( registry.listStepMetadata() ), 0 )
-        self.assertEqual( len( registry.sortSteps() ), 0 )
+        self.assertEqual( len( info_list ), 0 )
 
     def test_parseXML_single( self ):
 
@@ -511,37 +509,17 @@ class ImportStepRegistryTests( BaseRegistryTests
                              , description='Texas two step'
                              )
 
-        registry.parseXML( _SINGLE_IMPORT_XML )
+        info_list = registry.parseXML( _SINGLE_IMPORT_XML )
 
-        self.assertEqual( len( registry.listSteps() ), 1 )
-        self.failUnless( 'one' in registry.listSteps() )
+        self.assertEqual( len( info_list ), 1 )
 
-        info = registry.getStepMetadata( 'one' )
+        info = info_list[ 0 ]
         self.assertEqual( info[ 'id' ], 'one' )
         self.assertEqual( info[ 'version' ], '1' )
         self.assertEqual( info[ 'handler' ], ONE_FUNC_NAME )
         self.assertEqual( info[ 'dependencies' ], () )
         self.assertEqual( info[ 'title' ], 'One Step' )
-        self.failUnless( 'One small step' in info[ 'description' ] )
-
-    def test_parseXML_ordered( self ):
-
-        registry = self._makeOne().__of__( self.root )
-
-        registry.parseXML( _ORDERED_IMPORT_XML )
-
-        self.assertEqual( len( registry.listSteps() ), 3 )
-        self.failUnless( 'one' in registry.listSteps() )
-        self.failUnless( 'two' in registry.listSteps() )
-        self.failUnless( 'three' in registry.listSteps() )
-
-        steps = registry.sortSteps()
-        self.assertEqual( len( steps ), 3 )
-        one = steps.index( 'one' )
-        two = steps.index( 'two' )
-        three = steps.index( 'three' )
-
-        self.failUnless( 0 <= three < two < one )
+        self.failUnless( 'One small step' in info[ 'description' ], info )
 
 
 _EMPTY_IMPORT_XML = """\
@@ -740,10 +718,9 @@ class ExportStepRegistryTests( BaseRegistryTests
                              , description='One small step'
                              )
 
-        registry.parseXML( _EMPTY_EXPORT_XML )
+        info_list = registry.parseXML( _EMPTY_EXPORT_XML )
 
-        self.assertEqual( len( registry.listSteps() ), 0 )
-        self.assertEqual( len( registry.listStepMetadata() ), 0 )
+        self.assertEqual( len( info_list ), 0 )
 
     def test_parseXML_single( self ):
 
@@ -755,16 +732,15 @@ class ExportStepRegistryTests( BaseRegistryTests
                              , description='Texas two step'
                              )
 
-        registry.parseXML( _SINGLE_EXPORT_XML )
+        info_list = registry.parseXML( _SINGLE_EXPORT_XML )
 
-        self.assertEqual( len( registry.listSteps() ), 1 )
-        self.failUnless( 'one' in registry.listSteps() )
+        self.assertEqual( len( info_list ), 1 )
 
-        info = registry.getStepMetadata( 'one' )
+        info = info_list[ 0 ]
         self.assertEqual( info[ 'id' ], 'one' )
         self.assertEqual( info[ 'handler' ], ONE_FUNC_NAME )
         self.assertEqual( info[ 'title' ], 'One Step' )
-        self.failUnless( 'One small step' in info[ 'description' ] )
+        self.failUnless( 'One small step' in info[ 'description' ], info )
 
     def test_parseXML_single_as_ascii( self ):
 
@@ -776,27 +752,15 @@ class ExportStepRegistryTests( BaseRegistryTests
                              , description='Texas two step'
                              )
 
-        registry.parseXML( _SINGLE_EXPORT_XML, encoding='ascii' )
+        info_list = registry.parseXML( _SINGLE_EXPORT_XML, encoding='ascii' )
 
-        self.assertEqual( len( registry.listSteps() ), 1 )
-        self.failUnless( 'one' in registry.listSteps() )
+        self.assertEqual( len( info_list ), 1 )
 
-        info = registry.getStepMetadata( 'one' )
+        info = info_list[ 0 ]
         self.assertEqual( info[ 'id' ], 'one' )
         self.assertEqual( info[ 'handler' ], ONE_FUNC_NAME )
         self.assertEqual( info[ 'title' ], 'One Step' )
-        self.failUnless( 'One small step' in info[ 'description' ] )
-
-    def test_parseXML_ordered( self ):
-
-        registry = self._makeOne().__of__( self.root )
-
-        registry.parseXML( _ORDERED_EXPORT_XML )
-
-        self.assertEqual( len( registry.listSteps() ), 3 )
-        self.failUnless( 'one' in registry.listSteps() )
-        self.failUnless( 'two' in registry.listSteps() )
-        self.failUnless( 'three' in registry.listSteps() )
+        self.failUnless( 'One small step' in info[ 'description' ], info )
 
 
 _EMPTY_EXPORT_XML = """\
