@@ -787,7 +787,7 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
         workflows, bindings = configurator.parseToolXML( _EMPTY_TOOL_EXPORT )
 
         self.assertEqual( len( workflows ), 0 )
-        self.assertEqual( len( bindings ), 0 )
+        self.assertEqual( len( bindings ), 1 )
 
     def test_parseToolXML_default_chain_plus_overrides( self ):
 
@@ -827,7 +827,7 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
         self.assertEqual( meta_type, DCWorkflowDefinition.meta_type )
         self.assertEqual( filename, 'workflows/dcworkflow/definition.xml' )
 
-        self.assertEqual( len( bindings ), 0 )
+        self.assertEqual( len( bindings ), 1 )
 
     def test_parseWorkflowXML_empty( self ):
 

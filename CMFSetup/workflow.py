@@ -16,7 +16,6 @@ $Id$
 """
 
 import re
-from xml.sax import parseString
 from xml.dom.minidom import parseString as domParseString
 
 from AccessControl import ClassSecurityInfo
@@ -28,7 +27,6 @@ from Products.CMFCore.utils import getToolByName
 from Products.DCWorkflow.DCWorkflow import DCWorkflowDefinition
 
 from permissions import ManagePortal
-from utils import HandlerBase
 from utils import _xmldir
 from utils import _getNodeAttribute
 from utils import _queryNodeAttribute
@@ -294,10 +292,18 @@ class WorkflowToolConfigurator( Implicit ):
 
         """ Pseudo API.
         """
-        parser = _WorkflowToolParser( encoding )
-        parseString( xml, parser )
+        reader = getattr(xml, 'read', None)
+        if reader is not None:
+            xml = reader()
 
-        return parser._workflows, parser._bindings
+        dom = domParseString(xml)
+
+        root = dom.getElementsByTagName('workflow-tool')[0]
+
+        workflows = _extractWorkflowNodes(root, encoding)
+        bindings = _extractBindingsNode(root, encoding)
+
+        return workflows, bindings
 
     security.declareProtected( ManagePortal, 'parseWorkflowXML' )
     def parseWorkflowXML( self, xml, encoding=None ):
@@ -747,61 +753,6 @@ class WorkflowToolConfigurator( Implicit ):
 InitializeClass( WorkflowToolConfigurator )
 
 
-class _WorkflowToolParser( HandlerBase ):
-
-    security = ClassSecurityInfo()
-
-    def __init__( self, encoding ):
-
-        self._encoding = encoding
-        self._workflows = []
-        self._bindings = {}
-        self._binding_type = None
-
-    security.declarePrivate( 'startElement' )
-    def startElement( self, name, attrs ):
-
-        if name in ( 'workflow-tool', 'bindings' ):
-            pass
-
-        elif name == 'workflow':
-
-            workflow_id = self._extract( attrs, 'workflow_id' )
-            meta_type = self._extract( attrs, 'meta_type', workflow_id )
-
-            if meta_type == DCWorkflowDefinition.meta_type:
-
-                filename = self._extract( attrs, 'filename', workflow_id )
-
-                if filename == workflow_id:
-                    filename = _getWorkflowFilename( filename )
-
-            else:
-                filename = None
-
-            self._workflows.append( ( workflow_id, meta_type, filename ) )
-
-        elif name == 'default':
-
-            self._binding_type = None
-
-        elif name == 'type':
-
-            self._binding_type = self._extract( attrs, 'type_id' )
-
-        elif name == 'bound-workflow':
-
-            workflow_id = self._extract( attrs, 'workflow_id' )
-
-            bindings = self._bindings.setdefault( self._binding_type, [] )
-            bindings.append( workflow_id )
-
-        else:
-            raise ValueError, 'Unknown element: %s' % name
-
-InitializeClass( _WorkflowToolParser )
-
-
 def _getWorkflowFilename( workflow_id ):
 
     """ Return the name of the file which holds info for a given type.
@@ -815,6 +766,72 @@ def _getScriptFilename( workflow_id, script_id, meta_type ):
     wf_dir = workflow_id.replace( ' ', '_' )
     suffix = _METATYPE_SUFFIXES[ meta_type ]
     return 'workflows/%s/%s.%s' % ( wf_dir, script_id, suffix )
+
+def _extractWorkflowNodes(parent, encoding=None):
+
+    result = []
+
+    for wf_node in parent.getElementsByTagName('workflow'):
+
+        workflow_id = _getNodeAttribute(wf_node, 'workflow_id', encoding)
+        meta_type = _queryNodeAttribute(wf_node, 'meta_type', workflow_id,
+                                        encoding)
+        if meta_type == DCWorkflowDefinition.meta_type:
+            filename = _queryNodeAttribute(wf_node, 'filename', workflow_id,
+                                           encoding)
+            if filename == workflow_id:
+                filename = _getWorkflowFilename(filename)
+        else:
+            filename = None
+
+        result.append( (workflow_id, meta_type, filename) )
+
+    return result
+
+def _extractBindingsNode(parent, encoding=None):
+
+    result = {}
+
+    b_node = parent.getElementsByTagName('bindings')[0]
+    default = _extractDefaultChainNode(b_node, encoding)
+    result.update(default)
+    types = _extractTypeNodes(b_node, encoding)
+    result.update(types)
+
+    return result
+
+def _extractDefaultChainNode(parent, encoding=None):
+
+    result = {}
+
+    d_node = parent.getElementsByTagName('default')[0]
+    bound_workflows = _extractBoundWorkflowNodes(d_node, encoding)
+    result[None] = bound_workflows
+
+    return result
+
+def _extractTypeNodes(parent, encoding=None):
+
+    result = {}
+
+    for t_node in parent.getElementsByTagName('type'):
+
+        type_id = _getNodeAttribute(t_node, 'type_id', encoding)
+        bound_workflows = _extractBoundWorkflowNodes(t_node, encoding)
+        result[type_id] = bound_workflows
+
+    return result
+
+def _extractBoundWorkflowNodes(parent, encoding=None):
+
+    result = []
+
+    for t_node in parent.getElementsByTagName('bound-workflow'):
+
+        value = _getNodeAttribute(t_node, 'workflow_id', encoding)
+        result.append(value)
+
+    return tuple(result)
 
 def _extractStateNodes( root, encoding=None ):
 

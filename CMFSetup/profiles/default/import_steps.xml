@@ -67,6 +67,7 @@
               handler="Products.CMFSetup.workflow.importWorkflowTool"
               title="Workflow Tool">
   <dependency step="toolset"/>
+  <dependency step="typeinfo"/>
   
   
   
