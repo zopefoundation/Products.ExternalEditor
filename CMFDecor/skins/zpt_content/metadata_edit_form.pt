@@ -58,14 +58,17 @@
 
  <tr valign="top">
        <th align="right"> Subject </th>
-  <td>
-     <textarea name="subject:lines" rows="3"
-               cols="20"
-	   tal:define="lines here/subjectsList"><span tal:repeat="line lines" tal:replace="line"></span></textarea>
+  <td tal:define="subj_lines python: modules['string'].join(
+                                         here.subjectsList(), '\n' )">
+     <textarea name="subject:lines" rows="3" cols="20"
+	           tal:content="subj_lines"></textarea>
  <br> 
    <select name="subject:list" multiple>
      <option value=""
-		   tal:define="items python: here.portal_metadata.listAllowedSubjects(here); subjects here/Subject"
+		   tal:define="items python: here.portal_metadata.listAllowedSubjects(
+                                              here);
+                       subjects here/Subject;
+                      "
 		   tal:repeat="item items"
 		   tal:attributes="value item; selected python: item in subjects"
 		   tal:content="item">
