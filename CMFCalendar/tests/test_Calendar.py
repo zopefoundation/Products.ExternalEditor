@@ -439,6 +439,62 @@ class TestCalendar(unittest.TestCase):
         assert len(self.Site.portal_calendar.getEventsForThisDay(thisDay=DateTime('2002/5/1'))) == 4
         assert len(self.Site.portal_calendar.getEventsForThisDay(thisDay=DateTime('2002/5/31'))) == 3
 
+    def test_lastDayRendering(self):
+        # Bug in catalog_getevents included events starting at 00:00:00 on the next day
+
+        self.Site.Members.invokeFactory('Event', id='today', title='title',
+                                         start_date='2002/05/31 23:50:00', 
+                                         end_date='2002/05/31 23:59:59')
+
+        self.Site.Members.invokeFactory('Event', id='tomorrow', title='title',
+                                         start_date='2002/06/01 00:00:00', 
+                                         end_date='2002/06/01 00:10:00')
+
+        self.Site.portal_workflow.doActionFor(self.Site.Members.today, 'publish')
+        self.Site.portal_workflow.doActionFor(self.Site.Members.tomorrow, 'publish')
+
+        # Last week of May 2002
+        data = [
+               {'day': 25, 'event': 0, 'eventslist':[]},
+               {'day': 26, 'event': 0, 'eventslist':[]},
+               {'day': 27, 'event': 0, 'eventslist':[]},
+               {'day': 28, 'event': 0, 'eventslist':[]},
+               {'day': 29, 'event': 0, 'eventslist':[]},
+               {'day': 30, 'event': 0, 'eventslist':[]},
+               {'day': 31, 'event': 1, 'eventslist':[{'start': '23:50:00', 'end': '23:59:59', 'title': 'title'}]},
+               ]
+
+        events = self.Site.portal_calendar.catalog_getevents(2002, 5)
+        self.assertEqual([events[e] for e in range(25, 32)], data)
+
+    def test_firstDayRendering(self):
+        # Double check it works on the other boundary as well
+
+        self.Site.Members.invokeFactory('Event', id='yesterday', title='title',
+                                         start_date='2002/05/31 23:50:00', 
+                                         end_date='2002/05/31 23:59:59')
+
+        self.Site.Members.invokeFactory('Event', id='today', title='title',
+                                         start_date='2002/06/01 00:00:00', 
+                                         end_date='2002/06/01 00:10:00')
+
+        self.Site.portal_workflow.doActionFor(self.Site.Members.yesterday, 'publish')
+        self.Site.portal_workflow.doActionFor(self.Site.Members.today, 'publish')
+
+        # First week of June 2002
+        data = [
+               {'day': 1, 'event': 1, 'eventslist':[{'start': '00:00:00', 'end': '00:10:00', 'title': 'title'}]},
+               {'day': 2, 'event': 0, 'eventslist':[]},
+               {'day': 3, 'event': 0, 'eventslist':[]},
+               {'day': 4, 'event': 0, 'eventslist':[]},
+               {'day': 5, 'event': 0, 'eventslist':[]},
+               {'day': 6, 'event': 0, 'eventslist':[]},
+               {'day': 7, 'event': 0, 'eventslist':[]},
+               ]
+
+        events = self.Site.portal_calendar.catalog_getevents(2002, 6)
+        self.assertEqual([events[e] for e in range(1, 8)], data)
+
 
 def test_suite():
     return unittest.TestSuite((

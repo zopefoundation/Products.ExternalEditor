@@ -130,12 +130,9 @@ class CalendarTool (UniqueObject, SimpleItem):
         """ given a year and month return a list of days that have events """
         year=int(year)
         month=int(month)
-        first_date=DateTime(year, month, 1)
         last_day=calendar.monthrange(year, month)[1]
-        ## This line was cropping the last day of the month out of the
-        ## calendar when doing the query
-        ## last_date=DateTime(year, month, last_day)
-        last_date = DateTime('%d/%d/%s 23:59:59' % (month, last_day , year))
+        first_date=self.getBeginAndEndTimes(1, month, year)[0]
+        last_date=self.getBeginAndEndTimes(last_day, month, year)[1]
 
         query = self.portal_catalog(
                         portal_type=self.calendar_types,
