@@ -90,8 +90,6 @@ class PortalFolderTests( SecurityTest ):
         SecurityTest.setUp(self)
 
         root = self.root
-        try: root._delObject('test')
-        except AttributeError: pass
         root._setObject( 'test', PortalFolder( 'test','' ) )
 
     def test_deletePropagation( self ):
@@ -215,12 +213,9 @@ class PortalFolderTests( SecurityTest ):
         self.failUnless( 'foo' in catalog.uniqueValuesFor('getId') )
         assert has_path( catalog._catalog, '/test/folder/sub/foo' )
 
-        # WAAAA! must get _p_jar set
-        old, sub._p_jar = sub._p_jar, self.root._p_jar
-        try:
-            folder.manage_renameObject( id='sub', new_id='new_sub' )
-        finally:
-            sub._p_jar = old
+        get_transaction().commit(1)
+        folder.manage_renameObject(id='sub', new_id='new_sub')
+
         self.failUnless( 'foo' in catalog.uniqueValuesFor('getId') )
         assert len( catalog ) == 1
         assert has_path( catalog._catalog, '/test/folder/new_sub/foo' )
@@ -238,13 +233,9 @@ class PortalFolderTests( SecurityTest ):
         sub2.all_meta_types.extend( sub2.all_meta_types )
         sub2.all_meta_types.extend( extra_meta_types() )
 
-        # WAAAA! must get _p_jar set
-        old, bar._p_jar = sub._p_jar, self.root._p_jar
-        try:
-            cookie = folder.manage_cutObjects( ids=['bar'] )
-            sub2.manage_pasteObjects( cookie )
-        finally:
-            bar._p_jar = old
+        get_transaction().commit(1)
+        cookie = folder.manage_cutObjects(ids=['bar'])
+        sub2.manage_pasteObjects(cookie)
 
         self.failUnless( 'foo' in catalog.uniqueValuesFor('getId') )
         self.failUnless( 'bar' in catalog.uniqueValuesFor('getId') )
@@ -361,17 +352,14 @@ class PortalFolderTests( SecurityTest ):
         assert has_path( catalog._catalog, '/test/sub2/dummy' )
         assert not has_path( catalog._catalog, '/test/sub3/dummy' )
 
-        # WAAAA! must get _p_jar set
-        old, dummy._p_jar = dummy._p_jar, self.root._p_jar
-        try:
-            cookie = sub1.manage_cutObjects( ids = ( 'dummy', ) )
-            # Waaa! force sub2 to allow paste of Dummy object.
-            sub3.all_meta_types = []
-            sub3.all_meta_types.extend( sub3.all_meta_types )
-            sub3.all_meta_types.extend( extra_meta_types() )
-            sub3.manage_pasteObjects( cookie )
-        finally:
-            dummy._p_jar = old
+        get_transaction().commit(1)
+        cookie = sub1.manage_cutObjects( ids = ('dummy',) )
+        # Waaa! force sub2 to allow paste of Dummy object.
+        sub3.all_meta_types = []
+        sub3.all_meta_types.extend(sub3.all_meta_types)
+        sub3.all_meta_types.extend( extra_meta_types() )
+        sub3.manage_pasteObjects(cookie)
+
         assert not 'dummy' in sub1.objectIds()
         assert not 'dummy' in sub1.contentIds()
         assert 'dummy' in sub2.objectIds()
