@@ -3,7 +3,8 @@
 ##bind namespace=_
 ##parameters=
 REQUEST=context.REQUEST
-context.portal_registration.setProperties(REQUEST)
+member = context.portal_membership.getAuthenticatedMember()
+member.setProperties(REQUEST)
 
 if REQUEST.has_key('portal_skin'):
     context.portal_skins.updateSkinCookie()

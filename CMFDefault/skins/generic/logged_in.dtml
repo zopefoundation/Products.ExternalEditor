@@ -34,7 +34,7 @@
 
  </dtml-comment>
 
- <dtml-call "portal_registration.setProperties(last_login_time=ZopeTime(),login_time=ZopeTime())">
+ <dtml-call "member.setProperties(last_login_time=ZopeTime(),login_time=ZopeTime())">
 
  <h1 class="DesktopTitle">
   Welcome!
@@ -76,8 +76,8 @@
 
  <dtml-else>
 
- <dtml-call "portal_registration.setProperties(last_login_time=member.login_time)">
- <dtml-call "portal_registration.setProperties(login_time=ZopeTime())">
+ <dtml-call "member.setProperties(last_login_time=member.login_time)">
+ <dtml-call "member.setProperties(login_time=ZopeTime())">
 
 <!-- ****** Enable the automatic redirect ***** -->
 <dtml-if name="came_from">

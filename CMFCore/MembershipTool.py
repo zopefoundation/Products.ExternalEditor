@@ -69,6 +69,21 @@ class MembershipTool (UniqueObject, SimpleItem, ActionProviderBase):
     security.declareProtected(ManagePortal, 'manage_mapRoles')
     manage_mapRoles = DTMLFile('membershipRolemapping', _dtmldir )
  
+    security.declareProtected(CMFCorePermissions.SetOwnPassword, 'setPassword')
+    def setPassword(self, password, domains=None):
+        '''Allows the authenticated member to set his/her own password.
+        '''
+        registration = getToolByName(self, 'portal_registration', None)
+        if not self.isAnonymousUser():
+            member = self.getAuthenticatedMember()
+            if registration:
+                failMessage = registration.testPasswordValidity(password)
+                if failMessage is not None:
+                    raise 'Bad Request', failMessage
+            member.setSecurityProfile(password=password, domains=domains)
+        else:
+            raise 'Bad Request', 'Not logged in.'
+
     security.declarePublic('getAuthenticatedMember')
     def getAuthenticatedMember(self):
         '''

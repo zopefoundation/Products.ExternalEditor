@@ -22,7 +22,7 @@
    <div tal:condition="python: not(here.portal_membership.isAnonymousUser())"
         tal:define="member python: here.portal_membership.getAuthenticatedMember()">
 		  <div tal:condition="python: member.login_time == here.ZopeTime('2000/01/01') and p_props.validate_email">
-		      <div tal:define="dum_reg python: here.portal_registration.setProperties(last_login_time=here.ZopeTime(),login_time=here.ZopeTime())" />
+		      <div tal:define="dum_reg python: member.setProperties(last_login_time=here.ZopeTime(),login_time=here.ZopeTime())" />
 			   <h1 class="DesktopTitle">Welcome!</h1>
 			   <p class="Desktop">This is the first time that you've logged in to <span replace="p_props/title">Here</span>. 
 			   Before you start exploring you need to change your original password. 
@@ -55,7 +55,8 @@
 			   </form>
         </div>
 		<div tal:condition="python: not(member.login_time == here.ZopeTime('2000/01/01') and here.validate_email)">
-		  <div tal:define="d_reg python: here.portal_registration.setProperties(last_login_time=member.login_time); ereg python: here.portal_registration.setProperties(login_time=here.ZopeTime())">
+		  <div tal:define="d_reg python: member.setProperties(last_login_time=member.login_time); 
+                           ereg python: member.setProperties(login_time=here.ZopeTime())">
 		  </div>
 		<div tal:condition="request/came_from | nothing ">
 		 <div tal:define="dredirect python: request.RESPONSE.redirect(request.get('came_from'))"></div>

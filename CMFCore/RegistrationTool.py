@@ -153,37 +153,4 @@ class RegistrationTool (UniqueObject, SimpleItem, ActionProviderBase):
         '''
         raise 'NotImplemented'
 
-    security.declareProtected(SetOwnPassword, 'setPassword')
-    def setPassword(self, password, domains=None):
-        '''Allows the authenticated member to set his/her own password.
-        '''
-        membership = getToolByName(self, 'portal_membership')
-        if not membership.isAnonymousUser():
-            member = membership.getAuthenticatedMember()
-            failMessage = self.testPasswordValidity(password)
-            if failMessage is not None:
-                raise 'Bad Request', failMessage
-            member.setSecurityProfile(password=password, domains=domains)
-        else:
-            raise 'Bad Request', 'Not logged in.'
-            
-    security.declareProtected(SetOwnProperties, 'setProperties')
-    def setProperties(self, properties=None, **kw):
-        '''Allows the authenticated member to set his/her own properties.
-        Accepts either keyword arguments or a mapping for the "properties"
-        argument.
-        '''
-        if properties is None:
-            properties = kw
-        membership = getToolByName(self, 'portal_membership')
-        if not membership.isAnonymousUser():
-            member = membership.getAuthenticatedMember()
-            failMessage = self.testPropertiesValidity(properties, member)
-            if failMessage is not None:
-                raise 'Bad Request', failMessage
-            member.setMemberProperties(properties)
-        else:
-            raise 'Bad Request', 'Not logged in.'
-
-
 InitializeClass(RegistrationTool)

@@ -10,8 +10,6 @@
     <span tal:define="red_str string: ${here/portal_url}/login_form?came_from=${here/absolute_url};
                       redirect python: request.RESPONSE.redirect( red_str )"></span>
   </div>
-
-
 <div class="Desktop">
 
 <h1> Member Preferences </h1>

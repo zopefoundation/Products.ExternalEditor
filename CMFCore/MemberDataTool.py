@@ -223,6 +223,26 @@ class MemberData (SimpleItem):
     def getMemberId(self):
         return self.getUser().getUserName()
 
+    security.declareProtected(CMFCorePermissions.SetOwnProperties, 'setProperties')
+    def setProperties(self, properties=None, **kw):
+        '''Allows the authenticated member to set his/her own properties.
+        Accepts either keyword arguments or a mapping for the "properties"
+        argument.
+        '''
+        if properties is None:
+            properties = kw
+        membership = getToolByName(self, 'portal_membership')
+        registration = getToolByName(self, 'portal_registration', None)
+        if not membership.isAnonymousUser():
+            member = membership.getAuthenticatedMember()
+            if registration:
+                failMessage = registration.testPropertiesValidity(properties, member)
+                if failMessage is not None:
+                    raise 'Bad Request', failMessage
+            member.setMemberProperties(properties)
+        else:
+            raise 'Bad Request', 'Not logged in.'
+
     security.declarePrivate('setMemberProperties')
     def setMemberProperties(self, mapping):
         '''Sets the properties of the member.
