@@ -62,10 +62,13 @@ class LockTool(UniqueObject, SimpleItemWithProperties):
     # of autoversioning described in the DeltaV introduction.
     # http://www.webdav.org/deltav/WWW10/deltav-intro.htm
     auto_version = 1
+    timeout_days = 14  # 2 weeks
 
     _properties = (
         {'id': 'auto_version', 'type': 'boolean', 'mode': 'w',
          'label': 'Auto checkout and checkin using portal_versions'},
+        {'id': 'timeout_days', 'type': 'int', 'mode': 'w',
+         'label': 'Lock timeout in days'},
         )
 
     #
@@ -93,7 +96,7 @@ class LockTool(UniqueObject, SimpleItemWithProperties):
                     object = vt.checkout(object)
 
         user = getSecurityManager().getUser()
-        lockitem = LockItem(user)
+        lockitem = LockItem(user, timeout=(self.timeout_days * 86400))
         object.wl_setLock(lockitem.getLockToken(), lockitem)
 
 
@@ -142,11 +145,13 @@ class LockTool(UniqueObject, SimpleItemWithProperties):
         values = object.wl_lockValues()
         if not values:
             return ''
-
-        creator = values[0].getCreator()
-        if creator:
-            return creator[1]  # The user id without the path
-        return ''  # An expired lock?
+        for lock in values:
+            if lock.isValid():
+                creator = lock.getCreator()
+                if creator:
+                    return creator[1]  # The user id without the path
+        # All of the locks are expired or invalid
+        return ''
 
 
     security.declarePublic('isLockedOut')
