@@ -92,6 +92,9 @@ setDefaultRoles(SetOwnPassword, ('Manager',))  # + Member
 SetOwnProperties = 'Set own properties'
 setDefaultRoles(SetOwnProperties, ('Manager',))  # + Member
 
+ChangeLocalRoles = 'Change local roles'
+setDefaultRoles(ChangeLocalRoles, ('Owner', 'Manager'))
+
 MailForgottenPassword = 'Mail forgotten password'
 setDefaultRoles(MailForgottenPassword, ('Anonymous', 'Manager',))
 

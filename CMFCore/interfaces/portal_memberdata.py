@@ -47,23 +47,46 @@ class portal_memberdata(Interface):
         The result is designed to be iterated over in a dtml-in
         '''
 
-    ## pruneMemberDataContents__roles__ = ()  # Private.
     def pruneMemberDataContents():
-        '''
-        Compare the user IDs stored in the member data
-        tool with the list in the actual underlying acl_users
-        and delete anything not in acl_users
-        '''
+        """ Delete member data of all members not listet in acl_users.
 
-    ## searchMemberData__roles__ = ()  # Private.
+        Compare the user IDs stored in the member data tool with the list in
+        the actual underlying acl_users and delete anything not in acl_users.
+
+        Permission -- Python only
+        """
+
     def searchMemberData(search_param, search_term, attributes=()):
-        '''
+        """ Search members.
+
         Returns a sequence of dictionaries containing data for members
         that match the query as expressed by search_param and search_term.
         The contents of each member data mapping can be influenced by
         passing in a sequence of desired attributes, by default the only
         data returned is the username and the email address.
-        '''
+
+        Permission -- Python only
+
+        Returns -- Sequence of dictionaries
+        """
+
+    def registerMemberData(m, id):
+        """ Add the given member data to the _members btree.
+
+        This is done as late as possible to avoid side effect transactions and
+        to reduce the necessary number of entries.
+
+        Permission -- Python only
+        """
+
+    def deleteMemberData(member_id):
+        """ Delete member data of specified member.
+
+        Permission -- Python only
+
+        Returns -- Boolean value
+        """
+
 
 class MemberData(Interface):
     """ MemberData interface.

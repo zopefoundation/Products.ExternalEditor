@@ -15,6 +15,8 @@
 $Id$
 """
 
+from AccessControl import allow_module
+
 import PortalObject, PortalContent, PortalFolder
 import MembershipTool, WorkflowTool, CatalogTool, DiscussionTool
 import ActionsTool, UndoTool, RegistrationTool, SkinsTool
@@ -29,6 +31,9 @@ import CachingPolicyManager
 import utils
 
 from CMFCorePermissions import AddPortalFolders
+
+
+allow_module('Products.CMFCore.CMFCoreExceptions')
 
 try:
     import FSPageTemplate

@@ -26,6 +26,7 @@ from Acquisition import aq_parent, aq_inner, aq_base
 
 from CMFCorePermissions import AddPortalContent
 from CMFCorePermissions import AddPortalFolders
+from CMFCorePermissions import ChangeLocalRoles
 from CMFCorePermissions import ListFolderContents
 from CMFCorePermissions import ManagePortal
 from CMFCorePermissions import ManageProperties
@@ -62,7 +63,7 @@ factory_type_information = (
                          , 'name'          : 'Local Roles'
                          , 'action':
                                   'string:${object_url}/folder_localrole_form'
-                         , 'permissions'   : (ManageProperties,)
+                         , 'permissions'   : (ChangeLocalRoles,)
                          , 'category'      : 'folder'
                          }
                        )

@@ -15,20 +15,29 @@
 $Id$
 """
 
+from types import StringType
 from utils import UniqueObject, _getAuthenticatedUser, _checkPermission
 from utils import getToolByName, _dtmldir
 from OFS.Folder import Folder
-from Globals import InitializeClass, DTMLFile, MessageDialog, \
-     PersistentMapping
 from Acquisition import aq_base
+from Acquisition import aq_inner
+from Acquisition import aq_parent
 from AccessControl.User import nobody
 from AccessControl import ClassSecurityInfo
+from Globals import DTMLFile
+from Globals import InitializeClass
+from Globals import MessageDialog
+from Globals import PersistentMapping
+
+from ActionProviderBase import ActionProviderBase
+from CMFCoreExceptions import CMFNotImplementedError
+from CMFCoreExceptions import CMFUnauthorizedError
 from CMFCorePermissions import AccessContentsInformation
+from CMFCorePermissions import ChangeLocalRoles
 from CMFCorePermissions import ManagePortal
 from CMFCorePermissions import ManageUsers
 from CMFCorePermissions import SetOwnPassword
 from CMFCorePermissions import View
-from ActionProviderBase import ActionProviderBase
 
 from interfaces.portal_membership \
         import portal_membership as IMembershipTool
@@ -189,6 +198,14 @@ class MembershipTool(UniqueObject, Folder, ActionProviderBase):
         else:
             return ''
 
+    security.declarePublic('getMembersFolder')
+    def getMembersFolder(self):
+        """ Get the members folder object.
+        """
+        parent = aq_parent( aq_inner(self) )
+        members = getattr(parent, 'Members', None)
+        return members
+
     security.declareProtected(ManagePortal, 'getMemberareaCreationFlag')
     def getMemberareaCreationFlag(self):
         """
@@ -220,14 +237,13 @@ class MembershipTool(UniqueObject, Folder, ActionProviderBase):
                message='Member area creation flag has been updated',
                action ='manage_mapRoles')
 
-    security.declarePublic('createMemberarea')
-    def createMemberarea(self, member_id=''):
+    security.declarePublic('createMemberArea')
+    def createMemberArea(self, member_id=''):
         """ Create a member area for 'member_id' or authenticated user.
         """
         if not self.getMemberareaCreationFlag():
             return None
-        parent = self.aq_inner.aq_parent
-        members =  getattr(parent, 'Members', None)
+        members = self.getMembersFolder()
         if not members:
             return None
         if self.isAnonymousUser():
@@ -265,6 +281,22 @@ class MembershipTool(UniqueObject, Folder, ActionProviderBase):
             f.__ac_local_roles__ = None
             f.manage_setLocalRoles(member_id, ['Owner'])
         return f
+
+    security.declarePublic('createMemberarea')
+    createMemberarea = createMemberArea
+
+    security.declareProtected(ManageUsers, 'deleteMemberArea')
+    def deleteMemberArea(self, member_id):
+        """ Delete member area of member specified by member_id.
+        """
+        members = self.getMembersFolder()
+        if not members:
+            return 0
+        if hasattr( aq_base(members), member_id ):
+            members.manage_delObjects(member_id)
+            return 1
+        else:
+            return 0
 
     security.declarePublic('isAnonymousUser')
     def isAnonymousUser(self):
@@ -360,7 +392,7 @@ class MembershipTool(UniqueObject, Folder, ActionProviderBase):
         """ What local roles can I assign? """
         member = self.getAuthenticatedMember()
 
-        if 'Manager' in member.getRoles():
+        if _checkPermission(ManageUsers, obj):
             return self.getPortalRoles()
         else:
             member_roles = list( member.getRolesInContext( obj ) )
@@ -369,12 +401,11 @@ class MembershipTool(UniqueObject, Folder, ActionProviderBase):
         return tuple( member_roles )
 
     security.declareProtected(View, 'setLocalRoles')
-    def setLocalRoles( self, obj, member_ids, member_role, reindex=1 ):
-        """ Set local roles on an item """
-        member = self.getAuthenticatedMember()
-        my_roles = member.getRolesInContext( obj )
-
-        if 'Manager' in my_roles or member_role in my_roles:
+    def setLocalRoles(self, obj, member_ids, member_role, reindex=1):
+        """ Add local roles on an item.
+        """
+        if ( _checkPermission(ChangeLocalRoles, obj)
+             and member_role in self.getCandidateLocalRoles(obj) ):
             for member_id in member_ids:
                 roles = list(obj.get_local_roles_for_userid( userid=member_id ))
 
@@ -389,15 +420,21 @@ class MembershipTool(UniqueObject, Folder, ActionProviderBase):
             obj.reindexObjectSecurity()
 
     security.declareProtected(View, 'deleteLocalRoles')
-    def deleteLocalRoles( self, obj, member_ids, reindex=1 ):
-        """ Delete local roles for members member_ids """
-        member = self.getAuthenticatedMember()
-        my_roles = member.getRolesInContext( obj )
+    def deleteLocalRoles(self, obj, member_ids, reindex=1, recursive=0):
+        """ Delete local roles of specified members.
+        """
+        if _checkPermission(ChangeLocalRoles, obj):
+            for member_id in member_ids:
+                if obj.get_local_roles_for_userid(userid=member_id):
+                    obj.manage_delLocalRoles(userids=member_ids)
+                    break
 
-        if 'Manager' in my_roles or 'Owner' in my_roles:
-            obj.manage_delLocalRoles( userids=member_ids )
+        if recursive and hasattr( aq_base(obj), 'contentValues' ):
+            for subobj in obj.contentValues():
+                self.deleteLocalRoles(subobj, member_ids, 0, 1)
 
         if reindex:
+            # reindexObjectSecurity is always recursive
             obj.reindexObjectSecurity()
 
     security.declarePrivate('addMember')
@@ -420,6 +457,49 @@ class MembershipTool(UniqueObject, Folder, ActionProviderBase):
             member = self.getMemberById(id)
             member.setMemberProperties(properties)
 
+    security.declareProtected(ManageUsers, 'deleteMembers')
+    def deleteMembers(self, member_ids, delete_memberareas=1,
+                      delete_localroles=1):
+        """ Delete members specified by member_ids.
+        """
+
+        # Delete members in acl_users.
+        acl_users = self.acl_users
+        if _checkPermission(ManageUsers, acl_users):
+            if type(member_ids) is StringType:
+                member_ids = (member_ids,)
+            member_ids = list(member_ids)
+            for member_id in member_ids[:]:
+                if not acl_users.getUserById(member_id, None):
+                    member_ids.remove(member_id)
+            try:
+                acl_users.userFolderDelUsers(member_ids)
+            except (NotImplementedError, 'NotImplemented'):
+                raise CMFNotImplementedError('The underlying User Folder '
+                                         'doesn\'t support deleting members.')
+        else:
+            raise CMFUnauthorizedError('You need the \'Manage users\' '
+                                 'permission for the underlying User Folder.')
+
+        # Delete member data in portal_memberdata.
+        mdtool = getToolByName(self, 'portal_memberdata', None)
+        if mdtool:
+            for member_id in member_ids:
+                mdtool.deleteMemberData(member_id)
+
+        # Delete members' home folders including all content items.
+        if delete_memberareas:
+            for member_id in member_ids:
+                 self.deleteMemberArea(member_id)
+
+        # Delete members' local roles.
+        if delete_localroles:
+            utool = getToolByName(self, 'portal_url', None)
+            self.deleteLocalRoles( utool.getPortalObject(), member_ids,
+                                   reindex=1, recursive=1 )
+
+        return tuple(member_ids)
+
     security.declarePublic('getHomeFolder')
     def getHomeFolder(self, id=None, verifyPermission=0):
         """Returns a member's home folder object or None.
@@ -435,6 +515,5 @@ class MembershipTool(UniqueObject, Folder, ActionProviderBase):
         doesn't have the View permission on the folder.
         """
         return None
-
 
 InitializeClass(MembershipTool)

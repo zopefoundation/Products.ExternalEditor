@@ -168,6 +168,8 @@ class DummyFolder( Implicit ):
     def getId(self):
         return self._id
 
+    def reindexObjectSecurity(self):
+        pass
 
 class DummySite(DummyFolder):
     """ A dummy portal folder.
@@ -229,6 +231,10 @@ class DummyUserFolder(Implicit):
 
     def getUserById(self, id, default=None):
         return self.getUser(id)
+
+    def userFolderDelUsers(self, names):
+        for user_id in names:
+            delattr(self, user_id)
 
 
 class DummyTool(Implicit,ActionProviderBase):

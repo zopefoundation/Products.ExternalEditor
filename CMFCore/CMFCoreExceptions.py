@@ -10,25 +10,31 @@
 # FOR A PARTICULAR PURPOSE
 #
 ##############################################################################
-""" Extended membership tool interface.
+""" Declare Exceptions used throughout the CMF.
 
 $Id$
 """
 
-from Products.CMFCore.interfaces.portal_membership \
-        import portal_membership as BaseInterface
+from AccessControl import allow_class
+from AccessControl import Unauthorized
 
 
-class portal_membership(BaseInterface):
-    """ Declare product-specific APIs for CMFDefault's tool.
+class CMFError(Exception):
+    """ The root of all CMF evil.
     """
 
-    def setMembersFolderById(id=''):
-        """ Set the members folder object by its id.
+allow_class(CMFError)
 
-        The members folder has to be in the same container as the membership
-        tool. id is the id of an existing folder. If id is empty, member areas
-        are disabled.
 
-        Permission -- Manage portal
-        """
+class CMFNotImplementedError(NotImplementedError, CMFError):
+    """ NotImplementedError in CMF.
+    """
+
+allow_class(CMFNotImplementedError)
+
+
+class CMFUnauthorizedError(Unauthorized, CMFError):
+    """ Unauthorized error in CMF.
+    """
+
+allow_class(CMFUnauthorizedError)

@@ -40,7 +40,7 @@
        tal:define="first_time python:(
                     member.getProperty( 'login_time', None ) == never
                                        and p_props.validate_email );
-                   dum_home mtool/createMemberarea">
+                   dum_home mtool/createMemberArea">
 
    <div tal:condition="first_time">
     <div tal:define="dum_reg python:member.setProperties(

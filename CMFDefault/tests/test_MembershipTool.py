@@ -70,25 +70,25 @@ class MembershipToolSecurityTests(SecurityTest):
         self.site.id = 'testSite'
         self.mtool = MembershipTool().__of__(self.site)
 
-    def test_createMemberarea(self):
+    def test_createMemberArea(self):
         mtool = self.mtool
         members = self.site._setObject( 'Members', PortalFolder('Members') )
         acl_users = self.site._setObject( 'acl_users', DummyUserFolder() )
         wtool = self.site._setObject( 'portal_workflow', DummyTool() )
 
         # permission
-        mtool.createMemberarea('user_foo')
+        mtool.createMemberArea('user_foo')
         self.failIf( hasattr(members.aq_self, 'user_foo') )
         newSecurityManager(None, acl_users.user_bar)
-        mtool.createMemberarea('user_foo')
+        mtool.createMemberArea('user_foo')
         self.failIf( hasattr(members.aq_self, 'user_foo') )
         newSecurityManager(None, acl_users.user_foo)
         mtool.setMemberareaCreationFlag()
-        mtool.createMemberarea('user_foo')
+        mtool.createMemberArea('user_foo')
         self.failIf( hasattr(members.aq_self, 'user_foo') )
         newSecurityManager(None, acl_users.all_powerful_Oz)
         mtool.setMemberareaCreationFlag()
-        mtool.createMemberarea('user_foo')
+        mtool.createMemberArea('user_foo')
         self.failUnless( hasattr(members.aq_self, 'user_foo') )
 
         # default content
@@ -111,7 +111,7 @@ class MembershipToolSecurityTests(SecurityTest):
         # acquisition
         self.site.user_bar = 'test attribute'
         newSecurityManager(None, acl_users.user_bar)
-        mtool.createMemberarea('user_bar')
+        mtool.createMemberArea('user_bar')
         self.failUnless( hasattr(members.aq_self, 'user_bar'),
                          'CMF Collector issue #102 (acquisition bug)' )
 

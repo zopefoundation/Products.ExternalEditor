@@ -177,8 +177,8 @@ class MembershipTool( BaseTool ):
         members = getattr(parent, self.membersfolder_id, None)
         return members
 
-    security.declarePublic('createMemberarea')
-    def createMemberarea(self, member_id=''):
+    security.declarePublic('createMemberArea')
+    def createMemberArea(self, member_id=''):
         """ Create a member area for 'member_id' or authenticated user.
         """
         if not self.getMemberareaCreationFlag():
@@ -243,6 +243,9 @@ class MembershipTool( BaseTool ):
             f.index_html.reindexObject()
             f.index_html.notifyWorkflowCreated()
         return f
+
+    security.declarePublic('createMemberarea')
+    createMemberarea = createMemberArea
 
     def getHomeFolder(self, id=None, verifyPermission=0):
         """ Return a member's home folder object, or None.

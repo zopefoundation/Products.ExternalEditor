@@ -68,6 +68,17 @@ class portal_membership(Interface):
         Permission -- Always available
         """
 
+    def getMembersFolder():
+        """ Get the members folder object.
+
+        If no members folder is set or the set folder id doesn't exist, None
+        is returned.
+
+        Permission -- Always available
+
+        Returns -- Members folder object or None
+        """
+
     def getHomeFolder(id=None, verifyPermission=0):
         """Returns a member's home folder object or None.
         Set verifyPermission to 1 to return None when the user
@@ -115,6 +126,19 @@ class portal_membership(Interface):
         Permission -- Python only
         """
 
+    def deleteMembers(member_ids, delete_memberareas=1, delete_localroles=1):
+        """ Delete members specified by member_ids.
+
+        Delete members in acl_users and member data in portal_memberdata.
+        If delete_memberareas is true, delete members' home folders including
+        all content items. If delete_localroles is true, recursively delete
+        members' local roles, starting from the portal root.
+
+        Permission -- Manage users
+
+        Returns -- Tuple listing member_ids of deleted members
+        """
+
     def getPortalRoles():
         """
         Return all local roles defined by the portal itself,
@@ -160,10 +184,22 @@ class portal_membership(Interface):
         Permission -- Manage portal
         """
 
-    def createMemberarea(member_id=''):
+    def createMemberArea(member_id=''):
         """ Create a member area for 'member_id' or authenticated user.
 
         Permission -- Always available
 
         Returns -- created member folder object or None
+        """
+
+    def createMemberarea(member_id=''):
+        """ Deprecated alias of createMemberArea.
+        """
+
+    def deleteMemberArea(member_id):
+        """ Delete member area of member specified by member_id.
+
+        Permission -- Manage users
+
+        Returns -- Boolean value
         """

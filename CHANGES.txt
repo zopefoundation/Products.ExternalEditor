@@ -2,7 +2,34 @@ CMF 1.5alpha (unreleased)
 
   New Features
 
-    - MembershipTool (CMFCore and CMFDefault): Changed permissions.
+    - CMFCore MembershipTool and MemberDataTool: Added 'delete' methods.
+
+      o deleteMemberData() deletes the member data of a member.
+
+      o deleteMemberArea() deletes the member area of a member.
+
+      o deleteLocalRoles() now has a 'recursive' argument.
+
+      o deleteMembers() deletes members including member data, member area and
+        Local Roles.
+
+    - CMFCore MembershipTool: Changed interface.
+
+      o createMemberarea() is now called createMemberArea(). For backwards
+        compatibility createMemberarea is a deprecated alias.
+
+      o getMembersFolder() is now also part of the CMFCore interface.
+
+    - CMFCorePermissions: Added 'Change local roles' Permission.
+      PortalFolder's 'Local Roles' Action and MembershipTool's Local Roles
+      methods are now guarded by 'Change local roles' of the object.
+
+    - Added CMFCoreExceptions: Errors defined in this module are available for
+      import by Scripts. In the long run, all Errors defined in CMF should be
+      moved to this module and subclassed from CMFError. Subclassed standard
+      errors should only be used for end user focused raise statements.
+
+    - CMFCore and CMFDefault MembershipTool: Changed permissions.
       'createMemberarea()' for someone else and 'getRoster()' including hidden
       members are now protected by 'Manage users'.
 
@@ -25,11 +52,11 @@ CMF 1.5alpha (unreleased)
 
       o PortalFolder's 'mkdir' hook now makes use of Method Aliases.
 
-    - MembershipTool (CMFCore and CMFDefault): Changed member area creation.
+    - CMFCore and CMFDefault MembershipTool: Changed member area creation.
       'wrapUser()' does no longer call 'createMemberarea()'.
       'createMemberarea()' should now be called from the 'logged_in' page.
 
-    - MembershipTool (CMFDefault): Added a customization hook to
+    - CMFDefault MembershipTool: Added a customization hook to
       'createMemberarea()'. A 'createMemberContent' script placed inside the
       tool overrides default member content creation.
 

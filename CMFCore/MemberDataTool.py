@@ -169,11 +169,8 @@ class MemberDataTool (UniqueObject, SimpleItem, PropertyManager, ActionProviderB
 
     security.declarePrivate('pruneMemberDataContents')
     def pruneMemberDataContents(self):
-        '''
-        Compare the user IDs stored in the member data
-        tool with the list in the actual underlying acl_users
-        and delete anything not in acl_users
-        '''
+        """ Delete data contents of all members not listet in acl_users.
+        """
         membertool= getToolByName(self, 'portal_membership')
         members   = self._members
         user_list = membertool.listMemberIds()
@@ -216,13 +213,20 @@ class MemberDataTool (UniqueObject, SimpleItem, PropertyManager, ActionProviderB
 
     security.declarePrivate('registerMemberData')
     def registerMemberData(self, m, id):
-        '''
-        Adds the given member data to the _members dict.
-        This is done as late as possible to avoid side effect
-        transactions and to reduce the necessary number of
-        entries.
-        '''
+        """ Add the given member data to the _members btree.
+        """
         self._members[id] = m
+
+    security.declarePrivate('deleteMemberData')
+    def deleteMemberData(self, member_id):
+        """ Delete member data of specified member.
+        """
+        members = self._members
+        if members.has_key(member_id):
+            del members[member_id]
+            return 1
+        else:
+            return 0
 
 InitializeClass(MemberDataTool)
 
