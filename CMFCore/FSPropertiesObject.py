@@ -90,7 +90,7 @@ class FSPropertiesObject (FSObject, PropertyManager):
 
         fp = expandpath(self._filepath)
 
-        file = open(fp, 'rb')
+        file = open(fp, 'r')    # not 'rb', as this is a text file!
         try:
             lines = file.readlines()
         finally:
