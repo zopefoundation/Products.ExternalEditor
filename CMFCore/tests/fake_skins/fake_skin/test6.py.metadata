@@ -1,6 +1,10 @@
 [default]
 title = Test object
 cache = Default cache manager
+proxy = Manager,Anonymous
 
 [security]
 Access contents information = 1:Manager,Anonymous
+
+# [local]
+# local roles, not implemented yet

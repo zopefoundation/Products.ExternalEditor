@@ -15,7 +15,13 @@ from test_FSSecurity import FSSecurityBase
         
 class FSMetadata(FSSecurityBase):
 
-    def test_basicPermissions( self ):
+    def _checkProxyRoles(self, obj, roles):
+        """ Test proxy roles on the object """
+        for role in roles:
+            if not obj.manage_haveProxy(role):
+                raise 'Object does not have the "%s" role' % role
+
+    def test_basicPermissions(self):
         """ Test basic FS permissions """
         # check it has a title
         assert(self.ob.fake_skin.test6.title == 'Test object')
@@ -24,6 +30,11 @@ class FSMetadata(FSSecurityBase):
             'Access contents information',
             1,
             ['Manager','Anonymous'])
+    
+    def test_proxy(self):
+        """ Test roles """
+        ob = self.ob.fake_skin.test_dtml
+        self._checkProxyRoles(ob, ['Manager', 'Anonymous'])
 
 def test_suite():
     return TestSuite((
