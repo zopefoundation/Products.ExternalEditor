@@ -1323,72 +1323,6 @@ _NORMAL_WORKFLOW_EXPORT = """\
  <permission>Modify content</permission>
  <permission>Query history</permission>
  <permission>Restore expired content</permission>
- <variable
-    variable_id="killed_by"
-    for_catalog="True"
-    for_status="False"
-    update_always="True">
-   Killed by
-   <default>
-    <value>n/a</value>
-   </default>
-   <guard>
-    <guard-role>Hangman</guard-role>
-    <guard-role>Sherrif</guard-role>
-   </guard>
- </variable>
- <variable
-    variable_id="when_expired"
-    for_catalog="True"
-    for_status="False"
-    update_always="True">
-   Expired when
-   <default>
-    <expression>nothing</expression>
-   </default>
-   <guard>
-    <guard-permission>Query history</guard-permission>
-    <guard-permission>Open content for modifications</guard-permission>
-   </guard>
- </variable>
- <variable
-    variable_id="when_opened"
-    for_catalog="True"
-    for_status="False"
-    update_always="True">
-   Opened when
-   <default>
-    <expression>python:None</expression>
-   </default>
-   <guard>
-    <guard-permission>Query history</guard-permission>
-    <guard-permission>Open content for modifications</guard-permission>
-   </guard>
- </variable>
- <worklist
-    worklist_id="alive_list"
-    title="Alive">
-  Worklist for content not yet expired / killed
-  <action
-    category="workflow"
-    url="string:${portal_url}/expired_items">Expired items</action>
-  <guard>
-   <guard-permission>Restore expired content</guard-permission>
-  </guard>
-  <match name="state" values="open; closed"/>
- </worklist>
- <worklist
-    worklist_id="expired_list"
-    title="Expired">
-  Worklist for expired content
-  <action
-    category="workflow"
-    url="string:${portal_url}/expired_items">Expired items</action>
-  <guard>
-   <guard-permission>Restore expired content</guard-permission>
-  </guard>
-  <match name="state" values="expired"/>
- </worklist>
  <state
     state_id="expired"
     title="Expired">
@@ -1517,6 +1451,72 @@ _NORMAL_WORKFLOW_EXPORT = """\
   <assignment
     name="killed_by">string:${user/getId}</assignment>
  </transition>
+ <worklist
+    worklist_id="alive_list"
+    title="Alive">
+  Worklist for content not yet expired / killed
+  <action
+    category="workflow"
+    url="string:${portal_url}/expired_items">Expired items</action>
+  <guard>
+   <guard-permission>Restore expired content</guard-permission>
+  </guard>
+  <match name="state" values="open; closed"/>
+ </worklist>
+ <worklist
+    worklist_id="expired_list"
+    title="Expired">
+  Worklist for expired content
+  <action
+    category="workflow"
+    url="string:${portal_url}/expired_items">Expired items</action>
+  <guard>
+   <guard-permission>Restore expired content</guard-permission>
+  </guard>
+  <match name="state" values="expired"/>
+ </worklist>
+ <variable
+    variable_id="killed_by"
+    for_catalog="True"
+    for_status="False"
+    update_always="True">
+   Killed by
+   <default>
+    <value>n/a</value>
+   </default>
+   <guard>
+    <guard-role>Hangman</guard-role>
+    <guard-role>Sherrif</guard-role>
+   </guard>
+ </variable>
+ <variable
+    variable_id="when_expired"
+    for_catalog="True"
+    for_status="False"
+    update_always="True">
+   Expired when
+   <default>
+    <expression>nothing</expression>
+   </default>
+   <guard>
+    <guard-permission>Query history</guard-permission>
+    <guard-permission>Open content for modifications</guard-permission>
+   </guard>
+ </variable>
+ <variable
+    variable_id="when_opened"
+    for_catalog="True"
+    for_status="False"
+    update_always="True">
+   Opened when
+   <default>
+    <expression>python:None</expression>
+   </default>
+   <guard>
+    <guard-permission>Query history</guard-permission>
+    <guard-permission>Open content for modifications</guard-permission>
+   </guard>
+ </variable>
 </dc-workflow>
 """
 

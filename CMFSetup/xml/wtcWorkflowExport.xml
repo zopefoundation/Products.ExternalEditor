@@ -13,82 +13,6 @@
  <permission
         tal:repeat="permission workflow/permissions"
         tal:content="permission">PERMISSION</permission>
- <variable
-        variable_id="action"
-        for_catalog="True"
-        for_status="True"
-        update_always="True" 
-        tal:repeat="variable workflow/variable_info"
-        tal:attributes="variable_id variable/id;
-                        for_catalog variable/for_catalog;
-                        for_status variable/for_status;
-                        update_always variable/update_always;
-                       ">
-   <span
-        tal:replace="variable/description">The last transition</span>
-   <default>
-    <value
-        tal:condition="variable/default_value"
-        tal:content="variable/default_value">VALUE</value>
-    <expression
-        tal:condition="variable/default_expr"
-        tal:content="variable/default_expr">EXPRESSION</expression>
-   </default>
-   <guard>
-    <guard-permission
-        tal:repeat="permission variable/guard_permissions"
-        tal:content="permission">PERMISSION</guard-permission>
-    <guard-role
-        tal:repeat="role variable/guard_roles"
-        tal:content="role">ROLE</guard-role>
-    <guard-group
-        tal:repeat="group variable/guard_groups"
-        tal:content="group">GROUP</guard-group>
-    <guard-expression
-        tal:condition="variable/guard_expr"
-        tal:content="variable/guard_expr">EXPRESSION</guard-expression>
-   </guard>
- </variable>
- <worklist
-        worklist_id="reviewer_queue"
-        title="For Review"
-        tal:repeat="worklist workflow/worklist_info"
-        tal:attributes="worklist_id worklist/id;
-                        title worklist/title;
-                       ">
-  <span
-        tal:replace="worklist/description">Reviewer tasks</span>
-  <action
-        url="URL"
-        category="CATEGORY"
-        tal:condition="worklist/actbox_name"
-        tal:attributes="url worklist/actbox_url;
-                        category worklist/actbox_category;
-                       "
-        tal:content="worklist/actbox_name">ACTION NAME</action>
-  <guard>
-   <guard-permission
-        tal:repeat="permission worklist/guard_permissions"
-        tal:content="permission">PERMISSION</guard-permission>
-   <guard-role
-        tal:repeat="role worklist/guard_roles"
-        tal:content="role">ROLE</guard-role>
-   <guard-group
-        tal:repeat="group worklist/guard_groups"
-        tal:content="group">GROUP</guard-group>
-   <guard-expression
-        tal:condition="worklist/guard_expr"
-        tal:content="worklist/guard_expr">EXPRESSION</guard-expression>
-  </guard>
-  <match
-        name="review_state"
-        values="pending" 
-        tal:repeat="match worklist/var_match"
-        tal:attributes="name python: match[ 0 ];
-                        values python: match[ 1 ];
-                       "
-        />
- </worklist>
  <state
         state_id="pending"
         title="Waiting for reviewer"
@@ -174,4 +98,80 @@
         tal:attributes="name python:var[0]"
         tal:content="python:var[1]">EXPRESSION</assignment>
  </transition>
+ <worklist
+        worklist_id="reviewer_queue"
+        title="For Review"
+        tal:repeat="worklist workflow/worklist_info"
+        tal:attributes="worklist_id worklist/id;
+                        title worklist/title;
+                       ">
+  <span
+        tal:replace="worklist/description">Reviewer tasks</span>
+  <action
+        url="URL"
+        category="CATEGORY"
+        tal:condition="worklist/actbox_name"
+        tal:attributes="url worklist/actbox_url;
+                        category worklist/actbox_category;
+                       "
+        tal:content="worklist/actbox_name">ACTION NAME</action>
+  <guard>
+   <guard-permission
+        tal:repeat="permission worklist/guard_permissions"
+        tal:content="permission">PERMISSION</guard-permission>
+   <guard-role
+        tal:repeat="role worklist/guard_roles"
+        tal:content="role">ROLE</guard-role>
+   <guard-group
+        tal:repeat="group worklist/guard_groups"
+        tal:content="group">GROUP</guard-group>
+   <guard-expression
+        tal:condition="worklist/guard_expr"
+        tal:content="worklist/guard_expr">EXPRESSION</guard-expression>
+  </guard>
+  <match
+        name="review_state"
+        values="pending" 
+        tal:repeat="match worklist/var_match"
+        tal:attributes="name python: match[ 0 ];
+                        values python: match[ 1 ];
+                       "
+        />
+ </worklist>
+ <variable
+        variable_id="action"
+        for_catalog="True"
+        for_status="True"
+        update_always="True" 
+        tal:repeat="variable workflow/variable_info"
+        tal:attributes="variable_id variable/id;
+                        for_catalog variable/for_catalog;
+                        for_status variable/for_status;
+                        update_always variable/update_always;
+                       ">
+   <span
+        tal:replace="variable/description">The last transition</span>
+   <default>
+    <value
+        tal:condition="variable/default_value"
+        tal:content="variable/default_value">VALUE</value>
+    <expression
+        tal:condition="variable/default_expr"
+        tal:content="variable/default_expr">EXPRESSION</expression>
+   </default>
+   <guard>
+    <guard-permission
+        tal:repeat="permission variable/guard_permissions"
+        tal:content="permission">PERMISSION</guard-permission>
+    <guard-role
+        tal:repeat="role variable/guard_roles"
+        tal:content="role">ROLE</guard-role>
+    <guard-group
+        tal:repeat="group variable/guard_groups"
+        tal:content="group">GROUP</guard-group>
+    <guard-expression
+        tal:condition="variable/guard_expr"
+        tal:content="variable/guard_expr">EXPRESSION</guard-expression>
+   </guard>
+ </variable>
 </dc-workflow>
