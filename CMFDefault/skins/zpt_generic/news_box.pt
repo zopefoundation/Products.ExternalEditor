@@ -2,7 +2,7 @@
         width="100%" i18n:domain="cmf_default">
  <tbody tal:define="news python: here.portal_catalog(portal_type='News Item', sort_on='Date', sort_order='reverse', review_state='published');
          Batch python:modules['ZTUtils'].Batch;
-		 global batch python:Batch(news, 10, 0, orphan=1)">
+         global batch python:Batch(news, 10, 0, orphan=1)">
   <tr>
    <td class="NewsBorder" width="1" rowspan="13" bgcolor="#6699CC">
     <img src="spacer.gif" alt=" "
@@ -14,11 +14,11 @@
   </tr>
   <tr class="NewsItemRow"
       tal:condition="news"
-	  tal:repeat="news batch">
+      tal:repeat="news batch">
    <td>
     <a href=""
-	   tal:attributes="href python:news.getURL()"
-	   tal:content="news/Title"></a><br />
+       tal:attributes="href python:news.getURL()"
+       tal:content="news/Title"></a><br />
     <span tal:replace="news/Date">Date</span>
    </td>
   </tr>
@@ -33,6 +33,5 @@
      <a href="recent_news" i18n:translate="">More...</a>
    </td>
   </tr>
-</tbody>
+ </tbody>
  </table>
-
