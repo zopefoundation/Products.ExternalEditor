@@ -579,7 +579,7 @@ class TypesTool( UniqueObject, OFS.Folder.Folder ):
             {'name':ScriptableTypeInformation.meta_type,
              'action':'manage_addScriptableTIForm',
              'permission':'Manage portal'},
-            ) + all
+            ) + tuple(all)
 
     def filtered_meta_types(self, user=None):
         # Filters the list of available meta types.
