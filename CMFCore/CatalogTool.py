@@ -175,7 +175,7 @@ class CatalogTool (UniqueObject, ZCatalog):
         self._catalog.addColumn('effective')
         self._catalog.addColumn('expires')
         self._catalog.addColumn('modified')
-        self._catalog.addColumn('CreatedDate')
+        self._catalog.addColumn('CreationDate')
         self._catalog.addColumn('EffectiveDate')
         self._catalog.addColumn('ExpiresDate')
         self._catalog.addColumn('ModifiedDate')
