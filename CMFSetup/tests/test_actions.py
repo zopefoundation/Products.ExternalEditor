@@ -34,7 +34,7 @@ class DummyActionsTool( DummyTool ):
 
         self._providers = [ x for x in self._providers if x != provider_name ]
 
-class _ActionSetup:
+class _ActionSetup( BaseRegistryTests ):
 
     def _initSite( self, foo=2, bar=2 ):
 
@@ -74,9 +74,7 @@ class _ActionSetup:
 
         return site
 
-class ActionProvidersConfiguratorTests( BaseRegistryTests
-                                      , _ActionSetup
-                                      ):
+class ActionProvidersConfiguratorTests( _ActionSetup ):
 
     def _getTargetClass( self ):
 
@@ -217,9 +215,7 @@ _NORMAL_EXPORT = """\
 """
 
 
-class Test_exportActionProviders( BaseRegistryTests
-                                , _ActionSetup
-                                ):
+class Test_exportActionProviders( _ActionSetup ):
 
     def test_unchanged( self ):
 
@@ -251,9 +247,7 @@ class Test_exportActionProviders( BaseRegistryTests
         self.assertEqual( content_type, 'text/xml' )
 
 
-class Test_importActionProviders( BaseRegistryTests
-                                , _ActionSetup
-                                ):
+class Test_importActionProviders( _ActionSetup ):
 
     def test_empty_default_purge( self ):
 

@@ -4,19 +4,31 @@ $Id$
 """
 
 import unittest
+import os
+
+_TESTS_PATH = os.path.split( __file__ )[ 0 ]
 
 from OFS.Folder import Folder
+from OFS.SimpleItem import Item
+
 from Products.CMFCore.ActionProviderBase import ActionProviderBase
+from Products.CMFCore import DirectoryView
 
 from common import BaseRegistryTests
+from common import DOMComparator
 from common import DummyExportContext
 from common import DummyImportContext
 
 class DummySkinsTool( Folder ):
 
-    def __init__( self, selections={} ):
+    _setup_called = False
+
+    def __init__( self, selections={}, fsdvs=[] ):
 
         self._selections = selections
+
+        for id, obj in fsdvs:
+            self._setObject( id, obj )
 
     def _getSelections( self ):
 
@@ -28,47 +40,318 @@ class DummySkinsTool( Folder ):
         result.sort()
         return result
 
+    def addSkinSelection( self, skinname, skinpath, test=0, make_default=0 ):
 
-class SkinsToolConfiguratorTests( BaseRegistryTests ):
+        self._selections[ skinname ] = skinpath
+
+    def setupCurrentSkin( self, REQEUEST ):
+
+        self._setup_called = True
+
+class DummyFSDV( Item ):
+
+    meta_type = DirectoryView.DirectoryView.meta_type
+
+    def __init__( self, id ):
+
+        self.id = id
+        self._dirpath = os.path.join( _TESTS_PATH, id )
+
+class _SkinsSetup( BaseRegistryTests ):
+
+    def setUp( self ):
+        BaseRegistryTests.setUp( self )
+        self._olddirreg = DirectoryView._dirreg
+        self._dirreg = DirectoryView._dirreg = DirectoryView.DirectoryRegistry()
+
+    def tearDown( self ):
+        DirectoryView._dirreg = self._olddirreg
+        BaseRegistryTests.tearDown( self )
+
+    def _initSite( self, selections=None, fsdvs=None ):
+
+        if selections is None:
+            selections = {}
+
+        if fsdvs is None:
+            fsdvs = []
+
+        self.root.site = Folder( id='site' )
+
+        for id, fsdv in fsdvs:
+            self._registerDirectoryView( fsdv._dirpath )
+
+        self.root.site.portal_skins = DummySkinsTool( selections, fsdvs )
+
+        return self.root.site
+
+    def _registerDirectoryView( self, dirpath, subdirs=0 ):
+
+        self._dirreg.registerDirectoryByPath( dirpath, subdirs )
+
+class SkinsToolConfiguratorTests( _SkinsSetup ):
 
     def _getTargetClass( self ):
 
         from Products.CMFSetup.skins import SkinsToolConfigurator
         return SkinsToolConfigurator
 
-    def _initSite( self, selections={} ):
-
-        self.root.site = Folder( id='site' )
-        self.root.site.portal_skins = DummySkinsTool( selections )
-        return self.root.site
-
-    def test_listSkinPaths_empty( self ):
+    def test_empty( self ):
 
         site = self._initSite()
-        configurator = self._makeOne( site )
+        configurator = self._makeOne( site ).__of__( site )
 
         self.assertEqual( len( configurator.listSkinPaths() ), 0 )
+        self.assertEqual( len( configurator.listFSDirectoryViews() ), 0 )
 
-    def test_listSkinPaths_with_selections( self ):
+    def test_listSkinPaths( self ):
 
-        site = self._initSite( { 'a' : '/a/b/c', 'b' : '/d/e/f' } )
-        configurator = self._makeOne( site )
+        _PATHS = { 'basic' : 'one'
+                 , 'fancy' : 'three, two, one'
+                 }
+
+        site = self._initSite( selections=_PATHS )
+        configurator = self._makeOne( site ).__of__( site )
 
         self.assertEqual( len( configurator.listSkinPaths() ), 2 )
-        folders = configurator.listSkinPaths()
+        info_list = configurator.listSkinPaths()
 
-        self.assertEqual( folders[ 0 ][ 'id' ], 'a' )
-        self.assertEqual( folders[ 0 ][ 'path' ], '/a/b/c' )
+        self.assertEqual( info_list[ 0 ][ 'id' ], 'basic' )
+        self.assertEqual( info_list[ 0 ][ 'path' ]
+                        , _PATHS[ 'basic' ].split( ', ' ) )
 
-        self.assertEqual( folders[ 1 ][ 'id' ], 'b' )
-        self.assertEqual( folders[ 1 ][ 'path' ], '/d/e/f' )
+        self.assertEqual( info_list[ 1 ][ 'id' ], 'fancy' )
+        self.assertEqual( info_list[ 1 ][ 'path' ]
+                        , _PATHS[ 'fancy' ].split( ', ' ) )
+
+    def test_listFSDirectoryViews( self ):
+
+        _IDS = ( 'one', 'two', 'three' )
+        _FSDVS = [ ( id, DummyFSDV( id ) ) for id in _IDS ]
+        site = self._initSite( fsdvs=_FSDVS )
+        configurator = self._makeOne( site ).__of__( site )
+
+        info_list = configurator.listFSDirectoryViews()
+        self.assertEqual( len( info_list ), len( _IDS ) )
+
+        ids = list( _IDS )
+        ids.sort()
+
+        for i in range( len( ids ) ):
+            self.assertEqual( info_list[ i ][ 'id' ], ids[ i ] )
+            self.assertEqual( info_list[ i ][ 'directory' ]
+                            , 'CMFSetup/tests/%s' % ids[ i ]
+                            )
+
+    def test_generateXML_empty( self ):
+
+        site = self._initSite()
+        configurator = self._makeOne( site ).__of__( site )
+
+        self._compareDOM( configurator.generateXML(), _EMPTY_EXPORT )
+
+    def test_generateXML_normal( self ):
+
+        _IDS = ( 'one', 'two', 'three' )
+        _FSDVS = [ ( id, DummyFSDV( id ) ) for id in _IDS ]
+        _PATHS = { 'basic' : 'one'
+                 , 'fancy' : 'three, two, one'
+                 }
+
+        site = self._initSite( selections=_PATHS, fsdvs=_FSDVS )
+        configurator = self._makeOne( site ).__of__( site )
+
+        self._compareDOM( configurator.generateXML(), _NORMAL_EXPORT )
+
+
+
+_EMPTY_EXPORT = """\
+<?xml version="1.0"?>
+<skins-tool>
+</skins-tool>
+"""
+
+_NORMAL_EXPORT = """\
+<?xml version="1.0"?>
+<skins-tool>
+ <skin-directory id="one" directory="CMFSetup/tests/one" />
+ <skin-directory id="three" directory="CMFSetup/tests/three" />
+ <skin-directory id="two" directory="CMFSetup/tests/two" />
+ <skin-path id="basic">
+  <layer name="one" />
+ </skin-path>
+ <skin-path id="fancy">
+  <layer name="three" />
+  <layer name="two" />
+  <layer name="one" />
+ </skin-path>
+</skins-tool>
+"""
+
+class Test_exportSkinsTool( _SkinsSetup ):
+
+    def test_empty( self ):
+
+        site = self._initSite()
+        context = DummyExportContext( site )
+
+        from Products.CMFSetup.skins import exportSkinsTool
+        exportSkinsTool( context )
+
+        self.assertEqual( len( context._wrote ), 1 )
+        filename, text, content_type = context._wrote[ 0 ]
+        self.assertEqual( filename, 'skins.xml' )
+        self._compareDOM( text, _EMPTY_EXPORT )
+        self.assertEqual( content_type, 'text/xml' )
+
+    def test_normal( self ):
+
+        _IDS = ( 'one', 'two', 'three' )
+        _FSDVS = [ ( id, DummyFSDV( id ) ) for id in _IDS ]
+        _PATHS = { 'basic' : 'one'
+                 , 'fancy' : 'three, two, one'
+                 }
+
+        site = self._initSite( selections=_PATHS, fsdvs=_FSDVS )
+
+        context = DummyExportContext( site )
+
+        from Products.CMFSetup.skins import exportSkinsTool
+        exportSkinsTool( context )
+
+        self.assertEqual( len( context._wrote ), 1 )
+        filename, text, content_type = context._wrote[ 0 ]
+        self.assertEqual( filename, 'skins.xml' )
+        self._compareDOM( text, _NORMAL_EXPORT )
+        self.assertEqual( content_type, 'text/xml' )
+
+class Test_importSkinsTool( _SkinsSetup ):
+
+    def test_empty_default_purge( self ):
+
+        _IDS = ( 'one', 'two', 'three' )
+        _FSDVS = [ ( id, DummyFSDV( id ) ) for id in _IDS ]
+        _PATHS = { 'basic' : 'one'
+                 , 'fancy' : 'three, two, one'
+                 }
+
+        site = self._initSite( selections=_PATHS, fsdvs=_FSDVS )
+        skins_tool = site.portal_skins
+
+        self.failIf( skins_tool._setup_called )
+        self.assertEqual( len( skins_tool.getSkinPaths() ), 2 )
+        self.assertEqual( len( skins_tool.objectItems() ), 3 )
+
+        context = DummyImportContext( site )
+        context._files[ 'skins.xml' ] = _EMPTY_EXPORT
+
+        from Products.CMFSetup.skins import importSkinsTool
+        importSkinsTool( context )
+
+        self.failUnless( skins_tool._setup_called )
+        self.assertEqual( len( skins_tool.getSkinPaths() ), 0 )
+        self.assertEqual( len( skins_tool.objectItems() ), 0 )
+
+    def test_empty_explicit_purge( self ):
+
+        _IDS = ( 'one', 'two', 'three' )
+        _FSDVS = [ ( id, DummyFSDV( id ) ) for id in _IDS ]
+        _PATHS = { 'basic' : 'one'
+                 , 'fancy' : 'three, two, one'
+                 }
+
+        site = self._initSite( selections=_PATHS, fsdvs=_FSDVS )
+        skins_tool = site.portal_skins
+
+        self.failIf( skins_tool._setup_called )
+        self.assertEqual( len( skins_tool.getSkinPaths() ), 2 )
+        self.assertEqual( len( skins_tool.objectItems() ), 3 )
+
+        context = DummyImportContext( site, True )
+        context._files[ 'skins.xml' ] = _EMPTY_EXPORT
+
+        from Products.CMFSetup.skins import importSkinsTool
+        importSkinsTool( context )
+
+        self.failUnless( skins_tool._setup_called )
+        self.assertEqual( len( skins_tool.getSkinPaths() ), 0 )
+        self.assertEqual( len( skins_tool.objectItems() ), 0 )
+
+    def test_empty_skip_purge( self ):
+
+        _IDS = ( 'one', 'two', 'three' )
+        _FSDVS = [ ( id, DummyFSDV( id ) ) for id in _IDS ]
+        _PATHS = { 'basic' : 'one'
+                 , 'fancy' : 'three, two, one'
+                 }
+
+        site = self._initSite( selections=_PATHS, fsdvs=_FSDVS )
+        skins_tool = site.portal_skins
+
+        self.failIf( skins_tool._setup_called )
+        self.assertEqual( len( skins_tool.getSkinPaths() ), 2 )
+        self.assertEqual( len( skins_tool.objectItems() ), 3 )
+
+        context = DummyImportContext( site, False )
+        context._files[ 'skins.xml' ] = _EMPTY_EXPORT
+
+        from Products.CMFSetup.skins import importSkinsTool
+        importSkinsTool( context )
+
+        self.failUnless( skins_tool._setup_called )
+        self.assertEqual( len( skins_tool.getSkinPaths() ), 2 )
+        self.assertEqual( len( skins_tool.objectItems() ), 3 )
+
+    def test_normal( self ):
+
+        site = self._initSite()
+        self._registerDirectoryView( os.path.join( _TESTS_PATH, 'one' ) )
+        self._registerDirectoryView( os.path.join( _TESTS_PATH, 'two' ) )
+        self._registerDirectoryView( os.path.join( _TESTS_PATH, 'three' ) )
+        skins_tool = site.portal_skins
+
+        self.failIf( skins_tool._setup_called )
+        self.assertEqual( len( skins_tool.getSkinPaths() ), 0 )
+        self.assertEqual( len( skins_tool.objectItems() ), 0 )
+
+        context = DummyImportContext( site )
+        context._files[ 'skins.xml' ] = _NORMAL_EXPORT
+
+        from Products.CMFSetup.skins import importSkinsTool
+        importSkinsTool( context )
+
+        self.failUnless( skins_tool._setup_called )
+        self.assertEqual( len( skins_tool.getSkinPaths() ), 2 )
+        self.assertEqual( len( skins_tool.objectItems() ), 3 )
+
+    def test_normal_encode_as_ascii( self ):
+
+        site = self._initSite()
+        self._registerDirectoryView( os.path.join( _TESTS_PATH, 'one' ) )
+        self._registerDirectoryView( os.path.join( _TESTS_PATH, 'two' ) )
+        self._registerDirectoryView( os.path.join( _TESTS_PATH, 'three' ) )
+        skins_tool = site.portal_skins
+
+        self.failIf( skins_tool._setup_called )
+        self.assertEqual( len( skins_tool.getSkinPaths() ), 0 )
+        self.assertEqual( len( skins_tool.objectItems() ), 0 )
+
+        context = DummyImportContext( site, encoding='ascii' )
+        context._files[ 'skins.xml' ] = _NORMAL_EXPORT
+
+        from Products.CMFSetup.skins import importSkinsTool
+        importSkinsTool( context )
+
+        self.failUnless( skins_tool._setup_called )
+        self.assertEqual( len( skins_tool.getSkinPaths() ), 2 )
+        self.assertEqual( len( skins_tool.objectItems() ), 3 )
 
 
 def test_suite():
     return unittest.TestSuite((
         unittest.makeSuite( SkinsToolConfiguratorTests ),
-        #unittest.makeSuite( Test_exportSkinsTool ),
-        #unittest.makeSuite( Test_importSkinsTool ),
+        unittest.makeSuite( Test_exportSkinsTool ),
+        unittest.makeSuite( Test_importSkinsTool ),
         ))
 
 if __name__ == '__main__':

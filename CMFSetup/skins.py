@@ -4,8 +4,9 @@ Setup step and export script
 
 $Id$
 """
-
-from xml.sax import parse
+import os
+import re
+from xml.sax import parseString
 
 from AccessControl import ClassSecurityInfo
 from Acquisition import Implicit
@@ -13,10 +14,13 @@ from Globals import InitializeClass
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
 from Products.CMFCore.utils import getToolByName
+from Products.CMFCore.utils import minimalpath
 from Products.CMFCore.DirectoryView import createDirectoryView
+from Products.CMFCore.DirectoryView import DirectoryView
 
 from permissions import ManagePortal
 from utils import HandlerBase
+from utils import _resolveDottedName
 from utils import _xmldir
 
 class _SkinsParser( HandlerBase ):
@@ -37,7 +41,7 @@ class _SkinsParser( HandlerBase ):
         elif name == 'skin-directory':
 
             self._skin_dirs.append( ( self._extract( attrs, 'id' )
-                                    , self._extract( attrs, 'path' )
+                                    , self._extract( attrs, 'directory' )
                                     ) )
 
         elif name == 'skin-path':
@@ -57,8 +61,9 @@ class _SkinsParser( HandlerBase ):
 
         tool = self._skins_tool
 
-        for id, path in self._skin_dirs:
-            createDirectoryView( tool, path, id )
+        for id, directory in self._skin_dirs:
+
+            createDirectoryView( tool, directory, id )
 
         for path_name, layers in self._skin_paths:
             tool.addSkinSelection( path_name, ', '.join( layers ) )
@@ -67,6 +72,8 @@ class SkinsToolConfigurator( Implicit ):
 
     security = ClassSecurityInfo()   
     security.setDefaultAccess('allow')
+
+    _COMMA_SPLITTER = re.compile( r',[ ]*' )
     
     def __init__( self, site ):
 
@@ -84,15 +91,37 @@ class SkinsToolConfigurator( Implicit ):
 
           'path' -- sequence of layer IDs
         """
-        return [ { 'id' : k, 'path' : v }
-                  for k, v in self._skins_tool.getSkinPaths() ]
+        return [ { 'id' : k
+                 , 'path' : self._COMMA_SPLITTER.split( v )
+                 } for k, v in self._skins_tool.getSkinPaths() ]
 
-    security.declareProtected(ManagePortal, 'getDirPath' )
-    def getDirPath( self, dir ):
+    security.declareProtected(ManagePortal, 'listFSDirectoryViews' )
+    def listFSDirectoryViews( self ):
 
-        """Return the private _dirpath variable
+        """ Return a sequence of mappings for each FSDV.
+
+        o Keys include:
+
+          'id' -- FSDV ID
+
+          'directory' -- filesystem path of the FSDV.
         """
-        return dir._dirpath
+        result = []
+        fsdvs = self._skins_tool.objectItems( DirectoryView.meta_type )
+        fsdvs.sort()
+
+        for id, fsdv in fsdvs:
+
+            dirpath = fsdv._dirpath
+
+            if dirpath.startswith( '/' ):
+                dirpath = minimalpath( fsdv._dirpath )
+
+            result.append( { 'id' : id
+                           , 'directory' : dirpath
+                           } )
+
+        return result
 
     _skinsConfig = PageTemplateFile( 'stcExport.xml'
                                    , _xmldir
@@ -156,7 +185,7 @@ def importSkinsTool( context ):
 
         skins_tool._getSelections().clear()
 
-        for id in skins_tool.objectIds('Filesystem Directory View'):
+        for id in skins_tool.objectIds( DirectoryView.meta_type ):
             skins_tool._delObject(id)
 
     text = context.readDataFile( _FILENAME )

@@ -7,4 +7,18 @@
   Import custom roles and non-default role-permission mappings.
  
  </import-step>
+ <import-step id="actions" version="20040523-01"
+              handler="Products.CMFSetup.actions.importActionProviders"
+              title="Action Providers">
+  
+  Import actions tool's action providers and their actions.
+ 
+ </import-step>
+ <import-step id="skins" version="20040523-01"
+              handler="Products.CMFSetup.skins.importSkinsTool"
+              title="Skins Tool">
+  
+  Import skins tool's filesystem directory views and skin path definitions.
+ 
+ </import-step>
 </import-steps>

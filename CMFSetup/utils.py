@@ -75,13 +75,20 @@ def _extractDocstring( func, default_title, default_description ):
 
     return title, description
 
+
 class HandlerBase( ContentHandler ):
 
     _encoding = None
+    _MARKER = object()
 
-    def _extract( self, attrs, key ):
+    def _extract( self, attrs, key, default=None ):
 
-        return self._encode( attrs[ key ] )
+        result = attrs.get( key, self._MARKER )
+
+        if result is self._MARKER:
+            return default
+
+        return self._encode( result )
 
     def _encode( self, content ):
 
