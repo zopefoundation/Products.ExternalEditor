@@ -12,7 +12,8 @@ CMF 1.5alpha (unreleased)
       'folder_delete' and 'folder_paste' scripts. The result looks almost the
       same as before.
 
-    - PortalFolder: Added invisible 'new' and 'rename_items' actions.
+    - PortalFolder and SkinnedFolder: Added 'new' and 'rename_items' Actions.
+      Used for redirects they are invisible by default.
 
     - CMFCoreExceptions: Added some Exceptions.
       AccessControl.Unauthorized is a subclass of zExceptions.Unauthorized, so
@@ -167,6 +168,10 @@ CMF 1.5alpha (unreleased)
       tool overrides default member content creation.
 
   Bug Fixes
+
+    - SkinnedFolder: Removed 'foldercontents' Action.
+      As long as we have 'foldercontents' in ActionsTool we don't need this
+      Action in SkinnedFolder.
 
     - StrippingParser: Added 'big', 'small', 'sub' and 'sup' to valid tags.
 

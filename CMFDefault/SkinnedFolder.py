@@ -20,7 +20,7 @@ from Acquisition import aq_base
 from Globals import InitializeClass
 
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
-from Products.CMFCore.CMFCorePermissions import ListFolderContents
+from Products.CMFCore.CMFCorePermissions import AddPortalContent
 from Products.CMFCore.CMFCorePermissions import ManageProperties
 from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
 from Products.CMFCore.CMFCorePermissions import View
@@ -54,11 +54,19 @@ Skinned folders can define custom 'view' actions.
                          , 'permissions'   : (ManageProperties,)
                          , 'category'      : 'folder'
                          }
-                       , { 'id'            : 'foldercontents'
-                         , 'name'          : 'Folder contents'
-                         , 'action': 'string:${object_url}/folder_contents'
-                         , 'permissions'   : (ListFolderContents,)
+                       , { 'id'            : 'new'
+                         , 'name'          : 'New...'
+                         , 'action': 'string:${object_url}/folder_factories'
+                         , 'permissions'   : (AddPortalContent,)
                          , 'category'      : 'folder'
+                         , 'visible'       : 0
+                         }
+                       , { 'id'            : 'rename_items'
+                         , 'name'          : 'Rename items'
+                         , 'action': 'string:${object_url}/folder_rename_form'
+                         , 'permissions'   : (AddPortalContent,)
+                         , 'category'      : 'folder'
+                         , 'visible'       : 0
                          }
                        )
   }
