@@ -2,8 +2,7 @@ HEAD only (unreleased)
 
   New Features
 
-    - CachePolicyManager: You can now set a ETag using a TALES expression
-      (http://www.zope.org/Collectors/CMF/236)
+    - 
 
   Bug Fixes
 
@@ -40,4 +39,4 @@ HEAD only (unreleased)
 
 CMF 1.5.x
 
-  For a complete list see CHANGES.txt of CMF-1_5-branch"
+  For a complete list see CHANGES.txt of CMF-1_5-branch.
