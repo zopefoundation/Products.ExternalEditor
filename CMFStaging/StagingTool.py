@@ -159,11 +159,24 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
         return 0      
 
 
+    security.declareProtected(StageObjects, 'getStageOf')
+    def getStageOf(self, object):
+        """Returns the stage ID the object is in the context of.
+        """
+        root = aq_parent(aq_inner(self))
+        for stage_name, path in self._stages.items():
+            stage = root.restrictedTraverse(path, None)
+            if stage is not None and object.aq_inContextOf(stage, 1):
+                return stage_name
+        return None
+
+
     security.declareProtected(StageObjects, 'updateStages')
     def updateStages(self, object, from_stage, to_stages, message=''):
         """Updates corresponding objects to match the version
         in the specified stage."""
-        if from_stage in to_stages or not self._stages.has_key(from_stage):
+        if from_stage and (
+            from_stage in to_stages or not self._stages.has_key(from_stage)):
             raise StagingError, "Invalid from_stages or to_stages parameter."
 
         repo = self._getVersionRepository()
@@ -174,8 +187,12 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
             self._autoCheckin(object, message)
 
         object_map = self._getObjectStages(object)
-        dev_object = object_map[from_stage]
-        version_info = repo.getVersionInfo(dev_object)
+        if from_stage:
+            source_object = object_map[from_stage]
+        else:
+            # The default source stage is the stage where the object is now.
+            source_object = object
+        version_info = repo.getVersionInfo(source_object)
         version_id = version_info.version_id
         history_id = version_info.history_id
 
@@ -194,13 +211,13 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
                     if container is None:
                         # This can happen if a site doesn't yet exist on
                         # the stage.
-                        p = '/'.join(dev_object.getPhysicalPath())
+                        p = '/'.join(source_object.getPhysicalPath())
                         raise StagingError, (
                             'The container for "%s" does not exist on "%s"'
                             % (p, stage_name))
                     # Make a copy and put it in the new place.
                     # (see CopySupport.manage_pasteObjects())
-                    id = dev_object.getId()
+                    id = source_object.getId()
                     container._setObject(id, ob)
                 else:
                     if not repo.isUnderVersionControl(ob):
@@ -210,7 +227,7 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
                             'is in the way.' % p)
                     if repo.getVersionInfo(ob).history_id != history_id:
                         p = '/'.join(ob.getPhysicalPath())
-                        p2 = '/'.join(dev_object.getPhysicalPath())
+                        p2 = '/'.join(source_object.getPhysicalPath())
                         raise StagingError, (
                             'The object "%s", backed by a different '
                             'version history than "%s", '
