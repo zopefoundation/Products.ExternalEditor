@@ -259,9 +259,9 @@ class ActionsTool(UniqueObject, OFS.Folder.Folder, ActionProviderBase):
                 catlist = filtered_actions.get(category, None)
                 if catlist is None:
                     filtered_actions[category] = catlist = []
-                # If a bug occurs where actions appear more than once,
-                # a little code right here can fix it.
-                catlist.append(action)
+                # Filter out duplicate actions
+                if not action in catlist:
+                    catlist.append(action)
         return filtered_actions
 
     # listFilteredActions() is an alias.

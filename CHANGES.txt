@@ -44,6 +44,8 @@ New Features
 
 Bugs Fixed
 
+  - Fixed ActionsTool so that duplicate actions are stripped.
+
   - Caused CMFDefault Portal constructor to strip passed-in id
     before creating a portal object with that id.
 
