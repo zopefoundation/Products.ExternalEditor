@@ -55,7 +55,7 @@ class PropertiedUser( BasicUser ):
         """ -> login name
         """
         return self._login
-    
+
     def getRoles( self ):
 
         """ -> [ role ]
@@ -125,7 +125,7 @@ class PropertiedUser( BasicUser ):
                 continue
 
             new = getattr( object, 'im_self', None )
-            
+
             if new is not None:
 
                 object = aq_inner( new )
@@ -138,7 +138,7 @@ class PropertiedUser( BasicUser ):
     def allowed( self, object, object_roles=None ):
 
         """ Check whether the user has access to object.
-        
+
         o The user must have one of the roles in object_roles to allow access.
 
         o Include *both* local roles assigned directly to us *and* those
