@@ -1,10 +1,5 @@
 ## Script (Python) "join_control"
-##bind container=container
-##bind context=context
-##bind namespace=
-##bind script=script
-##bind subpath=traverse_subpath
-##parameters=member_id='', member_email='', password='', confirm='', send_password='', add='', cancel=''
+##parameters=member_id='', member_email='', password='', confirm='', send_password='', add='', cancel='', **kw
 ##title=
 ##
 from Products.CMFCore.utils import getToolByName
@@ -17,58 +12,33 @@ utool = getToolByName(script, 'portal_url')
 portal_url = utool()
 validate_email = ptool.getProperty('validate_email')
 is_anon = mtool.isAnonymousUser()
-is_newmember = 0
+is_newmember = False
 is_usermanager = mtool.checkPermission(ManageUsers, mtool)
-message = ''
-valid = 1
 
 
-if add:
-    if validate_email:
-        password = rtool.generatePassword()
-    else:
-        msg = rtool.testPasswordValidity(password, confirm)
-        if msg:
-            valid = 0
-            message = msg
-    if valid:
-        try:
-            rtool.addMember( id=member_id, password=password,
-                             properties={'username':member_id,
-                                         'email':member_email} )
-        except ValueError, msg:
-            valid = 0
-            message = msg
-        else:
-            if validate_email or send_password:
-                rtool.registeredNotify(member_id)
-            if is_usermanager:
-                message = 'Member registered.'
-            else:
-                message = 'Success!'
-                is_newmember = 1
-                is_anon = 0
-
-elif cancel:
-    if is_usermanager:
-        target = mtool.getActionInfo('global/manage_members')['url']
-    else:
-        target = portal_url
-    context.REQUEST.RESPONSE.redirect(target)
-    return None
-
-if message:
-    context.REQUEST.set('portal_status_message', message)
+form = context.REQUEST.form
+if add and \
+        context.validatePassword(**form) and \
+        context.members_add(**form) and \
+        context.setRedirect(rtool, 'user/join', **kw):
+    return
+elif cancel and \
+        context.setRedirect(mtool, 'global/manage_members', **kw):
+    return
 
 
 control = {}
 
+if context.REQUEST.get('portal_status_message', '') == 'Success!':
+    is_anon = False
+    is_newmember = True
+
 control['title'] = is_usermanager and 'Register Member' or 'Become a Member'
-control['member_id'] = (not valid or is_newmember) and member_id or ''
-control['member_email'] = not valid and member_email or ''
-control['password'] = is_newmember and password or ''
-control['send_password'] = not valid and send_password or ''
-control['portal_url'] = portal_url 
+control['member_id'] = member_id
+control['member_email'] = member_email
+control['password'] = is_newmember and context.REQUEST.get('password', '') or ''
+control['send_password'] = send_password
+control['portal_url'] = portal_url
 control['isAnon'] = is_anon
 control['isAnonOrUserManager'] = is_anon or is_usermanager
 control['isNewMember'] = is_newmember

@@ -1,38 +1,33 @@
 ## Script (Python) "members_manage_control"
-##bind container=container
-##bind context=context
-##bind namespace=
-##bind script=script
-##bind subpath=traverse_subpath
-##parameters=ids=(), b_start=0, members_new='', members_delete=''
+##parameters=ids=(), members_new='', members_delete='', **kw
 ##title=
 ##
 from ZTUtils import Batch
 from Products.CMFCore.utils import getToolByName
+
 mtool = getToolByName(script, 'portal_membership')
 rtool = getToolByName(script, 'portal_registration')
-message = ''
 
 
-if members_delete:
-    if ids:
-        mtool.deleteMembers(ids)
-        message = 'Selected member%s deleted.' % (len(ids)!=1 and 's' or '',)
-    else:
-        message = 'Please select one or more members to delete first.'
-
-elif members_new:
-    target = rtool.getActionInfo('user/join')['url']
-    context.REQUEST.RESPONSE.redirect(target)
-    return None
-
-if message:
-    context.REQUEST.set('portal_status_message', message)
+form = context.REQUEST.form
+if members_delete and \
+        context.validateMemberIds(**form) and \
+        context.members_delete(**form) and \
+        context.setRedirect(mtool, 'global/manage_members', **kw):
+    return
+elif members_new and \
+        context.setRedirect(rtool, 'user/join', **kw):
+    return
 
 
 control = {}
 
 target = mtool.getActionInfo('global/manage_members')['url']
+
+b_start = kw.pop('b_start', 0)
+if b_start:
+    kw['b_start'] = b_start
+
 members = mtool.listMembers()
 batch_obj = Batch(members, 25, b_start, orphan=0)
 items = []
