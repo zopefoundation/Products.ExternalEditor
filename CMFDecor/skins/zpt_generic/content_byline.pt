@@ -1,0 +1,18 @@
+<html xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal">
+<body>
+
+ <div tal:define="creator here/Creator; home_url python: here.portal_membership.getHomeUrl(creator)"
+       tal:condition="home_url">
+   			Created by <span><a href="here.html" title="Here"
+			       tal:define="title creator"
+			       tal:attributes="href home_url; title title"
+				   tal:content="title">Me</a>.</span>
+			<span tal:condition="python: not(home_url)"
+			      tal:replace="creator">Me</span>
+</div>
+ <span tal:condition="here/ModificationDate">
+     Last modified on <span tal:content="here/ModificationDate">Today</span>
+ </span>
+</body>
+</html>
