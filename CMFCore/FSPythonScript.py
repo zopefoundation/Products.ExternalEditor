@@ -98,11 +98,8 @@ from AccessControl import ClassSecurityInfo
 from CMFCorePermissions import ViewManagementScreens
 import CMFCorePermissions
 
-import sys, re
-from Products.PythonScripts import Guarded
-from Products.PythonScripts.PythonScript import PythonScript, Python_magic
+from Products.PythonScripts.PythonScript import PythonScript
 from Shared.DC.Scripts.Script import Script, defaultBindings
-from zLOG import LOG, ERROR, INFO
 
 
 class FSPythonScript (Script, Acquisition.Implicit, Item_w__name__):
@@ -220,6 +217,8 @@ class FSPythonScript (Script, Acquisition.Implicit, Item_w__name__):
       'ZScriptHTML_tryForm', 'PrincipiaSearchSource',
       'document_src', 'params', 'body')
 
+    # We can't use PythonScript as a base class since there are
+    # many ways to modify it.  Instead, we copy methods. :-/
     ZScriptHTML_tryParams = PythonScript.ZScriptHTML_tryParams
     _checkCBlock = PythonScript._checkCBlock
     _newfun = PythonScript._newfun
