@@ -126,7 +126,9 @@
  <tr valign="top">
   <td> <br> </td>
   <td>
-   <input type="submit" value=" Change ">
+       <input type="submit" name="change" value=" Change ">
+  <br> <input type="submit" name="change_and_edit" value=" Change & Edit ">
+  <br> <input type="submit" name="change_and_view" value=" Change & View ">
   </td>
  </tr>
 </table>
