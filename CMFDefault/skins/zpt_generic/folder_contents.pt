@@ -72,7 +72,7 @@
       <td colspan="1" align="left" width="49%">
        <table>
         <tr valign="top" tal:repeat="item batch1">
-         <td align="left" width="5" nowrap
+         <td width="5"
              tal:define="folderish item/isPrincipiaFolderish;
                          portalish item/isPortalContent | nothing;
                          global methodID python:( folderish
@@ -113,7 +113,7 @@
       <td colspan="1" width="49%">
        <table>
         <tr valign="top" tal:repeat="item batch2">
-         <td align="left" width="5" nowrap
+         <td width="5"
              tal:define="folderish item/isPrincipiaFolderish;
                          portalish item/isPortalContent | nothing;
                          global methodID python:( folderish

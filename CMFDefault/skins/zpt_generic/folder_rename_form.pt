@@ -22,7 +22,7 @@
       <span tal:replace="structure item/iconHTML">Type Image</span>
     </td>
 
-    <td align="left" valign="top" width="20%" nowrap>
+    <td width="20%">
       <span tal:replace="item/getId">ID</span>
       <input type="hidden" name="ids:list" value=""
              tal:attributes="value item/getId" />

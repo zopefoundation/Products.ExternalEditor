@@ -16,7 +16,7 @@
 <td>
 <table width="100%" class="FormLayout" tal:repeat="item here/allowedContentTypes">
 <tr valign="top">
-  <td align="left" width="2%" nowrap>
+  <td width="2%">
    <input type="radio" name="type_name" value="" id=""
           tal:attributes="value item/getId;
                           id string:cb_${repeat/item/number}" />

@@ -15,7 +15,7 @@
   <tr class="NewsItemRow"
       tal:condition="news"
 	  tal:repeat="news batch">
-   <td valign="top" nowrap>
+   <td>
     <a href=""
 	   tal:attributes="href python:news.getURL()"
 	   tal:content="news/Title"></a><br />
