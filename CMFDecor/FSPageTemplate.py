@@ -85,11 +85,12 @@
 """Customizable page templates that come from the filesystem."""
 __version__='$Revision$'[11:-2]
 
-from string import split
+from string import split, replace
 from os import stat
 
 import Globals, Acquisition
 from DateTime import DateTime
+from DocumentTemplate.DT_Util import html_quote
 from AccessControl import getSecurityManager, ClassSecurityInfo
 from Shared.DC.Scripts.Script import Script
 from Products.PageTemplates.PageTemplate import PageTemplate
@@ -166,8 +167,20 @@ class FSPageTemplate(FSObject, Script, PageTemplate):
     def pt_render(self, source=0, extra_context={}):
         # Tie in on an opportunity to auto-reload
         self._updateFromFS()
-        return FSPageTemplate.inheritedAttribute('pt_render')(self, source,
-            extra_context)
+        if Globals.DevelopmentMode:
+            try:
+                return FSPageTemplate.inheritedAttribute('pt_render')( self,
+                    source, extra_context )
+            except RuntimeError:
+                err = FSPageTemplate.inheritedAttribute( 'pt_errors' )( self )
+                err_type = err[0]
+                err_msg = '<pre>%s</pre>' % replace( err[1], "\'", "'" )
+                msg = 'FS Page Template %s has errors: %s.<br>%s' % (
+                    self.id, err_type, err_msg )
+                raise RuntimeError, msg
+        else:
+            return FSPageTemplate.inheritedAttribute('pt_render')(self,
+                source, extra_context )
 
     # Copy over more mothods
     security.declareProtected(FTPAccess, 'manage_FTPget')
