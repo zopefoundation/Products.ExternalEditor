@@ -28,10 +28,19 @@ from CMFCorePermissions import AccessContentsInformation, ManagePortal
 import CMFCorePermissions
 from FSObject import BadFile
 from utils import expandpath, minimalpath
+from zLOG import LOG, ERROR
+from sys import exc_info
 
 _dtmldir = os.path.join( package_home( globals() ), 'dtml' )
 
 __reload_module__ = 0
+
+# Ignore version control subdirectories
+# and special names.
+def _filtered_listdir(path):
+    n = filter(lambda name: name not in ('CVS', 'SVN', '.', '..'),
+               listdir(path))
+    return n
 
 class DirectoryInformation:
     data = None
@@ -39,13 +48,8 @@ class DirectoryInformation:
 
     def __init__(self, expanded_fp, minimal_fp):
         self.filepath = minimal_fp
-        l = listdir(expanded_fp)
         subdirs = []
-        for entry in l:
-            if entry in ('CVS', 'SVN', '.', '..'):
-                # Ignore version control subdirectories
-                # and special names.
-                continue
+        for entry in _filtered_listdir(expanded_fp):
             e_fp = path.join(expanded_fp, entry)
             if path.isdir(e_fp):
                 subdirs.append(entry)
@@ -96,17 +100,10 @@ class DirectoryInformation:
                 self.data, self.objects = self.prepareContents(registry,
                     register_subdirs=changed)
             except:
-                from zLOG import LOG, ERROR
-                import sys, traceback
-                type,value,tb = sys.exc_info()
-                try:
-                    LOG( 'DirectoryView'
-                    , ERROR
-                    , 'Error during prepareContents:'
-                    , traceback.format_exception( type, value, tb )
-                    )
-                finally:
-                    tb = None       # Avoid leaking frame
+                LOG('DirectoryView',
+                    ERROR,
+                    'Error during prepareContents:',
+                    error=exc_info())
                 self.data = {}
                 self.objects = ()
                     
@@ -117,9 +114,8 @@ class DirectoryInformation:
         fp = expandpath(self.filepath)
         data = {}
         objects = []
-        l = listdir(fp)
         types = self._readTypesFile()
-        for entry in l:
+        for entry in _filtered_listdir(fp):
             if not self._isAllowableFilename(entry):
                 continue
             e_filepath = path.join(self.filepath, entry)
@@ -130,9 +126,8 @@ class DirectoryInformation:
                 info = registry.getDirectoryInfo(e_filepath)
                 if info is None and register_subdirs:
                     # Register unknown subdirs
-                    if entry not in ('CVS', 'SVN', '.', '..'):
-                        registry.registerDirectoryByPath(e_fp)
-                        info = registry.getDirectoryInfo(e_filepath)
+                    registry.registerDirectoryByPath(e_fp)
+                    info = registry.getDirectoryInfo(e_filepath)
                 if info is not None:
                     mt = types.get(entry)
                     t = None
@@ -171,25 +166,27 @@ class DirectoryInformation:
                     try:
                         ob = t(name, e_filepath, fullname=entry)
                     except:
-                        from zLOG import LOG, ERROR
-                        import sys, traceback
-                        typ, val, tb = sys.exc_info()
+                        import traceback
+                        typ, val, tb = exc_info()
                         try:
-                            exc_lines = traceback.format_exception( typ
-                                                                  , val
-                                                                  , tb )
-                            LOG( 'DirectoryView', ERROR
-                               , join( exc_lines, '\n' ) )
-                            ob = BadFile( name
-                                        , e_filepath
-                                        , exc_str=join( exc_lines, '\r\n' )
-                                        , fullname=entry
-                                        )
+                            exc_lines = traceback.format_exception( typ,
+                                                                    val,
+                                                                    tb )
+                            LOG( 'DirectoryView',
+                                 ERROR,
+                                 join( exc_lines, '\n' ) )
+                            
+                            ob = BadFile( name,
+                                          e_filepath,
+                                          exc_str=join( exc_lines, '\r\n' ),
+                                          fullname=entry )
                         finally:
                             tb = None   # Avoid leaking frame!
+                            
                     ob_id = ob.getId()
                     data[ob_id] = ob
                     objects.append({'id': ob_id, 'meta_type': ob.meta_type})
+                    
         return data, tuple(objects)
 
 
