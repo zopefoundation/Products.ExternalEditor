@@ -151,6 +151,9 @@ CMF 1.5alpha (unreleased)
 
   Bug Fixes
 
+    - Tests: CachingPolicyManager tests don't fail on Windows anymore.
+      (Collector #107)
+
     - SkinsTool: Fixed cookie paths.
       clearSkinCookie() now uses the same cookie path as updateSkinCookie()
       which is now "inside-out" hosting safe.

@@ -15,32 +15,23 @@
 $Id$
 """
 
-from App.Common import rfc1123_date
-
 from AccessControl import ClassSecurityInfo
-
+from App.Common import rfc1123_date
 from DateTime.DateTime import DateTime
-
-from Globals import InitializeClass
 from Globals import DTMLFile
+from Globals import InitializeClass
 from Globals import PersistentMapping
-
 from OFS.SimpleItem import SimpleItem
-
 from Products.PageTemplates.Expressions import getEngine
 from Products.PageTemplates.Expressions import SecureModuleImporter
 
-from Products.CMFCore.interfaces.CachingPolicyManager \
+from CMFCorePermissions import ManagePortal
+from CMFCorePermissions import View
+from Expression import Expression
+from interfaces.CachingPolicyManager \
         import CachingPolicyManager as ICachingPolicyManager
-
-from Products.CMFCore.ActionProviderBase import ActionProviderBase
-from Products.CMFCore.CMFCorePermissions import View
-from Products.CMFCore.CMFCorePermissions import ManagePortal
-from Products.CMFCore.Expression import Expression
-
-from Products.CMFCore.utils import getToolByName
-from Products.CMFCore.utils import _dtmldir
-import time
+from utils import _dtmldir
+from utils import getToolByName
 
 
 def createCPContext( content, view_method, keywords, time=None ):
@@ -69,6 +60,7 @@ def createCPContext( content, view_method, keywords, time=None ):
 
     return getEngine().getContext( data )
 
+
 class CachingPolicy:
     """
         Represent a single class of cachable objects:
@@ -79,15 +71,15 @@ class CachingPolicy:
             'content' -- the content object itself
 
             'view' -- the name of the view method
-           
+
             'keywords' -- keywords passed to the request
-           
+
             'request' -- the REQUEST object itself
-           
+
             'member' -- the authenticated member, or None if anonymous
-           
+
             'modules' -- usual TALES access-with-import
-           
+
             'nothing' -- None
 
           - The "Last-modified" HTTP response header will be set using
@@ -486,15 +478,13 @@ class CachingPolicyManager( SimpleItem ):
         for policy_id, policy in self.listPolicies():
 
             headers = policy.getHeaders( context )
-
             if headers:
-
                 return headers
 
         return ()
 
-
 InitializeClass( CachingPolicyManager )
+
 
 def manage_addCachingPolicyManager( self, REQUEST=None ):
     """
