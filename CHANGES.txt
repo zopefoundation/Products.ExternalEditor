@@ -41,6 +41,9 @@
     sure Anonymous cannot access it without logging in (CMF Tracker
     Issue 349, thanks go to Bill Anderson)
 
+  - The Member Data Tool now uses an OOBTree instead of the old-style
+    BTree to store member data wrappers (CMF Tracker 375)
+
   - Added initial CMF use cases as FSSTXMethods in CMFDefault/help.
 
   - Made validation methods of 'portal_metadata' available to
