@@ -31,7 +31,7 @@
     <td align="left" valign="top">
     <select name="typeinfo_name">
       <option value="">(None)</option>
-      <dtml-in types>
+      <dtml-in types sort>
         <option value="&dtml-sequence-key;">&dtml-sequence-key;</option>
       </dtml-in>
     </select>
