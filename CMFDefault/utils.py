@@ -425,3 +425,20 @@ def html_marshal(**kw):
     for key, converter, value in complex_marshal( kw.items() ):
         vars.append( ( key + converter, escape( str(value) ) ) )
     return tuple(vars)
+
+security.declarePublic('toUnicode')
+def toUnicode(value, charset=None):
+    """ Convert value to unicode.
+    """
+    if isinstance(value, str):
+        return charset and unicode(value, charset) or unicode(value)
+    elif isinstance(value, list):
+        return [ toUnicode(val, charset) for val in value ]
+    elif isinstance(value, tuple):
+        return tuple( [ toUnicode(val, charset) for val in value ] )
+    elif isinstance(value, dict):
+        for key, val in value.items():
+            value[key] = toUnicode(val, charset)
+        return value
+    else:
+        return value
