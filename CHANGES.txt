@@ -56,6 +56,13 @@ CMF 1.5.0beta (2004/08/06)
       
   Bug Fixes
 
+    - CMFCore.PortalFolder: Enforce check of "Delete objects" permission
+      during cut + paste. (http://zope.org/Collectors/259)
+
+      N.B.  This fix depends on an update to the underlying Zope software,
+            e.g., Zope 2.7.3 or later.  Two new unit tests fail on
+            Zope 2.7.2 and earlier.
+
     - CMFDefault.MetadataTool: Validation would disallow
       vocabulary-constrained metadata elements to be empty
       (http://www.zope.org/Collectors/CMF/217)

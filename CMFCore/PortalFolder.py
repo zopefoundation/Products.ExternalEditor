@@ -39,7 +39,6 @@ from permissions import ListFolderContents
 from permissions import ManagePortal
 from permissions import ManageProperties
 from permissions import View
-from utils import _checkPermission
 from utils import getToolByName
 
 
@@ -162,7 +161,7 @@ class PortalFolder(DynamicType, CMFCatalogAware, OrderedFolder):
     def manage_addPortalFolder(self, id, title='', REQUEST=None):
         """Add a new PortalFolder object with id *id*.
         """
-        ob=PortalFolder(id, title)
+        ob = PortalFolder(id, title)
         self._setObject(id, ob)
         if REQUEST is not None:
             return self.folder_contents( # XXX: ick!
@@ -411,7 +410,7 @@ class PortalFolder(DynamicType, CMFCatalogAware, OrderedFolder):
         # This method prevents people other than the portal manager
         # from overriding skinned names.
         if not allow_dup:
-            if not _checkPermission(ManagePortal, self):
+            if not getSecurityManager().checkPermission(ManagePortal, self):
                 ob = self
                 while ob is not None and not getattr(ob, '_isPortalRoot', 0):
                     ob = aq_parent(aq_inner(ob))
@@ -428,61 +427,71 @@ class PortalFolder(DynamicType, CMFCatalogAware, OrderedFolder):
         # It enables the clipboard to function correctly
         # with objects created by a multi-factory.
         securityChecksDone = False
-        if (hasattr(object, '__factory_meta_type__') and
-            hasattr(self, 'all_meta_types')):
-            mt = object.__factory_meta_type__
+        sm = getSecurityManager()
+        parent = aq_parent(aq_inner(object))
+        object_id = object.getId()
+        mt = getattr(object, '__factory_meta_type__', None)
+        meta_types = getattr(self, 'all_meta_types', None)
+
+        if mt is not None and meta_types is not None:
             method_name=None
             permission_name = None
-            meta_types = self.all_meta_types
-            if callable(meta_types): meta_types = meta_types()
+
+            if callable(meta_types):
+                meta_types = meta_types()
+
             for d in meta_types:
+
                 if d['name']==mt:
                     method_name=d['action']
                     permission_name = d.get('permission', None)
                     break
 
             if permission_name is not None:
-                if _checkPermission(permission_name,self):
-                    if not validate_src:
-                        # We don't want to check the object on the clipboard
-                        securityChecksDone = True
-                    else:
-                        try: parent = aq_parent(aq_inner(object))
-                        except: parent = None
-                        if getSecurityManager().validate(None, parent,
-                                                         None, object):
-                            # validation succeeded
-                            securityChecksDone = True
-                        else:
-                            raise AccessControl_Unauthorized( object.getId() )
-                else:
-                    raise AccessControl_Unauthorized(permission_name)
+
+                if not sm.checkPermission(permission_name,self):
+                    raise Unauthorized, method_name
+
+                if validate_src:
+
+                    if not sm.validate(None, parent, None, object):
+                        raise Unauthorized, object_id
+
+                if validate_src > 1:
+                    if not sm.checkPermission(DeleteObjects, parent):
+                        raise Unauthorized
+
+                # validation succeeded
+                securityChecksDone = 1
+
             #
             # Old validation for objects that may not have registered
             # themselves in the proper fashion.
             #
             elif method_name is not None:
-                meth=self.unrestrictedTraverse(method_name)
-                if hasattr(meth, 'im_self'):
-                    parent = meth.im_self
-                else:
-                    try:    parent = aq_parent(aq_inner(meth))
-                    except: parent = None
-                if getSecurityManager().validate(None, parent, None, meth):
-                    # Ensure the user is allowed to access the object on the
-                    # clipboard.
-                    if not validate_src:
-                        securityChecksDone = True
-                    else:
-                        try: parent = aq_parent(aq_inner(object))
-                        except: parent = None
-                        if getSecurityManager().validate(None, parent,
-                                                         None, object):
-                            securityChecksDone = True
-                        else:
-                            raise AccessControl_Unauthorized( object.getId() )
-                else:
-                    raise AccessControl_Unauthorized(method_name)
+
+                meth = self.unrestrictedTraverse(method_name)
+
+                factory = getattr(meth, 'im_self', None)
+
+                if factory is None:
+                    factory = aq_parent(aq_inner(meth))
+
+                if not sm.validate(None, factory, None, meth):
+                    raise Unauthorized, method_name
+
+                # Ensure the user is allowed to access the object on the
+                # clipboard.
+                if validate_src:
+
+                    if not sm.validate(None, parent, None, object):
+                        raise Unauthorized, object_id
+
+                if validate_src > 1: # moving
+                    if not sm.checkPermission(DeleteObjects, parent):
+                        raise Unauthorized
+
+                securityChecksDone = 1
 
         # Call OFS' _verifyObjectPaste if necessary
         if not securityChecksDone:
@@ -491,12 +500,17 @@ class PortalFolder(DynamicType, CMFCatalogAware, OrderedFolder):
 
         # Finally, check allowed content types
         if hasattr(aq_base(object), 'getPortalTypeName'):
+
             type_name = object.getPortalTypeName()
+
             if type_name is not None:
+
                 pt = getToolByName(self, 'portal_types')
                 myType = pt.getTypeInfo(self)
+
                 if myType is not None and not myType.allowType(type_name):
-                    raise ValueError('Disallowed subobject type: %s' % type_name)
+                    raise ValueError('Disallowed subobject type: %s'
+                                        % type_name)
 
     security.setPermissionDefault(AddPortalContent, ('Owner','Manager'))
     security.setPermissionDefault(AddPortalFolders, ('Owner','Manager'))
