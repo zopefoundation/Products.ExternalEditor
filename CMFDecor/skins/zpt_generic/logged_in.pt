@@ -1,4 +1,4 @@
-<div tal:condition="here/portal_skins | nothing">
+<div tal:condition="exists: here/portal_skins | nothing">
   <div tal:condition="here/portal_skins/updateSkinCookie | nothing"
         tal:define="dummy here/setupCurrentSkin">
   </div>
@@ -9,8 +9,8 @@
 <body>
 <div metal:fill-slot="main">
  <div tal:define="p_props here/portal_properties">
-  <div tal:condition="here/portal_membership/isAnonymousUser | nothing"
-       tal:define="dummy python: request['RESPONSE'].expireCookie('__ac', path='/')">
+  <div tal:condition="here/portal_membership/isAnonymousUser | nothing">
+       <span tal:define="dummy python: request['RESPONSE'].expireCookie('__ac', path='/')"></span>
       <h1 class="DesktopTitle">Login failure</h1>
       <p class="Desktop">You are not currently logged in.  Your username and or password may be incorrect.
 	  Your browser may also not be configured to accept HTTP cookies.  If you need help please contact 

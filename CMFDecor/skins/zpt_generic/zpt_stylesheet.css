@@ -265,17 +265,22 @@ div.Desktop h1 {
 }
 
 div.Desktop a:link {
-    text-decoration: hover;
+    text-decoration: none;
+    color: #336699;
+}
+
+div.Desktop table tr td {
+    font-size: 80%;
     color: #336699;
 }
 
 div.Desktop a:visited {
-    text-decoration: hover;
+    text-decoration: none;
     color: #336699;
 }
 
 div.Desktop a:active {
-    text-decoration: hover;
+    text-decoration: none;
     color: #FF0000;
 }
 

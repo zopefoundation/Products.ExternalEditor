@@ -210,4 +210,5 @@ class FSDTMLMethod(RestrictedDTML, FSObject, Globals.HTML):
 Globals.InitializeClass(FSDTMLMethod)
 
 registerFileExtension('dtml', FSDTMLMethod)
+registerFileExtension('css', FSDTMLMethod)
 registerMetaType('DTML Method', FSDTMLMethod)
