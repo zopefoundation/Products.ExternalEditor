@@ -46,6 +46,9 @@ New Features
 
 Bugs Fixed
 
+  - Caused CMFDefault Portal constructor to strip passed-in id
+    before creating a portal object with that id.
+
   - Allowed the ActionsTool to gracefully handle objects
     which return ActionInformation objects. Thanks to 
     Andy Dawkins for the analysis. (Tracker #457)
