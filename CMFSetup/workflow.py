@@ -21,6 +21,7 @@ from utils import _getNodeAttribute
 from utils import _queryNodeAttribute
 from utils import _getNodeAttributeBoolean
 from utils import _coalesceTextNodeChildren
+from utils import _extractDescriptionNode
 
 TRIGGER_TYPES = ( 'AUTOMATIC', 'USER', 'WORKFLOW_METHOD' )
 
@@ -797,7 +798,7 @@ def _extractStateNodes( root, encoding=None ):
 
         info = { 'state_id' : _getNodeAttribute( s_node, 'state_id', encoding )
                , 'title' : _getNodeAttribute( s_node, 'title', encoding )
-               , 'description' : _coalesceTextNodeChildren( s_node, encoding )
+               , 'description' : _extractDescriptionNode( s_node, encoding )
                }
 
         info[ 'transitions' ] = [ _getNodeAttribute( x, 'transition_id'
@@ -859,7 +860,7 @@ def _extractTransitionNodes( root, encoding=None ):
         info = { 'transition_id' : _getNodeAttribute( t_node, 'transition_id'
                                                     , encoding )
                , 'title' : _getNodeAttribute( t_node, 'title', encoding )
-               , 'description' : _coalesceTextNodeChildren( t_node, encoding )
+               , 'description' : _extractDescriptionNode( t_node, encoding )
                , 'new_state' : _getNodeAttribute( t_node, 'new_state'
                                                 , encoding )
                , 'trigger' : _getNodeAttribute( t_node, 'trigger', encoding )
@@ -891,7 +892,7 @@ def _extractVariableNodes( root, encoding=None ):
 
         info = { 'variable_id' : _getNodeAttribute( v_node, 'variable_id'
                                                     , encoding )
-               , 'description' : _coalesceTextNodeChildren( v_node, encoding )
+               , 'description' : _extractDescriptionNode( v_node, encoding )
                , 'for_catalog' : _getNodeAttributeBoolean( v_node
                                                          , 'for_catalog'
                                                          )
@@ -918,7 +919,7 @@ def _extractWorklistNodes( root, encoding=None ):
         info = { 'worklist_id' : _getNodeAttribute( w_node, 'worklist_id'
                                                     , encoding )
                , 'title' : _getNodeAttribute( w_node, 'title' , encoding )
-               , 'description' : _coalesceTextNodeChildren( w_node, encoding )
+               , 'description' : _extractDescriptionNode( w_node, encoding )
                , 'match' : _extractMatchNode( w_node, encoding )
                , 'action' : _extractActionNode( w_node, encoding )
                , 'guard' : _extractGuardNode( w_node, encoding )

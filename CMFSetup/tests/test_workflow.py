@@ -1569,7 +1569,7 @@ _NORMAL_WORKFLOW_EXPORT = """\
  <state
     state_id="expired"
     title="Expired">
-  Expiration date has passed
+  <description>Expiration date has passed</description>
   <exit-transition
     transition_id="open"/>
   <permission-map
@@ -1588,7 +1588,7 @@ _NORMAL_WORKFLOW_EXPORT = """\
  <state
     state_id="opened"
     title="Opened">
-  Open for modifications
+  <description>Open for modifications</description>
   <exit-transition
     transition_id="close"/>
   <exit-transition
@@ -1614,7 +1614,7 @@ _NORMAL_WORKFLOW_EXPORT = """\
  <state
     state_id="closed"
     title="Closed">
-  Closed for modifications
+  <description>Closed for modifications</description>
   <exit-transition
     transition_id="open"/>
   <exit-transition
@@ -1635,7 +1635,7 @@ _NORMAL_WORKFLOW_EXPORT = """\
  <state
     state_id="killed"
     title="Killed">
-  Permanently unavailable
+  <description>Permanently unavailable</description>
  </state>
  <transition
     transition_id="close"
@@ -1644,7 +1644,7 @@ _NORMAL_WORKFLOW_EXPORT = """\
     new_state="closed"
     before_script=""
     after_script="after_close">
-  Close the object for modifications
+  <description>Close the object for modifications</description>
   <action
     category="workflow"
     url="string:${object_url}/close_for_modifications">Close</action>
@@ -1660,7 +1660,7 @@ _NORMAL_WORKFLOW_EXPORT = """\
     new_state="expired"
     before_script=""
     after_script="">
-  Retire objects whose expiration is past.
+  <description>Retire objects whose expiration is past.</description>
   <guard>
    <guard-expression>python: object.expiration() &lt;= object.ZopeTime()</guard-expression>
   </guard>
@@ -1674,7 +1674,7 @@ _NORMAL_WORKFLOW_EXPORT = """\
     new_state="opened"
     before_script="before_open"
     after_script="">
-  Open the object for modifications
+  <description>Open the object for modifications</description>
   <action
     category="workflow"
     url="string:${object_url}/open_for_modifications">Open</action>
@@ -1691,7 +1691,7 @@ _NORMAL_WORKFLOW_EXPORT = """\
     new_state="killed"
     before_script=""
     after_script="after_kill">
-  Make the object permanently unavailable.
+  <description>Make the object permanently unavailable.</description>
   <action
     category="workflow"
     url="string:${object_url}/kill_object">Kill</action>
@@ -1704,7 +1704,7 @@ _NORMAL_WORKFLOW_EXPORT = """\
  <worklist
     worklist_id="alive_list"
     title="Alive">
-  Worklist for content not yet expired / killed
+  <description>Worklist for content not yet expired / killed</description>
   <action
     category="workflow"
     url="string:${portal_url}/expired_items">Expired items</action>
@@ -1716,7 +1716,7 @@ _NORMAL_WORKFLOW_EXPORT = """\
  <worklist
     worklist_id="expired_list"
     title="Expired">
-  Worklist for expired content
+  <description>Worklist for expired content</description>
   <action
     category="workflow"
     url="string:${portal_url}/expired_items">Expired items</action>
@@ -1730,7 +1730,7 @@ _NORMAL_WORKFLOW_EXPORT = """\
     for_catalog="True"
     for_status="False"
     update_always="True">
-   Killed by
+   <description>Killed by</description>
    <default>
     <value type="string">n/a</value>
    </default>
@@ -1744,7 +1744,7 @@ _NORMAL_WORKFLOW_EXPORT = """\
     for_catalog="True"
     for_status="False"
     update_always="True">
-   Expired when
+   <description>Expired when</description>
    <default>
     <expression>nothing</expression>
    </default>
@@ -1758,7 +1758,7 @@ _NORMAL_WORKFLOW_EXPORT = """\
     for_catalog="True"
     for_status="False"
     update_always="True">
-   Opened when
+   <description>Opened when</description>
    <default>
     <expression>python:None</expression>
    </default>

@@ -18,6 +18,7 @@ from Products.CMFCore.utils import getToolByName
 from actions import _extractActionNodes
 from permissions import ManagePortal
 from utils import _coalesceTextNodeChildren
+from utils import _extractDescriptionNode
 from utils import _getNodeAttribute
 from utils import _queryNodeAttribute
 from utils import _queryNodeAttributeBoolean
@@ -321,11 +322,6 @@ def _extractAllowedContentTypeNodes(parent, encoding=None):
         result.append(value)
 
     return tuple(result)
-
-def _extractDescriptionNode(parent, encoding=None):
-
-    d_node = parent.getElementsByTagName('description')[0]
-    return _coalesceTextNodeChildren(d_node, encoding)
 
 def _extractAliasesNode(parent, encoding=None):
 

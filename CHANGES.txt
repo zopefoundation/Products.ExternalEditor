@@ -7,8 +7,9 @@ CMF 1.5.0-beta (unreleased)
 
   Bug Fixes
 
-    - CMFSetup: Refactored actions and type-infos.
-      Changed some XML attributes, converting list items to sub-elements.
+    - CMFSetup: Refactored actions, type-infos and workflow definition.
+      Changed some XML attributes. Converted list items and descriptions to
+      sub-elements.
 
     - ActionInformation: Some attribute cleanup.
       Enforced usage of 'Title' instead of 'Name', 'URL' or 'URL (Expression)'

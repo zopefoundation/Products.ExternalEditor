@@ -185,3 +185,11 @@ def _coalesceTextNodeChildren( node, encoding=None ):
         joined = joined.encode( encoding )
 
     return ''.join( [ line.lstrip() for line in joined.splitlines(True) ] )
+
+def _extractDescriptionNode(parent, encoding=None):
+
+    d_nodes = parent.getElementsByTagName('description')
+    if d_nodes:
+        return _coalesceTextNodeChildren(d_nodes[0], encoding)
+    else:
+        return ''

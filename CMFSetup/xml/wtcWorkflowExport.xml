@@ -20,9 +20,10 @@
         tal:repeat="state info/state_info"
         tal:attributes="state_id state/id;
                         title state/title;
-                       ">
-  <span
-        tal:replace="state/description">DESCRIPTION</span>
+                       "
+ ><tal:case tal:condition="state/description">
+  <description
+        tal:content="state/description">DESCRIPTION</description></tal:case>
   <exit-transition
         transition_id="TRANSITION_ID"
         tal:repeat="exit state/transitions"
@@ -71,9 +72,10 @@
                         trigger transition/trigger_type;
                         before_script transition/script_name;
                         after_script transition/after_script_name;
-                       ">
-  <span
-        tal:replace="transition/description">DESCRIPTION</span>
+                       "
+ ><tal:case tal:condition="transition/description">
+  <description
+      tal:content="transition/description">DESCRIPTION</description></tal:case>
   <action
         url="URL"
         category="CATEGORY"
@@ -82,19 +84,23 @@
                         category transition/actbox_category;
                        "
         tal:content="transition/actbox_name">ACTION NAME</action>
-  <guard>
+  <guard
+  ><tal:case tal:condition="transition/guard_permissions">
    <guard-permission
-        tal:repeat="permission transition/guard_permissions"
-        tal:content="permission">PERMISSION</guard-permission>
+       tal:repeat="permission transition/guard_permissions"
+       tal:content="permission">PERMISSION</guard-permission></tal:case
+  ><tal:case tal:condition="transition/guard_roles">
    <guard-role
-        tal:repeat="role transition/guard_roles"
-        tal:content="role">ROLE</guard-role>
+       tal:repeat="role transition/guard_roles"
+       tal:content="role">ROLE</guard-role></tal:case
+  ><tal:case tal:condition="transition/guard_groups">
    <guard-group
-        tal:repeat="group transition/guard_groups"
-        tal:content="group">GROUP</guard-group>
+       tal:repeat="group transition/guard_groups"
+       tal:content="group">GROUP</guard-group></tal:case
+  ><tal:case tal:condition="transition/guard_expr">
    <guard-expression
-        tal:condition="transition/guard_expr"
-        tal:content="transition/guard_expr">EXPRESSION</guard-expression>
+       tal:content="transition/guard_expr">EXPRESSION</guard-expression
+  ></tal:case>
   </guard>
   <assignment
         name="VAR_NAME"
@@ -108,9 +114,10 @@
         tal:repeat="worklist info/worklist_info"
         tal:attributes="worklist_id worklist/id;
                         title worklist/title;
-                       ">
-  <span
-        tal:replace="worklist/description">Reviewer tasks</span>
+                       "
+ ><tal:case tal:condition="worklist/description">
+  <description
+        tal:content="worklist/description">DESCRIPTION</description></tal:case>
   <action
         url="URL"
         category="CATEGORY"
@@ -119,19 +126,23 @@
                         category worklist/actbox_category;
                        "
         tal:content="worklist/actbox_name">ACTION NAME</action>
-  <guard>
+  <guard
+  ><tal:case tal:condition="worklist/guard_permissions">
    <guard-permission
-        tal:repeat="permission worklist/guard_permissions"
-        tal:content="permission">PERMISSION</guard-permission>
+       tal:repeat="permission worklist/guard_permissions"
+       tal:content="permission">PERMISSION</guard-permission></tal:case
+  ><tal:case tal:condition="worklist/guard_roles">
    <guard-role
-        tal:repeat="role worklist/guard_roles"
-        tal:content="role">ROLE</guard-role>
+       tal:repeat="role worklist/guard_roles"
+       tal:content="role">ROLE</guard-role></tal:case
+  ><tal:case tal:condition="worklist/guard_groups">
    <guard-group
-        tal:repeat="group worklist/guard_groups"
-        tal:content="group">GROUP</guard-group>
+       tal:repeat="group worklist/guard_groups"
+       tal:content="group">GROUP</guard-group></tal:case
+  ><tal:case tal:condition="worklist/guard_expr">
    <guard-expression
-        tal:condition="worklist/guard_expr"
-        tal:content="worklist/guard_expr">EXPRESSION</guard-expression>
+       tal:content="worklist/guard_expr">EXPRESSION</guard-expression
+  ></tal:case>
   </guard>
   <match
         name="review_state"
@@ -152,33 +163,38 @@
                         for_catalog variable/for_catalog;
                         for_status variable/for_status;
                         update_always variable/update_always;
-                       ">
-   <span
-        tal:replace="variable/description">The last transition</span>
-   <default>
-    <value
-        type="VAR_TYPE"
-        tal:attributes="type variable/default_type"
-        tal:condition="variable/default_value"
-        tal:content="variable/default_value">VALUE</value>
-    <expression
-        tal:condition="variable/default_expr"
-        tal:content="variable/default_expr">EXPRESSION</expression>
-   </default>
-   <guard>
-    <guard-permission
-        tal:repeat="permission variable/guard_permissions"
-        tal:content="permission">PERMISSION</guard-permission>
-    <guard-role
-        tal:repeat="role variable/guard_roles"
-        tal:content="role">ROLE</guard-role>
-    <guard-group
-        tal:repeat="group variable/guard_groups"
-        tal:content="group">GROUP</guard-group>
-    <guard-expression
-        tal:condition="variable/guard_expr"
-        tal:content="variable/guard_expr">EXPRESSION</guard-expression>
-   </guard>
+                       "
+ ><tal:case tal:condition="variable/description">
+  <description
+       tal:content="variable/description">DESCRIPTION</description></tal:case>
+  <default>
+   <value
+       type="VAR_TYPE"
+       tal:attributes="type variable/default_type"
+       tal:condition="variable/default_value"
+       tal:content="variable/default_value">VALUE</value>
+   <expression
+       tal:condition="variable/default_expr"
+       tal:content="variable/default_expr">EXPRESSION</expression>
+  </default>
+  <guard
+  ><tal:case tal:condition="variable/guard_permissions">
+   <guard-permission
+       tal:repeat="permission variable/guard_permissions"
+       tal:content="permission">PERMISSION</guard-permission></tal:case
+  ><tal:case tal:condition="variable/guard_roles">
+   <guard-role
+       tal:repeat="role variable/guard_roles"
+       tal:content="role">ROLE</guard-role></tal:case
+  ><tal:case tal:condition="variable/guard_groups">
+   <guard-group
+       tal:repeat="group variable/guard_groups"
+       tal:content="group">GROUP</guard-group></tal:case
+  ><tal:case tal:condition="variable/guard_expr">
+   <guard-expression
+       tal:content="variable/guard_expr">EXPRESSION</guard-expression
+  ></tal:case>
+  </guard>
  </variable>
  <script
         script_id="SCRIPT_ID"
