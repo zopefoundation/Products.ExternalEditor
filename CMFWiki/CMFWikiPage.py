@@ -1758,7 +1758,7 @@ def initPageMetadata(page):
                        effective_date=None,
                        expiration_date=None,
                        format='text_html',
-                       language='en-US',
+                       language='',
                        rights = '')
 
 

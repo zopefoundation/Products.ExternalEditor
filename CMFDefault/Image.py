@@ -143,7 +143,7 @@ def addImage( self
             , effective_date=None
             , expiration_date=None
             , format='text/html'
-            , language='en-US'
+            , language=''
             , rights=''
             ):
     """

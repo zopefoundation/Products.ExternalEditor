@@ -110,7 +110,7 @@ class DefaultDublinCoreImpl( PropertyManager ):
                 , effective_date=None
                 , expiration_date=None
                 , format='text/html'
-                , language='en-US'
+                , language=''
                 , rights=''
                 ):
             self.creation_date = DateTime()
