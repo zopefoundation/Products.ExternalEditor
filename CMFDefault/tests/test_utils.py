@@ -1,5 +1,5 @@
 import unittest
-from Products.PTKDemo.utils import parseHeadersBody
+from Products.CMFDefault.utils import parseHeadersBody
 from string import split
 
 class TestCase( unittest.TestCase ):
