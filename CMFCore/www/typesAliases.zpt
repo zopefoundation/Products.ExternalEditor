@@ -1,6 +1,6 @@
-<h1 tal:replace="structure here/manage_page_header">Header</h1>
+<h1 tal:replace="structure context/manage_page_header">Header</h1>
 <h2 tal:define="manage_tabs_message options/manage_tabs_message | nothing"
-    tal:replace="structure here/manage_tabs">Tabs</h2>
+    tal:replace="structure context/manage_tabs">Tabs</h2>
 
 <h3>Method Aliases Chart</h3>
 
@@ -11,7 +11,7 @@
 <table cellspacing="0" cellpadding="2" border="0">
  <tr class="list-header">
   <th align="left">Alias</th>
-  <th tal:repeat="key here/listMethodAliasKeys">
+  <th tal:repeat="key context/listMethodAliasKeys">
    <input type="text" name="" size="18" value=""
      tal:attributes="name string:aliases.${repeat/key/index}:record;
                      value key" />
@@ -20,7 +20,7 @@
    <input type="text" name="aliases.new:record" size="18" value="" />
   </th>
  </tr>
- <span tal:define="tis python:sequence.sort( here.listTypeInfo(),
+ <span tal:define="tis python:sequence.sort( context.listTypeInfo(),
                                              ( ('getId',), ) )"
    tal:repeat="ti tis" tal:omit-tag=""><tr class=""
    tal:attributes="class python:repeat['ti'].odd() and 'row-normal'
@@ -30,10 +30,10 @@
         tal:attributes="href string:${ti/absolute_url}/manage_aliases"
         tal:content="ti/getId">id</a>
   </th>
-  <td tal:repeat="key here/listMethodAliasKeys">
+  <td tal:repeat="key context/listMethodAliasKeys">
    <input type="text" name="" size="18" value=""
      tal:attributes="name string:${ti/getId}.${repeat/key/index}:record;
-                     value python:ti.getMethodURL(key) or ''" />
+                     value python:ti.queryMethodID(key, '')" />
   </td>
   <td>
    <input type="text" name="" size="18" value=""
@@ -69,4 +69,4 @@
   instead.</dd>
 </dl>
 
-<h1 tal:replace="structure here/manage_page_footer">Footer</h1>
+<h1 tal:replace="structure context/manage_page_footer">Footer</h1>

@@ -382,7 +382,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
         "Get the document body for FTP download (also used for the WebDAV SRC)"
         if self.Format() == 'text/html':
             ti = self.getTypeInfo()
-            method_id = ti and ti.getMethodURL('gethtml') or None
+            method_id = ti and ti.queryMethodID('gethtml')
             if method_id:
                 method = getattr(self, method_id)
                 if getattr(aq_base(method), 'isDocTemp', 0):

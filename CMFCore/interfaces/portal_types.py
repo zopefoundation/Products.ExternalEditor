@@ -70,8 +70,11 @@ class ContentTypeInformation(Interface):
         """
 
     def getActionById(id):
-        """
-            Return the URL of the action whose ID is id.
+        """ Get method ID by action ID.
+
+        This method is deprecated and will be removed in CMF 1.6. Please use
+        getActionInfo()['url'] if you need an URL or queryMethodID() if you
+        need a method ID.
         """
 
     def getIcon():
@@ -95,20 +98,12 @@ class ContentTypeInformation(Interface):
         Returns -- Boolean value
         """
 
-    def getMethodPath(key):
-        """ Get reverse relative method path by alias.
+    def queryMethodID(alias, default=None):
+        """ Query method ID by alias.
 
         Permission -- Always available
 
-        Returns -- Tuple of IDs
-        """
-
-    def getMethodURL(key):
-        """ Get relative method URL by alias.
-
-        Permission -- Always available
-
-        Returns -- Slash-separated string
+        Returns -- Method ID or default value
         """
 
 

@@ -270,17 +270,14 @@ class TypeInfoTests(TestCase):
     def test_MethodAliases_methods(self):
         ti = self._makeInstance( **FTIDATA_CMF15[0] )
         self.assertEqual( ti.getMethodAliases(), FTIDATA_CMF15[0]['aliases'] )
-        self.assertEqual( ti.getMethodPath('view'), ('dummy_view',) )
-        self.assertEqual( ti.getMethodPath('view.html'), ('dummy_view',) )
-        self.assertEqual( ti.getMethodURL('view'), 'dummy_view' )
-        self.assertEqual( ti.getMethodURL('view.html'), 'dummy_view' )
+        self.assertEqual( ti.queryMethodID('view'), 'dummy_view' )
+        self.assertEqual( ti.queryMethodID('view.html'), 'dummy_view' )
 
         ti.setMethodAliases( ti.getMethodAliases() )
         self.assertEqual( ti.getMethodAliases(), FTIDATA_CMF15[0]['aliases'] )
 
     def _checkContentTI(self, ti):
-        wanted_aliases = { 'view':('dummy_view',),
-                           '(Default)':('dummy_view',) }
+        wanted_aliases = { 'view': 'dummy_view', '(Default)': 'dummy_view' }
         wanted_actions_text0 = 'string:${object_url}/dummy_view'
         wanted_actions_text1 = 'string:${object_url}/dummy_edit_form'
         wanted_actions_text2 = 'string:${object_url}/metadata_edit_form'
@@ -302,7 +299,7 @@ class TypeInfoTests(TestCase):
         self.assertEqual( action0.getVisibility(), 1 )
 
     def _checkFolderTI(self, ti):
-        wanted_aliases = { 'view':('(Default)',), }
+        wanted_aliases = { 'view': '(Default)' }
         wanted_actions_text0 = 'string:${object_url}'
         wanted_actions_text1 = 'string:${object_url}/dummy_edit_form'
         wanted_actions_text2 = 'string:${object_url}/folder_localrole_form'
@@ -327,7 +324,7 @@ class TypeInfoTests(TestCase):
         self.failUnless( isinstance(ti._actions[0], dict) )
 
         # migrate FTI
-        ti.getMethodPath('view')
+        ti.queryMethodID('view')
         self._checkContentTI(ti)
 
     def test_CMF13_folder_migration(self):
@@ -343,7 +340,7 @@ class TypeInfoTests(TestCase):
         self.failUnless( isinstance(ti._actions[0], dict) )
 
         # migrate FTI
-        ti.getMethodPath('view')
+        ti.queryMethodID('view')
         self._checkFolderTI(ti)
 
     def test_CMF14_content_migration(self):
@@ -357,7 +354,7 @@ class TypeInfoTests(TestCase):
         self.failIf( hasattr(ti, '_aliases') )
 
         # migrate FTI
-        ti.getMethodPath('view')
+        ti.queryMethodID('view')
         self._checkContentTI(ti)
 
     def test_CMF14_folder_migration(self):
@@ -371,11 +368,11 @@ class TypeInfoTests(TestCase):
         self.failIf( hasattr(ti, '_aliases') )
 
         # migrate FTI
-        ti.getMethodPath('view')
+        ti.queryMethodID('view')
         self._checkFolderTI(ti)
 
     def test_CMF14_special_migration(self):
-        wanted = { 'view':('dummy_view',), 'mkdir':('dummy_mkdir',) }
+        wanted = { 'view': 'dummy_view', 'mkdir': 'dummy_mkdir' }
 
         # use old FTI Data
         ti = self._makeInstance( **FTIDATA_CMF14_SPECIAL[0] )
@@ -386,7 +383,7 @@ class TypeInfoTests(TestCase):
         self.failIf( hasattr(ti, '_aliases') )
 
         # migrate FTI
-        ti.getMethodPath('view')
+        ti.queryMethodID('view')
         self.assertEqual(ti._aliases, wanted)
 
     def test_CMF14_special2_migration(self):
@@ -401,8 +398,22 @@ class TypeInfoTests(TestCase):
         self.failIf( hasattr(ti, '_aliases') )
 
         # migrate FTI
-        ti.getMethodPath('view')
+        ti.queryMethodID('view')
         self.assertEqual(ti._aliases, wanted)
+
+    def test_CMF150beta_content_migration(self):
+
+        # use old FTI Data
+        ti = self._makeInstance( **FTIDATA_CMF14[0] )
+        self._checkContentTI(ti)
+
+        # simulate old FTI
+        ti._aliases = { 'view': ('dummy_view',),
+                        '(Default)': ('dummy_view',) }
+
+        # migrate FTI
+        ti.getMethodAliases()
+        self._checkContentTI(ti)
 
 
 class FTIDataTests( TypeInfoTests ):

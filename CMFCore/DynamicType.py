@@ -116,13 +116,12 @@ class DynamicType:
         stack = REQUEST['TraversalRequestNameStack']
         key = stack and stack[-1] or '(Default)'
         ti = self.getTypeInfo()
-        path = ti and ti.getMethodPath(key) or None
-        if path:
+        method_id = ti and ti.queryMethodID(key)
+        if method_id:
             if key != '(Default)':
                 stack.pop()
-            for id in path:
-                if id != '(Default)':
-                    stack.append(id)
+            if method_id != '(Default)':
+                stack.append(method_id)
             REQUEST._hacked_path = 1
 
 InitializeClass(DynamicType)

@@ -1,6 +1,6 @@
-<h1 tal:replace="structure here/manage_page_header">Header</h1>
+<h1 tal:replace="structure context/manage_page_header">Header</h1>
 <h2 tal:define="manage_tabs_message options/manage_tabs_message | nothing"
-    tal:replace="structure here/manage_tabs">Tabs</h2>
+    tal:replace="structure context/manage_tabs">Tabs</h2>
 
 <h3>Method Aliases</h3>
 
@@ -13,7 +13,7 @@
   <th>Alias</th>
   <th>Method</th>
  </tr>
- <tr tal:repeat="key here/listMethodAliasKeys">
+ <tr tal:repeat="key context/listMethodAliasKeys">
   <td>
    <input type="text" name="" size="18" value=""
      tal:attributes="name string:aliases.${repeat/key/index}:record;
@@ -22,7 +22,7 @@
   <td>
    <input type="text" name="" size="27" value=""
      tal:attributes="name string:methods.${repeat/key/index}:record;
-                     value python:here.getMethodURL(key) or ''" />
+                     value python:context.queryMethodID(key, '')" />
   </td>
  </tr>
  <tr>
@@ -62,4 +62,4 @@
   instead.</dd>
 </dl>
 
-<h1 tal:replace="structure here/manage_page_footer">Footer</h1>
+<h1 tal:replace="structure context/manage_page_footer">Footer</h1>

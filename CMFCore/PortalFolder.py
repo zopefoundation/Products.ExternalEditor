@@ -538,10 +538,10 @@ class PortalFolder(DynamicType, CMFCatalogAware, OrderedFolder):
         a PortalFolder.
         """
         ti = self.getTypeInfo()
-        method = ti and ti.getMethodURL('mkdir') or None
-        if method:
+        method_id = ti and ti.queryMethodID('mkdir')
+        if method_id:
             # call it
-            getattr(self, method)(id=id)
+            getattr(self, method_id)(id=id)
         else:
             self.invokeFactory( type_name='Folder', id=id )
 

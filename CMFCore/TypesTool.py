@@ -272,12 +272,11 @@ class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
 
     security.declarePublic('getActionById')
     def getActionById( self, id, default=_marker ):
-        """
-            Return the URL of the action whose ID is id.
+        """ Get method ID by action ID.
         """
         warn('getActionById() is deprecated and will be removed in CMF 1.6. '
              'Please use getActionInfo()[\'url\'] if you need an URL or '
-             'getMethodPath()[0] if you need a method.',
+             'queryMethodID() if you need a method ID.',
              DeprecationWarning)
         context = getActionContext( self )
         for action in self.listActions():
@@ -368,13 +367,13 @@ class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
         """
         if not hasattr(self, '_aliases'):
             self._guessMethodAliases()
-        _dict = {}
         aliases = self._aliases
-        for k, v in aliases.items():
-            path = list(v)
-            path.reverse()
-            _dict[k] = '/'.join(path)
-        return _dict
+        # for aliases created with CMF 1.5.0beta
+        for key, method_id in aliases.items():
+            if isinstance(method_id, tuple):
+                aliases[key] = method_id[0]
+                self._p_changed = True
+        return aliases
 
     security.declareProtected(ManagePortal, 'setMethodAliases')
     def setMethodAliases(self, aliases):
@@ -384,31 +383,25 @@ class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
         for k, v in aliases.items():
             v = v.strip()
             if v:
-                path = v.split('/')
-                path.reverse()
-                _dict[ k.strip() ] = tuple(path)
+                _dict[ k.strip() ] = v
         if not getattr(self, '_aliases', None) == _dict:
             self._aliases = _dict
-            return 1
+            return True
         else:
-            return 0
+            return False
 
-    security.declarePublic('getMethodPath')
-    def getMethodPath(self, key):
-        """ Get reverse relative method path by alias.
+    security.declarePublic('queryMethodID')
+    def queryMethodID(self, alias, default=None):
+        """ Query method ID by alias.
         """
         if not hasattr(self, '_aliases'):
             self._guessMethodAliases()
         aliases = self._aliases
-        return aliases.get( key, () )
-
-    security.declarePublic('getMethodURL')
-    def getMethodURL(self, key):
-        """ Get relative method URL by alias.
-        """
-        path = list( self.getMethodPath(key) )
-        path.reverse()
-        return '/'.join(path)
+        method_id = aliases.get(alias, default)
+        # for aliases created with CMF 1.5.0beta
+        if isinstance(method_id, tuple):
+            method_id = method_id[0]
+        return method_id
 
     security.declarePrivate('_guessMethodAliases')
     def _guessMethodAliases(self):
