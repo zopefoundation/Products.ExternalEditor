@@ -22,6 +22,15 @@
 
 <div metal:fill-slot="main">
 
+  <script type="text/javascript"><!--
+
+  function trip_assigned_button() {
+      button = document.getElementById("assign_button");
+      button.checked = 1;
+      return true;
+  }
+  // --></script>
+
   <div tal:condition="not: collector_issue_header_present|nothing">
     <!-- Master template has no "header" macro... -->
     <div metal:use-macro="here/collector_macros/macros/issue_header">
@@ -85,7 +94,7 @@
         <td tal:define="assigning python: [i[0] for i in actions_pairs
                                              if i[1] == 'Assign']"
             tal:condition="assigning">
-          <input type="radio" name="action" value="Assign"
+          <input type="radio" name="action" id="assign_button" value="Assign"
                  tal:attributes="value python: assigning[0]">Assign:
         </td>
       </tr>
@@ -110,12 +119,13 @@
                         supporters here/aq_parent/supporters"
             tal:condition="assigning">
           <select name="assignees:list" MULTIPLE size="5"
+                  onclick="trip_assigned_button();"
                   tal:attributes="size python:
                                        min(max(len(supporters), 3), 8)">
             <option tal:content="supporter"
                     tal:repeat="supporter supporters"
                     tal:attributes="selected python:
-                    supporter in here.assigned_to()">
+                                             supporter in here.assigned_to()">
               SUPPORTER
             </option>
           </select>
