@@ -119,8 +119,9 @@ class OrganizationTool(UniqueObject, SimpleItem):
     def setTypeLocation(self, type, location, skin_name=''):
         """Sets a single location and skin name for a type.
         """
-        self._types[type] = (location, skin_name)
-        self._p_changed = 1
+        t = self._types
+        t[type] = (location, skin_name)
+        self._types = t
 
     security.declareProtected(ManagePortal, 'setLocationInfo')
     def setLocationInfo(self, info, RESPONSE=None):
