@@ -19,11 +19,12 @@ $Id$
 """
 
 from Acquisition import aq_inner, aq_parent, aq_acquire
-from Products.CMFCore.utils import UniqueObject
-from Products.CMFCore.CMFCorePermissions import ManagePortal
 from OFS.SimpleItem import SimpleItem
 from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
+
+from Products.CMFCore.utils import UniqueObject, getToolByName
+from Products.CMFCore.CMFCorePermissions import ManagePortal
 
 # Permission name
 StageObjects = 'Use version control'
@@ -43,6 +44,10 @@ class StagingTool(UniqueObject, SimpleItem):
     manage_options = ( { 'label' : 'Overview', 'action' : 'manage_overview' }
                      , 
                      ) + SimpleItem.manage_options
+
+    # With auto_unlock_checkin turned on, updateStages() uses the
+    # lock tool and the versions tool to unlock and check in the object.
+    auto_checkin = 1
 
     # _stages maps stage names to relative paths.
     # This should be configurable TTW.
@@ -109,6 +114,17 @@ class StagingTool(UniqueObject, SimpleItem):
         return res
 
 
+    def _autoCheckin(self, object):
+        lt = getToolByName(self, 'portal_lock', None)
+        if lt is not None:
+            if lt.locked(object):
+                lt.unlock(object)
+        vt = getToolByName(self, 'portal_versions', None)
+        if vt is not None:
+            if vt.isCheckedOut(object):
+                vt.checkin(object)
+
+
     security.declareProtected(StageObjects, 'isStageable')
     def isStageable(self, object):
         """Returns a true value if the object can be staged."""
@@ -123,9 +139,15 @@ class StagingTool(UniqueObject, SimpleItem):
         in the specified stage."""
         if from_stage in to_stages or not self._stages.has_key(from_stage):
             raise StagingError, "Invalid from_stages or to_stages parameter."
+
         repo = self._getVersionRepository()
-        object_map = self._getObjectStages(object)
         container_map = self._getObjectStages(object, get_container=1)
+
+        self._checkContainers(object, to_stages, container_map)
+        if self.auto_checkin:
+            self._autoCheckin(object)
+
+        object_map = self._getObjectStages(object)
         dev_object = object_map[from_stage]
         version_info = repo.getVersionInfo(dev_object)
         version_id = version_info.version_id
@@ -186,20 +208,23 @@ class StagingTool(UniqueObject, SimpleItem):
         return self._getObjectVersionIds(object)
 
 
-    security.declareProtected(StageObjects, 'checkContainer')
-    def checkContainer(self, object, stage):
+    def _checkContainers(self, object, stages, containers):
+        for stage in stages:
+            if containers.get(stage) is None:
+                p = '/'.join(object.getPhysicalPath())
+                raise StagingError, (
+                    'The container for "%s" does not exist on "%s"'
+                    % (p, stage))
+
+
+    security.declareProtected(StageObjects, 'checkContainers')
+    def checkContainers(self, object, stages):
         """Verifies that the container exists for the object on the
-        given stage.  If not, an exception is raised.
+        given stages.  If not, an exception is raised.
         """
-        stages = self._getObjectStages(object, get_container=1)
-        container = stages[stage]
-        if container is not None:
-            return 1
-        else:
-            p = '/'.join(object.getPhysicalPath())
-            raise StagingError, (
-                'The container for "%s" does not exist on "%s"'
-                % (p, stage))
+        containers = self._getObjectStages(object, get_container=1)
+        self._checkContainers(object, stages, containers)
+        return 1
 
 
     security.declareProtected(StageObjects, 'getURLForStage')

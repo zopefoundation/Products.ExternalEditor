@@ -40,6 +40,14 @@ class VersionsTool(UniqueObject, SimpleItem):
                      , 
                      ) + SimpleItem.manage_options
 
+
+    # With auto_copy_forward turned on, the versions tool lets users
+    # check out an object even if it is not updated to the latest
+    # revision.  It copies the old revision forward.  Note that
+    # this feature really shouldn't be enabled unless users also have the
+    # ability to revert to specific revisions.
+    auto_copy_forward = 1
+
     security.declareProtected(ManagePortal, 'manage_overview' )
     #manage_overview = DTMLFile( 'explainVersionsTool', _dtmldir )
 
@@ -59,7 +67,7 @@ class VersionsTool(UniqueObject, SimpleItem):
         old_state = None
         if not repo.isUnderVersionControl(object):
             repo.applyVersionControl(object)
-        elif not repo.isResourceUpToDate(object):
+        elif self.auto_copy_forward and not repo.isResourceUpToDate(object):
             # Copy the old state forward after the object has been checked out.
             info = repo.getVersionInfo(object)
             old_state = repo.getVersionOfResource(

@@ -52,6 +52,13 @@ class LockTool(UniqueObject, SimpleItem):
                      , 
                      ) + SimpleItem.manage_options
 
+    # With auto_version on, locking automatically causes a version checkout
+    # and unlocking automatically causes a checkin.  This is one form
+    # of autoversioning described in the DeltaV introduction.
+    # Should be configurable TTW.
+    # http://www.webdav.org/deltav/WWW10/deltav-intro.htm
+    auto_version = 1
+
     #
     #   ZMI methods
     #
@@ -66,12 +73,17 @@ class LockTool(UniqueObject, SimpleItem):
     security.declareProtected(LockObjects, 'lock')
     def lock(self, object):
         '''Locks an object'''
-        user = getSecurityManager().getUser()
         locker = self.locker(object)
-
         if locker:
             raise LockingError, '%s is already locked' % pathOf(object)
 
+        if self.auto_version:
+            vt = getToolByName(self, 'portal_versions', None)
+            if vt is not None:
+                if not vt.isCheckedOut(object):
+                    object = vt.checkout(object)
+
+        user = getSecurityManager().getUser()
         lockitem = LockItem(user)
         object.wl_setLock(lockitem.getLockToken(), lockitem)
 
@@ -80,7 +92,6 @@ class LockTool(UniqueObject, SimpleItem):
     def unlock(self, object):
         '''Unlocks an object'''
         locker = self.locker(object)
-
         if not locker:
             raise LockingError, ("Unlocking an unlocked item: %s" %
                                  pathOf(object))
@@ -93,6 +104,11 @@ class LockTool(UniqueObject, SimpleItem):
         # According to WriteLockInterface, we shouldn't call
         # wl_clearLocks(), but it seems like the right thing to do anyway.
         object.wl_clearLocks()
+
+        if self.auto_version:
+            vt = getToolByName(self, 'portal_versions', None)
+            if vt is not None:
+                vt.checkin(object)
 
 
     security.declarePublic('locker')

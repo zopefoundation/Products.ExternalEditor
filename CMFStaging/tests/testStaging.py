@@ -142,11 +142,11 @@ class Tests(unittest.TestCase):
             'test')
         self.assert_('c1' not in self.review_stage.objectIds())
         # c1 is ok
-        st.checkContainer(self.dev_stage.c1, 'review')
+        st.checkContainers(self.dev_stage.c1, ['review'])
         # c1 doesn't exist on the review stage yet, so updates
         # to c1.test can't work yet.
-        self.assertRaises(StagingError, st.checkContainer,
-                          self.dev_stage.c1.test, 'review')
+        self.assertRaises(StagingError, st.checkContainers,
+                          self.dev_stage.c1.test, ['review'])
 
     def testGetURLForStage(self):
         st = self.root.portal_staging
