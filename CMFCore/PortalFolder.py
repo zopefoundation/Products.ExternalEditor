@@ -374,9 +374,9 @@ class PortalFolder(DynamicType, CMFCatalogAware, OrderedFolder):
         try:
             self._checkId(id)
         except BadRequest:
-            return 0
+            return False
         else:
-            return 1
+            return True
 
     def MKCOL_handler(self,id,REQUEST=None,RESPONSE=None):
         """
@@ -387,20 +387,25 @@ class PortalFolder(DynamicType, CMFCatalogAware, OrderedFolder):
     def _checkId(self, id, allow_dup=0):
         PortalFolder.inheritedAttribute('_checkId')(self, id, allow_dup)
 
-        # This method prevents people other than the portal manager
-        # from overriding skinned names.
-        if not allow_dup:
-            if not getSecurityManager().checkPermission(ManagePortal, self):
-                ob = self
-                while ob is not None and not getattr(ob, '_isPortalRoot', 0):
-                    ob = aq_parent(aq_inner(ob))
-                if ob is not None:
-                    # If the portal root has an object by this name,
-                    # don't allow an override.
-                    # FIXME: needed to allow index_html for join code
-                    if hasattr(ob, id) and id != 'index_html':
-                        raise BadRequest('The id "%s" is reserved.' % id)
-                    # Otherwise we're ok.
+        if allow_dup:
+            return
+
+        # FIXME: needed to allow index_html for join code
+        if id == 'index_html':
+            return
+
+        # This code prevents people other than the portal manager from
+        # overriding skinned names and tools.
+        if not getSecurityManager().checkPermission(ManagePortal, self):
+            ob = self
+            while ob is not None and not getattr(ob, '_isPortalRoot', False):
+                ob = aq_parent( aq_inner(ob) )
+            if ob is not None:
+                # If the portal root has a non-contentish object by this name,
+                # don't allow an override.
+                if hasattr(ob, id) and id not in ob.contentIds():
+                    raise BadRequest('The id "%s" is reserved.' % id)
+        # Otherwise we're ok.
 
     def _verifyObjectPaste(self, object, validate_src=1):
         # This assists the version in OFS.CopySupport.
