@@ -51,9 +51,10 @@ def importActionProviders( context ):
     site = context.getSite()
     encoding = context.getEncoding()
 
+    actions_tool = getToolByName( site, 'portal_actions' )
+
     if context.shouldPurge():
 
-        actions_tool = getToolByName( site, 'portal_actions' )
         for provider_id in actions_tool.listActionProviders():
             actions_tool.deleteActionProvider( provider_id )
 
@@ -62,7 +63,27 @@ def importActionProviders( context ):
     if text is not None:
 
         apc = ActionProvidersConfigurator( site ).__of__( site )
-        apc.parseXML( text, encoding )
+        info_list = apc.parseXML( text, encoding )
+
+        for p_info in info_list:
+
+            if p_info[ 'id' ] not in actions_tool.listActionProviders():
+
+                actions_tool.addActionProvider( p_info[ 'id' ] )
+
+            provider = getToolByName( site, p_info[ 'id' ] )
+            provider._actions = ()
+
+            for a_info in p_info[ 'actions' ]:
+
+                provider.addAction( id=a_info[ 'action_id' ]
+                                  , name=a_info[ 'name' ]
+                                  , action=a_info[ 'action' ]
+                                  , condition=a_info[ 'condition' ]
+                                  , permission=a_info[ 'permission' ]
+                                  , category=a_info[ 'category' ]
+                                  , visible=a_info[ 'visible' ]
+                                  )
 
     return 'Action providers imported.'
 
@@ -170,6 +191,7 @@ class ActionProvidersConfigurator( Implicit ):
 
         """ Pseudo API.
         """
+        result = []
         reader = getattr( text, 'read', None )
 
         if reader is not None:
@@ -182,23 +204,15 @@ class ActionProvidersConfigurator( Implicit ):
 
         for provider_id in parser._provider_ids:
 
-            if provider_id not in actions_tool.listActionProviders():
+            p_info = { 'id' : provider_id, 'actions' : [] }
 
-                actions_tool.addActionProvider( provider_id )
+            for a_info in parser._provider_info.get( provider_id, () ):
 
-            provider = getToolByName( self._site, provider_id )
-            provider._actions = ()
+                p_info[ 'actions' ].append( a_info )
 
-            for info in parser._provider_info.get( provider_id, () ):
+            result.append( p_info )
 
-                provider.addAction( id=info[ 'action_id' ]
-                                  , name=info[ 'name' ]
-                                  , action=info[ 'action' ]
-                                  , condition=info[ 'condition' ]
-                                  , permission=info[ 'permission' ]
-                                  , category=info[ 'category' ]
-                                  , visible=info[ 'visible' ]
-                                  )
+        return result
 
 InitializeClass( ActionProvidersConfigurator )
 

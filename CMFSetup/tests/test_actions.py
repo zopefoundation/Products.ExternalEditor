@@ -138,45 +138,54 @@ class ActionProvidersConfiguratorTests( _ActionSetup ):
         site = self._initSite( 0, 0 )
         configurator = self._makeOne( site )
 
-        before_list = configurator.listProviderInfo()
-        configurator.parseXML( _EMPTY_EXPORT )
-        after_list = configurator.listProviderInfo()
+        info_list = configurator.parseXML( _EMPTY_EXPORT )
 
-        self.assertEqual( before_list, after_list )
+        self.assertEqual( len( info_list ), 1 )
+
+        info = info_list[ 0 ]
+        self.assertEqual( info[ 'id' ], 'portal_actions' )
+        self.assertEqual( len( info[ 'actions' ] ), 0 )
 
     def test_parseXML_normal( self ):
 
         site = self._initSite( 1, 1 )
 
-        self.assertEqual( len( site.portal_foo.listActions() ), 0 )
-        self.assertEqual( len( site.portal_bar.listActions() ), 0 )
-
         configurator = self._makeOne( site )
-        configurator.parseXML( _NORMAL_EXPORT )
+        info_list = configurator.parseXML( _NORMAL_EXPORT )
 
-        self.assertEqual( len( site.portal_foo.listActions() ), 1 )
+        self.assertEqual( len( info_list ), 3 )
 
-        action = site.portal_foo.listActions()[ 0 ]
-        self.assertEqual( action.getId(), 'foo' )
-        self.assertEqual( action.Title(), 'Foo' )
-        self.assertEqual( action.getActionExpression()
+        info = info_list[ 0 ]
+        self.assertEqual( info[ 'id' ], 'portal_actions' )
+        self.assertEqual( len( info[ 'actions' ] ), 0 )
+
+        info = info_list[ 1 ]
+        self.assertEqual( info[ 'id' ], 'portal_foo' )
+        self.assertEqual( len( info[ 'actions' ] ), 1 )
+
+        action = info[ 'actions' ][ 0 ]
+        self.assertEqual( action[ 'id' ], 'foo' )
+        self.assertEqual( action[ 'title' ], 'Foo' )
+        self.assertEqual( action[ 'expression' ]
                         , 'string:${object_url}/foo' )
-        self.assertEqual( action.getCondition(), 'python:1' )
-        self.assertEqual( action.getPermissions(), () )
-        self.assertEqual( action.getCategory(), 'dummy' )
-        self.failUnless( action.getVisibility() )
+        self.assertEqual( action[ 'condition' ], 'python:1' )
+        self.assertEqual( action[ 'permissions' ], () )
+        self.assertEqual( action[ 'category' ], 'dummy' )
+        self.failUnless( action[ 'visible' ] )
 
-        self.assertEqual( len( site.portal_bar.listActions() ), 1 )
+        info = info_list[ 2 ]
+        self.assertEqual( info[ 'id' ], 'portal_bar' )
+        self.assertEqual( len( info[ 'actions' ] ), 1 )
 
-        action = site.portal_bar.listActions()[ 0 ]
-        self.assertEqual( action.getId(), 'bar' )
-        self.assertEqual( action.Title(), 'Bar' )
-        self.assertEqual( action.getActionExpression()
+        action = info[ 'actions' ][ 0 ]
+        self.assertEqual( action[ 'id' ], 'bar' )
+        self.assertEqual( action[ 'title' ], 'Bar' )
+        self.assertEqual( action[ 'expression' ]
                         , 'string:${object_url}/bar' )
-        self.assertEqual( action.getCondition(), 'python:0' )
-        self.assertEqual( action.getPermissions(), ( 'Manage portal', ) )
-        self.assertEqual( action.getCategory(), 'dummy' )
-        self.failIf( action.getVisibility() )
+        self.assertEqual( action[ 'condition' ], 'python:0' )
+        self.assertEqual( action[ 'permissions' ], ( 'Manage portal', ) )
+        self.assertEqual( action[ 'category' ], 'dummy' )
+        self.failIf( action[ 'visible' ] )
 
 
 
