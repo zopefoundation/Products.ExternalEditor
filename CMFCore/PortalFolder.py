@@ -39,6 +39,7 @@ from permissions import ListFolderContents
 from permissions import ManagePortal
 from permissions import ManageProperties
 from permissions import View
+from permissions import DeleteObjects
 from utils import getToolByName
 
 
@@ -450,16 +451,16 @@ class PortalFolder(DynamicType, CMFCatalogAware, OrderedFolder):
             if permission_name is not None:
 
                 if not sm.checkPermission(permission_name,self):
-                    raise Unauthorized, method_name
+                    raise AccessControl_Unauthorized, method_name
 
                 if validate_src:
 
                     if not sm.validate(None, parent, None, object):
-                        raise Unauthorized, object_id
+                        raise AccessControl_Unauthorized, object_id
 
                 if validate_src > 1:
                     if not sm.checkPermission(DeleteObjects, parent):
-                        raise Unauthorized
+                        raise AccessControl_Unauthorized
 
                 # validation succeeded
                 securityChecksDone = 1
@@ -478,18 +479,18 @@ class PortalFolder(DynamicType, CMFCatalogAware, OrderedFolder):
                     factory = aq_parent(aq_inner(meth))
 
                 if not sm.validate(None, factory, None, meth):
-                    raise Unauthorized, method_name
+                    raise AccessControl_Unauthorized, method_name
 
                 # Ensure the user is allowed to access the object on the
                 # clipboard.
                 if validate_src:
 
                     if not sm.validate(None, parent, None, object):
-                        raise Unauthorized, object_id
+                        raise AccessControl_Unauthorized, object_id
 
                 if validate_src > 1: # moving
                     if not sm.checkPermission(DeleteObjects, parent):
-                        raise Unauthorized
+                        raise AccessControl_Unauthorized
 
                 securityChecksDone = 1
 
