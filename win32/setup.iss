@@ -33,6 +33,7 @@ Root: HKCR; SubKey: "MIME\Database\Content Type\application/x-zope-edit"; Flags:
 Source: "..\dist\*.*"; DestDir: "{app}"; Flags: ignoreversion
 Source: "*.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "ZopeEdit.ini"; DestDir: "{app}"; Flags: onlyifdoesntexist
+Source: "ZopeExtEditDummyOCX.ocx"; DestDir: "{app}"; Flags: restartreplace regserver
 Source: "..\README.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\LICENSE.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\CHANGES.txt"; DestDir: "{app}"; Flags: ignoreversion
