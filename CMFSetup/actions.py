@@ -3,7 +3,6 @@
 $Id$
 """
 from xml.sax import parseString
-from xml.sax.handler import ContentHandler
 
 from AccessControl import ClassSecurityInfo
 from Acquisition import Implicit
@@ -13,14 +12,17 @@ from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from Products.CMFCore.utils import getToolByName
 
 from permissions import ManagePortal
+from utils import HandlerBase
 from utils import _xmldir
 
-# Dummy object for passing to listActions
 class _FauxContent:
+
+    # Dummy object for passing to listActions
+
     def __init__( self, **kw ):
         self.__dict__.update( kw )
 
-class _ActionProviderParser( ContentHandler ):
+class _ActionProviderParser( HandlerBase ):
 
     def __init__( self, site, encoding='latin-1' ):
 
@@ -28,10 +30,6 @@ class _ActionProviderParser( ContentHandler ):
         self._encoding = encoding
         self._provider_info = {}
         self._provider_ids = []
-
-    def _extract( self, attrs, key ):
-
-        return attrs[ key ].encode( self._encoding )
 
     def startElement( self, name, attrs ):
 
@@ -179,13 +177,13 @@ _FILENAME = 'actions.xml'
 
 def importActionProviders( context ):
 
-    """ Export roles / permission map as an XML file
+    """ Import roles / permission map from an XML file
 
     o 'context' must implement IImportContext.
 
     o Register via Python:
 
-      registry = site.portal_setup.setup_steps
+      registry = site.portal_setup.getImportStepRegistry()
       registry.registerStep( 'importActionProviders'
                            , '20040518-01'
                            , Products.CMFSetup.actions.importActionProviders
@@ -231,9 +229,9 @@ def exportActionProviders( context ):
 
     o Register via Python:
 
-      registry = site.portal_setup.export_steps
+      registry = site.portal_setup.getExportStepRegistry()
       registry.registerStep( 'exportActionProviders'
-                           , Products.CMFSetup.rolemap.exportActionProviders
+                           , Products.CMFSetup.actions.exportActionProviders
                            , 'Action Provider export'
                            , 'Export action providers registered with '
                              'the actions tool, and their actions.'
@@ -243,7 +241,7 @@ def exportActionProviders( context ):
  
       <export-script id="exportActionProviders"
                      version="20040518-01"
-                     handler="Products.CMFSetup.rolemap.exportActionProviders"
+                     handler="Products.CMFSetup.actions.exportActionProviders"
                      title="Action Provider export"
       >Export action providers registered with the actions tool,
        and their actions.</export-script>

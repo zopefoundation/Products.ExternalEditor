@@ -3,7 +3,6 @@
 $Id$
 """
 from xml.sax import parseString
-from xml.sax.handler import ContentHandler
 
 from AccessControl import ClassSecurityInfo
 from AccessControl.Permission import Permission
@@ -12,9 +11,10 @@ from Globals import InitializeClass
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
 from permissions import ManagePortal
+from utils import HandlerBase
 from utils import _xmldir
 
-class _RolemapParser( ContentHandler ):
+class _RolemapParser( HandlerBase ):
 
     def __init__( self, site, encoding='latin-1' ):
 
@@ -26,14 +26,18 @@ class _RolemapParser( ContentHandler ):
     def startElement( self, name, attrs ):
 
         if name == 'role':
-            self._roles.append( attrs[ 'name' ].encode( self._encoding )  )
+            self._roles.append( self._extract( attrs, 'name' )  )
 
         elif name == 'permission':
-            p_name = attrs[ 'name' ].encode( self._encoding )
-            roles = attrs[ 'roles' ].encode( self._encoding ).split()
-            acquire = attrs[ 'acquire' ].encode( self._encoding ).lower()
+
+            acquire = self._extract( attrs, 'acquire' ).lower()
             acquire = acquire in ( '1', 'true', 'yes' )
-            info = { 'name' : p_name, 'roles' : roles, 'acquire' : acquire }
+
+            info = { 'name'     : self._extract( attrs, 'name' )
+                   , 'roles'    : self._extract( attrs, 'roles' ).split()
+                   , 'acquire'  : acquire
+                   }
+
             self._permissions.append( info )
 
         elif name not in ( 'rolemap', 'permissions', 'roles' ):

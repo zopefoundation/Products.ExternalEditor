@@ -5,6 +5,7 @@ $Id$
 import os
 from inspect import getdoc
 from types import StringTypes, InstanceType
+from xml.sax.handler import ContentHandler
 
 from Globals import package_home
 
@@ -73,3 +74,10 @@ def _extractDocstring( func, default_title, default_description ):
         description = '\n'.join( lines[ 1: ] )
 
     return title, description
+
+class HandlerBase( ContentHandler ):
+
+    def _extract( self, attrs, key ):
+
+        return attrs[ key ].encode( self._encoding )
+
