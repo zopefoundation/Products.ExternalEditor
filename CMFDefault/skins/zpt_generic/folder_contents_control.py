@@ -72,7 +72,7 @@ elif items_paste:
 elif items_rename:
     if ids:
         ti = context.getTypeInfo()
-        target = ti.getActionInfo('redirect/rename_items', context)['url']
+        target = ti.getActionInfo('folder/rename_items', context)['url']
         query = make_query( ids=list(ids) )
         context.REQUEST.RESPONSE.redirect( '%s?%s' % (target, query) )
         return None

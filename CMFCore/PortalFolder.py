@@ -82,7 +82,7 @@ factory_type_information = (
                          , 'name'          : 'Rename items'
                          , 'action': 'string:${object_url}/folder_rename_form'
                          , 'permissions'   : (AddPortalContent,)
-                         , 'category'      : 'redirect'
+                         , 'category'      : 'folder'
                          , 'visible'       : 0
                          }
                        )
