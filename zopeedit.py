@@ -24,61 +24,12 @@ from httplib import HTTPConnection, HTTPSConnection
 
 class Configuration:
     
-    default_configuration = """\
-# Zope External Editor helper application configuration
-
-[general]
-# General configuration options
-
-# Uncomment and specify an editor value to override the editor
-# specified in the environment
-#editor = 
-
-# Automatic save interval, in seconds. Set to zero for
-# no auto save (save to Zope only on exit).
-save_interval = 1
-
-# Temporary file cleanup. Set to false for debugging or
-# to waste disk space. Note: setting this to false is a
-# security risk to the zope server
-cleanup_files = 1
-
-# Use WebDAV locking to prevent concurrent editing by
-# different users. Disable for single user use for
-# better performance
-use_locks = 1
-
-# Specific settings by content-type or meta-type. Specific
-# settings override general options above. Content-type settings
-# override meta-type settings for the same option.
-
-[meta-type:DTML Document]
-extension=.dtml
-
-[meta-type:DTML Method]
-extension=.dtml
-
-[meta-type:Script (Python)]
-extension=.py
-
-[meta-type:Page Template]
-extension=.pt
-
-[meta-type:Image]
-editor=gimp
-
-[content-type:text/*]
-extension=.txt
-
-[content-type:text/html]
-extension=.html"""
-    
     def __init__(self, path):
         # Create/read config file on instantiation
         self.path = path
         if not os.path.exists(path):
             f = open(path, 'w')
-            f.write(self.default_configuration)
+            f.write(default_configuration)
             f.close()
         self.changed = 0
         self.config = ConfigParser()
@@ -101,7 +52,7 @@ extension=.html"""
         self.changed = 1
     
     def __getattr__(self, name):
-        # Delegate to the ConfigParser instance'
+        # Delegate to the ConfigParser instance
         return getattr(self.config, name)
         
     def getAllOptions(self, meta_type, content_type):
@@ -124,43 +75,50 @@ extension=.html"""
         
 class ExternalEditor:
     
-    clean_up = 0
     saved = 1
     
     def __init__(self, input_file):
-        # Read the configuration file output any errors to the user
-        config_path = os.path.expanduser('~/.zope-external-edit')
-        self.config = Configuration(config_path)
-        
-        # Open the input file and read the metadata headers
-        in_f = open(input_file, 'rb')
-        metadata = {}
+        try:
+            # Read the configuration file
+            config_path = os.path.expanduser('~/.zope-external-edit')
+            self.config = Configuration(config_path)
 
-        while 1:
-            line = in_f.readline()[:-1]
-            if not line: break
-            sep = line.find(':')
-            key = line[:sep]
-            val = line[sep+1:]
-            metadata[key] = val
-        self.metadata = metadata
-        
-        self.options = self.config.getAllOptions(metadata['meta_type'],
-                           metadata.get('content_type',''))
-            
-        # Write the body of the input file to a separate file
-        body_file = self.metadata['url'][7:].replace('/',',')
-        body_file = '%s-%s' % (os.tmpnam(), body_file)
-        ext = self.options.get('extension')
-        if ext and not body_file.endswith(ext):
-            body_file = body_file + ext
-        body_f = open(body_file, 'wb')
-        body_f.write(in_f.read())
-        in_f.close()
-        body_f.close()
-        self.clean_up = int(self.options.get('cleanup_files', 1))
-        if self.clean_up: os.remove(input_file)
-        self.body_file = body_file
+            # Open the input file and read the metadata headers
+            in_f = open(input_file, 'rb')
+            metadata = {}
+
+            while 1:
+                line = in_f.readline()[:-1]
+                if not line: break
+                sep = line.find(':')
+                key = line[:sep]
+                val = line[sep+1:]
+                metadata[key] = val
+            self.metadata = metadata
+
+            self.options = self.config.getAllOptions(metadata['meta_type'],
+                               metadata.get('content_type',''))
+
+            # Write the body of the input file to a separate file
+            body_file = self.metadata['url'][7:].replace('/',',')
+            body_file = '%s-%s' % (os.tmpnam(), body_file)
+            ext = self.options.get('extension')
+            if ext and not body_file.endswith(ext):
+                body_file = body_file + ext
+            body_f = open(body_file, 'wb')
+            body_f.write(in_f.read())
+            in_f.close()
+            body_f.close()
+            self.clean_up = int(self.options.get('cleanup_files', 1))
+            if self.clean_up: os.remove(input_file)
+            self.body_file = body_file
+        except:
+            # for security, always delete the input file even if
+            # a fatal error occurs, unless explicitly stated otherwise
+            # in the config file
+            if getattr(self, 'clean_up', 1):
+                os.remove(input_file)
+            raise
         
         # Get the host and path from the URL
         self.ssl = self.metadata['url'].startswith('https:')
@@ -174,7 +132,8 @@ class ExternalEditor:
             self.path = url[path_start:]
         
     def __del__(self):
-        if self.clean_up:
+        # for security we always delete the files by default
+        if getattr(self, 'clean_up', 1):
             os.remove(self.body_file)
             
     def getEditorPath(self):
@@ -274,9 +233,9 @@ class ExternalEditor:
             # Something went wrong
             sys.stderr.write('Error occurred during HTTP put:\n%d %s\n' \
                              % (response.status, response.reason))
-            sys.stderr.write('\n----\n%s\n----' % response.read())
+            sys.stderr.write('\n----\n%s\n----\n' % response.read())
             
-            message = response.getheader('Bobo-Exception-Type','')
+            message = response.getheader('Bobo-Exception-Type')
             if has_tk():
                 from tkMessageBox import askretrycancel
                 if askretrycancel('Zope External Editor',
@@ -323,11 +282,11 @@ class ExternalEditor:
             if response.status == 423:
                 message = '\n(Object already locked)'
             else:
-                message = response.getheader('Bobo-Exception-Type','')
+                message = response.getheader('Bobo-Exception-Type')
 
             sys.stderr.write('Error occurred during lock request:\n%d %s\n' \
                              % (response.status, response.reason))
-            sys.stderr.write('\n----\n%s\n----' % response.read())
+            sys.stderr.write('\n----\n%s\n----\n' % response.read())
             if has_tk():
                 from tkMessageBox import askretrycancel
                 if askretrycancel('Zope External Editor',
@@ -351,10 +310,10 @@ class ExternalEditor:
         
         if response.status / 100 != 2:
             # Captain, she's still locked!
-            message = response.getheader('Bobo-Exception-Type','')
-            sys.stderr.write('Error occurred during lock request:\n%d %s\n%s' \
+            message = response.getheader('Bobo-Exception-Type')
+            sys.stderr.write('Error occurred during unlock request:\n%d %s\n%s\n' \
                              % (response.status, response.reason, message))
-            sys.stderr.write('\n----\n%s\n----' % response.read())
+            sys.stderr.write('\n----\n%s\n----\n' % response.read())
             if has_tk():
                 from tkMessageBox import askretrycancel
                 if askretrycancel('Zope External Editor',
@@ -398,7 +357,7 @@ class ExternalEditor:
             # On error return a null response with error info
             class NullResponse:
                 def getheader(n,d): return d
-                def read(): return ''
+                def read(self): return '(No Response From Server)'
             
             response = NullResponse()
             response.reason = sys.exc_info()[1]
@@ -431,6 +390,7 @@ def fatalError(message, exit=1):
         if has_tk():
             from tkMessageBox import showerror
             showerror('Zope External Editor', message)
+            has_tk()
     finally:
         sys.stderr.write(message)
         if exit: sys.exit(0)
@@ -451,6 +411,70 @@ def whereIs(filename):
         file_path = pathJoin(path, filename)
         if pathExists(file_path):
             return file_path
+
+default_configuration = """\
+# Zope External Editor helper application configuration
+
+[general]
+# General configuration options
+
+# Uncomment and specify an editor value to override the editor
+# specified in the environment
+#editor = 
+
+# Automatic save interval, in seconds. Set to zero for
+# no auto save (save to Zope only on exit).
+save_interval = 1
+
+# Temporary file cleanup. Set to false for debugging or
+# to waste disk space. Note: setting this to false is a
+# security risk to the zope server
+cleanup_files = 1
+
+# Use WebDAV locking to prevent concurrent editing by
+# different users. Disable for single user use for
+# better performance
+use_locks = 1
+
+# Specific settings by content-type or meta-type. Specific
+# settings override general options above. Content-type settings
+# override meta-type settings for the same option.
+
+[meta-type:DTML Document]
+extension=.dtml
+
+[meta-type:DTML Method]
+extension=.dtml
+
+[meta-type:Script (Python)]
+extension=.py
+
+[meta-type:Page Template]
+extension=.pt
+
+[meta-type:Z SQL Method]
+extension=.sql
+
+[content-type:text/*]
+extension=.txt
+
+[content-type:text/html]
+extension=.html
+
+[content-type:text/xml]
+extension=.xml
+
+[content-type:image/*]
+editor=gimp
+
+[content-type:image/gif]
+extension=.gif
+
+[content-type:image/jpeg]
+extension=.jpg
+
+[content-type:image/png]
+extension=.png"""
 
 if __name__ == '__main__':
     try:
