@@ -90,6 +90,7 @@ class DiscussionItem( Document
                      )
 
     meta_type           = 'Discussion Item'
+    portal_type         = 'Discussion Item'
     allow_discussion    = 1
     creator             = 'unknown'
     in_reply_to         = None
