@@ -480,8 +480,13 @@ _STXDWI = StructuredText.DocumentWithImages.__class__
 
 class CMFDocumentClass( StructuredText.DocumentWithImages.__class__ ):
     """
-        Override DWI to get '_' into links.
+    Override DWI to get '_' into links, and also turn on inner/named links.
     """
+    text_types = [
+        'doc_named_link',
+        'doc_inner_link',
+        ] + _STXDWI.text_types
+    
     _URL_AND_PUNC = r'([a-zA-Z0-9_\@\.\,\?\!\/\:\;\-\#\~]+)'
     def doc_href( self
                 , s
@@ -502,6 +507,16 @@ CMFDocumentClass = CMFDocumentClass()
 
 class CMFHtmlWithImages( HTMLWithImages ):
     """ Special subclass of HTMLWithImages, overriding document() """
+    def namedLink(self, doc, level, output):
+        """\
+        XXX Trial subclassed implementation of HTMLClass#namedLink(),
+        as default implementation seems to be broken...
+        """
+        name = doc.getNodeValue()
+        if name[:2] == '..':
+            name = name[2:]
+        output('<a name="#%s">[%s]</a>' % (name, name))
+
     def document(self, doc, level, output):
         """\
         HTMLWithImages.document renders full HTML (head, title, body).  For
