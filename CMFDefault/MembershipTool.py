@@ -165,7 +165,10 @@ class MembershipTool ( Products.CMFCore.MembershipTool.MembershipTool ):
 
         if hasattr(self, 'Members'):
             # Create Member's home folder
-            manage_addPortalFolder(self.Members, id)
+            # but avoid collisions
+            if not hasattr(self.Members, id):
+                manage_addPortalFolder(self.Members, id)
+
             f=getattr(self.Members, id)
 
             f.manage_permission('View',
