@@ -21,7 +21,7 @@
   <td class="NewsListing" align="left" valign="top">
       <a href="" class="NewsListing"
 	     tal:attributes="href newsitems/getURL"
-		 tal:content="newsitems/title">Title</a>
+		 tal:content="newsitems/Title">Title</a>
   </td>
   <td class="NewsListing" align="right" valign="top"
       tal:content="newsitems/Date">Date

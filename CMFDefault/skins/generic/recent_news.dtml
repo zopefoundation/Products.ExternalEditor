@@ -17,7 +17,7 @@
  </dtml-if>
  <tr>
   <td class="NewsListing" align="left" valign="top">
-      <a href="&dtml-getURL;"> &dtml-title; </a>
+      <a href="&dtml-getURL;"> &dtml-Title; </a>
    <br> By &dtml-Creator;
   </td>
   <td class="NewsListing" align="right" valign="top">
