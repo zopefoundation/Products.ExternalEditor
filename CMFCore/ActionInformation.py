@@ -15,6 +15,8 @@
 $Id$
 """
 
+from UserDict import UserDict
+
 from AccessControl import ClassSecurityInfo
 from Acquisition import aq_base, aq_inner, aq_parent
 from Globals import InitializeClass
@@ -29,56 +31,72 @@ from utils import getToolByName
 
 _unchanged = [] # marker
 
-class ActionInfo(dict):
+class ActionInfo(UserDict):
     """ A lazy dictionary for Action infos.
     """
     __implements__ = IActionInfo
     __allow_access_to_unprotected_subobjects__ = 1
 
     def __init__(self, action, ec):
-        self._marker = marker = object()
+        lazy_keys = []
 
         if isinstance(action, dict):
-            dict.__init__(self, action)
-            self.setdefault( 'id', self['name'].lower() )
-            self.setdefault( 'title', self['name'] )
-            self.setdefault( 'url', '' )
-            self.setdefault( 'permissions', () )
-            self.setdefault( 'category', 'object' )
-            self.setdefault( 'visible', True )
-            self['available'] = True
-            self['allowed'] = self['permissions'] and marker or True
+            UserDict.__init__(self, action)
+            self.data.setdefault( 'id', self.data['name'].lower() )
+            self.data.setdefault( 'title', self.data['name'] )
+            self.data.setdefault( 'url', '' )
+            self.data.setdefault( 'permissions', () )
+            self.data.setdefault( 'category', 'object' )
+            self.data.setdefault( 'visible', True )
+            self.data['available'] = True
 
         else:
             self._action = action
             self._ec = ec
-            mapping = action.getMapping()
-            self['id']          = mapping['id']
-            self['title']       = mapping['title']
-            self['name']        = mapping['title']
-            self['url']         = mapping['action'] and marker or ''
-            self['permissions'] = mapping['permissions']
-            self['category']    = mapping['category']
-            self['visible']     = mapping['visible']
-            self['available']   = mapping['condition'] and marker or True
-            self['allowed']     = mapping['permissions'] and marker or True
+            UserDict.__init__( self, action.getMapping() )
+            self.data['name'] = self.data['title']
+            del self.data['description']
+
+            if self.data['action']:
+                self.data['url'] = self._getURL
+                lazy_keys.append('url')
+            else:
+                self.data['url'] = ''
+            del self.data['action']
+
+            if self.data['condition']:
+                self.data['available'] = self._checkCondition
+                lazy_keys.append('available')
+            else:
+                self.data['available'] = True
+            del self.data['condition']
+
+        if self.data['permissions']:
+            self.data['allowed'] = self._checkPermissions
+            lazy_keys.append('allowed')
+        else:
+            self.data['allowed'] = True
+
+        self._lazy_keys = lazy_keys
 
     def __getitem__(self, key):
-        value = dict.__getitem__(self, key)
-        if value == self._marker:
-            if key == 'allowed':
-                value = self[key] = self._checkPermissions()
-            elif key == 'available':
-                value = self[key] = self._checkCondition()
-            elif key == 'url':
-                value = self[key] = self._getURL()
+        value = UserDict.__getitem__(self, key)
+        if key in self._lazy_keys:
+            value = self.data[key] = value()
+            self._lazy_keys.remove(key)
         return value
 
     def __eq__(self, other):
         # this is expensive, use it with care
-        [ self[key] for key in self ]
-        [ other[key] for key in other ]
-        return dict.__eq__(self, other)
+        [ self.__getitem__(key) for key in self._lazy_keys ]
+
+        if isinstance(other, self.__class__):
+            [ other[key] for key in other._lazy_keys ]
+            return self.data == other.data
+        elif isinstance(other, UserDict):
+            return self.data == other.data
+        else:
+            return self.data == other
 
     def _getURL(self):
         """ Get the result of the URL expression in the current context.
