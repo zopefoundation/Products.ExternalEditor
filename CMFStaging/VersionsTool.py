@@ -228,7 +228,6 @@ class VersionsTool(UniqueObject, SimpleItemWithProperties):
         version ID will include a plus sign to indicate that when the
         object is checked in, it will have a higher version number.
         """
-        verifyPermission(UseVersionControl, obj)
         obj = unproxied(obj)
         repo = self._getVersionRepository()
         if repo.isUnderVersionControl(obj):
