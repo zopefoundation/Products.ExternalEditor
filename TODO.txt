@@ -61,7 +61,7 @@ CMF TODO's
 
         ( ) Tracker #474:  FriendlyDateCriterion can't spell "today".
 
-        ( ) Tracker #475:  FDC has broken ZPT edit form
+        (x) Tracker #475:  FDC has broken ZPT edit form
 
       - ( ) STX Fixes (Seb Bacon)
 

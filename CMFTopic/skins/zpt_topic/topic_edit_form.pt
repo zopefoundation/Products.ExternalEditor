@@ -19,7 +19,7 @@
  </tr>
  <tr valign="top">
   <th align="right"> Description: </th>
-  <td><textarea name="description:test" rows="5" cols="65"
+  <td><textarea name="description:text" rows="5" cols="65"
         tal:content="here/description"
        >Description</textarea></td>
  </tr>

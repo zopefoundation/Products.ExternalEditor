@@ -23,7 +23,7 @@
    <select name="criteria.value:records" tal:define="dateoptions here/defaultDateOptions">
      <option value=""
         tal:repeat="doption dateoptions"
-        tal:attributes="value python:doption[0]; selected python:here.value == doption"
+        tal:attributes="value python:doption[0]; selected python:here.value == doption[0]"
         tal:content="python:doption[1]"
      >Date Option</option>
    </select>
