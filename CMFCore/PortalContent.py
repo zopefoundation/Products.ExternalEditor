@@ -71,6 +71,7 @@ class PortalContent(DynamicType, CMFCatalogAware, SimpleItem):
                          , 'action' : 'view'
                          }
                        )
+                     + CMFCatalogAware.manage_options
                      + SimpleItem.manage_options
                      )
 

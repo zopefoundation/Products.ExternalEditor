@@ -15,8 +15,11 @@ import Globals
 from Acquisition import aq_base
 
 from AccessControl import ClassSecurityInfo
-from CMFCorePermissions import ModifyPortalContent, AccessContentsInformation
+from CMFCorePermissions import ModifyPortalContent
+from CMFCorePermissions import AccessContentsInformation
+from CMFCorePermissions import ManagePortal
 from utils import getToolByName
+from utils import _dtmldir
 
 
 class CMFCatalogAware:
@@ -167,5 +170,49 @@ class CMFCatalogAware:
                 if hasattr(aq_base(ob), name):
                     getattr(ob, name)(*args)
                 if s is None: ob._p_deactivate()
+
+    # ZMI
+    # ---
+
+    manage_options = ({'label': 'Workflows',
+                       'action': 'manage_workflowsTab',
+                       },
+                       )
+
+    _manage_workflowsTab = Globals.DTMLFile('zmi_workflows', _dtmldir)
+
+    security.declareProtected(ManagePortal, 'manage_workflowsTab')
+    def manage_workflowsTab(self, REQUEST, manage_tabs_message=None):
+        """
+            Tab displaying the current workflows for the content object.
+        """
+        ob = self
+        wftool = getToolByName(self, 'portal_workflow', None)
+        # XXX None ?
+        if wftool is not None:
+            wf_ids = wftool.getChainFor(ob)
+            states = {}
+            chain = []
+            for wf_id in wf_ids:
+                wf = wftool.getWorkflowById(wf_id)
+                if wf is not None:
+                    # XXX a standard API would be nice
+                    if hasattr(wf, 'getReviewStateOf'):
+                        # Default Workflow
+                        state = wf.getReviewStateOf(ob)
+                    elif hasattr(wf, '_getWorkflowStateOf'):
+                        # DCWorkflow
+                        state = wf._getWorkflowStateOf(ob, id_only=1)
+                    else:
+                        state = '(Unknown)'
+                    states[wf_id] = state
+                    chain.append(wf_id)
+        return self._manage_workflowsTab(
+            REQUEST,
+            chain=chain,
+            states=states,
+            management_view='Workflows',
+            manage_tabs_message=manage_tabs_message)
+
 
 Globals.InitializeClass(CMFCatalogAware)
