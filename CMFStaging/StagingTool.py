@@ -120,27 +120,36 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
             rel_path = rel_path[:-1]
 
         res = {}
+        repo = self._getVersionRepository()
         for stage_name, stage_title, path in self._stages:
             stage = stages[stage_name]
             if stage is not None:
                 obj = stage.restrictedTraverse(rel_path, None)
-                # Avoid dangerous acquisition. Eg: acquiring
-                # from higher level folders or from above the stage
-                # and being unable to stage an object with the same
-                # id because the acquired object is non-versionable
-                # or backed by a different version history.
-                if (obj is not None and
-                    (not obj.aq_inContextOf(obj.aq_parent, 1) or
-                    obj == aq_parent(obj))):
-                    # XXX aq_inContextOf returns true if
-                    # aq_parent is the same object, so acquiring a folder
-                    # through itself causes trouble!
-                    obj = None
+                obj = self._verifyObjStage(obj, stage, repo)
             else:
                 obj = None
             res[stage_name] = obj
         return res
 
+    def _verifyObjStage(self, obj, stage, repo):
+        """ Verify if the object comes from a different
+        stage than we expect, through acquisition or other
+        means. Implementations may override this to provide
+        their own policy.
+        """
+        # Avoid dangerous acquisition. Eg: acquiring
+        # from higher level folders or from above the stage
+        # and being unable to stage an object with the same
+        # id because the acquired object is non-versionable
+        # or backed by a different version history.
+        if (obj is not None and
+            (not obj.aq_inContextOf(obj.aq_parent, 1) or
+             obj == aq_parent(obj))):
+            # XXX aq_inContextOf returns true if
+            # aq_parent is the same object, so acquiring a folder
+            # through itself causes trouble!
+            obj = None
+        return obj
 
     def _getObjectVersionIds(self, obj, include_status=0):
         repo = self._getVersionRepository()
