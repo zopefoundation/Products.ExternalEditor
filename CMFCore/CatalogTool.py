@@ -229,26 +229,26 @@ class CatalogTool (UniqueObject, ZCatalog):
     #   'portal_catalog' interface methods
     #
 
+    def _listAllowedRolesAndUsers( self, user ):
+        result = list( user.getRoles() )
+        result.append( 'Anonymous' )
+        result.append( 'user:%s' % user.getUserName() )
+        return result
+
     # searchResults has inherited security assertions.
     def searchResults(self, REQUEST=None, **kw):
-        '''Calls ZCatalog.searchResults with extra arguments that
-        limit the results to what the user is allowed to see.
-        '''
+        """
+            Calls ZCatalog.searchResults with extra arguments that
+            limit the results to what the user is allowed to see.
+        """
         user = _getAuthenticatedUser(self)
-        kw['allowedRolesAndUsers'] = list(user.getRoles()) + \
-                                     ['Anonymous',
-                                      'user:'+user.getUserName()]
+        kw[ 'allowedRolesAndUsers' ] = self._listAllowedRolesAndUsers( user )
+
         if not _checkPermission(
             CMFCorePermissions.AccessInactivePortalContent, self ):
-            if kw.has_key('Date') and None:
-                if kw.has_key('Date_usage'):
-                    kw['Date'] = min(kw['Date'])
-                kw['Date'] = [kw['Date'], DateTime()]
-                kw['Date_usage'] = 'range:min:max'
-            else:
-                kw[ 'effective' ] = kw[ 'expires' ] = DateTime()
-                kw['effective_usage'] = 'range:max'
-                kw['expires_usage'] = 'range:min'
+            now = DateTime()
+            kw[ 'effective' ] = { 'query' : now, 'usage' : 'range:max' }
+            kw[ 'expires'   ] = { 'query' : now, 'usage' : 'range:min' }
 
         return apply(ZCatalog.searchResults, (self, REQUEST), kw)
 
