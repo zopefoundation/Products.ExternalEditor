@@ -67,6 +67,9 @@ class Tests(unittest.TestCase):
         app = self.app
         if hasattr(app, 'testroot'):
             app._delObject('testroot')
+            get_transaction().commit()
+        else:
+            get_transaction().abort()
         self.conn.close()
         noSecurityManager()
 
