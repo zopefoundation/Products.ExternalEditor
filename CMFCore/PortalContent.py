@@ -250,7 +250,8 @@ class PortalContent(DynamicType, SimpleItem):
         right now, I will return that. Should be replaced with
         a list of tuples for every opaque item!
         """
-        talkback = getattr( aq_base( self ), 'talkback', None )
+        talkback = ( hasattr( aq_base( self ), 'talkback' ) and
+                      self.talkback or None )
         if talkback is not None:
             return ((talkback.id, talkback),)
         else:

@@ -65,7 +65,6 @@ class DiscussionTests(unittest.TestCase):
         get_transaction().abort()
 
     def test_deletePropagation(self):
-       # import pdb; pdb.set_trace()
         portal_catalog = CatalogTool()
         self.root._setObject('portal_catalog', portal_catalog)
         catalog = self.root.portal_catalog
@@ -88,7 +87,7 @@ class DiscussionTests(unittest.TestCase):
         foo = talkback.getReplies()[0]
         assert len(catalog) == 2
         self.root._delObject('test')
-        assert len(catalog) == 0
+        assert len(catalog) == 0, len(catalog)
 
 
 def test_suite():
