@@ -92,7 +92,7 @@ import Products.CMFCore
 from ZClasses import createZClassForBase
 from Products.CMFCore import utils
 from Products.CMFCore.DirectoryView import registerDirectory
-
+import TopicPermissions
 
 bases = (Topic.Topic,)
 
@@ -117,7 +117,7 @@ def initialize( context ):
     utils.ContentInit(
         'Portal Topic',
         content_types = (Topic.Topic,),
-        permission = Topic.ADD_TOPICS_PERMISSION,
+        permission = TopicPermissions.AddTopics,
         extra_constructors = (Topic.addTopic,),
         fti = Topic.factory_type_information,
         ).initialize(context)
