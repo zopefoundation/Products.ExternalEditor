@@ -34,6 +34,7 @@ from CMFCoreExceptions import CMFNotImplementedError
 from CMFCoreExceptions import CMFUnauthorizedError
 from CMFCorePermissions import AccessContentsInformation
 from CMFCorePermissions import ChangeLocalRoles
+from CMFCorePermissions import ListPortalMembers
 from CMFCorePermissions import ManagePortal
 from CMFCorePermissions import ManageUsers
 from CMFCorePermissions import SetOwnPassword
@@ -380,7 +381,7 @@ class MembershipTool(UniqueObject, Folder, ActionProviderBase):
         '''
         return map(self.wrapUser, self.__getPUS().getUsers())
 
-    security.declareProtected(View, 'searchMembers')
+    security.declareProtected(ListPortalMembers, 'searchMembers')
     def searchMembers( self, search_param, search_term ):
         """ Search the membership """
         md = getToolByName( self, 'portal_memberdata' )
