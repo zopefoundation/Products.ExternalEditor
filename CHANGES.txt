@@ -2,6 +2,10 @@ External Editor Change Log
 
   Next release
   
+    - Add ".zem" file extension support for MacOS X (especially Mac IE),
+      to ease helper app integration where MIME support is lacking. Thanks
+      to Zac Bir.
+  
     - Added "long_file_name" and "file_name_separator" config options.
 
     - Fixed bug which happened under Win32 when editing an Excel file

@@ -17,6 +17,7 @@
 # Zope External Editor Product by Casey Duncan
 
 from string import join # For Zope 2.3 compatibility
+import re
 import urllib
 import Acquisition
 from Globals import InitializeClass
@@ -44,6 +45,10 @@ class ExternalEditor(Acquisition.Implicit):
         path = request['TraversalRequestNameStack']
         if path:
             target = path[-1]
+            if request.get('macosx') and target.endswith('.zem'):
+                # Remove extension added by EditLink() for Mac finder
+                # so we can traverse to the target in Zope
+                target = target[:-4]
             request.set('target', target)
             path[:] = []
         else:
@@ -139,6 +144,8 @@ class ExternalEditor(Acquisition.Implicit):
 
 InitializeClass(ExternalEditor)
 
+is_mac_user_agent = re.compile('.*Mac OS X.*|.*Mac_PowerPC.*').match
+
 def EditLink(self, object, borrow_lock=0):
     """Insert the external editor link to an object if appropriate"""
     base = Acquisition.aq_base(object)
@@ -148,10 +155,21 @@ def EditLink(self, object, borrow_lock=0):
                 or hasattr(base, 'document_src')
                 or hasattr(base, 'read'))
     if editable and user.has_permission(ExternalEditorPermission, object):
-        url = "%s/externalEdit_/%s" % (
-            object.aq_parent.absolute_url(), urllib.quote(object.getId()))
+        query = {}
+        if is_mac_user_agent(object.REQUEST['HTTP_USER_AGENT']):
+            # Add extension to URL so that the Mac finder can
+            # launch the ZopeEditManager helper app
+            # this is a workaround for limited MIME type
+            # support on MacOS X browsers
+            ext = '.zem'
+            query['macosx'] = 1
+        else:
+            ext = ''
         if borrow_lock:
-            url += '?borrow_lock=1'
+            query['borrow_lock'] = 1
+        url = "%s/externalEdit_/%s%s%s" % (object.aq_parent.absolute_url(), 
+                                           urllib.quote(object.getId()), 
+                                           ext, querystr(query))
         return ('<a href="%s" '
                 'title="Edit using external editor">'
                 '<img src="%s/misc_/ExternalEditor/edit_icon" '
@@ -160,4 +178,11 @@ def EditLink(self, object, borrow_lock=0):
                )
     else:
         return ''
-                
+
+def querystr(d):
+    """Create a query string from a dict"""
+    if d:
+        return '?' + '&'.join(
+            ['%s=%s' % (name, val) for name, val in d.items()])
+    else:
+        return ''
