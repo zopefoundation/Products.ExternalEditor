@@ -992,6 +992,14 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
     def manage_FTPget(self):
         "Get source for FTP download"
 
+        headers = []
+        headers.append( "Wiki-Safetybelt: %s" % self.editTimestamp() )
+
+        parents = self.getParents()
+        if type( parents ) is not StringType:
+            parents = string.join( parents, ", " )
+        headers.append( "Wiki-Parents: %s" % parents )
+
         candidates = ['structuredtext', 'plaintext']
         types = "%s (alternatives:" % self.page_type
         if self.page_type in candidates:
@@ -999,13 +1007,22 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
         for i in candidates:
             types = types + " %s" % i
         types = types + ")"
+        headers.append( "Type: %s" % types )
+        headers.append( "Log: " )
 
-        return "Wiki-Safetybelt: %s\nType: %s\nLog: \n\n%s" % (
-            self.editTimestamp(), types, self._st_data or self.xread())
+        return "%s\n\n%s" % ( string.join( headers, "\n" )
+                            , self._st_data or self.xread()
+                            )
 
     security.declareProtected(CMFWikiPermissions.Edit, 'PUT')
-    def PUT(self, REQUEST, RESPONSE):
-        """Handle HTTP/FTP/WebDav PUT requests."""
+    def PUT( self
+           , REQUEST
+           , RESPONSE
+           , COMMA_SPACE=re.compile( "[, ]+" )
+           ):
+        """
+            Handle HTTP/FTP/WebDav PUT requests.
+        """
         self.dav__init(REQUEST, RESPONSE)
         body=REQUEST.get('BODY', '')
         self._validateProxy(REQUEST)
@@ -1029,6 +1046,19 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
             get_transaction().abort()
             RESPONSE.setStatus(450)
             return RESPONSE
+
+        NO_PARENTS = []
+        new_parents = headers.get( 'Wiki-Parents', NO_PARENTS )
+
+        if new_parents is not NO_PARENTS:
+
+            new_parents = filter( None, COMMA_SPACE.split( new_parents ) )
+            new_parents.sort()
+            old_parents = list( self.getParents() )
+            old_parents.sort()
+            if new_parents != old_parents:
+                self.reparent( new_parents )
+
         RESPONSE.setStatus(204)
         return RESPONSE
     
