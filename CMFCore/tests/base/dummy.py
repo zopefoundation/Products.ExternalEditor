@@ -173,7 +173,6 @@ class DummySite(DummyFolder):
 
     _domain = 'http://www.foobar.com'
     _path = 'bar'
-    __ac_roles__ = ('Member', 'Reviewer')
 
     def absolute_url(self, relative=0):
         return '/'.join( (self._domain, self._path, self._id) )
@@ -186,6 +185,9 @@ class DummySite(DummyFolder):
 
     def unrestrictedTraverse(self, path, default=None, restricted=0):
         return self.acl_users
+
+    def userdefined_roles(self):
+        return ('Member', 'Reviewer')
 
 
 class DummyUser(Implicit):

@@ -161,7 +161,7 @@ class MembershipTool(UniqueObject, Folder, ActionProviderBase):
         by the portal object
         """
         parent = self.aq_inner.aq_parent
-        roles = list(parent.__ac_roles__)
+        roles = list( parent.userdefined_roles() )
 
         # This is *not* a local role in the portal but used by it
         roles.append('Manager')
