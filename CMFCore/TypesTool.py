@@ -25,7 +25,6 @@ from Acquisition import aq_get
 from Globals import DTMLFile
 from Globals import InitializeClass
 from OFS.Folder import Folder
-from OFS.PropertyManager import PropertyManager
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from zLOG import LOG, ERROR
 import Products
@@ -70,11 +69,6 @@ class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
     security.declareProtected(ManagePortal, 'manage_editProperties')
     security.declareProtected(ManagePortal, 'manage_changeProperties')
     security.declareProtected(ManagePortal, 'manage_propertiesForm')
-
-    # Overload the schema freezing of SimpleItemWithProperties
-    security.declareProtected(ManagePortal, 'manage_addProperty')
-    security.declareProtected(ManagePortal, 'manage_delProperties')
-    manage_propertiesForm = PropertyManager.manage_propertiesForm
 
     _basic_properties = (
         {'id':'title', 'type': 'string', 'mode':'w',
