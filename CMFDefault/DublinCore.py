@@ -283,7 +283,7 @@ class DefaultDublinCoreImpl( PropertyManager ):
             date = getattr( self, 'creation_date', None )
         return date is None and self.__FLOOR_DATE or date
 
-    __CEILING_DATE = DateTime( 9999, 0 ) # never expires
+    __CEILING_DATE = DateTime( 2500, 0 ) # never expires
 
     security.declareProtected(View, 'expires')
     def expires( self ):

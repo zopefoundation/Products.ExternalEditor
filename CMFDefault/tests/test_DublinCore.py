@@ -18,6 +18,23 @@ class DummyContent(PortalContent, DefaultDublinCoreImpl):
     pass
 
 
+def _DateIndexConvert(value):
+    # Duplicate date conversion done by DateIndex._convert
+    t_tup = value.toZone('UTC').parts()
+    yr = t_tup[0]
+    mo = t_tup[1]
+    dy = t_tup[2]
+    hr = t_tup[3]
+    mn = t_tup[4]
+    t_val = ((((yr * 12 + mo) * 31 + dy) * 24 + hr) * 60 + mn)
+
+    if isinstance(t_val, long):
+        # t_val must be IntType, not LongType
+        raise OverflowError("Date too big: %s" % `value`)
+
+    return t_val
+
+
 class DublinCoreTests(SecurityTest):
 
     def setUp(self):
@@ -56,6 +73,14 @@ class DublinCoreTests(SecurityTest):
         item.addCreator('user_baz')
         self.assertEqual( item.listCreators(),
                           ('user_foo', 'user_bar', 'user_baz') )
+
+    def test_ceiling_parsable(self):
+        # Test that a None ceiling date will be parsable by a DateIndex
+        acl_users = self.site._setObject( 'acl_users', DummyUserFolder() )
+        newSecurityManager(None, acl_users.user_foo)
+        item = self._makeDummyContent('item')
+        self.assertEqual(item.expiration_date, None)
+        self.assert_(_DateIndexConvert(item.expires()))
 
     def test_interface(self):
         from Products.CMFCore.interfaces.DublinCore \
