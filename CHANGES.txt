@@ -1,5 +1,10 @@
 External Editor Change Log
 
+  8/19/02 - 0.5 Release
+
+    - Added patch for Zope find template so that you can use external editor
+      directly from find results in the ZMI. Thanks to Jim Washington.
+
     - Factored out external editor link generator. Product now registers
       a global method "externalEditLink_" which can be called to generate
       the external editor icon link for any object.
