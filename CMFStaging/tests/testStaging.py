@@ -21,7 +21,6 @@ import Testing
 import Zope
 from Acquisition import aq_base
 from OFS.Folder import Folder
-from OFS.Application import Application
 
 from Products.CMFStaging.StagingTool import StagingTool, StagingError
 from Products.ZopeVersionControl.Utility import VersionControlError
@@ -62,6 +61,9 @@ class Tests(unittest.TestCase):
 
 
     def tearDown(self):
+        app = self.app
+        if hasattr(app, 'testroot'):
+            app._delObject('testroot')
         self.app._p_jar.close()
 
 
