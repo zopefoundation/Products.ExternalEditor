@@ -303,7 +303,7 @@ class DirectoryRegistry:
 
     def getDirectoryInfo(self, filepath):
         # Can return None.
-        return self._directories.get(filepath, None)
+        return self._directories.get(os.path.normpath(filepath), None)
 
     def listDirectories(self):
         dirs = self._directories.keys()
