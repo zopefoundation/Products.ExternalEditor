@@ -99,6 +99,17 @@ from Acquisition import aq_base
 from DateTime import DateTime
 from AccessControl import ClassSecurityInfo
 from CMFCorePermissions import ManagePortal, AccessContentsInformation
+
+from OFS.Image import Image
+from OFS.DTMLMethod import DTMLMethod
+from Products.PythonScripts.PythonScript import PythonScript
+
+try:
+    from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
+    SUPPORTS_PAGE_TEMPLATES=1
+except ImportError:
+    SUPPORTS_PAGE_TEMPLATES=0
+
 import CMFCorePermissions
 
 
@@ -183,6 +194,36 @@ class SkinsTool(UniqueObject, SkinsContainer, PortalFolder):
         if REQUEST is not None:
             return self.manage_propertiesForm(
                 self, REQUEST, manage_tabs_message='Properties changed.')
+
+    security.declarePrivate('PUT_factory')
+
+    def PUT_factory( self, name, typ, body ):
+        """
+            Dispatcher for PUT requests to non-existent IDs.  Returns
+            an object of the appropriate type (or None, if we don't
+            know what to do).
+        """
+        major, minor = split( typ, '/' )
+
+        if major == 'image':
+            return Image( id=name
+                        , title=''
+                        , file=''
+                        , content_type=typ
+                        )
+
+        if major == 'text':
+
+            if minor == 'x-python':
+                return PythonScript( id=name )
+
+            if minor in ( 'html', 'xml' ) and SUPPORTS_PAGE_TEMPLATES:
+                return ZopePageTemplate( name )
+
+            return DTMLMethod( __name__=name )
+
+        return None
+
 
     security.declarePrivate('testSkinPath')
     def testSkinPath(self, p):
