@@ -116,15 +116,15 @@ CMF TODO's
 
         ( ) Tracker #506:  Invalid relative URL on metadata_edit_form
 
-      - ( ) Content fixes
+      - (x) Content fixes
 
         (x) Tracker #507:  Link inconsistent on empty remote_url
 
         (x) Tracker #513:  deleteReply is genocidal
 
-        ( ) Tracker #515:  Improper default button for discussion reply
+        (x) Tracker #515:  Improper default button for discussion reply
 
-        ( ) Tracker #516:  Preview, then edit broken for ZPT discussion
+        (x) Tracker #516:  Preview, then edit broken for ZPT discussion
                            replies.
 
       - (x) Documentation fixes (Tres Seaver)

@@ -1,6 +1,6 @@
 <dtml-var standard_html_header>
 
-<h3><dtml-var "REQUEST.form['title']"></h3>
+<h3><dtml-var "REQUEST.form['title']" html_quote></h3>
 
 <dtml-var "REQUEST.form['text']" fmt="structured-text">
 
@@ -13,9 +13,6 @@
         value="<dtml-var "REQUEST.form['title']" html_quote>">
  <input type="hidden" name="text_override"
         value="<dtml-var "REQUEST.form['text']" html_quote>">
- <dtml-let member="portal_membership.getAuthenticatedMember()">
-  <input type="hidden" name="Creator" value="&dtml-member;">
- </dtml-let>
  <table><tr>
   <td width="15%"></td>
   <td>

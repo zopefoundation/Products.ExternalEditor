@@ -4,29 +4,24 @@
 <body>
 <div metal:fill-slot="main">
 
-<h3 tal:content="python: request.form['title']"></h3>
+<h3 tal:content="request/form/title"></h3>
 
 <div tal:define="pss modules/Products.PythonScripts.standard"
      tal:replace="structure python: pss.structured_text(request.form['text'])">Text Body</div>
 
 <form method="POST" action="talkback"
-      tal:attributes="action python: here.absolute_url() + '/talkback'">
+      tal:attributes="action string:${here/absolute_url}/talkback">
  <input type="hidden" name="title" value=""
-      tal:attributes="value python: request.form['title']">
+      tal:attributes="value request/form/title">
  <input type="hidden" name="text" value=""
-      tal:attributes="value python: request.form['text']">
- <input type="hidden" name="title_override" value=""
-      tal:attributes="value python:  request.form['title']">
- <input type="hidden" name="text_override" value=""
-      tal:attributes="value python:  request.form['text']">
+      tal:attributes="value request/form/text">
   <input type="hidden" name="Creator" value=""
-         tal:attributes="value python: here.portal_membership.getAuthenticatedMember()">
+         tal:attributes="value here/portal_membership/getAuthenticatedMember">
  <table><tr>
   <td width="15%"></td>
   <td>
    <input type="submit" value="Edit" name=""
-          tal:define="hId here/getId"
-		  tal:attributes="name python: hId + '/discussion_reply_form:method'">
+          tal:attributes="name string:${here/getId}/discussion_reply_form:method">
    <input type="submit" value="Reply" name="discussion_reply:method">
   </td>
  </tr></table>
