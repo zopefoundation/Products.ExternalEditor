@@ -81,8 +81,8 @@ factory_type_information = (
 )
 
 def addTopic( self, id, title='', REQUEST=None ):
-    """
-        Create an empty topic.
+
+    """ Create an empty topic.
     """
     topic = Topic( id )
     topic.id = id
@@ -94,9 +94,11 @@ def addTopic( self, id, title='', REQUEST=None ):
 
 
 class Topic( PortalFolder ):
-    """
-        Topics are 'canned queries', which hold a set of zero or more
-        Criteria objects specifying the query.
+
+    """ Topics are 'canned queries'
+    
+    o Each topic holds a set of zero or more Criteria objects specifying
+      the query.
     """
 
     meta_type='Portal Topic'
@@ -108,10 +110,11 @@ class Topic( PortalFolder ):
     _criteriaTypes = []
 
     def __call__( self ):
-        """
-            Invoke the default action.
+
+        """ Invoke the default action.
         """
         view = _getViewFor( self )
+
         if getattr( aq_base( view ), 'isDocTemp', 0 ):
             return view(self, self.REQUEST)
         else:
@@ -121,39 +124,35 @@ class Topic( PortalFolder ):
 
     security.declareProtected(View, 'view')
     def view( self ):
-        """
-            Return the default view even if index_html is overridden.
+
+        """ Return the default view even if index_html is overridden.
         """
         return self()
 
-    security.declarePrivate( '_criteria_metatype_ids' )
-    def _criteria_metatype_ids( self ):
-        result = []
-        for mt in self._criteriaTypes:
-            result.append( mt.meta_type )
-        return tuple( result )
-
     security.declareProtected(ChangeTopics, 'listCriteria')
     def listCriteria( self ):
-        """
-            Return a list of our criteria objects.
+
+        """ Return a list of our criteria objects.
         """
         return self.objectValues( self._criteria_metatype_ids() )
 
 
     security.declareProtected(ChangeTopics, 'listCriteriaTypes')
     def listCriteriaTypes( self ):
+
+        """ List the available criteria types.
+        """
         out = []
+
         for ct in self._criteriaTypes:
-            out.append( {
-                'name': ct.meta_type,
-                } )
+            out.append( { 'name': ct.meta_type } )
+
         return out
 
     security.declareProtected(ChangeTopics, 'listAvailableFields')
     def listAvailableFields( self ):
-        """
-            Return a list of available fields for new criteria.
+
+        """ Return a list of available fields for new criteria.
         """
         portal_catalog = getToolByName( self, 'portal_catalog' )
         currentfields = map( lambda x: x.Field(), self.listCriteria() )
@@ -165,16 +164,19 @@ class Topic( PortalFolder ):
 
     security.declareProtected(ChangeTopics, 'listSubtopics')
     def listSubtopics( self ):
-        """
-            Return a list of our subtopics.
+
+        """ Return a list of our subtopics.
         """
         return self.objectValues( self.meta_type )
 
     security.declareProtected(ChangeTopics, 'edit')
     def edit( self, acquireCriteria, title=None, description=None ):
-        """
-            Set the flag which indicates whether to acquire criteria
-            from parent topics; update other meta data about the Topic.
+
+        """ Set the flag which indicates whether to acquire criteria.
+
+        o If set, reuse creiteria from parent topics;
+        
+        o Also update metadata about the Topic.
         """
         self.acquireCriteria = acquireCriteria
         if title is not None:
@@ -183,21 +185,24 @@ class Topic( PortalFolder ):
 
     security.declareProtected(View, 'buildQuery')
     def buildQuery( self ):
-        """
-            Construct a catalog query using our criterion objects.
+
+        """ Construct a catalog query using our criterion objects.
         """
         result = {}
 
         if self.acquireCriteria:
+
             try:
                 # Tracker 290 asks to allow combinations, like this:
                 # parent = aq_parent( self )
                 parent = aq_parent( aq_inner( self ) )
                 result.update( parent.buildQuery() )
+
             except: # oh well, can't find parent, or it isn't a Topic.
                 pass
 
         for criterion in self.listCriteria():
+
             for key, value in criterion.getCriteriaItems():
                 result[ key ] = value
 
@@ -205,9 +210,10 @@ class Topic( PortalFolder ):
 
     security.declareProtected(View, 'queryCatalog')
     def queryCatalog( self, REQUEST=None, **kw ):
-        """
-            Invoke the catalog using our criteria to augment any passed
-            in query before calling the catalog.
+
+        """ Invoke the catalog using our criteria.
+        
+        o Built-in criteria update any criteria passed in 'kw'.
         """
         kw.update( self.buildQuery() )
         portal_catalog = getToolByName( self, 'portal_catalog' )
@@ -216,12 +222,14 @@ class Topic( PortalFolder ):
     ### Criteria adding/editing/deleting
     security.declareProtected(ChangeTopics, 'addCriterion')
     def addCriterion( self, field, criterion_type ):
-        """
-            Add a new search criterion.
+
+        """ Add a new search criterion.
         """
         crit = None
         newid = 'crit__%s' % field
+
         for ct in self._criteriaTypes:
+
             if criterion_type == ct.meta_type:
                 crit = ct( newid, field )
 
@@ -231,14 +239,10 @@ class Topic( PortalFolder ):
 
         self._setObject( newid, crit )
 
-    # Backwards compatibility (deprecated)
-    security.declareProtected(ChangeTopics, 'addCriteria')
-    addCriteria = addCriterion
-
     security.declareProtected(ChangeTopics, 'deleteCriterion')
     def deleteCriterion( self, criterion_id ):
-        """
-            Delete selected criterion.
+
+        """ Delete selected criterion.
         """
         if type( criterion_id ) is type( '' ):
             self._delObject( criterion_id )
@@ -248,8 +252,8 @@ class Topic( PortalFolder ):
 
     security.declareProtected(View, 'getCriterion')
     def getCriterion( self, criterion_id ):
-        """
-            Get the criterion object.
+
+        """ Get the criterion object.
         """
         try:
             return self._getOb( 'crit__%s' % criterion_id )
@@ -258,11 +262,24 @@ class Topic( PortalFolder ):
 
     security.declareProtected(AddTopics, 'addSubtopic')
     def addSubtopic( self, id ):
-        """
-            Add a new subtopic.
+
+        """ Add a new subtopic.
         """
         ti = self.getTypeInfo()
         ti.constructInstance(self, id)
         return self._getOb( id )
+
+    #
+    #   Helper methods
+    #
+    security.declarePrivate( '_criteria_metatype_ids' )
+    def _criteria_metatype_ids( self ):
+
+        result = []
+
+        for mt in self._criteriaTypes:
+            result.append( mt.meta_type )
+
+        return tuple( result )
 
 InitializeClass( Topic )
