@@ -23,27 +23,9 @@
 
   </form>
 
-  <form action="" method="POST"
-        tal:attributes="action here/absolute_url">
-
-    <table>
-
-      <div metal:use-macro="here/workspace_content_rows/macros/tbody" />
-
-      <tr>
-
-        <td colspan="5">
-          <input type="submit" name="workspace_remove:method"
-                 value="Remove from workspace" />
-          <input type="submit" name="workspace_copy_to_other_form:method"
-                 value="Copy to other workspace..." />
-        </td>
-
-      </tr>
-
-    </table>
-
-  </form>
+  <div metal:use-macro="here/workspace_content_rows/macros/form">
+    Workspace contents
+  </div>
 
 <!--
   <div tal:define="

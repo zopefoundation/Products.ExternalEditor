@@ -115,13 +115,13 @@ class Workspace (PortalContent.PortalContent):
         self._refs.removeReference(id)
 
     security.declareProtected(ManageWorkspaces, 'listReferencedItems')
-    def listReferencedItems(self, sort_attr='Title', sort_direction='up'):
+    def listReferencedItems(self, sort_attr='Title', sort_order='normal'):
         """Returns a list of pairs containing (collection_id, object)."""
         if not sort_attr in self._allowed_sort_attrs:
             raise ValueError, "'%s' is not a valid sort attribute." % sort_attr
-        if not sort_direction in ('up', 'down'):
+        if not sort_order in ('normal', 'reverse'):
             raise ValueError, (
-                "'%s' is not a valid sort direction." % sort_direction)
+                "'%s' is not a valid sort order." % sort_order)
         seq = []
         for cid, ref in self._refs.items():
             ob = ref.dereferenceDefault(self)
@@ -140,7 +140,7 @@ class Workspace (PortalContent.PortalContent):
             seq.append((sort_key, cid, ob))
 
         seq.sort()
-        if sort_direction == 'down':
+        if sort_order == 'reverse':
             seq.reverse()
 
         return map(lambda item: item[1:], seq)
