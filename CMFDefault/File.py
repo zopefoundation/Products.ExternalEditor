@@ -113,19 +113,23 @@ File objects can contain arbitrary downloadable files."""
                              , 'actions'        :
                                 ( { 'name'          : 'View'
                                   , 'action'        : 'file_view'
-                                  , 'permissions'   : ('View',)
+                                  , 'permissions'   : (
+                                      CMFCorePermissions.View, )
                                   }
                                 , { 'name'          : 'Download'
                                   , 'action'        : ''
-                                  , 'permissions'   : ('View',)
+                                  , 'permissions'   : (
+                                      CMFCorePermissions.View, )
                                   }
                                 , { 'name'          : 'Edit'
                                   , 'action'        : 'file_edit_form'
-                                  , 'permissions'   : ('Modify portal content',)
+                                  , 'permissions'   : (
+                                      CMFCorePermissions.ModifyPortalContent, )
                                   }
                                 , { 'name'          : 'Metadata'
                                   , 'action'        : 'metadata_edit_form'
-                                  , 'permissions'   : ('Modify portal content',)
+                                  , 'permissions'   : (
+                                      CMFCorePermissions.ModifyPortalContent, )
                                   }
                                 )
                              }

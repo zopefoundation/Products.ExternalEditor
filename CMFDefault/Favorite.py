@@ -94,6 +94,7 @@ from Products.CMFCore.utils import getToolByName
 from DublinCore import DefaultDublinCoreImpl
 from Link import Link
 
+from Products.CMFCore import CMFCorePermissions
 from Products.CMFCore.WorkflowCore import afterCreate
 
 factory_type_information = ( { 'id'             : 'Favorite'
@@ -107,15 +108,18 @@ A Favorite is a Link to an intra-portal resource."""
                              , 'actions'        :
                                 ( { 'name'          : 'View'
                                   , 'action'        : 'favorite_view'
-                                  , 'permissions'   : ('View',)
+                                  , 'permissions'   : (
+                                      CMFCorePermissions.View, )
                                   }
                                 , { 'name'          : 'Edit'
                                   , 'action'        : 'link_edit_form'
-                                  , 'permissions'   : ('Modify portal content',)
+                                  , 'permissions'   : (
+                                      CMFCorePermissions.ModifyPortalContent, )
                                   }
                                 , { 'name'          : 'Metadata'
                                   , 'action'        : 'metadata_edit_form'
-                                  , 'permissions'   : ('Modify portal content',)
+                                  , 'permissions'   : (
+                                      CMFCorePermissions.ModifyPortalContent, )
                                   }
                                 )
                              }

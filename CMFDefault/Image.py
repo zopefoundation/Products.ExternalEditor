@@ -111,15 +111,18 @@ Image objects can be embedded in Portal documents."""
                              , 'actions'        :
                                 ( { 'name'          : 'View'
                                   , 'action'        : 'image_view'
-                                  , 'permissions'   : ('View',)
+                                  , 'permissions'   : (
+                                      CMFCorePermissions.View, )
                                   }
                                 , { 'name'          : 'Edit'
                                   , 'action'        : 'image_edit_form'
-                                  , 'permissions'   : ('Modify portal content',)
+                                  , 'permissions'   : (
+                                      CMFCorePermissions.ModifyPortalContent, )
                                   }
                                 , { 'name'          : 'Metadata'
                                   , 'action'        : 'metadata_edit_form'
-                                  , 'permissions'   : ('Modify portal content',)
+                                  , 'permissions'   : (
+                                      CMFCorePermissions.ModifyPortalContent, )
                                   }
                                 )
                              }

@@ -91,7 +91,8 @@ ADD_CONTENT_PERMISSION = 'Add portal content'
 import Globals, re, base64, marshal, string
 import CMFCorePermissions
 
-from CMFCorePermissions import AddPortalFolders, AddPortalContent, View
+from CMFCorePermissions import View, ManageProperties
+from CMFCorePermissions import AddPortalFolders, AddPortalContent
 from OFS.Folder import Folder
 from OFS.ObjectManager import REPLACEABLE
 from Globals import HTMLFile
@@ -112,17 +113,17 @@ Use folders to put content in categories."""
                              , 'actions'        :
                                 ( { 'name'          : 'View'
                                   , 'action'        : ''
-                                  , 'permissions'   : ('View',)
+                                  , 'permissions'   : (View,)
                                   , 'category'      : 'folder'
                                   }
                                 , { 'name'          : 'Edit'
                                   , 'action'        : 'folder_edit_form'
-                                  , 'permissions'   : ('Manage properties',)
+                                  , 'permissions'   : (ManageProperties,)
                                   , 'category'      : 'folder'
                                   }
                                 , { 'name'          : 'Syndication'
                                   , 'action'        : 'synPropertiesForm'
-                                  , 'permissions'   : ('Modify properties',)
+                                  , 'permissions'   : (ManageProperties,)
                                   , 'category'      : 'folder'
                                   }
                                 )

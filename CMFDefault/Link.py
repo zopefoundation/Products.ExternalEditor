@@ -107,15 +107,18 @@ Link items are URLs that come with additional information."""
                              , 'actions'        :
                                 ( { 'name'          : 'View'
                                   , 'action'        : 'link_view'
-                                  , 'permissions'   : ('View',)
+                                  , 'permissions'   : (
+                                      CMFCorePermissions.View, )
                                   }
                                 , { 'name'          : 'Edit'
                                   , 'action'        : 'link_edit_form'
-                                  , 'permissions'   : ('Modify portal content',)
+                                  , 'permissions'   : (
+                                      CMFCorePermissions.ModifyPortalContent, )
                                   }
                                 , { 'name'          : 'Metadata'
                                   , 'action'        : 'metadata_edit_form'
-                                  , 'permissions'   : ('Modify portal content',)
+                                  , 'permissions'   : (
+                                      CMFCorePermissions.ModifyPortalContent, )
                                   }
                                 )
                              }

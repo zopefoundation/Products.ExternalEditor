@@ -109,15 +109,18 @@ News Items contain short text articles and carry a title as well as an optional 
                              , 'actions'        :
                                 ( { 'name'          : 'View'
                                   , 'action'        : 'newsitem_view'
-                                  , 'permissions'   : ('View',)
+                                  , 'permissions'   : (
+                                      CMFCorePermissions.View, )
                                   }
                                 , { 'name'          : 'Edit'
                                   , 'action'        : 'newsitem_edit_form'
-                                  , 'permissions'   : ('Modify portal content',)
+                                  , 'permissions'   : (
+                                      CMFCorePermissions.ModifyPortalContent, )
                                   }
                                 , { 'name'          : 'Metadata'
                                   , 'action'        : 'metadata_edit_form'
-                                  , 'permissions'   : ('Modify portal content',)
+                                  , 'permissions'   : (
+                                      CMFCorePermissions.ModifyPortalContent, )
                                   }
                                 )
                              }
