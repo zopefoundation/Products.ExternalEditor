@@ -13,6 +13,9 @@ PluggableAuthService changelog
 
     Bugs Fixed
 
+      - Made logging when swallowing exceptions much less noisy (they
+        *don't* necessarily require attention).
+
       - Clarified interface of IAuthenticationPlugin, which should return
         None rather than raising an exception if asked to authenticate an
         unknown principal;  adjusted ZODBUserManager accordingly.
