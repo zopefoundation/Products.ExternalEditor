@@ -98,6 +98,7 @@ function toggleSelect() {
    ><strong>Last Modified</strong><dtml-else>Last Modified</dtml-if></a></div>
   </td>
 </tr>
+<dtml-let parent_url="absolute_url()">
 <dtml-in objectItems sort_expr="skey" reverse_expr="rkey">
 <dtml-if sequence-odd>
 <tr class="row-normal">
@@ -136,7 +137,7 @@ function toggleSelect() {
     <dtml-if expr="_.hasattr(explicit, 'manage_FTPget')
                    or _.hasattr(explicit, 'read')
                    or _.hasattr(explicit, 'document_src')">
-      <a href="&dtml-URL1;/externalEdit_/&dtml.url_quote-sequence-key;"
+      <a href="&dtml-parent_url;/externalEdit_/&dtml.url_quote-sequence-key;"
          title="Edit using external editor"
       ><img src="&dtml-BASEPATH1;/misc_/ExternalEditor/edit_icon"
             align="middle" hspace="2" border="0" alt="External Editor" /></a>
@@ -186,6 +187,7 @@ function toggleSelect() {
   </dtml-with>
 </tr>
 </dtml-in>
+</dtml-let>
 </table>
 
 <table cellspacing="0" cellpadding="2" border="0">
