@@ -141,6 +141,10 @@ class DiscussionItem( Document
 
     view = HTMLFile('dtml/discussionView',globals())
     index_html = view
+    # Ensure the name of the "view" method isn't ambiguous.
+    view.__name__ = 'view'
+    view._need__name__ = 0
+
     editForm = HTMLFile('dtml/discussionEdit',globals())
 
     # Replies should default to published
