@@ -208,6 +208,20 @@
       </tr>
 
       <tr>
+        <td>
+          <table>
+            <tr>
+              <th align="left"> Stealthy? </th>
+              <td width="100%">
+                <input type="checkbox" name="stealthy" />
+                  (Comment will be disregarded)
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+
+      <tr>
         <th> Edit Transcript </th>
       </tr>
       <tr tal:define="transcript here/get_transcript">
