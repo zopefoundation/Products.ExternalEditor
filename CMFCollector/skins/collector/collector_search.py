@@ -2,7 +2,7 @@
 ##title=Build Collector Search
 
 query = {}
-query['sort_on'] = 'id'
+query['sort_on'] = 'created'
 query['Type'] = "Collector Issue"
 query['path'] = context.absolute_url(1)
 
@@ -49,6 +49,4 @@ for i in reqget("status", []):
 if rs:
     query['review_state'] = rs
 
-return context.portal_catalog(REQUEST=query)
-
-# Use "sort_on='index_name'" to sort - default, id
+return context.portal_catalog(REQUEST=query)]
