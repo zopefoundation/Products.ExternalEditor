@@ -472,7 +472,7 @@ class FactoryTypeInformation (TypeInformation):
         id = str(id)
         if getattr( m, 'isDocTemp', 0 ):
             kw[ 'id' ] = id
-            apply( m, ( container, self.REQUEST ) + args, kw )
+            apply( m, ( m.aq_parent, self.REQUEST ) + args, kw )
         else:
             apply(m, (id,) + args, kw)
         ob = container._getOb(id)
