@@ -295,6 +295,17 @@ Zope External Editor
          Edit Locally
       </a>
       
+    As an alternative, you can also pass the path the object you want to edit
+    directly to the externalEdit_ object when you call its index_html method.
+    It can be called either directly by URL or from a python script.
+    externalEdit_ will return the proper response data for the object to edit.
+    Here are some examples::
+
+      http://zopeserver/externalEdit_?path=/my_stuff/document
+      
+      return context.externalEdit_.index_html(
+          context.REQUEST, context.RESPONSE, path='/my_stuff/document')
+      
     External Editor also defines a global method that you can call to insert
     pencil icon links for appropriate objects. The method automatically checks
     if the object supports external editing and whether the user has the "Use

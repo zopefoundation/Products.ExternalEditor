@@ -42,22 +42,28 @@ class ExternalEditor(Acquisition.Implicit):
     
     def __before_publishing_traverse__(self, self2, request):
         path = request['TraversalRequestNameStack']
-        target = path[-1]
-        request.set('target', target)
-        path[:] = []
+        if path:
+            target = path[-1]
+            request.set('target', target)
+            path[:] = []
+        else:
+            request.set('target', None)
     
-    def index_html(self, REQUEST, RESPONSE):
+    def index_html(self, REQUEST, RESPONSE, path=None):
         """Publish the object to the external editor helper app"""
         
         security = getSecurityManager()
-        parent = self.aq_parent
-        try:
-            ob = parent[REQUEST['target']] # Try getitem
-        except KeyError:
-            ob = getattr(parent, REQUEST['target']) # Try getattr
-        except AttributeError:
-            # Handle objects that are methods in ZClasses
-            ob = parent.propertysheets.methods[REQUEST['target']]
+        if path is None:
+            parent = self.aq_parent
+            try:
+                ob = parent[REQUEST['target']] # Try getitem
+            except KeyError:
+                ob = getattr(parent, REQUEST['target']) # Try getattr
+            except AttributeError:
+                # Handle objects that are methods in ZClasses
+                ob = parent.propertysheets.methods[REQUEST['target']]
+        else:
+            ob = self.restrictedTraverse( path )
         
         r = []
         r.append('url:%s' % ob.absolute_url())

@@ -1,5 +1,10 @@
 External Editor Change Log
 
+    - The externalEdit_ object now accepts a path argument to the object to
+      edit, allowing URLs like: http://zope/externalEdit_?path=/some/object.
+      This allows external editor to play better with applications making use
+      of traversal magic of their own. Thanks to Tres Seaver.
+
     - Fixed NameError bug in unlock retry code. Thanks to Federico Sevilla III.
 
     - Added a workaround for non-compliant SSL servers. The software now
