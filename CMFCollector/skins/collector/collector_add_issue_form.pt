@@ -22,7 +22,8 @@
  
   <div tal:define="pm python: here.portal_membership;
                    member python: pm.getAuthenticatedMember();
-                   authenticated python: member.has_role('Authenticated')">
+                   authenticated python: member.has_role('Authenticated')
+                                         or member.has_role('Member')">
 
   <form method="POST" enctype="multipart/form-data"
         action="collector_add_issue">
@@ -34,11 +35,9 @@
         <td>
          <input type="text" name="title" value="" size="40">
         </td>
-        <td align="right">
+        <td colspan="2">
             <input type=hidden name="security_related:boolean" value="">
             <input type=checkbox name="security_related:boolean">
-        </td>
-        <td valign="top">
             Security Related?
             <br>
               <font size="-1" color="gray">
