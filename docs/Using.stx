@@ -1,0 +1,135 @@
+Chapter 3: Using the CMF
+
+  This chapter shows you how to get started with the CMF. It provides
+  a hands-on introduction to the basic features of the CMF.
+
+  Getting Started
+
+    Before you can begin you must have access to a Zope site with the
+    CMF installed. See *The Zope Book* for more information on
+    downloading and installing Zope. See XXX for more information on
+    downloading and installing the CMF.
+
+    Creating an Account
+
+      To use the CMF you must obtain a user account. Visit the CMF
+      site in your web browser. You should see a page as shown in
+      [3-1]:
+
+      "A CMF site":img:3-1:imgs/3-1.png
+
+      The box on the left of the page that has the word "Guest" at the
+      top is called the "action box". It contains a list of
+      context-dependent links that give you access to site features.
+
+      Click on the "Join" link in the action box. You will be taken to
+      a form as shown in [3-2]:
+
+      "A join form":img:3-2:imgs/3-2.png
+
+      To create an account, simply fill out this form and click the
+      "Register" button. Depending on how your site is configured you
+      may see slightly different options. For example, some site allow
+      you to log in immediately, while others send you your password
+      via email. Once you have your password, it's time to log in.
+
+    Logging In and Out
+
+      To log in, click the "Log in" link in the action box. You will
+      be taken to a log in form as shown in [3-3]:
+
+      "A log in form":img:3-3:imgs/3-3.png
+
+      Type in your user name and password and click the "Login"
+      button. If all goes well you will be taken to a confirmation
+      page that tells you that you've logged in. If you've forgotten
+      your password you can try to log in again, or you can arrange to
+      have your password mailed to you.
+
+      Once you've logged in notice how the action box now says your
+      name at the top. This tells you that you're logged in. Also
+      notice that you now have many more options in your action box
+      than you had before. See [3-4] for an example:
+
+      "Logged in as Bob":img:3-4:imgs/3-4.png
+
+      Click the "Log out" in the action box. You should be taken to a
+      confirmation page that tells you that you're successfully logged
+      out. Notice how the action box changes. It now says "Guest" at
+      the top and contains different links.
+
+      Now you know how to log in and log out of your site. In general
+      you should log in when you want to do some work on the site, and
+      you should log out of the site after your done using it.
+
+    Personalizing Your Account
+
+      Now log in to your site again. You can personalize the site by
+      clicking the "Preferences" link in the action box. It takes you
+      to a form where you can set your preferences as shown in [3-5]:
+
+      "Preferences form":img:3-5:imgs/3-5.png
+
+      Depending on how your site is configured you may have different
+      preferences available. In this example you can change your email
+      address, whether you show up on the public member roster or not,
+      and your "skin". Skins give the site a customized look and
+      feel. Try selecting another skin and notice how the entire site
+      changes. You can still perform the same actions, but the new
+      skin changes the colors and formatting of the site.
+
+  Getting Around
+
+    Now let's take a look at some of the things you can do now that
+    you have an CMF account.
+
+    Using Navigation
+
+      To navigate the CMF site you'll normally use the site's normal
+      navigation controls. As a CMF member you can navigate the site
+      in the same way that anonymous site visitors do. You can use
+      navigational links and search facilities. 
+
+      In addition to normal site navigation, you can navigate the site
+      using links in the action box.
+
+    Your Member Folder
+
+      Click the "My Stuff" link in the action box. You will be taken
+      to your member area as shown in [3-6]:
+
+        "Member area":img:3-6:imgs/3-6.png
+
+      This is the part of the site where you can create your own
+      content. Your content is shown on this screen. Here you can
+      create new content and modify existing content.  Creating and
+      editing content is covered in the next chapter.
+
+      Content is arranged in folders. The objects you see in your
+      member area are contained in your member folder. You can create
+      folders inside your member folder. In fact you can think of your
+      entire site as a collection of objects within folders.
+
+      Create a new folder in your member folder by clicking the
+      "New..." button. Select "Folder" from the list of objects and
+      type "myFolder" into the "ID" field. Then click the "Add"
+      button.
+      
+      XXX
+
+    Cutting and Pasting
+
+    Undo
+
+    Content and Workflow Actions
+
+  Using Services
+
+    Searching
+
+    Using Discussion
+
+  Conclusion
+
+  
+  
