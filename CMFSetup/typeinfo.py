@@ -26,6 +26,23 @@ class TypeInfoConfigurator( Implicit ):
 
         self._site = site
 
+    security.declareProtected( ManagePortal, 'getTypeInfo' )
+    def getTypeInfo( self, type_id ):
+
+        """ Return a mapping for the given type info in the site.
+
+        o These mappings are pretty much equivalent to the stock
+          'factory_type_information' elements used everywhere in the
+          CMF.
+        """
+        typestool = getToolByName( self._site, 'portal_types' )
+        try:
+            ti = typestool.getTypeInfo( type_id )
+        except KeyError:
+            raise ValueError, 'Unknown type: %s' % type_id
+        else:
+            return self._makeTIMapping( ti )
+
     security.declareProtected( ManagePortal, 'listTypeInfo' )
     def listTypeInfo( self ):
 
@@ -46,22 +63,34 @@ class TypeInfoConfigurator( Implicit ):
 
         return result
 
-
-    security.declareProtected(ManagePortal, 'generateXML' )
-    def generateXML(self):
+    security.declareProtected( ManagePortal, 'generateToolXML' )
+    def generateToolXML( self ):
 
         """ Pseudo API.
         """
-        return self._typeinfoConfig()
+        return self._toolConfig()
+
+    security.declareProtected( ManagePortal, 'generateTypeXML' )
+    def generateTypeXML( self, type_id ):
+
+        """ Pseudo API.
+        """
+        return self._typeConfig( type_id=type_id )
 
     #
     #   Helper methods
     #
-    security.declarePrivate( '_typeinfoConfig' )
-    _typeinfoConfig = PageTemplateFile( 'ticExport.xml'
-                                      , _xmldir
-                                      , __name__='typeinfoConfig'
-                                      )
+    security.declarePrivate( '_toolConfig' )
+    _toolConfig = PageTemplateFile( 'ticToolExport.xml'
+                                  , _xmldir
+                                  , __name__='toolConfig'
+                                  )
+
+    security.declarePrivate( '_typeConfig' )
+    _typeConfig = PageTemplateFile( 'ticTypeExport.xml'
+                                  , _xmldir
+                                  , __name__='typeConfig'
+                                  )
 
     security.declarePrivate( '_makeTIMapping' )
     def _makeTIMapping( self, ti ):
