@@ -276,12 +276,13 @@ class MembershipTool( BaseTool ):
         members = self.getMembersFolder()
         if members:
             try:
-                folder = members[id]
+                folder = getattr(members, id)
                 if verifyPermission and not _checkPermission(View, folder):
                     # Don't return the folder if the user can't get to it.
                     return None
                 return folder
-            except KeyError: pass
+            except AttributeError:
+                pass
         return None
 
     def getHomeUrl(self, id=None, verifyPermission=0):
