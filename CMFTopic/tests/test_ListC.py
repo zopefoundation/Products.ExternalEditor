@@ -4,14 +4,7 @@ import Products.CMFTopic.ListCriterion
 LISTC = Products.CMFTopic.ListCriterion.ListCriterion
 
 
-class TestCase( unittest.TestCase ):
-    """
-    """
-    def setUp( self ):
-        pass
-
-    def tearDown( self ):
-        pass
+class TestListCriterion(unittest.TestCase):
     
     def test_Empty( self ):
         listc = LISTC('foo', 'foofield')
@@ -37,7 +30,10 @@ class TestCase( unittest.TestCase ):
         assert items[0][1] == tuple( abc )
 
 def test_suite():
-    return unittest.makeSuite( TestCase )
+    return unittest.makeSuite(TestListCriterion)
+
+def main():
+    unittest.TextTestRunner().run(test_suite())
 
 if __name__ == '__main__':
-    unittest.TextTestRunner().run( test_suite() )
+    main()

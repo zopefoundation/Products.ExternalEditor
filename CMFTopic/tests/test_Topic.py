@@ -8,7 +8,7 @@ SIC = Products.CMFTopic.SimpleIntCriterion.SimpleIntCriterion
 Topic = Products.CMFTopic.Topic.Topic
 
 
-class TestCase( unittest.TestCase ):
+class TestTopic(unittest.TestCase):
     """ Test all the general Topic cases  """
     def test_Empty( self ):
         topic = Topic('top')
@@ -83,7 +83,7 @@ class TestCase( unittest.TestCase ):
         
     
 def test_suite():
-    return unittest.makeSuite(TestCase)
+    return unittest.makeSuite(TestTopic)
 
 if __name__ == '__main__':
     unittest.TextTestRunner().run(test_suite())

@@ -4,7 +4,7 @@ from DateTime.DateTime import DateTime
 
 FriendlyDate = Products.CMFTopic.DateCriteria.FriendlyDateCriterion
 
-class FriendlyDateTest(unittest.TestCase):
+class TestFriendlyDate(unittest.TestCase):
     lessThanFiveDaysOld = {
         'value': 4,
         'operation': 'min',
@@ -91,8 +91,10 @@ class FriendlyDateTest(unittest.TestCase):
         assert result[1][1] == 'range:max'
 
 def test_suite():
-    return unittest.makeSuite(FriendlyDateTest)
+    return unittest.makeSuite(TestFriendlyDate)
 
-if __name__ == '__main__':
+def main():
     unittest.TextTestRunner().run(test_suite())
     
+if __name__ == '__main__':
+    main()

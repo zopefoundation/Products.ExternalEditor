@@ -4,23 +4,16 @@ import Products.CMFTopic.SimpleIntCriterion
 SIC = Products.CMFTopic.SimpleIntCriterion.SimpleIntCriterion
 
 
-class TestCase( unittest.TestCase ):
-    """
-    """
-    def setUp( self ):
-        pass
+class TestSimpleInt(unittest.TestCase):
 
-    def tearDown( self ):
-        pass
-    
-    def test_Empty( self ):
+    def test_Empty(self):
         sic = SIC('foo', 'foofield' )
         assert sic.id == 'foo'
         assert sic.field == 'foofield'
         assert sic.value == None
-        assert len( sic.getCriteriaItems() ) == 0
+        assert len(sic.getCriteriaItems()) == 0
     
-    def test_Nonempty( self ):
+    def test_Nonempty(self):
         sic = SIC('foo', 'foofield')
         sic.edit('0')
         assert sic.id == 'foo'
@@ -40,26 +33,31 @@ class TestCase( unittest.TestCase ):
         assert len(items[0]) == 2
         assert items[0][1] == 32
 
-    def test_Range( self ):
+    def test_Range(self):
         sic = SIC('foo', 'foofield')
         sic.edit(32, SIC.MINIMUM)
         items = sic.getCriteriaItems()
-        assert len( items ) == 2
-        assert len( items[0] ) == len( items[1] ) == 2
+        assert len(items) == 2
+        assert len(items[0]) == len(items[1]) == 2
         assert items[0][1] == 32
         assert items[1][0] == 'foofield_usage'
         assert items[1][1] == 'range:min'
+
         sic.direction = SIC.MAXIMUM
         items = sic.getCriteriaItems()
         assert items[1][0] == 'foofield_usage'
         assert items[1][1] == 'range:max'
+
         sic.direction = SIC.MINMAX
         items = sic.getCriteriaItems()
         assert items[1][0] == 'foofield_usage'
         assert items[1][1] == 'range:min:max'
 
 def test_suite():
-    return unittest.makeSuite( TestCase )
+    return unittest.makeSuite(TestSimpleInt)
+
+def main():
+    unittest.TextTestRunner().run(test_suite())
 
 if __name__ == '__main__':
-    unittest.TextTestRunner().run( test_suite() )
+    main()
