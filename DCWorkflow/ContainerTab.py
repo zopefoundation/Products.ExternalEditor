@@ -140,6 +140,12 @@ class ContainerTab (Folder):
                 raise KeyError, name
             return default
 
+    def __getattr__(self, name):
+        ob = self._mapping.get(name, None)
+        if ob is not None:
+            return ob
+        raise AttributeError, name
+
     def _setOb(self, name, value):
         mapping = self._mapping
         mapping[name] = aq_base(value)
@@ -181,3 +187,4 @@ class ContainerTab (Folder):
         if REQUEST is not None:
             return self.manage_main(REQUEST)
         return None
+
