@@ -1,8 +1,7 @@
-from unittest import TestCase, TestSuite, makeSuite, main
+from unittest import TestSuite, makeSuite, main
 import Testing
 import Zope
 Zope.startup()
-from Interface.Verify import verifyClass
 
 from Products.CMFCore.interfaces.IOpaqueItems \
     import ICallableOpaqueItem, ICallableOpaqueItemEvents
@@ -29,8 +28,8 @@ class DummyContent(OriginalDummyContent):
     """ A Dummy piece of PortalContent with additional attributes
     """
 
-    def __init__(self, id='dummy', opaqueItem=None, *args, **kw ):
-        apply(OriginalDummyContent.__init__, (self, id) + args, kw)
+    def __init__(self, id='dummy', opaqueItem=None, *args, **kw):
+        OriginalDummyContent.__init__(self, id, *args, **kw)
         if opaqueItem is None:
             self.opaqueItem = 'noncallable'
             self.opaqueItemsId = 'opaqueItem'

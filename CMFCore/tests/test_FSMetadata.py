@@ -3,16 +3,6 @@ import Testing
 import Zope
 Zope.startup()
 
-from types import ListType
-from os import remove
-from os.path import join
-from time import sleep
-
-from Globals import DevelopmentMode
-
-from Products.CMFCore.tests.base.testcase import RequestTest
-from Products.CMFCore.tests.base.testcase import FSDVTest
-
 from test_FSSecurity import FSSecurityBase
 
 
