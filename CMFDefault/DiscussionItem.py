@@ -131,6 +131,7 @@ class DiscussionItem( Document
     """
     meta_type = 'Discussion Item'
     allow_discussion = 1
+    creator = 'unknown'
 
     __ac_permissions__ = (
         ('Change Discussion Items', ('edit',), ('Owner',)),
@@ -189,6 +190,11 @@ class DiscussionItem( Document
         if REQUEST is not None:
             return self.editForm(self, REQUEST, portal_status_message= \
                                  'Discussion item changed.')
+
+    def Creator( self ):
+        """
+        """
+        return self.creator
 
 
 Globals.default__class_init__(DiscussionItem)
@@ -287,7 +293,7 @@ class DiscussionItemContainer(Persistent, Implicit):
         item.text = text
 
         if REQUEST.has_key( 'Creator' ):
-            item.Creator = REQUEST[ 'Creator' ]
+            item.creator = REQUEST[ 'Creator' ]
 
         item.__of__(self).setReplyTo(self.aq_parent)
  
