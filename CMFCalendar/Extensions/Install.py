@@ -28,19 +28,21 @@ CMF Events into the CMF Site instance.
 """
 from Products.CMFCore.TypesTool import ContentFactoryMetadata
 from Products.CMFCore.DirectoryView import addDirectoryViews
-from Products.CMFCore.utils import getToolByName
+from Products.CMFCore.utils import getToolByName, ToolInit
 from Products.CMFCalendar import Event, event_globals
 from Acquisition import aq_base
 from cStringIO import StringIO
 import string
 
+
 def install(self):
     " Register the CMF Event with portal_types and friends "
     out = StringIO()
     typestool = getToolByName(self, 'portal_types')
-    st = getToolByName(self, 'portal_skins')
+    skinstool = getToolByName(self, 'portal_skins')
     metadatatool = getToolByName(self, 'portal_metadata')
     catalog = getToolByName(self, 'portal_catalog')
+    portal_url = getToolByName(self, 'portal_url')
 
     # Due to differences in the API's for adding indexes between
     # Zope 2.3 and 2.4, we have to catch them here before we can add
@@ -101,44 +103,43 @@ def install(self):
     except: pass
     out.write('Event added to Metadata element Policies\n')
     
+    # Add the CMFCalendar tool to the site's root
+    p = portal_url.getPortalObject()
+    x = p.manage_addProduct['CMFCalendar'].manage_addTool(type="CMF Calendar Tool")
     
-
     # Setup the skins
     # This is borrowed from CMFDefault/scripts/addImagesToSkinPaths.pys
-    if 'calendar' not in st.objectIds() or 'zpt_calendar' not in st.objectIds():
+    if 'calendar' not in skinstool.objectIds():
         # We need to add Filesystem Directory Views for any directories
         # in our skins/ directory.  These directories should already be
         # configured.
-        try:  addDirectoryViews(st, 'skins', event_globals)
-        except:  pass
-        out.write("Added 'calendar' directory views to portal_skins\n")
+        addDirectoryViews(skinstool, 'skins', event_globals)
+        out.write("Added 'calendar' directory view to portal_skins\n")
 
     # Now we need to go through the skin configurations and insert
-    # 'calendar' and 'zpt_calendar' into the configurations.  Preferably, this 
-    #should be right before where 'content' is placed.  Otherwise, we append
+    # 'calendar' into the configurations.  Preferably, this should be
+    # right before where 'content' is placed.  Otherwise, we append
     # it to the end.
-    skins = st.getSkinSelections()
+    skins = skinstool.getSkinSelections()
     for skin in skins:
-        path = st.getSkinPath(skin)
+        path = skinstool.getSkinPath(skin)
         path = map(string.strip, string.split(path,','))
         if 'calendar' not in path:
             try: path.insert(path.index('content'), 'calendar')
             except ValueError:
                 path.append('calendar')
-            if 'zpt_generic' in path:
-                if 'zpt_calendar' not in path:
-                    path.insert(path.index('calendar'), 'zpt_calendar')
+                
+            try: path.insert(path.index('zpt_content'), 'zpt_calendar')
+            except ValueError:
+                pass
+            
             path = string.join(path, ', ')
             # addSkinSelection will replace exissting skins as well.
-            st.addSkinSelection(skin, path)
+            skinstool.addSkinSelection(skin, path)
             out.write("Added 'calendar' to %s skin\n" % skin)
         else:
-            if 'zpt_generic' in path:
-                if 'zpt_calendar' not in path:
-                    path.insert(path.index('calendar'), 'zpt_calendar')
-                path = string.join(path, ', ')
-                st.addSkinSelection(skin, path)
             out.write("Skipping %s skin, 'calendar' is already set up\n" % (
                 skin))
 
     return out.getvalue()
+

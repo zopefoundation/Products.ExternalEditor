@@ -1,0 +1,51 @@
+<tal:header tal:replace="structure here/manage_page_header">header</tal:header>
+<tal:tabs   tal:replace="structure here/manage_tabs">tabs</tal:tabs>
+
+<h3> Configure <code>portal_calendar</code> Tool </h3>
+
+
+<form action="edit_configuration" method="post">
+
+ <h3>Portal Types to show in the calendar</h3>
+ <select name="show_types:list" size="7" multiple>
+ 
+  <tal:types tal:repeat="type here/portal_types/objectIds">
+  
+   <option value="#"
+           tal:attributes="value type"
+           tal:content="type"
+           tal:condition="python: type not in here.getCalendarTypes()">type</option>
+
+   <option value="#" selected
+           tal:attributes="value type"
+           tal:content="type"
+           tal:condition="python: type in here.getCalendarTypes()">type</option>
+
+  </tal:types>
+
+ </select>
+ 
+ <p>
+ All types that are to show in the calendar must have an attribute 'start' and 
+ an attribute 'end' which return DateTime objects to the Catalog.
+ </p>
+
+  <tal:define tal:define="use_session here/portal_calendar/getUseSession">
+
+    <tal:use_session tal:condition="python:use_session">
+      <input type="radio" name="use_session" value="True" checked />Use sessions to remember the calendars state<br />
+      <input type="radio" name="use_session" value="" />Don't use sessions to remember the calendars state<br />
+    </tal:use_session>
+      
+    <tal:use_session tal:condition="python:not use_session">
+      <input type="radio" name="use_session" value="True" />Use sessions to remember the calendars state<br />
+      <input type="radio" name="use_session" value="" checked />Don't use sessions to remember the calendars state<br />
+    </tal:use_session>
+
+  </tal:define>
+  <br>
+  
+ <input type="submit" value="Submit">
+</form>
+
+<tal:footer tal:replace="structure here/manage_page_footer">footer</tal:footer>

@@ -17,6 +17,7 @@ import Products.CMFCore
 from Products.CMFCore import utils, CMFCorePermissions
 from Products.CMFCore.DirectoryView import registerDirectory
 import EventPermissions
+import CalendarTool
 
 import sys
 this_module = sys.modules[ __name__ ]
@@ -24,6 +25,7 @@ this_module = sys.modules[ __name__ ]
 contentConstructors = (Event.addEvent,)
 contentClasses = (Event.Event,)
 
+tools = ( CalendarTool.CalendarTool, )
 
 z_bases = utils.initializeBasesPhase1( contentClasses, this_module )
 
@@ -34,9 +36,12 @@ event_globals=globals()
 # Make the skins available as DirectoryViews
 registerDirectory('skins', globals())
 registerDirectory('skins/calendar', globals())
-registerDirectory('skins/zpt_calendar', globals())
 
 def initialize( context ):
+    utils.ToolInit('CMFCalendar Tool', tools=tools,
+                   product_name='CMFCalendar', icon='tool.gif',
+                   ).initialize( context )
+    
     utils.initializeBasesPhase2( z_bases, context )
     context.registerHelpTitle('CMF Calendar Help')
     context.registerHelp(directory='help')

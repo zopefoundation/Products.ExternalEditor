@@ -226,6 +226,14 @@
     </td>
    </tr>
 
+   <tr>
+    <td>
+     <div metal:use-macro="here/calendarBox/macros/calendarBox | default">
+      <!-- CMFCalendar not Installed -->
+     </div>
+    </td>
+   </tr>
+
   </table>
   <!-- end actions_box -->
 

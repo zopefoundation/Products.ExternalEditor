@@ -21,4 +21,7 @@
    - (__future__) Added DCWorkflow (through-the-web configurable
        workflows) to the core set of CMF products.
 
+   - Added a working implementation behind the CMFCalendar product.
+     Thanks to Andy Dawkins for the work.
+
  Bugs Fixed

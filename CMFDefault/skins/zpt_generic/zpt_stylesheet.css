@@ -362,3 +362,4 @@ p.NewsHeadline {
     background-color:  #336699;
 }
 
+<dtml-var CalendarStyle missing>

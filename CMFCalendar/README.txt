@@ -13,12 +13,13 @@ CMFCalendar README
   portal_metadatool with an Element policy for the content_type
   of the object.
 
-  At the time of this writing, this product is incomplete.  The
-  event is complete, and can stand alone, but will be
-  accompanyied by the CMFCalendar in the next release.  We wished
-  to get something out quickly, so we'll be living by the axiom:
-  'Release early; Release often' until all it's components are
-  completed.
+  The event portal_type is complete, and can be stand alone, but
+  now accompanyied by the CMFCalendar which is fully functional
+  and tested.
+
+  After installing the CMFCalendar you should notice a calendar
+  appear in your CMF.  This is fully customisable to your portals
+  needs.
 
   See the INSTALL.txt file for how to get the product installed
   within your CMF.
