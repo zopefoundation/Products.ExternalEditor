@@ -11,4 +11,12 @@ context.do_action(action,
                   fileid=REQUEST.get('fileid', ''),
                   filetype=(REQUEST.get('filetype', 'file')))
 
-context.REQUEST.RESPONSE.redirect(context.absolute_url())
+if context.status() in ['Resolved', 'Rejected', 'Deferred']:
+    collector = context.aq_parent
+    destination = collector.absolute_url()
+    if len(collector) > int(context.id):
+        destination = destination + "?b_start:int=%s" % int(context.id)
+else:
+    destination = context.absolute_url()
+
+context.REQUEST.RESPONSE.redirect(destination)
