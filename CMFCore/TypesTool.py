@@ -392,13 +392,17 @@ class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
         actions = self.listActions()
         ordered = []
         _dict = {}
+        viewmethod = ''
 
         # order actions and search 'mkdir' action 
         for action in actions:
             if action.getId() == 'view':
                 ordered.insert(0, action)
             elif action.getId() == 'mkdir':
-                mkdirmethod = action.action(context).strip()
+                try:
+                    mkdirmethod = action.action(context).strip()
+                except AttributeError:
+                    continue
                 if mkdirmethod.startswith('/'):
                     mkdirmethod = mkdirmethod[1:]
                 _dict['mkdir'] = mkdirmethod
@@ -409,7 +413,10 @@ class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
         for action in ordered:
             perms = action.getPermissions()
             if not perms or View in perms:
-                viewmethod = action.action(context).strip()
+                try:
+                    viewmethod = action.action(context).strip()
+                except AttributeError:
+                    break
                 if viewmethod.startswith('/'):
                     viewmethod = viewmethod[1:]
                 if not viewmethod:
@@ -417,17 +424,22 @@ class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
                 break
         else:
             viewmethod = '(Default)'
-        _dict['view'] = viewmethod
+        if viewmethod:
+            _dict['view'] = viewmethod
 
         # search default action
         for action in ordered:
-            defmethod = action.action(context).strip()
+            try:
+                defmethod = action.action(context).strip()
+            except AttributeError:
+                break
             if defmethod.startswith('/'):
                 defmethod = defmethod[1:]
             if not defmethod:
                 break
         else:
-            _dict['(Default)'] = viewmethod
+            if viewmethod:
+                _dict['(Default)'] = viewmethod
 
         # correct guessed values if we know better
         if self.content_meta_type in ('Portal File', 'Portal Folder',

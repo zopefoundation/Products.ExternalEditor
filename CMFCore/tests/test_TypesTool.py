@@ -43,6 +43,7 @@ from Products.CMFCore.tests.base.tidata import FTIDATA_CMF13_FOLDER
 from Products.CMFCore.tests.base.tidata import FTIDATA_CMF14
 from Products.CMFCore.tests.base.tidata import FTIDATA_CMF14_FOLDER
 from Products.CMFCore.tests.base.tidata import FTIDATA_CMF14_SPECIAL
+from Products.CMFCore.tests.base.tidata import FTIDATA_CMF14_SPECIAL2
 from Products.CMFCore.tests.base.tidata import FTIDATA_CMF15
 from Products.CMFCore.tests.base.tidata import FTIDATA_DUMMY
 from Products.CMFCore.tests.base.tidata import STI_SCRIPT
@@ -376,6 +377,21 @@ class TypeInfoTests(TestCase):
 
         # use old FTI Data
         ti = self._makeInstance( **FTIDATA_CMF14_SPECIAL[0] )
+        self.assertEqual(ti._aliases, wanted)
+
+        # simulate old FTI
+        del ti._aliases
+        self.failIf( hasattr(ti, '_aliases') )
+
+        # migrate FTI
+        ti.getMethodPath('view')
+        self.assertEqual(ti._aliases, wanted)
+
+    def test_CMF14_special2_migration(self):
+        wanted = {}
+
+        # use old FTI Data
+        ti = self._makeInstance( **FTIDATA_CMF14_SPECIAL2[0] )
         self.assertEqual(ti._aliases, wanted)
 
         # simulate old FTI

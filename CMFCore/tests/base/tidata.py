@@ -204,6 +204,43 @@ FTIDATA_CMF14_SPECIAL = (
     ,
     )
 
+FTIDATA_CMF14_SPECIAL2 = (
+      { 'id' : 'Dummy Content 14'
+      , 'meta_type' : 'Dummy'
+      , 'description' : (
+           'Dummy Content.')
+      , 'icon' : 'dummy_icon.gif'
+      , 'product' : 'FooProduct'
+      , 'factory' : 'addFoo'
+      , 'immediate_view' : 'metadata_edit_form'
+      , 'actions' : (
+            { 'id': 'top',
+              'name': 'View Mail Archive',
+              'category':'object',
+              'action':'python:object.getArchive().absolute_url()',
+              'permissions':(View,) }
+          , { 'id':'view',
+              'name':'View',
+              'action':"python:object.someMethod() + '/some_template.html'",
+              'permissions':(View,) }
+          , { 'id':'edit',
+              'name':'Edit',
+              'action':'string:${object_url}/dummy_edit_form',
+              'permissions':(ModifyPortalContent,) }
+          , { 'id':'metadata',
+              'name':'Metadata',
+              'action':'string:${object_url}/metadata_edit_form',
+              'permissions':(ModifyPortalContent,) }
+          , { 'id':'mkdir',
+              'name':'MKDIR handler',
+              'action':'python:object.getMKDIR().absolute_url()',
+              'category':'folder',
+              'visible':0 }
+          )
+      }
+    ,
+    )
+
 FTIDATA_CMF15 = (
       { 'id' : 'Dummy Content 15'
       , 'meta_type' : 'Dummy'
