@@ -10,21 +10,25 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-"""
-"""
+""" Link instances represent explicit links-as-content.
 
-ADD_CONTENT_PERMISSION = 'Add portal content'
+$Id$
+"""
+__version__ = "$Revision$"[11:-2]
 
-import Globals, string, urlparse
-from Globals import InitializeClass
+import string
+import urlparse
+
+from Globals import InitializeClass, DTMLFile
 from AccessControl import ClassSecurityInfo
-from Products.CMFCore.PortalContent import PortalContent
-from DublinCore import DefaultDublinCoreImpl
 
 from Products.CMFCore import CMFCorePermissions
+from Products.CMFCore.PortalContent import PortalContent
 from Products.CMFCore.WorkflowCore import WorkflowAction
 from Products.CMFCore.utils import keywordsplitter
-from utils import parseHeadersBody
+
+from DublinCore import DefaultDublinCoreImpl
+from utils import parseHeadersBody, _dtmldir
 
 factory_type_information = ( { 'id'             : 'Link'
                              , 'meta_type'      : 'Link'
@@ -66,7 +70,7 @@ def addLink( self
            , description=''
            ):
     """
-    Add a Link
+        Add a Link instance to 'self'.
     """
     o=Link( id, title, remote_url, description )
     self._setObject(id,o)
@@ -83,14 +87,9 @@ class Link( PortalContent
                      , DefaultDublinCoreImpl.__implements__
                      )
 
-    meta_type='Link'
+    meta_type = 'Link'
     effective_date = expiration_date = None
     _isDiscussable = 1
-
-    __ac_permissions__=(
-        (CMFCorePermissions.View, ('', 'view', 'getRemoteUrl')),
-        (CMFCorePermissions.ModifyPortalContent, ('edit',)),
-        )
 
     security = ClassSecurityInfo()
 
@@ -106,8 +105,25 @@ class Link( PortalContent
         self.remote_url=remote_url
         self.description=description
 
-    security.declareProtected(CMFCorePermissions.ModifyPortalContent, 'edit')
-    def edit( self, remote_url ):
+    security.declareProtected( CMFCorePermissions.ModifyPortalContent
+                             , 'manage_edit' )
+    manage_edit = DTMLFile( 'zmi_editLink', _dtmldir )
+
+    security.declareProtected( CMFCorePermissions.ModifyPortalContent
+                             , 'manage_editLink' )
+    def manage_editLink( self, remote_url, REQUEST=None ):
+        """
+            Update the Link via the ZMI.
+        """
+        self._edit( remote_url )
+        if REQUEST is not None:
+            REQUEST['RESPONSE'].redirect( self.absolute_url()
+                                        + '/manage_edit'
+                                        + '?manage_tabs_message=Link+updated'
+                                        )
+
+    security.declarePrivate( '_edit' )
+    def _edit( self, remote_url ):
         """
             Edit the Link
         """
@@ -117,7 +133,8 @@ class Link( PortalContent
         else:
             self.remote_url = 'http://' + remote_url
 
-    edit = WorkflowAction(edit)
+    security.declareProtected( CMFCorePermissions.ModifyPortalContent, 'edit' )
+    edit = WorkflowAction( _edit )
 
     security.declareProtected( CMFCorePermissions.View, 'SearchableText' )
     def SearchableText(self):
@@ -133,6 +150,7 @@ class Link( PortalContent
         """
         return self.remote_url
 
+    security.declarePrivate( '_writeFromPUT' )
     def _writeFromPUT( self, body ):
 
         headers = {}
@@ -160,10 +178,10 @@ class Link( PortalContent
                           )
         
     ## FTP handlers
-    security.declareProtected(CMFCorePermissions.ModifyPortalContent, 'PUT')
+    security.declareProtected( CMFCorePermissions.ModifyPortalContent, 'PUT')
     def PUT(self, REQUEST, RESPONSE):
         """
-            Handle HTTP (and presumably FTP?) PUT requests.
+            Handle HTTP / WebDAV / FTP PUT requests.
         """
         self.dav__init(REQUEST, RESPONSE)
         body = REQUEST.get('BODY', '')
@@ -173,7 +191,9 @@ class Link( PortalContent
 
     security.declareProtected( CMFCorePermissions.View, 'manage_FTPget' )
     def manage_FTPget(self):
-        "Get the link as text for FTP download (also used for the WebDAV SRC)"
+        """
+            Get the link as text for WebDAV src / FTP download.
+        """
         join = string.join
         lower = string.lower
         hdrlist = self.getMetadataHeaders()
@@ -185,7 +205,9 @@ class Link( PortalContent
 
     security.declareProtected( CMFCorePermissions.View, 'get_size' )
     def get_size( self ):
-        """ Used for FTP and apparently the ZMI now too """
+        """
+            Used for FTP and apparently the ZMI now too 
+        """
         return len(self.manage_FTPget())
 
 InitializeClass( Link )
