@@ -104,7 +104,7 @@ factory_type_information = (
                      'with up to date queries into the catalog.'),
      'product': 'CMFTopic',
      'factory': 'addTopic',
-     'immediate_view': 'topic_edit_formx',
+     'immediate_view': 'topic_edit_form',
      'actions': ({'id': 'view',
                   'name': 'View',
                   'action': 'topic_view',
