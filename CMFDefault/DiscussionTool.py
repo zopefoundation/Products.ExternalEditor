@@ -106,10 +106,10 @@ class DiscussionTool( UniqueObject, SimpleItem, ActionProviderBase ):
             talkback = getattr(content, 'talkback')
         else:
             talkback = getattr( aq_base(content), 'talkback', None )
-            if not talkback:
+            if talkback is None:
                 talkback = self._createDiscussionFor( content )
 
-        return talkback
+        return content.talkback # Return wrapped talkback
 
     security.declarePublic( 'isDiscussionAllowedFor' )
     def isDiscussionAllowedFor( self, content ):

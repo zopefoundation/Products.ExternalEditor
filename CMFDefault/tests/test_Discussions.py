@@ -4,6 +4,7 @@ import Zope
 Zope.startup()
 from Interface.Verify import verifyClass
 
+from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.CatalogTool import CatalogTool
 from Products.CMFCore.tests.base.dummy import DummyContent
 from Products.CMFCore.tests.base.dummy import DummySite
@@ -246,6 +247,25 @@ class DiscussionTests( SecurityTest ):
         talkback1 = dtool.getDiscussionFor(reply1)
         self.assertEqual(len(talkback.getReplies()), 1)
         self.assertEqual(len(talkback1.getReplies()), 0)
+
+    def test_newTalkbackIsWrapped(self):
+        test = self._makeDummyContent('test')
+        test.allow_discussion = 1
+        dtool = self.site.portal_discussion
+        talkback = dtool.getDiscussionFor(test)
+        self.failUnless(hasattr(talkback, 'aq_base'))
+        # Acquire a portal tool
+        self.failUnless(getToolByName(talkback, 'portal_discussion'))
+
+    def test_existingTalkbackIsWrapped(self):
+        test = self._makeDummyContent('test')
+        test.allow_discussion = 1
+        dtool = self.site.portal_discussion
+        talkback = dtool.getDiscussionFor(test)
+        talkback = dtool.getDiscussionFor(test)
+        self.failUnless(hasattr(talkback, 'aq_base'))
+        # Acquire a portal tool
+        self.failUnless(getToolByName(talkback, 'portal_discussion'))
 
 
 def test_suite():
