@@ -124,9 +124,12 @@ class CalendarTool (UniqueObject, SimpleItem):
         """ given a year and month return a list of days that have events """
         first_date=DateTime(str(month)+'/1/'+str(year))
         last_day=calendar.monthrange(year, month)[1]
-        last_date=DateTime(str(month)+'/'+str(last_day)+'/'+str(year))
-    
-        query=self.portal_catalog(Type=self.calendar_types,
+        ## This line was cropping the last day of the month out of the
+        ## calendar when doing the query
+	## last_date=DateTime(str(month)+'/'+str(last_day)+'/'+str(year))
+	last_date=first_date + last_day    
+        
+	query=self.portal_catalog(Type=self.calendar_types,
                                   review_state='published',	                          
                                   start=(first_date, last_date),
                                   start_usage='range:min:max',
