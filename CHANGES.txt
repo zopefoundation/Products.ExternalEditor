@@ -33,6 +33,28 @@
   - (__future__) Added DCWorkflow (through-the-web configurable
     workflows) to the core set of CMF products.
 
+  - (__future__) Merged Chris Withers' FSSQLMethod into CMFCore.
+
+  - Made skinned 'index_html' reflect generic view on folder
+    content, rather than simple title/description of the portal.
+
+  - Added "Change and View" submit button to content editing
+    forms;  added check for this button to POST handlers in CMFDefault,
+    and indirected redirect targets in those methods through
+    'getActionByID'.
+
+  - Added knob for skin cookie persistence to SkinsTool's
+    "properties" tab.  The default policy (unchanged) is that
+    skin cookies expire at the end of the browser session.  if
+    Skin Cookie Persistence is checked the cookie will last a
+    full yesr.
+
+  - Added an API to the 'portal_actions' interface for querying,
+    adding, and removing action providers.
+
+  - Added a "multi-review" form, enabling a reviewer to publish
+    or reject multiple items at once, using a common comment.
+
   - Added ZMI tab to DirectoryView to allow re-basing the
     filesystem path.
 
@@ -63,6 +85,21 @@
 
   - Ensure that object is recatalogued (e.g., after setting 'portal_type'
       (thanks to Florent Guillaume)
+
+  - Removed silly dependency of 'CatalogTool.searchResults' on
+    REQUEST (catalog already does the Right Thing (tm) when no
+    REQUEST is available).
+
+  - Changed redirect target after rejecting an item to the search
+    page for pending content items;  this resolves the problem
+    that the non-Manager reviewr who rejects an item no longer
+    has View permission on it, and therefore gets an Unauthorized
+    when redirecting to the object's view action.
+
+  - Moved generation of the "Add to Favorites" and "My Favorites"
+    links from the CMFCore/ActionsTool into the
+    CMFDefault/MembershipTool, which is a more logical location
+    for it because it relies on information from the membership tool.
 
   - Made Topic directly publishable (like PortalContent), using its
     'view' action (or the first action found, if view is not present).
