@@ -89,6 +89,7 @@ from Globals import default__class_init__, HTMLFile
 from DateTime.DateTime import DateTime
 from utils import tuplize
 from Products.CMFCore.WorkflowCore import WorkflowAction
+from Acquisition import aq_base
 
 class DefaultDublinCoreImpl( PropertyManager ):
     """
@@ -213,7 +214,10 @@ class DefaultDublinCoreImpl( PropertyManager ):
 
     def Type( self ):
         "Dublin Core element - Object type"
-        # XXX: fixme using 'portal_metadata'
+        if hasattr(aq_base(self), 'getTypeInfo'):
+            ti = self.getTypeInfo()
+            if ti is not None:
+                return ti.Type()
         return self.meta_type
 
     def Format( self ):
