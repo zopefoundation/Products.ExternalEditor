@@ -1,1 +1,1 @@
-CMFCollector Product 0.1
+CMFCollector Product 0.9
