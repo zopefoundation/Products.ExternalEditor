@@ -52,6 +52,12 @@ class FSFileTests( RequestTest, FSDVTest):
         self.assertEqual( file.get_size(), len( ref ) )
         self.assertEqual( file._readFile(0), ref )
 
+    def test_str( self ):
+        path, ref = self._extractFile()
+        file = self._makeOne( 'test_file', 'test_file.swf' )
+        file = file.__of__( self.root )
+        self.assertEqual( len(str(file)), len( ref ) )
+
     def test_index_html( self ):
 
         path, ref = self._extractFile()
