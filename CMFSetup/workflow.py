@@ -227,7 +227,7 @@ class WorkflowToolConfigurator( Implicit ):
 
         states = _extractStateNodes( root )
         transitions = _extractTransitionNodes( root )
-        variables = []
+        variables = _extractVariableNodes( root )
         worklists = []
         permissions = []
         scripts = []
@@ -763,6 +763,32 @@ def _extractTransitionNodes( root, encoding=None ):
 
     return result
 
+def _extractVariableNodes( root, encoding=None ):
+
+    result = []
+
+    for v_node in root.getElementsByTagName( 'variable' ):
+
+        info = { 'variable_id' : _getNodeAttribute( v_node, 'variable_id'
+                                                    , encoding )
+               , 'description' : _coalesceTextNodeChildren( v_node, encoding )
+               , 'for_catalog' : _getNodeAttributeBoolean( v_node
+                                                         , 'for_catalog'
+                                                         )
+               , 'for_status' : _getNodeAttributeBoolean( v_node
+                                                        , 'for_status'
+                                                        )
+               , 'update_always' : _getNodeAttributeBoolean( v_node
+                                                           , 'update_always'
+                                                           )
+               , 'default' : _extractDefaultNode( v_node, encoding )
+               , 'guard' : _extractGuardNode( v_node, encoding )
+               }
+
+        result.append( info )
+
+    return result
+
 def _extractActionNode( parent, encoding=None ):
 
     nodes = parent.getElementsByTagName( 'action' )
@@ -802,5 +828,33 @@ def _extractGuardNode( parent, encoding=None ):
                           for x in node.getElementsByTagName( 'role' ) ]
            , 'groups' : [ _coalesceTextNodeChildren( x, encoding )
                           for x in node.getElementsByTagName( 'group' ) ]
+           , 'expression' : expr_text
+           }
+
+def _extractDefaultNode( parent, encoding=None ):
+
+    nodes = parent.getElementsByTagName( 'default' )
+    assert len( nodes ) <= 1, nodes
+
+    if len( nodes ) < 1:
+        return { 'value' : '', 'expression' : '' }
+
+    node = nodes[ 0 ]
+
+    value_nodes = node.getElementsByTagName( 'value' )
+    assert( len( value_nodes ) <= 1 )
+
+    value_text = value_nodes and _coalesceTextNodeChildren( value_nodes[ 0 ]
+                                                          , encoding
+                                                          ) or ''
+
+    expr_nodes = node.getElementsByTagName( 'expression' )
+    assert( len( expr_nodes ) <= 1 )
+
+    expr_text = expr_nodes and _coalesceTextNodeChildren( expr_nodes[ 0 ]
+                                                        , encoding
+                                                        ) or ''
+
+    return { 'value' : value_text
            , 'expression' : expr_text
            }

@@ -889,6 +889,63 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
                             , expected[ 12 ] )
             self.assertEqual( guard.get( 'expression', '' ), expected[ 13 ] )
 
+    def test_parseWorkflowXML_normal_variables( self ):
+
+        from Products.CMFSetup.workflow import TRIGGER_TYPES
+
+        WF_ID = 'normal'
+        WF_TITLE = 'Normal DCWorkflow'
+        WF_INITIAL_STATE = 'closed'
+
+        site = self._initSite()
+
+        configurator = self._makeOne( site ).__of__( site )
+
+        ( workflow_id
+        , title
+        , state_variable
+        , initial_state
+        , states
+        , transitions
+        , variables
+        , worklists
+        , permissions
+        , scripts
+        ) = configurator.parseWorkflowXML( _NORMAL_WORKFLOW_EXPORT
+                                         % ( WF_ID
+                                           , WF_TITLE
+                                           , WF_INITIAL_STATE
+                                           ) )
+
+        self.assertEqual( len( variables ), len( _WF_VARIABLES ) )
+
+        for variable in variables:
+
+            variable_id = variable[ 'variable_id' ]
+            self.failUnless( variable_id in _WF_VARIABLES )
+
+            expected = _WF_VARIABLES[ variable_id ]
+
+            description = ''.join( variable[ 'description' ] )
+            self.failUnless( expected[ 0 ] in description )
+
+            default = variable[ 'default' ]
+            self.assertEqual( default[ 'value' ], expected[ 1 ] )
+            self.assertEqual( default[ 'expression' ], expected[ 2 ] )
+
+            self.assertEqual( variable[ 'for_catalog' ], expected[ 3 ] )
+            self.assertEqual( variable[ 'for_status' ], expected[ 4 ] )
+            self.assertEqual( variable[ 'update_always' ], expected[ 5 ] )
+
+            guard = variable[ 'guard' ]
+            self.assertEqual( tuple( guard.get( 'permissions', () ) )
+                            , expected[ 6 ] )
+            self.assertEqual( tuple( guard.get( 'roles', () ) )
+                            , expected[ 7 ] )
+            self.assertEqual( tuple( guard.get( 'groups', () ) )
+                            , expected[ 8 ] )
+            self.assertEqual( guard.get( 'expression', '' ), expected[ 9 ] )
+
 
 _WF_PERMISSIONS = \
 ( 'Open content for modifications'
