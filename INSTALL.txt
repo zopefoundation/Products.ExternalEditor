@@ -17,7 +17,7 @@ Installing CMF 1.1beta
        directory. For instance::
 
         $ cd /usr/local/zope
-        $ tar xzf /tmp/CMF-1.1beta.tar.gz
+        $ tar xzf /tmp/CMF-1.x.tar.gz
 
        Note for Windows users:  if you are using WinZip to unpack
           the file, be *sure* to disable the "TAR file smart CR/LF
@@ -26,10 +26,21 @@ Installing CMF 1.1beta
 
 
     2. Link (or copy/move) the CMF packages into
-       $INSTANCE_HOME/Products.  For instance::
+       $INSTANCE_HOME/Products (or into $SOFTWARE_HOME/lib/python/Products).
+       For instance::
 
-        $ cd /var/zope/Products
-        $ ln -s /usr/local/zope/CMF-1.1beta/CMF* .
+        $ cd /var/zope/Products  # /var/zope is INSTANCE_HOME
+        $ ln -s /usr/local/zope/CMF-1.x/CMFCore .
+        $ ln -s /usr/local/zope/CMF-1.x/CMFDefault .
+        $ ln -s /usr/local/zope/CMF-1.x/CMFTopic .
+
+       or, as a shortcut::
+
+        $ ln -s /usr/local/zope/CMF-1.x/CMF* .
+
+       Since linking doesn't apply on Windows, you will need
+       to cut or copy the files from the place where you unpacked
+       them to the 'Products' directory of your Zope.
 
     3. Restart Zope; verify that the CMF products loaded
        property, by examining them in Control_Panel/Product.
