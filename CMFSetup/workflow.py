@@ -193,7 +193,12 @@ class WorkflowToolConfigurator( Implicit ):
 
           'worklist_info' -- a list of mappings describing the
             worklists tracked by the workflow (see '_extractWorklists').
+
+          'script_info' -- a list of mappings describing the scripts which
+            provide added business logic (wee '_extractScripts').
         """
+        workflow_info[ 'filename' ] = ( 'workflows/%s/definition.xml'
+                                      % workflow.getId())
         workflow_info[ 'state_variable' ] = workflow.state_var
         workflow_info[ 'initial_state' ] = workflow.initial_state
         workflow_info[ 'permissions' ] = workflow.permissions
@@ -202,6 +207,7 @@ class WorkflowToolConfigurator( Implicit ):
         workflow_info[ 'transition_info' ] = self._extractTransitions(
                                                                    workflow )
         workflow_info[ 'worklist_info' ] = self._extractWorklists( workflow )
+        workflow_info[ 'script_info' ] = self._extractScripts( workflow )
 
     security.declarePrivate( '_extractVariables' )
     def _extractVariables( self, workflow ):
@@ -466,6 +472,33 @@ class WorkflowToolConfigurator( Implicit ):
                    , 'guard_roles'          : guard.getRolesText()
                    , 'guard_groups'         : guard.getGroupsText()
                    , 'guard_expr'           : guard.getExprText()
+                   }
+
+            result.append( info )
+
+        return result
+
+    security.declarePrivate( '_extractScripts' )
+    def _extractScripts( self, workflow ):
+
+        """ Return a sequence of mappings describing DCWorkflow scripts.
+
+        o Each mapping has the keys:
+
+          'id' -- the ID of the script
+
+          'meta_type' -- the title of the worklist
+
+          'body' -- the text of the script
+
+        """
+        result = []
+
+        for k, v in workflow.scripts.objectItems():
+
+            info = { 'id'                   : k
+                   , 'meta_type'            : v.meta_type
+                   , 'body'                 : v.read()
                    }
 
             result.append( info )

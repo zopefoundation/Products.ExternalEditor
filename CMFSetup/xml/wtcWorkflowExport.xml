@@ -1,0 +1,174 @@
+<?xml version="1.0"?>
+<dc-workflow
+        xmlns:tal="http://xml.zope.org/namespaces/tal"
+        workflow_id="dcworkflow"
+        type="DCWorkflow"
+        title="Some DCWorkflow"
+        state_variable="review_state" 
+        initial_state="visible" 
+        tal:repeat="workflow here/listWorkflowInfo"
+        tal:attributes="workflow_id workflow/id;
+                        title workflow/title;
+                        state_variable workflow/state_variable;
+                        initial_state workflow/initial_state">
+                       ">
+ <permission
+        tal:repeat="permission workflow/permissions"
+        tal:content="permission">PERMISSION</permission>
+ <variable
+        variable_id="action"
+        for_catalog="True"
+        for_status="True"
+        update_always="True" 
+        default_value=""
+        default_expression=""
+        guard_roles="Request review; Review portal content" 
+        tal:repeat="variable workflow/variable_info"
+        tal:attributes="variable_id variable/id;
+                        for_catalog variable/for_catalog;
+                        for_status variable/for_status;
+                        update_always variable/update_always;
+                       ">
+   <span
+        tal:replace="variable/description">The last transition</span>
+   <default>
+    <value
+        tal:condition="variable/default_value"
+        tal:content="variable/default_value">VALUE</value>
+    <expression
+        tal:condition="variable/default_expr"
+        tal:content="variable/default_expr">EXPRESSION</expression>
+   </default>
+   <guard>
+    <permission
+        tal:repeat="permission variable/guard_permissions"
+        tal:content="permission">PERMISSION</permission>
+    <role
+        tal:repeat="role variable/guard_roles"
+        tal:content="role">ROLE</role>
+    <group
+        tal:repeat="group variable/guard_groups"
+        tal:content="group">GROUP</group>
+    <expression
+        tal:condition="variable/guard_expr"
+        tal:content="variable/guard_expr">EXPRESSION</expression>
+   </guard>
+ </variable>
+ <worklist
+        worklist_id="reviewer_queue"
+        action_name="Pending (%(count)d)"
+        action_url="%(portal_url)s/search?review_state=pending"
+        action_category="global" 
+        tal:repeat="worklist workflow/worklist_info"
+        tal:attributes="worklist_id worklist/id">
+  <span
+        tal:replace="worklist/description">Reviewer tasks</span>
+  <action
+        url="URL"
+        category="CATEGORY"
+        tal:condition="worklist/actbox_name"
+        tal:attributes="url worklist/actbox_url;
+                        category worklist/actbox_category;
+                       "
+        tal:content="worklist/actbox_name">ACTION NAME</action>
+  <guard>
+   <permission
+        tal:repeat="permission worklist/guard_permissions"
+        tal:content="permission">PERMISSION</permission>
+   <role
+        tal:repeat="role worklist/guard_roles"
+        tal:content="role">ROLE</role>
+   <group
+        tal:repeat="group worklist/guard_groups"
+        tal:content="group">GROUP</group>
+   <expression
+        tal:condition="worklist/guard_expr"
+        tal:content="worklist/guard_expr">EXPRESSION</expression>
+  </guard>
+  <match
+        name="review_state"
+        values="pending" 
+        tal:repeat="match worklist/var_match"
+        tal:attributes="name python: match[ 0 ];
+                        values python: match[ 1 ];
+                       "
+        />
+ </worklist>
+ <state
+        state_id="pending"
+        title="Waiting for reviewer"
+        tal:repeat="state workflow/state_info"
+        tal:attributes="state_id state/id;
+                        title state/title;
+                       ">
+  <span
+        tal:replace="state/description">DESCRIPTION</span>
+  <permission
+        name=""
+        acquired="1"
+        roles=""
+        tal:repeat="perm state/permissions"
+        tal:attributes="name perm/name;
+                        acquired perm/acquired;
+                       ">
+   <role
+        tal:repeat="role perm/roles"
+        tal:content="role">ROLE</role>
+  </permission>
+  <exit-transition
+        transition_id="TRANSITION_ID"
+        tal:repeat="exit state/transitions"
+        tal:attributes="transition_id exit"
+        />
+  <assignment
+        name="VAR_NAME"
+        tal:repeat="var state/variables"
+        tal:attributes="name python:var[0]"
+        tal:content="python:var[1]">VALUE</assignment>
+ </state>
+ <transition
+        transition_id="Publish"
+        title="Reviewer publishes content"
+        new_state="published"
+        trigger="USER"
+        before_script=""
+        after_script=""
+        tal:repeat="transition workflow/transition_info"
+        tal:attributes="transition_id transition/id;
+                        title transition/title;
+                        new_state transition/new_state_id;
+                        trigger transition/trigger_type;
+                        before_script transition/before_script_name;
+                        after_script transition/after_script_name;
+                       ">
+  <span
+        tal:replace="transition/description">DESCRIPTION</span>
+  <action
+        url="URL"
+        category="CATEGORY"
+        tal:condition="transition/actbox_name"
+        tal:attributes="url transition/actbox_url;
+                        category transition/actbox_category;
+                       "
+        tal:content="transition/actbox_name">ACTION NAME</action>
+  <guard>
+   <permission
+        tal:repeat="permission transition/guard_permissions"
+        tal:content="permission">PERMISSION</permission>
+   <role
+        tal:repeat="role transition/guard_roles"
+        tal:content="role">ROLE</role>
+   <group
+        tal:repeat="group transition/guard_groups"
+        tal:content="group">GROUP</group>
+   <expression
+        tal:condition="transition/guard_expr"
+        tal:content="transition/guard_expr">EXPRESSION</expression>
+  </guard>
+  <assignment
+        name="VAR_NAME"
+        tal:repeat="var transition/variables"
+        tal:attributes="name python:var[0]"
+        tal:content="python:var[1];">EXPRESSION</assignment>
+ </transition>
+</dc-workflow>

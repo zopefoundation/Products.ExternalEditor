@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<workflow-tool
+        xmlns:tal="http://xml.zope.org/namespaces/tal">
+ <workflow
+        id="WORKFLOW_ID"
+        meta_type="META_TYPE"
+        tal:repeat="workflow here/listWorkflowInfo"
+        tal:attributes="id workflow/id;
+                        meta_type workflow/meta_type;
+                        filename workflow/filename | default;
+                       " />
+</workflow-tool>

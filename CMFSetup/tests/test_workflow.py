@@ -6,6 +6,8 @@ import unittest
 
 from OFS.Folder import Folder
 
+from Products.PythonScripts.PythonScript import PythonScript
+
 from Products.DCWorkflow.DCWorkflow import DCWorkflowDefinition
 from Products.DCWorkflow.Transitions import TRIGGER_USER_ACTION
 from Products.DCWorkflow.Transitions import TRIGGER_AUTOMATIC
@@ -157,6 +159,19 @@ class _WorkflowSetup( BaseRegistryTests ):
                                   , actbox_category=v[ 5 ]
                                   , props=props
                                   )
+
+    def _initScripts( self, dcworkflow ):
+
+        for k, v in _WF_SCRIPTS.items():
+
+            if v[ 0 ] == PythonScript.meta_type:
+                script = PythonScript( k )
+                script.write( v[ 1 ] )
+
+            else:
+                raise ValueError, 'Unknown script type: %s' % v[ 0 ]
+
+            dcworkflow.scripts._setObject( k, script )
 
 class WorkflowToolConfiguratorTests( _WorkflowSetup
                                    , _GuardChecker
@@ -391,6 +406,33 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
 
             self._assertGuard( info, *expected[ -4: ] )
 
+    def test_getWorkflowInfo_dcworkflow_scripts( self ):
+
+        WF_ID = 'dcworkflow_scripts'
+
+        site = self._initSite()
+        dcworkflow = self._initDCWorkflow( WF_ID )
+        self._initScripts( dcworkflow )
+
+        configurator = self._makeOne( site ).__of__( site )
+        info = configurator.getWorkflowInfo( WF_ID )
+
+        script_info = info[ 'script_info' ]
+        self.assertEqual( len( script_info ), len( _WF_SCRIPTS ) )
+
+        ids = [ x[ 'id' ] for x in script_info ]
+
+        for k in _WF_SCRIPTS.keys():
+            self.failUnless( k in ids )
+
+        for info in script_info:
+
+            expected = _WF_SCRIPTS[ info[ 'id' ] ]
+
+            self.assertEqual( info[ 'meta_type' ], expected[ 0 ] )
+            self.assertEqual( info[ 'body' ], expected[ 1 ] )
+
+
     def test_listWorkflowInfo_empty( self ):
 
         site = self._initSite()
@@ -398,6 +440,48 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
         configurator = self._makeOne( site ).__of__( site )
 
         self.assertEqual( len( configurator.listWorkflowInfo() ), 0 )
+
+    def test_listWorkflowInfo_mixed( self ):
+
+        from Products.DCWorkflow.DCWorkflow import DCWorkflowDefinition
+
+        site = self._initSite()
+
+        configurator = self._makeOne( site ).__of__( site )
+
+        self.assertEqual( len( configurator.listWorkflowInfo() ), 0 )
+
+        WF_ID_NON = 'non_dcworkflow'
+        WF_TITLE_NON = 'Non-DCWorkflow'
+        WF_ID_DC = 'dcworkflow'
+        WF_TITLE_DC = 'DCWorkflow'
+
+        site = self._initSite()
+
+        wf_tool = site.portal_workflow
+        nondcworkflow = DummyWorkflow( WF_TITLE_NON )
+        nondcworkflow.title = WF_TITLE_NON
+        wf_tool._setObject( WF_ID_NON, nondcworkflow )
+
+        dcworkflow = self._initDCWorkflow( WF_ID_DC )
+        dcworkflow.title = WF_TITLE_DC
+
+        configurator = self._makeOne( site ).__of__( site )
+
+        info_list = configurator.listWorkflowInfo()
+
+        self.assertEqual( len( info_list ), 2 )
+
+        non_info = [ x for x in info_list if x[ 'id' ] == WF_ID_NON ][0]
+        self.assertEqual( non_info[ 'title' ], WF_TITLE_NON )
+        self.assertEqual( non_info[ 'meta_type' ], DummyWorkflow.meta_type )
+
+        dc_info = [ x for x in info_list if x[ 'id' ] == WF_ID_DC ][0]
+        self.assertEqual( dc_info[ 'title' ], WF_TITLE_DC )
+        self.assertEqual( dc_info[ 'meta_type' ]
+                        , DCWorkflowDefinition.meta_type )
+        self.assertEqual( dc_info[ 'filename' ]
+                        , 'workflows/%s/definition.xml' % WF_ID_DC )
 
 
 _WF_PERMISSIONS = \
@@ -559,6 +643,57 @@ _WF_WORKLISTS = \
                     , ()
                     , ()
                     , ""
+                    )
+}
+
+_BEFORE_OPEN_SCRIPT = """\
+## Script (Python) "before_open"
+##bind container=container
+##bind context=context
+##bind namespace=
+##bind script=script
+##bind subpath=traverse_subpath
+##parameters=
+##title=
+##
+return 'before_open'
+"""
+
+_AFTER_CLOSE_SCRIPT = """\
+## Script (Python) "after_close"
+##bind container=container
+##bind context=context
+##bind namespace=
+##bind script=script
+##bind subpath=traverse_subpath
+##parameters=
+##title=
+##
+return 'after_close'
+"""
+
+_AFTER_KILL_SCRIPT = """\
+## Script (Python) "after_kill"
+##bind container=container
+##bind context=context
+##bind namespace=
+##bind script=script
+##bind subpath=traverse_subpath
+##parameters=
+##title=
+##
+return 'after_kill'
+"""
+
+_WF_SCRIPTS = \
+{ 'before_open':    ( PythonScript.meta_type
+                    , _BEFORE_OPEN_SCRIPT
+                    )
+, 'after_close':    ( PythonScript.meta_type
+                    , _AFTER_CLOSE_SCRIPT
+                    )
+, 'after_kill':     ( PythonScript.meta_type
+                    , _AFTER_KILL_SCRIPT
                     )
 }
 
