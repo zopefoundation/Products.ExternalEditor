@@ -99,6 +99,15 @@ class CachingPolicy:
             the "Cache-control" header will be set using 'max_age_secs',
             if passed;  it should be an integer value in seconds.
 
+          - The "Vary" HTTP response headers will be set if a value is 
+            provided. The Vary header is described in RFC 2616. In essence,
+            it instructs caches that respect this header (such as Squid
+            after version 2.4) to distinguish between requests not just by
+            the request URL, but also by values found in the headers showing
+            in the Vary tag. "Vary: Cookie" would force Squid to also take 
+            Cookie headers into account when deciding what cached object to 
+            choose and serve in response to a request.
+
           - Other tokens will be added to the "Cache-control" HTTP response
             header as follows:
 
@@ -117,6 +126,7 @@ class CachingPolicy:
                 , no_cache=0
                 , no_store=0
                 , must_revalidate=0
+                , vary=''
                 ):
 
         if not predicate:
@@ -135,6 +145,7 @@ class CachingPolicy:
         self._no_cache = int( no_cache )
         self._no_store = int( no_store )
         self._must_revalidate = int( must_revalidate )
+        self._vary = vary
 
     def getPolicyId( self ):
         """
@@ -170,6 +181,11 @@ class CachingPolicy:
         """
         """
         return self._must_revalidate
+
+    def getVary( self ):
+        """
+        """
+        return getattr(self, '_vary', '')
 
     def getHeaders( self, expr_context ):
         """
@@ -210,6 +226,9 @@ class CachingPolicy:
 
             if control:
                 headers.append( ( 'Cache-control', ', '.join( control ) ) )
+
+            if self.getVary():
+                headers.append( ( 'Vary', self._vary ) )
 
         return headers
 
@@ -266,6 +285,7 @@ class CachingPolicyManager( SimpleItem ):
                  , no_cache         # boolean (def. 0)
                  , no_store         # boolean (def. 0)
                  , must_revalidate  # boolean (def. 0)
+                 , vary             # string value
                  , REQUEST
                  ):
         """
@@ -278,6 +298,7 @@ class CachingPolicyManager( SimpleItem ):
                        , no_cache
                        , no_store
                        , must_revalidate
+                       , vary
                        )
         REQUEST[ 'RESPONSE' ].redirect( self.absolute_url()
                               + '/manage_cachingPolicies'
@@ -293,6 +314,7 @@ class CachingPolicyManager( SimpleItem ):
                     , no_cache          # boolean (def. 0)
                     , no_store          # boolean (def. 0)
                     , must_revalidate   # boolean (def. 0)
+                    , vary
                     , REQUEST ):
         """
             Update a caching policy.
@@ -304,6 +326,7 @@ class CachingPolicyManager( SimpleItem ):
                           , no_cache
                           , no_store
                           , must_revalidate
+                          , vary
                           )
         REQUEST[ 'RESPONSE' ].redirect( self.absolute_url()
                               + '/manage_cachingPolicies'
@@ -367,6 +390,7 @@ class CachingPolicyManager( SimpleItem ):
                   , no_cache
                   , no_store
                   , must_revalidate
+                  , vary
                   ):
         """
             Add a policy to our registry.
@@ -386,6 +410,7 @@ class CachingPolicyManager( SimpleItem ):
                                                    , no_cache
                                                    , no_store
                                                    , must_revalidate
+                                                   , vary
                                                    )
         idlist = list( self._policy_ids )
         idlist.append( policy_id )
@@ -400,6 +425,7 @@ class CachingPolicyManager( SimpleItem ):
                      , no_cache
                      , no_store
                      , must_revalidate
+                     , vary
                      ):
         """
             Update a policy in our registry.
@@ -414,6 +440,7 @@ class CachingPolicyManager( SimpleItem ):
                                                    , no_cache
                                                    , no_store
                                                    , must_revalidate
+                                                   , vary
                                                    )
 
     security.declarePrivate( '_reorderPolicy' )
