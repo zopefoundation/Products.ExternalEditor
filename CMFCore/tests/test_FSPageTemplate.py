@@ -1,4 +1,4 @@
-import unittest
+from unittest import TestSuite, makeSuite, main
 
 import Testing
 import Zope
@@ -8,6 +8,12 @@ except AttributeError:
     # for Zope versions before 2.6.1
     pass
 
+from os.path import join as path_join
+
+from OFS.Folder import Folder
+from Products.PageTemplates.TALES import Undefined
+
+from Products.CMFCore.FSPageTemplate import FSPageTemplate
 from Products.CMFCore.tests.base.dummy import DummyCachingManager
 from Products.CMFCore.tests.base.testcase import FSDVTest
 from Products.CMFCore.tests.base.testcase import RequestTest
@@ -17,11 +23,7 @@ from Products.CMFCore.tests.base.testcase import SecurityTest
 class FSPTMaker(FSDVTest):
 
     def _makeOne( self, id, filename ):
-
-        from Products.CMFCore.FSPageTemplate import FSPageTemplate
-        from os.path import join
-
-        return FSPageTemplate( id, join( self.skin_path_name, filename ) )
+        return FSPageTemplate( id, path_join(self.skin_path_name, filename) )
 
 
 class FSPageTemplateTests( RequestTest, FSPTMaker ):
@@ -62,8 +64,6 @@ class FSPageTemplateTests( RequestTest, FSPTMaker ):
                         , 'text/html; charset=utf-8')
 
     def test_BadCall( self ):
-
-        from Products.PageTemplates.TALES import Undefined
         script = self._makeOne( 'testPTbad', 'testPTbad.pt' )
         script = script.__of__(self.root)
 
@@ -89,15 +89,12 @@ class FSPageTemplateTests( RequestTest, FSPTMaker ):
     def test_pt_properties( self ):
 
         script = self._makeOne( 'testPT', 'testPT.pt' )
-        self.assertEqual( script.pt_source_file()
-                        , 'file:%s/testPT.pt' % self.skin_path_name )
+        self.assertEqual( script.pt_source_file(), 'file:%s'
+                               % path_join(self.skin_path_name, 'testPT.pt') )
 
 class FSPageTemplateCustomizationTests( SecurityTest, FSPTMaker ):
 
     def setUp( self ):
-
-        from OFS.Folder import Folder
-
         FSPTMaker.setUp(self)
         SecurityTest.setUp( self )
 
@@ -135,10 +132,10 @@ class FSPageTemplateCustomizationTests( SecurityTest, FSPTMaker ):
 
 
 def test_suite():
-    return unittest.TestSuite((
-        unittest.makeSuite(FSPageTemplateTests),
-        unittest.makeSuite(FSPageTemplateCustomizationTests),
+    return TestSuite((
+        makeSuite(FSPageTemplateTests),
+        makeSuite(FSPageTemplateCustomizationTests),
         ))
 
 if __name__ == '__main__':
-    unittest.main(defaultTest='test_suite')
+    main(defaultTest='test_suite')
