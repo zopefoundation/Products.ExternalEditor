@@ -13,15 +13,19 @@
                  month python:yearmonth[1];
                  weeks python:here.portal_calendar.getEventsForCalendar(month=month, year=year);">
                  
-    <!-- The calendar, rendered as a table -->
+    <div metal:define-slot="title" class="CalendarTitle">CMF Calendar</div>
 
+    <!-- The calendar, rendered as a table -->
+    <table cellspacing="0" cellpadding="0" border="1">
+    <tr><td>
+    
     <table cellpadding="2" cellspacing="0" border="0" class="calendar">
 
         <tr>
         
             <!-- The headers.  The month with links either side -->
             <th>
-                <a href="#" tal:attributes="href python:here.getPreviousMonthLink(request.URL0, month, year)">&laquo;</a>
+                <a href="#" class="CalendarArrow" tal:attributes="href python:here.getPreviousMonthLink(request.URL0, month, year)">&laquo;</a>
             </th>
 
             <th colspan="5" tal:define="date string:$month/1/$year">
@@ -29,7 +33,7 @@
             </th>
 
             <th>
-                <a href="#" tal:attributes="href python:here.getNextMonthLink(request.URL0, month, year)">&raquo;</a>
+                <a href="#" class="CalendarArrow" tal:attributes="href python:here.getNextMonthLink(request.URL0, month, year)">&raquo;</a>
             </th>
         </tr>
 
@@ -73,6 +77,8 @@
           </tal:week>
         </tr>
 
+    </table>
+    </td></tr>
     </table>
 
  </div>
