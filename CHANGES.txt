@@ -1,5 +1,7 @@
 External Editor Change Log
 
+    - Added plugins for Microsoft Word, Excel and Powerpoint.
+
     - Added the man page from the Debian distro. Thanks go out to
       Federico Sevilla III and Andreas Tille
 
