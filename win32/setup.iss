@@ -31,7 +31,7 @@ Root: HKCR; SubKey: "MIME\Database\Content Type\application/x-zope-edit"; Flags:
 [Files]
 Source: "dist\zopeedit\*.*"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 Source: "*.txt"; DestDir: "{app}"; CopyMode: alwaysoverwrite
-Source: "ZopeEdit.ini"; DestDir: "{app}"; CopyMode: alwaysskipifsameorolder
+Source: "ZopeEdit.ini"; DestDir: "{app}"; CopyMode: onlyifdoesntexist
 Source: "..\README.txt"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 Source: "..\LICENSE.txt"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 
