@@ -15,22 +15,27 @@
 $Id$
 """
 
-import OFS
-from utils import UniqueObject, SimpleItemWithProperties, _getAuthenticatedUser, _checkPermission
-from utils import getToolByName, _dtmldir, cookString
-from CMFCorePermissions import ManagePortal
-from OFS.SimpleItem import SimpleItem
 from Globals import InitializeClass, DTMLFile, package_home
-from urllib import quote
 from Acquisition import aq_base, aq_inner, aq_parent
 from AccessControl import ClassSecurityInfo
-from string import join
+from OFS.Folder import Folder
+from OFS.SimpleItem import SimpleItem
+
 from Expression import Expression, createExprContext
 from ActionInformation import ActionInformation, oai
 from ActionProviderBase import ActionProviderBase
 from TypesTool import TypeInformation
+from CMFCorePermissions import ManagePortal
 
-class ActionsTool(UniqueObject, OFS.Folder.Folder, ActionProviderBase):
+from utils import UniqueObject
+from utils import SimpleItemWithProperties
+from utils import _getAuthenticatedUser
+from utils import _checkPermission
+from utils import getToolByName
+from utils import _dtmldir
+from utils import cookString
+
+class ActionsTool(UniqueObject, Folder, ActionProviderBase):
     """
         Weave together the various sources of "actions" which are apropos
         to the current user and context.
@@ -59,22 +64,26 @@ class ActionsTool(UniqueObject, OFS.Folder.Folder, ActionProviderBase):
 
     meta_type = 'CMF Actions Tool'
 
-    action_providers = ('portal_membership'
-                      , 'portal_actions'
-                      , 'portal_registration'
-                      , 'portal_discussion'
-                      , 'portal_undo'
-                      , 'portal_syndication'
-                      , 'portal_workflow'
-                      , 'portal_properties')
+    action_providers = ( 'portal_membership'
+                       , 'portal_actions'
+                       , 'portal_registration'
+                       , 'portal_discussion'
+                       , 'portal_undo'
+                       , 'portal_syndication'
+                       , 'portal_workflow'
+                       , 'portal_properties'
+                       )
 
     security = ClassSecurityInfo()
 
-    manage_options = ( ActionProviderBase.manage_options +
-                      ({'label' : 'Action Providers', 'action' : 'manage_actionProviders'}
-                     ,   { 'label' : 'Overview', 'action' : 'manage_overview' }
-                     ,
-                     ) + OFS.Folder.Folder.manage_options
+    manage_options = ( ActionProviderBase.manage_options
+                     + ( { 'label' : 'Action Providers'
+                         , 'action' : 'manage_actionProviders'
+                         }
+                       , { 'label' : 'Overview'
+                         , 'action' : 'manage_overview'
+                         }
+                     ) + Folder.manage_options
                      ) 
 
     #
@@ -84,23 +93,6 @@ class ActionsTool(UniqueObject, OFS.Folder.Folder, ActionProviderBase):
     manage_overview = DTMLFile( 'explainActionsTool', _dtmldir )
     manage_actionProviders = DTMLFile('manageActionProviders', _dtmldir)
 
-
-    #
-    # Programmatically manipulate the list of action providers
-    #
-
-    security.declarePrivate('listActions')
-    def listActions(self, info=None):
-        """
-        Lists actions available through the tool.
-        """
-        return self._actions
-
-    security.declareProtected(ManagePortal, 'listActionProviders')
-    def listActionProviders(self):
-       """ returns a sequence of action providers known by this tool """
-       return self.action_providers
-
     security.declareProtected(ManagePortal, 'manage_aproviders')
     def manage_aproviders(self
                         , apname=''
@@ -109,7 +101,7 @@ class ActionsTool(UniqueObject, OFS.Folder.Folder, ActionProviderBase):
                         , del_provider=0
                         , REQUEST=None):
         """
-        Manage TTW Action Providers
+        Manage action providers through-the-web.
         """
         providers = list(self.listActionProviders())
         new_providers = []
@@ -119,50 +111,61 @@ class ActionsTool(UniqueObject, OFS.Folder.Folder, ActionProviderBase):
             for item in providers:
                 if item not in chosen:
                     new_providers.append(item)
-            providers = new_providers
+            providers = tuple(new_providers)
         self.action_providers = providers
         if REQUEST is not None:
-            return self.manage_actionProviders(self
-                                             , REQUEST
-                                             , manage_tabs_message='Properties changed.')
-        
+            return self.manage_actionProviders(self , REQUEST
+                          , manage_tabs_message='Providers changed.')
 
+    #
+    #   ActionProvider interface
+    #
+    security.declarePrivate('listActions')
+    def listActions(self, info=None):
+        """
+        Return a list of actions available through the tool.
+        """
+        return self._actions
+
+    #
+    #   Programmatically manipulate the list of action providers
+    #
+    security.declareProtected(ManagePortal, 'listActionProviders')
+    def listActionProviders(self):
+        """
+        Return a sequence of action providers known by this tool.
+        """
+        return self.action_providers
 
     security.declareProtected(ManagePortal, 'addActionProvider')
     def addActionProvider( self, provider_name ):
-        """ add the name of a new action provider """
-        if hasattr( self, provider_name ):
-            p_old = self.action_providers
-            p_new = p_old + ( provider_name, )
-            self.action_providers = p_new
+        """
+        Add the name of a new action provider.
+        """
+        ap = list( self.action_providers )
+        if hasattr( self, provider_name ) and provider_name not in ap:
+            ap.append( provider_name )
+            self.action_providers = tuple( ap )
 
     security.declareProtected(ManagePortal, 'deleteActionProvider')
     def deleteActionProvider( self, provider_name ):
-        """ remove an action provider """
-        if provider_name in self.action_providers:
-            p_old = list( self.action_providers )
-            del p_old[p_old.index( provider_name)]
-            self.action_providers = tuple( p_old )
+        """
+        Remove an action provider.
+        """
+        ap = list( self.action_providers )
+        if provider_name in ap:
+            ap.remove( provider_name )
+            self.action_providers = tuple( ap )
 
     #
     #   'portal_actions' interface methods
     #
-
-    def _listActions(self,append,object,info,ec):
-        a = object.listActions(info)
-        if a and type(a[0]) is not type({}):
-            for ai in a:
-                if ai.testCondition(ec):
-                    append(ai.getAction(ec))
-        else:
-            for i in a:
-                append(i)
-        
     security.declarePublic('listFilteredActionsFor')
     def listFilteredActionsFor(self, object=None):
-        '''Gets all actions available to the user and returns a mapping
-        containing user actions, object actions, and global actions.
-        '''
+        """
+        Return a mapping containing of all actions available to the
+        user against object, bucketing into categories.
+        """
         portal = aq_parent(aq_inner(self))
         if object is None or not hasattr(object, 'aq_base'):
             folder = portal
@@ -265,5 +268,19 @@ class ActionsTool(UniqueObject, OFS.Folder.Folder, ActionProviderBase):
     # listFilteredActions() is an alias.
     security.declarePublic('listFilteredActions')
     listFilteredActions = listFilteredActionsFor
+
+    #
+    #   Helper methods
+    #
+    def _listActions(self,append,object,info,ec):
+        a = object.listActions(info)
+        if a and type(a[0]) is not type({}):
+            for ai in a:
+                if ai.testCondition(ec):
+                    append(ai.getAction(ec))
+        else:
+            for i in a:
+                append(i)
+        
 
 InitializeClass(ActionsTool)
