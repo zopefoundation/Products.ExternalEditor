@@ -65,7 +65,7 @@ class InlineAuthHelper(Folder, BasePlugin):
                     , 'label' : 'Title'
                     , 'type'  : 'string'
                     , 'mode'  : 'w'
-                    }
+                    },
                   )
 
     manage_options = ( BasePlugin.manage_options[:1]
