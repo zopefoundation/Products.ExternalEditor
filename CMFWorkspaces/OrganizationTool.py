@@ -67,7 +67,9 @@ class OrganizationTool(UniqueObject, SimpleItem):
     security.declarePublic('listAddableTypes')
     def listAddableTypes(self):
         """Returns a list of types."""
-        return self._types.keys()
+        res = self._types.keys()
+        res.sort()
+        return res
 
 
     security.declarePublic('getAddFormURL')
@@ -119,9 +121,9 @@ class OrganizationTool(UniqueObject, SimpleItem):
         """
         types = {}
         for r in info:
-            t = str(r.type)
+            t = str(r['type'])
             if t:
-                types[t] = (str(r.location), str(r.skin_name))
+                types[t] = (str(r['location']), str(r['skin_name']))
         self._types = types
         if RESPONSE is not None:
             RESPONSE.redirect(self.absolute_url() + '/manage_placement?' +

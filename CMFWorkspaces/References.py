@@ -79,7 +79,8 @@ class RelativeReference (Base):
         return ob.__of__(context)
 
     def __repr__(self):
-        return '<%s, path=%s>' % (self.__class__.__name__, self._path)
+        return '<%s, path=%s>' % (self.__class__.__name__,
+                                  '/'.join(self._path))
 
     def __cmp__(self, other):
         """Compares this object with another.
