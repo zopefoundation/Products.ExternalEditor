@@ -122,12 +122,18 @@ class CookieCrumbler (Folder):
         return getattr(self, name, default)
 
     security.declarePrivate('defaultSetAuthCookie')
-    def defaultSetAuthCookie( self, resp, cookie_name, cookie_value ):
-        resp.setCookie( cookie_name, cookie_value, path=self.getCookiePath())
+    def defaultSetAuthCookie(self, resp, cookie_name, cookie_value):
+        kw = {}
+        req = getattr(self, 'REQUEST', None)
+        if req is not None and req.get('SERVER_URL', '').startswith('https:'):
+            # Ask the client to send back the cookie only in SSL mode
+            kw['secure'] = 'y'
+        resp.setCookie(cookie_name, cookie_value,
+                       path=self.getCookiePath(), **kw)
 
     security.declarePrivate('defaultExpireAuthCookie')
-    def defaultExpireAuthCookie( self, resp, cookie_name ):
-        resp.expireCookie( cookie_name, path=self.getCookiePath())
+    def defaultExpireAuthCookie(self, resp, cookie_name):
+        resp.expireCookie(cookie_name, path=self.getCookiePath())
     
     def _setAuthHeader(self, ac, request, response):
         """Set the auth headers for both the Zope and Medusa http request
@@ -401,6 +407,19 @@ class ResponseCleanup:
 manage_addCCForm = HTMLFile('dtml/addCC', globals())
 manage_addCCForm.__name__ = 'addCC'
 
+def _create_forms(ob):
+    ''' Create default forms inside ob '''
+    import os
+    from OFS.DTMLMethod import addDTMLMethod
+    dtmldir = os.path.join(os.path.dirname(__file__), 'dtml')
+    for fn in ('index_html', 'logged_in', 'logged_out', 'login_form',
+                'standard_login_footer', 'standard_login_header'):
+        filename = os.path.join(dtmldir, fn + '.dtml')
+        f = open(filename, 'rt')
+        try: data = f.read()
+        finally: f.close()
+        addDTMLMethod(ob, fn, file=data)
+
 def manage_addCC(dispatcher, id, create_forms=0, REQUEST=None):
     ' '
     ob = CookieCrumbler()
@@ -408,15 +427,6 @@ def manage_addCC(dispatcher, id, create_forms=0, REQUEST=None):
     dispatcher._setObject(ob.getId(), ob)
     ob = getattr(dispatcher.this(), ob.getId())
     if create_forms:
-        import os
-        from OFS.DTMLMethod import addDTMLMethod
-        dtmldir = os.path.join(os.path.dirname(__file__), 'dtml')
-        for fn in ('index_html', 'logged_in', 'logged_out', 'login_form',
-                   'standard_login_footer', 'standard_login_header'):
-            filename = os.path.join(dtmldir, fn + '.dtml')
-            f = open(filename, 'rt')
-            try: data = f.read()
-            finally: f.close()
-            addDTMLMethod(ob, fn, file=data)
+        _create_forms(ob)
     if REQUEST is not None:
         return dispatcher.manage_main(dispatcher, REQUEST)
