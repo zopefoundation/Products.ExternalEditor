@@ -78,14 +78,14 @@ class HTTPBasicAuthHelperTests( unittest.TestCase
                         , { 'login' : 'foo', 'password' : 'bar' } )
 
     def test_challenge( self ):
-
+        from zExceptions import Unauthorized
+        
         helper = self._makeOne()
         request = FauxHTTPRequest()
         response = FauxHTTPResponse()
 
         self.failIf( response._unauthorized_called )
-        helper.challenge( request, response )
-        self.failUnless( response._unauthorized_called )
+        self.failUnlessRaises(Unauthorized, helper.challenge, (request, response ), {})
 
     def test_updateCredentials( self ):
 

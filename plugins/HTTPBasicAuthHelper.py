@@ -92,7 +92,6 @@ class HTTPBasicAuthHelper( BasePlugin ):
 
         """ Challenge the user for credentials.
         """
-        return 0
         m = "<strong>You are not authorized to access this resource.</strong>"
         raise Unauthorized, m
 
