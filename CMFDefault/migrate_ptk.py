@@ -1,6 +1,7 @@
 
 
 from Acquisition import aq_base, aq_inner, aq_parent
+from ZODB.PersistentMapping import PersistentMapping
 from string import join
 import sys
 
@@ -10,82 +11,106 @@ import sys
 #
 
 
-class MigrationResults:
-    def __init__(self):
-        self.visited_folders = []
-        self.warnings = []
-        self.copied = []
-        self.skipped = []
-
-
 class Converter:
     def allowDescendChildren(self): raise 'Not implemented'
     def convert(self, ob): raise 'Not implemented'
     def showDuplicationError(self): raise 'Not implemented'
 
 
-def pathOf(ob):
-    return join(ob.getPhysicalPath(), '/')
+class Migrator:
 
-def _migrateObjectManager(src_folder, dst_folder, conversions, skip, res):
-    res.visited_folders.append(pathOf(src_folder))
-    for id, s_ob in src_folder.objectItems():
-        _migrateObject(id, s_ob, dst_folder, conversions, skip, res)
+    def __init__(self, conversions, skip):
+        self.conversions = conversions
+        self.skip = skip
+        self.visited_folders = []
+        self.warnings = []
+        self.copied = []
+        self.skipped = []
 
-def _migrateContainer(src_folder, dst_folder, conversions, skip, res):
-    res.visited_folders.append(pathOf(src_folder))
-    for id, ob in src_folder._container.items():
-        s_ob = ob.__of__(src_folder)
-        _migrateObject(id, s_ob, dst_folder, conversions, skip, res)
+    def migrateObjectManager(self, src_folder, dst_folder, place=()):
+        self.visited_folders.append(join(place, '/'))
+        for id, s_ob in src_folder.objectItems():
+            d_ob = getattr(dst_folder, id, None)
+            to_store = self.migrateObject(id, s_ob, d_ob, dst_folder,
+                                          place + (id,))
+            if to_store is not None:
+                owner = getattr(to_store, '_owner', None)
+                if hasattr(dst_folder, '_setObject'):
+                    dst_folder._setObject(id, to_store)
+                else:
+                    setattr(dst_folder, id, to_store)
+                if owner is not None:
+                    # Retain ownership.
+                    to_store._owner = owner
 
-def _migrateObject(id, s_ob, dst_folder, conversions, skip, res):
-    klass = s_ob.__class__
-    descend_ok = 1
-    pathname = pathOf(s_ob)
-    base_ob = aq_base(s_ob)
-    if skip.has_key(id):
-        descend_ok = skip[id]
-        if descend_ok and not hasattr(aq_base(dst_folder), id):
-            descend_ok = 0
-        res.skipped.append(pathname +
-                           (descend_ok and ' (descended)' or ' '))
-    elif hasattr(aq_base(dst_folder), id):
-        descend_ok = 1
-        show_message = 1
-        converter = conversions.get(klass, None)
-        if converter is not None:
-            descend_ok = converter.allowDescendChildren()
-            show_message = converter.showDuplicationError()
-        if show_message:
-            res.warnings.append('Folder %s already had an '
-                                'attribute named %s.'
-                                % (pathOf(dst_folder), id))
-    elif conversions.has_key(klass):
-        converter = conversions[klass]
-        d_ob = converter.convert(s_ob)
-        dst_folder._setObject(id, d_ob)
-        if hasattr(base_ob, '_owner'):
-            # Retain ownership.
-            d_ob._owner = s_ob._owner
-        res.copied.append(pathname)
-    elif hasattr(base_ob, '_getCopy'):
-        d_ob = s_ob._getCopy(dst_folder)
-        dst_folder._setObject(id, d_ob)
-        if hasattr(base_ob, '_owner'):
-            # Retain ownership.
-            d_ob._owner = s_ob._owner
-        res.warnings.append('Copied %s directly.' % pathname)
-        descend_ok = 0
-    else:
-        descend_ok = 0
-        res.warnings.append('Could not copy %s' % pathname)
-    if descend_ok and hasattr(dst_folder, '_getOb'):
+    def migrateDiscussionContainer(self, src_folder, dst_folder, place=()):
+        self.visited_folders.append(join(place, '/'))
+        dst_container = getattr(dst_folder, '_container', None)
+        if dst_container is None:
+            dst_container = dst_folder._container = PersistentMapping()
+        for id, s_ob in src_folder._container.items():
+            d_ob = dst_container.get(id)
+            to_store = self.migrateObject(id, s_ob, d_ob, dst_folder,
+                                          place + (id,))
+            if to_store is not None:
+                dst_container[id] = aq_base(to_store)
+
+    def migratePossibleContainer(self, s_ob, d_ob, place):
+        base_ob = aq_base(s_ob)
         if hasattr(base_ob, 'objectItems'):
-            _migrateObjectManager(s_ob, dst_folder._getOb(id),
-                                  conversions, skip, res)
+            self.migrateObjectManager(s_ob, d_ob, place)
         elif hasattr(base_ob, '_container'):
-            _migrateContainer(s_ob, dst_folder._getOb(id),
-                              conversions, skip, res)
+            self.migrateDiscussionContainer(s_ob, d_ob, place)
+
+    def migrateObject(self, id, s_ob, d_ob, dst_folder, place):
+        # Doesn't store changes, only returns the
+        # object to store.
+        conversions = self.conversions
+        klass = s_ob.__class__
+        descend_ok = 1
+        base_ob = aq_base(s_ob)
+        to_store = None
+        pathname = join(place, '/')
+        if self.skip.has_key(id):
+            # Don't migrate objects by this name, but we can still
+            # migrate subobjects.
+            descend_ok = self.skip[id]
+            if descend_ok and d_ob is None:
+                descend_ok = 0
+            self.skipped.append(pathname +
+                               (descend_ok and ' (descended)' or ' '))
+        elif d_ob is not None:
+            # The dest already has something with this ID.
+            descend_ok = 1
+            show_message = 1
+            converter = conversions.get(klass, None)
+            if converter is not None:
+                descend_ok = converter.allowDescendChildren()
+                show_message = converter.showDuplicationError()
+            if show_message:
+                self.warnings.append('Already existed: %s' % pathname)
+        elif conversions.has_key(klass):
+            # Invoke the appropriate converter.
+            converter = conversions[klass]
+            to_store = converter.convert(s_ob)
+            self.copied.append(pathname)
+        elif hasattr(base_ob, '_getCopy'):
+            # Make a direct copy.
+            to_store = s_ob._getCopy(dst_folder)
+            self.warnings.append('Copied %s directly.' % pathname)
+            descend_ok = 0
+        else:
+            # No way to copy.
+            descend_ok = 0
+            self.warnings.append('Could not copy %s' % pathname)
+        if descend_ok:
+            if to_store is not None:
+                d_ob = to_store
+            if d_ob is not None:
+                try: d_ob._p_jar = dst_folder._p_jar
+                except: pass
+                self.migratePossibleContainer(s_ob, d_ob, place)
+        return to_store
 
 
 class SimpleClassConverter (Converter):
@@ -101,14 +126,18 @@ class SimpleClassConverter (Converter):
         return self._show_dup
 
     def convert(self, ob):
+        # Creates a copy of ob without its children.
         ob = aq_base(ob)
         k = self._klass
         if hasattr(k, '__basicnew__'):
             newob = k.__basicnew__()
         else:
             newob = new.instance(k, {})
-        try: newob.id = ob.getId()
-        except AttributeError: pass
+        id = ob.id
+        if callable(id):
+            id = id()
+        try: newob._setId(id)
+        except AttributeError: newob.id = id
         newob.__dict__.update(ob.__dict__)
         if hasattr(newob, '_objects'):
             # Clear the children.
@@ -117,7 +146,7 @@ class SimpleClassConverter (Converter):
             newob._objects = ()
         if hasattr(newob, '_container'):
             # Clear the children.
-            newob._container.clear()
+            newob._container = PersistentMapping()
         return newob
         
 TupleType = type(())
@@ -145,6 +174,7 @@ def setupDirectConversions(old_prod, new_prod, modnames, conversions):
             modname = classname = info
         setupDirectConversion(old_prod, new_prod, modname, classname,
                               conversions)
+
 
 def _cleanupOwnership(ob, res, cleanup_children):
     '''
@@ -211,13 +241,19 @@ def _cleanupOwnership(ob, res, cleanup_children):
     
     return res
 
+def _copyUsers(src_folder, dst_folder):
+    source = src_folder.acl_users
+    target = dst_folder.acl_users
+    for user in source.getUsers():
+        target._addUser(name=user.name, password=user.__, confirm=user.__,
+                        roles=user.roles, domains=user.domains, REQUEST=None)
 
 #
 # PTK to CMF Migration script.
 #
 
 
-def migrate(self, src_path='', dest_path=''):
+def migrate(self, src_path='', dest_path='', copy_users=0, ownership_only=0):
     if not src_path or not dest_path:
         return '''
         <html><body><form action="%s" method="POST">
@@ -226,15 +262,21 @@ def migrate(self, src_path='', dest_path=''):
         <input type="text" name="src_path"></p>
         <p>Path (not including server URL) to CMF site (destination):
         <input type="text" name="dest_path"></p>
+        <p>Copy users:
+        <input type="checkbox" name="copy_users" value="1"></p>
         <input type="submit" name="submit" value="Migrate">
+        <input type="submit" name="ownership_only"
+        value="Just clean up ownership">
         </form></body></html>
         ''' % self.REQUEST['URL']
     root = self.getPhysicalRoot()
-    src_folder = root.restrictedTraverse(src_path)
     dst_folder = root.restrictedTraverse(dest_path)
-    res = MigrationResults()
-    _migrateObjectManager(src_folder, dst_folder,
-                          ptk2cmf_conversions, ptk2cmf_skip, res)
+    if not ownership_only:
+        src_folder = root.restrictedTraverse(src_path)
+        if copy_users:
+            _copyUsers(src_folder, dst_folder)
+        m = Migrator(ptk2cmf_conversions, ptk2cmf_skip)
+        m.migrateObjectManager(src_folder, dst_folder)
     ownership_res = []
     _cleanupOwnership(dst_folder, ownership_res, 1)
     return '''
@@ -245,13 +287,14 @@ def migrate(self, src_path='', dest_path=''):
         <p>Converted content:</p><pre>%s</pre>
         <p>Fixed up ownership:</p><pre>%s</pre>
         </body></html>
-        ''' % (join(res.warnings, '</li>\n<li>'),
-               join(res.visited_folders, '</li>\n<li>'),
-               join(res.skipped, '</li>\n<li>'),
-               join(res.copied, '\n'),
+        ''' % (join(m.warnings, '</li>\n<li>'),
+               join(m.visited_folders, '</li>\n<li>'),
+               join(m.skipped, '</li>\n<li>'),
+               join(m.copied, '\n'),
                join(ownership_res, '\n'),
                )
 
+migrate_ptk = migrate
 
 #
 # PTK to CMF Conversion definitions.
@@ -288,7 +331,16 @@ demo_conversions = (
     ('DiscussionItem', 'DiscussionItemContainer'),
     )
 
-setupDirectConversions('PTKDemo', 'CMFDefault', demo_conversions,
+
+BEFORE_CONTENT_MOVE = 0
+
+if BEFORE_CONTENT_MOVE:
+    content_product = 'PTKBase'
+else:
+    content_product = 'PTKDemo'
+    
+
+setupDirectConversions(content_product, 'CMFDefault', demo_conversions,
                        ptk2cmf_conversions)
 
 setupDirectConversion('PTKBase', 'CMFCore', 'DirectoryView', 'DirectoryView',
