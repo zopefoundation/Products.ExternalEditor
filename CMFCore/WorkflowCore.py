@@ -149,7 +149,7 @@ class WorkflowMethod (Method):
             # No workflow tool found.
             try:
                 res = apply(self._m, (instance,) + args, kw)
-            except NoReindex, ex:
+            except ObjectDeleted, ex:
                 res = ex.getResult()
             else:
                 catalog = getToolByName(instance, 'portal_catalog', None)
