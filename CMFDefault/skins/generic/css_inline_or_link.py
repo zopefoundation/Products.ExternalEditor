@@ -20,5 +20,4 @@ if hasattr(context, 'stylesheet_properties'):
         else:
             s_url = '%s/%s' % (context.portal_url(), sheet)
             stylesheet_code = '<link rel="stylesheet" href="%s" type="text/css" />' % s_url
-
 return stylesheet_code
