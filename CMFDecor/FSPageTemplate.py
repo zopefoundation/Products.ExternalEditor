@@ -132,6 +132,9 @@ class FSPageTemplate(FSObject, Script, PageTemplate):
         obj.write(self.read())
         return obj
 
+    def ZCacheable_isCachingEnabled(self):
+        return 0
+
     def _readFile(self, reparse):
         fp = expandpath(self._filepath)
         file = open(fp, 'rb')
