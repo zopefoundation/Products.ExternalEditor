@@ -216,7 +216,7 @@ class CMFSite ( PortalObjectBase
     description = ''
 
     __ac_permissions__=(
-        ('Manage portal', ('createPortalTools','manage_migrate_content')),
+        ('Manage portal', ('manage_migrate_content',)),
         ('Add portal content', ()),
         ('Add portal folders', ()),
         ('List portal members', ()),
