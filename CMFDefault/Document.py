@@ -329,7 +329,10 @@ class Document(PortalContent, DefaultDublinCoreImpl):
     security.declareProtected(CMFCorePermissions.View, 'SearchableText')
     def SearchableText(self):
         """ Used by the catalog for basic full text indexing """
-        return "%s %s %s" % (self.title, self.description, self.text)
+        return "%s %s %s" % ( self.Title()
+                            , self.Description()
+                            , self.EditableBody()
+                            )
 
     security.declareProtected(CMFCorePermissions.View, 'CookedBody')
     def CookedBody(self, stx_level=None, setlevel=0):
