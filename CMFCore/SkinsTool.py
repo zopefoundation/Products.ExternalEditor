@@ -15,6 +15,8 @@
 $Id$
 """
 
+from types import ListType
+
 from utils import UniqueObject, getToolByName, _dtmldir
 from Globals import DTMLFile
 from Globals import InitializeClass
@@ -23,19 +25,17 @@ from SkinsContainer import SkinsContainer
 from Acquisition import aq_base
 from DateTime import DateTime
 from AccessControl import ClassSecurityInfo
-from CMFCorePermissions import ManagePortal
+
 from CMFCorePermissions import AccessContentsInformation
+from CMFCorePermissions import ManagePortal
+from CMFCorePermissions import View
 from ActionProviderBase import ActionProviderBase
-from ActionInformation import ActionInformation
-from Expression import Expression
 
 from OFS.Folder import Folder
 from OFS.Image import Image
 from OFS.DTMLMethod import DTMLMethod
 from OFS.ObjectManager import REPLACEABLE
 from Products.PythonScripts.PythonScript import PythonScript
-
-from types import StringType, ListType
 
 try:
     from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
@@ -258,7 +258,7 @@ class SkinsTool(UniqueObject, SkinsContainer, Folder, ActionProviderBase):
         rval.sort()
         return rval
 
-    security.declareProtected('View', 'updateSkinCookie')
+    security.declareProtected(View, 'updateSkinCookie')
     def updateSkinCookie(self):
         '''
         If needed, updates the skin cookie based on the member preference.
@@ -289,7 +289,7 @@ class SkinsTool(UniqueObject, SkinsContainer, Folder, ActionProviderBase):
                     return 1
         return 0
 
-    security.declareProtected( 'View', 'clearSkinCookie' )
+    security.declareProtected(View, 'clearSkinCookie')
     def clearSkinCookie(self):
         req = self.REQUEST
         resp = req.RESPONSE
