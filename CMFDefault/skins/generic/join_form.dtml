@@ -29,7 +29,7 @@
 <dtml-if error>
 <div class="ErrorMessage">
 <dtml-var error>
-</dif>
+</div>
 </dtml-if>
 
 <form action="register" method="POST">
