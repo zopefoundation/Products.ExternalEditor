@@ -121,19 +121,23 @@ class MemberDataTool (UniqueObject, SimpleItem, PropertyManager, ActionProviderB
         if search_param == 'username':
             search_param = 'id'
 
-        for user_wrapper in self._members.values():
-            u = membership.getMemberById(user_wrapper.id)
-            searched = u.getProperty(search_param, None)
-            if searched is not None and searched.find(search_term) != -1:
-                user_data = {}
+        for user_id in self._members.keys():
+            u = membership.getMemberById(user_id)
 
-                for desired in attributes:
-                    if desired == 'id':
-                        user_data['username'] = u.getProperty(desired, '')
-                    else:
-                        user_data[desired] = u.getProperty(desired, '')
+            if u is not None:
+                memberProperty = u.getProperty
+                searched = memberProperty(search_param, None)
 
-                res.append(user_data)
+                if searched is not None and searched.find(search_term) != -1:
+                    user_data = {}
+
+                    for desired in attributes:
+                        if desired == 'id':
+                            user_data['username'] = memberProperty(desired, '')
+                        else:
+                            user_data[desired] = memberProperty(desired, '')
+
+                    res.append(user_data)
 
         return res
 
