@@ -13,8 +13,8 @@
          tal:attributes="href home_url;
                          title creator;
                         "
-         tal:content="creator">Creator</a>
-    </span><span tal:condition="not: home_url"
+         tal:content="creator">Creator</a
+    ></span><span tal:condition="not: home_url"
                  tal:content="creator">Creator</span
     >. <span tal:omit-tag="" i18n:translate="">Last modified</span>
     <span tal:content="here/ModificationDate"
