@@ -13,6 +13,11 @@
   <th align="right"> Title: </th>
   <td><input type="text" name="title" value="&dtml-title;" size="30" /></td>
  </tr>
+ <tr valign="top"
+  <th align="right"> Description: </th>
+  <td><textarea name="description:test" rows="5" cols="65"
+       >&dtml-Description;</textarea></td>
+ </tr>
  <tr valign="top">
   <th align="right"> Acquire Criteria<br>from Parent: </th>
   <td>

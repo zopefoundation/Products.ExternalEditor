@@ -194,10 +194,15 @@ class Topic( PortalFolder ):
         return self.objectValues(self.meta_type)
 
     security.declareProtected(TopicPermissions.ChangeTopics, 'edit')
-    def edit(self, acquireCriteria, title=None, REQUEST=None):
-        """ Enable the acquisition of criteria from parent topics """
+    def edit(self, acquireCriteria, title=None, description=None,
+             REQUEST=None):
+        """\
+        Enable the acquisition of criteria from parent topics, and update
+        other meta data about the Topic.
+        """
         self.acquireCriteria = acquireCriteria
         if title is not None: self.title = title
+        self.description = description
         
         if REQUEST is not None:
             REQUEST['RESPONSE'].redirect('%s/topic_view' % self.absolute_url())
