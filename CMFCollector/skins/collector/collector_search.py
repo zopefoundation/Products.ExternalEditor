@@ -1,4 +1,4 @@
-## Script (Python) "search_collector.py"
+## Script (Python) "collector_search.py"
 ##title=Build Collector Search
 
 query = {}
