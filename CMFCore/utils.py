@@ -636,3 +636,10 @@ def minimalpath(p):
             p = p[len(ppath)+1:]
             break
     return p.replace('\\','/')
+
+class SimpleRecord:
+    """ record-like class """
+
+    def __init__(self, **kw):
+        self.__dict__.update(kw)
+
