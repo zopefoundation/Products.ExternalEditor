@@ -7,6 +7,10 @@ import os
 
 from Products.CMFSetup.tests.common import BaseRegistryTests
 
+from conformance import ConformsToIStepRegistry
+from conformance import ConformsToIImportStepRegistry
+from conformance import ConformsToIExportStepRegistry
+
 #==============================================================================
 #   Dummy handlers
 #==============================================================================
@@ -24,12 +28,15 @@ FOUR_FUNC_NAME = '%s.%s' % ( __name__, FOUR_FUNC.__name__ )
 #==============================================================================
 #   SSR tests
 #==============================================================================
-class SetupStepRegistryTests( BaseRegistryTests ):
+class ImportStepRegistryTests( BaseRegistryTests
+                             , ConformsToIStepRegistry
+                             , ConformsToIImportStepRegistry
+                             ):
 
     def _getTargetClass( self ):
 
-        from Products.CMFSetup.registry import SetupStepRegistry
-        return SetupStepRegistry
+        from Products.CMFSetup.registry import ImportStepRegistry
+        return ImportStepRegistry
 
     def test_empty( self ):
 
@@ -429,7 +436,7 @@ class SetupStepRegistryTests( BaseRegistryTests ):
 
         xml = registry.exportAsXML()
 
-        self._compareDOM( registry.exportAsXML(), _EMPTY_STEPS_EXPORT )
+        self._compareDOM( registry.exportAsXML(), _EMPTY_IMPORT_XML )
 
     def test_export_single( self ):
 
@@ -443,7 +450,7 @@ class SetupStepRegistryTests( BaseRegistryTests ):
                              , description='One small step'
                              )
 
-        self._compareDOM( registry.exportAsXML(), _SINGLE_STEP_EXPORT )
+        self._compareDOM( registry.exportAsXML(), _SINGLE_IMPORT_XML )
 
     def test_export_ordered( self ):
 
@@ -473,7 +480,7 @@ class SetupStepRegistryTests( BaseRegistryTests ):
                              , description='Gimme three steps'
                              )
 
-        self._compareDOM( registry.exportAsXML(), _ORDERED_STEPS_EXPORT )
+        self._compareDOM( registry.exportAsXML(), _ORDERED_IMPORT_XML )
 
     def test_import_empty( self ):
 
@@ -486,7 +493,7 @@ class SetupStepRegistryTests( BaseRegistryTests ):
                              , description='One small step'
                              )
 
-        registry.importFromXML( _EMPTY_STEPS_EXPORT )
+        registry.importFromXML( _EMPTY_IMPORT_XML )
 
         self.assertEqual( len( registry.listSteps() ), 0 )
         self.assertEqual( len( registry.listStepMetadata() ), 0 )
@@ -504,7 +511,7 @@ class SetupStepRegistryTests( BaseRegistryTests ):
                              , description='Texas two step'
                              )
 
-        registry.importFromXML( _SINGLE_STEP_EXPORT )
+        registry.importFromXML( _SINGLE_IMPORT_XML )
 
         self.assertEqual( len( registry.listSteps() ), 1 )
         self.failUnless( 'one' in registry.listSteps() )
@@ -521,7 +528,7 @@ class SetupStepRegistryTests( BaseRegistryTests ):
 
         registry = self._makeOne().__of__( self.root )
 
-        registry.importFromXML( _ORDERED_STEPS_EXPORT )
+        registry.importFromXML( _ORDERED_IMPORT_XML )
 
         self.assertEqual( len( registry.listSteps() ), 3 )
         self.failUnless( 'one' in registry.listSteps() )
@@ -537,60 +544,63 @@ class SetupStepRegistryTests( BaseRegistryTests ):
         self.failUnless( 0 <= three < two < one )
 
 
-_EMPTY_STEPS_EXPORT = """\
+_EMPTY_IMPORT_XML = """\
 <?xml version="1.0"?>
-<setup-steps>
-</setup-steps>
+<import-steps>
+</import-steps>
 """
 
-_SINGLE_STEP_EXPORT = """\
+_SINGLE_IMPORT_XML = """\
 <?xml version="1.0"?>
-<setup-steps>
- <setup-step id="one"
+<import-steps>
+ <import-step id="one"
              version="1"
              handler="%s"
              title="One Step">
   One small step
- </setup-step>
-</setup-steps>
+ </import-step>
+</import-steps>
 """ % ( ONE_FUNC_NAME, )
 
-_ORDERED_STEPS_EXPORT = """\
+_ORDERED_IMPORT_XML = """\
 <?xml version="1.0"?>
-<setup-steps>
- <setup-step id="one"
+<import-steps>
+ <import-step id="one"
              version="1"
              handler="%s"
              title="One Step">
   <dependency step="two" />
   One small step
- </setup-step>
- <setup-step id="three"
+ </import-step>
+ <import-step id="three"
              version="3"
              handler="%s"
              title="Three Steps">
   Gimme three steps
- </setup-step>
- <setup-step id="two"
+ </import-step>
+ <import-step id="two"
              version="2"
              handler="%s"
              title="Two Steps">
   <dependency step="three" />
   Texas two step
- </setup-step>
-</setup-steps>
+ </import-step>
+</import-steps>
 """ % ( ONE_FUNC_NAME, THREE_FUNC_NAME, TWO_FUNC_NAME )
 
 
 #==============================================================================
 #   ESR tests
 #==============================================================================
-class ExportScriptRegistryTests( BaseRegistryTests ):
+class ExportStepRegistryTests( BaseRegistryTests
+                             , ConformsToIStepRegistry
+                             , ConformsToIExportStepRegistry
+                             ):
 
     def _getTargetClass( self ):
 
-        from Products.CMFSetup.registry import ExportScriptRegistry
-        return ExportScriptRegistry
+        from Products.CMFSetup.registry import ExportStepRegistry
+        return ExportStepRegistry
 
     def _makeOne( self, *args, **kw ):
 
@@ -599,42 +609,42 @@ class ExportScriptRegistryTests( BaseRegistryTests ):
     def test_empty( self ):
 
         registry = self._makeOne()
-        self.assertEqual( len( registry.listScripts() ), 0 )
-        self.assertEqual( len( registry.listScriptMetadata() ), 0 )
+        self.assertEqual( len( registry.listSteps() ), 0 )
+        self.assertEqual( len( registry.listStepMetadata() ), 0 )
 
-    def test_getScript_nonesuch( self ):
+    def test_getStep_nonesuch( self ):
 
         registry = self._makeOne()
-        self.assertEqual( registry.getScript( 'nonesuch' ), None )
+        self.assertEqual( registry.getStep( 'nonesuch' ), None )
 
-    def test_getScript_defaulted( self ):
+    def test_getStep_defaulted( self ):
 
         registry = self._makeOne()
         default = lambda x: false
-        self.assertEqual( registry.getScript( 'nonesuch', default ), default )
+        self.assertEqual( registry.getStep( 'nonesuch', default ), default )
 
-    def test_getScriptMetadata_nonesuch( self ):
-
-        registry = self._makeOne()
-        self.assertEqual( registry.getScriptMetadata( 'nonesuch' ), None )
-
-    def test_getScriptMetadata_defaulted( self ):
+    def test_getStepMetadata_nonesuch( self ):
 
         registry = self._makeOne()
-        self.assertEqual( registry.getScriptMetadata( 'nonesuch', {} ), {} )
+        self.assertEqual( registry.getStepMetadata( 'nonesuch' ), None )
 
-    def test_registerScript_simple( self ):
+    def test_getStepMetadata_defaulted( self ):
 
         registry = self._makeOne()
-        registry.registerScript( 'one', ONE_FUNC )
-        info = registry.getScriptMetadata( 'one', {} )
+        self.assertEqual( registry.getStepMetadata( 'nonesuch', {} ), {} )
+
+    def test_registerStep_simple( self ):
+
+        registry = self._makeOne()
+        registry.registerStep( 'one', ONE_FUNC )
+        info = registry.getStepMetadata( 'one', {} )
 
         self.assertEqual( info[ 'id' ], 'one' )
         self.assertEqual( info[ 'handler' ], ONE_FUNC_NAME )
         self.assertEqual( info[ 'title' ], 'one' )
         self.assertEqual( info[ 'description' ], '' )
 
-    def test_registerScript_docstring( self ):
+    def test_registerStep_docstring( self ):
 
         def func_with_doc( site ):
             """This is the first line.
@@ -644,15 +654,15 @@ class ExportScriptRegistryTests( BaseRegistryTests ):
         FUNC_NAME = '%s.%s' % ( __name__, func_with_doc.__name__ )
 
         registry = self._makeOne()
-        registry.registerScript( 'one', func_with_doc )
-        info = registry.getScriptMetadata( 'one', {} )
+        registry.registerStep( 'one', func_with_doc )
+        info = registry.getStepMetadata( 'one', {} )
 
         self.assertEqual( info[ 'id' ], 'one' )
         self.assertEqual( info[ 'handler' ], FUNC_NAME )
         self.assertEqual( info[ 'title' ], 'This is the first line.' )
         self.assertEqual( info[ 'description' ] , 'This is the second line.' )
 
-    def test_registerScript_docstring_with_override( self ):
+    def test_registerStep_docstring_with_override( self ):
 
         def func_with_doc( site ):
             """This is the first line.
@@ -662,20 +672,20 @@ class ExportScriptRegistryTests( BaseRegistryTests ):
         FUNC_NAME = '%s.%s' % ( __name__, func_with_doc.__name__ )
 
         registry = self._makeOne()
-        registry.registerScript( 'one', func_with_doc
+        registry.registerStep( 'one', func_with_doc
                                , description='Description' )
-        info = registry.getScriptMetadata( 'one', {} )
+        info = registry.getStepMetadata( 'one', {} )
 
         self.assertEqual( info[ 'id' ], 'one' )
         self.assertEqual( info[ 'handler' ], FUNC_NAME )
         self.assertEqual( info[ 'title' ], 'This is the first line.' )
         self.assertEqual( info[ 'description' ], 'Description' )
 
-    def test_registerScript_collision( self ):
+    def test_registerStep_collision( self ):
 
         registry = self._makeOne()
-        registry.registerScript( 'one', ONE_FUNC )
-        self.assertRaises( KeyError, registry.registerScript, 'one', TWO_FUNC )
+        registry.registerStep( 'one', ONE_FUNC )
+        self.assertRaises( KeyError, registry.registerStep, 'one', TWO_FUNC )
 
     def test_export_empty( self ):
 
@@ -683,74 +693,74 @@ class ExportScriptRegistryTests( BaseRegistryTests ):
 
         xml = registry.exportAsXML()
 
-        self._compareDOM( registry.exportAsXML(), _EMPTY_SCRIPTS_EXPORT )
+        self._compareDOM( registry.exportAsXML(), _EMPTY_EXPORT_XML )
 
     def test_export_single( self ):
 
         registry = self._makeOne().__of__( self.root )
 
-        registry.registerScript( id='one'
+        registry.registerStep( id='one'
                                , handler=ONE_FUNC
                                , title='One Step'
                                , description='One small step'
                                )
 
-        self._compareDOM( registry.exportAsXML(), _SINGLE_SCRIPT_EXPORT )
+        self._compareDOM( registry.exportAsXML(), _SINGLE_EXPORT_XML )
 
     def test_export_ordered( self ):
 
         registry = self._makeOne().__of__( self.root )
 
-        registry.registerScript( id='one'
+        registry.registerStep( id='one'
                                , handler=ONE_FUNC
                                , title='One Step'
                                , description='One small step'
                                )
 
-        registry.registerScript( id='two'
+        registry.registerStep( id='two'
                                , handler=TWO_FUNC
                                , title='Two Steps'
                                , description='Texas two step'
                                )
 
-        registry.registerScript( id='three'
+        registry.registerStep( id='three'
                                , handler=THREE_FUNC
                                , title='Three Steps'
                                , description='Gimme three steps'
                                )
 
-        self._compareDOM( registry.exportAsXML(), _ORDERED_SCRIPTS_EXPORT )
+        self._compareDOM( registry.exportAsXML(), _ORDERED_EXPORT_XML )
 
     def test_import_empty( self ):
 
         registry = self._makeOne().__of__( self.root )
 
-        registry.registerScript( id='one'
+        registry.registerStep( id='one'
                                , handler=ONE_FUNC
                                , description='One small step'
                                )
 
-        registry.importFromXML( _EMPTY_SCRIPTS_EXPORT )
+        registry.importFromXML( _EMPTY_EXPORT_XML )
 
-        self.assertEqual( len( registry.listScripts() ), 0 )
-        self.assertEqual( len( registry.listScriptMetadata() ), 0 )
+        self.assertEqual( len( registry.listSteps() ), 0 )
+        self.assertEqual( len( registry.listStepMetadata() ), 0 )
 
     def test_import_single( self ):
 
         registry = self._makeOne().__of__( self.root )
 
-        registry.registerScript( id='two'
+        registry.registerStep( id='two'
                                , handler=TWO_FUNC
                                , title='Two Steps'
                                , description='Texas two step'
                                )
 
-        registry.importFromXML( _SINGLE_SCRIPT_EXPORT )
+        registry.importFromXML( _SINGLE_EXPORT_XML )
 
-        self.assertEqual( len( registry.listScripts() ), 1 )
-        self.failUnless( 'one' in registry.listScripts() )
+        self.assertEqual( len( registry.listSteps() ), 1 )
+        self.failUnless( 'one' in registry.listSteps() )
 
-        info = registry.getScriptMetadata( 'one' )
+        info = registry.getStepMetadata( 'one' )
         self.assertEqual( info[ 'id' ], 'one' )
         self.assertEqual( info[ 'handler' ], ONE_FUNC_NAME )
         self.assertEqual( info[ 'title' ], 'One Step' )
@@ -760,57 +770,57 @@ class ExportScriptRegistryTests( BaseRegistryTests ):
 
         registry = self._makeOne().__of__( self.root )
 
-        registry.importFromXML( _ORDERED_SCRIPTS_EXPORT )
+        registry.importFromXML( _ORDERED_EXPORT_XML )
 
-        self.assertEqual( len( registry.listScripts() ), 3 )
-        self.failUnless( 'one' in registry.listScripts() )
-        self.failUnless( 'two' in registry.listScripts() )
-        self.failUnless( 'three' in registry.listScripts() )
+        self.assertEqual( len( registry.listSteps() ), 3 )
+        self.failUnless( 'one' in registry.listSteps() )
+        self.failUnless( 'two' in registry.listSteps() )
+        self.failUnless( 'three' in registry.listSteps() )
 
 
-_EMPTY_SCRIPTS_EXPORT = """\
+_EMPTY_EXPORT_XML = """\
 <?xml version="1.0"?>
-<export-scripts>
-</export-scripts>
+<export-steps>
+</export-steps>
 """
 
-_SINGLE_SCRIPT_EXPORT = """\
+_SINGLE_EXPORT_XML = """\
 <?xml version="1.0"?>
-<export-scripts>
- <export-script id="one"
+<export-steps>
+ <export-step id="one"
                 handler="%s"
                 title="One Step">
   One small step
- </export-script>
-</export-scripts>
+ </export-step>
+</export-steps>
 """ % ( ONE_FUNC_NAME, )
 
-_ORDERED_SCRIPTS_EXPORT = """\
+_ORDERED_EXPORT_XML = """\
 <?xml version="1.0"?>
-<export-scripts>
- <export-script id="one"
+<export-steps>
+ <export-step id="one"
                 handler="%s"
                 title="One Step">
   One small step
- </export-script>
- <export-script id="three"
+ </export-step>
+ <export-step id="three"
                 handler="%s"
                 title="Three Steps">
   Gimme three steps
- </export-script>
- <export-script id="two"
+ </export-step>
+ <export-step id="two"
                 handler="%s"
                 title="Two Steps">
   Texas two step
- </export-script>
-</export-scripts>
+ </export-step>
+</export-steps>
 """ % ( ONE_FUNC_NAME, THREE_FUNC_NAME, TWO_FUNC_NAME )
 
 
 def test_suite():
     return unittest.TestSuite((
-        unittest.makeSuite( SetupStepRegistryTests ),
-        unittest.makeSuite( ExportScriptRegistryTests ),
+        unittest.makeSuite( ImportStepRegistryTests ),
+        unittest.makeSuite( ExportStepRegistryTests ),
         ))
 
 if __name__ == '__main__':

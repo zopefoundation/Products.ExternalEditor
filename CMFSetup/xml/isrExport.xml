@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<setup-steps xmlns:tal="http://xml.zope.org/namespaces/tal">
- <setup-step id="STEP_ID"
+<import-steps xmlns:tal="http://xml.zope.org/namespaces/tal">
+ <import-step id="STEP_ID"
              version="STEP_VERSION"
              handler="DOTTED.NAME"
              title="TITLE"
@@ -14,5 +14,5 @@
               tal:repeat="dep step/dependencies"
               tal:attributes="step dep" />
   <span tal:replace="step/description">DESCRIPTION</span>
- </setup-step>
-</setup-steps>
+ </import-step>
+</import-steps>

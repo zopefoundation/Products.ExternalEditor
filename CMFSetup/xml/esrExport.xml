@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
-<export-scripts xmlns:tal="http://xml.zope.org/namespaces/tal">
- <export-script id="STEP_ID"
+<export-steps xmlns:tal="http://xml.zope.org/namespaces/tal">
+ <export-step id="STEP_ID"
                 handler="DOTTED.NAME"
                 title="TITLE"
-                tal:repeat="script here/listScriptMetadata"
-                tal:attributes="id script/id;
-                                handler script/handler;
-                                title script/title
+                tal:repeat="step here/listStepMetadata"
+                tal:attributes="id step/id;
+                                handler step/handler;
+                                title step/title
                                ">
-  <span tal:replace="script/description">DESCRIPTION</span>
- </export-script>
-</export-scripts>
+  <span tal:replace="step/description">DESCRIPTION</span>
+ </export-step>
+</export-steps>

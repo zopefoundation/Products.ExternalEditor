@@ -32,3 +32,39 @@ class ConformsToIExportContext:
         from Interface.Verify import verifyClass
 
         verifyClass( IExportContext, self._getTargetClass() )
+
+class ConformsToIStepRegistry:
+
+    def test_IStepRegistry_conformance( self ):
+
+        from Products.CMFSetup.interfaces import IStepRegistry
+        from Interface.Verify import verifyClass
+
+        verifyClass( IStepRegistry, self._getTargetClass() )
+
+class ConformsToIImportStepRegistry:
+
+    def test_IImportStepRegistry_conformance( self ):
+
+        from Products.CMFSetup.interfaces import IImportStepRegistry
+        from Interface.Verify import verifyClass
+
+        verifyClass( IImportStepRegistry, self._getTargetClass() )
+
+class ConformsToIExportStepRegistry:
+
+    def test_IExportStepRegistry_conformance( self ):
+
+        from Products.CMFSetup.interfaces import IExportStepRegistry
+        from Interface.Verify import verifyClass
+
+        verifyClass( IExportStepRegistry, self._getTargetClass() )
+
+class ConformsToISetupTool:
+
+    def test_ISetupTool_conformance( self ):
+
+        from Products.CMFSetup.tool import ISetupTool
+        from Interface.Verify import verifyClass
+
+        verifyClass( ISetupTool, self._getTargetClass() )

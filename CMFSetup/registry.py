@@ -1,4 +1,4 @@
-""" Classes:  SetupStepRegistry, ExportScriptRegistry
+""" Classes:  ImportStepRegistry, ExportStepRegistry
 
 $Id$
 """
@@ -9,35 +9,24 @@ from xml.sax.handler import ContentHandler
 from AccessControl import ClassSecurityInfo
 from Acquisition import Implicit
 from Globals import InitializeClass
-from Interface import Interface
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
+from interfaces import IImportStepRegistry
+from interfaces import IExportStepRegistry
 from permissions import ManagePortal
 from utils import _xmldir
 from utils import _getDottedName
 from utils import _resolveDottedName
 from utils import _extractDocstring
 
-class ISetupStep( Interface ):
-
-    """ The executable object which performs a step to configure a site.
-    """
-    def __call__( context ):
-
-        """ Perform the setup step.
-
-        o Return a message describing the work done.
-
-        o 'context' is a wrapper for the site object to be configured,
-          along with the data files used by the step.
-        """
-
-class SetupStepRegistry( Implicit ):
+class ImportStepRegistry( Implicit ):
 
     """ Manage knowledge about steps to create / configure site.
 
     o Steps are composed together to define a site profile.
     """
+    __implements__ = ( IImportStepRegistry, )
+
     security = ClassSecurityInfo()
 
     def __init__( self ):
@@ -127,7 +116,7 @@ class SetupStepRegistry( Implicit ):
     security.declarePrivate( 'getStep' )
     def getStep( self, key, default=None ):
 
-        """ Return the ISetupStep registered for 'key'.
+        """ Return the IImportPlugin registered for 'key'.
 
         o Return 'default' if no such step is registered.
         """
@@ -162,7 +151,7 @@ class SetupStepRegistry( Implicit ):
           - Attempting to register an older one after a newer one results
             in a KeyError.
 
-        o 'handler' should implement ISetupStep.
+        o 'handler' should implement IImportPlugin.
 
         o 'dependencies' is a tuple of step ids which have to run before
           this step in order to be able to run at all. Registration of
@@ -212,7 +201,7 @@ class SetupStepRegistry( Implicit ):
         if reader is not None:
             text = reader()
 
-        parseString( text, _SetupStepRegistryParser( self ) )
+        parseString( text, _ImportStepRegistryParser( self ) )
 
     #
     #   Helper methods
@@ -244,11 +233,11 @@ class SetupStepRegistry( Implicit ):
         return result
 
     security.declarePrivate( '_exportTemplate' )
-    _exportTemplate = PageTemplateFile( 'ssrExport.xml', _xmldir )
+    _exportTemplate = PageTemplateFile( 'isrExport.xml', _xmldir )
 
-InitializeClass( SetupStepRegistry )
+InitializeClass( ImportStepRegistry )
 
-class _SetupStepRegistryParser( ContentHandler ):
+class _ImportStepRegistryParser( ContentHandler ):
 
     security = ClassSecurityInfo()
     security.declareObjectPrivate()
@@ -263,14 +252,14 @@ class _SetupStepRegistryParser( ContentHandler ):
 
     def startElement( self, name, attrs ):
 
-        if name == 'setup-steps':
+        if name == 'import-steps':
 
             if self._started:
                 raise ValueError, 'Duplicated setup-steps element: %s' % name
 
             self._started = True
 
-        elif name == 'setup-step':
+        elif name == 'import-step':
 
             if self._pending is not None:
                 raise ValueError, 'Cannot nest setup-step elements'
@@ -297,10 +286,10 @@ class _SetupStepRegistryParser( ContentHandler ):
 
     def endElement(self, name):
 
-        if name == 'setup-steps':
+        if name == 'import-steps':
             pass
 
-        elif name == 'setup-step':
+        elif name == 'import-step':
 
             if self._pending is None:
                 raise ValueError, 'No pending step!'
@@ -322,37 +311,19 @@ class _SetupStepRegistryParser( ContentHandler ):
                                        )
             self._pending = None
 
-InitializeClass( _SetupStepRegistryParser )
+InitializeClass( _ImportStepRegistryParser )
 
 
-class IExportScript( Interface ):
+class ExportStepRegistry( Implicit ):
 
-    """ A script responsible for exporting some portion of the site.
-    """
-    def __call__( site ):
+    """ Registry of known site-configuration export steps.
 
-        """ Return a sequence of tuples describing a set of exported files.
-
-        o Each item is a three-tuple, ( 'data', 'content_type', 'filename' ),
-          representing one file exported by the script.
-      
-          - 'data' is a string containing the file data;
-
-          - 'content_type' is the MIME type of the data;
-
-          - 'filename' is a suggested filename for use when downloading.
-        """
-
-class ExportScriptRegistry( Implicit ):
-
-    """ Registry of known site-configuration export scripts.
-
-    o Each script is registered with a unique id.
+    o Each step is registered with a unique id.
     
     o When called, with the portal object passed in as an argument,
-      the script must return a sequence of three-tuples,
+      the step must return a sequence of three-tuples,
       ( 'data', 'content_type', 'filename' ), one for each file exported
-      by the script.
+      by the step.
       
       - 'data' is a string containing the file data;
 
@@ -361,27 +332,29 @@ class ExportScriptRegistry( Implicit ):
       - 'filename' is a suggested filename for use when downloading.
 
     """
+    __implements__ = ( IExportStepRegistry, )
+
     security = ClassSecurityInfo()
 
     def __init__( self ):
  
         self._registered = {}   
 
-    security.declareProtected( ManagePortal, 'listScripts' )
-    def listScripts( self ):
+    security.declareProtected( ManagePortal, 'listSteps' )
+    def listSteps( self ):
 
-        """ Return a list of registered script IDs.
+        """ Return a list of registered step IDs.
         """
         return self._registered.keys()
 
-    security.declareProtected( ManagePortal, 'getScriptMetadata' )
-    def getScriptMetadata( self, key, default=None ):
+    security.declareProtected( ManagePortal, 'getStepMetadata' )
+    def getStepMetadata( self, key, default=None ):
 
-        """ Return a mapping of metadata for the script identified by 'key'.
+        """ Return a mapping of metadata for the step identified by 'key'.
 
-        o Return 'default' if no such script is registered.
+        o Return 'default' if no such step is registered.
 
-        o The 'handler' metadata is available via 'getScript'.
+        o The 'handler' metadata is available via 'getStep'.
         """
         info = self._registered.get( key )
 
@@ -390,16 +363,16 @@ class ExportScriptRegistry( Implicit ):
 
         return info.copy()
 
-    security.declareProtected( ManagePortal, 'listScriptMetadata' )
-    def listScriptMetadata( self ):
+    security.declareProtected( ManagePortal, 'listStepMetadata' )
+    def listStepMetadata( self ):
 
-        """ Return a sequence of mappings describing registered scripts.
+        """ Return a sequence of mappings describing registered steps.
 
-        o Scripts will be alphabetical by ID.
+        o Steps will be alphabetical by ID.
         """
-        script_ids = self.listScripts()
-        script_ids.sort()
-        return [ self.getScriptMetadata( x ) for x in script_ids ]
+        step_ids = self.listSteps()
+        step_ids.sort()
+        return [ self.getStepMetadata( x ) for x in step_ids ]
 
     security.declareProtected( ManagePortal, 'exportAsXML' )
     def exportAsXML( self ):
@@ -410,12 +383,12 @@ class ExportScriptRegistry( Implicit ):
         """
         return self._exportTemplate()
 
-    security.declarePrivate( 'getScript' )
-    def getScript( self, key, default=None ):
+    security.declarePrivate( 'getStep' )
+    def getStep( self, key, default=None ):
 
-        """ Return the IExportScript registered for 'key'.
+        """ Return the IExportPlugin registered for 'key'.
 
-        o Return 'default' if no such script is registered.
+        o Return 'default' if no such step is registered.
         """
         marker = object()
         info = self._registered.get( key, marker )
@@ -425,27 +398,27 @@ class ExportScriptRegistry( Implicit ):
 
         return _resolveDottedName( info[ 'handler' ] )
 
-    security.declarePrivate( 'registerScript' )
-    def registerScript( self, id, handler, title=None, description=None ):
+    security.declarePrivate( 'registerStep' )
+    def registerStep( self, id, handler, title=None, description=None ):
 
-        """ Register an export script.
+        """ Register an export step.
 
-        o 'id' is the unique identifier for this script
+        o 'id' is the unique identifier for this step
 
-        o 'script' should implement IExportScript.
+        o 'step' should implement IExportPlugin.
 
-        o 'title' is a one-line UI description for this script.
-          If None, the first line of the documentation string of the script
+        o 'title' is a one-line UI description for this step.
+          If None, the first line of the documentation string of the step
           is used, or the id if no docstring can be found.
 
-        o 'description' is a one-line UI description for this script.
+        o 'description' is a one-line UI description for this step.
           If None, the remaining line of the documentation string of
-          the script is used, or default to ''.
+          the step is used, or default to ''.
         """
-        already = self.getScript( id )
+        already = self.getStep( id )
 
         if already:
-            raise KeyError( 'Existing registration for script %s' % id )
+            raise KeyError( 'Existing registration for step %s' % id )
 
         if title is None or description is None:
 
@@ -474,7 +447,7 @@ class ExportScriptRegistry( Implicit ):
         if reader is not None:
             text = reader()
 
-        parseString( text, _ExportScriptRegistryParser( self ) )
+        parseString( text, _ExportStepRegistryParser( self ) )
 
     #
     #   Helper methods
@@ -487,9 +460,9 @@ class ExportScriptRegistry( Implicit ):
     security.declarePrivate( '_exportTemplate' )
     _exportTemplate = PageTemplateFile( 'esrExport.xml', _xmldir )
 
-InitializeClass( ExportScriptRegistry )
+InitializeClass( ExportStepRegistry )
 
-class _ExportScriptRegistryParser( ContentHandler ):
+class _ExportStepRegistryParser( ContentHandler ):
 
     security = ClassSecurityInfo()
     security.declareObjectPrivate()
@@ -504,17 +477,17 @@ class _ExportScriptRegistryParser( ContentHandler ):
 
     def startElement( self, name, attrs ):
 
-        if name == 'export-scripts':
+        if name == 'export-steps':
 
             if self._started:
-                raise ValueError, 'Duplicated export-scripts element: %s' % name
+                raise ValueError, 'Duplicated export-steps element: %s' % name
 
             self._started = True
 
-        elif name == 'export-script':
+        elif name == 'export-step':
 
             if self._pending is not None:
-                raise ValueError, 'Cannot nest export-script elements'
+                raise ValueError, 'Cannot nest export-step elements'
 
             self._pending = dict( [ ( k, v.encode( self._encoding ) )
                                     for k, v in attrs.items() ] )
@@ -530,13 +503,13 @@ class _ExportScriptRegistryParser( ContentHandler ):
 
     def endElement(self, name):
 
-        if name == 'export-scripts':
+        if name == 'export-steps':
             pass
 
-        elif name == 'export-script':
+        elif name == 'export-step':
 
             if self._pending is None:
-                raise ValueError, 'No pending script!'
+                raise ValueError, 'No pending step!'
 
             id = self._pending[ 'id' ]
             handler = _resolveDottedName( self._pending[ 'handler' ] )
@@ -544,11 +517,11 @@ class _ExportScriptRegistryParser( ContentHandler ):
             title = self._pending.get( 'title', id )
             description = ''.join( self._pending.get( 'description', [] ) )
 
-            self._registry.registerScript( id=id
-                                         , handler=handler
-                                         , title=title
-                                         , description=description
-                                         )
+            self._registry.registerStep( id=id
+                                       , handler=handler
+                                       , title=title
+                                       , description=description
+                                       )
             self._pending = None
 
-InitializeClass( _ExportScriptRegistryParser )
+InitializeClass( _ExportStepRegistryParser )

@@ -16,7 +16,7 @@ def suite():
                            , [ 'test_context'
                              , 'test_registry'
                              , 'test_rolemap'
-                           # , 'test_tool'
+                             , 'test_tool'
                              , 'test_utils'
                              ]
                            )
