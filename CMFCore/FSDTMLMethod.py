@@ -137,7 +137,7 @@ class FSDTMLMethod(RestrictedDTML, FSObject, Globals.HTML):
             r=apply(Globals.HTML.__call__, (self, client, REQUEST), kw)
             if type(r) is not type('') or RESPONSE is None:
                 if not self._cache_namespace_keys:
-                    self.ZCacheable_set(result)
+                    self.ZCacheable_set(r)
                 return r
 
         finally: security.removeContext(self)
