@@ -124,24 +124,24 @@
         guard_roles=""
         guard_expr="python: True"
         tal:repeat="info workflow/transition_info"
-        tal:attributes="transition_id transition/id;
-                        title transition/title;
-                        new_state transition/new_state_id;
-                        trigger transition/trigger_type;
-                        before_script transition/before_script_name;
-                        after_script transition/after_script_name;
-                        action_name transition/actbox_name;
-                        action_url transition/actbox_url;
-                        action_category transition/actbox_category;
-                        guard_permissions transition/guard_permissions;
-                        guard_roles transition/guard_roles;
-                        guard_expr transition/guard_expr;
+        tal:attributes="transition_id info/id;
+                        title info/title;
+                        new_state info/new_state_id;
+                        trigger info/trigger_type;
+                        before_script info/before_script_name;
+                        after_script info/after_script_name;
+                        action_name info/actbox_name;
+                        action_url info/actbox_url;
+                        action_category info/actbox_category;
+                        guard_permissions info/guard_permissions;
+                        guard_roles info/guard_roles;
+                        guard_expr info/guard_expr;
                        ">
      <assignments>
       <assignment
         name=""
         expression="" 
-        tal:repeat="var transition/variables"
+        tal:repeat="var info/variables"
         tal:attributes="name python:var[0];
                         expression python:var[1];
                        "

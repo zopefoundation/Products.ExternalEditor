@@ -16,6 +16,8 @@ from permissions import ManagePortal
 from utils import HandlerBase
 from utils import _xmldir
 
+TRIGGER_TYPES = ( 'AUTOMATIC', 'USER', 'WORKFLOW_METHOD' )
+
 #
 #   Configurator entry points
 #
@@ -158,47 +160,6 @@ class WorkflowToolConfigurator( Implicit ):
           'var_match' -- a list of ( key, value ) tuples defining
             the variables used to "activate" the worklist.
 
-        o Within the workflow mapping, each 'transition_info' mapping has keys:
-
-          'id' -- the ID of the transition
-
-          'title' -- the title of the transition
-
-          'new_state_id' -- the ID of the state into which the transition
-            moves an object
-
-          'trigger_type' -- one of the following values, indicating how the
-            transition is fired:
-
-            - "AUTOMATIC" -> fired opportunistically whenever the workflow
-               notices that its guard conditions permit
-
-            - "USER" -> fired in response to user request
-
-            - "WORKFLOW_METHOD" -> fired as the result of execting a
-               WorkflowMethod
-
-          'before_script_name' -- the ID of a script to be executed before
-             the transition
-
-          'after_script_name' -- the ID of a script to be executed after
-             the transition
-
-          'actbox_name' -- the name of the action by which the user
-             triggers the transition
-
-          'actbox_url' -- the URL of the action by which the user
-             triggers the transition
-
-          'actbox_category' -- the category of the action by which the user
-             triggers the transition
-
-          'guard_permissions' -- a list of permissions guarding the transition
-
-          'guard_roles' -- a list of roles guarding the transition
-
-          'guard_expr' -- an expression guarding the transition
-
         """
         workflow_tool = getToolByName( self._site, 'portal_workflow' )
         workflow = workflow_tool.getWorkflowById( workflow_id )
@@ -248,22 +209,24 @@ class WorkflowToolConfigurator( Implicit ):
             variables tracked by the workflow (see '_extractVariables').
 
           'worklist_info' -- a list of mappings describing the
-            worklists tracked by the workflow (see below).
+            worklists tracked by the workflow (see '_extractWorklists').
 
           'initial_state' -- the name of the state in the workflow
             in which objects start their lifecycle.
 
           'state_info' -- a list of mappings describing the
-            states tracked by the workflow (see below).
+            states tracked by the workflow (see '_extractStates').
 
           'transition_info' -- a list of mappings describing the
-            transitions tracked by the workflow (see below).
+            transitions tracked by the workflow (see '_extractTransitions').
         """
         workflow_info[ 'state_variable' ] = workflow.state_var
         workflow_info[ 'initial_state' ] = workflow.initial_state
         workflow_info[ 'permissions' ] = workflow.permissions
         workflow_info[ 'variable_info' ] = self._extractVariables( workflow )
         workflow_info[ 'state_info' ] = self._extractStates( workflow )
+        workflow_info[ 'transition_info' ] = self._extractTransitions(
+                                                                    workflow )
 
     security.declarePrivate( '_extractVariables' )
     def _extractVariables( self, workflow ):
@@ -292,6 +255,8 @@ class WorkflowToolConfigurator( Implicit ):
 
           'guard_roles' -- a list of roles guarding access
             to the variable
+
+          'guard_groups' -- a list of groups guarding the transition
 
           'guard_expr' -- an expression guarding access to the variable
         """
@@ -390,6 +355,87 @@ class WorkflowToolConfigurator( Implicit ):
 
         return result
 
+
+    security.declarePrivate( '_extractTransitions' )
+    def _extractTransitions( self, workflow ):
+
+        """ Return a sequence of mappings describing DCWorkflow transitions.
+
+        o Each mapping has the keys:
+
+          'id' -- the transition's ID
+
+          'title' -- the transition's ID
+
+          'description' -- the transition's description
+
+          'new_state_id' -- the ID of the state into which the transition
+            moves an object
+
+          'trigger_type' -- one of the following values, indicating how the
+            transition is fired:
+
+            - "AUTOMATIC" -> fired opportunistically whenever the workflow
+               notices that its guard conditions permit
+
+            - "USER" -> fired in response to user request
+
+            - "WORKFLOW_METHOD" -> fired as the result of execting a
+               WorkflowMethod
+
+          'script_name' -- the ID of a script to be executed before
+             the transition
+
+          'after_script_name' -- the ID of a script to be executed after
+             the transition
+
+          'actbox_name' -- the name of the action by which the user
+             triggers the transition
+
+          'actbox_url' -- the URL of the action by which the user
+             triggers the transition
+
+          'actbox_category' -- the category of the action by which the user
+             triggers the transition
+
+          'variables' -- a list of ( id, expr ) tuples defining how variables
+            are to be set during the transition
+
+          'guard_permissions' -- a list of permissions guarding the transition
+
+          'guard_roles' -- a list of roles guarding the transition
+
+          'guard_groups' -- a list of groups guarding the transition
+
+          'guard_expr' -- an expression guarding the transition
+
+        """
+        result = []
+
+        for k, v in workflow.transitions.objectItems():
+
+            guard = v.getGuard()
+
+            info = { 'id'                   : k
+                   , 'title'                : v.title
+                   , 'description'          : v.description
+                   , 'new_state_id'         : v.new_state_id
+                   , 'trigger_type'         : TRIGGER_TYPES[ v.trigger_type ]
+                   , 'script_name'          : v.script_name
+                   , 'after_script_name'    : v.after_script_name
+                   , 'actbox_name'          : v.actbox_name
+                   , 'actbox_url'           : v.actbox_url
+                   , 'actbox_category'      : v.actbox_category
+                   , 'variables'            : v.getVariableExprs()
+                   , 'guard_permissions'    : guard.getPermissionsText()
+                   , 'guard_roles'          : guard.getRolesText()
+                   , 'guard_groups'         : guard.getGroupsText()
+                   , 'guard_expr'           : guard.getExprText()
+                   }
+
+            result.append( info )
+
+        return result
 
 
 InitializeClass( WorkflowToolConfigurator )
