@@ -19,6 +19,7 @@ def suite():
                              , 'test_rolemap'
                              , 'test_skins'
                              , 'test_tool'
+                             , 'test_typeinfo'
                              , 'test_utils'
                              ]
                            )

@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<types-tool xmlns:tal="http://xml.zope.org/namespaces/tal">
+ <type-info
+    id="foo"
+    kind="Factory-based Type Information"
+    title="Foo"
+    meta_type="Foo Thing"
+    icon="foo.png"
+    immediate_view="foo_view"
+    filter_content_types="False"
+    allowed_content_types=""
+    allow_discussion="False"
+    global_allow="False"
+    tal:repeat="info here/listTypeInfo"
+    tal:attributes="id info/id;
+                    kind info/kind;
+                    title info/title;
+                    meta_type info/meta_type;
+                    icon info/icon;
+                    product info/product | default;
+                    factory info/factory | default;
+                    permission info/permission | default;
+                    constructor_path info/constructor_path | default;
+                    immediate_view info/immediate_view;
+                    filter_content_types info/filter_content_types;
+                    allowed_content_types python:
+                        ','.join( info[ 'allowed_content_types' ] );
+                    allow_discussion info/allow_discussion;
+                    global_allow info/global_allow;
+                   "
+    >
+   <description tal:content="info/description">Foo things</description>
+   <aliases>
+    <alias from="(Default)" to="foo_view"
+           tal:repeat="item info/aliases/items"
+           tal:attributes="from python: item[ 0 ]; to python: item[ 1 ];"
+    />
+   </aliases>
+   <action
+      action_id="view"
+      title="View"
+      condition=""
+      action_expr="string:${object_url}/foo_view"
+      permissions="View"
+      category="object"
+      visible="True"
+      tal:repeat="action info/actions"
+      tal:attributes="action_id action/id;
+                      title action/title;
+                      condition action/condition;
+                      action_expr action/action;
+                      permissions python:
+                        ','.join( action[ 'permissions' ] );
+                      category action/category;
+                      visible action/visible;
+                     "
+      />
+ </type-info>
+</types-tool>
