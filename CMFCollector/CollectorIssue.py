@@ -96,6 +96,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
     # Accumulated instance-data backwards-compatability values:
     _collector_path = None
     submitter_email = None
+    submitter_name = None
     version_info = ''
 
     def __init__(self,
@@ -121,17 +122,9 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         if submitter_id is None:
             submitter_id = str(user)
         self.submitter_id = submitter_id
-        if submitter_name is None:
-            n = user.getProperty('full_name', '')
-            if n: submitter_name = n
-        self.submitter_name = submitter_name
-        email_pref = user.getProperty('email', '')
-        if submitter_email and submitter_email == email_pref:
-            # A bit different than you'd expect: only stash the specified
-            # email if it's different than the member-preference.  Otherwise,
-            # stash None, so the preference is tracked at send time.
-            submitter_email = None
-        self.submitter_email = submitter_email
+        self.__of__(container)._set_submitter_specs(submitter_id,
+                                                    submitter_name,
+                                                    submitter_email)
 
         if kibitzers is None:
             kibitzers = ()
@@ -145,8 +138,8 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         self.version_info = version_info
 
         self.portal_type = 'Collector Issue'
-        container._setObject(id, self)
         # 'contained' is for stuff that needs collector acquisition wrapping.
+        container._setObject(id, self)
         contained = container._getOb(id)
         contained._setPortalTypeName('Collector Issue')
         DefaultDublinCoreImpl.__init__(contained,
@@ -161,10 +154,35 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         contained.do_action('request', description, assignees,
                             file, fileid, filetype)
 
+    def _set_submitter_specs(self, submitter_id,
+                             submitter_name, submitter_email):
+        """Given an id, set the name and email as warranted by the values."""
+
+        import pdb; pdb.set_trace()
+        mbrtool = getToolByName(self, 'portal_membership')
+        user = mbrtool.getMemberById(submitter_id)
+        changes = []
+        if submitter_name is None:
+            name = util.safeGetProperty(user, 'full_name', '')
+            if name: submitter_name = name
+        if self.submitter_name != submitter_name:
+            changes.append('submitter name')
+            self.submitter_name = submitter_name
+        email_pref = util.safeGetProperty(user, 'email', '')
+        if submitter_email and submitter_email == email_pref:
+            # A bit different than you'd expect: only stash the specified
+            # email if it's different than the member-preference.  Otherwise,
+            # stash None, so the preference is tracked at send time.
+            submitter_email = None
+        if self.submitter_email != submitter_email:
+            changes.append("submitter email")
+            self.submitter_email = submitter_email
+        return changes
+
     def _set_collector_path(self, collector):
         """Stash path to containing collector."""
         # For getting the internal catalog when being indexed - at which 
-        # time we don't have an acquisition content to use...
+        # time we may not have an acquisition context...
         self._collector_path = "/".join(collector.getPhysicalPath())
 
     security.declareProtected(CMFCorePermissions.View, 'no_submitter_email')
@@ -174,8 +192,9 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
             return 0
         if self.submitter_id != str(self.acl_users._nobody):
             member = self.portal_membership.getMemberById(self.submitter_id)
-            if member and member.getProperty('email'):
-                return 0
+            if member:
+                email_pref = util.safeGetProperty(member, 'email', '')
+                return not email_pref
         return 1
 
     security.declareProtected(CMFCorePermissions.View, 'CookedBody')
@@ -204,6 +223,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
     security.declareProtected(EditCollectorIssue, 'edit')
     def edit(self,
              title=None,
+             submitter_name=None, submitter_email=None,
              security_related=None,
              description=None,
              topic=None,
@@ -219,6 +239,8 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
 
         transcript = self.get_transcript()
         text = text.replace('\r', '')
+        changes += self._set_submitter_specs(self.submitter_id,
+                                             submitter_name, submitter_email)
         if text is not None and text != transcript.text:
             changes.append('revised transcript')
             transcript._edit(text_format=DEFAULT_TRANSCRIPT_FORMAT,
