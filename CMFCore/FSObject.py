@@ -93,7 +93,7 @@ from AccessControl import ClassSecurityInfo
 from OFS.SimpleItem import Item
 from DateTime import DateTime
 
-from utils import expandpath
+from utils import expandpath, getToolByName
 import CMFCorePermissions
 
 class FSObject(Acquisition.Implicit, Item):
@@ -139,7 +139,8 @@ class FSObject(Acquisition.Implicit, Item):
         
         id = obj.getId()
         fpath = tuple(split(folder_path, '/'))
-        folder = self.restrictedTraverse(fpath)
+        portal_skins = getToolByName(self,'portal_skins') 
+        folder = portal_skins.restrictedTraverse(fpath)
         folder._verifyObjectPaste(obj, validate_src=0)
         folder._setObject(id, obj)
 
