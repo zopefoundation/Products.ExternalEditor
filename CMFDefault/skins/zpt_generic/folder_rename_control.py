@@ -4,27 +4,44 @@
 ##bind namespace=
 ##bind script=script
 ##bind subpath=traverse_subpath
-##parameters=ids=(), new_ids=(), rename='', cancel=''
+##parameters=ids=(), new_ids=(), rename='', cancel='', **kw
 ##title=
 ##
 from ZTUtils import make_query
+from Products.CMFCore.CMFCoreExceptions import CopyError
 from Products.CMFCore.utils import getToolByName
+from Products.CMFDefault.utils import html_marshal
 utool = getToolByName(script, 'portal_url')
 portal_url = utool()
+target_action = 'object/folderContents'
+status = ''
 message = ''
 
 
 if rename:
-    context.manage_renameObjects(ids, new_ids)
-    target = context.getActionInfo('object/folderContents')['url']
-    message = 'Item%s renamed.' % ( len(ids) != 1 and 's' or '' )
-    query = make_query(portal_status_message=message)
-    context.REQUEST.RESPONSE.redirect( '%s?%s' % (target, query) )
-    return None
+    if not ids == new_ids:
+        try:
+            context.manage_renameObjects(ids, new_ids)
+            status = 'success'
+            message = 'Item%s renamed.' % ( len(ids) != 1 and 's' or '' )
+        except CopyError:
+            message = 'CopyError: Rename failed.'
+    else:
+        message = 'Nothing to change.'
 
 elif cancel:
-    target = context.getActionInfo('object/folderContents')['url']
-    context.REQUEST.RESPONSE.redirect(target)
+    status = 'success'
+
+
+if status == 'success':
+    target = context.getActionInfo(target_action)['url']
+    if message:
+        kw['portal_status_message'] = message
+    if kw:
+        query = make_query(kw)
+        context.REQUEST.RESPONSE.redirect( '%s?%s' % (target, query) )
+    else:
+        context.REQUEST.RESPONSE.redirect(target)
     return None
 
 if message:
@@ -46,11 +63,15 @@ for item in raw_items:
                     'type': item.Type() or None } )
 control['batch'] = { 'listItemInfos': tuple(items) }
 
-buttons = []
 target = context.getActionInfo('object/rename_items')['url']
+hidden_vars = []
+for name, value in html_marshal(**kw):
+    hidden_vars.append( {'name': name, 'value': value} )
+buttons = []
 buttons.append( {'name': 'rename', 'value': 'Rename'} )
 buttons.append( {'name': 'cancel', 'value': 'Cancel'} )
 control['form'] = { 'action': target,
+                    'listHiddenVarInfos': tuple(hidden_vars),
                     'listButtonInfos': tuple(buttons) }
 
 return control

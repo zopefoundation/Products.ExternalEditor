@@ -14,7 +14,8 @@
 <h2 i18n:translate="">Rename Items</h2>
 
 <form action="members_manage" method="post"
-   tal:attributes="action form/action">
+   tal:attributes="action form/action"
+><metal:block metal:use-macro="here/form_widgets/macros/hidden_vars" />
  <table class="FormLayout">
   <tr tal:repeat="item_info batch/listItemInfos">
    <td width="8%"

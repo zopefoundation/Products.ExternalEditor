@@ -367,9 +367,29 @@ p.NewsHeadline {
 }
 
 .BatchTable tr.list-header {
-    background-color: #c0c0c0;
+    background-color: #aaaaaa;
     text-align: left;
     font: 90%/120% sans-serif;
+}
+
+.BatchTable tr.list-header a:link {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.BatchTable tr.list-header a:visited {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.BatchTable tr.list-header a:active {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.BatchTable tr.list-header a:hover {
+    color: #336699;
+    text-decoration: none;
 }
 
 .BatchTable tr.row-normal {

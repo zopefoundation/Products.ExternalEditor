@@ -10,6 +10,8 @@
 from ZTUtils import make_query
 if kw.has_key('b_start'):
     del kw['b_start']
+if kw.has_key('portal_status_message'):
+    del kw['portal_status_message']
 
 navigation = {}
 

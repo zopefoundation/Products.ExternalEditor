@@ -1,6 +1,17 @@
 <html>
 <body>
 
+<tal:test tal:define="hidden_vars python: ( {'name': 'b_start:int',
+                                         'value': 25}, );
+                      global form python: {'listHiddenVarInfos': hidden_vars}
+                      " />
+
+<metal:block metal:define-macro="hidden_vars">
+ <tal:loop tal:repeat="hidden_var form/listHiddenVarInfos"
+ ><input type="hidden" name="HiddenVarName" value=""
+     tal:attributes="name hidden_var/name; value hidden_var/value" /></tal:loop
+></metal:block>
+
 <tal:test tal:define="buttons python: ( {'name': 'delete_items',
                                          'value': 'Delete'}, );
                       global form python: {'listButtonInfos': buttons}" />
