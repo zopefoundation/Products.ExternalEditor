@@ -12,9 +12,13 @@ did, create an external method in your portal root:
   o function name: collector_webtext_migration
 
 For each collector, visit the visit the URL constructed of the URL for the
-collector plus '/convert_to_webtext'.  This'll run the method on the
-collector, producing a (sparse) page reporting the changes, or that no changes
-were necessary.
+collector plus '/collector_webtext_migration'.  This will run the method on
+the collector, producing a (sparse) page reporting the changes, or that no
+changes were necessary.
+
+The process may take a while, if your site catalogs a lot of objects - the
+converted issues are (necessarily) reindexed, internally and in the site
+catalog.
 
 You can delete the external method once you've upgraded your preexisting
 issues - it won't be needed after that."""
@@ -65,7 +69,7 @@ def collector_webtext_migration(self):
             text = text.replace('\n<hr>\n', '\n' + RULE + '\n')
             
             transcript.text = text      # Ditch garbage
-            transcript._edit(text)      # Cook the text.
+            transcript._edit('webtext', text)      # Cook the text.
             transcript._p_mtime = was_p_mtime
             transcript.creation_date = was_creation_date
     if total_changed:
