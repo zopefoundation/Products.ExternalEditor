@@ -288,6 +288,13 @@ class DummyTool(Implicit,ActionProviderBase):
     def getIcon( self, relative=0 ):
         return 'Tool: %s' % relative
 
+    # TypesTool
+    def listTypeInfo(self, container=None):
+        return ( DummyObject('Dummy Content'), )
+
+    def getTypeInfo(self, contentType):
+        return ( DummyObject('Dummy Content'), )
+
     # WorkflowTool
     test_notified = None
 
