@@ -261,12 +261,23 @@ class PortalFolder( Folder, DynamicType ):
 
     security.declareProtected( ListFolderContents
                              , 'listFolderContents' )
-    def listFolderContents( self, spec=None, filter=None ): # XXX
+    def listFolderContents( self, spec=None, contentFilter=None ): # XXX
         """
             Hook around 'contentValues' to let 'folder_contents'
-            be protected.
+            be protected.  Duplicating skip_unauthorized behavior of dtml-in.
         """
-        return self.contentValues( filter=filter )
+        items = self.contentValues(filter=contentFilter)
+        l = []
+        for obj in items:
+            id = obj.getId()
+            v = obj
+            try: 
+                if getSecurityManager().validate(self, self, id, v):
+                    l.append(obj)
+            except "Unauthorized":
+                pass
+        return l
+
 
     security.declarePublic('contentItems')
     def contentItems( self, spec=None, filter=None ):
