@@ -31,7 +31,8 @@ CMF 1.5alpha (unreleased)
 
     - CMFCore and CMFDefault MembershipTool: Changed permissions.
       'createMemberarea()' for someone else and 'getRoster()' including hidden
-      members are now protected by 'Manage users'.
+      members are now protected by 'Manage users'. 'getMemberById()',
+      listMemberIds() and listMembers() as well.
 
     - Document and NewsItem: Un-hardwired 'manage_FTPget()' for 'text/html'.
       Added 'source_html.dtml' and 'source_html.pt'. 'manage_FTPget()' now has

@@ -99,7 +99,7 @@ class portal_membership(Interface):
         """
         Returns the given member.
 
-        Permission -- Manage portal
+        Permission -- Manage users
         """
 
     def listMemberIds():
@@ -108,13 +108,33 @@ class portal_membership(Interface):
         This may eventually be replaced with a set of methods for querying
         pieces of the list rather than the entire list at once.
 
-        Permission -- Manage portal
+        Permission -- Manage users
         """
 
     def listMembers():
         """ Gets the list of all members.
 
-        Permission -- Manage portal
+        Permission -- Manage users
+        """
+
+    def getCandidateLocalRoles(obj):
+        """ What local roles can I assign?
+
+        Permission -- Always available
+
+        Returns -- Tuple of roles
+        """
+
+    def setLocalRoles(obj, member_ids, member_role, reindex=1):
+        """ Add local roles on an item.
+
+        Permission -- Always available
+        """
+
+    def deleteLocalRoles(obj, member_ids, reindex=1, recursive=0):
+        """ Delete local roles of specified members.
+
+        Permission -- Always available
         """
 
     def addMember(id, password, roles, domains):

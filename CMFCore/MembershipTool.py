@@ -344,7 +344,7 @@ class MembershipTool(UniqueObject, Folder, ActionProviderBase):
                     change = self.restrictedTraverse(p)
                     change(user, name, password)
 
-    security.declareProtected(ManagePortal, 'getMemberById')
+    security.declareProtected(ManageUsers, 'getMemberById')
     def getMemberById(self, id):
         '''
         Returns the given member.
@@ -366,7 +366,7 @@ class MembershipTool(UniqueObject, Folder, ActionProviderBase):
                 if us.meta_type == 'Persistent User Source':
                     return us.__of__(acl_users)
 
-    security.declareProtected(ManagePortal, 'listMemberIds')
+    security.declareProtected(ManageUsers, 'listMemberIds')
     def listMemberIds(self):
         '''Lists the ids of all members.  This may eventually be
         replaced with a set of methods for querying pieces of the
@@ -375,7 +375,7 @@ class MembershipTool(UniqueObject, Folder, ActionProviderBase):
         user_folder = self.__getPUS()
         return [ x.getId() for x in user_folder.getUsers() ]
 
-    security.declareProtected(ManagePortal, 'listMembers')
+    security.declareProtected(ManageUsers, 'listMembers')
     def listMembers(self):
         '''Gets the list of all members.
         '''
@@ -389,17 +389,17 @@ class MembershipTool(UniqueObject, Folder, ActionProviderBase):
         return md.searchMemberData( search_param, search_term )
 
     security.declareProtected(View, 'getCandidateLocalRoles')
-    def getCandidateLocalRoles( self, obj ):
-        """ What local roles can I assign? """
+    def getCandidateLocalRoles(self, obj):
+        """ What local roles can I assign?
+        """
         member = self.getAuthenticatedMember()
-
         if _checkPermission(ManageUsers, obj):
-            return self.getPortalRoles()
+            local_roles = self.getPortalRoles()
         else:
-            member_roles = list( member.getRolesInContext( obj ) )
-            del member_roles[member_roles.index( 'Member')]
-
-        return tuple( member_roles )
+            local_roles = [ role for role in member.getRolesInContext(obj)
+                            if role not in ('Member', 'Authenticated') ]
+        local_roles.sort()
+        return tuple(local_roles)
 
     security.declareProtected(View, 'setLocalRoles')
     def setLocalRoles(self, obj, member_ids, member_role, reindex=1):

@@ -171,12 +171,14 @@ class DummyFolder( Implicit ):
     def reindexObjectSecurity(self):
         pass
 
+
 class DummySite(DummyFolder):
     """ A dummy portal folder.
     """
 
     _domain = 'http://www.foobar.com'
     _path = 'bar'
+    __ac_roles__ = ('Member', 'Reviewer')
 
     def absolute_url(self, relative=0):
         return '/'.join( (self._domain, self._path, self._id) )
@@ -208,8 +210,11 @@ class DummyUser(Implicit):
             return 0
         if object_roles:
             if 'FooAdder' in object_roles:
-                return 0 
+                return 0
         return 1
+
+    def getRolesInContext(self, object):
+        return ('Authenticated', 'Dummy', 'Member')
 
 
 class DummyUserFolder(Implicit):

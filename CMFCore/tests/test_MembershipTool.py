@@ -42,6 +42,17 @@ class MembershipToolSecurityTests(SecurityTest):
         self.site = DummySite('site').__of__(self.root)
         self.mtool = MembershipTool().__of__(self.site)
 
+    def test_getCandidateLocalRoles(self):
+        mtool = self.mtool
+        acl_users = self.site._setObject( 'acl_users', DummyUserFolder() )
+
+        newSecurityManager(None, acl_users.user_foo)
+        rval = mtool.getCandidateLocalRoles(mtool)
+        self.assertEqual( rval, ('Dummy',) )
+        newSecurityManager(None, acl_users.all_powerful_Oz)
+        rval = mtool.getCandidateLocalRoles(mtool)
+        self.assertEqual( rval, ('Manager', 'Member', 'Owner', 'Reviewer') )
+
     def test_createMemberArea(self):
         mtool = self.mtool
         members = self.site._setObject( 'Members', PortalFolder('Members') )
