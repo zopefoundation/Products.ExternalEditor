@@ -9,7 +9,7 @@
 <h1> Portal Members </h1>
 
 <dtml-let roster="portal_membership.getRoster()"
-          isUserManager="portal_membership.checkPermission( 'Manage_users',
+          isUserManager="portal_membership.checkPermission( 'Manage users',
                                        portal_membership.getMembersFolder() )"
 >
 

@@ -12,39 +12,42 @@
      i18n:domain="cmf_default"
 >
 
-<h3 i18n:translate="">Portal Members</h3>
+<h2 i18n:translate="">Portal Members</h2>
 
 <table class="SearchResults"
     tal:define="mtool here/portal_membership;
-                isUserManager python: mtool.checkPermission( 'Manage_users',
+                isUserManager python: mtool.checkPermission( 'Manage users',
                                                   mtool.getMembersFolder() )">
-<tr>
+<thead>
+ <tr>
   <td width="16"> <br /> </td>
   <th i18n:translate="">Member</th>
   <th tal:condition="isUserManager" i18n:translate="">Listed?</th>
-</tr>
-<div tal:define="b_start string:0;b_start request/b_start | b_start;
-                 members mtool/getRoster;
-	   Batch python:modules['ZTUtils'].Batch;
-	   global batch python:Batch(members, 25, int(b_start), orphan=1)">
-<tr tal:repeat="members batch">
+ </tr>
+</thead>
+<tbody tal:define="b_start string:0;
+                   b_start request/b_start | b_start;
+                   members mtool/getRoster;
+                   Batch python:modules['ZTUtils'].Batch;
+                   batch python:Batch(members, 25, int(b_start), orphan=1)">
+ <tr tal:repeat="members batch">
   <td> <br /> </td>
   <td tal:define="id members/id;
                   homeUrl python: mtool.getHomeUrl(id, verifyPermission=1)">
-         <a href="www.here.com"
-			tal:condition="homeUrl"
-	    	tal:attributes="href homeUrl"
-   			tal:content="id">ID</a>
-       <span tal:condition="not:homeUrl"
-	         tal:replace="id">ID</span>
+   <a href="www.here.com"
+       tal:condition="homeUrl"
+       tal:attributes="href homeUrl"
+       tal:content="id">ID</a>
+   <span tal:condition="not:homeUrl"
+       tal:replace="id">ID</span>
   </td>
   <td tal:condition="isUserManager"
       tal:define="listed members/listed" i18n:translate="">
    <span tal:replace="python: listed and 'Yes' or 'No'">Yes...Or No</span>
   </td>
-</tr>
+ </tr>
 
-<tr>
+ <tr>
   <td> <br /> </td>
   <td>
    <span tal:define="p batch/previous" tal:condition="p">
@@ -60,11 +63,10 @@
                                     i18n:name="count">n</span> Members</a>
    </span>
   </td>
-</tr>
-</div>
+ </tr>
+</tbody>
 </table>
 </div>
 </div>
 </body>
 </html>
-
