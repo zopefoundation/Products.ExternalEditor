@@ -15,11 +15,12 @@ CMF 1.5.0-beta (unreleased)
         instead of Action info mappings. ActionInfo objects have a backwards
         compatible mapping interface.
 
-    - Added CMFUid which provides unique id functionality. 
+    - Added CMFUid product which provides tools for generating,
+      registering, and storing unique IDs for content.
 
-    - As example of how to use unique ids CMFDefaults Favorite content 
-      type was enhanced by using unique ids to track moved or renamed 
-      content items.
+      o As an example of how to use unique ids, enhanced CMFDefault.Favorite
+        content class, using unique ids to track moved or renamed 
+        content items.
 
     - Added __init__ method to the IOpaqueItems.ICallableOpaqueItem 
       interface.
