@@ -190,7 +190,7 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
                             'url': tdef.actbox_url % info,
                             'permissions': (),  # Predetermined.
                             'category': tdef.actbox_category,
-                            'transition':tdef}))
+                            'transition': tdef}))
         res.sort()
         return map((lambda (id, val): val), res)
 
