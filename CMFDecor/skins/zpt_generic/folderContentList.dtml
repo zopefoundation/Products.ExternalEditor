@@ -1,7 +1,7 @@
 <dtml-let filterString="REQUEST.get( 'folderfilter', '' )"
           filter="decodeFolderFilter( filterString )"
 >
-<dtml-in expr="listFolderContents( filter=filter )"
+<dtml-in expr="listFolderContents(filter=filter)"
          sort="getId" size="19" start=qs skip_unauthorized>
  <dtml-if next-sequence>
   <dtml-call "REQUEST.set('next-sequence'

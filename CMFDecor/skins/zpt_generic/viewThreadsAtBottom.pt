@@ -1,5 +1,5 @@
-<div tal:condition="here/talkback">
-    <div tal:condition="python: here.talkback.hasReplies( here )">
+<div tal:condition="here/talkback|nothing">
+    <div tal:condition="python: here.talkback.hasReplies(here)">
       <h4>Comments:</h4>
       <span tal:replace="structure here/talkback_tree"></span>
 	</div>

@@ -13,8 +13,8 @@
    </tr>
 
    <tr valign="top">
-   <td class="SideBar" width="15%" align="left" valign="top" tal:content="structure container/actions_box">
-   Actions box
+   <td class="SideBar" width="15%" align="left" valign="top">
+   <span metal:use-macro="container/actions_box/macros/actions">Actions box</span>
    </td>
 
    <!-- Horizontal whitespace -->
