@@ -24,7 +24,7 @@ from os import path
 import traceback
 from tempfile import mktemp
 from ConfigParser import ConfigParser
-from httplib import HTTPConnection, HTTPSConnection, HTTPException
+from httplib import HTTPConnection, HTTPSConnection
 from urlparse import urlparse
 import urllib
 
