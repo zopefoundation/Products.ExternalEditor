@@ -281,6 +281,21 @@ class SetupToolTests( TestBase
 
         self.assertEqual( message, 'Unpurged' )
 
+    def test_runImportStep_consistent_context( self ):
+
+        TITLE = 'original title'
+        site = self._makeSite( TITLE )
+
+        tool = self._makeOne().__of__( site )
+
+        registry = tool.getImportStepRegistry()
+        registry.registerStep( 'purging', '1', _purgeIfRequired )
+        registry.registerStep( 'dependent', '1'
+                             , _uppercaseSiteTitle, ( 'purging', ) )
+
+        message = tool.runImportStep( 'dependent', purge_old=False )
+        self.failIf( site.purged )
+
 def _underscoreSiteTitle( context ):
 
     site = context.getSite()

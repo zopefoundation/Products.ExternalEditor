@@ -111,6 +111,9 @@ class SetupTool( UniqueObject, Folder ):
 
         """ See ISetupTool.
         """
+        profile_path = self._getFullyQualifiedProfileDirectory()
+        context = ImportContext( self, profile_path, purge_old )
+
         info = self._import_registry.getStepMetadata( step_id )
 
         if info is None:
@@ -123,15 +126,10 @@ class SetupTool( UniqueObject, Folder ):
             for dependency in dependencies:
 
                 if already.get( dependency ) is None:
-                    self.runImportStep( dependency )
+                    self._doRunImportStep( dependency, context )
                     already[ dependency ] = 1
 
-        handler = self._import_registry.getStep( step_id )
-
-        profile_path = self._getFullyQualifiedProfileDirectory()
-        context = ImportContext( self, profile_path, purge_old )
-
-        return handler( context )
+        return self._doRunImportStep( step_id, context )
 
     security.declareProtected( ManagePortal, 'runAllSetupSteps')
     def runAllImportSteps( self, purge_old=True ):
@@ -212,5 +210,14 @@ class SetupTool( UniqueObject, Folder ):
         f.close()
 
         self._export_registry.importFromXML( xml )
+
+    security.declarePrivate( '_doRunImportStep' )
+    def _doRunImportStep( self, step_id, context ):
+
+        """ Run a single import step, using a pre-built context.
+        """
+        handler = self._import_registry.getStep( step_id )
+
+        return handler( context )
 
 InitializeClass( SetupTool )
