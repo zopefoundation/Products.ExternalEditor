@@ -28,7 +28,7 @@ from CMFCorePermissions import AddPortalFolders, AddPortalContent
 from OFS.Folder import Folder
 from OFS.ObjectManager import REPLACEABLE
 from Globals import DTMLFile
-from AccessControl import getSecurityManager, ClassSecurityInfo
+from AccessControl import getSecurityManager, ClassSecurityInfo, Unauthorized
 from Acquisition import aq_parent, aq_inner, aq_base
 from DynamicType import DynamicType
 from utils import getToolByName, _checkPermission
@@ -217,10 +217,12 @@ class PortalFolder( Folder, DynamicType ):
         for obj in items:
             id = obj.getId()
             v = obj
-            try: 
+            # validate() can either raise Unauthorized or return 0 to
+            # mean unauthorized.
+            try:
                 if getSecurityManager().validate(self, self, id, v):
                     l.append(obj)
-            except "Unauthorized":
+            except Unauthorized:
                 pass
         return l
 

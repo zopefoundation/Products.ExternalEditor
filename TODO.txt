@@ -102,7 +102,7 @@ CMF TODO's
         ( ) Tracker #503:  index_html/folder_view don't skip unauth
                            folders
 
-        ( ) Tracker #512:  Incorrect use of string exception in
+        (x) Tracker #512:  Incorrect use of string exception in
                            PortalFolder.
 
       - ( ) Tool fixes
