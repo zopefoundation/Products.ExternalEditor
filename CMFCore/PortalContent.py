@@ -87,7 +87,7 @@ import string, urllib
 from DateTime import DateTime
 from Globals import InitializeClass
 from OFS.SimpleItem import SimpleItem
-from AccessControl import ClassSecurityInfo, getSecurityManager
+from AccessControl import ClassSecurityInfo
 from CMFCorePermissions import AccessContentsInformation, View, \
      ReviewPortalContent, ModifyPortalContent
 import CMFCorePermissions
@@ -204,7 +204,6 @@ class PortalContent(DynamicType, SimpleItem):
         pp = action.get('permissions', ())
         if not pp:
             return 1
-        sm = getSecurityManager()
         for p in pp:
             if _checkPermission(p, self):
                 return 1

@@ -1,5 +1,7 @@
 import Zope
 import unittest
+import Products.CMFCore
+import Products.CMFDefault
 
 class MembershipTests( unittest.TestCase ):
 
