@@ -63,9 +63,9 @@
       </td>
       <td>
          <a href=""
-		    tal:attributes="href python: items.getId() + '/' + methodID"><span tal:replace="items/getId">ID
-			<span tal:condition="items/title"
-			      tal:replace="python: '(' + items.title() + ')'">(Title)</span></span></a>
+		    tal:attributes="href python: items.getId() + '/' + methodID"><span tal:replace="items/getId">ID</span>
+			<span tal:condition="items/Title"
+			      tal:replace="python: '(' + items.Title() + ')'">(Title)</span></a>
       </td>	  
      </tr>
 	 </tbody>
@@ -95,9 +95,9 @@
       </td>
       <td>
          <a href=""
-		    tal:attributes="href python: items.getId() + '/' + methodID"><span tal:replace="items/getId">ID
-			<span tal:condition="items/title"
-			      tal:replace="python: '(' + items.title() + ')'">(Title)</span></span></a>
+		    tal:attributes="href python: items.getId() + '/' + methodID"><span tal:replace="items/getId">ID</span>
+			<span tal:condition="items/Title" 
+			      tal:replace="python: '(' + items.Title() + ')'">(Title)</span></a>
       </td>	  
      </tr>
   </table>
@@ -110,14 +110,14 @@
   <td align="left">
      <span tal:define="p batch/previous" tal:condition="p">
        <a href=""
-          tal:attributes="href string:?b_start=${p/previous/first}">Previous Items</a>
+          tal:attributes="href string:folder_contents?b_start=${p/previous/first}">Previous Items</a>
      </span>
   </td>
 <td>&nbsp;</td>
   <td align="left">
    <span tal:define="n batch1/next|nothing" tal:condition="n">
      <a href=""
-        tal:attributes="href string:?b_start=${batch1/end}">Next Items</a>
+        tal:attributes="href string:folder_contents?b_start=${batch1/end}">Next Items</a>
    </span>
   </td>
  </tr>
