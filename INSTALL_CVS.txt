@@ -12,8 +12,8 @@ Overview
     - See the note below [1] if you want to export or check out
       the sources for a specific version from CVS.
 
- *Please note that current versions of the CMF (1.2 and later)
-  require Zope 2.4.3 or later*
+ *Please note that current versions of the CMF (1.4 and later)
+  require Zope 2.5 or later*
 
   * For help with CVS in general, see the "CVS Online Manual",
     http://www.loria.fr/~molli/cvs-index.html
@@ -43,6 +43,8 @@ Installation
 
       - CMFCalendar
 
+      - DCWorkflow
+
      and several others.
 
   2. Copy or link each of these subdirectories into the 'Products' directory of
@@ -52,6 +54,7 @@ Installation
       $ ln -s /tmp/CMF-head/CMFCore .
       $ ln -s /tmp/CMF-head/CMFDefault .
       $ ln -s /tmp/CMF-head/CMFTopic .
+      $ ln -s /tmp/CMF-head/DCWorkflow .
 
   3. Verify filesystem products:
 
