@@ -150,7 +150,7 @@ class ElementSpec( SimpleItem ):
             object name is 'typ';  return a default, if none found.
         """
         try:
-            return self.policies[ typ ]
+            return self.policies[ typ ].__of__(self)
         except KeyError:
             return self.policies[ None ]
 
@@ -159,7 +159,10 @@ class ElementSpec( SimpleItem ):
         """
             Return a list of all policies for this element.
         """
-        return self.policies.items()
+        res = []
+        for k, v in self.policies.items():
+            res.append((k, v.__of__(self)))
+        return res
 
     security.declareProtected( CMFCorePermissions.ManagePortal , 'addPolicy' )
     def addPolicy( self, typ ):
@@ -387,7 +390,10 @@ class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
             Return a list of ElementSpecs representing
             the elements managed by the tool.
         """
-        return tuple( self.element_specs.items() )
+        res = []
+        for k, v in self.element_specs.items():
+            res.append((k, v.__of__(self)))
+        return res
 
     security.declareProtected( CMFCorePermissions.ManagePortal
                              , 'getElementSpec' )

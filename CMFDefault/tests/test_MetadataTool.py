@@ -1,4 +1,5 @@
 import Zope
+from Acquisition import aq_base
 from unittest import TestCase, TestSuite, makeSuite, main
 
 from Products.CMFDefault.MetadataTool import \
@@ -175,7 +176,7 @@ class TestMetadataTool( TestCase ):
 
         # Fetch (default) policy for a type.
         tDoc  = tSpec.getPolicy( 'Document' )
-        assert tDoc == tDef
+        self.assertEqual(aq_base(tDoc), aq_base(tDef))
 
         # Changing default changes policies found from there.
         tDef.edit( 1, 1, 'xyz', 0, () )
@@ -190,14 +191,14 @@ class TestMetadataTool( TestCase ):
         assert len( tSpec.listPolicies() ) == 2
 
         tDoc  = tSpec.getPolicy( 'Document' )
-        assert tDoc != tDef
+        self.assertNotEqual(aq_base(tDoc), aq_base(tDef))
         assert not tDoc.isRequired()
         assert not tDoc.supplyDefault()
         assert not tDoc.defaultValue()
 
         tSpec.removePolicy( 'Document' )
         tDoc  = tSpec.getPolicy( 'Document' )
-        assert tDoc == tDef
+        self.assertEqual(aq_base(tDoc), aq_base(tDef))
         assert tDoc.isRequired()
         assert tDoc.supplyDefault()
         assert tDoc.defaultValue() == 'xyz'
@@ -216,7 +217,7 @@ class TestMetadataTool( TestCase ):
 
         # Fetch (default) policy for a type.
         sDoc  = sSpec.getPolicy( 'Document' )
-        assert sDoc == sDef
+        self.assertEqual(aq_base(sDoc), aq_base(sDef))
 
         # Changing default changes policies found from there.
         sDef.edit( 1, 1, 'xyz', 1, ( 'foo', 'bar' ) )
@@ -239,7 +240,7 @@ class TestMetadataTool( TestCase ):
         assert len( sSpec.listPolicies() ) == 2
 
         sDoc  = sSpec.getPolicy( 'Document' )
-        assert sDoc != sDef
+        self.assertNotEqual(aq_base(sDoc), aq_base(sDef))
         assert not sDoc.isRequired()
         assert not sDoc.supplyDefault()
         assert not sDoc.defaultValue()
@@ -248,7 +249,7 @@ class TestMetadataTool( TestCase ):
 
         sSpec.removePolicy( 'Document' )
         sDoc  = sSpec.getPolicy( 'Document' )
-        assert sDoc == sDef
+        self.assertEqual(aq_base(sDoc), aq_base(sDef))
         assert sDoc.isRequired()
         assert sDoc.supplyDefault()
         assert sDoc.defaultValue() == 'xyz'
