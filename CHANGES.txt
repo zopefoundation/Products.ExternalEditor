@@ -2,6 +2,10 @@ Future
 
   New Features
   
+    - Added .css to the extensions that create FSFile objects in DirectoryViews (see CMFCore/FSFile.py)
+      All sites upgrading which expected css extension to be dropped and to contain DTML will be
+      required to rename their css files to foo.dtml.
+
     - Added .js to the extensions that create FSFile objects in
       DirectoryViews
 

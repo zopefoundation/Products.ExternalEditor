@@ -25,7 +25,7 @@
  <metal:block define-slot="base" /> 
 
  <link rel="stylesheet" href="zpt_stylesheet.css" type="text/css"
-       tal:attributes="href here/zpt_stylesheet/absolute_url">
+       tal:attributes="href here/zpt_stylesheet.css/absolute_url">
 
 </head>
 
