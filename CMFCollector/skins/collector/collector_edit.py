@@ -21,9 +21,14 @@ if not changes:
 else:
     changes = "Changed: " + changes
 
-if context.REQUEST.get('recatalog', None):
-    context.reinstate_catalog()
-    changes = changes + ", Reinstated catalog"
+recatalog = context.REQUEST.get('recatalog', None)
+if recatalog:
+    if recatalog == 1:
+        context.reinstate_catalog(internal_only=1)
+        changes += ", reinstated catalog, reindexed internally"
+    else:
+        context.reinstate_catalog(internal_only=0)
+        changes += ", reinstated catalog, reindexed internally and site wide"
 
 msg = '?portal_status_message=%s.' % url_quote_plus(changes)
  
