@@ -54,3 +54,6 @@ Zope object.  They are accessible by name in expressions.  Scripts
 are invoked with a state_change object as the first argument; see
 expressions.stx.
 
+Once you've crafted your workflow, you hook it up with a content type
+by using the portal_workflow top-level "Workflows" tab.  Specify the
+workflow name in the target content type's box.
