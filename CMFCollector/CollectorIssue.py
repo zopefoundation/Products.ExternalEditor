@@ -303,7 +303,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         username = str(getSecurityManager().getUser())
 
         if comment:
-            comment = "\n\n" + util.process_comment(string.strip(comment))
+            comment = "\n\n" + util.process_comment(comment)
         else:
             comment = ''
 
@@ -383,8 +383,8 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
 
         transcript._edit('stx',
                          comment_header_str
-                         + util.process_comment(string.strip(comment))
-                         + ((action_number > 1) and "\n<hr>\n" or '')
+                         + util.process_comment(comment)
+                         + ((action_number > 1) and "\n\n<hr>\n" or '')
                          + transcript.EditableBody())
         self.reindexObject()
         self._send_update_notice(action, username,
@@ -487,7 +487,8 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
                        % (subject, self.id, self.action_number,
                           string.capitalize(action), self.title))
 
-            body = self._cook_links(self.get_transcript().text, email=1)
+            body = util.unprocess_comments(self.get_transcript().text)
+            body = self._cook_links(body, email=1)
             cin = self.collector_issue_notice
             message = cin(sender=sender,
                           recipients=to,
