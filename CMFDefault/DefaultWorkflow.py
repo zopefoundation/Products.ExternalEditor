@@ -28,7 +28,6 @@ from Products.CMFCore.utils import _modifyPermissionMappings
 from Products.CMFCore.utils import _checkPermission
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.utils import SimpleItemWithProperties
-from Products.CMFCore.WorkflowCore import WorkflowException
 from Products.CMFCore.WorkflowTool import addWorkflowClass
 
 from Products.CMFCore.interfaces.portal_workflow \
