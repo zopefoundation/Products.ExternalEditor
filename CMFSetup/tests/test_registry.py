@@ -54,6 +54,7 @@ class SetupStepRegistryTests( SecurityRequestTest ):
                              , version='1'
                              , callable=ONE_FUNC
                              , dependencies=( 'two', 'three' )
+                             , title='One Step'
                              , description='One small step'
                              )
 
@@ -72,6 +73,7 @@ class SetupStepRegistryTests( SecurityRequestTest ):
         self.assertEqual( info[ 'version' ], '1' )
         self.assertEqual( info[ 'callable' ], ONE_FUNC_NAME )
         self.assertEqual( info[ 'dependencies' ], ( 'two', 'three' ) )
+        self.assertEqual( info[ 'title' ], 'One Step' )
         self.assertEqual( info[ 'description' ], 'One small step' )
 
         info_list = registry.listStepMetadata()
@@ -82,20 +84,13 @@ class SetupStepRegistryTests( SecurityRequestTest ):
 
         registry = self._makeOne()
 
-        registry.registerStep( id='one'
-                             , version='1'
-                             , callable=ONE_FUNC
-                             , dependencies=( 'two', 'three' )
-                             , description='One small step'
-                             )
+        registry.registerStep( id='one', version='1', callable=ONE_FUNC )
 
         self.assertRaises( KeyError
                          , registry.registerStep
                          , id='one'
                          , version='0'
                          , callable=ONE_FUNC
-                         , dependencies=( 'two', 'three' )
-                         , description='One small step'
                          )
 
         self.assertRaises( KeyError
@@ -103,8 +98,6 @@ class SetupStepRegistryTests( SecurityRequestTest ):
                          , id='one'
                          , version='1'
                          , callable=ONE_FUNC
-                         , dependencies=( 'two', 'three' )
-                         , description='One small step'
                          )
 
     def test_registerStep_replacement( self ):
@@ -115,6 +108,7 @@ class SetupStepRegistryTests( SecurityRequestTest ):
                              , version='1'
                              , callable=ONE_FUNC
                              , dependencies=( 'two', 'three' )
+                             , title='One Step'
                              , description='One small step'
                              )
 
@@ -122,14 +116,16 @@ class SetupStepRegistryTests( SecurityRequestTest ):
                              , version='1.1'
                              , callable=ONE_FUNC
                              , dependencies=()
-                             , description='One small step'
+                             , title='Leads to Another'
+                             , description='Another small step'
                              )
 
         info = registry.getStepMetadata( 'one' )
         self.assertEqual( info[ 'id' ], 'one' )
         self.assertEqual( info[ 'version' ], '1.1' )
         self.assertEqual( info[ 'dependencies' ], () )
-        self.assertEqual( info[ 'description' ], 'One small step' )
+        self.assertEqual( info[ 'title' ], 'Leads to Another' )
+        self.assertEqual( info[ 'description' ], 'Another small step' )
 
     def test_registerStep_multiple( self ):
 
@@ -139,21 +135,18 @@ class SetupStepRegistryTests( SecurityRequestTest ):
                              , version='1'
                              , callable=ONE_FUNC
                              , dependencies=()
-                             , description='One small step'
                              )
 
         registry.registerStep( id='two'
                              , version='2'
                              , callable=TWO_FUNC
                              , dependencies=()
-                             , description='Texas two step'
                              )
 
         registry.registerStep( id='three'
                              , version='3'
                              , callable=THREE_FUNC
                              , dependencies=()
-                             , description='Gimme three steps'
                              )
 
         steps = registry.listSteps()
@@ -170,14 +163,12 @@ class SetupStepRegistryTests( SecurityRequestTest ):
                              , version='1'
                              , callable=ONE_FUNC
                              , dependencies=( 'two', )
-                             , description='One small step'
                              )
 
         registry.registerStep( id='two'
                              , version='2'
                              , callable=TWO_FUNC
                              , dependencies=()
-                             , description='Texas two step'
                              )
 
         steps = registry.sortSteps()
@@ -195,21 +186,21 @@ class SetupStepRegistryTests( SecurityRequestTest ):
                              , version='1'
                              , callable=ONE_FUNC
                              , dependencies=( 'two', )
-                             , description='One small step'
+                             , title='One small step'
                              )
 
         registry.registerStep( id='two'
                              , version='2'
                              , callable=TWO_FUNC
                              , dependencies=( 'three', )
-                             , description='Texas two step'
+                             , title='Texas two step'
                              )
 
         registry.registerStep( id='three'
                              , version='3'
                              , callable=THREE_FUNC
                              , dependencies=()
-                             , description='Gimme three steps'
+                             , title='Gimme three steps'
                              )
 
         steps = registry.sortSteps()
@@ -228,28 +219,28 @@ class SetupStepRegistryTests( SecurityRequestTest ):
                              , version='1'
                              , callable=ONE_FUNC
                              , dependencies=( 'two', )
-                             , description='One small step'
+                             , title='One small step'
                              )
 
         registry.registerStep( id='two'
                              , version='2'
                              , callable=TWO_FUNC
                              , dependencies=( 'four', )
-                             , description='Texas two step'
+                             , title='Texas two step'
                              )
 
         registry.registerStep( id='three'
                              , version='3'
                              , callable=THREE_FUNC
                              , dependencies=( 'four', )
-                             , description='Gimme three steps'
+                             , title='Gimme three steps'
                              )
 
         registry.registerStep( id='four'
                              , version='4'
                              , callable=FOUR_FUNC
                              , dependencies=()
-                             , description='Four step program'
+                             , title='Four step program'
                              )
 
         steps = registry.sortSteps()
@@ -270,28 +261,28 @@ class SetupStepRegistryTests( SecurityRequestTest ):
                              , version='1'
                              , callable=ONE_FUNC
                              , dependencies=( 'two', 'three' )
-                             , description='One small step'
+                             , title='One small step'
                              )
 
         registry.registerStep( id='two'
                              , version='2'
                              , callable=TWO_FUNC
                              , dependencies=( 'four', )
-                             , description='Texas two step'
+                             , title='Texas two step'
                              )
 
         registry.registerStep( id='three'
                              , version='3'
                              , callable=THREE_FUNC
                              , dependencies=( 'four', )
-                             , description='Gimme three steps'
+                             , title='Gimme three steps'
                              )
 
         registry.registerStep( id='four'
                              , version='4'
                              , callable=FOUR_FUNC
                              , dependencies=()
-                             , description='Four step program'
+                             , title='Four step program'
                              )
 
         steps = registry.sortSteps()
@@ -312,7 +303,6 @@ class SetupStepRegistryTests( SecurityRequestTest ):
                              , version='1'
                              , callable=ONE_FUNC
                              , dependencies=( 'two', )
-                             , description='One small step'
                              )
 
         incomplete = registry.checkComplete()
@@ -323,7 +313,6 @@ class SetupStepRegistryTests( SecurityRequestTest ):
                              , version='2'
                              , callable=TWO_FUNC
                              , dependencies=()
-                             , description='Texas two step'
                              )
 
         self.assertEqual( len( registry.checkComplete() ), 0 )
@@ -336,7 +325,6 @@ class SetupStepRegistryTests( SecurityRequestTest ):
                              , version='1'
                              , callable=ONE_FUNC
                              , dependencies=( 'two', 'three' )
-                             , description='One small step'
                              )
 
         incomplete = registry.checkComplete()
@@ -348,7 +336,6 @@ class SetupStepRegistryTests( SecurityRequestTest ):
                              , version='2'
                              , callable=TWO_FUNC
                              , dependencies=()
-                             , description='Texas two step'
                              )
 
         incomplete = registry.checkComplete()
@@ -359,7 +346,6 @@ class SetupStepRegistryTests( SecurityRequestTest ):
                              , version='3'
                              , callable=THREE_FUNC
                              , dependencies=()
-                             , description='Gimme three steps'
                              )
 
         self.assertEqual( len( registry.checkComplete() ), 0 )
@@ -368,7 +354,6 @@ class SetupStepRegistryTests( SecurityRequestTest ):
                              , version='2.1'
                              , callable=TWO_FUNC
                              , dependencies=( 'four', )
-                             , description='Texas two step'
                              )
 
         incomplete = registry.checkComplete()
@@ -391,6 +376,7 @@ class SetupStepRegistryTests( SecurityRequestTest ):
                              , version='1'
                              , callable=ONE_FUNC
                              , dependencies=()
+                             , title='One Step'
                              , description='One small step'
                              )
 
@@ -404,6 +390,7 @@ class SetupStepRegistryTests( SecurityRequestTest ):
                              , version='1'
                              , callable=ONE_FUNC
                              , dependencies=( 'two', )
+                             , title='One Step'
                              , description='One small step'
                              )
 
@@ -411,6 +398,7 @@ class SetupStepRegistryTests( SecurityRequestTest ):
                              , version='2'
                              , callable=TWO_FUNC
                              , dependencies=( 'three', )
+                             , title='Two Steps'
                              , description='Texas two step'
                              )
 
@@ -418,6 +406,7 @@ class SetupStepRegistryTests( SecurityRequestTest ):
                              , version='3'
                              , callable=THREE_FUNC
                              , dependencies=()
+                             , title='Three Steps'
                              , description='Gimme three steps'
                              )
 
@@ -448,6 +437,7 @@ class SetupStepRegistryTests( SecurityRequestTest ):
                              , version='2'
                              , callable=TWO_FUNC
                              , dependencies=()
+                             , title='Two Steps'
                              , description='Texas two step'
                              )
 
@@ -460,6 +450,7 @@ class SetupStepRegistryTests( SecurityRequestTest ):
         self.assertEqual( info[ 'id' ], 'one' )
         self.assertEqual( info[ 'version' ], '1' )
         self.assertEqual( info[ 'dependencies' ], () )
+        self.assertEqual( info[ 'title' ], 'One Step' )
         self.failUnless( 'One small step' in info[ 'description' ] )
 
     def test_import_ordered( self ):
@@ -505,7 +496,8 @@ _SINGLE_EXPORT = """\
 <setup-steps>
  <setup-step id="one"
              version="1"
-             callable="%s">
+             callable="%s"
+             title="One Step">
   One small step
  </setup-step>
 </setup-steps>
@@ -516,18 +508,21 @@ _ORDERED_EXPORT = """\
 <setup-steps>
  <setup-step id="three"
              version="3"
-             callable="%s">
+             callable="%s"
+             title="Three Steps">
   Gimme three steps
  </setup-step>
  <setup-step id="two"
              version="2"
-             callable="%s">
+             callable="%s"
+             title="Two Steps">
   <dependency step="three" />
   Texas two step
  </setup-step>
  <setup-step id="one"
              version="1"
-             callable="%s">
+             callable="%s"
+             title="One Step">
   <dependency step="two" />
   One small step
  </setup-step>
@@ -535,10 +530,95 @@ _ORDERED_EXPORT = """\
 """ % ( THREE_FUNC_NAME, TWO_FUNC_NAME, ONE_FUNC_NAME )
 
 
+class ExportScriptRegistryTests( unittest.TestCase ):
+
+    def _getTargetClass( self ):
+
+        from Products.CMFSetup.registry import ExportScriptRegistry
+        return ExportScriptRegistry
+
+    def _makeOne( self, *args, **kw ):
+
+        return self._getTargetClass()( *args, **kw )
+
+    def test_empty( self ):
+
+        registry = self._makeOne()
+        self.assertEqual( len( registry.listScripts() ), 0 )
+        self.assertEqual( len( registry.listScriptMetadata() ), 0 )
+
+    def test_getScript_nonesuch( self ):
+
+        registry = self._makeOne()
+        self.assertEqual( registry.getScript( 'nonesuch' ), None )
+        self.assertEqual( registry.getScriptMetadata( 'nonesuch' ), None )
+
+    def test_getScript_defaulted( self ):
+
+        registry = self._makeOne()
+        default = lambda x: false
+        self.assertEqual( registry.getScript( 'nonesuch', default ), default )
+        self.assertEqual( registry.getScriptMetadata( 'nonesuch', {} ), {} )
+
+    def test_registerScript_simple( self ):
+
+        registry = self._makeOne()
+        registry.registerScript( 'one', ONE_FUNC )
+        info = registry.getScriptMetadata( 'one', {} )
+
+        self.assertEqual( info[ 'id' ], 'one' )
+        self.assertEqual( info[ 'callable' ], ONE_FUNC_NAME )
+        self.assertEqual( info[ 'title' ], 'one' )
+        self.assertEqual( info[ 'description' ], '' )
+
+    def test_registerScript_no_desc( self ):
+
+        def func_with_doc( site ):
+            """This is the first line.
+
+            This is the second line.
+            """
+        FUNC_NAME = '%s.%s' % ( __name__, func_with_doc.__name__ )
+
+        registry = self._makeOne()
+        registry.registerScript( 'one', func_with_doc )
+        info = registry.getScriptMetadata( 'one', {} )
+
+        self.assertEqual( info[ 'id' ], 'one' )
+        self.assertEqual( info[ 'callable' ], FUNC_NAME )
+        self.assertEqual( info[ 'title' ], 'This is the first line.' )
+        self.assertEqual( info[ 'description' ] , 'This is the second line.' )
+
+    def test_registerScript_w_desc( self ):
+
+        def func_with_doc( site ):
+            """This is the first line.
+
+            This is the second line.
+            """
+        FUNC_NAME = '%s.%s' % ( __name__, func_with_doc.__name__ )
+
+        registry = self._makeOne()
+        registry.registerScript( 'one', func_with_doc
+                               , description='Description' )
+        info = registry.getScriptMetadata( 'one', {} )
+
+        self.assertEqual( info[ 'id' ], 'one' )
+        self.assertEqual( info[ 'callable' ], FUNC_NAME )
+        self.assertEqual( info[ 'title' ], 'This is the first line.' )
+        self.assertEqual( info[ 'description' ], 'Description' )
+
+    def test_registerScript_collision( self ):
+
+        registry = self._makeOne()
+        registry.registerScript( 'one', ONE_FUNC )
+        self.assertRaises( KeyError, registry.registerScript, 'one', TWO_FUNC )
+
 
 def test_suite():
     return unittest.TestSuite((
         unittest.makeSuite( SetupStepRegistryTests ),
+        unittest.makeSuite( ExportScriptRegistryTests ),
         ))
 
 if __name__ == '__main__':

@@ -1,4 +1,4 @@
-""" Classes:  SetupStepRegistry
+""" Classes:  SetupStepRegistry, ExportScriptRegistry
 
 $Id$
 """
@@ -9,12 +9,28 @@ from xml.sax.handler import ContentHandler
 from AccessControl import ClassSecurityInfo
 from Acquisition import Implicit
 from Globals import InitializeClass
+from Interface import Interface
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
 from permissions import ManagePortal
 from utils import _xmldir
 from utils import _getDottedName
 from utils import _resolveDottedName
+from utils import _extractDocstring
+
+class ISetupStep( Interface ):
+
+    """ The executable object which performs a step to configure a site.
+    """
+    def __call__( context ):
+
+        """ Perform the setup step.
+
+        o Return a message describing the work done.
+
+        o 'context' is a wrapper for the site object to be configured,
+          along with the data files used by the step.
+        """
 
 class SetupStepRegistry( Implicit ):
 
@@ -35,12 +51,15 @@ class SetupStepRegistry( Implicit ):
 
         o Order is not significant.
         """
-        return self._steps.keys()
+        return self._registered.keys()
 
     security.declareProtected( ManagePortal, 'sortSteps' )
     def sortSteps( self ):
 
-        """ Return a sequence of step IDs, sorted topologically by dependency.
+        """ Return a sequence of registered step IDs
+        
+        o Sequence is sorted topologically by dependency, with the dependent
+          steps *after* the steps they depend on.
         """
         return self._computeTopologicalSort()
 
@@ -78,7 +97,7 @@ class SetupStepRegistry( Implicit ):
         """
         result = {}
 
-        info = self._steps.get( key )
+        info = self._registered.get( key )
 
         if info is None:
             return default
@@ -113,12 +132,12 @@ class SetupStepRegistry( Implicit ):
     security.declarePrivate( 'getStep' )
     def getStep( self, key, default=None ):
 
-        """ Return the callable for the step identified by 'key'.
+        """ Return the ISetupStep registered for 'key'.
 
         o Return 'default' if no such step is registered.
         """
         marker = object()
-        info = self._steps.get( key, marker )
+        info = self._registered.get( key, marker )
 
         if info is marker:
             return default
@@ -131,6 +150,7 @@ class SetupStepRegistry( Implicit ):
                     , version
                     , callable
                     , dependencies=()
+                    , title=None
                     , description=None
                     ):
         """ Register a setup step.
@@ -147,20 +167,20 @@ class SetupStepRegistry( Implicit ):
           - Attempting to register an older one after a newer one results
             in a KeyError.
 
-        o 'callable' is the setup code, which is passed a context object when
-          called, and is expected to return a user-friendly message as to
-          what happened.  The context object provides access to data files
-          and the portal object.
+        o 'callable' should implement ISetupStep.
 
         o 'dependencies' is a tuple of step ids which have to run before
           this step in order to be able to run at all. Registration of
           steps that have unmet dependencies are deferred until the
           dependencies have been registered.
 
-        o 'description' defaults to the first line of the function doc
-          string, and can be used in a display enumerating steps. If the
-          docstring is also empty, the id of the step is used as a final
-          fallback.
+        o 'title' is a one-line UI description for this step.
+          If None, the first line of the documentation string of the callable
+          is used, or the id if no docstring can be found.
+
+        o 'description' is a one-line UI description for this step.
+          If None, the remaining line of the documentation string of
+          the callable is used, or default to ''.
         """
         already = self.getStepMetadata( id )
 
@@ -172,10 +192,11 @@ class SetupStepRegistry( Implicit ):
                , 'version'      : version
                , 'callable'     : callable
                , 'dependencies' : dependencies
+               , 'title'        : title
                , 'description'  : description
                }
 
-        self._steps[ id ] = info
+        self._registered[ id ] = info
 
     security.declarePrivate( 'importFromXML' )
     def importFromXML( self, text ):
@@ -197,7 +218,7 @@ class SetupStepRegistry( Implicit ):
     security.declarePrivate( '_clear' )
     def _clear( self ):
 
-        self._steps = {}
+        self._registered = {}
 
     security.declarePrivate( '_computeTopologicalSort' )
     def _computeTopologicalSort( self ):
@@ -205,7 +226,7 @@ class SetupStepRegistry( Implicit ):
         result = []
 
         graph = [ ( x[ 'id' ], x[ 'dependencies' ] )
-                    for x in self._steps.values() ]
+                    for x in self._registered.values() ]
 
         for node, edges in graph:
 
@@ -230,8 +251,6 @@ class _SetupStepRegistryParser( ContentHandler ):
     security = ClassSecurityInfo()
     security.declareObjectPrivate()
     security.setDefaultAccess( 'deny' )
-
-    _WHITESPACE = re.compile( r'\s*' )
 
     def __init__( self, registry, encoding='latin-1' ):
 
@@ -289,14 +308,154 @@ class _SetupStepRegistryParser( ContentHandler ):
             callable = _resolveDottedName( self._pending[ 'callable' ] )
 
             dependencies = tuple( self._pending.get( 'dependencies', () ) )
+            title = self._pending.get( 'title', id )
             description = ''.join( self._pending.get( 'description', [] ) )
 
             self._registry.registerStep( id=id
                                        , version=version
                                        , callable=callable
                                        , dependencies=dependencies
+                                       , title=title
                                        , description=description
                                        )
             self._pending = None
 
 InitializeClass( _SetupStepRegistryParser )
+
+
+class IExportScript( Interface ):
+
+    """ A script responsible for exporting some portion of the site.
+    """
+    def __call__( site ):
+
+        """ Return a sequence of tuples describing a set of exported files.
+
+        o Each item is a three-tuple, ( 'data', 'content_type', 'filename' ),
+          representing one file exported by the script.
+      
+          - 'data' is a string containing the file data;
+
+          - 'content_type' is the MIME type of the data;
+
+          - 'filename' is a suggested filename for use when downloading.
+        """
+
+class ExportScriptRegistry( Implicit ):
+
+    """ Registry of known site-configuration export scripts.
+
+    o Each script is registered with a unique id.
+    
+    o When called, with the portal object passed in as an argument,
+      the script must return a sequence of three-tuples,
+      ( 'data', 'content_type', 'filename' ), one for each file exported
+      by the script.
+      
+      - 'data' is a string containing the file data;
+
+      - 'content_type' is the MIME type of the data;
+
+      - 'filename' is a suggested filename for use when downloading.
+
+    """
+    security = ClassSecurityInfo()
+
+    def __init__( self ):
+ 
+        self._registered = {}   
+
+    security.declareProtected( ManagePortal, 'listScripts' )
+    def listScripts( self ):
+
+        """ Return a list of registered script IDs.
+        """
+        return self._registered.keys()
+
+    security.declareProtected( ManagePortal, 'getScriptMetadata' )
+    def getScriptMetadata( self, key, default=None ):
+
+        """ Return a mapping of metadata for the script identified by 'key'.
+
+        o Return 'default' if no such script is registered.
+
+        o The 'callable' metadata is available via 'getScript'.
+        """
+        result = {}
+
+        info = self._registered.get( key )
+
+        if info is None:
+            return default
+
+        for key, value in info.items():
+
+            if key == 'callable':
+                result[ key ] = _getDottedName( value )
+            else:
+                result[ key ] = value
+
+        return result
+
+    security.declareProtected( ManagePortal, 'listScriptMetadata' )
+    def listScriptMetadata( self ):
+
+        """ Return a sequence of mappings describing registered scripts.
+
+        o Order is not significant.
+        """
+        return [ self.getStepMetadata( x ) for x in self.listScripts() ]
+
+    security.declarePrivate( 'getScript' )
+    def getScript( self, key, default=None ):
+
+        """ Return the IExportScript registered for 'key'.
+
+        o Return 'default' if no such script is registered.
+        """
+        marker = object()
+        info = self._registered.get( key, marker )
+
+        if info is marker:
+            return default
+
+        return info[ 'callable' ]
+
+    security.declarePrivate( 'registerScript' )
+    def registerScript( self, id, callable, title=None, description=None ):
+
+        """ Register an export script.
+
+        o 'id' is the unique identifier for this script
+
+        o 'script' should implement IExportScript.
+
+        o 'title' is a one-line UI description for this script.
+          If None, the first line of the documentation string of the script
+          is used, or the id if no docstring can be found.
+
+        o 'description' is a one-line UI description for this script.
+          If None, the remaining line of the documentation string of
+          the script is used, or default to ''.
+        """
+        already = self.getScript( id )
+
+        if already:
+            raise KeyError( 'Existing registration for script %s' % id )
+
+        if title is None or description is None:
+
+            t, d = _extractDocstring( callable, id, '' )
+
+            title = title or t
+            description = description or d
+
+        info = { 'id'           : id
+               , 'callable'     : callable
+               , 'title'        : title
+               , 'description'  : description
+               }
+
+        self._registered[ id ] = info
+
+InitializeClass( ExportScriptRegistry )

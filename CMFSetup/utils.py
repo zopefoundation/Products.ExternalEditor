@@ -3,6 +3,7 @@
 $Id$
 """
 import os
+from inspect import getdoc
 
 from Globals import package_home
 
@@ -45,3 +46,23 @@ def _resolveDottedName( dotted ):
 
     return obj
 
+def _extractDocstring( func, default_title, default_description ):
+
+    try:
+        doc = getdoc( func )
+        lines = doc.split( '\n' )
+
+    except AttributeError:
+
+        title = default_title
+        description = default_description
+
+    else:
+        title = lines[ 0 ]
+
+        if len( lines ) > 1 and lines[ 1 ].strip() == '':
+            del lines[ 1 ]
+
+        description = '\n'.join( lines[ 1: ] )
+
+    return title, description
