@@ -63,6 +63,13 @@ Sometimes people do interesting things
   All in favor say pi!
 """
 
+STX_NO_HEADERS = """\
+Title Phrase
+
+    This is a "plain" STX file, with no headers.  Saving with
+    it shouldn't overwrite any metadata.
+"""
+
 class DocumentTests(unittest.TestCase):
 
     def test_Empty(self):
@@ -191,6 +198,28 @@ class DocumentTests(unittest.TestCase):
         assert d.text == ''
         assert d.title == 'Foodoc'
         assert d.Format() == 'text/plain'
+    
+    def test_STX_NoHeaders( self ):
+        d = Document('foo')
+        d._editMetadata( title="Plain STX"
+                       , description="Look, Ma, no headers!"
+                       , subject=( "plain", "STX" )
+                       )
+        assert d.Format() == 'text/html'
+        assert d.Title() == 'Plain STX'
+        assert d.Description() == 'Look, Ma, no headers!'
+        assert len( d.Subject() ) == 2
+        assert 'plain' in d.Subject()
+        assert 'STX' in d.Subject()
+
+        d.edit(text_format='structured-text', text=STX_NO_HEADERS)
+        
+        assert d.Format() == 'text/plain'
+        assert d.Title() == 'Plain STX'
+        assert d.Description() == 'Look, Ma, no headers!'
+        assert len( d.Subject() ) == 2
+        assert 'plain' in d.Subject()
+        assert 'STX' in d.Subject()
 
 
 class TestDocumentPUT(unittest.TestCase):

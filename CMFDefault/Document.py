@@ -215,7 +215,8 @@ class Document(PortalContent, DefaultDublinCoreImpl):
         self.text = body
 
         headers['Format'] = self.Format()
-        headers['Subject'] = keywordsplitter(headers)
+        new_subject = keywordsplitter(headers)
+        headers['Subject'] = new_subject or self.Subject()
         haveheader = headers.has_key
         for key, value in self.getMetadataHeaders():
             if key != 'Format' and not haveheader(key):
