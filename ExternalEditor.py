@@ -17,6 +17,7 @@
 # Zope External Editor Product by Casey Duncan
 
 from string import join # For Zope 2.3 compatibility
+import types
 import re
 import urllib
 import Acquisition
@@ -31,7 +32,12 @@ except ImportError:
     # webdav module not available
     def wl_isLocked(ob):
         return 0
-
+try:
+    from ZPublisher.Iterators import IStreamIterator
+except ImportError:
+    # pre-2.7.1 Zope without stream iterators
+    IStreamIterator = None
+    
 ExternalEditorPermission = 'Use external editor'
 
 class ExternalEditor(Acquisition.Implicit):
@@ -107,6 +113,7 @@ class ExternalEditor(Acquisition.Implicit):
                     break       
               
         r.append('')
+        streamiterator = None
         
         # Using RESPONSE.setHeader('Pragma', 'no-cache') would be better, but
         # this chokes crappy most MSIE versions when downloads happen on SSL.
@@ -130,21 +137,38 @@ class ExternalEditor(Acquisition.Implicit):
             return ''
         if hasattr(ob, 'manage_FTPget'):
             try:
-                r.append(ob.manage_FTPget())
+                body = ob.manage_FTPget()
             except TypeError: # some need the R/R pair!
-                r.append(ob.manage_FTPget(REQUEST, RESPONSE))
+                body = ob.manage_FTPget(REQUEST, RESPONSE)
         elif hasattr(ob, 'EditableBody'):
-            r.append(ob.EditableBody())
+            body = ob.EditableBody()
         elif hasattr(ob, 'document_src'):
-            r.append(ob.document_src(REQUEST, RESPONSE))
+            body = ob.document_src(REQUEST, RESPONSE)
         elif hasattr(ob, 'read'):
-            r.append(ob.read())
+            body = ob.read()
         else:
             # can't read it!
             raise 'BadRequest', 'Object does not support external editing'
         
-        RESPONSE.setHeader('Content-Type', 'application/x-zope-edit')    
-        return join(r, '\n')
+        RESPONSE.setHeader('Content-Type', 'application/x-zope-edit')
+
+        if (IStreamIterator is not None and
+            IStreamIterator.isImplementedBy(body)):
+            # We need to manage our content-length because we're streaming.
+            # The content-length should have been set in the response by
+            # the method that returns the iterator, but we need to fix it up
+            # here because we insert metadata before the body.
+            clen = RESPONSE.headers.get('content-length', None)
+            assert clen is not None
+            metadata = join(r, '\n')
+            RESPONSE.setHeader('Content-Length', len(metadata) + int(clen) + 1)
+            RESPONSE.write(metadata)
+            RESPONSE.write('\n')
+            for data in body:
+                RESPONSE.write(data)
+        else:
+            r.append(body)
+            return join(r, '\n')
 
 InitializeClass(ExternalEditor)
 
@@ -190,3 +214,4 @@ def querystr(d):
             ['%s=%s' % (name, val) for name, val in d.items()])
     else:
         return ''
+

@@ -1,7 +1,12 @@
 External Editor Change Log
 
   Next Release
-  
+
+    - External Editor now compatible with objects that return a
+      "filestream iterator" in Zope 2.7.1+. (if upgrading: this fix
+      does not require an update to EE client, just the EE Zope
+      product).
+
     - Properly escape hyphens in man page. Thanks to Federico Sevilla III.
   
     - Check if the editor was launched before locking the file in Zope. This
