@@ -1,8 +1,9 @@
 import unittest, os, cStringIO
 
 from Products.CMFDefault.Image import Image
+from Products.CMFDefault import tests
 
-TESTS_HOME = os.path.join(INSTANCE_HOME, 'Products/CMFDefault/tests')
+TESTS_HOME = tests.__path__[0]
 TEST_JPG = os.path.join(TESTS_HOME, 'TestImage.jpg')
 
 
