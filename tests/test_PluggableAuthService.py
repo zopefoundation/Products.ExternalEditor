@@ -1683,7 +1683,6 @@ class PluggableAuthServiceTests( unittest.TestCase ):
         creds_store = zcuf._getOb('creds')
 
         plugins = zcuf._getOb('plugins')
-        #import pdb; pdb.set_trace()
         directlyProvides( creds_store
                         , ( IExtractionPlugin
                           , ICredentialsUpdatePlugin
