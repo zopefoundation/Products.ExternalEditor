@@ -95,6 +95,12 @@ class SimpleHTMLParser(SGMLParser):
         if self.savedata is not None:
             self.savedata = self.savedata + data
 
+    def handle_charref(self, ref):
+        self.handle_data("&#%s;" % ref)
+
+    def handle_entityref(self, ref):
+        self.handle_data("&%s;" % ref)
+
     def save_bgn(self):
         self.savedata = ''
 
