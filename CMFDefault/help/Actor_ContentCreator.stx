@@ -15,7 +15,7 @@ Content Creator Goals
 
       o "Edit" form.
 
-    - "Define content metadata":ChangeMetadata
+    - **XXX** "Define content metadata":ChangeMetadata
 
       This should mainly be pointers back to "Create a content object".  
 
@@ -40,7 +40,7 @@ Content Creator Goals
   * Improve content quality over time using end user
           feedback.
 
-    - "Make a content object discussable":EnableDiscussion
+    - **XXX** "Make a content object discussable":EnableDiscussion
 
           *Note:  this is not a per-object option in stock CMF.*
 

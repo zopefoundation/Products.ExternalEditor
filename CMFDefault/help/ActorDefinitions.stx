@@ -41,7 +41,7 @@ CMF Actors
   **Content Creator** --
     Content Creators are responsible for producing and
     maintaining the actual content of a site.  See "Actor:
-    Content Creator:Actor_ContentCreator.
+    Content Creator":Actor_ContentCreator.
 
   **Reviewer** --
     This actor is responsible for ensuring the quality and

@@ -2,7 +2,7 @@ Site Designer Goals
 
   * Provide an integrated look and feel for site content.
 
-    - "Create new skin for the site":CreateNewSkin
+    - **XXX** "Create new skin for the site":CreateNewSkin
 
       o portal_skins Properties tab.  Discussion of Layers and their
         order of precedence.  
@@ -15,7 +15,7 @@ Site Designer Goals
       o The theory behind customizing methods, but don't refer to
         specific layers or specific methods/images.
  
-    - "Modify skin appearance":ChangeSkinLookAndFeel
+    - **XXX** "Modify skin appearance":ChangeSkinLookAndFeel
 
       o Brief description of customizing methods.  Refer back to
         "Create new skin for the site".
@@ -25,7 +25,7 @@ Site Designer Goals
  
   * Give end users an effective way to navigate the site.
 
-    - "Change skin behavior":ChangeSkinBehavior
+    - **XXX** "Change skin behavior":ChangeSkinBehavior
 
       o Brief description of customizing methods.  Refer back to
         "Create new skin for the site description".
@@ -35,7 +35,7 @@ Site Designer Goals
  
   * Keep the site fresh and interesting for end users.
 
-    - "Change the default skin for the site":ChangeDefaultSiteSkin
+    - **XXX** "Change the default skin for the site":ChangeDefaultSiteSkin
 
       o Brief description of skins.  Refer back to other skin use
         cases. 
