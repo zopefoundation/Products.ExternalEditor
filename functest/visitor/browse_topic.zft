@@ -1,0 +1,36 @@
+[Scenario]
+Title : Browse Topic
+Use_case: Browse Topic
+
+[Setup]
+Filename: %(config_dir)s/scaffolding.py
+Function: browse_topic_setup
+
+[Home_page]
+URL: %(portal_url)s/%(site_path)s
+Expected_Result: 200
+
+[Topic_view]
+HTTP_Verb: GET
+HTTP_Version: HTTP/1.0
+URL: %(portal_url)s/%(site_path)s/%(topic_id)s
+Expected_Result: 200
+
+[ClickThrough]
+HTTP_Verb: GET
+HTTP_Version: HTTP/1.0
+URL: %(portal_url)s/%(site_path)s/%(click_through_id)s
+Expected_Result: 200
+
+[Teardown]
+Filename: %(config_dir)s/scaffolding.py
+Function: browse_topic_teardown
+
+[DEFAULT]
+userid: test_user
+password: xyzzy
+click_through_id: test_news
+click_through_Type: News Item
+topic_crit_value: News Item
+topic_crit_field: Type
+topic_id: test_topic

@@ -1,0 +1,29 @@
+[Scenario]
+Title : Browse Site News
+Use_case: Browse Site News
+
+[Setup]
+Filename: %(config_dir)s/scaffolding.py
+Function: browse_news_setup
+
+[Homepage]
+HTTP_Verb: GET
+HTTP_Version: HTTP/1.0
+URL: %(portal_url)s/%(site_path)s
+Expected_Result: 200
+
+[NewsPage]
+HTTP_Verb: GET
+HTTP_Version: HTTP/1.0
+URL: %(portal_url)s/%(site_path)s/recent_news
+Expected_Result: 200
+
+[NewsItem]
+HTTP_Verb: GET
+HTTP_Version: HTTP/1.0
+URL: %(portal_url)s/%(site_path)s/test_news
+Expected_Result: 200
+
+[Teardown]
+Filename: %(config_dir)s/scaffolding.py
+Function: browse_news_teardown

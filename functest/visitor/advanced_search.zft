@@ -1,0 +1,63 @@
+[Scenario]
+Title : Advanced Search
+Use_case: Search CMF Site
+
+[Setup]
+Filename: %(config_dir)s/scaffolding.py
+Function: advanced_search_setup
+
+[Search_form]
+HTTP_Verb: GET
+HTTP_Version: HTTP/1.0
+URL: %(portal_url)s/%(site_path)s/search_form
+Expected_Result: 200
+
+[Q_text]
+HTTP_Verb: GET
+HTTP_Version: HTTP/1.0
+URL: %(portal_url)s/%(site_path)s/search?SearchableText=content&Title=&Description=&created:date=1970/01/01+00:00:00+GMT&created_usage=range:min&Creator=
+Expected_Result: 200
+
+[Q_subject]
+HTTP_Verb: GET
+HTTP_Version: HTTP/1.0
+URL: %(portal_url)s/%(site_path)s/search?SearchableText=&Title=&Subject:list=Bar&Description=&created:date=1970/01/01+00:00:00+GMT&created_usage=range:min&Creator=
+Expected_Result: 200
+
+[Q_title]
+HTTP_Verb: GET
+HTTP_Version: HTTP/1.0
+URL: %(portal_url)s/%(site_path)s/search?SearchableText=&Title=test&Description=&created:date=1970/01/01+00:00:00+GMT&created_usage=range:min&Creator=
+Expected_Result: 200
+
+[Click_through]
+HTTP_Verb: GET
+HTTP_Version: HTTP/1.0
+URL: %(portal_url)s/%(site_path)s/%(click_through_id)s/view
+Expected_Result: 200
+
+[Q_created]
+HTTP_Verb: GET
+HTTP_Version: HTTP/1.0
+URL: %(portal_url)s/%(site_path)s/search?SearchableText=&Title=&Description=&created:date=2001/11/11&created_usage=range:min&Creator=
+Expected_Result: 200
+
+[Q_type]
+HTTP_Verb: GET
+HTTP_Version: HTTP/1.0
+URL: %(portal_url)s/%(site_path)s/search?SearchableText=&Title=&Description=&created:date=1970/01/01+00:00:00+GMT&created_usage=range:min&Type:list=Document&Creator=
+Expected_Result: 200
+
+[Q_creator]
+HTTP_Verb: GET
+HTTP_Version: HTTP/1.0
+URL: %(portal_url)s/%(site_path)s/search?SearchableText=&Title=&Description=&created:date=1970/01/01+00:00:00+GMT&created_usage=range:min&Creator=test_user
+Expected_Result: 200
+
+[Teardown]
+Filename: %(config_dir)s/scaffolding.py
+Function: advanced_search_teardown
+
+[DEFAULT]
+click_through_type: News Item
+click_through_id: test_news

@@ -1,0 +1,38 @@
+[Scenario]
+Title : Quick Search
+Use_case: Quick Search
+
+[Setup]
+Filename: %(config_dir)s/scaffolding.py
+Function: quick_search_setup
+
+[Home_page]
+URL: %(portal_url)s/%(site_path)s
+Expected_Result: 200
+
+[Search_ok]
+HTTP_Verb: GET
+HTTP_Version: HTTP/1.0
+URL: %(portal_url)s/%(site_path)s/search?SearchableText=content
+Expected_Result: 200
+
+[ClickThrough]
+HTTP_Verb: GET
+HTTP_Version: HTTP/1.0
+URL: %(portal_url)s/%(site_path)s/Members/test_user/index_html/view
+Authentication: %(userid)s:%(password)s
+Expected_Result: 200
+
+[Search_none]
+HTTP_Verb: GET
+HTTP_Version: HTTP/1.0
+URL: %(portal_url)s/%(site_path)s/search?SearchableText=zigabenyi&go.x=5&go.y=8
+Expected_Result: 200
+
+[Teardown]
+Filename: %(config_dir)s/scaffolding.py
+Function: quick_search_teardown
+
+[DEFAULT]
+userid: test_user
+password: xyzzy

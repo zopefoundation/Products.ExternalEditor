@@ -1,0 +1,141 @@
+[Scenario]
+Title : Provide Feedback on Content
+Use_case: Provide Feedback on Content
+
+[Setup]
+Filename: %(config_dir)s/scaffolding.py
+Function: provide_feedback_setup
+
+[HomePage]
+HTTP_Verb: GET
+HTTP_Version: HTTP/1.0
+URL: %(portal_url)s/%(site_path)s
+Expected_Result: 200
+
+[LoginForm]
+HTTP_Verb: GET
+HTTP_Version: HTTP/1.0
+URL: %(portal_url)s/%(site_path)s/login_form
+Expected_Result: 200
+
+[LogIn]
+HTTP_Verb: POST
+HTTP_Version: HTTP/1.0
+URL: %(portal_url)s/%(site_path)s/logged_in
+Field_1: __ac_name=test_user
+Field_2: __ac_password=xyzzy
+Field_3: __ac_persistent=1
+Field_4: submit= Login 
+Expected_Result: 200
+
+[HomePage_loggedIn]
+HTTP_Verb: GET
+HTTP_Version: HTTP/1.0
+URL: %(portal_url)s/%(site_path)s
+Expected_Result: 200
+
+[NewsItem_1]
+HTTP_Verb: GET
+HTTP_Version: HTTP/1.0
+URL: %(portal_url)s/%(site_path)s/test_news
+Authentication: %(userid)s:%(password)s
+Field_1: %(doh)sac_name:string=%(userid)s
+Field_2: %(doh)sac_password:string=%(password)s
+Expected_Result: 200
+
+[ReplyForm_1]
+HTTP_Verb: GET
+HTTP_Version: HTTP/1.0
+Authentication: %(userid)s:%(password)s
+URL: %(portal_url)s/%(site_path)s/test_news/discussion_reply_form
+Expected_Result: 200
+
+[AddReply_1]
+HTTP_Verb: POST
+HTTP_Version: HTTP/1.0
+URL: %(portal_url)s/%(site_path)s/test_news/talkback
+Authentication: %(userid)s:%(password)s
+Field_1: title=This is a test
+Field_2: text=How beautiful upon the hills are the feet of them
+ that bring good tidings!
+Field_3: title_override=This is a test
+Field_4: text_override=How beautiful upon the hills are the feet of them
+ that bring good tidings!
+Field_5: Creator=test_user
+Field_6: discussion_reply:method=Reply
+Expected_Result: 302
+
+[NewsItem_2]
+HTTP_Verb: GET
+HTTP_Version: HTTP/1.0
+URL: %(portal_url)s/%(site_path)s/test_news/newsitem_view
+Authentication: %(userid)s:%(password)s
+Expected_Result: 200
+
+# WAAAA!  How are we going to test nested replies, when the URLs have
+#         timestamps?
+#
+#[Preview_1]
+#HTTP_Verb: POST
+#HTTP_Version: HTTP/1.0
+#URL: %(portal_url)s/%(site_path)s/test_news/talkback
+#Authentication: %(userid)s:%(password)s
+#Field_1: Creator=test_user
+#Field_2: title=This is a test
+#Field_3: text=How beautiful upon the hills are the feet of them
+# that bring good tidings!
+#Field_4: discussion_reply_preview:method=Preview
+#Expected_Result: 200
+#
+#[Request_018]
+#HTTP_Verb: GET
+#HTTP_Version: HTTP/1.0
+#URL: %(portal_url)s/%(site_path)s/test_news/talkback/1005604371
+#Expected_Result: 200
+#
+#[Request_020]
+#HTTP_Verb: GET
+#HTTP_Version: HTTP/1.0
+#URL: %(portal_url)s/%(site_path)s/test_news/talkback/1005604371/discussion_reply_form
+#Expected_Result: 200
+#
+#[Request_022]
+#HTTP_Verb: POST
+#HTTP_Version: HTTP/1.0
+#URL: %(portal_url)s/%(site_path)s/test_news/talkback/1005604371/talkback
+#Field_1: Creator=test_user
+#Field_2: title=This is a test
+#Field_3: text=My love is like a red, red rose.
+#Field_4: discussion_reply:method=Reply
+#Expected_Result: 200
+#
+#[Request_023]
+#HTTP_Verb: GET
+#HTTP_Version: HTTP/1.0
+#URL: %(portal_url)s/%(site_path)s/test_news/talkback/1005604371/discussionitem_view
+#Expected_Result: 200
+#
+#[Request_024]
+#HTTP_Verb: GET
+#HTTP_Version: HTTP/1.0
+#URL: %(portal_url)s/%(site_path)s/test_news
+#Expected_Result: 200
+#
+#[Request_026]
+#HTTP_Verb: GET
+#HTTP_Version: HTTP/1.0
+#URL: %(portal_url)s/%(site_path)s/test_news?tree-e=eJyLVneEAl9PC1t1HQUE39fRVj0WAICLB9Q
+#Expected_Result: 200
+
+[Postcondition]
+Filename: %(config_dir)s/scaffolding.py
+Function: provide_feedback_postcondition
+
+[Teardown]
+Filename: %(config_dir)s/scaffolding.py
+Function: provide_feedback_teardown
+
+[DEFAULT]
+userid: test_user
+password: xyzzy
+doh=__
