@@ -27,15 +27,27 @@ def supplement_subject_many(field, index_name=None, reqget=reqget, items=subj_it
 
 supplement_query("SearchableText")
 supplement_query("Creator")
-supplement_query("status", "review_state")
 supplement_subject_many("classifications", "classification")
 supplement_subject_many("severities", "severity")
 supplement_subject_many("supporters", "assigned_to")
 supplement_subject_one("resolution")
-supplement_subject_one("security_related")
 supplement_subject_one("reported_version")
+
+sr = reqget("security_related", 'x')
+if sr in ['0', '1']:
+    subj_items.append('security_related:%s' % sr)
+
 if subj_items:
     query["Subject"] = subj_items
+
+rs = []
+for i in reqget("status", []):
+    rs.append(i)
+    # Include confidential alternatives to selected states.
+    if i in ['Pending', 'Accepted']:
+        rs.append("%s_confidential" % i)
+if rs:
+    query['review_state'] = rs
 
 return context.portal_catalog(REQUEST=query)
 
