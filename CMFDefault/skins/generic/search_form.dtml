@@ -113,11 +113,10 @@
   <th> Item type
   </th>
   <td>
-   <dtml-comment> FIXME!!!!!!!!!!!! </dtml-comment>
    <select name="meta_type:list" multiple size="5">
-    <option>News Item</option>
-    <option>Document</option>
-    <option>Link</option>
+    <dtml-in expr="portal_types.listTypeInfo()" reverse>
+     <option><dtml-var expr="_['sequence-item'].getId()"></option>
+    </dtml-in>
    </select>
 
    <dl class="FieldHelp">
@@ -156,3 +155,4 @@
 </div>
 
 <dtml-var standard_html_footer>
+
