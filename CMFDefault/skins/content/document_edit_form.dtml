@@ -12,6 +12,9 @@
 <h2>Edit &dtml-getId;</h2>
 
 <form action="document_edit" method="post" enctype="multipart/form-data">
+
+ <input type="hidden" name="SafetyBelt" value="&dtml-SafetyBelt;">
+
 <table class="FormLayout">
  <tr>
   <th>
