@@ -117,9 +117,6 @@ class CookieAuthHelper(Folder, BasePlugin):
                 creds['login'] = login
                 creds['password'] = password
 
-                request.set('__ac_name', '')
-                request.set('__ac_password', '')
-
         if creds:
             creds['remote_host'] = request.get('REMOTE_HOST', '')
 
