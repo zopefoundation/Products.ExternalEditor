@@ -18,6 +18,7 @@ __version__='$Revision$'[11:-2]
 
 
 from Globals import InitializeClass, DTMLFile
+from Acquisition import aq_base
 from AccessControl import ClassSecurityInfo
 from OFS.SimpleItem import SimpleItem
 
@@ -99,11 +100,12 @@ class DiscussionTool( UniqueObject, SimpleItem, ActionProviderBase ):
         """
         if not self.isDiscussionAllowedFor( content ):
             raise DiscussionNotAllowed
-            
-        talkback = getattr( content, 'talkback', None )
-        if not talkback:
+
+        if hasattr(aq_base(self), 'talkback'):
+            talkback = self.talkback
+        else:
             talkback = self._createDiscussionFor( content )
-        
+
         return talkback
 
     security.declarePublic( 'isDiscussionAllowedFor' )
