@@ -34,6 +34,8 @@ BASIC_STRUCTUREDTEXT = '''\
 Title: My Document
 Description: A document by me
 Contributors: foo@bar.com baz@bam.net no@yes.maybe
+Subject: content management, zope
+Keywords: unit tests; , framework
 
 This is the header
 
@@ -118,6 +120,7 @@ class DocumentTests(unittest.TestCase):
 
     def test_StructuredText(self):
         d = Document('foo')
+        assert hasattr(d, 'cooked_text')
         d.edit(text_format='structured-text', text=BASIC_STRUCTUREDTEXT)
         
         assert d.Format() == 'text/plain'
@@ -129,6 +132,17 @@ class DocumentTests(unittest.TestCase):
         # Make sure extra HTML is NOT found
         assert string.find(d.cooked_text, '<title>') == -1, d.cooked_text
         assert string.find(d.cooked_text, '<body>') == -1, d.cooked_text
+
+        # test subject/keyword headers
+        subj = list(d.Subject())
+        assert len(subj) == 4
+        subj.sort()
+        assert subj == [
+            'content management',
+            'framework',
+            'unit tests',
+            'zope'
+            ]
 
     def test_Init(self):
         d = Document('foo', text=BASIC_STRUCTUREDTEXT)
