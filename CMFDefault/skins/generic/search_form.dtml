@@ -28,7 +28,7 @@
  </tr>
 </dtml-if>
  
- <tr>
+ <tr valign="top">
   <th> Full Text
   </th>
   <td>
@@ -50,6 +50,14 @@
   <td>
    <input name="Title" size="20">
   </td>
+ </tr>
+
+ <tr valign="top">
+  <th>Subject</th>
+  <td><input name="Subject:tokens" size="20">
+      <dl class="FieldHelp">
+      <dd>A space seperated list of subject keywords</dd>
+      </dl></td>
  </tr>
 
  <tr>
