@@ -309,7 +309,6 @@ class ExternalEditor:
                 sys.exit()            
         
         save_interval = float(self.options.get('save_interval'))
-        launch_success = 0
         last_mtime = os.path.getmtime(self.content_file)
         command = self.getEditorCommand()
 
@@ -351,6 +350,8 @@ class ExternalEditor:
         if use_locks:
             self.lock()
             
+        launch_success = editor.isAlive()
+	    
         while 1:
             editor.wait(save_interval or 2)
             mtime = os.path.getmtime(self.content_file)

@@ -1,5 +1,14 @@
 External Editor Change Log
 
+  4/23/04 - 0.7.2 Release
+
+    - Fixed packaging bug in Windows binary which disabled several plugins.
+      This fixes "Editor did not launch properly" errors for MSOffice
+      among others.
+
+    - Fixed a bug where very short editing sessions where no changes were
+      made could make EE think the editor never launched. Thanks to Maik Ihde.
+
   11/7/03 - 0.7.1 Release (affects win32 binary only)
 
     - Fix encoding bug in windows binary. Thanks to Chris McDonough.
