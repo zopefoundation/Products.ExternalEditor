@@ -15,21 +15,22 @@
 $Id$
 """
 
+from AccessControl import ClassSecurityInfo
+from Globals import DTMLFile
+from Globals import InitializeClass
 from OFS.SimpleItem import SimpleItem
-from Globals import InitializeClass, DTMLFile
-from AccessControl import ClassSecurityInfo, Unauthorized
 
+from ActionInformation import ActionInformation
+from ActionProviderBase import ActionProviderBase
+from exceptions import AccessControl_Unauthorized
+from Expression import Expression
+from interfaces.portal_undo import portal_undo as IUndoTool
+from permissions import ListUndoableChanges
+from permissions import ManagePortal
 from utils import _checkPermission
 from utils import _dtmldir
 from utils import _getAuthenticatedUser
 from utils import UniqueObject
-from Expression import Expression
-from ActionInformation import ActionInformation
-from ActionProviderBase import ActionProviderBase
-from permissions import ListUndoableChanges
-from permissions import ManagePortal
-
-from interfaces.portal_undo import portal_undo as IUndoTool
 
 
 class UndoTool (UniqueObject, SimpleItem, ActionProviderBase):
@@ -45,7 +46,7 @@ class UndoTool (UniqueObject, SimpleItem, ActionProviderBase):
                                 , action=Expression(
                text='string:${portal_url}/undo_form')
                                 , condition=Expression(
-               text='member') 
+               text='member')
                                 , permissions=(ListUndoableChanges,)
                                 , category='global'
                                 , visible=1
@@ -58,7 +59,7 @@ class UndoTool (UniqueObject, SimpleItem, ActionProviderBase):
     manage_options = ( ActionProviderBase.manage_options +
                        SimpleItem.manage_options +
                        ({ 'label' : 'Overview', 'action' : 'manage_overview' }
-                     , 
+                     ,
                      ))
     #
     #   ZMI methods
@@ -116,9 +117,8 @@ class UndoTool (UniqueObject, SimpleItem, ActionProviderBase):
 
         for tinfo in transaction_info:
             if not xids.get( tinfo, None ):
-                raise Unauthorized
+                raise AccessControl_Unauthorized
 
         object.manage_undo_transactions(transaction_info)
-
 
 InitializeClass(UndoTool)

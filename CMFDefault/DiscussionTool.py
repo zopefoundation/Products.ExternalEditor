@@ -15,9 +15,9 @@
 $Id$
 """
 
-from Globals import InitializeClass
-from Globals import DTMLFile
 from AccessControl import ClassSecurityInfo
+from Globals import DTMLFile
+from Globals import InitializeClass
 from OFS.SimpleItem import SimpleItem
 
 from Products.CMFCore.ActionInformation import ActionInformation
@@ -29,15 +29,13 @@ from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.utils import UniqueObject
 
 from DiscussionItem import DiscussionItemContainer
-from utils import _dtmldir
 from exceptions import AccessControl_Unauthorized
+from exceptions import DiscussionNotAllowed
 from permissions import ManagePortal
 from permissions import ModifyPortalContent
 from permissions import ReplyToItem
+from utils import _dtmldir
 
-
-class DiscussionNotAllowed( Exception ):
-    pass
 
 class DiscussionTool( UniqueObject, SimpleItem, ActionProviderBase ):
 
@@ -63,7 +61,7 @@ class DiscussionTool( UniqueObject, SimpleItem, ActionProviderBase ):
 
     manage_options = (ActionProviderBase.manage_options +
                      ({ 'label' : 'Overview', 'action' : 'manage_overview' }
-                     , 
+                     ,
                      ) + SimpleItem.manage_options)
 
     #
@@ -99,11 +97,11 @@ class DiscussionTool( UniqueObject, SimpleItem, ActionProviderBase ):
         """
         if not self.isDiscussionAllowedFor( content ):
             raise DiscussionNotAllowed
-            
+
         talkback = getattr( content, 'talkback', None )
         if not talkback:
             talkback = self._createDiscussionFor( content )
-        
+
         return talkback
 
     security.declarePublic( 'isDiscussionAllowedFor' )

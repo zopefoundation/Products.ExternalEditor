@@ -15,23 +15,27 @@
 $Id$
 """
 
-from utils import UniqueObject, getToolByName, _dtmldir
-from OFS.SimpleItem import SimpleItem
-from OFS.PropertyManager import PropertyManager
+from AccessControl import ClassSecurityInfo
+from AccessControl.Role import RoleManager
+from Acquisition import aq_inner, aq_parent, aq_base
+from BTrees.OOBTree import OOBTree
 from Globals import DTMLFile
 from Globals import InitializeClass
-from AccessControl.Role import RoleManager
-from BTrees.OOBTree import OOBTree
+from OFS.PropertyManager import PropertyManager
+from OFS.SimpleItem import SimpleItem
 from ZPublisher.Converters import type_converters
-from Acquisition import aq_inner, aq_parent, aq_base
-from AccessControl import ClassSecurityInfo
-from permissions import ViewManagementScreens
+
+from ActionProviderBase import ActionProviderBase
+from exceptions import BadRequest
+from interfaces.portal_memberdata import MemberData as IMemberData
+from interfaces.portal_memberdata import portal_memberdata as IMemberDataTool
 from permissions import ManagePortal
 from permissions import SetOwnProperties
-from ActionProviderBase import ActionProviderBase
+from permissions import ViewManagementScreens
+from utils import _dtmldir
+from utils import getToolByName
+from utils import UniqueObject
 
-from interfaces.portal_memberdata import portal_memberdata as IMemberDataTool
-from interfaces.portal_memberdata import MemberData as IMemberData
 
 _marker = []  # Create a new marker object.
 
@@ -298,10 +302,10 @@ class MemberData (SimpleItem):
             if registration:
                 failMessage = registration.testPropertiesValidity(properties, member)
                 if failMessage is not None:
-                    raise 'Bad Request', failMessage
+                    raise BadRequest(failMessage)
             member.setMemberProperties(properties)
         else:
-            raise 'Bad Request', 'Not logged in.'
+            raise BadRequest('Not logged in.')
 
     security.declarePrivate('setMemberProperties')
     def setMemberProperties(self, mapping):

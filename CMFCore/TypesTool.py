@@ -15,37 +15,39 @@
 $Id$
 """
 
-import sys
-import warnings
+from sys import exc_info
 
-from Globals import DTMLFile
-from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
 from AccessControl import getSecurityManager
-from AccessControl import Unauthorized
 from Acquisition import aq_base
 from Acquisition import aq_get
-from zLOG import LOG, WARNING, ERROR
+from Globals import DTMLFile
+from Globals import InitializeClass
 from OFS.Folder import Folder
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
+from zLOG import LOG, WARNING, ERROR
 import Products
 
+from ActionProviderBase import ActionProviderBase
+from exceptions import AccessControl_Unauthorized
+from exceptions import BadRequest
+from exceptions import zExceptions_Unauthorized
 from interfaces.portal_types import ContentTypeInformation as ITypeInformation
 from interfaces.portal_types import portal_types as ITypesTool
-
-from ActionProviderBase import ActionProviderBase
 from permissions import AccessContentsInformation
 from permissions import ManagePortal
 from permissions import View
-from utils import UniqueObject
-from utils import SimpleItemWithProperties
-from utils import _dtmldir
 from utils import _checkPermission
+from utils import _dtmldir
 from utils import _wwwdir
 from utils import cookString
 from utils import getActionContext
+from utils import SimpleItemWithProperties
+from utils import UniqueObject
+
 
 _marker = []  # Create a new marker.
+
 
 class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
     """
@@ -157,7 +159,7 @@ class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
             v = v.strip()
             if v:
                 aliases[k] = v
-        
+
         _dict = {}
         for k, v in form['methods'].items():
             if aliases.has_key(k):
@@ -393,7 +395,7 @@ class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
         _dict = {}
         viewmethod = ''
 
-        # order actions and search 'mkdir' action 
+        # order actions and search 'mkdir' action
         for action in actions:
             if action.getId() == 'view':
                 ordered.insert(0, action)
@@ -474,7 +476,7 @@ class FactoryTypeInformation (TypeInformation):
 
     product = ''
     factory = ''
- 
+
     #
     #   Agent methods
     #
@@ -489,7 +491,7 @@ class FactoryTypeInformation (TypeInformation):
                                self.getId())
         if getSecurityManager().validate(p, p, self.factory, m):
             return m
-        raise Unauthorized, ('Cannot create %s' % self.getId())
+        raise AccessControl_Unauthorized( 'Cannot create %s' % self.getId() )
 
     def _queryFactoryMethod(self, container, default=None):
         if not self.product or not self.factory:
@@ -498,7 +500,7 @@ class FactoryTypeInformation (TypeInformation):
             p = container.manage_addProduct[self.product]
         except AttributeError:
             LOG('Types Tool', ERROR, '_queryFactoryMethod raised an exception',
-                error=sys.exc_info())
+                error=exc_info())
             return default
         m = getattr(p, self.factory, None)
         if m:
@@ -507,7 +509,7 @@ class FactoryTypeInformation (TypeInformation):
                 # mean unauthorized.
                 if getSecurityManager().validate(p, p, self.factory, m):
                     return m
-            except Unauthorized:
+            except zExceptions_Unauthorized:  # Catch *all* Unauths!
                 pass
         return default
 
@@ -592,7 +594,7 @@ class ScriptableTypeInformation( TypeInformation ):
         'container', using 'id' as its id.  Return the object.
         """
         if not self.isConstructionAllowed(container):
-            raise Unauthorized
+            raise AccessControl_Unauthorized
 
         constructor = self.restrictedTraverse( self.constructor_path )
         # make sure ownership is explicit before switching the context
@@ -739,11 +741,11 @@ class TypesTool(UniqueObject, Folder, ActionProviderBase):
                     fti = ft
                     break
             if fti is None:
-                raise 'Bad Request', ('%s not found.' % typeinfo_name)
+                raise BadRequest('%s not found.' % typeinfo_name)
             if not id:
                 id = fti.get('id', None)
         if not id:
-            raise 'Bad Request', 'An id is required.'
+            raise BadRequest('An id is required.')
         for mt in typeClasses:
             if mt['name'] == add_meta_type:
                 klass = mt['class']
@@ -773,7 +775,7 @@ class TypesTool(UniqueObject, Folder, ActionProviderBase):
             v = v.strip()
             if v:
                 aliases[k] = v
-        
+
         for ti in self.listTypeInfo():
             _dict = {}
             for k, v in form[ ti.getId() ].items():
@@ -808,7 +810,7 @@ class TypesTool(UniqueObject, Folder, ActionProviderBase):
     def _checkViewType(self,t):
         try:
             return getSecurityManager().validate(t, t, 'Title', t.Title)
-        except Unauthorized:
+        except zExceptions_Unauthorized:  # Catch *all* Unauths!
             return 0
 
     security.declareProtected(AccessContentsInformation, 'listTypeInfo')
@@ -879,11 +881,11 @@ class TypesTool(UniqueObject, Folder, ActionProviderBase):
         """
         info = self.getTypeInfo( type_name )
         if info is None:
-            raise 'ValueError', 'No such content type: %s' % type_name
+            raise ValueError('No such content type: %s' % type_name)
 
         # check we're allowed to access the type object
         if not self._checkViewType(info):
-            raise Unauthorized,info
+            raise AccessControl_Unauthorized(info)
 
         ob = info.constructInstance(container, id, *args, **kw)
 

@@ -14,22 +14,26 @@
 
 $Id$
 """
+
 from types import StringType
 
-from OFS.Folder import Folder
+from AccessControl import ClassSecurityInfo
+from AccessControl.User import nobody
 from Acquisition import aq_base
 from Acquisition import aq_inner
 from Acquisition import aq_parent
-from AccessControl.User import nobody
-from AccessControl import ClassSecurityInfo
 from Globals import DTMLFile
 from Globals import InitializeClass
 from Globals import MessageDialog
 from Globals import PersistentMapping
+from OFS.Folder import Folder
 from ZODB.POSException import ConflictError
 
 from ActionProviderBase import ActionProviderBase
 from exceptions import AccessControl_Unauthorized
+from exceptions import BadRequest
+from interfaces.portal_membership \
+        import portal_membership as IMembershipTool
 from permissions import AccessContentsInformation
 from permissions import ChangeLocalRoles
 from permissions import ListPortalMembers
@@ -37,14 +41,11 @@ from permissions import ManagePortal
 from permissions import ManageUsers
 from permissions import SetOwnPassword
 from permissions import View
-from utils import UniqueObject
-from utils import _getAuthenticatedUser
 from utils import _checkPermission
-from utils import getToolByName
 from utils import _dtmldir
-
-from interfaces.portal_membership \
-        import portal_membership as IMembershipTool
+from utils import _getAuthenticatedUser
+from utils import getToolByName
+from utils import UniqueObject
 
 
 class MembershipTool(UniqueObject, Folder, ActionProviderBase):
@@ -95,10 +96,10 @@ class MembershipTool(UniqueObject, Folder, ActionProviderBase):
             if registration:
                 failMessage = registration.testPasswordValidity(password)
                 if failMessage is not None:
-                    raise 'Bad Request', failMessage
+                    raise BadRequest(failMessage)
             member.setSecurityProfile(password=password, domains=domains)
         else:
-            raise 'Bad Request', 'Not logged in.'
+            raise BadRequest('Not logged in.')
 
     security.declarePublic('getAuthenticatedMember')
     def getAuthenticatedMember(self):

@@ -15,8 +15,8 @@ from Products.CMFCore.TypesTool import FactoryTypeInformation as FTI
 from Products.CMFCore.TypesTool import TypesTool
 from Products.CMFDefault.DiscussionItem import DiscussionItem
 from Products.CMFDefault.DiscussionItem import DiscussionItemContainer
-from Products.CMFDefault.DiscussionTool import DiscussionNotAllowed
 from Products.CMFDefault.DiscussionTool import DiscussionTool
+from Products.CMFDefault.exceptions import DiscussionNotAllowed
 
 
 class DiscussionItemTests(TestCase):

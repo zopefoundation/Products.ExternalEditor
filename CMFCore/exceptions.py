@@ -10,7 +10,7 @@
 # FOR A PARTICULAR PURPOSE
 #
 ##############################################################################
-""" Declare Exceptions used throughout the CMF.
+""" CMFCore product exceptions.
 
 $Id$
 """
@@ -21,6 +21,22 @@ from OFS.CopySupport import CopyError
 from webdav.Lockable import ResourceLockedError
 from zExceptions import Unauthorized as zExceptions_Unauthorized
 
+try:
+    from zExceptions import BadRequest
+except ImportError:
+    # for Zope versions before 2.7.0
+
+    class BadRequest(Exception):
+        pass
+
+try:
+    from zExceptions import NotFound
+except ImportError:
+    # for Zope versions before 2.7.0
+
+    class NotFound(Exception):
+        pass
+
 
 security = ModuleSecurityInfo('Products.CMFCore.exceptions')
 
@@ -28,18 +44,14 @@ security = ModuleSecurityInfo('Products.CMFCore.exceptions')
 # zExceptions_Unauthorized to catch them all.
 
 security.declarePublic('AccessControl_Unauthorized')
+security.declarePublic('BadRequest')
 security.declarePublic('CopyError')
+security.declarePublic('NotFound')
 security.declarePublic('ResourceLockedError')
 security.declarePublic('zExceptions_Unauthorized')
 
 
-security.declarePublic('IllegalHTML')
-class IllegalHTML(ValueError):
-    """ Illegal HTML error.
-    """
-
-
-security.declarePublic('EditingConflict')
-class EditingConflict(Exception):
-    """ Editing conflict error.
+security.declarePublic('SkinPathError')
+class SkinPathError(Exception):
+    """ Invalid skin path error.
     """

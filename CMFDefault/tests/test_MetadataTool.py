@@ -7,10 +7,10 @@ from Interface.Verify import verifyClass
 from Acquisition import aq_base
 
 from Products.CMFDefault.DublinCore import DefaultDublinCoreImpl
+from Products.CMFDefault.exceptions import MetadataError
 from Products.CMFDefault.MetadataTool import DEFAULT_ELEMENT_SPECS
 from Products.CMFDefault.MetadataTool import ElementSpec
 from Products.CMFDefault.MetadataTool import MetadataElementPolicy
-from Products.CMFDefault.MetadataTool import MetadataError
 from Products.CMFDefault.MetadataTool import MetadataTool
 
 

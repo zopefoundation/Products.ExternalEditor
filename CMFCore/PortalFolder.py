@@ -15,10 +15,10 @@
 $Id$
 """
 
-import sys
-import re
 import base64
 import marshal
+import re
+from sys import exc_info
 from warnings import warn
 
 from AccessControl import ClassSecurityInfo
@@ -52,6 +52,7 @@ from permissions import View
 from DynamicType import DynamicType
 from utils import _checkPermission
 from utils import getToolByName
+
 
 factory_type_information = (
   { 'id'             : 'Folder'
@@ -406,8 +407,11 @@ class PortalFolder(DynamicType, CMFCatalogAware, OrderSupport, Folder):
     def checkIdAvailable(self, id):
         try:
             self._checkId(id)
+        except BadRequest:
+            return 0
         except:
-            if sys.exc_info()[0] == 'Bad Request':
+            # for Zope versions before 2.7.0
+            if exc_info()[0] == 'Bad Request':
                 return 0
             raise  # Some other exception.
         else:
@@ -434,8 +438,7 @@ class PortalFolder(DynamicType, CMFCatalogAware, OrderSupport, Folder):
                     # don't allow an override.
                     # FIXME: needed to allow index_html for join code
                     if hasattr(ob, id) and id != 'index_html':
-                        raise 'Bad Request', (
-                            'The id "%s" is reserved.' % id)
+                        raise BadRequest('The id "%s" is reserved.' % id)
                     # Otherwise we're ok.
 
     def _verifyObjectPaste(self, object, validate_src=1):

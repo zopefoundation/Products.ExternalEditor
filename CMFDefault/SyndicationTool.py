@@ -18,7 +18,6 @@ $Id$
 """
 
 from AccessControl import ClassSecurityInfo
-from AccessControl import Unauthorized
 from Acquisition import aq_base
 from DateTime import DateTime
 from Globals import HTMLFile
@@ -32,10 +31,11 @@ from Products.CMFCore.PortalFolder import PortalFolder
 from Products.CMFCore.utils import _checkPermission
 from Products.CMFCore.utils import UniqueObject
 
-from SyndicationInfo import SyndicationInformation
+from exceptions import AccessControl_Unauthorized
 from permissions import AccessContentsInformation
 from permissions import ManagePortal
 from permissions import ManageProperties
+from SyndicationInfo import SyndicationInformation
 from utils import _dtmldir
 
 
@@ -180,7 +180,7 @@ class SyndicationTool (UniqueObject, SimpleItem, ActionProviderBase):
         Not Sitewide Properties.
         """
         if not _checkPermission( ManageProperties, obj ):
-            raise Unauthorized
+            raise AccessControl_Unauthorized
 
         syInfo = getattr(obj, 'syndication_information', None)
 

@@ -15,17 +15,13 @@
 $Id$
 """
 
-from Acquisition import aq_base
 from AccessControl import ClassSecurityInfo
+from Acquisition import aq_base
 from Globals import InitializeClass
 
-from permissions import AccessContentsInformation
+from exceptions import SkinPathError
 from interfaces.portal_skins import SkinsContainer as ISkinsContainer
-
-
-class SkinPathError (Exception):
-    'Invalid skin path'
-    pass
+from permissions import AccessContentsInformation
 
 
 class SkinsContainer:

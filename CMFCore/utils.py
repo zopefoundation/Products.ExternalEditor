@@ -48,6 +48,7 @@ from Products.PageTemplates.Expressions import getEngine
 from Products.PageTemplates.Expressions import SecureModuleImporter
 
 from exceptions import AccessControl_Unauthorized
+from exceptions import NotFound
 
 
 security = ModuleSecurityInfo( 'Products.CMFCore.utils' )
@@ -209,7 +210,7 @@ def _getViewFor(obj, view='view'):
         raise AccessControl_Unauthorized( 'No accessible views available for '
                                     '%s' % '/'.join( obj.getPhysicalPath() ) )
     else:
-        raise 'Not Found', ('Cannot find default view for "%s"' %
+        raise NotFound('Cannot find default view for "%s"' %
                             '/'.join(obj.getPhysicalPath()))
 
 
@@ -466,7 +467,7 @@ def manage_addTool(self, type, REQUEST=None):
             obj = tool()
             break
     if obj is None:
-        raise 'NotFound', type
+        raise NotFound(type)
     self._setObject(obj.getId(), obj)
     if REQUEST is not None:
         return self.manage_main(self, REQUEST)
@@ -545,7 +546,7 @@ def manage_addContent( self, id, type, REQUEST=None ):
             obj = content_type( id )
             break
     if obj is None:
-        raise 'NotFound', type
+        raise NotFound(type)
     self._setObject( id, obj )
     if REQUEST is not None:
         return self.manage_main(self, REQUEST)

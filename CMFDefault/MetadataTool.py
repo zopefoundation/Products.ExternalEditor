@@ -15,23 +15,24 @@
 $Id$
 """
 
-from OFS.SimpleItem import SimpleItem
-from Globals import PersistentMapping
-
-from Globals import InitializeClass
-from Globals import DTMLFile
 from AccessControl import ClassSecurityInfo
 from AccessControl import getSecurityManager
+from Globals import DTMLFile
+from Globals import InitializeClass
+from Globals import PersistentMapping
+from OFS.SimpleItem import SimpleItem
 
-from Products.CMFCore.utils import UniqueObject
 from Products.CMFCore.ActionProviderBase import ActionProviderBase
 from Products.CMFCore.interfaces.portal_metadata \
         import portal_metadata as IMetadataTool
+from Products.CMFCore.utils import UniqueObject
 
-from permissions import View
+from exceptions import MetadataError
 from permissions import ManagePortal
 from permissions import ModifyPortalContent
+from permissions import View
 from utils import _dtmldir
+
 
 class MetadataElementPolicy( SimpleItem ):
     """
@@ -84,7 +85,7 @@ class MetadataElementPolicy( SimpleItem ):
             Must this element be supplied?
         """
         return self.is_required
-    
+
     security.declareProtected(View , 'supplyDefault')
     def supplyDefault( self ):
         """
@@ -122,6 +123,7 @@ DEFAULT_ELEMENT_SPECS = ( ( 'Title', 0 )
                         , ( 'Rights', 0 )
                         )
 
+
 class ElementSpec( SimpleItem ):
     """
         Represent all the tool knows about a single metadata element.
@@ -137,8 +139,7 @@ class ElementSpec( SimpleItem ):
         self.is_multi_valued  = is_multi_valued
         self.policies         = PersistentMapping()
         self.policies[ None ] = self._makePolicy()  # set default policy
-        
-    
+
     security.declarePrivate( '_makePolicy' )
     def _makePolicy( self ):
         return MetadataElementPolicy( self.is_multi_valued )
@@ -197,8 +198,6 @@ class ElementSpec( SimpleItem ):
 
 InitializeClass( ElementSpec )
 
-class MetadataError( Exception ):
-    pass
 
 class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
 
@@ -238,7 +237,7 @@ class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
     #
     #   ZMI methods
     #
-    manage_options = ( ActionProviderBase.manage_options + 
+    manage_options = ( ActionProviderBase.manage_options +
                      ( { 'label'      : 'Overview'
                          , 'action'     : 'manage_overview'
                          }
