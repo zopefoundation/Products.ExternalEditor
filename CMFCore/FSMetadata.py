@@ -141,6 +141,12 @@ class FSMetadata:
                 kv = line.split('=', 1)
                 if len(kv) == 2:
                     props[kv[0].strip()] = kv[1].strip()
+                else:
+                    LOG('FSMetadata',
+                        ERROR,
+                        'Error parsing .properties file',
+                        error=exc_info())
+
             return props
     
     def _old_readSecurity(self):
