@@ -2,6 +2,11 @@ CMF 1.5alpha (unreleased)
 
   New Features
 
+    - Callable Opaque Items, CMFCatalogAware: Added a marker interface 
+      'ICallableOpaqueItemWithHooks'. CMF now calls the manage_after*
+      and manage_before* hooks of a marked opaque item on copying, 
+      moving or deleting the containing content object (gregweb).
+
     - DublinCore: Creator element no longer depends on Ownership.
       (Collector #25)
 
