@@ -185,6 +185,7 @@ class CookieCrumblerTests (unittest.TestCase):
     def testLoginRestoresQueryString(self):
         # When redirecting for login, the came_from form field should
         # include the submitted URL as well as the query string.
+        self.req['PATH_INFO'] = '/protected'
         self.req['QUERY_STRING'] = 'a:int=1&x:string=y'
         try:
             self.req.traverse('/protected')
