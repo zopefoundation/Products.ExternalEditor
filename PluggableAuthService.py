@@ -784,7 +784,7 @@ class PluggableAuthService( Folder ):
 
         """ user_id -> decorated_user
         """
-        if user_id == self._emergency_user.getId():
+        if user_id == self._emergency_user.getUserName():
             return self._emergency_user
 
         if cache is None:

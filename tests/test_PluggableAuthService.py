@@ -791,6 +791,27 @@ class PluggableAuthServiceTests( unittest.TestCase ):
 
         self.assertEqual( len( user.listPropertysheets() ), 0 )
 
+    def test__findEmergencyUser_no_plugins( self ):
+
+        from AccessControl.User import UnrestrictedUser
+
+        from Products.PluggableAuthService import PluggableAuthService
+
+        old_eu = PluggableAuthService.emergency_user
+
+        eu = UnrestrictedUser( 'foo', 'bar', ( 'manage', ), () )
+
+        PluggableAuthService.emergency_user = eu
+
+        plugins = self._makePlugins()
+        zcuf = self._makeOne()
+        zcuf._emergency_user = eu
+        user = zcuf._findUser( plugins, 'foo' )
+
+        self.assertEqual( aq_base(zcuf._getEmergencyUser()), aq_base(user) )
+
+        PluggableAuthService.emergency_user = old_eu
+
     def test__findUser_with_userfactory_plugin( self ):
 
         from Products.PluggableAuthService.interfaces.plugins \
