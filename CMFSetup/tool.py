@@ -124,9 +124,7 @@ class SetupTool( UniqueObject, Folder ):
     id = 'portal_setup'
     meta_type = 'Portal Setup Tool'
 
-    _product_name = None
-    _profile_directory = None
-    _root_directory = None
+    _import_context_id = ''
 
     security = ClassSecurityInfo()
 
@@ -150,43 +148,19 @@ class SetupTool( UniqueObject, Folder ):
         """
         return 'ascii'
 
-    security.declareProtected( ManagePortal, 'getProfileProduct' )
-    def getProfileProduct( self ):
+    security.declareProtected( ManagePortal, 'getImportContextId' )
+    def getImportContextID( self ):
 
         """ See ISetupTool.
         """
-        return self._product_name
+        return self._import_context_id
 
-    security.declareProtected( ManagePortal, 'getProfileDirectory' )
-    def getProfileDirectory( self, relative_to_product=False ):
-
-        """ See ISetupTool.
-        """
-        return ( relative_to_product
-             and self._profile_directory
-              or self._getFullyQualifiedProfileDirectory()
-               )
-
-    security.declareProtected( ManagePortal, 'setProfileDirectory' )
-    def setProfileDirectory( self, path, product_name=None, encoding=None ):
+    security.declareProtected(ManagePortal, 'setImportContext')
+    def setImportContext(self, context_id, encoding=None):
 
         """ See ISetupTool.
         """
-        if product_name is not None:
-
-            root = self._root_directory = self._getProductPath( product_name )
-
-            if not os.path.exists( os.path.join( root, path ) ):
-                raise ValueError, 'Invalid path: %s' % path
-
-        else:
-            if not os.path.exists( path ):
-                raise ValueError, 'Invalid path: %s' % path
-
-            self._root_directory = None
-
-        self._profile_directory = path
-        self._product_name = product_name
+        self._import_context_id = context_id
 
         self._updateImportStepsRegistry( encoding )
         self._updateExportStepsRegistry( encoding )
@@ -218,10 +192,7 @@ class SetupTool( UniqueObject, Folder ):
 
         """ See ISetupTool.
         """
-        profile_path = self._getFullyQualifiedProfileDirectory()
-        encoding = self.getEncoding()
-        context = DirectoryImportContext( self, profile_path, purge_old,
-                                          encoding )
+        context = self._getImportContext(self._import_context_id, purge_old)
 
         info = self._import_registry.getStepMetadata( step_id )
 
@@ -251,10 +222,7 @@ class SetupTool( UniqueObject, Folder ):
 
         """ See ISetupTool.
         """
-        profile_path = self._getFullyQualifiedProfileDirectory()
-        encoding = self.getEncoding()
-        context = DirectoryImportContext( self, profile_path, purge_old,
-                                          encoding )
+        context = self._getImportContext(self._import_context_id, purge_old)
 
         steps = self._import_registry.sortSteps()
         messages = {}
@@ -398,25 +366,10 @@ class SetupTool( UniqueObject, Folder ):
     manage_tool = PageTemplateFile( 'sutProperties', _wwwdir )
 
     security.declareProtected( ManagePortal, 'manage_updateToolProperties' )
-    def manage_updateToolProperties( self
-                                   , profile_directory
-                                   , profile_product
-                                   , RESPONSE
-                                   ):
+    def manage_updateToolProperties(self, context_id, RESPONSE):
         """ Update the tool's settings.
         """
-        profile_directory = profile_directory.strip()
-        profile_product = profile_product.strip()
-
-        if profile_directory.startswith( '.' ):
-            raise ValueError(
-                    "Directories begining with '.' are not allowed." )
-
-        if profile_product and profile_directory.startswith( '/' ):
-            raise ValueError(
-                    "Product may not be specified with absolute directories" )
-
-        self.setProfileDirectory( profile_directory, profile_product )
+        self.setImportContext(context_id)
 
         RESPONSE.redirect( '%s/manage_tool?manage_tabs_message=%s'
                          % ( self.absolute_url(), 'Properties+updated.' )
@@ -544,6 +497,21 @@ class SetupTool( UniqueObject, Folder ):
         """
         return _profile_registry.listProfileInfo()
 
+    security.declareProtected(ManagePortal, 'listContextInfos')
+    def listContextInfos(self):
+
+        """ List registered profiles and snapshots.
+        """
+
+        s_infos = [ { 'id': 'snapshot-%s' % info['id'],
+                      'title': info['title'] }
+                    for info in self.listSnapshotInfo() ]
+        p_infos = [ { 'id': 'profile-%s' % info['id'],
+                      'title': info['title'] }
+                    for info in self.listProfileInfo() ]
+
+        return tuple(s_infos + p_infos)
+
     security.declareProtected( ManagePortal, 'manage_createSnapshot' )
     def manage_createSnapshot( self, RESPONSE, snapshot_id=None ):
 
@@ -618,10 +586,12 @@ class SetupTool( UniqueObject, Folder ):
         return product.__path__[0]
 
     security.declarePrivate( '_getImportContext' )
-    def _getImportContext( self, context_id ):
+    def _getImportContext( self, context_id, should_purge=False ):
 
         """ Crack ID and generate appropriate import context.
         """
+        encoding = self.getEncoding()
+
         if context_id.startswith( 'profile-' ):
 
             context_id = context_id[ len( 'profile-' ): ]
@@ -633,33 +603,19 @@ class SetupTool( UniqueObject, Folder ):
             else:
                 path = info[ 'path' ]
 
-            return DirectoryImportContext( self, path )
+            return DirectoryImportContext(self, path, should_purge, encoding)
 
         # else snapshot
         context_id = context_id[ len( 'snapshot-' ): ]
-        return SnapshotImportContext( self, context_id )
-
-    security.declarePrivate( '_getFullyQualifiedProfileDirectory' )
-    def _getFullyQualifiedProfileDirectory( self ):
-
-        """ Return the fully-qualified directory path of our profile.
-        """
-        if self._root_directory is not None:
-            return os.path.join( self._root_directory
-                               , self._profile_directory )
-
-        return self._profile_directory
+        return SnapshotImportContext(self, context_id, should_purge, encoding)
 
     security.declarePrivate( '_updateImportStepsRegistry' )
     def _updateImportStepsRegistry( self, encoding ):
 
         """ Update our import steps registry from our profile.
         """
-        fq = self._getFullyQualifiedProfileDirectory()
-
-        f = open( os.path.join( fq, IMPORT_STEPS_XML ), 'r' )
-        xml = f.read()
-        f.close()
+        context = self._getImportContext(self._import_context_id)
+        xml = context.readDataFile(IMPORT_STEPS_XML)
 
         info_list = self._import_registry.parseXML( xml, encoding )
 
@@ -686,11 +642,8 @@ class SetupTool( UniqueObject, Folder ):
 
         """ Update our export steps registry from our profile.
         """
-        fq = self._getFullyQualifiedProfileDirectory()
-
-        f = open( os.path.join( fq, EXPORT_STEPS_XML ), 'r' )
-        xml = f.read()
-        f.close()
+        context = self._getImportContext(self._import_context_id)
+        xml = context.readDataFile(EXPORT_STEPS_XML)
 
         info_list = self._export_registry.parseXML( xml, encoding )
 
@@ -713,11 +666,8 @@ class SetupTool( UniqueObject, Folder ):
 
         """ Update our toolset registry from our profile.
         """
-        fq = self._getFullyQualifiedProfileDirectory()
-
-        f = open( os.path.join( fq, TOOLSET_XML ), 'r' )
-        xml = f.read()
-        f.close()
+        context = self._getImportContext(self._import_context_id)
+        xml = context.readDataFile(TOOLSET_XML)
 
         self._toolset_registry.parseXML( xml, encoding )
 

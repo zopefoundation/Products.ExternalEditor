@@ -20,11 +20,12 @@ import Testing
 import Zope
 Zope.startup()
 
-import os
 from StringIO import StringIO
 
 from Acquisition import aq_base
 from OFS.Folder import Folder
+
+from Products.CMFSetup import profile_registry
 
 from common import DOMComparator
 from common import DummyExportContext
@@ -41,6 +42,19 @@ class SetupToolTests( FilesystemTestBase
                     ):
 
     _PROFILE_PATH = '/tmp/STT_test'
+
+    def setUp( self ):
+
+        FilesystemTestBase.setUp( self )
+        self._profile_registry_info = profile_registry._profile_info
+        self._profile_registry_ids = profile_registry._profile_ids
+        profile_registry._clear()
+
+    def tearDown( self ):
+
+        profile_registry._profile_info = self._profile_registry_info
+        profile_registry._profile_ids = self._profile_registry_ids
+        FilesystemTestBase.tearDown( self )
 
     def _getTargetClass( self ):
 
@@ -64,8 +78,7 @@ class SetupToolTests( FilesystemTestBase
 
         tool = self._makeOne()
 
-        self.assertEqual( tool.getProfileProduct(), None )
-        self.assertEqual( tool.getProfileDirectory(), None )
+        self.assertEqual( tool.getImportContextID(), '' )
 
         import_registry = tool.getImportStepRegistry()
         self.assertEqual( len( import_registry.listSteps() ), 0 )
@@ -79,7 +92,7 @@ class SetupToolTests( FilesystemTestBase
         self.assertEqual( len( toolset_registry.listForbiddenTools() ), 0 )
         self.assertEqual( len( toolset_registry.listRequiredTools() ), 0 )
 
-    def test_getProfileDirectory_relative_no_product( self ):
+    def test_getImportContextID( self ):
 
         from Products.CMFSetup.tool import IMPORT_STEPS_XML
         from Products.CMFSetup.tool import EXPORT_STEPS_XML
@@ -106,20 +119,21 @@ class SetupToolTests( FilesystemTestBase
                      , _EMPTY_TOOLSET_XML
                      )
 
-        tool.setProfileDirectory( self._PROFILE_PATH )
+        profile_registry.registerProfile('foo', 'Foo', '', self._PROFILE_PATH)
+        tool.setImportContext('profile-foo')
 
-        self.assertEqual( tool.getProfileDirectory( True ), self._PROFILE_PATH )
+        self.assertEqual( tool.getImportContextID(), 'profile-foo' )
 
-    def test_setProfileDirectory_absolute_invalid( self ):
+    def test_setImportContext_invalid( self ):
 
         tool = self._makeOne()
 
-        self.assertRaises( ValueError
-                         , tool.setProfileDirectory
-                         , self._PROFILE_PATH
+        self.assertRaises( KeyError
+                         , tool.setImportContext
+                         , 'profile-foo'
                          )
 
-    def test_setProfileDirectory_absolute( self ):
+    def test_setImportContext( self ):
 
         from Products.CMFSetup.tool import IMPORT_STEPS_XML
         from Products.CMFSetup.tool import EXPORT_STEPS_XML
@@ -147,10 +161,10 @@ class SetupToolTests( FilesystemTestBase
                      , _NORMAL_TOOLSET_XML
                      )
 
-        tool.setProfileDirectory( self._PROFILE_PATH )
+        profile_registry.registerProfile('foo', 'Foo', '', self._PROFILE_PATH)
+        tool.setImportContext('profile-foo')
 
-        self.assertEqual( tool.getProfileProduct(), None )
-        self.assertEqual( tool.getProfileDirectory(), self._PROFILE_PATH )
+        self.assertEqual( tool.getImportContextID(), 'profile-foo' )
 
         import_registry = tool.getImportStepRegistry()
         self.assertEqual( len( import_registry.listSteps() ), 1 )
@@ -187,109 +201,6 @@ class SetupToolTests( FilesystemTestBase
         self.failUnless( 'obligatory' in toolset.listRequiredTools() )
         info = toolset.getRequiredToolInfo( 'obligatory' )
         self.assertEqual( info[ 'class' ], 'path.to.another' )
-
-    def test_setProfileDirectory_relative_invalid( self ):
-
-        _PATH = 'tests/nonesuch'
-
-        tool = self._makeOne()
-
-        self.assertRaises( ValueError
-                         , tool.setProfileDirectory
-                         , _PATH
-                         , 'CMFSetup'
-                         )
-
-    def test_setProfileDirectory_relative( self ):
-
-        import Products.CMFSetup
-        from common import dummy_handler
-
-        _PATH = 'tests/default_profile'
-        _PRODUCT_PATH = os.path.split( Products.CMFSetup.__file__ )[0]
-        _FQPATH = os.path.join( _PRODUCT_PATH, _PATH )
-
-        tool = self._makeOne()
-        tool.setProfileDirectory( _PATH, 'CMFSetup' )
-
-        self.assertEqual( tool.getProfileProduct(), 'CMFSetup' )
-        self.assertEqual( tool.getProfileDirectory(), _FQPATH )
-        self.assertEqual( tool.getProfileDirectory( True ), _PATH )
-
-        import_registry = tool.getImportStepRegistry()
-        self.assertEqual( len( import_registry.listSteps() ), 1 )
-        self.failUnless( 'one' in import_registry.listSteps() )
-        info = import_registry.getStepMetadata( 'one' )
-        self.assertEqual( info[ 'id' ], 'one' )
-        self.assertEqual( info[ 'title' ], 'One Step' )
-        self.assertEqual( info[ 'version' ], '1' )
-        self.failUnless( 'One small step' in info[ 'description' ] )
-        self.assertEqual( info[ 'handler' ]
-                        , 'Products.CMFSetup.tests.common.dummy_handler' )
-        self.assertEqual( import_registry.getStep( 'one' ), dummy_handler )
-
-        export_registry = tool.getExportStepRegistry()
-        self.assertEqual( len( export_registry.listSteps() ), 1 )
-        self.failUnless( 'one' in import_registry.listSteps() )
-        info = export_registry.getStepMetadata( 'one' )
-        self.assertEqual( info[ 'id' ], 'one' )
-        self.assertEqual( info[ 'title' ], 'One Step' )
-        self.failUnless( 'One small step' in info[ 'description' ] )
-        self.assertEqual( info[ 'handler' ]
-                        , 'Products.CMFSetup.tests.common.dummy_handler' )
-        self.assertEqual( export_registry.getStep( 'one' ), dummy_handler )
-
-        toolset = tool.getToolsetRegistry()
-        self.assertEqual( len( toolset.listForbiddenTools() ), 1 )
-        self.failUnless( 'doomed' in toolset.listForbiddenTools() )
-        self.assertEqual( len( toolset.listRequiredTools() ), 2 )
-        self.failUnless( 'mandatory' in toolset.listRequiredTools() )
-        info = toolset.getRequiredToolInfo( 'mandatory' )
-        self.assertEqual( info[ 'class' ], 'path.to.one' )
-        self.failUnless( 'obligatory' in toolset.listRequiredTools() )
-        info = toolset.getRequiredToolInfo( 'obligatory' )
-        self.assertEqual( info[ 'class' ], 'path.to.another' )
-
-    def test_setProfileDirectory_relative_encode_as_ascii( self ):
-
-        import Products.CMFSetup
-        from common import dummy_handler
-
-        _PATH = 'tests/default_profile'
-        _PRODUCT_PATH = os.path.split( Products.CMFSetup.__file__ )[0]
-        _FQPATH = os.path.join( _PRODUCT_PATH, _PATH )
-
-        tool = self._makeOne()
-        tool.setProfileDirectory( _PATH, 'CMFSetup', encoding='ascii' )
-
-        import_registry = tool.getImportStepRegistry()
-        self.assertEqual( len( import_registry.listSteps() ), 1 )
-        self.failUnless( 'one' in import_registry.listSteps() )
-        self.assertEqual( import_registry.getStep( 'one' ), dummy_handler )
-
-        export_registry = tool.getExportStepRegistry()
-        self.assertEqual( len( export_registry.listSteps() ), 1 )
-        self.failUnless( 'one' in import_registry.listSteps() )
-        self.assertEqual( export_registry.getStep( 'one' ), dummy_handler )
-
-        toolset = tool.getToolsetRegistry()
-        self.assertEqual( len( toolset.listForbiddenTools() ), 1 )
-        self.failUnless( 'doomed' in toolset.listForbiddenTools() )
-        self.assertEqual( len( toolset.listRequiredTools() ), 2 )
-        self.failUnless( 'mandatory' in toolset.listRequiredTools() )
-        info = toolset.getRequiredToolInfo( 'mandatory' )
-        self.assertEqual( info[ 'class' ], 'path.to.one' )
-        self.failUnless( 'obligatory' in toolset.listRequiredTools() )
-        info = toolset.getRequiredToolInfo( 'obligatory' )
-        self.assertEqual( info[ 'class' ], 'path.to.another' )
-
-    def test_setProfileDirectory_relative_invalid_product( self ):
-
-        _PATH = 'tests/default_profile'
-        tool = self._makeOne()
-
-        self.assertRaises( ValueError
-                         , tool.setProfileDirectory, _PATH, 'NonesuchProduct' )
 
     def test_runImportStep_nonesuch( self ):
 

@@ -1,5 +1,5 @@
-<h1 tal:replace="structure here/manage_page_header">PAGE HEADER</h1>
-<h1 tal:replace="structure here/manage_tabs">TABS</h1>
+<h1 tal:replace="structure context/manage_page_header">PAGE HEADER</h1>
+<h2 tal:replace="structure context/manage_tabs">TABS</h2>
 
 <style type="text/css">
 .file-to-dir {
@@ -70,47 +70,25 @@ configuration sets.
 </p>
 
 <p>Configurations to compare:</p>
-<form method="POST" action="."
-      tal:attributes="action string:${here/absolute_url}">
+<form method="post" action="."
+      tal:attributes="action string:${context/absolute_url}">
 
 <select name="lhs">
-
-  <option value="snapshot-SNAPSHOT_ID"
-          tal:repeat="s_info here/listSnapshotInfo"
-          tal:attributes="selected python:lhs.endswith( s_info['id'] );
-                          value string:snapshot-${s_info/id};
-                         "
-          tal:content="s_info/title"
-  >SNAPSHOT_TITLE</option>
-
-  <option value="profile-PROFILE_ID"
-          tal:repeat="p_info here/listProfileInfo"
-          tal:attributes="selected python:lhs.endswith( p_info['id'] );
-                          value string:profile-${p_info/id};
-                         "
-          tal:content="p_info/title"
-  >PROFILE_TITLE</option>
-
+ <option value="context-CONTEXT_ID"
+    tal:repeat="context_info context/listContextInfos"
+    tal:attributes="selected python:lhs == context_info['id'];
+                    value context_info/id"
+    tal:content="context_info/title"
+ >CONTEXT_TITLE</option>
 </select>
 
 <select name="rhs">
-
-  <option value="snapshot-SNAPSHOT_ID"
-          tal:repeat="s_info here/listSnapshotInfo"
-          tal:attributes="selected python:rhs.endswith( s_info['id'] );
-                          value string:snapshot-${s_info/id};
-                         "
-          tal:content="s_info/title"
-  >SNAPSHOT_TITLE</option>
-
-  <option value="profile-PROFILE_ID"
-          tal:repeat="p_info here/listProfileInfo"
-          tal:attributes="selected python:rhs.endswith( p_info['id'] );
-                          value string:profile-${p_info/id};
-                         "
-          tal:content="p_info/title"
-  >PROFILE_TITLE</option>
-
+ <option value="context-CONTEXT_ID"
+    tal:repeat="context_info context/listContextInfos"
+    tal:attributes="selected python:rhs == context_info['id'];
+                    value context_info/id"
+    tal:content="context_info/title"
+ >CONTEXT_TITLE</option>
 </select>
 
 <br />
@@ -140,14 +118,14 @@ Ignore lines of whitespace
     
 <div tal:define="mae request/missing_as_empty | nothing;
                  ib request/ignore_blanks | nothing;
-                 mcc nocall: here/manage_compareConfigurations;
+                 mcc nocall: context/manage_compareConfigurations;
                  comparison python:mcc( lhs, rhs, mae, ib )"
 >
 <p>
 Comparison of <span tal:replace="request/lhs">LHS</span>
           and <span tal:replace="request/rhs">RHS</span>:</p>
 
-<span tal:replace="structure python: here.markupComparison( comparison )"
+<span tal:replace="structure python: context.markupComparison( comparison )"
 >COMPARISON HERE</span>
 
 </div>
@@ -155,4 +133,4 @@ Comparison of <span tal:replace="request/lhs">LHS</span>
 
 </div>
 
-<h1 tal:replace="structure here/manage_page_footer">PAGE FOOTER </h1>
+<h1 tal:replace="structure context/manage_page_footer">PAGE FOOTER</h1>

@@ -385,29 +385,14 @@ class ISetupTool( Interface ):
         o Return None if the data should not be encoded.
         """
 
-    def getProfileProduct():
+    def getImportContextID():
 
-        """ Return the name of the product defining our current profile.
-
-        o Return None if the current profile is not relative to a product.
+        """ Get the ID of the active import context.
         """
 
-    def getProfileDirectory( relative_to_product=False ):
+    def setImportContext( context_id ):
 
-        """ Return the path to the directory containing profile information.
-
-        o If 'relative_to_product', return it relative to the root directory
-          of our profile product.
-        """
-
-    def setProfileDirectory( path, product_name=None ):
-
-        """ Set the path to the directory containing profile information.
-
-        o If 'product_name' is not None, compute the fully-qualified path
-          relative to the product's root directory.
-
-        o Update the import and export step registries from that directory.
+        """ Set the ID of the active import context and update the registries.
         """
 
     def getImportStepRegistry():

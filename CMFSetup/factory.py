@@ -44,11 +44,7 @@ def addConfiguredSite( dispatcher, site_id, profile_id, RESPONSE=None ):
     site._setObject( 'portal_setup', setup_tool )
     setup_tool = getToolByName( site, 'portal_setup' )
 
-    profile_info = profile_registry.getProfileInfo( profile_id )
-    setup_tool.setProfileDirectory( profile_info[ 'path' ]
-                                  , profile_info.get( 'product' )
-                                  )
-
+    setup_tool.setImportContext( 'profile-%s' % profile_id )
     setup_tool.runAllImportSteps()
     setup_tool.createSnapshot( 'initial_configuration' )
 
