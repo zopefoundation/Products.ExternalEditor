@@ -258,10 +258,17 @@
              </span>
           </th>
 
-          <td align="center" NOWRAP>
+          <td align="center" NOWRAP
+              tal:define="total here/length;
+                          found python: len(items)">
             <b>
-              <span tal:replace="python: 'Issues %s to %s of %s'
-                                   % (batch.start, batch.end, here.length())"/>
+              <span tal:replace="python: 'Issues %s => %s of'
+                                   % (batch.start, batch.end)"/>
+              <span tal:condition="python: total != found"
+                    tal:replace="python: '%s found (%s total)'
+                                         % (found, total)">FOUND/TOTAL</span>
+              <span tal:condition="python: total == found"
+                    tal:replace="python: '%s total' % total">TOTAL</span>
             </b>
           </td>
 
