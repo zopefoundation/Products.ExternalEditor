@@ -1089,20 +1089,24 @@ class PluggableAuthService( Folder ):
     def __call__(self, container, req):
         """ The __before_publishing_traverse__ hook. """
         resp = req['RESPONSE']
-        resp.old_unauthorized = resp._unauthorized
-        resp._unauthorized = self.challenge
+        resp.old_unauthorized = resp.unauthorized
+        resp.unauthorized = self.challenge
         return
 
     def challenge(self):
+        
         req = self.REQUEST
         resp = req['RESPONSE']
-        resp.old_unauthorized()
+        resp._unauthorized()
         
         # Go through all challenge plugins
         plugins = self._getOb('plugins')
         challengers = plugins.listPlugins( IChallengePlugin )
         for challenger_id, challenger in challengers:
             challenger.challenge(req, resp)
+            
+        # No plugin challenged, fallback to default challenge
+        resp.old_unauthorized()
         
     security.declarePublic( 'hasUsers' )
     def hasUsers(self):

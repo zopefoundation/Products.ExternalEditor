@@ -17,6 +17,8 @@
 $Id$
 """
 
+from zExceptions import Unauthorized
+
 from AccessControl.SecurityInfo import ClassSecurityInfo
 from App.class_init import default__class_init__ as InitializeClass
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
@@ -90,8 +92,9 @@ class HTTPBasicAuthHelper( BasePlugin ):
 
         """ Challenge the user for credentials.
         """
-        # XXX:  Does this need to check whether we have an HTTP response?
-        response.unauthorized()
+        return 0
+        m = "<strong>You are not authorized to access this resource.</strong>"
+        raise Unauthorized, m
 
     security.declarePrivate( 'resetCredentials' )
     def resetCredentials( self, request, response ):

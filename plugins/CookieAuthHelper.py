@@ -185,7 +185,7 @@ class CookieAuthHelper(Folder, BasePlugin):
             raise 'Redirect', url
 
         # Fall through to the standard unauthorized() call.
-        resp.unauthorized()
+        return 0
 
 
     security.declarePrivate('getLoginURL')
