@@ -260,7 +260,6 @@ class Collector(SkinnedFolder):
             if self.classifications != x:
                 self.classifications = x
                 changes.append("Classifications")
-                changes = 1
         if importances is not None:
             x = filter(None, importances)
             if self.importances != x:
