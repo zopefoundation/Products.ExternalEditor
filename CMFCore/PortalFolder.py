@@ -138,6 +138,7 @@ class PortalFolder( Folder, DynamicType ):
 ##                           }
 ##                         ,
 ##                         )
+    description = ''
 
     def __init__( self, id, title='' ):
         self.id = id
@@ -162,11 +163,12 @@ class PortalFolder( Folder, DynamicType ):
         return tuple( types )
 
     security.declareProtected(CMFCorePermissions.ManageProperties, 'edit')
-    def edit(self, title=''):
+    def edit(self, title='', description=''):
         """
         Edit the folder title (and possibly other attributes later)
         """
         self.title = title
+        self.description = description
 
     security.declarePublic('allowedContentTypes')
     def allowedContentTypes( self ):
@@ -303,6 +305,13 @@ class PortalFolder( Folder, DynamicType ):
              Implement dublin core Title
         """
         return self.title
+
+    security.declareProtected(View, 'Description')
+    def Description( self ):
+        """
+             Implement dublin core Description
+        """
+        return self.description
 
     security.declareProtected(View, 'Type')
     def Type( self ):

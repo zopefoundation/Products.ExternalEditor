@@ -1,4 +1,6 @@
-<dtml-call expr="edit(REQUEST['title'])">
+<dtml-call expr="edit( title=REQUEST['title']
+                     , description=REQUEST['description']
+                     )">
 <dtml-let portal_status_message="'Folder changed.'">
 <dtml-return folder_contents>
 </dtml-let>

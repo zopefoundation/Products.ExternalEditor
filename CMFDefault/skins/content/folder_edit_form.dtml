@@ -23,6 +23,14 @@
           value="&dtml-title;"
           size="65">
   </td>
+  
+ <tr valign="top">
+  <th align="right"> Description
+  </th>
+  <td colspan="3">
+   <textarea name="description:text" rows="5"
+             cols="65">&dtml-Description;</textarea>
+  </td>
  </tr>
 
  <tr valign="top">
