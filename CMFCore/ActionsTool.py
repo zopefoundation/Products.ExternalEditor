@@ -243,9 +243,12 @@ class ActionsTool(UniqueObject, OFS.Folder.Folder, ActionProviderBase):
                 # This action requires no extra permissions.
                 verified = 1
             else:
-                if category in ('object', 'workflow') and object is not None:
+                if (object is not None and
+                    (category.startswith('object') or
+                     category.startswith('workflow'))):
                     context = object
-                elif category == 'folder' and folder is not None:
+                elif (folder is not None and
+                      category.startswith('folder')):
                     context = folder
                 else:
                     context = portal
