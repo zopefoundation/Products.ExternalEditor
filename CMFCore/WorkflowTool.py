@@ -443,7 +443,7 @@ class WorkflowTool (UniqueObject, Folder):
             catalog = getToolByName(ob, 'portal_catalog', None)
             if catalog is not None:
                 catalog.reindexObject(ob)
-            return res
+        return res
 
     security.declarePublic('doActionFor')
     def doActionFor(self, ob, action, wf_id=None, *args, **kw):
