@@ -8,6 +8,13 @@ WorkflowDefinition interface.
 - Added getPortal() to the expression namespace.  Again, thanks to Jens
 Quade.
 
+- DCWorkflow is now aware of ObjectDeleted and ObjectMoved messages.
+ 
+- getObjectContainer() added to expressions.
+ 
+- What is passed to scripts is now an object whose attributes are from
+  the expression namespace.
+
 Version 0.2
 
 - As suggested by Seb Bacon, simplified by making transitions trigger on
