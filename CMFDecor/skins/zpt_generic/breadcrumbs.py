@@ -24,10 +24,11 @@ portal = context.portal_url.getPortalObject()
 for i in range( len( relative ) ):
     now = relative[ :i+1 ]
     obj = portal.restrictedTraverse( now )
-    result.append( { 'id'      : now[ -1 ]
-                   , 'title'   : obj.Title()
-                   , 'url'     : portal_url + '/' + join( now, '/' )
-                   }
-                 )
+    if not now[ -1 ] == 'talkback':
+        result.append( { 'id'      : now[ -1 ]
+                       , 'title'   : obj.Title()
+                       , 'url'     : portal_url + '/' + join( now, '/' )
+                       }
+                    )
 
 return result
