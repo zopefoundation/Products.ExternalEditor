@@ -177,7 +177,6 @@ class ActionProvidersConfigurator(ConfiguratorBase):
                'category':        {},
                'condition_expr':  {KEY: 'condition'},
                'permission':      {KEY: 'permissions', DEFAULT: ()},
-               'category':        {},
                'visible':         {CONVERTER: self._convertToBoolean},
                'url_expr':        {KEY: 'action'} },
           'permission':
