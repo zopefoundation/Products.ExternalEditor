@@ -221,14 +221,22 @@ class VersionsTool(UniqueObject, SimpleItemWithProperties):
 
 
     security.declarePublic('getVersionId')
-    def getVersionId(self, obj):
+    def getVersionId(self, obj, plus=0):
         """Returns the version ID of the current revision.
+
+        If the 'plus' flag is set and the object is checked out, the
+        version ID will include a plus sign to indicate that when the
+        object is checked in, it will have a higher version number.
         """
         verifyPermission(UseVersionControl, obj)
         obj = unproxied(obj)
         repo = self._getVersionRepository()
         if repo.isUnderVersionControl(obj):
-            return repo.getVersionInfo(obj).version_id
+            info = repo.getVersionInfo(obj)
+            res = info.version_id
+            if plus and info.status == info.CHECKED_OUT:
+                res += '+'
+            return res
         else:
             return ''
 
