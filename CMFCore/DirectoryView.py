@@ -348,7 +348,7 @@ class DirectoryRegistry:
 
     def getDirectoryInfo(self, filepath):
         # Can return None.
-        return self._directories.get(os.path.normpath(filepath), None)
+        return self._directories.get(minimalpath(filepath), None)
 
     def listDirectories(self):
         dirs = self._directories.keys()

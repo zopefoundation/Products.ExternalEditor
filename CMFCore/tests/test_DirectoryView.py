@@ -1,11 +1,14 @@
 import Zope
 from unittest import TestCase, TestSuite, makeSuite, main
 
-from Products.CMFCore.tests.base.dummy import \
-     DummyFolder
+from Products.CMFCore.tests.base.dummy import DummyFolder
 
-from Products.CMFCore.DirectoryView import \
-     registerDirectory,addDirectoryViews,DirectoryViewSurrogate
+from Products.CMFCore.DirectoryView import registerDirectory
+from Products.CMFCore.DirectoryView import addDirectoryViews
+from Products.CMFCore.DirectoryView import DirectoryViewSurrogate
+from Products.CMFCore.DirectoryView import _dirreg
+from Products.CMFCore.DirectoryView import DirectoryInformation
+
 from Globals import package_home, DevelopmentMode
 
 from os import remove, mkdir, rmdir, curdir, stat
@@ -52,9 +55,37 @@ def _deleteFile(filename):
 
 class DirectoryViewTests1( TestCase ):
 
+    def setUp(self):
+        _registerDirectory()
+        self.ob = DummyFolder()
+        
     def test_registerDirectory( self ):
         """ Test registerDirectory  """
-        _registerDirectory()
+        pass
+    
+    def test_getDirectoryInfo1( self ):
+        """ windows INSTANCE_HOME  """
+        addDirectoryViews(self.ob, 'fake_skins', _prefix)
+        self.ob.fake_skin.manage_properties(r'Products\CMFCore\tests\fake_skins\fake_skin')        
+        self.failUnless(hasattr(self.ob.fake_skin,'test1'))
+
+    def test_getDirectoryInfo2( self ):
+        """ windows SOFTWARE_HOME  """
+        addDirectoryViews(self.ob, 'fake_skins', _prefix)
+        self.ob.fake_skin.manage_properties(r'C:\Zope\2.5.1\Products\CMFCore\tests\fake_skins\fake_skin')        
+        self.failUnless(hasattr(self.ob.fake_skin,'test1'))
+
+    def test_getDirectoryInfo3( self ):
+        """ *nix INSTANCE_HOME  """
+        addDirectoryViews(self.ob, 'fake_skins', _prefix)
+        self.ob.fake_skin.manage_properties('Products/CMFCore/tests/fake_skins/fake_skin')        
+        self.failUnless(hasattr(self.ob.fake_skin,'test1'))
+
+    def test_getDirectoryInfo4( self ):
+        """ *nix SOFTWARE_HOME  """
+        addDirectoryViews(self.ob, 'fake_skins', _prefix)
+        self.ob.fake_skin.manage_properties('/usr/local/zope/2.5.1/Products/CMFCore/tests/fake_skins/fake_skin')        
+        self.failUnless(hasattr(self.ob.fake_skin,'test1'))
 
 class DirectoryViewTests2( TestCase ):
 
@@ -80,7 +111,6 @@ class DirectoryViewTests2( TestCase ):
     def test_properties(self):
         """Make sure the directory view is reading properties"""
         self.assertEqual(self.ob.fake_skin.testPT.title, 'Zope Pope')
-
 
 test1path = join(skin_path_name,'test1.py')
 test2path = join(skin_path_name,'test2.py')
@@ -204,8 +234,8 @@ else:
 
 def test_suite():
     return TestSuite((
-        # makeSuite(DirectoryViewTests1),
-        # makeSuite(DirectoryViewTests2),
+        makeSuite(DirectoryViewTests1),
+        makeSuite(DirectoryViewTests2),
         makeSuite(DebugModeTests),
         ))
 

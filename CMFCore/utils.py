@@ -630,13 +630,8 @@ def minimalpath(p):
     # Trims INSTANCE_HOME or SOFTWARE_HOME from a path.
     p = os_path.abspath(p)
     abs = normalize(p)
-    l = len(normINSTANCE_HOME)
-    if abs[:l] != normINSTANCE_HOME:
-        l = len(normSOFTWARE_HOME)
-        if abs[:l] != normSOFTWARE_HOME:
-            # Can't minimize.
-            return p
-    p = p[l:]
+    p = abs[abs.index('products'):]
     while p[:1] in separators:
         p = p[1:]
     return p
+
