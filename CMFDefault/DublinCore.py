@@ -119,7 +119,17 @@ class DefaultDublinCoreImpl( PropertyManager ):
         , ( 'Owner','Manager','Reviewer' )
         ),
         ( 'Modify portal content'
-        , ( 'editMetadata', )
+        , ( 'editMetadata'
+          , 'setTitle'
+          , 'setSubject'
+          , 'setDescription'
+          , 'setContributors'
+          , 'setEffectiveDate'
+          , 'setExpirationDate'
+          , 'setFormat'
+          , 'setLanguage'
+          , 'setRights'
+          )
         ),
     )
 
@@ -303,8 +313,9 @@ class DefaultDublinCoreImpl( PropertyManager ):
     def _datify( self, attrib ):
         if attrib == 'None':
             attrib = None
-        if attrib is not None:
-            attrib = DateTime( attrib )
+        elif not isinstance( attrib, DateTime ):
+            if attrib is not None:
+                attrib = DateTime( attrib )
         return attrib
 
     def setTitle( self, title ):
