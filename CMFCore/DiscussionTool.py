@@ -21,6 +21,7 @@ from Acquisition import Implicit
 from AccessControl import ClassSecurityInfo
 
 from ActionProviderBase import ActionProviderBase
+from ActionInformation import getOAI
 from permissions import AccessContentsInformation
 from permissions import ManagePortal
 from permissions import ReplyToItem
