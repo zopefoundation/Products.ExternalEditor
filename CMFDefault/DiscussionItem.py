@@ -109,7 +109,6 @@ class DiscussionItem(Document):
         """
         if not hasattr(aq_base(self), 'creators'):
             # for content created with CMF versions before 1.5
-            owner = self.getOwner()
             if hasattr(aq_base(self), 'creator') and self.creator != 'unknown':
                 self.creators = ( self.creator, )
             else:

@@ -123,7 +123,7 @@ class DefaultDublinCoreImpl( PropertyManager ):
     def listCreators(self):
         """ List Dublin Core Creator elements - resource authors.
         """
-        if not hasattr(self, 'creators'):
+        if not hasattr(aq_base(self), 'creators'):
             # for content created with CMF versions before 1.5
             owner = self.getOwner()
             if hasattr(owner, 'getId'):
