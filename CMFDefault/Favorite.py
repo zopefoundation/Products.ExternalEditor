@@ -130,8 +130,9 @@ def addFavorite(self, id, title='', remote_url='', description=''):
     Add a Favorite
     """
     portal_url = getToolByName(self, 'portal_url')
-    relUrl = portal_url.getRelativeUrl(self.restrictedTraverse(
-        remote_url))
+    portal_obj = portal_url.getPortalObject()
+    content_obj = portal_obj.restrictedTraverse( remote_url )
+    relUrl = portal_url.getRelativeUrl( content_obj )
     o=Favorite( id, title, relUrl, description )
     self._setObject(id,o)
 
