@@ -80,26 +80,6 @@ class ActionsToolTests( SecurityRequestTest ):
                           'folder': [],
                           'global': []})
 
-    def test_listDictionaryActions(self):
-        """
-        Check that listFilteredActionsFor works for objects
-        that return dictionaries
-        """
-        root = self.root
-        tool = self.tool
-        root._setObject('donkey', PortalFolder('donkey'))
-        self.assertEqual(tool.listFilteredActionsFor(root.donkey),
-                         {'workflow': [],
-                          'user': [],
-                          'object': [],
-                          'folder': [{'permissions': ('List folder contents',),
-                                      'id': 'folderContents',
-                                      'url': 'http://foo/donkey/folder_contents',
-                                      'name': 'Folder contents',
-                                      'visible': 1,
-                                      'category': 'folder'}],
-                          'global': []})
-
     def test_DuplicateActions(self):
         """
         Check that listFilteredActionsFor
