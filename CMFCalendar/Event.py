@@ -23,7 +23,6 @@ try:
 except ImportError:
     # BBB: for Zope 2.7
     from Products.CMFCore.utils import transaction
-from webdav.Lockable import ResourceLockedError
 
 from Products.CMFCore.PortalContent import PortalContent
 from Products.CMFCore.utils import contributorsplitter
@@ -36,6 +35,7 @@ from Products.CMFDefault.utils import html_headcheck
 from Products.CMFDefault.utils import parseHeadersBody
 from Products.CMFDefault.utils import SimpleHTMLParser
 
+from exceptions import ResourceLockedError
 from permissions import ChangeEvents
 from permissions import ModifyPortalContent
 from permissions import View

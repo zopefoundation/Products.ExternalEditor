@@ -25,13 +25,13 @@ try:
 except ImportError:
     # BBB: for Zope 2.7
     from Products.CMFCore.utils import transaction
-from webdav.Lockable import ResourceLockedError
 
 from Products.CMFCore.PortalContent import PortalContent
 from Products.CMFCore.utils import contributorsplitter
 from Products.CMFCore.utils import keywordsplitter
 
 from DublinCore import DefaultDublinCoreImpl
+from exceptions import ResourceLockedError
 from permissions import ModifyPortalContent
 from permissions import View
 from utils import _dtmldir
