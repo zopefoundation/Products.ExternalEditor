@@ -1,0 +1,31 @@
+22 August 2004
+
+  PluggableAuthService.py:
+
+    - arrows images finally work in the ZMI
+    - searchPrincipals will work for exact matches when a plugin
+      supports both enumerateUsers and enumerateGroups
+    - 'Authenticated' Role is added dynamically by the
+      PluggableAuthService, not by any role manager
+
+  plugins/ZODBGroupManager.py:
+
+    - if a previously assigned principal goes away, the
+      ZODBGroupManager won't freak out.
+
+  plugins/ZODBRoleManager.py:
+
+    - ZODBRoleManager will only claim authority for the
+      __ac_roles__ of its grandparent that aren't 'Authenticated'
+      or 'Anonymous'
+
+    - if a previously assigned principal goes away, the
+      ZODBRoleManager won't freak out.
+
+  plugins/ZODBUserManager.py:
+
+    - ZODBUserManager now uses AuthEncoding for its password
+      encryption so that we can more easily support migrating
+      existing UserFolders. Since PAS has been out for a while,
+      though, we still will authenticate against old credentials
+
