@@ -92,6 +92,10 @@
 
       <tr>
         <td colspan="2">
+          <font size="-1">
+            Whitespace of lines beginning with whitespace or '&gt;', or
+            between '&lt;pre&gt;'/'&lt;/pre&gt;', will be preserved.
+          </font>
           <textarea name="comment" rows="10" cols="65" wrap="soft"
                     tal:content="python: (request.get('do_cite')
                                           and here.cited_text()) or ''">
