@@ -23,7 +23,14 @@ import FSZSQLMethod
 import CookieCrumbler
 import ContentTypeRegistry
 import utils
-import FSPageTemplate
+
+try:
+    import FSPageTemplate
+except ImportError:
+    HAS_PAGE_TEMPLATES = 0
+else:
+    HAS_PAGE_TEMPLATES = 1
+
 
 ADD_FOLDERS_PERMISSION = 'Add portal folders'
 
@@ -87,8 +94,9 @@ def initialize(context):
         icon = 'images/registry.gif'
         )
 
-    utils.registerIcon(FSPageTemplate.FSPageTemplate,
-                      'images/fspt.gif', globals())
+    if HAS_PAGE_TEMPLATES:
+        utils.registerIcon(FSPageTemplate.FSPageTemplate,
+                        'images/fspt.gif', globals())
     utils.registerIcon(FSDTMLMethod.FSDTMLMethod,
                        'images/fsdtml.gif', globals())
     utils.registerIcon(FSPythonScript.FSPythonScript,
