@@ -93,13 +93,13 @@
              </strong>
            </td>
            <td tal:condition="here/security_related">
+                Security Related -
              <font color="RED or BLACK"
                    tal:attributes="color python: (here.confidential() and 'red'
-                                                  or 'black')">
-                Security Related </font>
-             (<span tal:replace="python: (here.confidential()
-                                          and 'Confidential'
-                                          or 'Public')">CONFIDENTIALITY</span>)
+                                                  or 'black')"
+                   tal:content="python: (here.confidential()
+                                         and 'Confidential'
+                                         or 'Public')">CONFIDENTIALITY</font>
 
            </td>
          </tr>
