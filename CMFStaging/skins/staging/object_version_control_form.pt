@@ -7,8 +7,8 @@
 <div metal:fill-slot="main">
 
 <form action="." method="POST" tal:attributes="action here/absolute_url"
-      tal:define="LockTool here/LockTool|nothing;
-                  isLockedOut python: LockTool and LockTool.isLockedOut(here)">
+      tal:define="lt here/portal_lock|nothing;
+                  isLockedOut python: lt and lt.isLockedOut(here)">
 
 <table>
 <tr>
@@ -18,8 +18,8 @@
  <th align="left">Message</th>
 </tr>
 
-<tr tal:define="cur_id python: here.StagingTool.getVersionId(here)"
-    tal:repeat="entry python: here.StagingTool.getLogEntries(here, 1)">
+<tr tal:define="cur_id python: here.portal_versions.getVersionId(here)"
+    tal:repeat="entry python: here.portal_versions.getLogEntries(here, 1)">
 
 <td>
  <input type="radio" name="version_id"
