@@ -2,6 +2,8 @@ CMF 1.5alpha (unreleased)
 
   New Features
 
+    - CMFCorePermissions: Made them available for import by Scripts.
+
     - CMFCore MembershipTool and MemberDataTool: Added 'delete' methods.
 
       o deleteMemberData() deletes the member data of a member.
