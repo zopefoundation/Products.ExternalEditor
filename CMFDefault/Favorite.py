@@ -96,9 +96,9 @@ class Favorite( Link ):
         """
         portal_url = getToolByName(self, 'portal_url')
         if self.remote_url:
-            return portal_url.getPortalPath() + '/' + self.remote_url
+            return portal_url() + '/' + self.remote_url
         else:
-            return portal_url.getPortalPath()
+            return portal_url()
 
     def getIcon(self, relative_to_portal=0):
         """

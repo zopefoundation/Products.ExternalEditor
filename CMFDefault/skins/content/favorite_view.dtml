@@ -6,10 +6,7 @@
 
 <dtml-var content_byline>
 
-<p>
-<a href="<dtml-var expr="portal_url.getPortalPath() + '/' + remote_url">">
-<dtml-var expr="portal_url.getPortalPath() + '/' + remote_url"></a></p>
-</p>
+<p> <a href="&dtml-getRemoteUrl;">"><dtml-var getRemoteUrl></a> </p>
 
 <dtml-var Description>
 

@@ -23,8 +23,8 @@
 <div metal:fill-slot="main">
 
  <p> Link: <a href=""
-              tal:attributes="href here/remote_url"
-              tal:content="here/remote_url"
+              tal:attributes="href here/getRemoteUrl"
+              tal:content="here/getRemoteUrl"
            >/index_html</a></p>
 
  <div class="Discussion">
