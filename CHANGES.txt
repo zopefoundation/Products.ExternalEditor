@@ -23,5 +23,8 @@
 
   Bug Fixes
 
+    - Made links emitted by 'topic_view' play nice with virtual hosting
+      (Tracker #433).
+
     - Ensure that package initialization files are non-empty, to prevent
       suspicion that they were corrupted in download (Tracker #426).
