@@ -337,7 +337,7 @@ class PortalFolder( Folder, DynamicType ):
 
         if myType is not None:
             if not myType.allowType( type_name ):
-                raise ValueError, 'Disallowed suboject type: %s' % type_name
+                raise ValueError, 'Disallowed subobject type: %s' % type_name
 
         apply( pt.constructContent
              , (type_name, self, id, RESPONSE) + args
