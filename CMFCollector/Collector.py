@@ -24,6 +24,8 @@ from Products.CMFCore.WorkflowCore import WorkflowAction
 
 from Products.CMFDefault.SkinnedFolder import SkinnedFolder
 
+import util
+
 # Import permission names
 from Products.CMFCore import CMFCorePermissions
 from CollectorPermissions import *
@@ -78,7 +80,10 @@ class Collector(SkinnedFolder):
 
     security = ClassSecurityInfo()
 
-    def __init__(self, id, title='', description='',
+    abbrev = 'CLTR'
+
+    def __init__(self, id, title='', description='', abbrev='',
+                 email=None,
                  topics=None, classifications=None,
                  importances=None, severities=None,
                  supporters=None,
@@ -89,6 +94,7 @@ class Collector(SkinnedFolder):
         self.last_issue_id = 0
 
         self.description = description
+        self.abbrev = abbrev
 
         username = str(getSecurityManager().getUser())
         util.add_local_role(self, username, 'Manager')
@@ -98,6 +104,9 @@ class Collector(SkinnedFolder):
             else: supporters = []
         self._adjust_supporters_roster(supporters)
         self.supporters = supporters
+
+        # XXX We need to ensure *some* collector email addr...
+        self.email = email
 
         if topics is None:
             self.topics = ['Zope', 'Collector', 'Database',
@@ -137,7 +146,6 @@ class Collector(SkinnedFolder):
                   title=None,
                   description=None,
                   submitter=None,
-                  email=None,
                   security_related=None,
                   kibitzers=None,
                   topic=None,
@@ -157,7 +165,6 @@ class Collector(SkinnedFolder):
                           description=description,
                           submitter_id=submitter_id,
                           submitter_name=submitter,
-                          submitter_email=email,
                           kibitzers=kibitzers,
                           topic=topic,
                           classification=classification,
@@ -171,19 +178,25 @@ class Collector(SkinnedFolder):
 
 
     security.declareProtected(ManageCollector, 'edit')
-    def edit(self, title=None, description=None, supporters=None,
+    def edit(self, title=None, description=None,
+             abbrev=None, email=None,
+             supporters=None,
              topics=None, classifications=None,
              importances=None, severities=None,
              versions=None, other_versions_spiel=None):
         changed = 0
-        if title is not None:
-            if title != self.title:
-                self.title = title
-                changed = 1
-        if description is not None:
-            if self.description != description:
-                self.description = description
-                changed = 1
+        if title is not None and title != self.title:
+            self.title = title
+            changed = 1
+        if description is not None and self.description != description:
+            self.description = description
+            changed = 1
+        if abbrev is not None and self.abbrev != abbrev:
+            self.abbrev = abbrev
+            changed = 1
+        if email is not None and self.email != email:
+            self.email = email
+            changed = 1
         if supporters is not None:
             # XXX Vette supporters - they must exist, etc.
             x = filter(None, supporters)
@@ -265,7 +278,7 @@ InitializeClass(Collector)
 # XXX Enable use of pdb.set_trace() in python scripts
 ModuleSecurityInfo('pdb').declarePublic('set_trace')
 
-def addCollector(self, id, title=None, description=None,
+def addCollector(self, id, title='', description='', abbrev='',
                  topics=None, classifications=None,
                  importances=None, severities=None,
                  supporters=None,
@@ -274,7 +287,7 @@ def addCollector(self, id, title=None, description=None,
     """
     Create a collector.
     """
-    it = Collector(id, title=title, description=description,
+    it = Collector(id, title=title, description=description, abbrev=abbrev,
                    topics=topics, classifications=classifications,
                    supporters=supporters, 
                    versions=versions,
