@@ -48,7 +48,7 @@ class ActionInformationTests(TransactionalTest):
         self.assertEqual(ai.Title(), 'View')
         self.assertEqual(ai.Description(), '')
         self.assertEqual(ai.getCondition(), 'member')
-        self.assertEqual(ai.getActionExpression(), 'view')
+        self.assertEqual(ai.getActionExpression(), 'string:view')
         self.assertEqual(ai.getVisibility(), 0)
         self.assertEqual(ai.getCategory(), 'global')
         self.assertEqual(ai.getPermissions(), ())
