@@ -42,9 +42,9 @@ factory_type_information = \
 PARAMETER_TYPES = ( 'review_state'
                   , 'submitter_id'
                   , 'supporters:list'
-                  , 'topic'
-                  , 'class'
-                  , 'importance'
+                  , 'topics:list'
+                  , 'classifications:list'
+                  , 'importances:list'
                   )
 
 class CollectorSubset( PortalContent, DefaultDublinCoreImpl ):
@@ -145,7 +145,10 @@ class CollectorSubset( PortalContent, DefaultDublinCoreImpl ):
         """
             Erase all parameters.
         """
-        del self._parameters
+        try:
+            del self._parameters
+        except KeyError:
+            pass
 
 
 def addCollectorSubset( self, id, REQUEST=None ):

@@ -23,9 +23,9 @@ class CollectorSubsetTests( unittest.TestCase ):
         self.failUnless( 'submitter_id' in parm_types )
         self.failUnless( 'supporters:list' in parm_types )
 
-        self.failUnless( 'topic' in parm_types )
-        self.failUnless( 'class' in parm_types )
-        self.failUnless( 'importance' in parm_types )
+        self.failUnless( 'topics:list' in parm_types )
+        self.failUnless( 'classifications:list' in parm_types )
+        self.failUnless( 'importances:list' in parm_types )
 
     def test_empty( self ):
 
@@ -37,9 +37,10 @@ class CollectorSubsetTests( unittest.TestCase ):
         self.assertEqual( subset.getParameterValue( 'review_state' ), '' )
         self.assertEqual( subset.getParameterValue( 'submitter_id' ), '' )
         self.assertEqual( subset.getParameterValue( 'supporters:list' ), '' )
-        self.assertEqual( subset.getParameterValue( 'topic' ), '' )
-        self.assertEqual( subset.getParameterValue( 'class' ), '' )
-        self.assertEqual( subset.getParameterValue( 'importance' ), '' )
+        self.assertEqual( subset.getParameterValue( 'topics:list' ), '' )
+        self.assertEqual( subset.getParameterValue( 'classifications:list' )
+                        , '' )
+        self.assertEqual( subset.getParameterValue( 'importances:list' ), '' )
 
     def test_getParameterValue_badParm( self ):
 
@@ -66,9 +67,10 @@ class CollectorSubsetTests( unittest.TestCase ):
         self.assertEqual( subset.getParameterValue( 'submitter_id' ), '' )
         self.assertEqual( subset.getParameterValue( 'supporters:list' )
                                                   , 'fred' )
-        self.assertEqual( subset.getParameterValue( 'topic' ), '' )
-        self.assertEqual( subset.getParameterValue( 'class' ), '' )
-        self.assertEqual( subset.getParameterValue( 'importance' ), '' )
+        self.assertEqual( subset.getParameterValue( 'topics:list' ), '' )
+        self.assertEqual( subset.getParameterValue( 'classifications:list' )
+                        , '' )
+        self.assertEqual( subset.getParameterValue( 'importances:list' ), '' )
 
     def test_clearParameters( self ):
 
@@ -86,38 +88,40 @@ class CollectorSubsetTests( unittest.TestCase ):
         self.failUnless( 'submitter_id' in parm_types )
         self.failUnless( 'supporters:list' in parm_types )
 
-        self.failUnless( 'topic' in parm_types )
-        self.failUnless( 'class' in parm_types )
-        self.failUnless( 'importance' in parm_types )
+        self.failUnless( 'topics:list' in parm_types )
+        self.failUnless( 'classifications:list' in parm_types )
+        self.failUnless( 'importances:list' in parm_types )
 
         self.assertEqual( subset.getParameterValue( 'review_state' ), '' )
         self.assertEqual( subset.getParameterValue( 'submitter_id' ), '' )
         self.assertEqual( subset.getParameterValue( 'supporters:list' ), '' )
-        self.assertEqual( subset.getParameterValue( 'topic' ), '' )
-        self.assertEqual( subset.getParameterValue( 'class' ), '' )
-        self.assertEqual( subset.getParameterValue( 'importance' ), '' )
+        self.assertEqual( subset.getParameterValue( 'topics:list' ), '' )
+        self.assertEqual( subset.getParameterValue( 'classifications:list' )
+                        , '' )
+        self.assertEqual( subset.getParameterValue( 'importances:list' ), '' )
 
     def test_setParameters_twoParms( self ):
 
         subset = self._makeOne()
 
         subset.setParameter( 'supporters:list', 'fred' )
-        subset.setParameter( 'topic', 'bug' )
+        subset.setParameter( 'topics:list', 'bug' )
 
         self.assertEqual( len( subset.listParameters() ), 2 )
         qs = subset._buildQueryString()
         terms = qs.split( '&' )
         terms.sort()
         self.assertEqual( terms[0], 'supporters%3Alist=fred' )
-        self.assertEqual( terms[1], 'topic=bug' )
+        self.assertEqual( terms[1], 'topics%3Alist=bug' )
 
         self.assertEqual( subset.getParameterValue( 'review_state' ), '' )
         self.assertEqual( subset.getParameterValue( 'submitter_id' ), '' )
         self.assertEqual( subset.getParameterValue( 'supporters:list' )
                                                   , 'fred' )
-        self.assertEqual( subset.getParameterValue( 'topic' ), 'bug' )
-        self.assertEqual( subset.getParameterValue( 'class' ), '' )
-        self.assertEqual( subset.getParameterValue( 'importance' ), '' )
+        self.assertEqual( subset.getParameterValue( 'topics:list' ), 'bug' )
+        self.assertEqual( subset.getParameterValue( 'classifications:list' )
+                        , '' )
+        self.assertEqual( subset.getParameterValue( 'importances:list' ), '' )
 
 def test_suite():
     suite = unittest.TestSuite()
