@@ -1,12 +1,12 @@
 CMF Tour
 
-  The Zope Content Managment Framework can be used to provide a whole
-  range of content managment solutions.  In this chapter, we'll take
+  The Zope Content Management Framework can be used to provide a whole
+  range of content management solutions.  In this chapter, we'll take
   you on a quick tour of an online newspaper. Keep in mind that this
   is just one example of using the CMF to manage content.
 
   Imagine a small newspaper that has reporters, editors, and readers.
-  The reporters want to create new news stories which are submited to
+  The reporters want to create new news stories that are submitted to
   the editor.  The editor needs to either approve or reject those
   stories.  Approved stories go on to the front page of the newspaper,
   but rejected stories are sent back to the reporter to be revised and
@@ -15,13 +15,13 @@ CMF Tour
   This may sound like a simple problem to solve with email, but an
   email system does not enforce a certain flow of actions that need to
   be taken.  If a reporter sends their story to the editor by email,
-  the editor may simply foget to take care of it.  
+  the editor may simply forget to take care of it.  
   
   The email system can't remind him to take care of it, because with
   email the workflow and what state the work is in must always be
   known by the various actors involved, and if one person forgets a
-  task the the whole system breaks down.  The more actors you add to
-  an email-based system, the faster it becomes unmanagable.
+  task the whole system breaks down.  The more actors you add to
+  an email-based system, the faster it becomes unmanageable.
 
   A true workflow system like Zope's CMF keeps the user focused on
   achieving their goals.  The editor can't go off and forget to review
@@ -44,7 +44,7 @@ CMF Tour
 
       <screenshot>
 
-    You see the content managment interface for Fred.  Fred is a
+    You see the content management interface for Fred.  Fred is a
     reporter that works at our newspaper, and today he is going to
     write a story.  He does this by creating a news object in his
     personal area.  He can do this by clicking on the *New* button.
@@ -59,12 +59,12 @@ CMF Tour
 
     Here we see Fred is now editing the news item he just created.  He
     types in some news about the local school BBQ, and clicks
-    *Change*.  Now fred has created some content in Zope.  He can
+    *Change*.  Now Fred has created some content in Zope.  He can
     repeat this task as many times as he wants for lots of content.
 
   Scenario: Submit, Review, Approve content.
 
-    We just showed how fred can create News content in his area.  Now
+    We just showed how Fred can create News content in his area.  Now
     in a newspaper, this news should be first read and approved by the
     editor.  This is called *workflow*.  Fred writes the content and
     the editor, Janet, reads and either approves or rejects Fred's
@@ -123,7 +123,7 @@ CMF Tour
 
     People make mistakes.  Fred could submit a story and then realize
     that he forgot some details.  Janet could reject a story by
-    accidentaly clicking the wrong button.  In a world of mistakes,
+    accidentally clicking the wrong button.  In a world of mistakes,
     the CMF lets you undo all of the actions you take.  After creating
     a new news item, here is what Fred sees when he clicks the *Undo*
     link in his personal area:
@@ -136,7 +136,7 @@ CMF Tour
     created is gone.
 
     All users have the same interface for undoing their actions.  If
-    Janet accidentaly clicks the wrong button, she can undo that
+    Janet accidentally clicks the wrong button, she can undo that
     mistake the same way Fred undid his.
 
   Scenario: Organize content.
@@ -154,7 +154,7 @@ CMF Tour
 
       <screenshot>
 
-    Here, fred gave this news item the keyword 'birds'.  Fred can add
+    Here, Fred gave this news item the keyword 'birds'.  Fred can add
     as many keywords as he wants.  The next time he creates content,
     all of the keywords he has defined so far will show up in a pull
     down box on the *Metadata* screen, so that he can just select the
