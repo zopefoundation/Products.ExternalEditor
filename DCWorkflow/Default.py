@@ -211,7 +211,7 @@ def setupDefaultWorkflowRev2(wf):
 
     vdef = wf.variables['action']
     vdef.setProperties(description='The last transition',
-                       default_expr='transition/getId',
+                       default_expr='transition/getId|nothing',
                        for_status=1)
 
     vdef = wf.variables['actor']
@@ -343,7 +343,7 @@ def setupDefaultWorkflowClassic(wf):
 
     vdef = wf.variables['action']
     vdef.setProperties(description='The last transition',
-                       default_expr='transition/getId',
+                       default_expr='transition/getId|nothing',
                        for_status=1)
 
     vdef = wf.variables['actor']
