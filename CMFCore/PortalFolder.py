@@ -42,24 +42,34 @@ Use folders to put content in categories."""
                              , 'filter_content_types' : 0
                              , 'immediate_view' : 'folder_edit_form'
                              , 'actions'        :
-                                ( { 'name'          : 'View'
+                                ( { 'id'            : 'view'
+                                  , 'name'          : 'View'
                                   , 'action'        : ''
                                   , 'permissions'   : (View,)
                                   , 'category'      : 'folder'
                                   }
-                                , { 'name'          : 'Edit'
+                                , { 'id'            : 'edit'
+                                  , 'name'          : 'Edit'
                                   , 'action'        : 'folder_edit_form'
                                   , 'permissions'   : (ManageProperties,)
                                   , 'category'      : 'folder'
                                   }
-                                , { 'name'          : 'Local Roles'
+                                , { 'id'            : 'localroles'
+                                  , 'name'          : 'Local Roles'
                                   , 'action'        : 'folder_localrole_form'
                                   , 'permissions'   : (ManageProperties,)
                                   , 'category'      : 'folder'
                                   }
-                                , { 'name'          : 'Syndication'
+                                , { 'id'            : 'syndication'
+                                  , 'name'          : 'Syndication'
                                   , 'action'        : 'synPropertiesForm'
                                   , 'permissions'   : (ManageProperties,)
+                                  , 'category'      : 'folder'
+                                  }
+                                , { 'id'            : 'foldercontents'
+                                  , 'name'          : 'Folder contents'
+                                  , 'action'        : 'folder_contents'
+                                  , 'permissions'   : (CMFCorePermissions.ListFolderContents,)
                                   , 'category'      : 'folder'
                                   }
                                 )

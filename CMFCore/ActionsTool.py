@@ -67,7 +67,8 @@ class ActionsTool (UniqueObject, SimpleItem):
     id = 'portal_actions'
     meta_type = 'CMF Actions Tool'
 
-    action_providers = ( 'portal_actions'
+    action_providers = ( 'portal_memberdata'
+                       , 'portal_registration'
                        , 'portal_discussion'
                        , 'portal_membership'
                        , 'portal_workflow'
@@ -108,6 +109,10 @@ class ActionsTool (UniqueObject, SimpleItem):
             p_old = self.action_providers
             p_new = p_old + ( provider_name, )
             self.action_providers = p_new
+
+    security.declarePrivate('listActions')
+    def listActions(self, info):
+        return None
 
     security.declareProtected( CMFCorePermissions.ManagePortal
                              , 'deleteActionProvider'
@@ -222,50 +227,5 @@ class ActionsTool (UniqueObject, SimpleItem):
     # listFilteredActions() is an alias.
     security.declarePublic('listFilteredActions')
     listFilteredActions = listFilteredActionsFor
-
-    security.declarePrivate('listActions')
-    def listActions(self, info):
-        # This will eventually be configurable through the portal_actions UI.
-        portal_url = info.portal_url
-        if info.isAnonymous:
-            actions = [
-                {'name': 'Log in',
-                 'url': portal_url + '/login_form',
-                 'permissions': [],
-                 'category': 'user'},
-                {'name': 'Join',
-                 'url': portal_url + '/join_form',
-                 'permissions': [CMFCorePermissions.AddPortalMember],
-                 'category': 'user'},
-                ]
-        else:
-            actions = [
-                {'name': 'Preferences',
-                 'url': portal_url + '/personalize_form',
-                 'permissions': [],
-                 'category': 'user'},
-                {'name': 'Log out',
-                 'url': portal_url + '/logout',
-                 'permissions' : [],
-                 'category': 'user'},
-                {'name': 'Reconfigure portal',
-                 'url': portal_url + '/reconfig_form',
-                 'permissions': ['Manage portal'],
-                 'category': 'global'},
-                ]
-
-            folder_url = info.folder_url
-            content_url = info.content_url
-
-            if folder_url is not None:
-                actions.append({
-                    'name': 'Folder contents',
-                    'url': folder_url + '/folder_contents',
-                    'permissions' : ['List folder contents'],
-                    'category': 'folder',
-                    })
-
-        return actions
-
 
 InitializeClass(ActionsTool)

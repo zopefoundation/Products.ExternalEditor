@@ -27,7 +27,7 @@ import Document
 from Globals import InitializeClass, DTMLFile
 from AccessControl import ClassSecurityInfo
 from Products.CMFCore.CMFCorePermissions import View, AccessContentsInformation
-from Products.CMFCore.CMFCorePermissions import ListPortalMembers
+from Products.CMFCore.CMFCorePermissions import ListPortalMembers, AddPortalMember
 from Products.CMFCore.CMFCorePermissions import ManagePortal
 from utils import _dtmldir
 
@@ -154,13 +154,40 @@ class MembershipTool ( Products.CMFCore.MembershipTool.MembershipTool ):
     def listActions(self, info):
         '''Lists actions available to the user.'''
         user_actions = None
+        portal_url = info.portal_url
+        if info.isAnonymous:
+            user_actions = (
+                {'name': 'Log in',
+                 'url': portal_url + '/login_form',
+                 'permissions': [],
+                 'category': 'user'},
+                {'name': 'Join',
+                 'url': portal_url + '/join_form',
+                 'permissions': [AddPortalMember],
+                 'category': 'user'},
+                )
 
         if not info.isAnonymous:
             home_folder = self.getHomeFolder()
             homeUrl = self.getHomeUrl()
+            user_actions = (
+                {'name': 'Preferences',
+                 'url': portal_url + '/personalize_form',
+                 'permissions': [],
+                 'category': 'user'},
+                {'name': 'Log out',
+                 'url': portal_url + '/logout',
+                 'permissions' : [],
+                 'category': 'user'},
+                {'name': 'Reconfigure portal',
+                 'url': portal_url + '/reconfig_form',
+                 'permissions': ['Manage portal'],
+                 'category': 'global'},
+                )
+
             if homeUrl is not None:
                 content_url = info.content_url
-                user_actions = (
+                actions = (
                     {'name': 'Add to Favorites',
                      'url': ( content_url + '/addtoFavorites' ),
                      'permissions' : [],
@@ -170,6 +197,7 @@ class MembershipTool ( Products.CMFCore.MembershipTool.MembershipTool ):
                      'permissions': [],
                      'category': 'user'},
                     )
+                user_actions = user_actions + actions
 
                 if hasattr( home_folder, 'Favorites' ):
                     added_actions = (
@@ -177,9 +205,8 @@ class MembershipTool ( Products.CMFCore.MembershipTool.MembershipTool ):
                        'url' : homeUrl + '/Favorites/folder_contents',
                        'permissions': [],
                        'category': 'user'},) 
+                    user_actions = user_actions + added_actions
                     
-                    user_actions = added_actions + user_actions
-
         return user_actions
 
 

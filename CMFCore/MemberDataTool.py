@@ -82,6 +82,10 @@ class MemberDataTool (UniqueObject, SimpleItem, PropertyManager):
     #
     #   'portal_memberdata' interface methods
     #
+    security.declarePrivate('listActions')
+    def listActions(self, info):
+        return None
+
     security.declarePrivate('getMemberDataContents')
     def getMemberDataContents(self):
         '''

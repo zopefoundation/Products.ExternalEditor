@@ -54,6 +54,11 @@ class RegistrationTool (RegistrationTool):
                    'Please try again.'
         return None
 
+    security.declarePublic('listActions')
+    def listActions(self, info):
+        """
+        """
+
     security.declarePublic( 'testPropertiesValidity' )
     def testPropertiesValidity(self, props, member=None):
         '''If the properties are valid, returns None.  If not, returns

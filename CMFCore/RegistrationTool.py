@@ -51,6 +51,10 @@ class RegistrationTool (UniqueObject, SimpleItem):
     #
     #   'portal_registration' interface methods
     #
+    security.declarePrivate('listActions')
+    def listActions(self, info):
+        return none
+
     security.declarePublic('isRegistrationAllowed')
     def isRegistrationAllowed(self, REQUEST):
         '''Returns a boolean value indicating whether the user
