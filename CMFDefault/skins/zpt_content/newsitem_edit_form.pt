@@ -15,11 +15,31 @@
 
 <form action="newsitem_edit" method="post">
 <table class="FormLayout">
+
  <tr>
   <th> Title
   </th>
   <td> <span tal:replace="here/Title">My Title</span> </td>
  </tr>
+
+ <tr>
+  <th>
+   Format
+  </th>
+  <td>
+   <input type="radio" name="text_format"
+                     value="structured-text"
+                     tal:attributes="checked python: path('here/text_format') == 'structured-text'" />
+   <label for="cb_structuredtext">structured-text</label>
+   <input type="radio" name="text_format" value="plain"
+          tal:attributes="checked python: path('here/text_format') == 'plain'" />
+   <label for="cb_html">plain text</label>
+   <input type="radio" name="text_format" value="html"
+          tal:attributes="checked python: path('here/text_format') == 'html'" />
+   <label for="cb_html">html</label>
+  </td>
+ </tr>
+
  <tr>
   <th class="TextField"> Lead-in </th>
   <td class="TextField">
@@ -35,6 +55,7 @@
              tal:content="here/EditableBody"></textarea>
   </td>
  </tr>
+
  <tr>
   <th> <br> 
   <td>
@@ -42,6 +63,7 @@
    <input type="submit" name="choice" value=" Change and View ">
   </td>
  </tr>
+
 </table>
 </form>
 

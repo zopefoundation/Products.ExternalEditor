@@ -18,6 +18,27 @@
   </th>
   <td> <dtml-var Title> </td>
  </tr>
+
+ <tr>
+  <th>
+   Format
+  </th>
+  <td>
+   <input type="radio" name="text_format" value="structured-text"
+          <dtml-if "text_format=='structured-text'">checked</dtml-if>
+          id="cb_structuredtext" />
+          <label for="cb_structuredtext">structured-text</label>
+   <input type="radio" name="text_format" value="plain"
+          <dtml-if "text_format=='plain'">checked</dtml-if>
+	  id="cb_html" />
+	  <label for="cb_html">plain text</label>
+   <input type="radio" name="text_format" value="html"
+          <dtml-if "text_format=='html'">checked</dtml-if>
+	  id="cb_html" />
+	  <label for="cb_html">html</label>
+  </td>
+ </tr>
+
  <tr>
   <th class="TextField"> Lead-in </th>
   <td class="TextField">
@@ -25,6 +46,7 @@
              cols="65">&dtml-description;</textarea>
   </td>
  </tr>
+
  <tr>
   <th class="TextField"> Body
   </th>
@@ -32,6 +54,7 @@
    <textarea name="text:text" rows="20" cols="65">&dtml-EditableBody;</textarea>
   </td>
  </tr>
+
  <tr>
   <th> <br> </td>
   <td>
@@ -39,6 +62,7 @@
     <input type="submit" name="choice" value=" Change and View ">
   </td>
  </tr>
+
 </table>
 </form>
 

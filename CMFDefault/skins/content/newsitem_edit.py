@@ -1,8 +1,8 @@
 ## Script (Python) "newsitem_edit"
-##parameters=text, description, choice=' Change '
+##parameters=text, description, text_format=None, choice=' Change '
 ##title=Edit a news item
  
-context.edit(text, description)
+context.edit(text=text, description=description, text_format=text_format)
 
 qst='portal_status_message=News+Item+changed.'
 
