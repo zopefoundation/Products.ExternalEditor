@@ -1,52 +1,22 @@
 ## Script (Python) "folder_rename_control"
-##bind container=container
-##bind context=context
-##bind namespace=
-##bind script=script
-##bind subpath=traverse_subpath
 ##parameters=ids=(), new_ids=(), rename='', cancel='', **kw
 ##title=
 ##
-from ZTUtils import make_query
 from Products.CMFCore.utils import getToolByName
-from Products.CMFDefault.exceptions import CopyError
 from Products.CMFDefault.utils import html_marshal
 
 utool = getToolByName(script, 'portal_url')
 portal_url = utool()
-target_action = 'object/folderContents'
-status = ''
-message = ''
 
 
-if rename:
-    if not ids == new_ids:
-        try:
-            context.manage_renameObjects(ids, new_ids)
-            status = 'success'
-            message = 'Item%s renamed.' % ( len(ids) != 1 and 's' or '' )
-        except CopyError:
-            message = 'CopyError: Rename failed.'
-    else:
-        message = 'Nothing to change.'
-
-elif cancel:
-    status = 'success'
-
-
-if status == 'success':
-    target = context.getActionInfo(target_action)['url']
-    if message:
-        kw['portal_status_message'] = message
-    if kw:
-        query = make_query(kw)
-        context.REQUEST.RESPONSE.redirect( '%s?%s' % (target, query) )
-    else:
-        context.REQUEST.RESPONSE.redirect(target)
-    return None
-
-if message:
-    context.REQUEST.set('portal_status_message', message)
+form = context.REQUEST.form
+if rename and \
+        context.folder_rename(**form) and \
+        context.setRedirect(context, 'object/folderContents', **kw):
+    return
+elif cancel and \
+        context.setRedirect(context, 'object/folderContents', **kw):
+    return
 
 
 control = {}

@@ -1,17 +1,10 @@
 ## Script (Python) "folder_contents_control"
-##bind container=container
-##bind context=context
-##bind namespace=
-##bind script=script
-##bind subpath=traverse_subpath
-##parameters=b_start=0, key='', reverse=0, ids=(), delta=1, items_copy='', items_cut='', items_delete='', items_new='', items_paste='', items_rename='', items_up='', items_down='', items_top='', items_bottom='', items_sort='', **kw
+##parameters=ids=(), delta=1, items_copy='', items_cut='', items_delete='', items_new='', items_paste='', items_rename='', items_up='', items_down='', items_top='', items_bottom='', items_sort='', **kw
 ##title=
 ##
 from ZTUtils import Batch
 from ZTUtils import make_query
 from Products.CMFCore.utils import getToolByName
-from Products.CMFDefault.exceptions import CopyError
-from Products.CMFDefault.exceptions import zExceptions_Unauthorized
 from Products.CMFDefault.permissions import AddPortalContent
 from Products.CMFDefault.permissions import DeleteObjects
 from Products.CMFDefault.permissions import ListFolderContents
@@ -22,129 +15,60 @@ from Products.CMFDefault.utils import html_marshal
 mtool = getToolByName(script, 'portal_membership')
 utool = getToolByName(script, 'portal_url')
 portal_url = utool()
-target_action = 'object/folderContents'
-status = ''
-message = ''
-
-if not key:
-    (key, reverse) = context.getDefaultSorting()
-    is_default = 1
-elif (key, reverse) == context.getDefaultSorting():
-    is_default = 1
-else:
-    kw['key'] = key
-    if reverse:
-        kw['reverse'] = reverse
-    is_default = 0
-if b_start:
-    kw['b_start'] = b_start
 
 
-if not mtool.checkPermission(ListFolderContents, context):
-    status = 'success'
-    target_action = 'object/view'
-
-elif items_copy:
-    if ids:
-        context.manage_copyObjects(ids, context.REQUEST)
-        status = 'success'
-        message = 'Item%s copied.' % ( len(ids) != 1 and 's' or '' )
-    else:
-        message = 'Please select one or more items to copy first.'
-
-elif items_cut:
-    if ids:
-        context.manage_cutObjects(ids, context.REQUEST)
-        status = 'success'
-        message = 'Item%s cut.' % ( len(ids) != 1 and 's' or '' )
-    else:
-        message = 'Please select one or more items to cut first.'
-
-elif items_delete:
-    if ids:
-        context.manage_delObjects( list(ids) )
-        status = 'success'
-        message = 'Item%s deleted.' % ( len(ids) != 1 and 's' or '' )
-    else:
-        message = 'Please select one or more items to delete first.'
-
-elif items_new:
-    status = 'success'
-    target_action = 'object/new'
-
-elif items_paste:
-    if context.cb_dataValid:
-        try:
-            result = context.manage_pasteObjects(context.REQUEST['__cp'])
-            status = 'success'
-            message = 'Item%s pasted.' % ( len(result) != 1 and 's' or '' )
-        except CopyError:
-            message = 'CopyError: Paste failed.'
-        except zExceptions_Unauthorized:
-            message = 'Unauthorized: Paste failed.'
-    else:
-        message = 'Please copy or cut one or more items to paste first.'
-
-elif items_rename:
-    if ids:
-        status = 'success'
-        target_action = 'object/rename_items'
-        kw['ids'] = list(ids)
-    else:
-        message = 'Please select one or more items to rename first.'
-
-elif items_sort:
-    context.setDefaultSorting(key, reverse)
-    status = 'success'
-    if kw.has_key('key'):
-        del kw['key']
-    if kw.has_key('reverse'):
-        del kw['reverse']
-
-elif items_up or items_down or items_top or items_bottom:
-    if ids:
-        subset_ids = [ obj.getId() for obj in context.listFolderContents() ]
-        try:
-            if items_up:
-                attempt = context.moveObjectsUp(ids, delta,
-                                                subset_ids=subset_ids)
-                move = 'up'
-            elif items_down:
-                attempt = context.moveObjectsDown(ids, delta,
-                                                  subset_ids=subset_ids)
-                move = 'down'
-            elif items_top:
-                attempt = context.moveObjectsToTop(ids, subset_ids=subset_ids)
-                move = 'to top'
-            elif items_bottom:
-                attempt = context.moveObjectsToBottom(ids,
-                                                      subset_ids=subset_ids)
-                move = 'to bottom'
-            status = 'success'
-            if attempt:
-                message = '%d item%s moved %s.' % ( attempt,
-                                        ( (attempt!=1) and 's' or '' ), move )
-            else:
-                message = 'Nothing to change.'
-        except ValueError, errmsg:
-            message = 'ValueError: %s' % (errmsg)
-    else:
-        message = 'Please select one or more items to move first.'
-
-
-if status == 'success':
-    target = context.getActionInfo(target_action)['url']
-    if message:
-        kw['portal_status_message'] = message
-    if kw:
-        query = make_query(kw)
-        context.REQUEST.RESPONSE.redirect( '%s?%s' % (target, query) )
-    else:
-        context.REQUEST.RESPONSE.redirect(target)
-    return None
-
-if message:
-    context.REQUEST.set('portal_status_message', message)
+form = context.REQUEST.form
+default_target = 'object/folderContents'
+if items_copy and \
+        context.validateItemIds(**form) and \
+        context.folder_copy(**form) and \
+        context.setRedirect(context, default_target, **kw):
+    return
+elif items_cut and \
+        context.validateItemIds(**form) and \
+        context.folder_cut(**form) and \
+        context.setRedirect(context, default_target, **kw):
+    return
+elif items_delete and \
+        context.validateItemIds(**form) and \
+        context.folder_delete(**form) and \
+        context.setRedirect(context, default_target, **kw):
+    return
+elif items_new and \
+        context.setRedirect(context, 'object/new'):
+    return
+elif items_paste and \
+        context.folder_paste(**form) and \
+        context.setRedirect(context, default_target, **kw):
+    return
+elif items_rename and \
+        context.validateItemIds(**form) and \
+        context.setRedirect(context, 'object/rename_items', ids=ids, **kw):
+    return
+elif items_sort and \
+        context.folder_sort(**form) and \
+        context.setRedirect(context, default_target, **kw):
+    return
+elif items_up and \
+        context.validateItemIds(**form) and \
+        context.folder_up(**form) and \
+        context.setRedirect(context, default_target, **kw):
+    return
+elif items_down and \
+        context.validateItemIds(**form) and \
+        context.folder_down(**form) and \
+        context.setRedirect(context, default_target, **kw):
+    return
+elif items_top and \
+        context.validateItemIds(**form) and \
+        context.folder_top(**form) and \
+        context.setRedirect(context, default_target, **kw):
+    return
+elif items_bottom and \
+        context.validateItemIds(**form) and \
+        context.folder_bottom(**form) and \
+        context.setRedirect(context, default_target, **kw):
+    return
 
 
 control = {}
@@ -171,6 +95,22 @@ if upitems_list_allowed:
 control['up_info'] = up_info
 
 target = context.getActionInfo('object/folderContents')['url']
+
+key = kw.pop('key', '')
+reverse = kw.pop('reverse', 0)
+if not key:
+    (key, reverse) = context.getDefaultSorting()
+    is_default = 1
+elif (key, reverse) == context.getDefaultSorting():
+    is_default = 1
+else:
+    kw['key'] = key
+    if reverse:
+        kw['reverse'] = reverse
+    is_default = 0
+b_start = kw.pop('b_start', 0)
+if b_start:
+    kw['b_start'] = b_start
 
 columns = ( {'key': 'Type',
              'title': 'Type',
