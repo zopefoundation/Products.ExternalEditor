@@ -20,9 +20,6 @@ from Globals import DTMLFile
 from OFS.SimpleItem import SimpleItem
 from AccessControl import ClassSecurityInfo
 from random import choice
-from string import lowercase
-from string import uppercase
-from string import digits
 
 from ActionProviderBase import ActionProviderBase
 from permissions import AddPortalMember
@@ -87,14 +84,11 @@ class RegistrationTool(UniqueObject, SimpleItem, ActionProviderBase):
 
     security.declarePublic('generatePassword')
     def generatePassword(self):
-        '''Generates a password which is guaranteed to comply
-        with the password policy.
-        '''
-        chars = lowercase[:26] + uppercase[:26] + digits
-        result = []
-        for n in range(6):
-            result.append( choice(chars) )
-        return ''.join(result)
+        """ Generate a valid password.
+        """
+        # we don't use these to avoid typos: OQ0Il1
+        chars = 'ABCDEFGHJKLMNPRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789'
+        return ''.join( [ choice(chars) for i in range(6) ] )
 
     security.declareProtected(AddPortalMember, 'addMember')
     def addMember(self, id, password, roles=('Member',), domains='',
