@@ -13,18 +13,17 @@
 </dtml-let>
 <dtml-var manage_tabs>
 
-<form action="manage_properties" method="POST">
+<form action="manage_skinLayers" method="POST">
 <table>
   <tr>
      <th valign="top" align="left">Skin selections</th>
   </tr>
   <tr>
      <td colspan="2">
-       <table border="1"><tr><td>
        <table>
          <tr>
-           <th>Name</th>
-           <th>Layers (in order of precedence)</th>
+           <th align="left">Name</th>
+           <th align="left">Layers (in order of precedence)</th>
          </tr>
          <dtml-in getSkinPaths>
          <tr>
@@ -34,34 +33,47 @@
              &dtml-sequence-key;
            </td>
            <td class="form-element">
-             <input type="text" name="skinpath_&dtml-sequence-key;"
-              value="&dtml-sequence-item;" size="70">
+             <textarea cols="30" rows="8" name="skinpath_&dtml-sequence-key;:lines"><dtml-var expr="'\n'.join(_['sequence-item'].split(','))"></textarea>
            </td>
          </tr>
          </dtml-in>
 
          <tr>
-           <td>
+           <td colspan="2">
+             <input type="submit" name="del_skin" value="Delete">
+             <input type="submit" name="submit" value="Save">
+           </td>
+         </tr>
+         
+         <tr><th colspan="2" align="left">Add a new skin</th><tr>
+         <tr>
+            <th align="left">Name</th>
+            <th align="left">Layers</th>
+         </tr>
+         <tr>
+           <td valign="top">
              <input type="text" name="skinname" value="" size="20">
            </td>
            <td>
-             <input type="text" name="skinpath" value="" size="70">
+             <textarea cols="30" rows="3" name="skinpath:lines"></textarea>
            </td>
          </tr>
 
          <tr>
            <td colspan="2">
-             <input type="submit" name="add_skin" value=" Add ">
-             <input type="submit" name="del_skin" value=" Delete ">
+             <input type="submit" name="add_skin" value="Add">
            </td>
          </tr>
 
        </table>
-       </td></tr></table>
      </td>
   </tr>
   <tr>
-   <td> <br /> </td>
+</table>
+</form>
+<hr />
+<form action="manage_properties" method="POST">
+<table>
   </tr>
   <tr>
      <td class="form-label" valign="top" align="left">Default skin</td>

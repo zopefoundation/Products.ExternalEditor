@@ -35,6 +35,8 @@ from OFS.DTMLMethod import DTMLMethod
 from OFS.ObjectManager import REPLACEABLE
 from Products.PythonScripts.PythonScript import PythonScript
 
+from types import StringType, ListType
+
 try:
     from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
     SUPPORTS_PAGE_TEMPLATES=1
@@ -104,34 +106,50 @@ class SkinsTool(UniqueObject, SkinsContainer, Folder, ActionProviderBase):
     security.declareProtected(ManagePortal, 'manage_propertiesForm')
     manage_propertiesForm = DTMLFile('dtml/skinProps', globals())
 
+    security.declareProtected(ManagePortal, 'manage_skinLayers')
+    def manage_skinLayers(self, chosen=(), add_skin=0, del_skin=0,
+                          skinname='', skinpath='', REQUEST=None):
+        """ Change the skinLayers """                          
+        sels = self._getSelections()
+        if del_skin:
+            for name in chosen:
+                del sels[name]
+
+        if REQUEST is not None:
+            for key in sels.keys():
+                fname = 'skinpath_%s' % key
+                val = REQUEST[fname]
+
+                # if val is a list from the new lines field
+                # then munge it back into a comma delimited list
+                # for hysterical reasons
+                if isinstance(val, ListType):
+                    val = ','.join([layer.strip() for layer in val])
+                                        
+                if sels[key] != val:
+                    self.testSkinPath(val)
+                    sels[key] = val
+
+        if add_skin:
+            skinpath = ','.join([layer.strip() for layer in skinpath])
+            self.testSkinPath(skinpath)
+            sels[str(skinname)] = skinpath
+
+        if REQUEST is not None:
+            return self.manage_propertiesForm(
+                self, REQUEST, management_view='Properties', manage_tabs_message='Skins changed.')
+
+
     security.declareProtected(ManagePortal, 'manage_properties')
     def manage_properties(self, default_skin='', request_varname='',
                           allow_any=0, chosen=(), add_skin=0,
                           del_skin=0, skinname='', skinpath='',
                           cookie_persistence=0, REQUEST=None):
-        '''
-        Changes portal_skin properties.
-        '''
-        sels = self._getSelections()
-        if add_skin:
-            skinpath = str(skinpath)
-            self.testSkinPath(skinpath)
-            sels[str(skinname)] = skinpath
-        elif del_skin:
-            for name in chosen:
-                del sels[name]
-        else:
-            self.default_skin = str(default_skin)
-            self.request_varname = str(request_varname)
-            self.allow_any = allow_any and 1 or 0
-            self.cookie_persistence = cookie_persistence and 1 or 0
-            if REQUEST is not None:
-                for key in sels.keys():
-                    fname = 'skinpath_%s' % key
-                    val = str(REQUEST[fname])
-                    if sels[key] != val:
-                        self.testSkinPath(val)
-                        sels[key] = val
+        """ Changes portal_skin properties. """
+        self.default_skin = str(default_skin)
+        self.request_varname = str(request_varname)
+        self.allow_any = allow_any and 1 or 0
+        self.cookie_persistence = cookie_persistence and 1 or 0
         if REQUEST is not None:
             return self.manage_propertiesForm(
                 self, REQUEST, management_view='Properties', manage_tabs_message='Properties changed.')
