@@ -141,7 +141,7 @@ def addImage( self
             , contributors=()
             , effective_date=None
             , expiration_date=None
-            , format='text/html'
+            , format='image/png'
             , language=''
             , rights=''
             ):
@@ -213,7 +213,7 @@ class Image( OFS.Image.Image
                 , contributors=()
                 , effective_date=None
                 , expiration_date=None
-                , format='text/html'
+                , format='image/png'
                 , language='en-US'
                 , rights=''
                 ):
