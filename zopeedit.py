@@ -183,7 +183,7 @@ class ExternalEditor:
     def launch(self):
         """Launch external editor"""
         save_interval = float(self.options.get('save_interval'))
-        use_locks = int(self.options.get('use_locks'))
+        use_locks = int(self.options.get('use_locks', 0))
         launch_success = 0
         last_mtime = path.getmtime(self.content_file)
         command = '%s %s' % (self.getEditorCommand(), self.content_file)
@@ -221,6 +221,15 @@ class ExternalEditor:
         
     def putChanges(self):
         """Save changes to the file back to Zope"""
+        if int(self.options.get('use_locks', 0)) and \
+           not hasattr(self, 'lock_token'):
+            # We failed to get a lock initially, so try again before saving
+            if not self.lock():
+                # Confirm save without lock
+                if not askYesNo('Could not acquire lock. '
+                                'Attempt to save to Zope anyway?'):
+                    return 0
+            
         f = open(self.content_file, 'rb')
         body = f.read()
         f.close()

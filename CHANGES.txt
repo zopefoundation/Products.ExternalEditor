@@ -1,5 +1,7 @@
 External Editor Change Log
 
+    - Improved behavior when saving after lock attempts fail.
+
     - Now works on Windows (applause) using Pythonwin. Much overall
       refactoring to abstract process control. Thanks to Oliver Deckmyn and 
       Gabriel Genellina for testing, patches and suggestions.
