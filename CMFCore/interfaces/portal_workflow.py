@@ -45,7 +45,7 @@ class portal_workflow(Base):
         '''
 
     # security.declarePublic('getActionsFor')
-    def getActionsFor(self, ob):
+    def getActionsFor(ob):
         '''
         Return a list of action dictionaries for 'ob', just as though
         queried via 'ActionsTool.listFilteredActionsFor'.
