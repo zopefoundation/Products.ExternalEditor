@@ -49,6 +49,9 @@ Default page for %s
 class MembershipTool( BaseTool ):
     """ Implement 'portal_membership' interface using "stock" policies.
     """
+
+    __implements__ = BaseTool.__implements__
+
     _actions =[
       AI( id='login'
         , title='Login'
@@ -218,12 +221,5 @@ class MembershipTool( BaseTool ):
             return home.absolute_url()
         else:
             return None
-
-    security.declarePrivate( 'listActions' )
-    def listActions(self, info=None):
-
-        """ List actions available through the tool.
-        """
-        return self._actions
 
 InitializeClass(MembershipTool)

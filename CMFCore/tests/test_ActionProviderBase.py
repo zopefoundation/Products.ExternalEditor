@@ -1,5 +1,10 @@
 import unittest
 import Zope
+try:
+    from Interface.Verify import verifyClass
+except ImportError:
+    # for Zope versions before 2.6.0
+    from Interface import verify_class_implementation as verifyClass
 
 from Products.CMFCore.tests.base.dummy import DummyTool
 
@@ -141,6 +146,12 @@ class ActionProviderBaseTests(unittest.TestCase):
         another_ids = map( idify, another.listActions() )
         self.failIf( one_ids == another_ids )
         self.assertEqual( old_ids, another_ids )
+
+    def test_interface(self):
+        from Products.CMFCore.interfaces.portal_actions \
+                import ActionProvider as IActionProvider
+
+        verifyClass(IActionProvider, ActionProviderBase)
 
 def test_suite():
     return unittest.TestSuite((

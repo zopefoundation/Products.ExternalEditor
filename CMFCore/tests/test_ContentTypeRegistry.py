@@ -1,6 +1,11 @@
-import Zope
 from unittest import TestCase, TestSuite, makeSuite, main
 
+import Zope
+try:
+    from Interface.Verify import verifyClass
+except ImportError:
+    # for Zope versions before 2.6.0
+    from Interface import verify_class_implementation as verifyClass
 
 from Products.CMFCore.ContentTypeRegistry import ContentTypeRegistry
 from Products.CMFCore.ContentTypeRegistry import MajorMinorPredicate
@@ -42,6 +47,14 @@ class MajorMinorPredicateTests( TestCase ):
         assert pred( 'foo', 'text/html', 'asdfljksadf' )
         assert not pred( 'foo', 'image/png', 'asdfljksadf' )
 
+    def test_interface(self):
+        from Products.CMFCore.interfaces.ContentTypeRegistry \
+                import ContentTypeRegistryPredicate \
+                as IContentTypeRegistryPredicate
+
+        verifyClass(IContentTypeRegistryPredicate, MajorMinorPredicate)
+
+
 class ExtensionPredicateTests( TestCase ):
 
     def test_empty( self ):
@@ -70,6 +83,14 @@ class ExtensionPredicateTests( TestCase ):
         assert pred( 'foo.htm', 'text/plain', 'asdfljksadf' )
         assert not pred( 'foo.bar', 'text/html', 'asdfljksadf' )
 
+    def test_interface(self):
+        from Products.CMFCore.interfaces.ContentTypeRegistry \
+                import ContentTypeRegistryPredicate \
+                as IContentTypeRegistryPredicate
+
+        verifyClass(IContentTypeRegistryPredicate, ExtensionPredicate)
+
+
 class MimeTypeRegexPredicateTests( TestCase ):
 
     def test_empty( self ):
@@ -92,6 +113,14 @@ class MimeTypeRegexPredicateTests( TestCase ):
         assert pred( 'foo', 'text/html', 'asdfljksadf' )
         assert not pred( 'foo', 'image/png', 'asdfljksadf' )
     
+    def test_interface(self):
+        from Products.CMFCore.interfaces.ContentTypeRegistry \
+                import ContentTypeRegistryPredicate \
+                as IContentTypeRegistryPredicate
+
+        verifyClass(IContentTypeRegistryPredicate, MimeTypeRegexPredicate)
+
+
 class NameRegexPredicateTests( TestCase ):
 
     def test_empty( self ):
@@ -114,6 +143,14 @@ class NameRegexPredicateTests( TestCase ):
         assert pred( 'foo', 'text/plain', 'asdfljksadf' )
         assert pred( 'fargo', 'text/plain', 'asdfljksadf' )
         assert not pred( 'bar', 'text/plain', 'asdfljksadf' )
+
+    def test_interface(self):
+        from Products.CMFCore.interfaces.ContentTypeRegistry \
+                import ContentTypeRegistryPredicate \
+                as IContentTypeRegistryPredicate
+
+        verifyClass(IContentTypeRegistryPredicate, NameRegexPredicate)
+
     
 class ContentTypeRegistryTests( TestCase ):
 
@@ -151,6 +188,13 @@ class ContentTypeRegistryTests( TestCase ):
         assert not reg.findTypeName( 'bar', 'text/plain', 'asdfljksadf' )
         assert reg.findTypeName( 'foo', '', '' ) == 'Foo'
         assert reg.findTypeName( 'foo', None, None ) == 'Foo'
+
+    def test_interface(self):
+        from Products.CMFCore.interfaces.ContentTypeRegistry \
+                import ContentTypeRegistry as IContentTypeRegistry
+
+        verifyClass(IContentTypeRegistry, ContentTypeRegistry)
+
 
 def test_suite():
     return TestSuite((

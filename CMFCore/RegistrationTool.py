@@ -36,11 +36,17 @@ from utils import _limitGrantedRoles
 from utils import getToolByName
 from utils import _dtmldir
 
+from interfaces.portal_registration \
+        import portal_registration as IRegistrationTool
+
 
 class RegistrationTool(UniqueObject, SimpleItem, ActionProviderBase):
 
     """ Create and modify users by making calls to portal_membership.
     """
+
+    __implements__ = (IRegistrationTool, ActionProviderBase.__implements__)
+
     id = 'portal_registration'
     meta_type = 'CMF Registration Tool'
 
@@ -60,10 +66,6 @@ class RegistrationTool(UniqueObject, SimpleItem, ActionProviderBase):
     #
     #   'portal_registration' interface methods
     #
-    security.declarePrivate('listActions')
-    def listActions(self, info):
-        return None 
-
     security.declarePublic('isRegistrationAllowed')
     def isRegistrationAllowed(self, REQUEST):
         '''Returns a boolean value indicating whether the user

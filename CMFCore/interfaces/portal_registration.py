@@ -10,14 +10,20 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-""" Registration tool interface description.
+""" Registration tool interface.
 
 $Id$
 """
 
-from Interface import Attribute, Base
+from Interface import Attribute
+try:
+    from Interface import Interface
+except ImportError:
+    # for Zope versions before 2.6.0
+    from Interface import Base as Interface
 
-class portal_registration(Base):
+
+class portal_registration(Interface):
     '''Establishes policies for member registration. Depends on
     portal_membership. Is not aware of membership storage details.
     '''
@@ -73,14 +79,4 @@ class portal_registration(Base):
     def mailPassword(forgotten_userid, REQUEST):
         '''Email a forgotten password to a member.  Raises an exception
         if user ID is not found.
-        '''
-
-    # permission: 'Set own password'
-    def setPassword(password, domains=None):
-        '''Allows the authenticated member to set his/her own password.
-        '''
-            
-    # permission: 'Set own properties'
-    def setProperties(properties=None, **kw):
-        '''Allows the authenticated member to set his/her own properties.
         '''

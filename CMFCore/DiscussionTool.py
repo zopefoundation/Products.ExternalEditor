@@ -26,11 +26,17 @@ from Globals import InitializeClass, DTMLFile
 import Acquisition
 from AccessControl import ClassSecurityInfo
 
+from interfaces.Discussions import OldDiscussable as IOldDiscussable
+from interfaces.portal_discussion \
+        import oldstyle_portal_discussion as IOldstyleDiscussionTool
+
 
 class OldDiscussable(Acquisition.Implicit):
     """
         Adapter for PortalContent to implement "old-style" discussions.
     """
+
+    __implements__ = IOldDiscussable
 
     _isDiscussable = 1
 
@@ -105,6 +111,9 @@ class OldDiscussable(Acquisition.Implicit):
 
 
 class DiscussionTool (UniqueObject, SimpleItem):
+
+    __implements__ = IOldstyleDiscussionTool
+
     id = 'portal_discussion'
     meta_type = 'Oldstyle CMF Discussion Tool'
     # This tool is used to find the discussion for a given content object.

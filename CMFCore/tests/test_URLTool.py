@@ -1,6 +1,11 @@
 from unittest import TestCase, TestSuite, makeSuite, main
 
 import Zope
+try:
+    from Interface.Verify import verifyClass
+except ImportError:
+    # for Zope versions before 2.6.0
+    from Interface import verify_class_implementation as verifyClass
 
 from Products.CMFCore.tests.base.dummy import DummyFolder as BaseDummyFolder
 from Products.CMFCore.tests.base.dummy import DummyContent
@@ -66,13 +71,11 @@ class URLToolTests(TestCase):
     def test_interface(self):
         from Products.CMFCore.interfaces.portal_url \
                 import portal_url as IURLTool
-        try:
-            from Interface.Verify import verifyClass
-        except ImportError:
-            # for Zope versions before 2.6.0
-            from Interface import verify_class_implementation as verifyClass
+        from Products.CMFCore.interfaces.portal_actions \
+                import ActionProvider as IActionProvider
 
         verifyClass(IURLTool, URLTool)
+        verifyClass(IActionProvider, URLTool)
 
 
 def test_suite():

@@ -33,12 +33,16 @@ from CMFCorePermissions import View
 from CMFCorePermissions import ManagePortal
 from CMFCorePermissions import AccessContentsInformation
 
+from interfaces.portal_types import ContentTypeInformation as ITypeInformation
+from interfaces.portal_types import portal_types as ITypesTool
+
 _marker = []  # Create a new marker.
 
 class TypeInformation (SimpleItemWithProperties):
     """
     Base class for information about a content type.
     """
+
     _isTypeInformation = 1
 
     manage_options = (SimpleItemWithProperties.manage_options[:1] +
@@ -428,6 +432,9 @@ class FactoryTypeInformation (TypeInformation):
     """
     Portal content factory.
     """
+
+    __implements__ = ITypeInformation
+
     meta_type = 'Factory-based Type Information'
     security = ClassSecurityInfo()
 
@@ -522,6 +529,9 @@ class ScriptableTypeInformation( TypeInformation ):
     """
     Invokes a script rather than a factory to create the content.
     """
+
+    __implements__ = ITypeInformation
+
     meta_type = 'Scriptable Type Information'
     security = ClassSecurityInfo()
 
@@ -599,6 +609,9 @@ class TypesTool( UniqueObject, OFS.Folder.Folder, ActionProviderBase ):
     """
         Provides a configurable registry of portal content types.
     """
+
+    __implements__ = (ITypesTool, ActionProviderBase.__implements__)
+
     id = 'portal_types'
     meta_type = 'CMF Types Tool'
     _actions = []
@@ -616,14 +629,6 @@ class TypesTool( UniqueObject, OFS.Folder.Folder, ActionProviderBase ):
     #
     security.declareProtected(ManagePortal, 'manage_overview')
     manage_overview = DTMLFile( 'explainTypesTool', _dtmldir )
-
-    security.declarePrivate('listActions')
-    def listActions(self, info=None):
-        """
-        Return a list of action information instances
-        for actions provided via tool
-        """
-        return self._actions
 
     def all_meta_types(self):
         """Adds TypesTool-specific meta types."""

@@ -27,8 +27,14 @@ from Products.CMFCore.utils import SimpleItemWithProperties
 from Products.CMFCore.WorkflowCore import WorkflowException
 from Products.CMFCore.WorkflowTool import addWorkflowClass
 
+from Products.CMFCore.interfaces.portal_workflow \
+        import WorkflowDefinition as IWorkflowDefinition
+
 
 class DefaultWorkflowDefinition (SimpleItemWithProperties):
+
+    __implements__ = IWorkflowDefinition
+
     meta_type = 'Workflow'
     id = 'default_workflow'
     title = 'Simple Review / Publish Policy'

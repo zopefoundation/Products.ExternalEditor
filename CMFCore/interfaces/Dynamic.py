@@ -10,7 +10,7 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-""" Syndicatable interface.
+""" Dynamic type interface.
 
 $Id$
 """
@@ -22,16 +22,21 @@ except ImportError:
     from Interface import Base as Interface
 
 
-class Syndicatable(Interface):
-    """\
-    Returns back a list of objects which implements the DublinCore.
+class DynamicType(Interface):
+    """ General interface for dynamic items.
     """
-
-    def synContentValues(self):
+    
+    def getIcon(relative_to_portal=0):
         """
-        Returns a list of results which is to be Syndicated.  For example, the normal call
-        contentValues (on PortalFolders) returns a list of subObjects of the current object
-        (i.e. objectValues with filtering applied).  For the case of a Topic, one would 
-        return a sequence of objects from a catalog query, not the subObjects of the Topic.
-        What is returned must implement the DublinCore.
+        This method returns the path to an object's icon. It is used 
+        in the folder_contents view to generate an appropriate icon 
+        for the items found in the folder.
+
+        If the content item does not define an attribute named "icon"
+        this method will return the path "/misc_/dtmldoc.gif", which is 
+        the icon used for DTML Documents.
+
+        If 'relative_to_portal' is true, return only the portion of
+        the icon's URL which finds it "within" the portal;  otherwise,
+        return it as an absolute URL.
         """

@@ -43,6 +43,8 @@ try:
 except ImportError:
     SUPPORTS_PAGE_TEMPLATES=0
 
+from interfaces.portal_skins import portal_skins as ISkinsTool
+
 
 def modifiedOptions():
     # Remove the existing "Properties" option and add our own.
@@ -60,6 +62,8 @@ class SkinsTool(UniqueObject, SkinsContainer, Folder, ActionProviderBase):
     '''
     This tool is used to supply skins to a portal.
     '''
+
+    __implements__ = (ISkinsTool, ActionProviderBase.__implements__)
 
     id = 'portal_skins'
     meta_type = 'CMF Skins Tool'
@@ -94,14 +98,6 @@ class SkinsTool(UniqueObject, SkinsContainer, Folder, ActionProviderBase):
     request_varname = 'portal_skin'
     allow_any = 0
     selections = None
-
-    security.declarePrivate('listActions')
-    def listActions(self, info=None):
-        """
-        Return a list of actions information instances
-        provided by the tool.
-        """
-        return self._actions
 
     security.declareProtected(ManagePortal, 'manage_propertiesForm')
     manage_propertiesForm = DTMLFile('dtml/skinProps', globals())

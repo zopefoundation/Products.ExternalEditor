@@ -10,7 +10,7 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-""" URL tool interface description.
+""" URL tool interface.
 
 $Id$
 """

@@ -10,14 +10,20 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-""" Skins tool interface description.
+""" Skins tool interface.
 
 $Id$
 """
 
-from Interface import Attribute, Base
+from Interface import Attribute
+try:
+    from Interface import Interface
+except ImportError:
+    # for Zope versions before 2.6.0
+    from Interface import Base as Interface
 
-class portal_skins(Base):
+
+class portal_skins(Interface):
     '''An object that provides skins to a portal object.
     '''
     id = Attribute('id', 'Must be set to "portal_skins"')

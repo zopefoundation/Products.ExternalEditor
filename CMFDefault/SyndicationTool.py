@@ -45,6 +45,8 @@ class SyndicationTool (UniqueObject, SimpleItem, ActionProviderBase):
         syndication of folder content as RSS.
     """
 
+    __implements__ = ActionProviderBase.__implements__
+
     id = 'portal_syndication'
 
     meta_type = 'Default Syndication Tool'
@@ -108,13 +110,6 @@ class SyndicationTool (UniqueObject, SimpleItem, ActionProviderBase):
     security.declareProtected(ManagePortal, 'reportForm')
     reportForm = HTMLFile('synReports', _dtmldir)
    
-    security.declarePrivate('listActions')
-    def listActions(self, info=None):
-        """
-        Return actions provided by tool
-        """
-        return self._actions
-
     security.declareProtected(ManagePortal, 'editProperties')
     def editProperties( self
                       , updatePeriod=None

@@ -10,14 +10,20 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-""" Membership data storage tool interface description.
+""" Memberdata storage tool interface.
 
 $Id$
 """
 
-from Interface import Attribute, Base
+from Interface import Attribute
+try:
+    from Interface import Interface
+except ImportError:
+    # for Zope versions before 2.6.0
+    from Interface import Base as Interface
 
-class portal_memberdata(Base):
+
+class portal_memberdata(Interface):
     '''A helper for portal_membership that transparently adds
     member data to user objects.
     '''
@@ -48,3 +54,13 @@ class portal_memberdata(Base):
         tool with the list in the actual underlying acl_users
         and delete anything not in acl_users
         '''
+
+class MemberData(Interface):
+    """ MemberData interface.
+    """
+
+    def setProperties(properties=None, **kw):
+        """ Allows the authenticated member to set his/her own properties.
+
+        Permission -- SetOwnProperties
+        """

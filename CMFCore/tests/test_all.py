@@ -6,6 +6,8 @@ def test_suite():
 
     return build_test_suite('Products.CMFCore.tests',[
         'test_ContentTypeRegistry',
+        'test_DynamicType',
+        'test_PortalContent',
         'test_PortalFolder',
         'test_TypesTool',
         'test_WorkflowTool',
@@ -21,6 +23,12 @@ def test_suite():
         'test_FSImage',
         'test_CachingPolicyManager',
         'test_FSSecurity',
+        'test_DiscussionTool',
+        'test_MemberDataTool',
+        'test_MembershipTool',
+        'test_RegistrationTool',
+        'test_SkinsTool',
+        'test_UndoTool',
         'test_URLTool',
         ])
 

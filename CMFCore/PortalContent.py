@@ -55,9 +55,12 @@ class PortalContent(DynamicType, CMFCatalogAware, SimpleItem):
     """
     
     if not NoWL:
-        __implements__ = (WriteLockInterface, Contentish,)
+        __implements__ = (WriteLockInterface,
+                          Contentish,
+                          DynamicType.__implements__)
     else:
-        __implements__ = (Contentish)
+        __implements__ = (Contentish, DynamicType.__implements__)
+
     isPortalContent = 1
     _isPortalContent = 1  # More reliable than 'isPortalContent'.
 
@@ -93,17 +96,16 @@ class PortalContent(DynamicType, CMFCatalogAware, SimpleItem):
             raise ResourceLockedError, 'This resource is locked via webDAV'
         return 0
 
-    # indexed methods
-    # ---------------
-    
+    #
+    #   Contentish interface methods
+    #
     security.declareProtected(View, 'SearchableText')
     def SearchableText(self):
-        "Returns a concatination of all searchable text"
-        # Should be overriden by portal objects
-        return "%s %s" % (self.Title(), self.Description())
+        """ Returns a concatination of all searchable text.
 
-    # Contentish interface methods
-    # ----------------------------
+        Should be overriden by portal objects.
+        """
+        return "%s %s" % (self.Title(), self.Description())
 
     def __call__(self):
         '''

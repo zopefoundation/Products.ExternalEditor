@@ -10,11 +10,21 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-import Interface
+""" Dublin Core interface.
 
-class DublinCore(Interface.Base):
+$Id$
+"""
+
+try:
+    from Interface import Interface
+except ImportError:
+    # for Zope versions before 2.6.0
+    from Interface import Base as Interface
+
+
+class DublinCore(Interface):
     """
-        Define which Dublin Core metadata elements are supported by the PTK,
+        Define which Dublin Core metadata elements are supported by the CMF,
         and the semantics therof.
     """
 
@@ -172,7 +182,7 @@ class DublinCore(Interface.Base):
             Permissions: View
         """
 
-class CatalogableDublinCore(Interface.Base):
+class CatalogableDublinCore(Interface):
     """
         Provide Zope-internal date objects for cataloging purposes.
     """
@@ -208,7 +218,7 @@ class CatalogableDublinCore(Interface.Base):
             Permissions: View
         """
 
-class MutableDublinCore(Interface.Base):
+class MutableDublinCore(Interface):
     """
         Update interface for mutable metadata.
     """

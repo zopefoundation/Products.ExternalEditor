@@ -10,14 +10,20 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-""" Type registration tool interface description.
+""" Type registration tool interface.
 
 $Id$
 """
 
-from Interface import Attribute, Base
+from Interface import Attribute
+try:
+    from Interface import Interface
+except ImportError:
+    # for Zope versions before 2.6.0
+    from Interface import Base as Interface
 
-class ContentTypeInformation(Base):
+
+class ContentTypeInformation(Interface):
     """
         Registry entry interface.
     """
@@ -74,7 +80,7 @@ class ContentTypeInformation(Base):
             Returns the portal-relative icon for this type.
         """
 
-class portal_types(Base):
+class portal_types(Interface):
     """
         Provides a configurable registry of portal content types.
     """

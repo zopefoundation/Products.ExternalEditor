@@ -10,16 +10,21 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-""" Discussion tool interface description.
+""" Discussion tool interface.
 
 $Id$
 """
 
-from Interface import Attribute, Base
+from Interface import Attribute
+try:
+    from Interface import Interface
+except ImportError:
+    # for Zope versions before 2.6.0
+    from Interface import Base as Interface
 
-class portal_discussion(Base):
-    """
-        Links content to discussions.
+
+class oldstyle_portal_discussion(Interface):
+    """ Links content to discussions.
     """
     id = Attribute('id', 'Must be set to "portal_discussion"')
 
@@ -37,6 +42,11 @@ class portal_discussion(Base):
             up via an object-specific value, or by place, or from
             a site-wide policy.
         """
+
+
+class portal_discussion(oldstyle_portal_discussion):
+    """ Links content to discussions.
+    """
 
     #getDiscussionFor__roles__ = None
     def overrideDiscussionFor(content, allowDiscussion):

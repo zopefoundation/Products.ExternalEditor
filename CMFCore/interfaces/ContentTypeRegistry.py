@@ -10,15 +10,28 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-"""
-Declare interfaces for MIMEtype <-> Type object registry objects.
+""" Putfactory registration tool interface.
+
+$Id$
 """
 
-from Interface import Attribute, Base
+try:
+    from Interface import Interface
+except ImportError:
+    # for Zope versions before 2.6.0
+    from Interface import Base as Interface
 
-class ContentTypeRegistryPredicate(Base):
-    """\
-    Express a rule for matching a given name/typ/body.
+
+class ContentTypeRegistryPredicate(Interface):
+    """ Express a rule for matching a given name/typ/body.
+
+    predicateWidget -- Return a snipped of HTML suitable for editing the
+        predicate; the snippet should arrange for values to be marshalled by
+        ZPublisher as a ':record', with the ID of the predicate as the name of
+        the record.
+
+    The registry will call the predictate's 'edit' method, passing the fields
+    of the record.
     """
 
     def __call__(name, typ, body):
@@ -26,22 +39,9 @@ class ContentTypeRegistryPredicate(Base):
 
     def getTypeLabel():
         """ Return a human-readable label for the predicate type. """
-    
-    def edit(**kw):
-        """ Update the predicate. """
 
-    def predicateWidget():
-        """\
-        Return a snipped of HTML suitable for editing the
-        predicate;  the snippet should arrange for values
-        to be marshalled by ZPublisher as a ':record', with
-        the ID of the predicate as the name of the record.
-        
-        The registry will call the predictate's 'edit' method,
-        passing the fields of the record.
-        """
 
-class ContentTypeRegistry(Base):
+class ContentTypeRegistry(Interface):
     """ Registry for rules which map PUT args to a CMF Type Object. """
 
     def findTypeName(name, typ, body):

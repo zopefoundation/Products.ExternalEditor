@@ -1,5 +1,11 @@
+from unittest import TestCase, TestSuite, makeSuite, main
+
 import Zope
-from unittest import TestCase,TestSuite,makeSuite,main
+try:
+    from Interface.Verify import verifyClass
+except ImportError:
+    # for Zope versions before 2.6.0
+    from Interface import verify_class_implementation as verifyClass
 
 from Products.CMFCore.tests.base.testcase import \
      SecurityRequestTest
@@ -10,8 +16,8 @@ from Products.CMFCore.PortalFolder import PortalFolder
 from Products.CMFCore.ActionInformation import ActionInformation
 from Products.CMFCore.Expression import Expression
 from Products.CMFCore.URLTool import URLTool
-from Products.CMFDefault.RegistrationTool import RegistrationTool
-from Products.CMFDefault.MembershipTool import MembershipTool
+from Products.CMFCore.RegistrationTool import RegistrationTool
+from Products.CMFCore.MembershipTool import MembershipTool
 
 class ActionsToolTests( SecurityRequestTest ):
 
@@ -116,6 +122,16 @@ class ActionsToolTests( SecurityRequestTest ):
                             'name': 'Test',
                             'visible': 1,
                             'category': 'object'}])
+
+    def test_interface(self):
+        from Products.CMFCore.interfaces.portal_actions \
+                import portal_actions as IActionsTool
+        from Products.CMFCore.interfaces.portal_actions \
+                import ActionProvider as IActionProvider
+
+        verifyClass(IActionsTool, ActionsTool)
+        verifyClass(IActionProvider, ActionsTool)
+
 
 def test_suite():
     return TestSuite((

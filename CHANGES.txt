@@ -24,6 +24,26 @@ Future
     - (__future__) Added DCWorkflow (through-the-web configurable
       workflows) to the core set of CMF products.
 
+    - Cleaned up Interfaces and API Help (Collector #96):
+
+      o  Removed redundant 'Syndicatable' and 'IndexableContent' interfaces.
+
+      o  Removed unfixable 'Membership' and 'ReviewableContent' interfaces.
+
+      o  Removed listActions() from 'Contentish' and 'portal_workflow'
+         interface.
+
+      o  Removed redundant or 'None' overriding of listActions().
+
+      o  Updated all interfaces to work with new Zope 2.6 Interface API.
+
+      o  Added 'portal_properties' and 'Dynamic' interfaces.
+
+      o  Added many interface implementation tests and made them pass.
+
+    - Removed deprecated 'register' module and 'PortalContentRegistration'
+      interface.
+
     - Moved URLTool to CMFCore. Added interface and basic tests.
       (Collector #67)
 

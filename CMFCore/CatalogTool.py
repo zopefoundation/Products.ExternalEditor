@@ -10,12 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-
 """ Basic portal catalog.
 
 $Id$
 """
-
 
 import os
 from utils import UniqueObject, _checkPermission, _getAuthenticatedUser
@@ -36,8 +34,14 @@ from CMFCorePermissions import ManagePortal
 from CMFCorePermissions import AccessInactivePortalContent
 from Acquisition import aq_base
 
+from interfaces.portal_catalog \
+        import IndexableObjectWrapper as IIndexableObjectWrapper
+from interfaces.portal_catalog import portal_catalog as ICatalogTool
+
 
 class IndexableObjectWrapper:
+
+    __implements__ = IIndexableObjectWrapper
 
     def __init__(self, vars, ob):
         self.__vars = vars
@@ -71,6 +75,9 @@ class IndexableObjectWrapper:
 class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
     '''This is a ZCatalog that filters catalog queries.
     '''
+
+    __implements__ = (ICatalogTool, ActionProviderBase.__implements__)
+
     id = 'portal_catalog'
     meta_type = 'CMF Catalog'
     security = ClassSecurityInfo()
@@ -96,14 +103,6 @@ class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
     #
     #   Subclass extension interface
     #
-    security.declarePrivate('listActions')
-    def listActions(self, info=None):
-        """
-        Return a list of action information instances 
-        provided via tool
-        """
-        return self._actions
-
     security.declarePublic( 'enumerateIndexes' ) # Subclass can call
     def enumerateIndexes( self ):
         #   Return a list of ( index_name, type ) pairs for the initial

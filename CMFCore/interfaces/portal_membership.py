@@ -10,19 +10,31 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-""" Membership tool interface description.
+""" Membership tool interface.
 
 $Id$
 """
 
-from Interface import Attribute, Base
+from Interface import Attribute
+try:
+    from Interface import Interface
+except ImportError:
+    # for Zope versions before 2.6.0
+    from Interface import Base as Interface
 
-class portal_membership(Base):
+
+class portal_membership(Interface):
     '''Deals with the details of how and where to store and retrieve
     members and their member folders.
     '''
     id = Attribute('id', 'Must be set to "portal_membership"')
 
+    def setPassword(password, domains=None):
+        """ Allows the authenticated member to set his/her own password.
+
+        Permission -- SetOwnPassword
+        """
+            
     #getAuthenticatedMember__roles__ = None  # Allow all.
     def getAuthenticatedMember():
         '''

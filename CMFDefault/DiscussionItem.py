@@ -28,6 +28,9 @@ from Products.CMFCore.PortalContent import PortalContent
 from Document import Document
 from DublinCore import DefaultDublinCoreImpl
 
+from Products.CMFCore.interfaces.Discussions import DiscussionResponse
+from Products.CMFCore.interfaces.Discussions import Discussable
+
 
 factory_type_information = ( { 'id'             : 'Discussion Item'
                              , 'meta_type'      : 'Discussion Item'
@@ -87,7 +90,8 @@ class DiscussionItem( Document
         Class for content which is a response to other content.
     """
 
-    __implements__ = ( PortalContent.__implements__
+    __implements__ = ( DiscussionResponse
+                     , PortalContent.__implements__
                      , DefaultDublinCoreImpl.__implements__
                      )
 
@@ -170,6 +174,8 @@ class DiscussionItemContainer( Persistent, Implicit, Traversable ):
         instance of DiscussionItemContainer injected into it to
         hold the discussion threads.
     """
+
+    __implements__ = Discussable
 
     # for the security machinery to allow traversal
     #__roles__ = None

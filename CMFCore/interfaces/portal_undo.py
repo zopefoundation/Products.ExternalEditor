@@ -10,14 +10,20 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-""" Undo tool interface description.
+""" Undo tool interface.
 
 $Id$
 """
 
-from Interface import Attribute, Base
+from Interface import Attribute
+try:
+    from Interface import Interface
+except ImportError:
+    # for Zope versions before 2.6.0
+    from Interface import Base as Interface
 
-class portal_undo(Base):
+
+class portal_undo(Interface):
     '''Provides access to Zope undo functions.
     '''
     id = Attribute('id', 'Must be set to "portal_undo"')

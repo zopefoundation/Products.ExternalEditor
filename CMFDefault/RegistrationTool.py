@@ -19,24 +19,24 @@ $Id$
 from Globals import InitializeClass, DTMLFile
 from AccessControl import ClassSecurityInfo
 
-from Products.CMFCore.interfaces.portal_registration import portal_registration
-from Products.CMFCore.utils import UniqueObject
 from Products.CMFCore.utils import _checkPermission
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.ActionInformation import ActionInformation
 from Products.CMFCore.Expression import Expression
 from Products.CMFCore.ActionProviderBase import ActionProviderBase
-from Products.CMFCore.RegistrationTool import RegistrationTool
+from Products.CMFCore.RegistrationTool import RegistrationTool as BaseTool
 from Products.CMFCore.CMFCorePermissions import AddPortalMember
 from Products.CMFCore.CMFCorePermissions import ManagePortal
 
 from utils import _dtmldir
 
-class RegistrationTool (RegistrationTool, ActionProviderBase):
+class RegistrationTool(BaseTool):
 
     """ Manage through-the-web signup policies.
     """
-    __implements__ = ( portal_registration, )
+
+    __implements__ = BaseTool.__implements__
+
     meta_type = 'Default Registration Tool'
 
     _actions = [ ActionInformation( id='join'
@@ -65,16 +65,6 @@ class RegistrationTool (RegistrationTool, ActionProviderBase):
                        )
                      )
     manage_overview = DTMLFile( 'explainRegistrationTool', _dtmldir )
-
-    #
-    #   ActionProvider interface
-    #
-    security.declarePublic('listActions')
-    def listActions(self, info=None):
-        """
-        Return actions provided via tool.
-        """
-        return self._actions 
 
     #
     #   'portal_registration' interface

@@ -10,15 +10,20 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-""" Catalog tool interface description.
+""" Catalog tool interface.
 
 $Id$
 """
 
+from Interface import Attribute
+try:
+    from Interface import Interface
+except ImportError:
+    # for Zope versions before 2.6.0
+    from Interface import Base as Interface
 
-from Interface import Attribute, Base
 
-class portal_catalog(Base):
+class portal_catalog(Interface):
     '''This tool interacts with a customized ZCatalog.
     '''
     id = Attribute('id', 'Must be set to "portal_catalog"')
@@ -54,3 +59,14 @@ class portal_catalog(Base):
     def getpath(data_record_id_):
         '''Calls ZCatalog.getpath().
         '''
+
+
+class IndexableObjectWrapper(Interface):
+    """ Indexable object wrapper interface.
+    """
+
+    def allowedRolesAndUsers():
+        """
+        Return a list of roles and users with View permission.
+        Used by PortalCatalog to filter out items you're not allowed to see.
+        """

@@ -1,6 +1,12 @@
+from unittest import TestCase, TestSuite, makeSuite, main
+
 import Zope
 from Acquisition import aq_base
-from unittest import TestCase, TestSuite, makeSuite, main
+try:
+    from Interface.Verify import verifyClass
+except ImportError:
+    # for Zope versions before 2.6.0
+    from Interface import verify_class_implementation as verifyClass
 
 from Products.CMFDefault.MetadataTool import \
      MetadataElementPolicy, MetadataTool, ElementSpec, \
@@ -357,6 +363,15 @@ class TestMetadataTool( TestCase ):
 
         foo.setTitle( 'Foo title' )
         self.tool.validateMetadata( foo )
+
+    def test_interface(self):
+        from Products.CMFCore.interfaces.portal_metadata \
+                import portal_metadata as IMetadataTool
+        from Products.CMFCore.interfaces.portal_actions \
+                import ActionProvider as IActionProvider
+
+        verifyClass(IMetadataTool, MetadataTool)
+        verifyClass(IActionProvider, MetadataTool)
 
 
 def test_suite():

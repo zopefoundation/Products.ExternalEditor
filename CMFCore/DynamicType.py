@@ -20,12 +20,17 @@ from utils import getToolByName
 import Globals
 from urllib import quote
 
+from interfaces.Dynamic import DynamicType as IDynamicType
+
 
 class DynamicType:
     """
     Mixin for portal content that allows the object to take on
     a dynamic type property.
     """
+
+    __implements__ = IDynamicType
+
     portal_type = None
 
     security = ClassSecurityInfo()

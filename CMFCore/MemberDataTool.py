@@ -32,12 +32,18 @@ from CMFCorePermissions import ManagePortal
 from CMFCorePermissions import SetOwnProperties
 from ActionProviderBase import ActionProviderBase
 
+from interfaces.portal_memberdata import portal_memberdata as IMemberDataTool
+from interfaces.portal_memberdata import MemberData as IMemberData
+
 _marker = []  # Create a new marker object.
 
 
 class MemberDataTool (UniqueObject, SimpleItem, PropertyManager, ActionProviderBase):
     '''This tool wraps user objects, making them act as Member objects.
     '''
+
+    __implements__ = (IMemberDataTool, ActionProviderBase.__implements__)
+
     id = 'portal_memberdata'
     meta_type = 'CMF Member Data Tool'
     _actions = []
@@ -80,13 +86,6 @@ class MemberDataTool (UniqueObject, SimpleItem, PropertyManager, ActionProviderB
     #
     #   'portal_memberdata' interface methods
     #
-    security.declarePrivate('listActions')
-    def listActions(self, info=None):
-        """
-        Return actions provided via tool.
-        """
-        return self._actions
-
     security.declarePrivate('getMemberDataContents')
     def getMemberDataContents(self):
         '''
@@ -183,6 +182,9 @@ Globals.InitializeClass(MemberDataTool)
 
 
 class MemberData (SimpleItem):
+
+    __implements__ = IMemberData
+
     security = ClassSecurityInfo()
 
     def __init__(self, tool, id):

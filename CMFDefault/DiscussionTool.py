@@ -29,10 +29,16 @@ from Products.CMFCore.ActionInformation import ActionInformation
 from Products.CMFCore.ActionProviderBase import ActionProviderBase
 from Products.CMFCore.Expression import Expression
 
+from Products.CMFCore.interfaces.portal_discussion \
+        import portal_discussion as IDiscussionTool
+
+
 class DiscussionNotAllowed( Exception ):
     pass
 
 class DiscussionTool( UniqueObject, SimpleItem, ActionProviderBase ):
+
+    __implements__ = (IDiscussionTool, ActionProviderBase.__implements__)
 
     id = 'portal_discussion'
     meta_type = 'Default Discussion Tool'
@@ -64,13 +70,6 @@ class DiscussionTool( UniqueObject, SimpleItem, ActionProviderBase ):
     #
     #   'portal_discussion' interface methods
     #
-
-    security.declarePrivate('listActions')
-    def listActions(self, info=None):
-        """
-        Return available actions via tool.
-        """
-        return self._actions
 
     security.declarePublic( 'overrideDiscussionFor' )
     def overrideDiscussionFor(self, content, allowDiscussion):

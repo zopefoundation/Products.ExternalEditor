@@ -6,6 +6,7 @@ def test_suite():
 
     return build_test_suite('Products.CMFDefault.tests',[
         'test_Discussions',
+        'test_DublinCore',
         'test_Document',
         'test_NewsItem',
         'test_Link',
@@ -15,6 +16,11 @@ def test_suite():
         'test_utils',
         'test_join',
         'test_Portal',
+        'test_DiscussionTool',
+        'test_MembershipTool',
+        'test_PropertiesTool',
+        'test_RegistrationTool',
+        'test_DefaultWorkflow',
         ])
 
 if __name__ == '__main__':

@@ -1,5 +1,11 @@
+from unittest import TestCase, TestSuite, makeSuite, main
+
 import Zope
-from unittest import TestSuite, makeSuite, main
+try:
+    from Interface.Verify import verifyClass
+except ImportError:
+    # for Zope versions before 2.6.0
+    from Interface import verify_class_implementation as verifyClass
 
 from Products.CMFCore.tests.base.testcase import \
      SecurityTest
@@ -12,12 +18,38 @@ from Products.CMFCore.tests.base.dummy import DummyContent
 
 from Products.CMFCore.CatalogTool import CatalogTool
 from Products.CMFCore.TypesTool import TypesTool
+from Products.CMFCore.URLTool import URLTool
 from Products.CMFCore.WorkflowTool import WorkflowTool
 
-from Products.CMFDefault.DiscussionTool import \
-     DiscussionTool, DiscussionNotAllowed
+from Products.CMFDefault.DiscussionTool import DiscussionTool
+from Products.CMFDefault.DiscussionTool import DiscussionNotAllowed
+from Products.CMFDefault.DiscussionItem import DiscussionItem
+from Products.CMFDefault.DiscussionItem import DiscussionItemContainer
 
-from Products.CMFCore.URLTool import URLTool
+
+class DiscussionItemTests(TestCase):
+
+    def test_interface(self):
+        from Products.CMFCore.interfaces.Dynamic \
+                import DynamicType as IDynamicType
+        from Products.CMFCore.interfaces.Contentish \
+                import Contentish as IContentish
+        from Products.CMFCore.interfaces.Discussions \
+                import DiscussionResponse as IDiscussionResponse
+
+        verifyClass(IDynamicType, DiscussionItem)
+        verifyClass(IContentish, DiscussionItem)
+        verifyClass(IDiscussionResponse, DiscussionItem)
+
+
+class DiscussionItemContainerTests(TestCase):
+
+    def test_interface(self):
+        from Products.CMFCore.interfaces.Discussions \
+                import Discussable as IDiscussable
+
+        verifyClass(IDiscussable, DiscussionItemContainer)
+
 
 class DiscussionTests( SecurityTest ):
 
@@ -200,6 +232,8 @@ class DiscussionTests( SecurityTest ):
 
 def test_suite():
     return TestSuite((
+        makeSuite( DiscussionItemTests ),
+        makeSuite( DiscussionItemContainerTests ),
         makeSuite( DiscussionTests ),
         ))
 

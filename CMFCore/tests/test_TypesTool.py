@@ -1,5 +1,11 @@
-import Zope
 from unittest import TestCase, TestSuite, makeSuite, main
+
+import Zope
+try:
+    from Interface.Verify import verifyClass
+except ImportError:
+    # for Zope versions before 2.6.0
+    from Interface import verify_class_implementation as verifyClass
 
 from Products.CMFCore.TypesTool import\
      FactoryTypeInformation as FTI,\
@@ -76,6 +82,16 @@ class TypesToolTests( SecurityRequestTest ):
         # Check the ones we're expecting are there
         self.failUnless(meta_types.has_key('Scriptable Type Information'))
         self.failUnless(meta_types.has_key('Factory-based Type Information'))
+
+    def test_interface(self):
+        from Products.CMFCore.interfaces.portal_types \
+                import portal_types as ITypesTool
+        from Products.CMFCore.interfaces.portal_actions \
+                import ActionProvider as IActionProvider
+
+        verifyClass(ITypesTool, TypesTool)
+        verifyClass(IActionProvider, TypesTool)
+
 
 class TypeInfoTests( TestCase ):
     
@@ -231,7 +247,7 @@ class TypeInfoTests( TestCase ):
         
         action = ti.getActionById( 'slot' )
         self.assertEqual( action, 'foo_slot' )
-        
+
 
 class FTIDataTests( TypeInfoTests ):
 
@@ -250,6 +266,12 @@ class FTIDataTests( TypeInfoTests ):
         self.assertEqual( ti.product, 'FooProduct' )
         self.assertEqual( ti.factory, 'addFoo' )
 
+    def test_interface(self):
+        from Products.CMFCore.interfaces.portal_types \
+                import ContentTypeInformation as ITypeInformation
+
+        verifyClass(ITypeInformation, FTI)
+        
 
 class STIDataTests( TypeInfoTests ):
 
@@ -267,6 +289,13 @@ class STIDataTests( TypeInfoTests ):
                                )
         self.assertEqual( ti.permission, 'Add Foos' )
         self.assertEqual( ti.constructor_path, 'foo_add' )
+
+    def test_interface(self):
+        from Products.CMFCore.interfaces.portal_types \
+                import ContentTypeInformation as ITypeInformation
+
+        verifyClass(ITypeInformation, STI)
+        
 
 class FTIConstructionTests( TestCase ):
 

@@ -10,9 +10,9 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
+""" CMFDefault portal_metadata tool.
 
-"""\
-CMFDefault portal_metadata tool.
+$Id$
 """
 
 from OFS.SimpleItem import SimpleItem
@@ -27,6 +27,10 @@ from Products.CMFCore.CMFCorePermissions import ManagePortal
 from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
 from Products.CMFCore.ActionProviderBase import ActionProviderBase
 from utils import _dtmldir
+
+from Products.CMFCore.interfaces.portal_metadata \
+        import portal_metadata as IMetadataTool
+
 
 class MetadataElementPolicy( SimpleItem ):
     """
@@ -197,6 +201,8 @@ class MetadataError( Exception ):
 
 class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
 
+    __implements__ = (IMetadataTool, ActionProviderBase.__implements__)
+
     id              = 'portal_metadata'
     meta_type       = 'Default Metadata Tool'
 
@@ -254,13 +260,6 @@ class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
 
     security.declareProtected(ManagePortal, 'propertiesForm')
     propertiesForm = DTMLFile( 'metadataProperties', _dtmldir )
-
-    security.declarePrivate('listActions')
-    def listActions(self, info=None):
-        """
-        Return actions provided via tool.
-        """
-        return self._actions
 
     security.declareProtected(ManagePortal, 'editProperties')
     def editProperties( self

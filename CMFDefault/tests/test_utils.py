@@ -6,7 +6,7 @@ from Products.CMFDefault.utils import seq_strip
 
 class DefaultUtilsTests(TestCase):
     COMMON_HEADERS = '''Author: Tres Seaver
-Title: Test Products.PTKDemo.utils.parseHeadersBody'''
+Title: Test Products.CMFDefault.utils.parseHeadersBody'''
 
     MULTILINE_DESCRIPTION = '''Description: this description spans
         multiple lines.'''

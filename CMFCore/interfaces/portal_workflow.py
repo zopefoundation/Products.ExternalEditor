@@ -10,16 +10,22 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-""" Workflow tool interface description.
+""" Workflow tool interface.
 
 $Id$
 """
 
-from Interface import Attribute, Base
+from Interface import Attribute
+try:
+    from Interface import Interface
+except ImportError:
+    # for Zope versions before 2.6.0
+    from Interface import Base as Interface
 
 _marker = []
 
-class portal_workflow(Base):
+
+class portal_workflow(Interface):
     '''This tool accesses and changes the workflow state of content.
     '''
     id = Attribute('id', 'Must be set to "portal_workflow"')
@@ -32,17 +38,6 @@ class portal_workflow(Base):
         making it possible to implement queues.
         Returns a mapping containing the catalog variables
         that apply to ob.
-        '''
-
-    # security.declarePrivate('listActions')
-    def listActions(info):
-        '''
-        Invoked by the portal_actions tool.  Allows workflows to
-        include actions to be displayed in the actions box.
-        Object actions are supplied by workflows that apply
-        to the object.  Global actions are supplied by all
-        workflows.
-        Returns the actions to be displayed to the user.
         '''
 
     # security.declarePublic('getActionsFor')
@@ -117,7 +112,7 @@ class portal_workflow(Base):
         '''
 
 
-class WorkflowDefinition(Base):
+class WorkflowDefinition(Interface):
     '''The interface expected of workflow definitions objects.
     Accesses and changes the workflow state of objects.
     '''
@@ -169,7 +164,7 @@ class WorkflowDefinition(Base):
         '''
 
     # security.declarePrivate('doActionFor')
-    def doActionFor(ob, action, *args, **kw):
+    def doActionFor(ob, action, comment=''):
         '''
         Invoked by the portal_workflow tool.
         Allows the user to request a workflow action.  This method
@@ -184,7 +179,7 @@ class WorkflowDefinition(Base):
         '''
 
     # security.declarePrivate('getInfoFor')
-    def getInfoFor(ob, name, default, *args, **kw):
+    def getInfoFor(ob, name, default):
         '''
         Invoked by the portal_workflow tool.
         Allows the user to request information provided by the

@@ -10,11 +10,12 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-""" Syndicatable interface.
+""" Properties tool interface.
 
 $Id$
 """
 
+from Interface import Attribute
 try:
     from Interface import Interface
 except ImportError:
@@ -22,16 +23,27 @@ except ImportError:
     from Interface import Base as Interface
 
 
-class Syndicatable(Interface):
-    """\
-    Returns back a list of objects which implements the DublinCore.
-    """
+class portal_properties(Interface):
+    """ CMF Properties Tool interface.
 
-    def synContentValues(self):
+    This interface provides access to "portal-wide" properties.
+    """
+    id = Attribute('id', 'Must be set to "portal_properties"')
+
+    def editProperties(props):
+        """ Change portal settings.
+
+        Permission -- ManagePortal
         """
-        Returns a list of results which is to be Syndicated.  For example, the normal call
-        contentValues (on PortalFolders) returns a list of subObjects of the current object
-        (i.e. objectValues with filtering applied).  For the case of a Topic, one would 
-        return a sequence of objects from a catalog query, not the subObjects of the Topic.
-        What is returned must implement the DublinCore.
+
+    def title():
+        """ Get portal title.
+
+        Returns -- String
+        """
+
+    def smtp_server():
+        """ Get local SMTP server.
+
+        Returns -- String
         """

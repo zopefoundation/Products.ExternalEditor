@@ -10,14 +10,20 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-""" Actions tool interface description.
+""" Actions tool interface.
 
 $Id$
 """
 
-from Interface import Base, Attribute
+from Interface import Attribute
+try:
+    from Interface import Interface
+except ImportError:
+    # for Zope versions before 2.6.0
+    from Interface import Base as Interface
 
-class portal_actions(Base):
+
+class portal_actions(Interface):
     '''Gathers a list of links which the user is allowed to view according to
     the current context.
     '''
@@ -64,13 +70,20 @@ class portal_actions(Base):
         '''
 
 
-class ActionProvider(Base):
+class ActionProvider(Interface):
     '''The interface expected of an object that can provide actions.
     '''
 
     # listActions__roles__ = ()  # No permission.
     def listActions(info):
-        '''Support for the old list of mappings is currently supported:
+        """ Return all the actions defined by a provider.
+
+        The info argument is currently used by 'Oldstyle CMF Discussion Tool'
+        and 'CMF Workflow Tool'.
+
+        Returns -- Tuple of ActionInformation objects
+
+        Oldstyle dictionary actions are currently also supported:
         Returns a list of mappings describing actions.  Each action
         should contain the keys "name", "url", "permissions", and
         "category", conforming to the specs outlined in
@@ -86,5 +99,5 @@ class ActionProvider(Base):
           content
           content_url
           The new way of doing this is....
-        '''
+        """
 

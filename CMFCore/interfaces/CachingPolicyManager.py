@@ -10,15 +10,20 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-
-"""Caching tool interface description.
+""" Caching policies tool interface.
 
 $Id$
 """
 
-from Interface import Attribute, Base
+from Interface import Attribute
+try:
+    from Interface import Interface
+except ImportError:
+    # for Zope versions before 2.6.0
+    from Interface import Base as Interface
 
-class CachingPolicyManager( Base ):
+
+class CachingPolicyManager(Interface):
     """
         Manage HTTP cache policies for skin methods.
     """
