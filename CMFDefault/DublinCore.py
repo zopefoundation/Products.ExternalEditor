@@ -152,14 +152,16 @@ class DefaultDublinCoreImpl( PropertyManager ):
         """
             Dublin Core element - date resource becomes effective.
         """
-        return self.effective_date and self.effective_date.ISO() or 'None'
+        ed = getattr( self, 'effective_date', None )
+        return ed and ed.ISO() or 'None'
 
     security.declarePublic( 'ExpirationDate' )
     def ExpirationDate( self ):
         """
             Dublin Core element - date resource expires.
         """
-        return self.expiration_date and self.expiration_date.ISO() or 'None'
+        ed = getattr( self, 'expiration_date', None )
+        return ed and ed.ISO() or 'None'
 
     security.declarePublic( 'ModificationDate' )
     def ModificationDate( self ):
