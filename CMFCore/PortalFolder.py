@@ -370,7 +370,7 @@ class PortalFolder(DynamicType, CMFCatalogAware, OrderedFolder):
             if not myType.allowType( type_name ):
                 raise ValueError('Disallowed subobject type: %s' % type_name)
 
-        pt.constructContent(type_name, self, id, RESPONSE, *args, **kw)
+        return pt.constructContent(type_name, self, id, RESPONSE, *args, **kw)
 
     security.declareProtected(AddPortalContent, 'checkIdAvailable')
     def checkIdAvailable(self, id):

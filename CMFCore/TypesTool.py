@@ -867,6 +867,8 @@ class TypesTool(UniqueObject, IFAwareObjectManager, Folder,
                                       , info.immediate_view )
             RESPONSE.redirect( immediate_url )
 
+        return ob.getId()
+
     security.declarePrivate( 'listActions' )
     def listActions(self, info=None, object=None):
         """ List all the actions defined by a provider.
