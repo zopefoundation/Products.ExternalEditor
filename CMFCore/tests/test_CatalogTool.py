@@ -109,6 +109,12 @@ class CatalogToolTests(SecurityTest):
             expires={'query': now-1, 'range': 'max'})))
         self.assertEqual(1, len(catalog.searchResults(
             expires={'query': (now-3, now-1), 'range': 'min:max'})))
+        self.assertEqual(1, len(catalog.searchResults(
+            expires={'query': (now-3, now-1), 'range': 'minmax'})))
+        self.assertEqual(1, len(catalog.searchResults(
+            expires={'query': now-2})))
+        self.assertEqual(1, len(catalog.searchResults(
+            expires={'query': now-2, 'range': None})))
 
     def test_search_restrict_inactive(self):
         catalog = CatalogTool()
@@ -135,6 +141,10 @@ class CatalogToolTests(SecurityTest):
             expires={'query': now+3, 'range': 'max'})))
         self.assertEqual(0, len(catalog.searchResults(
             expires={'query': (now-3, now-1), 'range': 'min:max'})))
+        self.assertEqual(0, len(catalog.searchResults(
+            expires={'query': (now-3, now-1), 'range': 'minmax'})))
+        self.assertEqual(0, len(catalog.searchResults(
+            expires={'query': now-2, 'range': None})))
 
     def test_search_restrict_visible(self):
         catalog = CatalogTool()
@@ -161,6 +171,10 @@ class CatalogToolTests(SecurityTest):
             effective={'query': now+1, 'range': 'max'})))
         self.assertEqual(0, len(catalog.searchResults(
             effective={'query': (now-1, now+1), 'range': 'min:max'})))
+        self.assertEqual(0, len(catalog.searchResults(
+            effective={'query': (now-1, now+1), 'range': 'minmax'})))
+        self.assertEqual(1, len(catalog.searchResults(
+            expires={'query': now-2, 'range': None})))
 
         self.assertEqual(1, len(catalog.searchResults(
             effective={'query': now-3, 'range': 'min'})))
@@ -172,6 +186,8 @@ class CatalogToolTests(SecurityTest):
             effective={'query': now+3, 'range': 'max'})))
         self.assertEqual(1, len(catalog.searchResults(
             effective={'query': (now-3, now+3), 'range': 'min:max'})))
+        self.assertEqual(1, len(catalog.searchResults(
+            effective={'query': (now-3, now+3), 'range': 'minmax'})))
 
         self.assertEqual(1, len(catalog.searchResults(
             expires={'query': now-1, 'range': 'min'})))
@@ -183,6 +199,8 @@ class CatalogToolTests(SecurityTest):
             expires={'query': now+1, 'range': 'max'})))
         self.assertEqual(0, len(catalog.searchResults(
             expires={'query': (now-1, now+1), 'range': 'min:max'})))
+        self.assertEqual(0, len(catalog.searchResults(
+            expires={'query': (now-1, now+1), 'range': 'minmax'})))
 
         self.assertEqual(1, len(catalog.searchResults(
             expires={'query': now-3, 'range': 'min'})))
@@ -194,6 +212,8 @@ class CatalogToolTests(SecurityTest):
             expires={'query': now+3, 'range': 'max'})))
         self.assertEqual(1, len(catalog.searchResults(
             expires={'query': (now-3, now+3), 'range': 'min:max'})))
+        self.assertEqual(1, len(catalog.searchResults(
+            expires={'query': (now-3, now+3), 'range': 'minmax'})))
 
         self.assertEqual(1, len(catalog.searchResults(
             effective={'query': now-1, 'range': 'max'},

@@ -209,19 +209,19 @@ class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
             # Intersect query restrictions with those implicit to the tool
             for k in 'effective', 'expires':
                 if kw.has_key(k):
-                    range = kw[k]['range'].split(':')
+                    range = kw[k]['range'] or ''
                     query = kw[k]['query']
                     if (not isinstance(query, TupleType) and
                         not isinstance(query, ListType)):
                         query = (query,)
                 else:
-                    range = []
+                    range = ''
                     query = None
-                if 'min' in range:
+                if range.find('min') > -1:
                     lo = min(query)
                 else:
                     lo = None
-                if 'max' in range:
+                if range.find('max') > -1:
                     hi = max(query)
                 else:
                     hi = None
