@@ -449,7 +449,8 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
                 gotemails.append(email)
                 recipients.append((name, email))
 
-        if self.state_email.has_key(new_status):
+        if (self.state_email.has_key(new_status)
+            and self.state_email[new_status]):
             se = ("_%s_ recipient" % new_status, self.state_email[new_status])
             candidates.append(se)       # For recipients-debug
             recipients.append(se)
