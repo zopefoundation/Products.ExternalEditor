@@ -49,7 +49,7 @@ Installation
      your Zope server (either SOFTWARE_HOME or INSTANCE_HOME) e.g.::
 
       $ cd /var/zope/Products
-      $ ln -s /tmp/CMF-head/CMFDefault .
+      $ ln -s /tmp/CMF-head/CMFCore .
       $ ln -s /tmp/CMF-head/CMFDefault .
       $ ln -s /tmp/CMF-head/CMFTopic .
 

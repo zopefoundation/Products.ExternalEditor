@@ -46,7 +46,7 @@ Installing CMF 1.3-beta2
         $ ln -s /usr/local/zope/CMF-1.3-beta2/CMFCore .
         $ ln -s /usr/local/zope/CMF-1.3-beta2/CMFDefault .
         $ ln -s /usr/local/zope/CMF-1.3-beta2/CMFTopic .
-        $ ln -s /usr/local/zope/CMF-1.3-beta2/CMFCalendar
+        $ ln -s /usr/local/zope/CMF-1.3-beta2/CMFCalendar .
         
        or, as a shortcut::
 
