@@ -193,9 +193,13 @@ class MembershipTool (UniqueObject, SimpleItem):
                 return portal_user
 
             except:
-                # DEBUGGING CODE
-                import traceback
-                traceback.print_exc()
+                from zLOG import LOG, ERROR
+                import sys
+                type,value,tb = sys.exc_info()
+                LOG('CMFCore.MembershipTool',
+                    ERROR,
+                    'Error during wrapUser:',
+                    "\nType:%s\nValue:%s\n" % (type,value))
                 pass
         # Failed.
         return u
