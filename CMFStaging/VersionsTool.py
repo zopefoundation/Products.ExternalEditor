@@ -18,27 +18,29 @@ Provides a way to interact with a version repository.
 $Id$
 """
 
+import os
+
 from Acquisition import aq_acquire
-from OFS.SimpleItem import SimpleItem
-from Globals import InitializeClass
+from Globals import InitializeClass, DTMLFile
 from AccessControl import ClassSecurityInfo
-from Products.CMFCore.utils import UniqueObject
+from Products.CMFCore.utils import UniqueObject, SimpleItemWithProperties
 from Products.CMFCore.CMFCorePermissions import ManagePortal
 
 # Permission name
 UseVersionControl = 'Use version control'
 
+_wwwdir = os.path.join(os.path.dirname(__file__), 'www') 
 
-class VersionsTool(UniqueObject, SimpleItem):
+
+class VersionsTool(UniqueObject, SimpleItemWithProperties):
     __doc__ = __doc__ # copy from module
     id = 'portal_versions'
     meta_type = 'Portal Versions tool'
 
     security = ClassSecurityInfo()
 
-    manage_options = ( { 'label' : 'Overview', 'action' : 'manage_overview' }
-                     , 
-                     ) + SimpleItem.manage_options
+    manage_options = ({'label' : 'Overview', 'action' : 'manage_overview'}, 
+                      ) + SimpleItemWithProperties.manage_options
 
 
     # With auto_copy_forward turned on, the versions tool lets users
@@ -50,8 +52,15 @@ class VersionsTool(UniqueObject, SimpleItem):
 
     repository_name = 'VersionRepository'
 
+    _properties = (
+        {'id': 'repository_name', 'type': 'string', 'mode': 'w',
+         'label': 'ID of the version repository'},
+        {'id': 'auto_copy_forward', 'type': 'boolean', 'mode': 'w',
+         'label': 'Copy old revisions forward rather than disallow checkout'},
+        )
+
     security.declareProtected(ManagePortal, 'manage_overview' )
-    #manage_overview = DTMLFile( 'explainVersionsTool', _dtmldir )
+    manage_overview = DTMLFile( 'explainVersionsTool', _wwwdir )
 
     def _getVersionRepository(self):
         repo = aq_acquire(self, self.repository_name, containment=1)

@@ -18,41 +18,53 @@ Uses a version repository to implement staging.
 $Id$
 """
 
-from Acquisition import aq_inner, aq_parent, aq_acquire
-from OFS.SimpleItem import SimpleItem
-from Globals import InitializeClass
-from AccessControl import ClassSecurityInfo
+import os
 
-from Products.CMFCore.utils import UniqueObject, getToolByName
+from Acquisition import aq_inner, aq_parent, aq_acquire
+from Globals import InitializeClass, DTMLFile
+from AccessControl import ClassSecurityInfo
+from Products.PageTemplates.PageTemplateFile import PageTemplateFile
+
+from Products.CMFCore.utils import UniqueObject, getToolByName, \
+     SimpleItemWithProperties
 from Products.CMFCore.CMFCorePermissions import ManagePortal
 
 # Permission name
 StageObjects = 'Use version control'
+
+_wwwdir = os.path.join(os.path.dirname(__file__), 'www') 
 
 
 class StagingError (Exception):
     """Error while attempting to stage an object"""
 
 
-class StagingTool(UniqueObject, SimpleItem):
+class StagingTool(UniqueObject, SimpleItemWithProperties):
     __doc__ = __doc__ # copy from module
     id = 'portal_staging'
     meta_type = 'Portal Staging Tool'
 
     security = ClassSecurityInfo()
 
-    manage_options = ( { 'label' : 'Overview', 'action' : 'manage_overview' }
-                     , 
-                     ) + SimpleItem.manage_options
+    manage_options = (
+        {'label': 'Overview', 'action': 'manage_overview'},
+        {'label': 'Stages', 'action': 'manage_stagesForm'},
+        ) + SimpleItemWithProperties.manage_options
 
-    # With auto_unlock_checkin turned on, updateStages() uses the
+    # With auto_checkin turned on, updateStages() uses the
     # lock tool and the versions tool to unlock and check in the object.
     auto_checkin = 1
 
     repository_name = 'VersionRepository'
 
+    _properties = (
+        {'id': 'repository_name', 'type': 'string', 'mode': 'w',
+         'label': 'ID of the version repository'},
+        {'id': 'auto_checkin', 'type': 'boolean', 'mode': 'w',
+         'label': 'Unlock and checkin before staging'},
+        )
+
     # _stages maps stage names to relative paths.
-    # This should be configurable TTW.
     _stages = {
         'dev':    'Stages/Development',
         'review': 'Stages/Review',
@@ -60,7 +72,7 @@ class StagingTool(UniqueObject, SimpleItem):
         }
 
     security.declareProtected(ManagePortal, 'manage_overview' )
-    #manage_overview = DTMLFile( 'explainStagingTool', _dtmldir )
+    manage_overview = DTMLFile('explainStagingTool', _wwwdir)
 
     def _getVersionRepository(self):
         repo = aq_acquire(self, self.repository_name, containment=1)
@@ -99,7 +111,10 @@ class StagingTool(UniqueObject, SimpleItem):
         res = {}
         for stage_name, path in self._stages.items():
             stage = stages[stage_name]
-            object = stage.restrictedTraverse(rel_path, None)
+            if stage is not None:
+                object = stage.restrictedTraverse(rel_path, None)
+            else:
+                object = None
             res[stage_name] = object
         return res
 
@@ -238,6 +253,31 @@ class StagingTool(UniqueObject, SimpleItem):
             return ob.absolute_url(relative)
         else:
             return None
+
+
+    security.declareProtected(
+        ManagePortal, 'manage_stagesForm' 'manage_editStages', 'getStagePaths')
+
+    manage_stagesForm = PageTemplateFile('stagesForm', _wwwdir)
+
+    def getStageItems(self):
+        lst = self._stages.items()
+        lst.sort()
+        return lst
+
+    def manage_editStages(self, stages=(), RESPONSE=None):
+        """Edits the stages."""
+        ss = {}
+        for stage in stages:
+            name = str(stage.name)
+            path = str(stage.path)
+            if name and path:
+                ss[name] = path
+        self._stages = ss
+        if RESPONSE is not None:
+            RESPONSE.redirect(
+                '%s/manage_stagesForm?manage_tabs_message=Stages+changed.'
+                % self.absolute_url())
 
 
 InitializeClass(StagingTool)

@@ -23,7 +23,7 @@ from Products.CMFCore import utils
 
 import VersionsTool, StagingTool, LockTool
 
-#registerDirectory('skins', globals())
+registerDirectory('skins', globals())
 
 tools = (
     VersionsTool.VersionsTool,

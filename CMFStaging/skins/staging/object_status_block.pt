@@ -1,0 +1,80 @@
+<form action="." method="POST"
+      tal:define="lt here/portal_lock|nothing;
+                  locker python: lt and lt.locker(here);
+                  username python: user.getUserName();
+                  versions python: here.portal_staging.getVersionIds(here);"
+      tal:attributes="action here/absolute_url">
+<!--
+  allow_submit python: (locker == username) or (
+      not locker and versions['dev'] != versions['prod']);
+  allow_publish allow_submit
+-->
+<table>
+<tr>
+  <td>
+   <img src="status_synced.gif"
+        tal:replace="structure python: here.get_status_image('dev')" />
+  </td>
+  <td>Development</td>
+
+  <td width="90%"> &nbsp;
+    <span tal:content="python: versions['dev'] and (
+    'rev %s%s' % (versions['dev'], locker and '+' or '')) or '--'">rev 1</span>
+    <span tal:condition="locker">
+      (<span tal:replace="locker">someone</span>)
+    </span>
+  </td>
+</tr>
+
+<tr>
+  <td></td>
+  <td colspan="2">
+    <input type="submit" name="object_lock:method"
+           value="Lock" tal:condition="not:locker" />
+    <input type="submit" name="object_unlock:method"
+           value="Unlock"
+           tal:condition="python: locker == username" />
+<!--
+    <input type="submit" name="content_submit_form:method"
+           value="Submit for review..." tal:condition="allow_submit" />
+-->
+  </td>
+</tr>
+
+<tr>
+  <td>
+   <img src="status_synced.gif"
+        tal:replace="structure python: here.get_status_image('review')" />
+  </td>
+  <td>Review</td>
+  <td> &nbsp;
+    <span tal:content="python: versions['review'] and (
+                       'rev %s' % versions['review']) or '--'">rev 1</span>
+  </td>
+</tr>
+
+<!--
+<tr>
+  <td></td>
+  <td colspan="2">
+    <input type="submit" name="content_publish_form:method"
+           value="Publish..." tal:condition="allow_publish" />
+  </td>
+</tr>
+-->
+
+<tr>
+  <td>
+   <img src="status_synced.gif"
+        tal:replace="structure python: here.get_status_image('prod')" />
+  </td>
+  <td>Production</td>
+  <td> &nbsp;
+    <span tal:content="python: versions['prod'] and (
+                       'rev %s' % versions['prod']) or '--'">rev 1</span>
+  </td>
+</tr>
+
+
+</table>
+</form>

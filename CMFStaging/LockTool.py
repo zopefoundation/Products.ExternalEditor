@@ -19,11 +19,13 @@ WebDAV locks.
 $Id$
 """
 
-from Globals import InitializeClass
-from OFS.SimpleItem import SimpleItem
+import os
+
+from Globals import InitializeClass, DTMLFile
 from AccessControl import ClassSecurityInfo, getSecurityManager
-from Products.CMFCore.utils import UniqueObject, getToolByName
-from Products.CMFCore import CMFCorePermissions
+from Products.CMFCore.utils import UniqueObject, getToolByName, \
+     SimpleItemWithProperties
+from Products.CMFCore.CMFCorePermissions import ManagePortal
 
 from webdav.WriteLockInterface import WriteLockInterface
 from webdav.LockItem import LockItem
@@ -31,6 +33,8 @@ from webdav.LockItem import LockItem
 # Permission names
 LockObjects = 'WebDAV Lock items'
 UnlockObjects = 'WebDAV Unlock items'
+
+_wwwdir = os.path.join(os.path.dirname(__file__), 'www') 
 
 
 def pathOf(object):
@@ -41,7 +45,7 @@ class LockingError(Exception):
     pass
 
 
-class LockTool(UniqueObject, SimpleItem):
+class LockTool(UniqueObject, SimpleItemWithProperties):
     __doc__ = __doc__ # copy from module
     id = 'portal_lock'
     meta_type = 'Portal Lock Tool'
@@ -50,21 +54,24 @@ class LockTool(UniqueObject, SimpleItem):
 
     manage_options = ( { 'label' : 'Overview', 'action' : 'manage_overview' }
                      , 
-                     ) + SimpleItem.manage_options
+                     ) + SimpleItemWithProperties.manage_options
 
     # With auto_version on, locking automatically causes a version checkout
     # and unlocking automatically causes a checkin.  This is one form
     # of autoversioning described in the DeltaV introduction.
-    # Should be configurable TTW.
     # http://www.webdav.org/deltav/WWW10/deltav-intro.htm
     auto_version = 1
+
+    _properties = (
+        {'id': 'auto_version', 'type': 'boolean', 'mode': 'w',
+         'label': 'Auto checkout and checkin using portal_versions'},
+        )
 
     #
     #   ZMI methods
     #
-    security.declareProtected( CMFCorePermissions.ManagePortal
-                             , 'manage_overview' )
-    #manage_overview = DTMLFile( 'explainDiscussionTool', _dtmldir )
+    security.declareProtected(ManagePortal, 'manage_overview' )
+    manage_overview = DTMLFile('explainLockTool', _wwwdir)
 
     #
     #   'LockTool' interface methods

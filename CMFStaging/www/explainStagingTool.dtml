@@ -1,0 +1,12 @@
+<dtml-var manage_page_header>
+<dtml-var manage_tabs>
+
+<h3> <code>portal_staging</code> Tool </h3>
+
+<p>
+This tool synchronizes changes between different stages in the site.
+Stages help you isolate changes in the development area from the
+review and production areas.
+</p>
+
+<dtml-var manage_page_footer>
