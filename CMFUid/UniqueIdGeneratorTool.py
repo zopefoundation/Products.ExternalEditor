@@ -40,8 +40,9 @@ class UniqueIdGeneratorTool(UniqueObject, SimpleItem, ActionProviderBase):
     """
 
     __implements__ = (
-        SimpleItem.__implements__,
         IUniqueIdGenerator,
+        ActionProviderBase.__implements__,
+        SimpleItem.__implements__,
     )
 
     id = 'portal_uidgenerator'

@@ -39,8 +39,9 @@ class UniqueIdHandlerTool(UniqueObject, SimpleItem, ActionProviderBase):
     __doc__ = __doc__ # copy from module
 
     __implements__ = (
+        IUniqueIdGenerator,
+        ActionProviderBase.__implements__,
         SimpleItem.__implements__,
-        IUniqueIdHandler,
     )
 
     id = 'portal_uidhandler'
