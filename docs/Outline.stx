@@ -3,11 +3,10 @@ The Zope Content Managment Framework
   Introduction
 
     - What is content management, what is unique about CMF, what's the
-      future for the CMF
+      future of the CMF
 
-    - Content and services. Introduce ideas of core ideas including:
-      metadata, search, distributed control,
-      workflow, security, etc.
+    - Content and services. Introduce core ideas including: metadata,
+      search, distributed control, workflow, security, etc.
 
   Quick Tour
 
@@ -25,19 +24,22 @@ The Zope Content Managment Framework
 
     - Overview of content - distributed authorship, distributed
       through out site, ownership, access controls (ie public versus
-      private), catalogability, etc.
+      private), workflow, metadata, catalogability, etc.
 
-    - Site, Folder, Topic, Document, Image, etc. Desribe what each
+    - Folder, Topic, Document, File, Image, etc. Desribe what each
       built-in content type is good for, how to create and edit them,
       and other features (if applicable).
 
     - Formats (stx, html)
 
-    - Metadata - overview, why its important, and definition of the
+    - Metadata - overview, why it's important, and definition of the
       various metadata fields.
 
     - Remote authoring - FTP & WebDAV. How to use various editors. How
       to set metadata headers, how to handle errors, etc.
+
+    - Workflow - how content flows through workflow. How to move
+      content along in workflow. Your inbox.
 
   Configuring and Customizing the CMF
 
@@ -49,17 +51,20 @@ The Zope Content Managment Framework
 
     - Basic configuration - Portal configuration stuff
 
-    - Look and Feel - Skins, Page Templates, etc.
+    - Look and Feel - Skins (how to configure skins and override look
+      and feel elements), DTML, Page Templates, etc.
 
-    - Workflow
+    - Workflow - configuring workflow states, transitions, actions
 
-    - Search - cataloging
+    - Search - cataloging, building search forms, searching public and
+      private content
 
-    - Syndication
+    - Membership (using various authentication sources, managing users
+      and their preferences, user data schemas)
 
-    - Discussion,
-      
-    - Membership, (using various authentication sources)
+    - Syndication XXX fiction ? XXX
+
+    - Discussion XXX fiction ? XXX
 
     - Versioning XXX fiction? XXX
 
@@ -68,6 +73,9 @@ The Zope Content Managment Framework
   Scripting the CMF
 
     - Overview of scripting CMF
+
+    - Customizing Skins - how to customize skins by overriding
+      scripts.
 
     - API docs for CMF tools and other scriptable objects. Should
       include plenty of examples.
