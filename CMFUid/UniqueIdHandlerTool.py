@@ -31,6 +31,8 @@ from Products.CMFCore.ActionProviderBase import ActionProviderBase
 from Products.CMFCore.permissions import ManagePortal
 
 from Products.CMFUid.interfaces import IUniqueIdHandler
+from Products.CMFUid.interfaces import IUniqueIdBrainQuery
+from Products.CMFUid.interfaces import IUniqueIdUnrestrictedQuery
 from Products.CMFUid.interfaces import UniqueIdError
 
 UID_ATTRIBUTE_NAME = 'cmf_uid'
@@ -40,6 +42,8 @@ class UniqueIdHandlerTool(UniqueObject, SimpleItem, ActionProviderBase):
 
     __implements__ = (
         IUniqueIdHandler,
+        IUniqueIdBrainQuery,
+        IUniqueIdUnrestrictedQuery,
         ActionProviderBase.__implements__,
         SimpleItem.__implements__,
     )
@@ -68,30 +72,6 @@ class UniqueIdHandlerTool(UniqueObject, SimpleItem, ActionProviderBase):
         # reindex
         catalog.reindexObject(obj)
 
-    security.declarePublic('queryUid')
-    def queryUid(self, obj, default=None):
-        """See IUniqueIdQuery.
-        """
-        uid = getattr(aq_base(obj), self.UID_ATTRIBUTE_NAME, None)
-        # If 'obj' is a content object the 'uid' attribute is usually a
-        # callable object. If 'obj' is a catalog brain the uid attribute 
-        # is non callable and possibly equals the 'Missing.MV' value.
-        if uid is Missing.MV or uid is None:
-            return default
-        if callable(uid):
-            return uid()
-        return uid
-    
-    security.declarePublic('getUid')
-    def getUid(self, obj):
-        """See IUniqueIdQuery.
-        """
-        uid = self.queryUid(obj, None)
-        if uid is None:
-            raise UniqueIdError, "No unique id available on '%s'" % obj
-        return uid
-    
-    
     security.declareProtected(ManagePortal, 'register')
     def register(self, obj):
         """See IUniqueIdSet.
@@ -126,15 +106,39 @@ class UniqueIdHandlerTool(UniqueObject, SimpleItem, ActionProviderBase):
         self._reindexObject(obj)
     
     
-    security.declarePublic('queryBrain')
-    def queryBrain(self, uid, default=None):
-        """See IUniqueIdBrainQuery.
+    security.declarePublic('queryUid')
+    def queryUid(self, obj, default=None):
+        """See IUniqueIdQuery.
+        """
+        uid = getattr(aq_base(obj), self.UID_ATTRIBUTE_NAME, None)
+        # If 'obj' is a content object the 'uid' attribute is usually a
+        # callable object. If 'obj' is a catalog brain the uid attribute 
+        # is non callable and possibly equals the 'Missing.MV' value.
+        if uid is Missing.MV or uid is None:
+            return default
+        if callable(uid):
+            return uid()
+        return uid
+    
+    security.declarePublic('getUid')
+    def getUid(self, obj):
+        """See IUniqueIdQuery.
+        """
+        uid = self.queryUid(obj, None)
+        if uid is None:
+            raise UniqueIdError, "No unique id available on '%s'" % obj
+        return uid
+    
+    def _queryBrain(self, uid, searchMethodName, default=None):
+        """This helper method does the "hard work" of querying the catalog
+           and interpreting the results.
         """
         if uid is None:
             return default
         
         catalog = getToolByName(self, 'portal_catalog')
-        result = catalog({self.UID_ATTRIBUTE_NAME: uid})
+        searchMethod = getattr(catalog, searchMethodName)
+        result = searchMethod({self.UID_ATTRIBUTE_NAME: uid})
         len_result = len(result)
 
         # return None if no object found with this uid
@@ -143,39 +147,71 @@ class UniqueIdHandlerTool(UniqueObject, SimpleItem, ActionProviderBase):
 
         # print a message to the log  if more than one object has
         # the same uid (uups!)
-        # TODO: It would be nice if there were a logging tool :-)
         if len_result > 1:
             zLOG.LOG("CMUid ASSERT:", zLOG.INFO,
                      "Uups, %s objects have '%s' as uid!!!" % \
                      (len_result, uid))
         
         return result[0]
+    
+    security.declarePublic('queryBrain')
+    def queryBrain(self, uid, default=None):
+        """See IUniqueIdBrainQuery.
+        """
+        return self._queryBrain(uid, 'searchResults', default)
         
+    def _getBrain(self, uid, queryBrainMethod):
+        brain = queryBrainMethod(uid, default=None)
+        if brain is None:
+            raise UniqueIdError, "No object found with '%s' as uid." % uid
+        return brain
+    
     security.declarePublic('getBrain')
     def getBrain(self, uid):
         """See IUniqueIdBrainQuery.
         """
-        brain = self.queryBrain(obj, default=None)
-        if brain is None:
-            raise UniqueIdError, "No object found with '%s' as uid." % uid
-        return brain
-        
-    security.declarePublic('queryObject')
-    def queryObject(self, uid, default=None):
-        """See IUniqueIdQuery.
-        """
-        brain = self.queryBrain(uid, default=default)
-        if brain is default:
-            return default
-        return brain.getObject()
-    
+        return self._getBrain(uid, self.queryBrain)
+
     security.declarePublic('getObject')
     def getObject(self, uid):
         """See IUniqueIdQuery.
         """
-        brain = self.queryBrain(uid, default=None)
-        if brain is None:
-            raise UniqueIdError, "No object found with '%s' as uid." % uid
-        return brain.getObject()
+        return self.getBrain(uid).getObject()
+
+    security.declarePublic('queryObject')
+    def queryObject(self, uid, default=None):
+        """See IUniqueIdQuery.
+        """
+        try:
+            return self.getObject(uid)
+        except UniqueIdError:
+            return default
+    
+    security.declarePrivate('unrestrictedQueryBrain')
+    def unrestrictedQueryBrain(self, uid, default=None):
+        """See IUniqueIdUnrestrictedQuery.
+        """
+        return self._queryBrain(uid, 'unrestrictedSearchResults', default)
         
+    security.declarePrivate('unrestrictedGetBrain')
+    def unrestrictedGetBrain(self, uid):
+        """See IUniqueIdUnrestrictedQuery.
+        """
+        return self._getBrain(uid, self.unrestrictedQueryBrain)
+        
+    security.declarePrivate('unrestrictedGetObject')
+    def unrestrictedGetObject(self, uid):
+        """See IUniqueIdUnrestrictedQuery.
+        """
+        return self.unrestrictedGetBrain(uid).getObject()
+    
+    security.declarePrivate('unrestrictedQueryObject')
+    def unrestrictedQueryObject(self, uid, default=None):
+        """See IUniqueIdUnrestrictedQuery.
+        """
+        try:
+            return self.unrestrictedGetObject(uid)
+        except UniqueIdError:
+            return default
+    
 InitializeClass(UniqueIdHandlerTool)
