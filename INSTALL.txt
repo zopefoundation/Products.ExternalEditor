@@ -1,0 +1,45 @@
+Zope External Editor Installation
+
+  Installation is two-fold: 
+
+  - Install the ExternalEditor product in Zope.
+
+  - Install the helper application on the client(s) and configure the browser(s)
+
+  Product Installation
+
+    Download the archive and extract it into your Zope products directory. Then
+    restart Zope. If you succeeded, you'll notice pencil icons next to the
+    external editable objects in the Zope management screens.
+
+  Helper Application Installation (Unix)
+
+    Download the helper app archive and extract into the directory where you want
+    to install it (it contains one executable Python module file). ~/bin or
+    /usr/local/bin might be good choices, the latter if you want to share it
+    between multiple users.
+
+    In order to use the helper app, you must have Python and Tkinter installed.
+    It has been tested using Python 2.2.1, but it should work with Python 2.0 or
+    better.
+
+    Once you have the help application installed, you need to configure your
+    browser to fire it off appropriately. To do so, create an entry in the helper
+    applications list for your browser(s) that associates the mime type
+    "application/x-zope-edit" with the helper application.
+    
+    Here are the step-by-step configuration instructions for Mozilla:
+    
+    - From the Edit menu choose Preferences
+    
+    - Under Navigator choose Helper Applications
+    
+    - Click on the New Type button
+    
+    - Enter a descripition, like "Zope Editor"
+    
+    - For MIME type, enter application/x-zope-edit
+    
+    - for Application, select the helper application python file
+
+ 

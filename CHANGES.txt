@@ -1,0 +1,9 @@
+External Editor Change Log
+
+    5/16/02 - 0.2 Release
+    
+        Fixed product uninstallation bug
+        
+    5/15/02 - 0.1
+    
+        Initial release
