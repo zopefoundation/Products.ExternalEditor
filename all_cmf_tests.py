@@ -14,6 +14,7 @@ PACKAGES_UNDER_TEST = []
 
 def test_suite():
 
+    import Testing
     import Zope
 
     try:
