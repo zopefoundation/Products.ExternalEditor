@@ -1,4 +1,4 @@
-##############################################################################
+1##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights
 # Reserved.
@@ -28,11 +28,9 @@ class DummyPlugin(Implicit):
 
 class DummyUserEnumerator( DummyPlugin ):
 
-    PLUGINID = 'users'
-
     def __init__( self, user_id, login=None ):
 
-        self._user_id = user_id
+        self._user_id = self.PLUGINID = user_id
 
         if login is None:
             login = user_id
@@ -47,20 +45,18 @@ class DummyUserEnumerator( DummyPlugin ):
                    } ]
 
         if kw.get( 'id' ) == self._user_id:
-            return result
+            return tuple(result)
 
         if kw.get( 'login' ) == self._login:
-            return result
+            return tuple(result)
 
-        return []
+        return ()
 
 class DummyGroupEnumerator( DummyPlugin ):
 
-    PLUGINID = 'groups'
-
     def __init__( self, group_id ):
 
-        self._group_id = group_id
+        self._group_id = self.PLUGINID = group_id
 
     def enumerateGroups( self
                        , id=None
@@ -76,8 +72,8 @@ class DummyGroupEnumerator( DummyPlugin ):
 
         if id:
             if self._group_id.find( id ) >= 0:
-                return result
-        return []
+                return tuple(result)
+        return ()
 
 class DummySuperEnumerator(DummyUserEnumerator, DummyGroupEnumerator):
 
@@ -153,6 +149,9 @@ class FauxObject( Implicit ):
 
         return 'Args: %s\nKeywords: %s' % ( args, kw )
 
+    def this(self):
+        return self
+
 class FauxContainer( FauxObject, ObjectManager ):
 
     pass
@@ -160,7 +159,7 @@ class FauxContainer( FauxObject, ObjectManager ):
 class FauxRoot( FauxContainer ):
 
     isTopLevelPrincipiaApplicationObject = 1
-    
+
     def getPhysicalRoot( self ):
         return self
 
@@ -340,6 +339,16 @@ class PluggableAuthServiceTests( unittest.TestCase ):
         zcuf = self._makeOne()
 
         self.assertEqual( zcuf.getId(), 'acl_users' )
+
+    def test_checkBeforeTraverse( self ):
+
+        rc, root, folder, object = self._makeTree()
+
+        zcuf = self._makeOne()
+
+        root._setObject('acl_users', zcuf)
+
+        self.assertEqual( len(root.__before_traverse__), 1)
 
     def test__extractUserIds_simple( self ):
 
@@ -1149,12 +1158,12 @@ class PluggableAuthServiceTests( unittest.TestCase ):
         self.assertEqual( zcuf.getUser( 'zope' ), None )
 
         user = zcuf.getUser( 'foo' )
-        self.assertEqual( user.getId(), 'users__foo' )
+        self.assertEqual( user.getId(), 'foo__foo' )
 
-        self.assertEqual( zcuf.getUser( 'users__bar' ), None )
+        self.assertEqual( zcuf.getUser( 'foo__bar' ), None )
 
         user = zcuf.getUser( 'bar@example.com' )
-        self.assertEqual( user.getId(), 'users__bar' )
+        self.assertEqual( user.getId(), 'bar__bar' )
 
     def test_simple_getUserGroups_with_Groupplugin(self):
 
