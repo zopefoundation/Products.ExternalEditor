@@ -1,0 +1,4 @@
+""" PluggableAuthService interface declarations
+
+$Id$
+"""
