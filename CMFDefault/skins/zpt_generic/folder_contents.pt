@@ -13,7 +13,7 @@
                up control/up">
 <div class="Desktop">
 
-<h1 i18n:translate="">Desktop</h1>
+<h2 i18n:translate="">Desktop</h2>
 
 <tal:case tal:condition="up"
 ><tal:case tal:condition="up/url"
