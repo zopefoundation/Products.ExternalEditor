@@ -3,20 +3,23 @@
 <table>
 <tbody metal:define-macro="tbody"
        tal:define="my_url python: request['URL'] + '?';
-                   mq python: modules['ZTUtils'].make_query">
+       mq python: modules['ZTUtils'].make_query;
+       sort_on sort_on | python: request.get('sort_on', 'Title');
+       sort_order sort_order | python: request.get('sort_order', 'normal');">
       <tr>
         <th width="1%"> </th>
-        <th nowrap width="5%"></th>
+        <th nowrap="nowrap" width="5%"></th>
         <th tal:repeat="column python: ['Title', 'Type', 'CreationDate']"
             tal:attributes="width python:
-                            column == 'Title' and '50%' or default">
-          <a href="" tal:omit-tag="python: sort_attr == column"
+                            column == 'Title' and '50%' or default"
+            align="left">
+          <a href="" tal:omit-tag="python: sort_on == column"
              tal:attributes="href python: my_url + 
-             mq(request.form, sort_attr=column, sort_order='normal')"
+             mq(request.form, sort_on=column, sort_order='normal')"
              tal:content="column">Title</a>
-          <a href="" tal:condition="python: sort_attr == column"
+          <a href="" tal:condition="python: sort_on == column"
              tal:attributes="href python: my_url + mq(request.form,
-             sort_attr=column, sort_order=(sort_order == 'normal'
+             sort_on=column, sort_order=(sort_order == 'normal'
              and 'reverse' or 'normal'))"><img border="0"
              src="sorted_down.gif" tal:attributes="src
              python: '%s/%s' % (here.portal_url(), sort_order == 'normal'
@@ -25,7 +28,7 @@
       </tr>
 
       <tr tal:repeat="it items">
-<tal:block define="item python:it[1]">
+       <tal:block define="item python:it[1]">
         <td><img tal:define="status_image item/get_status_image | nothing"
                tal:condition="status_image"
                tal:replace="structure status_image"
@@ -46,17 +49,17 @@
               TITLE or ID </a>
         </td>
 
-        <td tal:content="item/Type"
+        <td tal:content="item/Type" nowrap="nowrap"
             tal:on-error="string:(unknown)">
           Type
         </td>
 
-        <td tal:content="item/CreationDate"
+        <td tal:content="item/CreationDate" nowrap="nowrap"
             tal:on-error="string:(unknown)">
           CreationDate
         </td>
 
-</tal:block>
+       </tal:block>
       </tr>
 </tbody>
 </table>

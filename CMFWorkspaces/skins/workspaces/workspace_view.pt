@@ -26,9 +26,9 @@
 
   <form action="" method="POST"
         tal:attributes="action here/absolute_url"
-        tal:define="sort_attr python: request.get('sort_attr', 'Title');
+        tal:define="sort_on python: request.get('sort_on', 'Title');
            sort_order python: request.get('sort_order', 'normal');
-           items python: here.listReferencedItems(sort_attr, sort_order)">
+           items python: here.listReferencedItems(sort_on, sort_order)">
 
     <table tal:condition="items">
 
@@ -55,20 +55,23 @@
 
   </form>
 
+  <form action="." method="GET" tal:attributes="action
+        string:${here/absolute_url}/workspace_search_results">
 
+   <table>
+    <thead>
+     <tr>
+      <th align="left" colspan="2">
+       Find additions to workspace...
+      </th>
+     </tr>
+    </thead>
 
-
-
-
-<!--
-  <div tal:define="
-       title string:Find additions to workspace...;
-       action string:${here/absolute_url}/workspace_search_results;">
-  <div metal:use-macro="here/search_box_simple/macros/search_box">
-    SEARCH FORM
-  </div>
-  </div>
--->
+    <tbody metal:use-macro="here/search_box_small/macros/tbody">
+     <tr><td>Search form</td></tr>
+    </tbody>
+   </table>
+  </form>
 
 </div>
 </body>

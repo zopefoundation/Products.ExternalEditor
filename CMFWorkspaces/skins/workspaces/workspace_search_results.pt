@@ -5,13 +5,20 @@
 <body>
 
 <div metal:fill-slot="main"
-     tal:define="action string:workspace_add;
-                 cancel_action string:view;
-                 got here/get_collection_paths">
+     tal:define="batch_info python: here.search_box_results_batch(request)">
 
-<div metal:use-macro="here/search_box_results/macros/form">
+<form action="." method="POST" tal:attributes="action here/absolute_url">
+
+<div metal:use-macro="here/search_box_results/macros/block">
 Search results
 </div>
+
+<input type="submit" name="workspace_add:action" value="Add to workspace"
+       tal:condition="batch_info/total" />
+&nbsp;
+<input type="submit" name="workspace_view:action" value="Search again" />
+
+</form>
 
 </div>
 

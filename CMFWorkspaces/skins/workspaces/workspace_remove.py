@@ -1,28 +1,19 @@
-##parameters=selected_items=()
+##parameters=selected_items=(), RESPONSE=None
 ##title=Remove listed references from workspace.
-
-message = "No items selected for removal"
 
 if selected_items:
 
-    missing = []
     plural = ""
 
     for rid in selected_items:
-        try:
-            context.remove_reference(rid)
-        except KeyError:
-            missing.append(rid)
+        context.removeReference(rid)
 
-    if missing:
-        amt = len(selected_items) - len(missing)
-        plural = ((amt != 1) and "s") or ""
-        message = ("%s item%s removed %s targets not found"
-                   % (amt, plural, len(missing)))
-    else:
-        amt = len(selected_items)
-        plural = ((amt != 1) and "s") or ""
-        message = "%s item%s removed" % (len(selected_items), plural)
+    amt = len(selected_items)
+    plural = ((amt != 1) and "s") or ""
+    message = "Removed+%s+reference%s." % (amt, plural)
 
-container.do_next(context, message)
-
+if RESPONSE is not None:
+    RESPONSE.redirect("%s/%s?portal_status_message=%s" %
+                      (context.absolute_url(),
+                       'workspace_view',
+                       message))
