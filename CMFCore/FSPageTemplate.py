@@ -56,6 +56,7 @@ class FSPageTemplate(FSObject, Script, PageTemplate):
     def _createZODBClone(self):
         """Create a ZODB (editable) equivalent of this object."""
         obj = ZopePageTemplate(self.getId(), self._text, self.content_type)
+        obj.expand = 0
         obj.write(self.read())
         return obj
 

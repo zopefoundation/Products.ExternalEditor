@@ -44,6 +44,9 @@ New Features
 
 Bugs Fixed
 
+  - Turned off auto-expansion of customized FSPageTemplates
+    (Tracker #477).
+    
   - Fixed ActionProvidorBase for the case when no permission 
     is specified for an action that is added TTW.
 
