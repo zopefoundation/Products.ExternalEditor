@@ -2,5 +2,6 @@
                             , text=REQUEST['text']
                             , log=REQUEST['log']
                             )">
-<dtml-call expr="REQUEST['RESPONSE'].redirect( absolute_url() +
-                     '?portal_status_message=Page+added.' )">
+<dtml-call expr="REQUEST['RESPONSE'].redirect(
+                           this().aq_parent[page].absolute_url()
+                           + '?portal_status_message=Page+added.' )">
