@@ -48,6 +48,9 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
     dtml_allowed = 0
     username=''
     last_editor = None
+    _last_safety_belt = ''
+    _last_safety_belt_editor = ''
+    _safety_belt = None
     last_log = ''
     comment_number = 0
     _st_data = None
@@ -1059,21 +1062,60 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
         try:
             self.edit(body, type=type, log=log, timeStamp=timestamp)
         except 'EditingConflict':
+            get_transaction().abort()
             RESPONSE.setStatus(450)
             return RESPONSE
         RESPONSE.setStatus(204)
         return RESPONSE
     
     security.declarePublic('checkEditTimeStamp')
-    def checkEditTimeStamp(self, timeStamp):
-        if timeStamp is not None and timeStamp != self.editTimestamp():
+    def checkEditTimeStamp(self, timeStamp=''):
+        """Check validity of safety belt and update tracking if valid.
+
+        Return 0 if safety belt is invalid, 1 otherwise.
+
+        Note that the policy is deliberately lax if no safety belt value is
+        present - "you're on your own if you don't use your safety belt".
+
+        When present, either the safety belt token:
+         - ... is the same as the current one given out, or
+         - ... is the same as the last one given out, and the person doing the
+               edit is the same as the last editor."""
+
+        this_belt = timeStamp
+        this_user = getSecurityManager().getUser().getUserName()
+
+        if (# we have a safety belt value:
+            this_belt
+            # and the current object has a one (ie - not freshly minted):
+            and (self._safety_belt is not None)
+            # and the submitted safety belt doesn't match the current one:
+            and (this_belt != self._safety_belt)
+            # and safety belt + user don't match last safety belt + user:
+            and not ((this_belt == self._last_safety_belt)
+                     and (this_user == self._last_safety_belt_editor))):
+            # Fail.
             raise 'EditingConflict', (
                 'Someone has edited this page since you loaded the page '
                 'for editing.  Try editing the page again.')
 
+        # We qualified - either:
+        #  - the edit was submitted with safety belt stripped, or
+        #  - the current safety belt was used, or
+        #  - the last one was reused by the last person who did the last edit.
+        # In any case, update the tracking.
+
+        self._last_safety_belt_editor = this_user
+        self._last_safety_belt = this_belt
+        self._safety_belt = str(self._p_mtime)
+
+        return 1
+
     security.declarePublic('editTimestamp')
     def editTimestamp(self):
-        return str(self._p_mtime)
+        if self._safety_belt is None:
+            return str(self._p_mtime)
+        return self._safety_belt
 
     security.declarePublic('getParents')
     def getParents(self):
