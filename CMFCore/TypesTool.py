@@ -88,6 +88,8 @@ class TypeInformation (SimpleItemWithProperties):
     _advanced_properties = (
         {'id':'immediate_view', 'type': 'string', 'mode':'w',
          'label':'Initial view name'},
+        {'id':'global_allow', 'type': 'boolean', 'mode':'w',
+         'label':'Implicitly addable?'},
         {'id':'filter_content_types', 'type': 'boolean', 'mode':'w',
          'label':'Filter content types?'},
         {'id':'allowed_content_types'
@@ -109,6 +111,7 @@ class TypeInformation (SimpleItemWithProperties):
     filter_content_types = 1
     allowed_content_types = ()
     allow_discussion = 0
+    global_allow = 1
     _actions = ()
 
     def __init__(self, id, **kw):
@@ -182,7 +185,9 @@ class TypeInformation (SimpleItemWithProperties):
             type object we are?
         """
         if not self.filter_content_types:
-            return 1
+            ti = self.getTypeInfo( contentType )
+            return ti is None or ti.globalAllow() \
+                   or contentType in self.allowed_content_types
         return contentType in self.allowed_content_types
     
     security.declarePublic('getId')
@@ -203,6 +208,13 @@ class TypeInformation (SimpleItemWithProperties):
         """
         # Private because this returns the actual structure.
         return self._actions
+
+    security.declarePublic('globalAllow')
+    def globalAllow(self):
+        """
+        Should this type be implicitly addable anywhere?
+        """
+        return self.global_allow
 
     security.declarePublic('getActionById')
     def getActionById( self, id, default=_marker ):

@@ -240,7 +240,7 @@ class TypesToolTests( TestCase ):
         self.failUnless(meta_types.has_key('Scriptable Type Information'))
         self.failUnless(meta_types.has_key('Dummy Test Type Info'))
         self.failUnless(meta_types.has_key('Factory-based Type Information'))
-        
+
 class TypeInfoTests( TestCase ):
     
     def test_construction( self ):
@@ -261,16 +261,46 @@ class TypeInfoTests( TestCase ):
                                )
         self.assertEqual( ti.immediate_view, 'foo_view' )
 
+    def _makeAndSetInstance( self,id,**kw ):
+        tool = self.tool
+        t = apply( self._makeInstance, (id,), kw )
+        tool._setObject(id,t)
+        return tool[id]
+              
     def test_allowType( self ):
-        ti = self._makeInstance( 'Foo' )
+        self.tool = TypesTool()        
+        ti = self._makeAndSetInstance( 'Foo' )
         self.failIf( ti.allowType( 'Foo' ) )
         self.failIf( ti.allowType( 'Bar' ) )
 
-        ti = self._makeInstance( 'Foo', allowed_content_types=( 'Bar', ) )
+        ti = self._makeAndSetInstance( 'Foo2', allowed_content_types=( 'Bar', ) )
         self.failUnless( ti.allowType( 'Bar' ) )
 
-        ti = self._makeInstance( 'Foo', filter_content_types=0 )
-        self.failUnless( ti.allowType( 'Foo' ) )
+        ti = self._makeAndSetInstance( 'Foo3', filter_content_types=0 )
+        self.failUnless( ti.allowType( 'Foo3' ) )
+
+    
+    def test_GlobalHide( self ):
+        self.tool = TypesTool()        
+        tnf = self._makeAndSetInstance( 'Folder', filter_content_types=0)
+        taf = self._makeAndSetInstance( 'Allowing Folder',
+                                  allowed_content_types=('Hidden','Not Hidden'))
+        tih = self._makeAndSetInstance( 'Hidden'     ,global_allow=0)
+        tnh = self._makeAndSetInstance( 'Not Hidden')
+        # make sure we're normally hidden but everything else is visible
+        self.failIf     ( tnf.allowType( 'Hidden' ) )
+        self.failUnless ( tnf.allowType( 'Not Hidden') )
+        # make sure we're available where we should be
+        self.failUnless ( taf.allowType( 'Hidden' ) )
+        self.failUnless ( taf.allowType( 'Not Hidden') )
+        # make sure we're available in a non-content-type-filtered type
+        # where we have been explicitly allowed
+        taf2 = self._makeAndSetInstance( 'Allowing Folder2',
+                                   allowed_content_types=('Hidden','Not Hidden'),
+                                   filter_content_types=0)
+        self.failUnless ( taf2.allowType( 'Hidden' ) )
+        self.failUnless ( taf2.allowType( 'Not Hidden') )
+        
 
     def test_allowDiscussion( self ):
         ti = self._makeInstance( 'Foo' )
@@ -365,7 +395,7 @@ class TypeInfoTests( TestCase ):
         
         action = ti.getActionById( 'slot' )
         self.assertEqual( action, 'foo_slot' )
-
+        
 
 class FTIDataTests( TypeInfoTests ):
 
@@ -593,7 +623,6 @@ class FTIConstructionTests_w_Roles( TestCase ):
         ti.constructInstance( folder, 'dust' )
         majyk_dust = folder._getOb( 'majyk_dust' )
         self.assertEqual( majyk_dust.id, 'majyk_dust' )
-
 
 
 def test_suite():
