@@ -194,25 +194,25 @@ class ActionsTool (UniqueObject, SimpleItem):
         # Include actions from object.
         if object is not None:
             base = aq_base(object)
-            if hasattr(base, 'getTypeInfo'):
-                ti = object.getTypeInfo()
-                if ti is not None:
-                    defs = ti.getActions()
-                    if defs:
-                        c_url = info.content_url
-                        for d in defs:
-                            a = d['action']
-                            if a:
-                                url = c_url + '/' + a
-                            else:
-                                url = c_url
-                            actions.append({
-                                'id': d.get('id', None),
-                                'name': d['name'],
-                                'url': url,
-                                'permissions': d['permissions'],
-                                'category': d.get('category', 'object'),
-                                })
+            types_tool = getToolByName( self, 'portal_types' )
+            ti = types_tool.getTypeInfo( object )
+            if ti is not None:
+                defs = ti.getActions()
+                if defs:
+                    c_url = info.content_url
+                    for d in defs:
+                        a = d['action']
+                        if a:
+                            url = c_url + '/' + a
+                        else:
+                            url = c_url
+                        actions.append({
+                            'id': d.get('id', None),
+                            'name': d['name'],
+                            'url': url,
+                            'permissions': d['permissions'],
+                            'category': d.get('category', 'object'),
+                            })
             if hasattr(base, 'listActions'):
                 a = object.listActions(info)
                 if a:

@@ -163,8 +163,7 @@ class PortalFolder( Folder, DynamicType ):
         """
         result = []
         portal_types = getToolByName(self, 'portal_types')
-        pt = self._getPortalTypeName()
-        myType = portal_types.getTypeInfo(pt)
+        myType = portal_types.getTypeInfo(self)
 
         if myType is not None:
             for contentType in portal_types.listTypeInfo():
@@ -293,7 +292,8 @@ class PortalFolder( Folder, DynamicType ):
         """
              Implement dublin core type
         """
-        ti = self.getTypeInfo()
+        portal_types = getToolByName(self, 'portal_types')
+        ti = portal_types.getTypeInfo(self)
         if ti is not None:
             return ti.Type()
         return self.meta_type

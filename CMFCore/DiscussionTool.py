@@ -211,8 +211,7 @@ class DiscussionTool (UniqueObject, SimpleItem):
         '''
         if hasattr( content, 'allow_discussion' ):
             return content.allow_discussion
-        typeInfo = getToolByName(self, 'portal_types').getTypeInfo(
-            content.Type())
+        typeInfo = getToolByName(self, 'portal_types').getTypeInfo( content )
         if typeInfo:
             return typeInfo.allowDiscussion()
         return 0

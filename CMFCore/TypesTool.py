@@ -666,8 +666,15 @@ class TypesTool( UniqueObject, OFS.Folder.Folder ):
         """
             Return an instance which implements the
             TypeInformation interface, corresponding to
-            the specified 'contentType'.
+            the specified 'contentType'.  If contentType is actually
+            an object, rather than a string, attempt to look up
+            the appropriate type info using its Type or meta_type.
         """
+        if type( contentType ) is not type( '' ):
+            try:
+                contentType = contentType._getPortalTypeName()
+            except:
+                contentType = contentType.meta_type
         ob = getattr( self, contentType, None )
         if getattr(aq_base(ob), '_isTypeInformation', 0):
             return ob

@@ -126,8 +126,7 @@ class DynamicType:
         tool = getToolByName(self, 'portal_types', None)
         if tool is None:
             return None
-        pt = self._getPortalTypeName()
-        return tool.getTypeInfo(pt)  # Can return None.
+        return tool.getTypeInfo(self)  # Can return None.
 
     # Support for dynamic icons
 

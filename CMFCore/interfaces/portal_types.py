@@ -164,7 +164,9 @@ class portal_types( Base ):
         """
             Return an instance which implements the
             ContentTypeInformation interface, corresponding to
-            the specified 'contentType'.
+            the specified 'contentType'.  If contentType is actually
+            an object, rather than a string, attempt to look up
+            the appropriate type info using its Type or meta_type.
         """
 
     # listTypeInfo__roles__ = None  # Public
