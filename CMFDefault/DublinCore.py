@@ -446,7 +446,11 @@ class DefaultDublinCoreImpl( PropertyManager ):
         used to be:  editMetadata = WorkflowAction(_editMetadata)
         Need to add check for webDAV locked resource for TTW methods.
         """
-        self.failIfLocked()
+        # as per bug #69, we cant assume they use the webdav
+        # locking interface, and fail gracefully if they dont
+        if hasattr(self, 'failIfLocked'):
+            self.failIfLocked()
+            
         self._editMetadata(title=title
                      , subject=subject
                      , description=description
