@@ -225,15 +225,34 @@ class MembershipTool ( Products.CMFCore.MembershipTool.MembershipTool ):
     security.declarePrivate( 'listActions' )
     def listActions(self, info):
         '''Lists actions available to the user.'''
+        user_actions = None
+
         if not info.isAnonymous:
+            home_folder = self.getHomeFolder()
             homeUrl = self.getHomeUrl()
             if homeUrl is not None:
-                return (
+                content_url = info.content_url
+                user_actions = (
+                    {'name': 'Add to Favorites',
+                     'url': ( content_url + '/addtoFavorites' ),
+                     'permissions' : [],
+                     'category': 'user'},
                     {'name': 'My Stuff',
                      'url': homeUrl + '/folder_contents',
                      'permissions': [],
                      'category': 'user'},
                     )
-        return None
+
+                if hasattr( home_folder, 'Favorites' ):
+                    added_actions = (
+                      {'name': 'My Favorites',
+                       'url' : homeUrl + '/Favorites/folder_contents',
+                       'permissions': [],
+                       'category': 'user'},) 
+                    
+                    user_actions = added_actions + user_actions
+
+        return user_actions
+
 
 InitializeClass(MembershipTool)

@@ -308,23 +308,7 @@ class ActionsTool (UniqueObject, SimpleItem):
                     'permissions' : ['List folder contents'],
                     'category': 'folder',
                     })
-            pm = getToolByName(self, 'portal_membership')
-            home_folder = pm.getHomeFolder()
-            if content_url is not None and home_folder is not None:
-                home_url = pm.getHomeUrl()
-                actions.append({
-                    'name': 'Add to Favorites',
-                    'url': ( content_url + '/addtoFavorites' ),
-                    'permissions' : [],
-                    'category': 'user',
-                    })
-                if hasattr(home_folder, 'Favorites'):
-                    actions.append({
-                        'name': 'My Favorites',
-                        'url' : home_url + '/Favorites/folder_contents',
-                        'permissions': [],
-                        'category': 'user',
-                        })
+
         return actions
 
 
