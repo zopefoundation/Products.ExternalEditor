@@ -50,7 +50,7 @@ if add:
 
 elif cancel:
     if is_usermanager:
-        target = '%s/members_manage_form' % portal_url
+        target = mtool.getActionInfo('global/manage_members')['url']
     else:
         target = portal_url
     context.REQUEST.RESPONSE.redirect(target)
@@ -76,10 +76,10 @@ control['validate_email'] = validate_email
 
 buttons = []
 if is_newmember:
-    target = '%s/logged_in' % portal_url
+    target = mtool.getActionInfo('user/logged_in')['url']
     buttons.append( {'name': 'login', 'value': 'Log in'} )
 else:
-    target = '%s/join_form' % portal_url
+    target = rtool.getActionInfo('user/join')['url']
     buttons.append( {'name': 'add', 'value': 'Register'} )
     buttons.append( {'name': 'cancel', 'value': 'Cancel'} )
 control['form'] = { 'action': target,

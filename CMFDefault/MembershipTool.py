@@ -128,6 +128,15 @@ class MembershipTool( BaseTool ):
         , condition=None
         , visible=1
         )
+    , AI( id='logged_in'
+        , title='Logged in'
+        , description='Used by scripts'
+        , action=Expression(text='string:${portal_url}/logged_in')
+        , permissions=(View,)
+        , category='user'
+        , condition=None
+        , visible=0
+        )
     )
 
     membersfolder_id = 'Members'

@@ -10,8 +10,7 @@
 from ZTUtils import Batch
 from Products.CMFCore.utils import getToolByName
 mtool = getToolByName(script, 'portal_membership')
-utool = getToolByName(script, 'portal_url')
-portal_url = utool()
+rtool = getToolByName(script, 'portal_registration')
 message = ''
 
 
@@ -23,7 +22,7 @@ if members_delete:
         message = 'Please select one or more members to delete first.'
 
 elif members_new:
-    target = '%s/join_form' % portal_url
+    target = rtool.getActionInfo('user/join')['url']
     context.REQUEST.RESPONSE.redirect(target)
     return None
 
@@ -33,7 +32,7 @@ if message:
 
 control = {}
 
-target = '%s/members_manage_form' % portal_url
+target = mtool.getActionInfo('global/manage_members')['url']
 members = mtool.listMembers()
 batch_obj = Batch(members, 25, b_start, orphan=0)
 items = []

@@ -2,13 +2,15 @@
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       metal:use-macro="here/main_template/macros/master">
 <body>
-<div metal:fill-slot="main" i18n:domain="cmf_default">
+<div metal:fill-slot="main" i18n:domain="cmf_default"
+   tal:define="mtool here/portal_membership">
 <div class="Desktop">
-<h1 class="Desktop" i18n:translate="">Log in</h1>
+
+<h2 i18n:translate="">Log in</h2>
 
 <form action="" method="post"
-      tal:attributes="action string:${here/portal_url}/logged_in"
->
+   tal:attributes="action python: mtool.getActionInfo(
+                                                    'user/logged_in')['url']">
 
 <!-- ****** Enable the automatic redirect ***** -->
 <span tal:condition="exists: request/came_from">
