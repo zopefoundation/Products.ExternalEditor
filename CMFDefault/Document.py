@@ -95,7 +95,7 @@ from DublinCore import DefaultDublinCoreImpl
 
 from Products.CMFCore import CMFCorePermissions
 from Products.CMFCore.WorkflowCore import WorkflowAction, afterCreate
-from Products.CMFCore.utils import _format_stx
+from Products.CMFCore.utils import _format_stx, keywordsplitter
 from utils import parseHeadersBody, SimpleHTMLParser, bodyfinder, _dtmldir
 
 factory_type_information = ( { 'id'             : 'Document'
@@ -212,6 +212,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
         self.text = body
 
         headers['Format'] = self.Format()
+        headers['Subject'] = keywordsplitter(headers)
         haveheader = headers.has_key
         for key, value in self.getMetadataHeaders():
             if key != 'Format' and not haveheader(key):
