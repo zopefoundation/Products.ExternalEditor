@@ -1,5 +1,7 @@
 External Editor Change Log
 
+    - Fixed bug in Windows registry editor lookup.
+
   6/16/02 - 0.3 Release
 
     - Improved behavior when saving after lock attempts fail.

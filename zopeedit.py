@@ -222,35 +222,38 @@ class ExternalEditor:
                     except EnvironmentError:
                         pass
 
-                if classname is not None and editor is None:
-                    # Enumerate the actions looking for one
-                    # starting with 'Edit'
-                    try:
-                        key = OpenKeyEx(HKEY_CLASSES_ROOT, classname+'\\Shell')
-                        index = 0
-                        while 1:
-                            try:
-                                subkey = EnumKey(key, index)
-                                index += 1
-                                if str(subkey).lower().startswith('edit'):
-                                    subkey = OpenKeyEx(key, 
-                                                       subkey + '\\Command')
-                                    editor, nil = QueryValueEx(subkey, None)
-                                else:
-                                    continue
-                            except EnvironmentError:
-                                break
-                    except EnvironmentError:
-                        pass
+                    if editor is None:
+                        # Enumerate the actions looking for one
+                        # starting with 'Edit'
+                        try:
+                            key = OpenKeyEx(HKEY_CLASSES_ROOT, 
+                                            classname+'\\Shell')
+                            index = 0
+                            while 1:
+                                try:
+                                    subkey = EnumKey(key, index)
+                                    index += 1
+                                    if str(subkey).lower().startswith('edit'):
+                                        subkey = OpenKeyEx(key, 
+                                                           subkey + 
+                                                           '\\Command')
+                                        editor, nil = QueryValueEx(subkey, 
+                                                                   None)
+                                    else:
+                                        continue
+                                except EnvironmentError:
+                                    break
+                        except EnvironmentError:
+                            pass
 
-                if editor is None:
-                    try:
-                        # Look for Open action in registry
-                        key = OpenKeyEx(HKEY_CLASSES_ROOT, 
-                                        classname+'\\Shell\\Open\\Command')
-                        editor, nil = QueryValueEx(key, None)
-                    except EnvironmentError:
-                        pass
+                    if editor is None:
+                        try:
+                            # Look for Open action in registry
+                            key = OpenKeyEx(HKEY_CLASSES_ROOT, 
+                                            classname+'\\Shell\\Open\\Command')
+                            editor, nil = QueryValueEx(key, None)
+                        except EnvironmentError:
+                            pass
 
                 if editor is None:
                     try:
