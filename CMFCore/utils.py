@@ -502,7 +502,7 @@ class CMFHtmlWithImages( HTMLWithImages ):
         name = doc.getNodeValue()
         if name[:2] == '..':
             name = name[2:]
-        output('<a name="#%s">[%s]</a>' % (name, name))
+        output('<a name="%s">[%s]</a>' % (name, name))
 
     def document(self, doc, level, output):
         """\

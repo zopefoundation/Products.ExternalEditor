@@ -1,4 +1,4 @@
-1.2 alpha
+1.2 beta (2001/12/07)
 
  New features
 
@@ -109,6 +109,9 @@
     well as Dublin Core).
 
  Bug fixes
+
+  - Fixed inner / named links in Document / News Item (thanks to 
+    Kenichi Sato for the patch!)
 
   - Added 'getReply' to CMFDefault.DiscussionItem.DiscussionItemContainer,
     to permit access to an individual reply without needing to
