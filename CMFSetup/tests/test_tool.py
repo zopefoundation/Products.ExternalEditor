@@ -48,7 +48,7 @@ class SetupToolTests( FilesystemTestBase
         FilesystemTestBase.setUp( self )
         self._profile_registry_info = profile_registry._profile_info
         self._profile_registry_ids = profile_registry._profile_ids
-        profile_registry._clear()
+        profile_registry.clear()
 
     def tearDown( self ):
 
@@ -145,6 +145,7 @@ class SetupToolTests( FilesystemTestBase
         from common import _makeTestFile
 
         tool = self._makeOne()
+        tool.getExportStepRegistry().clear()
 
         _makeTestFile( IMPORT_STEPS_XML
                      , self._PROFILE_PATH

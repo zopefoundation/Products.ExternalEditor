@@ -17,6 +17,7 @@ $Id$
 
 from AccessControl import ModuleSecurityInfo
 
+from interfaces import BASE, EXTENSION
 from permissions import ManagePortal
 from registry import _profile_registry as profile_registry
 

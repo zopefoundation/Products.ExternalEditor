@@ -2,6 +2,13 @@ HEAD only (unreleased)
 
   New Features
 
+    - CMFSetup: Added support for extension profiles.
+      Extension profiles are profile fragments used to modify base profiles.
+      They can be shipped with add-on products or used for customization
+      steps. Importing an extension profile adds or overwrites existing
+      settings in a fine-grained way. You can't export extension profiles.
+      Snapshots and exports always represent the merged settings.
+
     - DirectoryView and derived classes can now have metadata associated with
       them just like regular FSObject-derived objects can.
 

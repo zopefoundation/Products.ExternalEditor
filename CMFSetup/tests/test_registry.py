@@ -22,6 +22,7 @@ Zope.startup()
 
 from OFS.Folder import Folder
 from Products.CMFSetup.tests.common import BaseRegistryTests
+from Products.CMFSetup import EXTENSION
 
 from conformance import ConformsToIStepRegistry
 from conformance import ConformsToIImportStepRegistry
@@ -182,12 +183,10 @@ class ImportStepRegistryTests( BaseRegistryTests
                          , handler=ONE_FUNC
                          )
 
-        self.assertRaises( KeyError
-                         , registry.registerStep
-                         , id='one'
-                         , version='1'
-                         , handler=ONE_FUNC
-                         )
+        registry.registerStep( id='one', version='1', handler=ONE_FUNC )
+
+        info_list = registry.listStepMetadata()
+        self.assertEqual( len( info_list ), 1 )
 
     def test_registerStep_replacement( self ):
 
@@ -682,7 +681,13 @@ class ExportStepRegistryTests( BaseRegistryTests
 
         registry = self._makeOne()
         registry.registerStep( 'one', ONE_FUNC )
-        self.assertRaises( KeyError, registry.registerStep, 'one', TWO_FUNC )
+        registry.registerStep( 'one', TWO_FUNC )
+        info = registry.getStepMetadata( 'one', {} )
+
+        self.assertEqual( info[ 'id' ], 'one' )
+        self.assertEqual( info[ 'handler' ], TWO_FUNC_NAME )
+        self.assertEqual( info[ 'title' ], 'one' )
+        self.assertEqual( info[ 'description' ], '' )
 
     def test_generateXML_empty( self ):
 
@@ -873,8 +878,9 @@ class ToolsetRegistryTests( BaseRegistryTests
         configurator = self._makeOne().__of__( site )
 
         configurator.addForbiddenTool( 'once' )
+        configurator.addForbiddenTool( 'once' )
 
-        self.assertRaises( KeyError, configurator.addForbiddenTool, 'once' )
+        self.assertEqual( len( configurator.listForbiddenTools() ), 1 )
 
     def test_addForbiddenTool_but_required( self ):
 
@@ -919,12 +925,11 @@ class ToolsetRegistryTests( BaseRegistryTests
         configurator = self._makeOne().__of__( site )
 
         configurator.addRequiredTool( 'required', 'some.dotted.name' )
+        configurator.addRequiredTool( 'required', 'another.name' )
 
-        self.assertRaises( KeyError
-                         , configurator.addRequiredTool
-                         , 'required'
-                         , 'another.name'
-                         )
+        info = configurator.getRequiredToolInfo( 'required' )
+        self.assertEqual( info[ 'id' ], 'required' )
+        self.assertEqual( info[ 'class' ], 'another.name' )
 
     def test_addRequiredTool_but_forbidden( self ):
 
@@ -1043,6 +1048,7 @@ class ProfileRegistryTests( BaseRegistryTests
         DESCRIPTION = 'One profile'
         PATH = '/path/to/one'
         PRODUCT = 'TestProduct'
+        PROFILE_TYPE = EXTENSION
 
         registry = self._makeOne()
         registry.registerProfile( PROFILE_ID
@@ -1050,6 +1056,7 @@ class ProfileRegistryTests( BaseRegistryTests
                                 , DESCRIPTION
                                 , PATH
                                 , PRODUCT
+                                , PROFILE_TYPE
                                 )
 
         self.assertEqual( len( registry.listProfiles() ), 1 )
@@ -1062,6 +1069,7 @@ class ProfileRegistryTests( BaseRegistryTests
         self.assertEqual( info[ 'description' ], DESCRIPTION )
         self.assertEqual( info[ 'path' ], PATH )
         self.assertEqual( info[ 'product' ], PRODUCT )
+        self.assertEqual( info[ 'type' ], PROFILE_TYPE )
 
     def test_registerProfile_duplicate( self ):
 
@@ -1075,6 +1083,7 @@ class ProfileRegistryTests( BaseRegistryTests
         self.assertRaises( KeyError
                          , registry.registerProfile
                          , PROFILE_ID, TITLE, DESCRIPTION, PATH )
+
 
 def test_suite():
     return unittest.TestSuite((

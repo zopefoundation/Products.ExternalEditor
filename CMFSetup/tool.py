@@ -28,6 +28,7 @@ from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from Products.CMFCore.utils import UniqueObject
 from Products.CMFCore.utils import getToolByName
 
+from interfaces import EXTENSION
 from interfaces import ISetupTool
 from permissions import ManagePortal
 from context import DirectoryImportContext
@@ -188,7 +189,7 @@ class SetupTool( UniqueObject, Folder ):
         return self._toolset_registry
 
     security.declareProtected( ManagePortal, 'executeStep' )
-    def runImportStep( self, step_id, run_dependencies=True, purge_old=True ):
+    def runImportStep( self, step_id, run_dependencies=True, purge_old=None ):
 
         """ See ISetupTool.
         """
@@ -218,7 +219,7 @@ class SetupTool( UniqueObject, Folder ):
         return { 'steps' : steps, 'messages' : messages }
 
     security.declareProtected( ManagePortal, 'runAllSetupSteps')
-    def runAllImportSteps( self, purge_old=True ):
+    def runAllImportSteps( self, purge_old=None ):
 
         """ See ISetupTool.
         """
@@ -382,7 +383,6 @@ class SetupTool( UniqueObject, Folder ):
     def manage_importSelectedSteps( self
                                   , ids
                                   , run_dependencies
-                                  , purge_old
                                   , RESPONSE
                                   ):
         """ Import the steps selected by the user.
@@ -393,10 +393,7 @@ class SetupTool( UniqueObject, Folder ):
         else:
             steps_run = []
             for step_id in ids:
-                result = self.runImportStep( step_id
-                                           , run_dependencies
-                                           , purge_old
-                                           )
+                result = self.runImportStep( step_id, run_dependencies )
                 steps_run.extend( result[ 'steps' ] )
 
             message = 'Steps+run:%s' % '+,'.join( steps_run )
@@ -406,11 +403,11 @@ class SetupTool( UniqueObject, Folder ):
                          )
 
     security.declareProtected( ManagePortal, 'manage_importSelectedSteps' )
-    def manage_importAllSteps( self, purge_old, RESPONSE ):
+    def manage_importAllSteps( self, RESPONSE ):
 
         """ Import all steps.
         """
-        result = self.runAllImportSteps( purge_old )
+        result = self.runAllImportSteps()
         message = 'Steps+run:%s' % '+,'.join( result[ 'steps' ] )
 
         RESPONSE.redirect( '%s/manage_importSteps?manage_tabs_message=%s'
@@ -586,7 +583,7 @@ class SetupTool( UniqueObject, Folder ):
         return product.__path__[0]
 
     security.declarePrivate( '_getImportContext' )
-    def _getImportContext( self, context_id, should_purge=False ):
+    def _getImportContext( self, context_id, should_purge=None ):
 
         """ Crack ID and generate appropriate import context.
         """
@@ -602,11 +599,14 @@ class SetupTool( UniqueObject, Folder ):
                                    , info[ 'path' ] )
             else:
                 path = info[ 'path' ]
-
+            if should_purge is None:
+                should_purge = (info.get('type') != EXTENSION)
             return DirectoryImportContext(self, path, should_purge, encoding)
 
         # else snapshot
         context_id = context_id[ len( 'snapshot-' ): ]
+        if should_purge is None:
+            should_purge = True
         return SnapshotImportContext(self, context_id, should_purge, encoding)
 
     security.declarePrivate( '_updateImportStepsRegistry' )
@@ -616,6 +616,8 @@ class SetupTool( UniqueObject, Folder ):
         """
         context = self._getImportContext(self._import_context_id)
         xml = context.readDataFile(IMPORT_STEPS_XML)
+        if xml is None:
+            return
 
         info_list = self._import_registry.parseXML( xml, encoding )
 
@@ -644,6 +646,8 @@ class SetupTool( UniqueObject, Folder ):
         """
         context = self._getImportContext(self._import_context_id)
         xml = context.readDataFile(EXPORT_STEPS_XML)
+        if xml is None:
+            return
 
         info_list = self._export_registry.parseXML( xml, encoding )
 
@@ -668,6 +672,8 @@ class SetupTool( UniqueObject, Folder ):
         """
         context = self._getImportContext(self._import_context_id)
         xml = context.readDataFile(TOOLSET_XML)
+        if xml is None:
+            return
 
         self._toolset_registry.parseXML( xml, encoding )
 

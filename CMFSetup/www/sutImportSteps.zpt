@@ -62,12 +62,6 @@ procedure, in order to pick up changes since the site was created.
     <label for="run_dependencies">Include dependencies?</label>
     &nbsp; &nbsp;
 
-    <input type="hidden" name="purge_old:int:default" value="0" />
-    <input class="form-element" type="checkbox" id="purge_old"
-           name="purge_old:boolean" value="1" checked="checked" />
-    <label for="purge_old">Purge existing setup?</label>
-    &nbsp; &nbsp;
-      
     <input class="form-element" type="submit"
            name="manage_importSelectedSteps:method"
            value=" Import selected steps " />

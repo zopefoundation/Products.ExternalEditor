@@ -22,6 +22,7 @@ from Acquisition import Implicit
 from Globals import InitializeClass
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
+from interfaces import BASE
 from interfaces import IImportStepRegistry
 from interfaces import IExportStepRegistry
 from interfaces import IToolsetRegistry
@@ -32,6 +33,7 @@ from utils import _xmldir
 from utils import _getDottedName
 from utils import _resolveDottedName
 from utils import _extractDocstring
+
 
 class ImportStepRegistry( Implicit ):
 
@@ -45,7 +47,7 @@ class ImportStepRegistry( Implicit ):
 
     def __init__( self ):
 
-        self._clear()
+        self.clear()
 
     security.declareProtected( ManagePortal, 'listSteps' )
     def listSteps( self ):
@@ -182,7 +184,7 @@ class ImportStepRegistry( Implicit ):
         """
         already = self.getStepMetadata( id )
 
-        if already and already[ 'version' ] >= version:
+        if already and already[ 'version' ] > version:
             raise KeyError( 'Existing registration for step %s, version %s'
                           % ( id, already[ 'version' ] ) )
 
@@ -206,10 +208,8 @@ class ImportStepRegistry( Implicit ):
     security.declarePrivate( 'parseXML' )
     def parseXML( self, text, encoding=None ):
 
-        """ Parse 'text' into a clean registry.
+        """ Parse 'text'.
         """
-        self._clear()
-
         reader = getattr( text, 'read', None )
 
         if reader is not None:
@@ -220,14 +220,14 @@ class ImportStepRegistry( Implicit ):
 
         return parser._parsed
 
-    #
-    #   Helper methods
-    #
-    security.declarePrivate( '_clear' )
-    def _clear( self ):
+    security.declarePrivate( 'clear' )
+    def clear( self ):
 
         self._registered = {}
 
+    #
+    #   Helper methods
+    #
     security.declarePrivate( '_computeTopologicalSort' )
     def _computeTopologicalSort( self ):
 
@@ -279,7 +279,7 @@ class ExportStepRegistry( Implicit ):
 
     def __init__( self ):
 
-        self._registered = {}
+        self.clear()
 
     security.declareProtected( ManagePortal, 'listSteps' )
     def listSteps( self ):
@@ -356,11 +356,6 @@ class ExportStepRegistry( Implicit ):
           If None, the remaining line of the documentation string of
           the step is used, or default to ''.
         """
-        already = self.getStep( id )
-
-        if already:
-            raise KeyError( 'Existing registration for step %s' % id )
-
         if title is None or description is None:
 
             t, d = _extractDocstring( handler, id, '' )
@@ -379,10 +374,8 @@ class ExportStepRegistry( Implicit ):
     security.declarePrivate( 'parseXML' )
     def parseXML( self, text, encoding=None ):
 
-        """ Parse 'text' into a clean registry.
+        """ Parse 'text'.
         """
-        self._clear()
-
         reader = getattr( text, 'read', None )
 
         if reader is not None:
@@ -393,14 +386,14 @@ class ExportStepRegistry( Implicit ):
 
         return parser._parsed
 
-    #
-    #   Helper methods
-    #
-    security.declarePrivate( '_clear' )
-    def _clear( self ):
+    security.declarePrivate( 'clear' )
+    def clear( self ):
 
         self._registered = {}
 
+    #
+    #   Helper methods
+    #
     security.declarePrivate( '_exportTemplate' )
     _exportTemplate = PageTemplateFile( 'esrExport.xml', _xmldir )
 
@@ -417,7 +410,7 @@ class ToolsetRegistry( Implicit ):
 
     def __init__( self ):
 
-        self._clear()
+        self.clear()
 
     #
     #   Toolset API
@@ -437,7 +430,7 @@ class ToolsetRegistry( Implicit ):
         """ See IToolsetRegistry.
         """
         if tool_id in self._forbidden:
-            raise KeyError, 'Duplicate forbidden tool: %s' % tool_id
+            return
 
         if self._required.get( tool_id ) is not None:
             raise ValueError, 'Tool %s is required!' % tool_id
@@ -473,9 +466,6 @@ class ToolsetRegistry( Implicit ):
 
         """ See IToolsetRegistry.
         """
-        if self._required.get( tool_id ) is not None:
-            raise KeyError, "Duplicate required tool: %s" % tool_id
-
         if tool_id in self._forbidden:
             raise ValueError, "Forbidden tool ID: %s" % tool_id
 
@@ -503,23 +493,21 @@ class ToolsetRegistry( Implicit ):
         parser = _ToolsetParser( encoding )
         parseString( text, parser )
 
-        self._clear()
-
         for tool_id in parser._forbidden:
             self.addForbiddenTool( tool_id )
 
         for tool_id, dotted_name in parser._required.items():
             self.addRequiredTool( tool_id, dotted_name )
 
-    #
-    #   Helper methods.
-    #
-    security.declarePrivate( '_clear' )
-    def _clear( self ):
+    security.declarePrivate( 'clear' )
+    def clear( self ):
 
         self._forbidden = []
         self._required = {}
 
+    #
+    #   Helper methods.
+    #
     security.declarePrivate( '_toolsetConfig' )
     _toolsetConfig = PageTemplateFile( 'tscExport.xml'
                                      , _xmldir
@@ -539,7 +527,7 @@ class ProfileRegistry( Implicit ):
 
     def __init__( self ):
 
-        self._clear()
+        self.clear()
 
     security.declareProtected( ManagePortal, '' )
     def getProfileInfo( self, profile_id ):
@@ -570,6 +558,7 @@ class ProfileRegistry( Implicit ):
                        , description
                        , path
                        , product=None
+                       , profile_type=BASE
                        ):
         """ See IProfileRegistry.
         """
@@ -583,13 +572,13 @@ class ProfileRegistry( Implicit ):
                , 'description' : description
                , 'path' : path
                , 'product' : product
+               , 'type': profile_type
                }
 
         self._profile_info[ profile_id ] = info
 
-    #   Helper methods
-    security.declarePrivate( '_clear' )
-    def _clear( self ):
+    security.declarePrivate( 'clear' )
+    def clear( self ):
 
         self._profile_info = {}
         self._profile_ids = []
