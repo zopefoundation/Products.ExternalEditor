@@ -38,7 +38,7 @@ def install(self):
         if t['id'] not in typestool.objectIds():
             cfm = apply(ContentFactoryMetadata, (), t)
             typestool._setObject(t['id'], cfm)
-            out.write('Registered with the types tool\n')
+            out.write('Registered %s with the types tool\n' % t['id'])
         else:
             out.write('Object "%s" already existed in the types tool\n' % (
                 t['id']))
