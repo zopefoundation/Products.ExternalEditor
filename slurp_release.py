@@ -105,7 +105,13 @@ options:
 
     -?, -h, --help      Print this usage message
 
-    -x, --execute       Select a particular step (def. 'doWholeEnchilada')
+    -x, --execute       Select a particular step. Available steps are:
+
+                        exportReleaseFile
+                        makeArchives
+                        uploadArchives
+                        uploadDocs
+                        doWholeEnchilada (default)
     
     -a, --auth          Use authentication pair, in fmt 'userid:password'
 """
