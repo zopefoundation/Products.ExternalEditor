@@ -74,6 +74,13 @@
          <label for="cb_allowany">Allow arbitrary skins to be
 	 selected</label></td>
   </tr>
+  <tr>
+    <th valign="top" align="left">Skin Cookie persistence</th>
+    <td><input type="checkbox" name="cookie_persistence" id="cb_cookiep"
+         <dtml-if getCookiePersistence>checked="checked"</dtml-if> />
+        <label for="cb_cookiep">Make skin cookie persist indefinitely
+        </label></td>
+  </tr>
 </table>
 <input type="submit" name="submit" value="Save">
 </form>

@@ -132,6 +132,7 @@ class SkinsTool(UniqueObject, SkinsContainer, PortalFolder):
 
     id = 'portal_skins'
     meta_type = 'CMF Skins Tool'
+    cookie_persistence = 0
 
     security = ClassSecurityInfo()
 
@@ -168,7 +169,7 @@ class SkinsTool(UniqueObject, SkinsContainer, PortalFolder):
     def manage_properties(self, default_skin='', request_varname='',
                           allow_any=0, chosen=(), add_skin=0,
                           del_skin=0, skinname='', skinpath='',
-                          REQUEST=None):
+                          cookie_persistence=0, REQUEST=None):
         '''
         Changes portal_skin properties.
         '''
@@ -184,6 +185,7 @@ class SkinsTool(UniqueObject, SkinsContainer, PortalFolder):
             self.default_skin = str(default_skin)
             self.request_varname = str(request_varname)
             self.allow_any = allow_any and 1 or 0
+            self.cookie_persistence = cookie_persistence and 1 or 0
             if REQUEST is not None:
                 for key in sels.keys():
                     fname = 'skinpath_%s' % key
@@ -270,6 +272,14 @@ class SkinsTool(UniqueObject, SkinsContainer, PortalFolder):
         '''
         return self.allow_any
 
+    security.declareProtected(AccessContentsInformation, 'getCookiePersistence')
+    def getCookiePersistence(self):
+        '''
+        Used by the management UI.  Returns a flag indicating whether
+        the skins cookie is persistent or not.
+        '''
+        return self.cookie_persistence
+
     security.declareProtected(AccessContentsInformation, 'getSkinPaths')
     def getSkinPaths(self):
         '''
@@ -307,8 +317,16 @@ class SkinsTool(UniqueObject, SkinsContainer, PortalFolder):
                 cookie = req.cookies.get(self.request_varname, None)
                 if cookie != mskin:
                     resp = req.RESPONSE
-                    # *Don't* make the cookie persistent!
-                    resp.setCookie( self.request_varname, mskin, path='/' )
+                    if not self.cookie_persistence:
+                        # *Don't* make the cookie persistent!
+                        resp.setCookie( self.request_varname, mskin, path='/' )
+                    else:
+                        expires = ( DateTime( 'GMT' ) + 365 ).rfc822()
+                        resp.setCookie( self.request_varname
+                                      , mskin
+                                      , path='/'
+                                      , expires=expires
+                                      )
                     # Ensure updateSkinCookie() doesn't try again
                     # within this request.
                     req.cookies[self.request_varname] = mskin
