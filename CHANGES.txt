@@ -48,6 +48,12 @@ CMF 1.3 beta2 (2002/06/30)
 
   Bugs Fixed
 
+    - Correctly reindex the just-reset workflow variables of an object
+      in a DCWorkflow after a paste.
+
+    - Correctly insert into the workflows the objects created by a
+      Scriptable Type.
+
     - Fixed Friendly Date Criterion edit form to correctly display the
       duration in its menu (Tracker #475, thanks to Axel Joester for the
       patch).

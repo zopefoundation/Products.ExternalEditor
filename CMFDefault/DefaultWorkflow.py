@@ -230,26 +230,17 @@ class DefaultWorkflowDefinition (SimpleItemWithProperties):
     security.declarePrivate('setReviewStateOf')
     def setReviewStateOf(self, ob, review_state, action, comment):
         tool = aq_parent(aq_inner(self))
-        tool.notifyBefore(ob, action)
-        try:
-            pm = getToolByName(self, 'portal_membership')
-            current_user = pm.getAuthenticatedMember().getUserName()
-            status = {
-                'actor': current_user,
-                'action': action,
-                'review_state': review_state,
-                'time': DateTime(),
-                'comments': comment,
-                }
-            tool.setStatusOf(self.getId(), ob, status)
-        except:
-            tool.notifyException(ob, action, sys.exc_info())
-            raise
-        else:
-            tool.notifySuccess(ob, action)
-            catalog = getToolByName(self, 'portal_catalog', None)
-            if catalog is not None:
-                catalog.reindexObject(ob)
+        pm = getToolByName(self, 'portal_membership')
+        current_user = pm.getAuthenticatedMember().getUserName()
+        status = {
+            'actor': current_user,
+            'action': action,
+            'review_state': review_state,
+            'time': DateTime(),
+            'comments': comment,
+            }
+        tool.setStatusOf(self.getId(), ob, status)
+        self.updateRoleMappingsFor(ob)
 
     security.declarePrivate('notifyCreated')
     def notifyCreated(self, ob):
@@ -258,7 +249,7 @@ class DefaultWorkflowDefinition (SimpleItemWithProperties):
         and put in its new place.
         '''
         self.setReviewStateOf( ob, 'private', 'joined', '' )
-        self.updateRoleMappingsFor(ob)
+        self.notifySuccess(ob, 'joined', '')
 
     security.declarePrivate('notifyBefore')
     def notifyBefore(self, ob, action):
@@ -275,7 +266,7 @@ class DefaultWorkflowDefinition (SimpleItemWithProperties):
         '''
         Notifies this workflow that an action has taken place.
         '''
-        self.updateRoleMappingsFor(ob)
+        pass
 
     security.declarePrivate('notifyException')
     def notifyException(self, ob, action, exc):

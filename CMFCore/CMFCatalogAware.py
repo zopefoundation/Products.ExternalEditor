@@ -64,6 +64,9 @@ class CMFCatalogAware:
             wf = getToolByName(self, 'portal_workflow', None)
             if wf is not None:
                 wf.notifyCreated(self)
+                # After a clone, the workflow may have reset
+                # its variables so the object has to be reindexed.
+                self.reindexObject()
 
     def manage_beforeDelete(self, item, container):
         """
