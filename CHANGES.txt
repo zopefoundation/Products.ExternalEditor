@@ -104,6 +104,9 @@
 
  Bug fixes
 
+  - Updated CMFCore.CatalogTool to allow new, optional 'idxs'
+    argument to 'catalog_object' (tracker #405).
+
   - Added a workaround for the problem where the CookieCrumber
     set cookies even though the user entered an incorrect password.
     RESPONSE.unauthorized() now cancels the cookie response
@@ -116,7 +119,7 @@
 
   - Corrected solecism in Topic (use of 'criteria' for singular);
     removed the need to know about the funky generated IDs for
-    criterion objects.
+    criterion objects.  Fixed derived bug in skins (tracker #408).
 
   - Modified error-logging code to avoid potential leaks of
     traceback frame.

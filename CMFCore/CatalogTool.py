@@ -259,7 +259,7 @@ class CatalogTool (UniqueObject, ZCatalog):
 
     manage_catalogFind = DTMLFile( 'catalogFind', _dtmldir )
 
-    def catalog_object(self, object, uid):
+    def catalog_object(self, object, uid, idxs=[]):
         # Wraps the object with workflow and accessibility
         # information just before cataloging.
         wf = getattr(self, 'portal_workflow', None)
@@ -268,7 +268,7 @@ class CatalogTool (UniqueObject, ZCatalog):
         else:
             vars = {}
         w = IndexableObjectWrapper(vars, object)
-        ZCatalog.catalog_object(self, w, uid)
+        ZCatalog.catalog_object(self, w, uid, idxs)
 
     security.declarePrivate('indexObject')
     def indexObject(self, object):
