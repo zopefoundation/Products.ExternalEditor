@@ -350,12 +350,15 @@ class PortalFolderTests(SecurityTest):
         self.failIf(test.checkIdAvailable('foo'))
 
     def test_interface(self):
+        from Products.CMFCore.interfaces.Folderish \
+                import Folderish as IFolderish
         from Products.CMFCore.interfaces.Dynamic \
                 import DynamicType as IDynamicType
         from OFS.IOrderSupport import IOrderedContainer
         from webdav.WriteLockInterface import WriteLockInterface
         from Products.CMFCore.PortalFolder import PortalFolder
 
+        verifyClass(IFolderish, PortalFolder)
         verifyClass(IDynamicType, PortalFolder)
         verifyClass(IOrderedContainer, PortalFolder)
         verifyClass(WriteLockInterface, PortalFolder)

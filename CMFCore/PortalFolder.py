@@ -31,6 +31,7 @@ from DynamicType import DynamicType
 from exceptions import AccessControl_Unauthorized
 from exceptions import BadRequest
 from exceptions import zExceptions_Unauthorized
+from interfaces.Folderish import Folderish as IFolderish
 from permissions import AddPortalContent
 from permissions import AddPortalFolders
 from permissions import ChangeLocalRoles
@@ -101,7 +102,8 @@ class PortalFolder(DynamicType, CMFCatalogAware, OrderedFolder):
     meta_type = 'Portal Folder'
     portal_type = 'Folder'
 
-    __implements__ = (DynamicType.__implements__, OrderedFolder.__implements__)
+    __implements__ = (IFolderish, DynamicType.__implements__,
+                      OrderedFolder.__implements__)
 
     security = ClassSecurityInfo()
 
@@ -114,20 +116,24 @@ class PortalFolder(DynamicType, CMFCatalogAware, OrderedFolder):
         self.id = id
         self.title = title
 
+    #
+    #   'MutableDublinCore' interface methods
+    #
     security.declareProtected(ManageProperties, 'setTitle')
     def setTitle( self, title ):
-        """
-            Edit the folder title.
+        """ Set Dublin Core Title element - resource name.
         """
         self.title = title
 
     security.declareProtected(ManageProperties, 'setDescription')
     def setDescription( self, description ):
-        """
-            Edit the folder description.
+        """ Set Dublin Core Description element - resource summary.
         """
         self.description = description
 
+    #
+    #   other methods
+    #
     security.declareProtected(ManageProperties, 'edit')
     def edit(self, title='', description=''):
         """
@@ -204,27 +210,34 @@ class PortalFolder(DynamicType, CMFCatalogAware, OrderedFolder):
                 append( (id, obj) )
         return result
 
+    #
+    #   'Folderish' interface methods
+    #
+    security.declarePublic('contentItems')
+    def contentItems(self, filter=None):
+        # List contentish and folderish sub-objects and their IDs.
+        # (method is without docstring to disable publishing)
+        #
+        ids = self.objectIds()
+        return self._filteredItems(ids, filter)
+
     security.declarePublic('contentIds')
     def contentIds(self, filter=None):
-        """
-            Provide a filtered view onto 'objectIds', allowing only
-            PortalFolders and PortalContent-derivatives to show through.
-        """
+        # List IDs of contentish and folderish sub-objects.
+        # (method is without docstring to disable publishing)
+        #
         return [ item[0] for item in self.contentItems(filter) ]
 
     security.declarePublic('contentValues')
     def contentValues(self, filter=None):
-        """
-            Provide a filtered view onto 'objectValues', allowing only
-            PortalFolders and PortalContent-derivatives to show through.
-        """
+        # List contentish and folderish sub-objects.
+        # (method is without docstring to disable publishing)
+        #
         return [ item[1] for item in self.contentItems(filter) ]
 
     security.declareProtected(ListFolderContents, 'listFolderContents')
     def listFolderContents(self, contentFilter=None):
-        """
-            Hook around 'contentValues' to let 'folder_contents'
-            be protected.  Duplicating skip_unauthorized behavior of dtml-in.
+        """ List viewable contentish and folderish sub-objects.
         """
         l = []
         for id, obj in self.contentItems(contentFilter):
@@ -237,40 +250,38 @@ class PortalFolder(DynamicType, CMFCatalogAware, OrderedFolder):
                 pass
         return l
 
-    security.declarePublic('contentItems')
-    def contentItems(self, filter=None):
-        """
-            Provide a filtered view onto 'objectItems', allowing only
-            PortalFolders and PortalContent-derivatives to show through.
-        """
-        ids = self.objectIds()
-        return self._filteredItems(ids, filter)
+    #
+    #   webdav Resource method
+    #
 
     # protected by 'WebDAV access'
     def listDAVObjects(self):
+        # List sub-objects for PROPFIND requests.
+        # (method is without docstring to disable publishing)
+        #
         if _checkPermission(ManagePortal, self):
             return self.objectValues()
         else:
             return self.listFolderContents()
 
+    #
+    #   'DublinCore' interface methods
+    #
     security.declareProtected(View, 'Title')
     def Title( self ):
-        """
-             Implement dublin core Title
+        """ Dublin Core Title element - resource name.
         """
         return self.title
 
     security.declareProtected(View, 'Description')
     def Description( self ):
-        """
-             Implement dublin core Description
+        """ Dublin Core Description element - resource summary.
         """
         return self.description
 
     security.declareProtected(View, 'Type')
     def Type( self ):
-        """
-             Implement dublin core type
+        """ Dublin Core Type element - resource type.
         """
         if hasattr(aq_base(self), 'getTypeInfo'):
             ti = self.getTypeInfo()
@@ -278,6 +289,9 @@ class PortalFolder(DynamicType, CMFCatalogAware, OrderedFolder):
                 return ti.Title()
         return self.meta_type
 
+    #
+    #   other methods
+    #
     security.declarePublic('encodeFolderFilter')
     def encodeFolderFilter(self, REQUEST):
         """
