@@ -5,11 +5,12 @@ class MembershipTests( unittest.TestCase ):
 
     def setUp( self ):
         get_transaction().begin()
-        self.root = Zope.app()
+        self.connection = Zope.DB.open()
+        self.root = self.connection.root()[ 'Application' ]
 
     def tearDown( self ):
-        del self.root
         get_transaction().abort()
+        self.connection.close()
 
     def test_join( self ):
         self.root.manage_addProduct[ 'CMFDefault' ].manage_addCMFSite( 'site' )

@@ -35,7 +35,8 @@ class DiscussionTests( unittest.TestCase ):
         get_transaction().begin()
         self._policy = UnitTestSecurityPolicy()
         SecurityManager.setSecurityPolicy( self._policy )
-        self.root = Zope.app()
+        self.connection = Zope.DB.open()
+        self.root = self.connection.root()[ 'Application' ]
         self.root._setObject( 'portal_discussion', DiscussionTool() )
         self.discussion_tool = self.root.portal_discussion
         self.root._setObject( 'portal_catalog', CatalogTool() )
@@ -56,6 +57,7 @@ class DiscussionTests( unittest.TestCase ):
         del self.root
         del self._policy
         get_transaction().abort()
+        self.connection.close()
 
     def test_policy( self ):
 

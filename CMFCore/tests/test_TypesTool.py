@@ -42,7 +42,8 @@ class TypesToolTests( unittest.TestCase ):
         get_transaction().begin()
         self._policy = UnitTestSecurityPolicy()
         SecurityManager.setSecurityPolicy(self._policy)
-        root = self.root = Zope.app()
+        self.connection = Zope.DB.open()
+        root = self.root = self.connection.root()[ 'Application' ]
 
         env = { 'SERVER_NAME' : 'http://localhost'
               , 'SERVER_PORT' : '80'
@@ -64,6 +65,7 @@ class TypesToolTests( unittest.TestCase ):
     
     def tearDown( self ):
         get_transaction().abort()
+        self.connection.close()
 
     def test_otherFolderTypes( self ):
         """

@@ -76,11 +76,13 @@ class PortalFolderTests( unittest.TestCase ):
         get_transaction().begin()
         self._policy = UnitTestSecurityPolicy()
         SecurityManager.setSecurityPolicy(self._policy)
-        self.root = Zope.app()
+        self.connection = Zope.DB.open()
+        self.root = self.connection.root()[ 'Application' ]
         newSecurityManager( None, UnitTestUser().__of__( self.root ) )
     
     def tearDown( self ):
         get_transaction().abort()
+        self.connection.close()
 
     def test_deletePropagation( self ):
 
@@ -314,6 +316,43 @@ def has_path( catalog, path ):
         if catalog.getpath( rid ) == path:
             return 1
     return 0
+
+class LimitedUnitTestUser( Acquisition.Implicit ):
+    """
+        Stubbed out mmember for unit testing purposes.
+    """
+    def getId( self ):
+        return 'unit_test_member'
+    
+    getUserName = getId
+
+    def allowed( self, object, object_roles=None ):
+        if object_roles is None:
+            object_roles = ()
+        return 'Member' in object_roles
+
+class PortalFolderPermissionTests( unittest.TestCase ):
+
+    def setUp( self ):
+        get_transaction().begin()
+        self._policy = UnitTestSecurityPolicy()
+        SecurityManager.setSecurityPolicy(self._policy)
+        self.connection = Zope.DB.open()
+        self.root = self.connection.root()[ 'Application' ]
+        self.manager = UnitTestUser().__of__( self.root )
+        self.member = LimitedUnitTestUser().__of__( self.root )
+        self.root._setObject( 'folder', PortalFolder( 'folder', '' ) )
+        self.folder = self.root.folder
+        self.folder._setObject( 'doc1', DummyContent( 'doc1' ) )
+        self.folder._setObject( 'doc2', DummyContent( 'doc2' ) )
+        self.folder._setObject( 'doc3', DummyContent( 'doc3' ) )
+    
+    def tearDown( self ):
+        get_transaction().abort()
+        self.connection.close()
+
+    def test_listFolderContentsPerms( self ):
+        pass
 
 class DummyContentWithMetadata( DummyContent ):
 
@@ -550,6 +589,7 @@ class ContentFilterTests( unittest.TestCase ):
 def test_suite():
     suite = unittest.TestSuite()
     suite.addTest( unittest.makeSuite( PortalFolderTests ) )
+    suite.addTest( unittest.makeSuite( PortalFolderPermissionTests ) )
     suite.addTest( unittest.makeSuite( ContentFilterTests ) )
     return suite
 
