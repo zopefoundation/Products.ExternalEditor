@@ -98,7 +98,7 @@ import Globals
 from DublinCore import DefaultDublinCoreImpl
 
 from Products.CMFCore import CMFCorePermissions
-from Products.CMFCore.WorkflowCore import WorkflowAction, afterCreate
+from Products.CMFCore.WorkflowCore import WorkflowAction
 
 
 factory_type_information = ( { 'id'             : 'File'
@@ -174,8 +174,6 @@ def addFile( self
     # constructor because the object is now in the ZODB and
     # can span ZODB objects.
     self._getOb(id).manage_upload(file)
-
-    afterCreate(self._getOb(id))
 
 
 class File( OFS.Image.File

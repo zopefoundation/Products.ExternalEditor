@@ -162,8 +162,3 @@ class WorkflowMethod (Method):
 
 # Backward compatibility.
 WorkflowAction = WorkflowMethod
-
-
-def afterCreate(ob):
-    # This functionality is now in PortalContent.py.
-    pass

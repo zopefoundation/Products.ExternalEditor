@@ -94,7 +94,7 @@ from Products.CMFCore.PortalContent import PortalContent
 from DublinCore import DefaultDublinCoreImpl
 
 from Products.CMFCore import CMFCorePermissions
-from Products.CMFCore.WorkflowCore import WorkflowAction, afterCreate
+from Products.CMFCore.WorkflowCore import WorkflowAction
 from Products.CMFCore.utils import _format_stx, keywordsplitter
 from utils import parseHeadersBody, SimpleHTMLParser, bodyfinder, _dtmldir
 

@@ -97,7 +97,7 @@ import Globals
 from DublinCore import DefaultDublinCoreImpl
 
 from Products.CMFCore import CMFCorePermissions
-from Products.CMFCore.WorkflowCore import WorkflowAction, afterCreate
+from Products.CMFCore.WorkflowCore import WorkflowAction
 
 factory_type_information = ( { 'id'             : 'Image'
                              , 'meta_type'      : 'Portal Image'
@@ -166,8 +166,6 @@ def addImage( self
     # 'Upload' the image.  This is done now rather than in the
     # constructor because it's faster (see File.py.)
     self._getOb(id).manage_upload(file)
-
-    afterCreate(self._getOb(id))
 
 
 class Image( OFS.Image.Image

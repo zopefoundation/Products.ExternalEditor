@@ -34,7 +34,6 @@ from ZWikiRegexes import urlchars, url, urlexp, bracketedexpr,\
      protected_lineexp, antidecaptext, antidecapexp, commentsdelim,\
      preexp, unpreexp, citedexp, cite_prefixexp, intl_char_entities
 import CMFWikiPermissions
-from Products.CMFCore.WorkflowCore import afterCreate
 from Products.CMFCore.PortalContent import PortalContent
 from Products.CMFCore.PortalFolder import PortalFolder
 from Products import CMFDefault

@@ -88,7 +88,7 @@ from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
 from Products.CMFDefault.DublinCore import DefaultDublinCoreImpl
 from Products.CMFCore.PortalContent import PortalContent
-from Products.CMFCore.WorkflowCore import WorkflowAction, afterCreate
+from Products.CMFCore.WorkflowCore import WorkflowAction
 
 # Import permission names
 from Products.CMFCore import CMFCorePermissions
@@ -148,7 +148,6 @@ def addEvent(self
                   , event_url
                  )
     self._setObject(id, event)
-    afterCreate(self.this()._getOb(id))
 
 def _dateStrings( when ):
 

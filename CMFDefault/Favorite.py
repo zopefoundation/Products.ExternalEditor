@@ -95,7 +95,6 @@ from DublinCore import DefaultDublinCoreImpl
 from Link import Link
 
 from Products.CMFCore import CMFCorePermissions
-from Products.CMFCore.WorkflowCore import afterCreate
 
 factory_type_information = ( { 'id'             : 'Favorite'
                              , 'meta_type'      : 'Favorite'
@@ -135,7 +134,6 @@ def addFavorite(self, id, title='', remote_url='', description=''):
         remote_url))
     o=Favorite( id, title, relUrl, description )
     self._setObject(id,o)
-    afterCreate(self.this()._getOb(id))
 
 
 class Favorite( Link ):

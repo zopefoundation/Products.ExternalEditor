@@ -95,7 +95,7 @@ from utils import parseHeadersBody
 
 from Products.CMFCore import CMFCorePermissions
 from AccessControl import ClassSecurityInfo
-from Products.CMFCore.WorkflowCore import WorkflowAction, afterCreate
+from Products.CMFCore.WorkflowCore import WorkflowAction
 
 factory_type_information = ( { 'id'             : 'News Item'
                              , 'meta_type'      : 'News Item'
@@ -143,8 +143,6 @@ def addNewsItem( self
               , text_format=text_format
               )
     self._setObject(id, o)
-    afterCreate(self.this()._getOb(id))
-
 
 class NewsItem( Document ):
     """

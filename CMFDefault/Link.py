@@ -93,7 +93,7 @@ from Products.CMFCore.PortalContent import PortalContent
 from DublinCore import DefaultDublinCoreImpl
 
 from Products.CMFCore import CMFCorePermissions
-from Products.CMFCore.WorkflowCore import WorkflowAction, afterCreate
+from Products.CMFCore.WorkflowCore import WorkflowAction
 
 factory_type_information = ( { 'id'             : 'Link'
                              , 'meta_type'      : 'Link'
@@ -136,7 +136,6 @@ def addLink( self
     """
     o=Link( id, title, remote_url, description )
     self._setObject(id,o)
-    afterCreate(self.this()._getOb(id))
 
 
 class Link( PortalContent
