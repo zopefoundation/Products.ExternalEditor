@@ -116,7 +116,8 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         SkinnedFolder.__init__(self, id, title)
         self._set_collector_path(container)
 
-        user = getSecurityManager().getUser()
+        mbtool = getToolByName(container, 'portal_membership')
+        user = mbtool.getAuthenticatedMember()
         if submitter_id is None:
             submitter_id = str(user)
         self.submitter_id = submitter_id
