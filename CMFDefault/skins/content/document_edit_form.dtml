@@ -61,7 +61,7 @@
   <th class="TextField"> Edit </th>
   <td class="TextField">
    <textarea name="text:text"
-             rows="20" cols="80"><dtml-var text html_quote></textarea>
+             rows="20" cols="80"><dtml-var EditableBody html_quote></textarea>
   </td>
  </tr>
 

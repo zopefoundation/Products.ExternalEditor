@@ -316,10 +316,28 @@ class Document(PortalContent, DefaultDublinCoreImpl):
 
         return 1
 
+    ### Content accessor methods
     security.declareProtected(CMFCorePermissions.View, 'SearchableText')
     def SearchableText(self):
         """ Used by the catalog for basic full text indexing """
         return "%s %s %s" % (self.title, self.description, self.text)
+
+    security.declareProtected(CMFCorePermissions.View, 'CookedBody')
+    def CookedBody(self):
+        """\
+        The prepared basic rendering of an object.  For Documents, this
+        means pre-rendered structured text, or what was between the
+        <BODY> tags of HTML.
+        """
+        return self.cooked_text
+
+    security.declareProtected(CMFCorePermissions.View, 'EditableBody')
+    def EditableBody(self):
+        """\
+        The editable body of text.  This is the raw structured text, or
+        in the case of HTML, what was between the <BODY> tags.
+        """
+        return self.text
 
     security.declareProtected(CMFCorePermissions.View, 'Description')
     def Description(self):

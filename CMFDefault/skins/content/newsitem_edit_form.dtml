@@ -29,7 +29,7 @@
   <th class="TextField"> Body
   </th>
   <td class="TextField">
-   <textarea name="text:text" rows="20" cols="65">&dtml-text;</textarea>
+   <textarea name="text:text" rows="20" cols="65">&dtml-EditableBody;</textarea>
   </td>
  </tr>
  <tr>

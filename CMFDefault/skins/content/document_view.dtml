@@ -4,7 +4,7 @@
 <div class="Desktop">
  <div class="Document">
   <dtml-var content_byline>
-  <dtml-var cooked_text>
+  <dtml-var CookedBody>
 
   <div class="Discussion">
    <dtml-var viewThreadsAtBottom>

@@ -12,7 +12,7 @@
 
 <dtml-var content_byline>
 
-<dtml-var cooked_text>
+<dtml-var CookedBody>
 
 <div class="Discussion">
 
