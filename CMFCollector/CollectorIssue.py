@@ -166,14 +166,14 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         # time we don't have an acquisition content to use...
         self._collector_path = "/".join(collector.getPhysicalPath())
 
-    security.declareProtected(EditCollectorIssue, 'no_submitter_email')
+    security.declareProtected(CMFCorePermissions.View, 'no_submitter_email')
     def no_submitter_email(self):
         """True if there's no way to get an email address for the submitter."""
         if self.submitter_email:
             return 0
         if self.submitter_id != str(self.acl_users._nobody):
             member = self.portal_membership.getMemberById(self.submitter_id)
-            if member and member.getProperty('email', ''):
+            if member and member.getProperty('email'):
                 return 0
         return 1
 
