@@ -158,9 +158,8 @@ class Guard (Persistent):
                 res.append('<code>' + escape(p) + '</code>')
         if self.roles:
             if res:
-                res.append(', role:')
-            else:
-                res.append('Requires role:')
+                res.append('<br/>')
+            res.append('Requires role:')
             for idx in range(len(self.roles)):
                 r = self.roles[idx]
                 if idx > 0:
@@ -171,9 +170,8 @@ class Guard (Persistent):
                 res.append('<code>' + escape(r) + '</code>')
         if self.expr is not None:
             if res:
-                res.append(', expr:')
-            else:
-                res.append('Requires expr:')
+                res.append('<br/>')
+            res.append('Requires expr:')
             res.append('<code>' + escape(self.expr.text) + '</code>')
         return join(res, ' ')
 
