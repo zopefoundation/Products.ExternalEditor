@@ -201,10 +201,15 @@ class ActionsTool (UniqueObject, SimpleItem):
                     if defs:
                         c_url = info.content_url
                         for d in defs:
+                            a = d['action']
+                            if a:
+                                url = c_url + '/' + a
+                            else:
+                                url = c_url
                             actions.append({
                                 'id': d.get('id', None),
                                 'name': d['name'],
-                                'url': join((c_url, d['action']), '/'),
+                                'url': url,
                                 'permissions': d['permissions'],
                                 'category': d.get('category', 'object'),
                                 })
@@ -229,7 +234,7 @@ class ActionsTool (UniqueObject, SimpleItem):
                 # This action requires no extra permissions.
                 verified = 1
             else:
-                if category == 'object' and object is not None:
+                if category in ('object', 'workflow') and object is not None:
                     context = object
                 elif category == 'folder' and folder is not None:
                     context = folder
