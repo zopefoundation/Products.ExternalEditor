@@ -73,10 +73,10 @@ class VersionsTool(UniqueObject, SimpleItemWithProperties):
         
         Returns the object, which might be different from what was passed to
         the method if the object was replaced."""
-        # assert object is in dev portal
         repo = self._getVersionRepository()
         old_state = None
         if not repo.isUnderVersionControl(object):
+            get_transaction().commit(1)  # Get _p_jar attributes set.
             repo.applyVersionControl(object)
         elif self.auto_copy_forward and not repo.isResourceUpToDate(object):
             # Copy the old state forward after the object has been checked out.
@@ -109,8 +109,6 @@ class VersionsTool(UniqueObject, SimpleItemWithProperties):
     security.declareProtected(UseVersionControl, 'checkin')
     def checkin(self, object, message=''):
         """Checks in a new version on the development stage."""
-        # assert object is in dev portal
-
         # Make sure we copy the current data.
         # XXX ZopeVersionControl tries to do this but isn't quite correct yet.
         get_transaction().commit(1)
@@ -123,10 +121,16 @@ class VersionsTool(UniqueObject, SimpleItemWithProperties):
             repo.checkinResource(object, message)
 
 
+    security.declareProtected(UseVersionControl, 'isUnderVersionControl')
+    def isUnderVersionControl(self, object):
+        """Returns a true value if the object is under version control."""
+        repo = self._getVersionRepository()
+        return repo.isUnderVersionControl(object)
+
+
     security.declareProtected(UseVersionControl, 'isCheckedOut')
     def isCheckedOut(self, object):
         """Returns a true value if the object is checked out."""
-        # assert object is in dev portal
         repo = self._getVersionRepository()
         if not repo.isUnderVersionControl(object):
             return 0
@@ -138,7 +142,6 @@ class VersionsTool(UniqueObject, SimpleItemWithProperties):
     def getLogEntries(self, object, only_checkins=0):
         """Returns the log entries for an object as a sequence of
         mappings."""
-        # assert object is in dev portal
         repo = self._getVersionRepository()
         if not repo.isUnderVersionControl(object):
             return []
@@ -186,7 +189,6 @@ class VersionsTool(UniqueObject, SimpleItemWithProperties):
         the object's state can progress along a new line without
         making the user deal with branches, labels, etc.
         """
-        # assert object is in dev portal
         repo = self._getVersionRepository()
         # Verify the object is under version control.
         repo.getVersionInfo(object)

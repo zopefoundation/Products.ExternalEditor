@@ -87,7 +87,8 @@ class LockTool(UniqueObject, SimpleItemWithProperties):
         if self.auto_version:
             vt = getToolByName(self, 'portal_versions', None)
             if vt is not None:
-                if not vt.isCheckedOut(object):
+                if (vt.isUnderVersionControl(object)
+                    and not vt.isCheckedOut(object)):
                     object = vt.checkout(object)
 
         user = getSecurityManager().getUser()
