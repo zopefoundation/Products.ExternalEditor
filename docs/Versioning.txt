@@ -1,0 +1,389 @@
+Title: Version Control in Zope
+Description: Content authors and site designers working in complex web
+sites require support for version control.  This chapter introduces
+versioning in Zope, shows how it can be used, and provides some
+architectural information about how Zope handles versioning.
+Subject: products
+
+Working on a web site is often a complex activity.  There are teams of
+people with various roles producing content and site design resources.
+As the site changes over time, it is important to manage the changes.
+This is the domain of *version control*.
+
+This chapter introduces content authors and site designers to the use
+of versioning in Zope.
+
+   o Goals of versioning
+
+   o Quick tour of using the basics in versioning
+
+   o Advanced operations
+
+   o Versioning architecture
+
+   o Glossary of versioning terms
+
+Goals
+
+  There are numerous goals for different audiences that a version
+  control system addresses.  
+
+  xxx fill in some information on goals here.
+
+  Zope's approach to fulfilling these goals is based on the *DeltaV*
+  model.  DeltaV is an extension of the WebDAV protocol, and has
+  recently become achieved "Proposed Standard" status.  DeltaV
+  represents the collected wisdom of many professionals in the field
+  of version control systems.
+
+  While Zope will use the architecture and jargon from DeltaV to
+  accomplish the goals of versioning, there are no current plans to
+  make Zope compliant with the DeltaV protocol.  Work on this would be
+  a follow-on project.
+
+Quick Start
+
+  For a quick overview of the basics of version control for content
+  authors, imagine a structured website at a newspaper called Whoville
+  Times (WT), Inc.  The WT website is organized similar to the
+  newspaper sections, with extra structure for the web content::
+
+    /
+      /index.html
+      /logo.gif
+      /styles.css
+      /contacts.html
+      /localnews/
+        /localnews/index.html
+	/localnews/policeblotter.html
+      /sports
+        /sports/index.html
+	/sports/scores.html
+      /livechats/
+        /livechats/index.html
+
+  There are several people that have access to work on the website,
+  corresponding to editors and writers of the sections of the
+  newspaper.  Additionally there are website producers that have
+  privileges in different areas of the site.  For instance:
+
+    o Jane is the senior editor for the website.  She can work on any
+    section and approve changes made by others.  She is the primary
+    producer for web-only content, such as the Live Chat feature.
+
+    o Mary is the editor of the Local News section of the newspaper.
+    She also administers this section of the online edition.
+
+    o Art is the copy editor in the sports department that works on
+    the website.
+
+  In addition to the site structure, there is another kind of
+  organization that is common in large web productions.  That is, the
+  test and production server approach is used to allow material to be
+  authored in one location and deployed in another location.  These
+  locations might be on separate machines, in separate Zope processes
+  on the same machine, or in separate folders in the same Zope
+  process.  This test/production split is used to allow updates in
+  isolation, thus increasing the quality and stability of the
+  production site.
+
+  Thus we have an addition to the structure::
+
+    working/   (Test site)
+      working/index.html
+      working/logo.gif
+      working/styles.css
+      working/contacts.html
+      working/localnews/
+        working/localnews/index.html
+	working/localnews/policeblotter.html
+	working/localnews/headlines.html
+      working/sports
+        working/sports/index.html
+	working/sports/scores.html
+	working/sports/springtraining.html
+      working/livechats/
+        working/livechats/index.html
+
+    prod/  (Production site)
+      prod/index.html
+      prod/logo.gif
+      prod/styles.css
+      prod/contacts.html
+      prod/localnews/
+        prod/localnews/index.html
+	prod/localnews/policeblotter.html
+	prod/localnews/headlines.html
+      prod/sports
+        prod/sports/index.html
+	prod/sports/scores.html
+	prod/sports/springtraining.html
+      prod/livechats/
+        prod/livechats/index.html
+
+  In this quickstart section, let's presume that the 'working' and 'prod'
+  sites are already under version control.
+
+  Making Changes With Versioning
+
+    Mary begins her website work by updating the police blotter page
+    with new information from the police department.  She logs in to
+    the 'working' website, where she authors all her content.  Mary
+    then navigates to the police blotter page at
+    '/localnews/policeblotter.html'.
+
+    Since she is logged in, Mary sees an application bar that isn't
+    visible on the page that the site visitors will see on the
+    production site.  The application bar tells her that the police
+    blotter page is checked in and that she is viewing version 1.8 of
+    the page.
+
+    Mary clicks on 'Edit', makes a change, then clicks on save.  The
+    page now says she is viewing version 1.9 of the page.  This is
+    because her part of the website is setup to do *autoversioning*.
+    Behind the scenes, every save does a checkout/update/checkin
+    cycle.
+
+    Mary now wants to update the headlines.  This is a page that
+    several of the people in her department edit as soon as something
+    big happens.  In the past this has meant that people's changes
+    sometimes overwrite her work.  She learned that, to prevent this,
+    she needs to *lock* the page before doing her edits, so that
+    others can neither open the page for editing nor save any changes.
+
+    Mary visits the 'headlines.html' page which is at version 1.32.
+    This time she clicks on 'Lock and edit'.  The application bar
+    indicates that the page is now 'Checked out with lock'.  She makes
+    a change and saves the change.  She then receives a phone call and
+    makes three more saves during the course of the call.  When she is
+    done with the call and her changes, Mary clicks on 'Unlock and
+    checkin' to finish her work on the 'headlines.html' page.  She is
+    prompted for a comment to accompany the unlock and checkin
+    operation.
+
+    The application bar reports that the page is now 'Checked in' and
+    that the version has only increased to 1.33.  Why not 1.36?  Even
+    though she saved the page 4 times, 'Lock and edit' tells Zope to
+    only do a checkin when the page is unlocked.  Thus, in this mode
+    of editing, only one new version is changed for the editing cycle.
+
+    Art has been working on a major feature about this year's spring
+    training camp for baseball.  He has a page at
+    'sports/springtraining.html' where he saves his work and
+    periodically makes it available for review by checking in the
+    page.  Art visits the website to makes some changes to the page
+    and to check in the changes.
+
+    The application bar for the page reports that
+    'springtraining.html' is 'Checked in' and at version 1.5.  Art
+    clicks on 'Check out'.  The application bar now reports the status
+    of the page as 'Checked out'.  Art makes seven edits and realizes
+    he needs some help from a collegue on some wording.  The collegue
+    visits the page, and since it isn't locked, makes a quick change.
+    Art then reloads the contents to get the change, makes some more
+    editing, and prepares to finish.
+
+    Art checks in his changes by clicking on 'Check in'.  He is
+    prompted for a comment.  He types in a status message and clicks
+    'Done'.  The application bar now shows the page as 'Checked in' at
+    version 1.6.
+
+    Jane is told that the number for the circulation department has
+    changed and she needs to update the site.  Since she is an
+    advanced user, Jane uses a desktop editing tool that lets her
+    author content more productively.  This editing tool supports the
+    WebDAV protocol.
+
+    Jane opens her editor, goes to the folder containing the website,
+    and double-clicks on 'contacts.html'.  The editor locks the page
+    and opens it for editing.  The editor has a property inspector
+    that lets her look at the DAV properties, showing her the current
+    version.  Jane makes several changes, saves the document, and
+    closes the document.  When the document is closed, the editing
+    tool unlocks the page, prompting Zope to check in a new version.
+    Jane opens the document again and sees that the property sheet
+    says the version has increased.
+
+  Using Private Workspaces
+
+    Later in the day, Jane hears that the HTML used by the Local News
+    staff isn't compliant with the HTML 4 specification.  She'd like
+    to update all the content, but do so in a way that allows Mary to
+    continue working.
+
+    To accomplish this, Jane decides to checkout her own version of
+    the content used in the 'localnews' folder.  Remember, the folder
+    at '/localnews' and all the content it contains are really
+    checkouts themselves.  There is an authoritative copy in the
+    repository, along with all previous versions of the content.
+
+    Jane uses her web browser to visit the '/localnews' folder.  She
+    sees that the folder itself is 'Checked in' and at version 1.3.
+    Jane clicks on 'Copy new checkout'.  She then visits her user
+    folder by clicking on 'My Content'.  She goes to her 'WORKSPACES'
+    folder and clicks 'Paste'.  Zope then does a new checkout of the
+    folder at '/localnews' and the content contained by the folder.
+
+    Note that, as Jane checks in changes on her own workspace to the
+    local news, the content in '/localnews' doesn't change.  Getting
+    Jane's private changes updated in the '/localnews' area requires
+    an explicit step.  However, as Mary visits the content in
+    '/localnews', the application bar will indicate that some of the
+    content has been updated in another checkout.
+
+    xxx What happens if Mary tries to save a change to a version that
+    is no longer the tip?
+
+    Jane now has her own checkout of the content.  Again, Jane is a
+    power user and wants to run a command-line tool that automatically
+    converts all the content to be compliant with the HTML 4 standard.
+    She runs 'sitecopy', a WebDAV tool that downloads all the
+    resources from '~jane/WORKSPACE/localnews' and saves the pages on
+    her local drive.  She then runs the 'tidy' command line tool to
+    reformat the HTML.  Finally, she runs sitecopy again to upload her
+    changes.
+
+    Her 'WORKSPACE' area is configured to *not* do autoversioning.
+    Thus, the changes to the resources in '~jane/WORKSPACE/localnews'
+    haven't yet been checked in.  Jane uses her web browser to go to
+    the 'localnews' folder in her workspace and verifies that the
+    changes have been uploaded.  She then clicks on 'Checkin' to
+    checkin her changes, supplies a comment, then clicks 'Done'.
+
+  Setting Baselines For Production Content
+
+    The work for the day is now done and it is time to put out a new
+    edition of the newspaper.  In Zope (and DeltaV) jargon, an edition
+    is known as a *baseline*.  A baseline is a way to organize the
+    correct version of all the material needed for a website at a
+    certain time.  Thus, the live website can run a different baseline
+    than test site.  When the test baseline is ready, a new baseline
+    is made from the test site.  The production site is then updated
+    to use the new baseline.  If something goes wrong, the production
+    site can quickly switch back to the old baseline.
+
+    The deadline is approaching and everyone has informed Jane that
+    they are finished.  Jane goes to the URL at 'working/' and browses
+    the site looking for problems.  She notes that the application bar
+    says she is working in 'Baseline: Prod126'.
+
+    Jane clicks on 'Versioning', then clicks on 'Baseline'.  She gets
+    a page that describes all the changes to the site since the last
+    baseline.  Everything is in order, so she types 'Prod127' as the
+    label for the new baseline and clicks 'Submit'.  The baseline is
+    created and the site is now using the new baseline.  Thus, there
+    are no items in the list of changes since the baseline was set.
+
+    Jane now starts switching the live site to use the new baseline.
+    She goes to the URL at 'prod/' and clicks on 'Version Control',
+    then 'Switch to baseline'.  She provides 'Prod127' as the baseline
+    to switch to and clicks 'Done'.  After several seconds, the site
+    has all the new and updated content from the test site.  Any
+    renames or deletes are also reflected in the production site.
+
+  Summary
+
+    This quickstart section provided an overview of how versioning is
+    used in Zope.  We showed the various ways that content authors can
+    work on resources using versioning.  We also saw how site managers
+    can perform work on the entire body of content.
+
+    In the remainder of this chapter we will focus on the specifics of
+    each aspect introduced here.  We will also look under the covers
+    at the versioning architecture in Zope.
+
+Using Version Control
+
+  Setting Up The Repository
+
+    - Create new repository, connect to existing repository,
+    disconnect from existing repository
+
+  Initial Checkout
+
+    o setting parameters like autoversioning
+
+  Modes of Authoring
+
+    - autoversioning on edit, autoversioning on unlock, checkout
+
+    - viewing changes in context
+
+    - versioning of configuration content
+
+    - locking
+
+    - checked in content can't be edited
+
+    - working from DAV/ftp
+
+      o editing and synchronizing
+
+      o changing the view to show DAV property info
+
+    - issues for skins and site designers
+
+  Commit, Update, Discard
+
+  Working With Version Histories
+
+    - view versions and change history, compare between versions, copy
+    old version to new version,
+
+  Workspaces
+
+  Branches
+
+    - branching, merging
+
+  Baselines -- grouping together versions of resources
+
+  Branching and Merging
+
+  Reports
+
+  Configuration and Administration of Versioning
+
+    - Site policies, collection policies, permissions on version
+    operations,
+
+    - Administration on repository (e.g. archiving), 
+
+Architecture
+
+  o Properties and property sheets as part of versioned resource
+
+  o DAV properties from DeltaV: which supported?
+
+  o Different repository implementations (pack, undo, diff, etc.)
+
+  o Will we have a catalog for fast operations on all versioned
+  content?
+
+  o Versioned collection issues
+
+  o Issues involving interactions between versioning and both site
+  catalogs and workflow (e.g. will versioned objects be searchable
+  when they aren't checked in, will two resources that point to the
+  same version both be searchable)
+
+  o Issues for developers
+
+    - APIs for versioning, properties for versioning, serialization
+
+    - preconditions and postconditions on version commits
+
+    - are properties a logical part of the content being versioned,
+    and does a change to a property generate a new version?
+
+Glossary
+
+  Working server
+
+  Production server
+
+  Autoversioning
+
+Notes
+
+  o Is the Site a workspace, baseline, activity, collection, etc.?
