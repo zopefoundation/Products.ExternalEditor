@@ -57,6 +57,10 @@ HEAD only (unreleased)
 
   Others
 
+    - Added DeprecationWarning to the all_cmf_tests.py script. The canonical
+      way to run the tests is using "zopectl test".
+      (http://www.zope.org/Collectors/CMF/272)
+
     - CMFDefault: Oldstyle DefaultWorkflowDefinition is no longer registered.
       So you can't accidentally add this deprecated workflow.
 

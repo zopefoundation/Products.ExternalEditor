@@ -16,6 +16,7 @@
 
 $Id$
 """
+from warnings import warn
 
 import unittest
 import Testing
@@ -75,6 +76,10 @@ where
     sys.exit( 2 )
 
 def main():
+    warn( 'all_cmf_tests is deprecated and will be removed in CMF 1.7. '
+          'Please run the tests using \"zopectl test\" instead.'
+        , DeprecationWarning
+        )
 
     try:
         opts, args = getopt.getopt( sys.argv[1:], 'vq?' )
