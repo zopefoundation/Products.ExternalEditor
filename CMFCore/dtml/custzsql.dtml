@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML lang="en">
+<HEAD>
+<TITLE>Customize</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF" LINK="#000099" VLINK="#555555">
+<dtml-var manage_tabs>
+
+  <FORM ACTION="manage_doCustomize" METHOD="POST">
+    <TABLE CELLSPACING="2">
+      <TR>
+	<TH ALIGN="LEFT" VALIGN="TOP">Id</TH>
+	<TD ALIGN="LEFT" VALIGN="TOP"><dtml-var getId></TD>
+      </TR>
+      <tr>
+	<th align="left" valign="top">
+        <em>Size</em>
+        </th>
+	<td align="left" valign="top">
+        <dtml-var get_size thousands_commas> bytes
+	</td>
+      </tr>
+      <tr>
+	<th align="left" valign="top">
+        <em>Last modified</em>
+        </th>
+	<td align="left" valign="top">
+        &dtml-getModTime;
+	</td>
+      </tr>
+      <tr>
+	<th align="left" valign="top">
+        <em>Source file</em>
+        </th>
+	<td align="left" valign="top">
+        &dtml-getObjectFSPath;
+	</td>
+      </tr>
+      <tr>
+        <th align="left" valign="top">
+          Customize
+        </th>
+        <td align="left" valign="top">
+          <em>Select a destination folder and press the button
+          to make a copy of this method that can be customized.</em><br>
+          <select name="folder_path" size="1">
+            <dtml-in expr="listCustFolderPaths('DTML Method')">
+              <option value="&dtml-sequence-key;">&dtml-sequence-item;</option>
+            </dtml-in>
+          </select>
+          <input type="submit" name="submit" value=" Customize ">
+        </td>
+      </tr>
+    </TABLE>
+  </FORM>
+<table border="1" bgcolor="#cccccc"><tr><td>
+<code><dtml-var src newline_to_br html_quote></code>
+</td></tr></table>
+</BODY>
+</HTML>

@@ -92,6 +92,7 @@ import ActionsTool, UndoTool, RegistrationTool, SkinsTool
 import MemberDataTool, TypesTool
 import DirectoryView, FSImage, FSPropertiesObject
 import FSDTMLMethod, FSPythonScript, FSSTXMethod
+import FSZSQLMethod
 import CookieCrumbler
 import ContentTypeRegistry
 import utils
@@ -166,6 +167,8 @@ def initialize(context):
                        'images/fsimage.gif', globals())
     utils.registerIcon(FSPropertiesObject.FSPropertiesObject,
                        'images/fsprops.gif', globals())
+    utils.registerIcon(FSZSQLMethod.FSZSQLMethod,
+                       'images/fssqlmethod.gif', globals())
     utils.registerIcon(TypesTool.FactoryTypeInformation,
                        'images/typeinfo.gif', globals())
     utils.registerIcon(TypesTool.ScriptableTypeInformation,

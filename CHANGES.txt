@@ -35,7 +35,7 @@
   - (__future__) Added DCWorkflow (through-the-web configurable
     workflows) to the core set of CMF products.
 
-  - (__future__) Merged Chris Withers' FSSQLMethod into CMFCore.
+  - Merged Chris Withers' FSSQLMethod into CMFCore.
 
   - Perform permission checking inside personalize_form to make
     sure Anonymous cannot access it without logging in (CMF Tracker
@@ -97,8 +97,9 @@
 
  Bug fixes
 
-  - Refactored getDefaultView into CMFCore.utils._getView;
-    can now specify a view to get by name.
+  - Merged Seb Bacon's refactoring of getDefaultView into
+    CMFCoreutils._getView; clients can now specify a view by name,
+    as well.
 
   - Removed an infinite loop condition that arises when
     MembershipTool.createMemberArea gets called inside wrapUser
