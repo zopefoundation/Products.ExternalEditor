@@ -294,6 +294,8 @@ class Document(PortalContent, DefaultDublinCoreImpl):
 
         if (# we have a safety belt value:
             this_belt
+            # and the current object has a safety belt (ie - not freshly made)
+            and (self._safety_belt is not None)
             # and the safety belt doesn't match the current one:
             and (this_belt != self._safety_belt)
             # and safety belt and user don't match last safety belt and user:
