@@ -115,9 +115,9 @@ class Document(PortalContent, DefaultDublinCoreImpl):
 
     security.declareProtected(CMFCorePermissions.ModifyPortalContent,
                               'manage_editDocument' )
-    def manage_editDocument(self, text_format, text, file='', REQUEST=None):
+    def manage_editDocument(self, text, text_format, file='', REQUEST=None):
         """ A ZMI (Zope Management Interface) level editing method """
-        self.edit(text_format, text, file)
+        self.edit(text_format=text_format, text=text, file=file)
         if REQUEST is not None:
             REQUEST['RESPONSE'].redirect(
                 self.absolute_url()
