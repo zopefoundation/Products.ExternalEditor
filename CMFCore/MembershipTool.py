@@ -291,7 +291,8 @@ class MembershipTool (UniqueObject, SimpleItem):
         parent = self.aq_inner.aq_parent
         members =  getattr(parent, 'Members', None)
         if members is not None:
-            members.manage_addPortalFolder(member_id)
+            f_title = "%s's Home" % member_id
+            members.manage_addPortalFolder( id=member_id, title=f_title )
             f=getattr(members, member_id)
  
             f.manage_permission(CMFCorePermissions.View,
