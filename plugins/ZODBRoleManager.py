@@ -79,7 +79,8 @@ class ZODBRoleManager( BasePlugin ):
             role_holder = aq_parent( aq_inner( container ) )
             for role in getattr( role_holder, '__ac_roles__', () ):
                 try:
-                    self.addRole( role )
+                    if role not in ('Anonymous', 'Authenticated'):
+                        self.addRole( role )
                 except KeyError:
                     pass
 
@@ -129,14 +130,14 @@ class ZODBRoleManager( BasePlugin ):
                 e_url = '%s/manage_roles' % self.getId()
                 p_qs = 'role_id=%s' % role_id
                 m_qs = 'role_id=%s&assign=1' % role_id
-                
+
                 info = {}
                 info.update( self._roles[ role_id ] )
-                
+
                 info[ 'pluginid' ] = plugin_id
                 info[ 'properties_url'  ] = '%s?%s' % (e_url, p_qs)
                 info[ 'members_url'  ] = '%s?%s' % (e_url, m_qs)
-                
+
                 if not role_filter or role_filter( info ):
                     role_info.append( info )
 
@@ -240,7 +241,7 @@ class ZODBRoleManager( BasePlugin ):
                 if ( role_id not in self._principal_roles.get( id, () )
                  and role_id != id ):
                     result.append( ( id, title ) )
-        
+
         return result
 
     security.declareProtected( ManageUsers, 'listAssignedPrincipals' )
@@ -252,13 +253,17 @@ class ZODBRoleManager( BasePlugin ):
 
         for k, v in self._principal_roles.items():
             if role_id in v:
-                # should be one and only one mapping to 'k'
+                # should be at most one and only one mapping to 'k'
 
                 parent = aq_parent( self )
                 info = parent.searchPrincipals( id=k, exact_match=True )
-                assert( len( info ) == 1 )
-                result.append( ( k, info[0].get( 'title', k ) ) )
-        
+                assert( len( info ) in ( 0, 1 ) )
+                if len( info ) == 0:
+                    title = '<%s: not found>' % k
+                else:
+                    title = info[0].get( 'title', k )
+                result.append( ( k, title ) )
+
         return result
 
     security.declareProtected( ManageUsers, 'assignRoleToPrincipal' )
@@ -373,7 +378,7 @@ class ZODBRoleManager( BasePlugin ):
             message = 'no+roles+selected'
 
         else:
-        
+
             for role_id in role_ids:
                 self.removeRole( role_id )
 
@@ -418,7 +423,7 @@ class ZODBRoleManager( BasePlugin ):
         """ Remove a role from one or more principals via the ZMI.
         """
         removed = []
-        
+
         for principal_id in principal_ids:
             if self.removeRoleFromPrincipal( role_id, principal_id ):
                 removed.append( principal_id )
