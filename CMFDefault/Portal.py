@@ -91,7 +91,8 @@ from Products.CMFCore.utils import getToolByName
 from Products.CMFTopic import Topic, topic_globals
 from DublinCore import DefaultDublinCoreImpl
 
-import Document, Image, File, Link, NewsItem, Favorite, DiscussionItem
+import Document, Image, File, Link, NewsItem, Favorite
+import DiscussionItem, SkinnedFolder
 
 factory_type_information = ( Document.factory_type_information
                            + Image.factory_type_information
@@ -100,6 +101,7 @@ factory_type_information = ( Document.factory_type_information
                            + NewsItem.factory_type_information
                            + Favorite.factory_type_information
                            + DiscussionItem.factory_type_information
+                           + SkinnedFolder.factory_type_information
                            )
 
 
@@ -351,7 +353,13 @@ class PortalGenerator:
         self.setupRoles(p)
         self.setupPermissions(p)
         self.setupDefaultSkins(p)
-        self.setupTypes(p)
+
+        #   SkinnedFolders are only for customization;
+        #   they aren't a default type.
+        default_types = tuple( filter( lambda x: x['id'] != 'Skinned Folder'
+                                     , factory_type_information ) )
+        self.setupTypes(p, default_types )
+
         self.setupTypes(p, PortalFolder.factory_type_information)
         self.setupTypes(p, Topic.factory_type_information)
         self.setupMimetypes(p)

@@ -88,12 +88,7 @@
 ADD_CONTENT_PERMISSION = 'Add portal content'
  
 import Portal
-import Document, Link, NewsItem, File, Image, Favorite
-try:
-    import SkinnedFolder
-    HAS_SKINNED_FOLDER=1
-except ImportError:
-    HAS_SKINNED_FOLDER=0
+import Document, Link, NewsItem, File, Image, Favorite, SkinnedFolder
 
 import DiscussionItem
 import PropertiesTool, MembershipTool, MetadataTool
@@ -139,10 +134,9 @@ contentClasses = ( Document.Document
                  , Link.Link
                  , Favorite.Favorite
                  , NewsItem.NewsItem
+                 , SkinnedFolder.SkinnedFolder
                  )
 
-if HAS_SKINNED_FOLDER:
-    contentClasses = contentClasses + ( SkinnedFolder.SkinnedFolder, )
 
 contentConstructors = ( Document.addDocument
                       , File.addFile
@@ -150,6 +144,7 @@ contentConstructors = ( Document.addDocument
                       , Link.addLink
                       , Favorite.addFavorite
                       , NewsItem.addNewsItem
+                      , SkinnedFolder.addSkinnedFolder
                       )
 
 bases = ( ( Portal.CMFSite

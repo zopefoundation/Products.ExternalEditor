@@ -2,6 +2,9 @@
 
  New features
 
+  - Landed "skinned folder" module, which permits creation of
+    "folderish" types with customized replacements for 'index_html'.
+
   - Added 'run_all_tests' script, to simplify running all unit
     tests for CMF-related products.
 
