@@ -168,13 +168,6 @@ class CookieAuthHelper(Folder, BasePlugin):
     security.declarePrivate('unauthorized')
     def unauthorized(self):
         resp = self.REQUEST['RESPONSE']
-        # No errors of any sort may propagate, and we don't care *what*
-        # they are, even to log them.
-        try: del resp.unauthorized
-        except: pass
-        try: del resp._unauthorized
-        except: pass
-
         # If we set the auth cookie before, delete it now.
         if resp.cookies.has_key(self.cookie_name):
             del resp.cookies[self.cookie_name]
@@ -182,9 +175,10 @@ class CookieAuthHelper(Folder, BasePlugin):
         # Redirect if desired.
         url = self.getLoginURL()
         if url is not None:
-            raise 'Redirect', url
+            response.redirect(url)
+            return 1
 
-        # Fall through to the standard unauthorized() call.
+        # Could not challenge.
         return 0
 
 
