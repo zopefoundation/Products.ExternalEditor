@@ -68,6 +68,7 @@ def addFavorite(self, id, title='', remote_url='', description=''):
     portal_obj = portal_url.getPortalObject()
     content_obj = portal_obj.restrictedTraverse( remote_url )
     relUrl = portal_url.getRelativeUrl( content_obj )
+    
     o=Favorite( id, title, relUrl, description )
     self._setObject(id,o)
 
@@ -95,8 +96,18 @@ class Favorite( Link ):
         self.remote_url=remote_url
         self.description = description
         
+    def manage_afterAdd(self, item, container):
+        """Intercept after favorite has beeing added.
+        
+        The tools are not reachable in '__init__' because 'self' is 
+        not yet wrapped at this time. That's why the after add hook
+        has to be intercepted.
+        """
         # save unique id of favorite
         self.remote_uid = self._getUidByUrl()
+        
+        # do the usual stuff
+        Link.manage_afterAdd(self, item, container)
         
     def _getUidByUrl(self):
         """Registers and returns the uid of the remote object if
