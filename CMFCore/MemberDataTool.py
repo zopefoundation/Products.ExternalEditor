@@ -306,14 +306,27 @@ class MemberData (SimpleItem):
 
     security.declarePublic('getProperty')
     def getProperty(self, id, default=_marker):
+
         tool = self.getTool()
-        if tool.hasProperty(id):
-            return getattr(self, id)
-        else:
-            if default is _marker:
-                raise 'Property not found', id
-            else:
-                return default
+        base = aq_base( self )
+
+        # First, check the wrapper (w/o acquisition).
+        # XXX: s.b., tool.getPropertyForMember( self, id, default )?
+        value = getattr( base, id, _marker )
+        if value is not _marker:
+            return value
+
+        # Then, check the tool for a value other than ''
+        value = tool.getProperty( id, _marker )
+        if value is not _marker and value != '':
+            return value
+
+        # Finally, try the user object.
+        value = getattr( self.getUser(), id, default )
+        if value is _marker:
+            raise 'Property not found', id
+
+        return value
 
     security.declarePrivate('getPassword')
     def getPassword(self):
