@@ -1,1 +1,1 @@
-Unreleased
+CMFWorkspaces-0.10
