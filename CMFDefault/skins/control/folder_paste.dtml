@@ -1,2 +1,11 @@
-<dtml-call expr="manage_pasteObjects(REQUEST['__cp'], REQUEST)">
-<dtml-return expr="folder_contents(_.None, _, portal_status_message='Pasted.')">
+<dtml-if expr="REQUEST.has_key( 'ids' )">
+  <dtml-call expr="manage_pasteObjects(REQUEST['__cp'], REQUEST)">
+  <dtml-call expr="REQUEST['RESPONSE'].redirect(
+               '%s/folder_contents?portal_status_message=Pasted.'
+               % absolute_url() )">
+<dtml-else>
+  <dtml-call expr="REQUEST['RESPONSE'].redirect(
+               '%s/folder_contents?portal_status_message='
+               'Please+copy+or+cut+one+or+more+items+first.'
+             % absolute_url() )">
+</dtml-if>

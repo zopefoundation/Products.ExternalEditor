@@ -1,2 +1,10 @@
-<dtml-call expr="manage_delObjects(REQUEST['ids'], REQUEST)">
-<dtml-return expr="folder_contents(_.None, _, portal_status_message='Deleted.')">
+<dtml-if expr="REQUEST.has_key( 'ids' )">
+  <dtml-call expr="manage_delObjects(REQUEST['ids'], REQUEST)">
+  <dtml-call expr="REQUEST['RESPONSE'].redirect(
+               '%s/folder_contents?portal_status_message=Deleted.'
+               % absolute_url() )">
+<dtml-else>
+  <dtml-call expr="REQUEST['RESPONSE'].redirect(
+               '%s/folder_contents?portal_status_message='
+               'Please+select+one+or+more+items+first.' % absolute_url() )">
+</dtml-if>

@@ -1,2 +1,10 @@
-<dtml-call expr="manage_copyObjects(REQUEST['ids'], REQUEST, RESPONSE)">
-<dtml-return expr="folder_contents(_.None, _, portal_status_message='Copied.')">
+<dtml-if expr="REQUEST.has_key( 'ids' )">
+  <dtml-call expr="manage_copyObjects(REQUEST['ids'], REQUEST, RESPONSE)">
+  <dtml-call expr="REQUEST['RESPONSE'].redirect(
+               '%s/folder_contents?portal_status_message=Copied.'
+               % absolute_url() )">
+<dtml-else>
+  <dtml-call expr="REQUEST['RESPONSE'].redirect(
+               '%s/folder_contents?portal_status_message='
+               'Please+select+one+or+more+items+first.' % absolute_url() )">
+</dtml-if>
