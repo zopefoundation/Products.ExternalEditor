@@ -2,7 +2,9 @@ CMF 1.5.0-alpha (2004/07/09)
 
   New Features
 
-    - New CMFSetup tool provides export / import of various site
+    - CMFActionIcons product is now shipped as part of the CMF release.
+
+    - New portal_setup tool provides export / import of various site
       configuration choices, both as tarballs and as TTW "snapshots".
       See the "README":CMFSetup/README.txt.
 
