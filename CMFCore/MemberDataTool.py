@@ -159,7 +159,9 @@ class MemberDataTool (UniqueObject, SimpleItem, PropertyManager, ActionProviderB
                 m = MemberData(base, id)
                 if temps is None:
                     self._v_temps = {id:m}
-                    self.REQUEST._hold(CleanupTemp(self))
+                    if hasattr(self, 'REQUEST'):
+                        # No REQUEST during tests.
+                        self.REQUEST._hold(CleanupTemp(self))
                 else:
                     temps[id] = m
         else:
