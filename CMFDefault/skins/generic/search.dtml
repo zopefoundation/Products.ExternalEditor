@@ -10,9 +10,7 @@
 items<dtml-if name="SearchableText"> matching "&dtml-SearchableText;"</dtml-if>.</p>
 
 <dtml-in results size="25" start="batch_start">
- <dtml-let objURL="getURL() + '/view'"
-           objIcon="'%s/%s' % ( portal_url(), icon )"
- >
+ <dtml-let objURL="getURL() + '/view'">
 
  <dtml-if sequence-start>
 <table class="SearchResults">
@@ -28,14 +26,18 @@ items<dtml-if name="SearchableText"> matching "&dtml-SearchableText;"</dtml-if>.
  </dtml-if>
 
  <tr>
-  <td>
-   <a href="&dtml.url_quote-objURL;"><img src="&dtml-objIcon;" border="0" alt="[&dtml-meta_type;]" title="[&dtml-meta_type;]"></a>
+  <td><dtml-if icon>
+   <a href="&dtml-objURL;"><img
+    src="&dtml-BASEPATH1;/&dtml-icon;" border="0"
+    alt="[&dtml.missing-Type;]"
+    title="[&dtml.missing-Type;]"></a>
+   </dtml-if>
   </td>
   <td>
-   <a href="&dtml.url_quote-objURL;"><dtml-if name="Title"><dtml-var name="Title" size="75" html_quote><dtml-else>(No title)</dtml-if></a>
+   <a href="&dtml-objURL;"><dtml-if name="Title"><dtml-var name="Title" size="75" html_quote><dtml-else>(No title)</dtml-if></a>
   </td>
   <td>
-    &dtml-meta_type;
+    &dtml.missing-Type;
   </td>
   <td>
    &dtml-Date;
@@ -44,8 +46,9 @@ items<dtml-if name="SearchableText"> matching "&dtml-SearchableText;"</dtml-if>.
  <tr>
   <td>&nbsp;</td>
   <td colspan="3"><em>
-   <dtml-if name="Description"><dtml-var name="Description" missing="No description..." size="100" html_quote>
-   <dtml-else>No description...</dtml-if></em></td>
+   <dtml-if name="Description"><dtml-var name="Description"
+   missing="(No description)" size="100" html_quote>
+   <dtml-else>(No description)</dtml-if></em></td>
  </tr>
  <dtml-if sequence-end>
   </table>

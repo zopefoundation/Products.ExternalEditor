@@ -1,12 +1,22 @@
 <dtml-comment>
-Start Filtering cookies stuff here
+folderfilter cookie maintenance.
 </dtml-comment>
-<dtml-call "parseFilterString(REQUEST)">
-<dtml-if "REQUEST.has_key('encoded')">
 
-<dtml-call "RESPONSE.setCookie('folderfilter', REQUEST['encoded'], path='/', expires='Wed, 19 Feb 2020 14:28:00 GMT')">
-
+<dtml-if expr="REQUEST.get('clear_view_filter', 0)">
+ <dtml-call expr="RESPONSE.expireCookie('folderfilter', path='/')">
+ <dtml-call expr="REQUEST.set('folderfilter', '')">
+ <dtml-call expr="REQUEST.set('close_filter_form', '1')">
+<dtml-elif expr="REQUEST.get('set_view_filter', 0)">
+ <dtml-let filter="encodeFolderFilter(REQUEST)">
+  <dtml-call expr="RESPONSE.setCookie('folderfilter', filter,
+                   path='/', expires='Wed, 19 Feb 2020 14:28:00 GMT')">
+  <dtml-call expr="REQUEST.set('folderfilter', filter)">
+ </dtml-let>
 </dtml-if>
+
+<dtml-comment>
+Folder contents display.
+</dtml-comment>
 
 <dtml-call "REQUEST.set('isDesktop', 1)">
 <dtml-var standard_html_header>
@@ -52,7 +62,9 @@ Start Filtering cookies stuff here
      </dtml-if>
 
 
-<dtml-in "contentValues(REQUEST=REQUEST)" sort="id" size="19" start=qs skip_unauthorized>
+<dtml-in expr="contentValues(filter=decodeFolderFilter(
+         REQUEST.get('folderfilter', '')))"
+         sort="id" size="19" start=qs skip_unauthorized>
  <dtml-if next-sequence>
   <dtml-call "REQUEST.set('next-sequence'
                          , _['next-sequence-start-number'])">
@@ -66,7 +78,8 @@ Start Filtering cookies stuff here
            portalish="_.hasattr( obj, 'isPortalContent' )
                      and obj.isPortalContent"
            methodID="folderish and '/folder_contents' or ( portalish
-                         and '/view' or '' )"
+                     and '/view' or '' )"
+           icon="_.getattr(obj, 'icon', 0)"
  >
      <tr valign="top">
       <td>
@@ -74,9 +87,11 @@ Start Filtering cookies stuff here
           id="cb_&dtml-id;" />
       </td>
       <td>
+         <dtml-if icon>
          <a href="&dtml.url_quote-id;&dtml-methodID;"
-          ><img src="&dtml-portal_url;/<dtml-var expr="obj.getIcon()">"
-                alt="&dtml-meta_type;" border="0"></a> 
+          ><img src="&dtml-BASEPATH1;/&dtml-icon;"
+                alt="&dtml-Type;" border="0"></a> 
+         </dtml-if>
       </td>
       <td>
          <a href="&dtml.url_quote-id;&dtml-methodID;"

@@ -38,12 +38,13 @@
 <dtml-if object_actions>
  <tr class="&dtml-AuthClass;">
   <td class="ActionTitle">
-   <dtml-let icon="obj.icon"
-             mt="obj.meta_type"
+   <dtml-let icon="_.getattr(obj, 'icon', '')"
+             typ="_.getattr(obj, 'Type', '')"
              objID="obj.id"
    >
-     <img src="&dtml-portal_url;/&dtml-icon;" align="left"
-          alt="&dtml-meta_type;">
+     <dtml-if icon>
+     <img src="&dtml-BASEPATH1;/&dtml-icon;" align="left" alt="&dtml-typ;" />
+     </dtml-if>
      &dtml-objID;
     </dtml-let>
   </td>
