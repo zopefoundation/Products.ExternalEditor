@@ -19,8 +19,8 @@ from Interface import Attribute
 from Interface import Interface
 
 
-class ICallableOpaqueItemWithHooks(Interface):
-    """Interface for callable opaque items with manage_* hooks.
+class ICallableOpaqueItem(Interface):
+    """Interface for callable opaque items.
 
     Opaque items are subelements that are contained using something that
     is not an ObjectManager.
@@ -36,4 +36,19 @@ class ICallableOpaqueItemWithHooks(Interface):
     
     def getId():
         """Returns the name of the attribute the opaque item is assigend to.
+        """
+
+class ICallableOpaqueItemEvents(Interface):
+    """CMF specific events upon copying, renaming and deletion.
+    """
+    def manage_afterClone(item):
+        """After clone event hook.
+        """
+    
+    def manage_beforeDelete(item, container):
+        """Before delete event hook.
+        """
+    
+    def manage_afterAdd(self, item, container):
+        """After add event hook.
         """

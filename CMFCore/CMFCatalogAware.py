@@ -27,7 +27,7 @@ from permissions import ModifyPortalContent
 from utils import _dtmldir
 from utils import getToolByName
 
-from interfaces.IOpaqueItems import ICallableOpaqueItemWithHooks
+from interfaces.IOpaqueItems import ICallableOpaqueItem
 
 class CMFCatalogAware(Base):
     """Mix-in for notifying portal_catalog and portal_workflow
@@ -122,8 +122,7 @@ class CMFCatalogAware(Base):
         
         # Call 'talkback' knowing that it is an opaque item.
         # This will remain here as long as the discussion item does
-        # not implement ICallableOpaqueItemWithHooks (backwards 
-        # compatibility).
+        # not implement ICallableOpaqueItem (backwards compatibility).
         if hasattr(aq_base(self), 'talkback'):
             talkback = self.talkback
             if talkback is not None:
@@ -132,11 +131,11 @@ class CMFCatalogAware(Base):
         # Other opaque items than 'talkback' may have callable
         # manage_after* and manage_before* hooks.
         # Loop over all attributes and add those to 'items' 
-        # implementing 'ICallableOpaqueItemWithHooks'.
+        # implementing 'ICallableOpaqueItem'.
         self_base = aq_base(self)
         for name in self_base.__dict__.keys():
             obj = getattr(self_base, name)
-            if ICallableOpaqueItemWithHooks.isImplementedBy(obj):
+            if ICallableOpaqueItem.isImplementedBy(obj):
                 items.append((obj.getId(), obj))
         
         return tuple(items)

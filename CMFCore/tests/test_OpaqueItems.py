@@ -6,7 +6,8 @@ from Interface.Verify import verifyClass
 
 from types import StringType
 
-from Products.CMFCore.interfaces.IOpaqueItems import ICallableOpaqueItemWithHooks
+from Products.CMFCore.interfaces.IOpaqueItems 
+    import ICallableOpaqueItem, ICallableOpaqueItemEvents
 from Products.CMFCore.PortalFolder import PortalFolder
 from Products.CMFCore.tests.base.dummy import DummyContent as OriginalDummyContent
 from Products.CMFCore.tests.base.testcase import SecurityTest
@@ -76,13 +77,17 @@ class MarkerOnly(OpaqueBase):
     as callable
     """
     __implements__ = (
-        ICallableOpaqueItemWithHooks,
+        ICallableOpaqueItem,
     )
 
 class HooksOnly(OpaqueBase):
     """ Opaque item with manage_after/before hookes but not marked
     as callable
     """
+    __implements__ = (
+        ICallableOpaqueItemEvents
+    )
+    
     def manage_afterAdd(self, item, container):
         self.addCount = self.addCounter
         self.addCounter += 1
@@ -100,7 +105,7 @@ class HooksAndMarker(HooksOnly, MarkerOnly):
     """ Opaque item with manage_after/before hookes and marked
     as callable
     """
-    pass
+    __implements__ = HooksOnly.__implements__ + MarkerOnly.__implements__
 
 
 # -------------------------------------------
