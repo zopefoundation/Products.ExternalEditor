@@ -284,14 +284,14 @@ class TypeInfoConfiguratorTests( _TypeInfoSetup ):
         configurator = self._makeOne( site ).__of__( site )
         self.assertEqual( len( tool.objectIds() ), 0 )
 
-        configurator.parseTypeXML( _FOO_EXPORT % 'foo' )
-        self.assertEqual( len( tool.objectIds() ), 1 )
+        info_list = configurator.parseTypeXML( _FOO_EXPORT % 'foo' )
 
-        type_id, ti = tool.objectItems()[ 0 ]
-        self.assertEqual( type_id, 'foo' )
-        self.assertEqual( ti.getId(), 'foo' )
-        self.assertEqual( ti.Title(), 'Foo' )
-        self.assertEqual( len( ti.getMethodAliases() ), 2 )
+        self.assertEqual( len( info_list ), 1 )
+
+        info = info_list[ 0 ]
+        self.assertEqual( info[ 'id' ], 'foo' )
+        self.assertEqual( info[ 'title' ], 'Foo' )
+        self.assertEqual( len( info[ 'aliases' ] ), 2 )
 
     def test_parseTypeXML_STI( self ):
 
@@ -300,14 +300,13 @@ class TypeInfoConfiguratorTests( _TypeInfoSetup ):
         configurator = self._makeOne( site ).__of__( site )
         self.assertEqual( len( tool.objectIds() ), 0 )
 
-        configurator.parseTypeXML( _BAR_EXPORT % 'bar' )
-        self.assertEqual( len( tool.objectIds() ), 1 )
+        info_list = configurator.parseTypeXML( _BAR_EXPORT % 'bar' )
+        self.assertEqual( len( info_list ), 1 )
 
-        type_id, ti = tool.objectItems()[ 0 ]
-        self.assertEqual( type_id, 'bar' )
-        self.assertEqual( ti.getId(), 'bar' )
-        self.assertEqual( ti.Title(), 'Bar' )
-        self.assertEqual( len( ti.getMethodAliases() ), 2 )
+        info = info_list[ 0 ]
+        self.assertEqual( info[ 'id' ], 'bar' )
+        self.assertEqual( info[ 'title' ], 'Bar' )
+        self.assertEqual( len( info[ 'aliases' ] ), 2 )
 
     def test_parseTypeXML_actions( self ):
 
@@ -315,16 +314,16 @@ class TypeInfoConfiguratorTests( _TypeInfoSetup ):
         tool = site.portal_types
         configurator = self._makeOne( site ).__of__( site )
 
-        configurator.parseTypeXML( _FOO_EXPORT % 'foo' )
+        type_info_list = configurator.parseTypeXML( _FOO_EXPORT % 'foo' )
 
-        type_id, ti = tool.objectItems()[ 0 ]
-        action_list = ti.listActions()
-        self.assertEqual( len( action_list ), 3 )
+        type_info = type_info_list[ 0 ]
+        action_info_list = type_info[ 'actions' ]
+        self.assertEqual( len( action_info_list ), 3 )
 
-        info = action_list[ 0 ]
-        self.assertEqual( info.getId(), 'view' )
-        self.assertEqual( info.Title(), 'View' )
-        self.assertEqual( info.getPermissions(), ( 'View', ) )
+        action_info = action_info_list[ 0 ]
+        self.assertEqual( action_info[ 'id' ], 'view' )
+        self.assertEqual( action_info[ 'title' ], 'View' )
+        self.assertEqual( action_info[ 'permissions' ], ( 'View', ) )
 
 
 _TI_LIST = ( { 'id'                     : 'foo'

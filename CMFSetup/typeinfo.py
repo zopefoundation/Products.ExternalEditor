@@ -45,7 +45,16 @@ def importTypesTool( context ):
     for type_id, type_filename in configurator.parseToolXML( text ):
 
         text = context.readDataFile( type_filename )
-        configurator.parseTypeXML( text )
+        info_list = configurator.parseTypeXML( text )
+
+        for info in info_list:
+
+            klass_info = [ x for x in typeClasses
+                              if x[ 'name' ] == info[ 'kind' ] ][ 0 ]
+
+            type_info = klass_info[ 'class' ]( **info )
+
+            types_tool._setObject( str( info[ 'id' ] ), type_info )
 
 
     # XXX: YAGNI?
@@ -154,14 +163,7 @@ class TypeInfoConfigurator( Implicit ):
         parser = _TypeInfoParser( encoding )
         parseString( xml, parser )
 
-        for info in parser._info_list:
-
-            klass_info = [ x for x in typeClasses
-                              if x[ 'name' ] == info[ 'kind' ] ][ 0 ]
-
-            type_info = klass_info[ 'class' ]( **info )
-
-            tool._setObject( str( info[ 'id' ] ), type_info )
+        return parser._info_list
 
     #
     #   Helper methods
