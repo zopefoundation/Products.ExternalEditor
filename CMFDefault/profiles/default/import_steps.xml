@@ -63,6 +63,19 @@
   
  
  </import-step>
+ <import-step id="various" version="20041118-01"
+              handler="Products.CMFDefault.setuphandlers.importVarious"
+              title="Various Settings">
+  <dependency step="toolset"/>
+  
+  
+  
+  Import various settings from PortalGenerator.
+ 
+ 
+  
+ 
+ </import-step>
  <import-step id="workflow" version="20040630-01"
               handler="Products.CMFSetup.workflow.importWorkflowTool"
               title="Workflow Tool">

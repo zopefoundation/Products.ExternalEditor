@@ -51,14 +51,6 @@ def initialize( context ):
                          , interfaces=None
                          )
 
-
-    profile_registry.registerProfile( 'default'
-                                    , 'CMFSetup Default'
-                                    , 'Default profile (for testing)'
-                                    , 'profiles/default'
-                                    , 'CMFSetup'
-                                    )
-
     return # XXX comment out the rest
 
     # XXX:  This is *all* policy, and belongs in an XML file!
