@@ -42,6 +42,7 @@ from types import StringType
 import marshal
 
 import Globals
+import webdav
 from DateTime import DateTime
 from AccessControl import ClassSecurityInfo, User, getSecurityManager
 from Products.CMFCore import PortalContent
@@ -84,7 +85,9 @@ you navigate efficiently.""",
     )
 
 
-class Workspace (PortalContent.PortalContent, DefaultDublinCoreImpl):
+class Workspace (PortalContent.PortalContent, 
+                 DefaultDublinCoreImpl,
+                 webdav.Collection.Collection):
     __doc__ = __doc__                   # Use the module docstring.
 
     meta_type = 'Workspace'
@@ -160,6 +163,7 @@ class Workspace (PortalContent.PortalContent, DefaultDublinCoreImpl):
     # the workspace. Subobjects can implement there own PUT factories to deal
     # with it down below.
     
+    security.declareProtected(ManageWorkspaces, 'manage_FTPlist')
     def manage_FTPlist(self, REQUEST):
         """ FTP dir list """
         # Things currently missing: recursion and globbing support
@@ -175,7 +179,8 @@ class Workspace (PortalContent.PortalContent, DefaultDublinCoreImpl):
                 out.append((id, stat))
         
         return marshal.dumps(out)
-        
+    
+    security.declareProtected(ManageWorkspaces, 'manage_FTPstat')
     def manage_FTPstat(self, REQUEST):
         """ FTP stat for listings """
         mode = 0040000
@@ -208,11 +213,28 @@ class Workspace (PortalContent.PortalContent, DefaultDublinCoreImpl):
     def __getitem__(self, key):
         """ Returns an object based on its unique workspace key """
         # Return the referenced object wrapped in our context
-        return self._refs[key].dereference(self)
-        
+        try:
+            return self._refs[key].dereference(self)
+        except KeyError:
+            request = getattr(self, 'REQUEST', None)
+            if request is not None:
+                method=request.get('REQUEST_METHOD', 'GET')
+                if (request.maybe_webdav_client and 
+                    not method in ('GET', 'POST')):
+                    return webdav.NullResource.NullResource(
+                        self, key, request).__of__(self)
+        raise KeyError, key            
+
+    security.declareProtected(ManageWorkspaces, 'has_key')
     def has_key(self, key):
         """ read-only mapping interface """
         return self._refs.has_key(key)
+
+    security.declareProtected(ManageWorkspaces, 'objectValues')
+    def objectValues(self):
+        """Required by WebDAV"""
+        return [ref.dereferenceDefault(self) for ref in self._refs.values()]
+    
         
 Globals.InitializeClass(Workspace)
 
