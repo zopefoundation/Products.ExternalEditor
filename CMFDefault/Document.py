@@ -162,22 +162,10 @@ class Document(PortalContent, DefaultDublinCoreImpl):
             if contents:
                 text = self.text = contents
 
-        # Now parse out HTML if its applicable, or the plain text,
-        # getting any headers passed along in the document
-        bodyfound = bodyfinder.search(text)
-        ishtml = (text_format == 'html') or (bodyfound is not None)
-        if ishtml:
-            parser = SimpleHTMLParser()
-            parser.feed(text)
-            headers.update(parser.metatags)
-            if parser.title: headers['Title'] = parser.title
-            if bodyfound:
-                text = self.text = bodyfound.group('bodycontent')
-            text_format = self.text_format = 'html'
-        else:
-            headers, text = parseHeadersBody(text, headers)
-            text_format = self.text_format = 'structured-text'
-            self.text = text
+        headers, body, cooked, format = self.handleText(text, text_format)
+        self.text_format = format
+        self.cooked_text = cooked
+        self.text = body
 
         headers['Format'] = self.Format()
         haveheader = headers.has_key
@@ -195,23 +183,40 @@ class Document(PortalContent, DefaultDublinCoreImpl):
                           language=headers['Language'],
                           rights=headers['Rights'],
                           )
-        self._parse()
 
     security.declareProtected( CMFCorePermissions.ModifyPortalContent, 'edit' )
     edit = WorkflowAction(_edit)
 
-    def _parse(self):
-        """\
-        If the format is structured text, this method turns our body text
-        into HTML for 'cooked_text', used by the default skins for Document.
-        """
-        if self.text_format=='structured-text':
-            ct = self._format_stx(text=self.text)
-            if type(ct) is not type(''):
-                ct = ct.read()
-            self.cooked_text=ct
+    security.declarePrivate('guessFormat')
+    def guessFormat(self, text):
+        """ Simple stab at guessing the inner format of the text """
+        if bodyfinder.search(text) is not None:
+            return 'html'
         else:
-            self.cooked_text=self.text
+            return 'structured-text'
+    
+    security.declarePrivate('handleText')
+    def handleText(self, text, format=None):
+        """ Handles the raw text, returning headers, body, cooked, format """
+        headers = {}
+        body = cooked = ""
+        if not format:
+            format = self.guessFormat(text)
+
+        if format == 'html':
+            parser = SimpleHTMLParser()
+            parser.feed(text)
+            if parser.title:
+                headers['Title'] = parser.title
+            headers.update(parser.metatags)
+            bodyfound = bodyfinder.search(text)
+            if bodyfound:
+                cooked = body = bodyfound.group('bodycontent')
+        else:
+            headers, body = parseHeadersBody(text, headers)
+            cooked = self._format_stx(text=body)
+
+        return headers, body, cooked, format
             
     def _format_stx(self, text, level=1):
         """ Renders structured text """
