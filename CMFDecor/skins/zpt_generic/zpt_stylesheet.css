@@ -444,7 +444,7 @@ td.NewsTitle {
     font-weight: bold;
 }
 
-tr.NewsItemRow td {
+.NewsItemRow {
     background-color: #AAAAAA;
     font-size: 70%;
 }
