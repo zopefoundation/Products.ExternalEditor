@@ -1,5 +1,5 @@
 ## Script (Python) "collector_issue_followup.py"
-##parameters=comment, action
+##parameters=comment, action="comment"
 ##title=Submit a new comment.
 
 REQUEST = context.REQUEST
