@@ -64,8 +64,7 @@
           </span>
         </td>
 
-        <td align="center"
-            tal:define="assigning python: [i[0] for i in actions_pairs
+        <td tal:define="assigning python: [i[0] for i in actions_pairs
                                              if i[1] == 'Assign']"
             tal:condition="assigning">
           <input type="radio" name="action" value="Assign"
@@ -75,7 +74,7 @@
 
       <tr>
         <td colspan="2">
-          <textarea name="comment" rows="10" cols="60" wrap="soft"
+          <textarea name="comment" rows="10" cols="65" wrap="soft"
                     tal:content="python: (request.get('do_cite')
                                           and here.cited_text()) or ''">
 </textarea>
@@ -88,7 +87,7 @@
             tal:condition="assigning">
           <select name="assignees:list" MULTIPLE size="5"
                   tal:attributes="size python:
-                                       min(max(len(supporters), 3), 9)">
+                                       min(max(len(supporters), 3), 8)">
             <span tal:repeat="supporter supporters">
               <option tal:content="supporter"
                       tal:attributes="selected python:
