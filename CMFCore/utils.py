@@ -301,6 +301,10 @@ def _setCacheHeaders(obj, extra_context):
             RESPONSE = REQUEST['RESPONSE']
             for key, value in headers:
                 RESPONSE.setHeader(key, value)
+            if headers:
+                RESPONSE.setHeader('X-Cache-Headers-Set-By',
+                                   'CachingPolicyManager: %s' %
+                                   '/'.join(manager.getPhysicalPath()))
 
 #
 #   Base classes for tools
