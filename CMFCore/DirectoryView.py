@@ -32,6 +32,7 @@ from utils import expandpath, minimalpath
 from zLOG import LOG, ERROR
 from sys import exc_info
 from types import StringType
+from FSMetadata import FSMetadata
 
 _dtmldir = path.join( package_home( globals() ), 'dtml' )
 
@@ -98,56 +99,6 @@ class DirectoryInformation:
                 else:
                     types[strip(obname)] = strip(meta_type)
         return types
-
-
-    def _readProperties(self, fp):
-        """Reads the properties file next to an object.
-        """
-        try:
-            f = open(fp, 'rt')
-        except IOError:
-            return None
-        else:
-            lines = f.readlines()
-            f.close()
-            props = {}
-            for line in lines:
-                try: key, value = split(line, '=',1)
-                except: pass
-                else:
-                    props[strip(key)] = strip(value)
-            return props
-
-    def _readSecurity(self, fp):
-        """Reads the security file next to an object.
-        """
-        try:
-            f = open(fp, 'rt')
-        except IOError:
-            return None        
-        else:
-            lines = f.readlines()
-            f.close()
-            prm = {}
-            for line in lines:
-                try:
-                    c1 = line.index(':')+1
-                    c2 = line.index(':',c1)
-                    permission = line[:c1-1]
-                    acquire = not not line[c1:c2] # get boolean                    
-                    proles = line[c2+1:].split(',')
-                    roles=[]
-                    for role in proles:
-                        role = role.strip()
-                        if role:
-                            roles.append(role)
-                except:
-                    LOG('DirectoryView',
-                        ERROR,
-                        'Error reading permission from .security file',
-                        error=exc_info())
-                prm[permission]=(acquire,roles)
-            return prm
 
     if Globals.DevelopmentMode:
 
@@ -253,11 +204,11 @@ class DirectoryInformation:
                     t = registry.getTypeByExtension(ext)
                 
                 if t is not None:
-                    properties = self._readProperties(
-                        e_fp + '.properties')
+                    metadata = FSMetadata(e_fp)
+                    metadata.read()
                     try:
                         ob = t(name, e_filepath, fullname=entry,
-                               properties=properties)
+                               properties=metadata.getProperties())
                     except:
                         import traceback
                         typ, val, tb = exc_info()
@@ -278,7 +229,7 @@ class DirectoryInformation:
                             
                     # FS-based security
                     try:
-                        permissions = self._readSecurity(e_fp + '.security')
+                        permissions = metadata.getSecurity()
                         if permissions is not None:
                             for name in permissions.keys():
                                 acquire,roles = permissions[name]

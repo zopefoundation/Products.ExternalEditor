@@ -1,0 +1,6 @@
+[default]
+title = Test object
+cache = Default cache manager
+
+[security]
+Access contents information = 1:Manager,Anonymous
