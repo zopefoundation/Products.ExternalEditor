@@ -37,6 +37,8 @@ factory_type_information = (
   , 'product'        : 'CMFTopic'
   , 'factory'        : 'addTopic'
   , 'immediate_view' : 'topic_edit_form'
+  , 'aliases'        : {'(Default)':'topic_view',
+                        'view':'topic_view'}
   , 'actions'        : ( { 'id'            : 'view'
                          , 'name'          : 'View'
                          , 'action': 'string:${object_url}/topic_view'

@@ -49,6 +49,7 @@ from Products.PageTemplates.Expressions import SecureModuleImporter
 security = ModuleSecurityInfo( 'Products.CMFCore.utils' )
 
 _dtmldir = os_path.join( package_home( globals() ), 'dtml' )
+_wwwdir = os.path.join( package_home( globals() ), 'www' )
 
 #
 #   Simple utility functions, callable from restricted code.

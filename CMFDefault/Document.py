@@ -42,6 +42,8 @@ They may also contain HTML, or "plain" text.
   , 'product'        : 'CMFDefault'
   , 'factory'        : 'addDocument'
   , 'immediate_view' : 'metadata_edit_form'
+  , 'aliases'        : {'(Default)':'document_view',
+                        'view':'document_view'}
   , 'actions'        : ( { 'id'            : 'view' 
                          , 'name'          : 'View'
                          , 'action': 'string:${object_url}/document_view'

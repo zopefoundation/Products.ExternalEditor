@@ -36,6 +36,8 @@ A Favorite is a Link to an intra-portal resource.
   , 'product'        : 'CMFDefault'
   , 'factory'        : 'addFavorite'
   , 'immediate_view' : 'metadata_edit_form'
+  , 'aliases'        : {'(Default)':'favorite_view',
+                        'view':'favorite_view'}
   , 'actions'        : ( { 'id'            : 'view'
                          , 'name'          : 'View'
                          , 'action': 'string:${object_url}/favorite_view'

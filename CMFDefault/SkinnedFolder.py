@@ -36,6 +36,8 @@ Skinned folders can define custom 'view' actions.
   , 'factory'        : 'addSkinnedFolder'
   , 'filter_content_types' : 0
   , 'immediate_view' : 'folder_edit_form'
+  , 'aliases'        : {'(Default)':'folder_view',
+                        'view':'folder_view'}
   , 'actions'        : ( { 'id'            : 'view' 
                          , 'name'          : 'View'
                          , 'action': 'string:${object_url}/folder_view'

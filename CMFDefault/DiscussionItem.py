@@ -46,6 +46,8 @@ They should *not* be addable through the standard 'folder_factories' interface.
   , 'product'        : '' # leave blank to suppress
   , 'factory'        : ''
   , 'immediate_view' : ''
+  , 'aliases'        : {'(Default)':'discussionitem_view',
+                        'view':'discussionitem_view'}
   , 'actions'        : ( { 'id'            : 'view'
                          , 'name'          : 'View'
                          , 'action': 'string:${object_url}/discussionitem_view'

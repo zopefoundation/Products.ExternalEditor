@@ -80,6 +80,39 @@ class ContentTypeInformation(Interface):
             Returns the portal-relative icon for this type.
         """
 
+    def getMethodAliases():
+        """ Get method aliases dict.
+
+        Permission -- Manage portal
+
+        Returns -- Dictionary
+        """
+
+    def setMethodAliases(aliases):
+        """ Set method aliases dict.
+
+        Permission -- Manage portal
+
+        Returns -- Boolean value
+        """
+
+    def getMethodPath(key):
+        """ Get reverse relative method path by alias.
+
+        Permission -- Always available
+
+        Returns -- Tuple of IDs
+        """
+
+    def getMethodURL(key):
+        """ Get relative method URL by alias.
+
+        Permission -- Always available
+
+        Returns -- Slash-separated string
+        """
+
+
 class portal_types(Interface):
     """
         Provides a configurable registry of portal content types.

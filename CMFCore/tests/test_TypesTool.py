@@ -31,27 +31,17 @@ from Products.CMFCore.tests.base.security import OmnipotentUser
 from Products.CMFCore.tests.base.security import UserWithRoles
 from Products.CMFCore.tests.base.dummy import DummyFactory
 from Products.CMFCore.tests.base.dummy import DummyFolder
-from Products.CMFCore.tests.base.dummy import DummyFTI
 from Products.CMFCore.tests.base.dummy import DummyObject
 from Products.CMFCore.tests.base.dummy import DummySite
 from Products.CMFCore.tests.base.dummy import DummyUserFolder
+from Products.CMFCore.tests.base.tidata import FTIDATA_ACTIONS
+from Products.CMFCore.tests.base.tidata import FTIDATA_CMF14
+from Products.CMFCore.tests.base.tidata import FTIDATA_CMF14_FOLDER
+from Products.CMFCore.tests.base.tidata import FTIDATA_CMF14_SPECIAL
+from Products.CMFCore.tests.base.tidata import FTIDATA_CMF15
+from Products.CMFCore.tests.base.tidata import FTIDATA_DUMMY
+from Products.CMFCore.tests.base.tidata import STI_SCRIPT
 from Products.CMFCore.tests.base.testcase import SecurityTest
-
-STI_SCRIPT = """\
-## Script (Python) "addBaz"
-##bind container=container
-##bind context=context
-##bind namespace=
-##bind script=script
-##bind subpath=traverse_subpath
-##parameters=container, id
-##title=
-##
-product = container.manage_addProduct['FooProduct']
-product.addFoo(id)
-item = getattr(container, id)
-return item
-"""
 
 
 class TypesToolTests(SecurityTest):
@@ -61,7 +51,9 @@ class TypesToolTests(SecurityTest):
         self.site = DummySite('site').__of__(self.root)
         self.acl_users = self.site._setObject( 'acl_users', DummyUserFolder() )
         self.ttool = self.site._setObject( 'portal_types', TypesTool() )
-        self.ttool._setObject( 'Dummy Content', DummyFTI ) 
+        fti = FTIDATA_DUMMY[0].copy()
+        del fti['id']
+        self.ttool._setObject( 'Dummy Content', apply( FTI, ('Dummy Content',), fti) )
  
     def test_processActions( self ):
         """
@@ -216,39 +208,11 @@ class TypeInfoTests(TestCase):
         ti = self._makeInstance( 'Foo', allow_discussion=1 )
         self.failUnless( ti.allowDiscussion() )
 
-    ACTION_LIST = \
-    ( { 'id'            : 'view'
-      , 'name'          : 'View'
-      , 'action'        : 'string:'
-      , 'permissions'   : ( 'View', )
-      , 'category'      : 'object'
-      , 'visible'       : 1
-      }
-    , { 'name'          : 'Edit'                # Note: No ID passed
-      , 'action'        : 'string:${object_url}/foo_edit'
-      , 'permissions'   : ( 'Modify', )
-      , 'category'      : 'object'
-      , 'visible'       : 1
-      }
-    , { 'name'          : 'Object Properties'   # Note: No ID passed
-      , 'action'        : 'string:foo_properties'
-      , 'permissions'   : ( 'Modify', )
-      , 'category'      : 'object'
-      , 'visible'       : 1
-      }
-    , { 'id'            : 'slot'
-      , 'action'        : 'string:foo_slot'
-      , 'category'      : 'object'
-      , 'visible'       : 0
-      }
-    )
-
     def test_listActions( self ):
         ti = self._makeInstance( 'Foo' )
         self.failIf( ti.listActions() )
 
-        ti = self._makeInstance( 'Foo', actions=self.ACTION_LIST )
-
+        ti = self._makeInstanceByFTIData(FTIDATA_ACTIONS)
         actions = ti.listActions()
         self.failUnless( actions )
 
@@ -279,7 +243,7 @@ class TypeInfoTests(TestCase):
                         , id( marker ) )
         self.assertRaises( ValueError, ti.getActionById, 'view' )
 
-        ti = self._makeInstance( 'Foo', actions=self.ACTION_LIST )
+        ti = self._makeInstanceByFTIData(FTIDATA_ACTIONS)
         self.assertEqual( id( ti.getActionById( 'foo', marker ) )
                         , id( marker ) )
         self.assertRaises( ValueError, ti.getActionById, 'foo' )
@@ -328,11 +292,74 @@ class TypeInfoTests(TestCase):
 
         self.failUnless( isinstance( ti._actions[0], ActionInformation ) )
 
+    def test_MethodAliases_methods(self):
+        ti = self._makeInstanceByFTIData(FTIDATA_CMF15)
+        self.assertEqual( ti.getMethodAliases(), FTIDATA_CMF15[0]['aliases'] )
+        self.assertEqual( ti.getMethodPath('view'), ('dummy_view',) )
+        self.assertEqual( ti.getMethodPath('view.html'), ('dummy_view',) )
+        self.assertEqual( ti.getMethodURL('view'), 'dummy_view' )
+        self.assertEqual( ti.getMethodURL('view.html'), 'dummy_view' )
+
+        ti.setMethodAliases( ti.getMethodAliases() )
+        self.assertEqual( ti.getMethodAliases(), FTIDATA_CMF15[0]['aliases'] )
+
+    def test_MethodAliases_content_migration(self):
+        wanted = { 'view':('dummy_view',),
+                   '(Default)':('dummy_view',) }
+
+        # use old FTI Data
+        ti = self._makeInstanceByFTIData(FTIDATA_CMF14)
+        self.assertEqual(ti._aliases, wanted)
+
+        # simulate old FTI
+        del ti._aliases
+        self.failIf( hasattr(ti, '_aliases') )
+
+        # migrate FTI
+        ti.getMethodPath('view')
+        self.assertEqual(ti._aliases, wanted)
+
+    def test_MethodAliases_folder_migration(self):
+        wanted = { 'view':('(Default)',), }
+
+        # use old FTI Data
+        ti = self._makeInstanceByFTIData(FTIDATA_CMF14_FOLDER)
+        self.assertEqual(ti._aliases, wanted)
+
+        # simulate old FTI
+        del ti._aliases
+        self.failIf( hasattr(ti, '_aliases') )
+
+        # migrate FTI
+        ti.getMethodPath('view')
+        self.assertEqual(ti._aliases, wanted)
+
+    def test_MethodAliases_special_migration(self):
+        wanted = { 'view':('dummy_view',), 'mkdir':('dummy_mkdir',) }
+
+        # use old FTI Data
+        ti = self._makeInstanceByFTIData(FTIDATA_CMF14_SPECIAL)
+        self.assertEqual(ti._aliases, wanted)
+
+        # simulate old FTI
+        del ti._aliases
+        self.failIf( hasattr(ti, '_aliases') )
+
+        # migrate FTI
+        ti.getMethodPath('view')
+        self.assertEqual(ti._aliases, wanted)
+
 
 class FTIDataTests( TypeInfoTests ):
 
     def _makeInstance( self, id, **kw ):
         return apply( FTI, ( id, ), kw )
+
+    def _makeInstanceByFTIData(self, ftidata):
+        fti = ftidata[0].copy()
+        id = fti['id']
+        del fti['id']
+        return apply( FTI, ( id, ), fti )
 
     def test_properties( self ):
         ti = self._makeInstance( 'Foo' )
@@ -357,6 +384,12 @@ class STIDataTests( TypeInfoTests ):
 
     def _makeInstance( self, id, **kw ):
         return apply( STI, ( id, ), kw )
+
+    def _makeInstanceByFTIData(self, ftidata):
+        fti = ftidata[0].copy()
+        id = fti['id']
+        del fti['id']
+        return apply( STI, ( id, ), fti )
 
     def test_properties( self ):
         ti = self._makeInstance( 'Foo' )

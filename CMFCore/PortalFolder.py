@@ -41,6 +41,9 @@ factory_type_information = (
   , 'factory'        : 'manage_addPortalFolder'
   , 'filter_content_types' : 0
   , 'immediate_view' : 'folder_edit_form'
+  , 'aliases'        : {'(Default)':'index_html',
+                        'view':'index_html',
+                        'index.html':'index_html'}
   , 'actions'        : ( { 'id'            : 'view'
                          , 'name'          : 'View'
                          , 'action': 'string:${object_url}'
@@ -464,20 +467,18 @@ class PortalFolder(DynamicType, CMFCatalogAware, Folder):
                         , title=''
                         , REQUEST=None
                         ):
+        """ Add a new folder-like object with id *id*.
+
+        IF present, use the parent object's 'mkdir' alias; otherwise, just add
+        a PortalFolder.
         """
-            Add a new folder-like object with id *id*.  IF present,
-            use the parent object's 'mkdir' action;  otherwise, just
-            add a PortalFolder.
-            to take control of the process by checking for a 'mkdir'
-            action.
-        """
-        try:
-            action = self.getTypeInfo().getActionById( 'mkdir' )
-        except ValueError:
-            self.invokeFactory( type_name='Folder', id=id )
-        else:
+        ti = self.getTypeInfo()
+        method = ti and ti.getMethodURL('mkdir') or None
+        if method:
             # call it
-            getattr( self, action )( id=id )
+            getattr(self, method)(id=id)
+        else:
+            self.invokeFactory( type_name='Folder', id=id )
 
         ob = self._getOb( id )
         ob.setTitle( title )

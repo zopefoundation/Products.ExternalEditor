@@ -38,6 +38,8 @@ File objects can contain arbitrary downloadable files.
   , 'product'        : 'CMFDefault'
   , 'factory'        : 'addFile'
   , 'immediate_view' : 'metadata_edit_form'
+  , 'aliases'        : {'(Default)':'index_html',
+                        'view':'file_view'}
   , 'actions'        : ( { 'id'            : 'view'
                          , 'name'          : 'View'
                          , 'action': 'string:${object_url}/file_view'

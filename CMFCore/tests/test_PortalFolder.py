@@ -281,14 +281,8 @@ class PortalFolderTests( SecurityTest ):
         self.assertEqual( test.simple.Title(), 'Simple' )
 
         # Now, test overridden behavior
-        types_tool.Folder.addAction( id = 'mkdir'
-                                   , name = 'MKDIR handler'
-                                   , action = 'string:grabbed'
-                                   , condition = ''
-                                   , permission = ''
-                                   , category = 'folder'
-                                   , visible = 0
-                                   )
+        types_tool.Folder.setMethodAliases( {'mkdir': 'grabbed'} )
+
         class Grabbed:
 
             _grabbed_with = None

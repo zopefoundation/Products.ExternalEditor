@@ -2,6 +2,21 @@ CMF 1.5alpha (unreleased)
 
   New Features
 
+    - TypeInformation: Added Method Aliases.
+
+      o TypesTool and TypeInformation now have an 'Aliases' tab to configure
+        Method Aliases TTW.
+
+      o factory_type_information now has a key 'aliases' to configure Method
+        Aliases in a product. This key is required, but may be empty: If it
+        doesn't exist, TypeInformation will try to update by guessing aliases.
+
+      o DynamicType manipulates 'TraversalRequestNameStack' depending on
+        Method Aliases. '(Default)' and 'view' aliases bypass __call__() and
+        view() methods on traversal.
+
+      o PortalFolder's 'mkdir' hook now makes use of Method Aliases.
+
     - MembershipTool (CMFCore and CMFDefault): Changed member area creation.
       'wrapUser()' does no longer call 'createMemberarea()'.
       'createMemberarea()' should now be called from the 'logged_in' page.

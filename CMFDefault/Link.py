@@ -40,6 +40,8 @@ Link items are annotated URLs.
   , 'product'        : 'CMFDefault'
   , 'factory'        : 'addLink'
   , 'immediate_view' : 'metadata_edit_form'
+  , 'aliases'        : {'(Default)':'link_view',
+                        'view':'link_view'}
   , 'actions'        : ( { 'id'            : 'view'
                          , 'name'          : 'View'
                          , 'action': 'string:${object_url}/link_view'
@@ -59,7 +61,6 @@ Link items are annotated URLs.
   }
 ,
 )
-
 
 def addLink( self
            , id

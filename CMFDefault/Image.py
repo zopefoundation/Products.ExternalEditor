@@ -36,6 +36,8 @@ Image objects can be embedded in Portal documents.
   , 'product'        : 'CMFDefault'
   , 'factory'        : 'addImage'
   , 'immediate_view' : 'metadata_edit_form'
+  , 'aliases'        : {'(Default)':'index_html',
+                        'view':'image_view'}
   , 'actions'        : ( { 'id'            : 'view'
                          , 'name'          : 'View'
                          , 'action': 'string:${object_url}/image_view'

@@ -25,6 +25,7 @@ from Acquisition import aq_base
 from Acquisition import aq_get
 from zLOG import LOG, WARNING, ERROR
 from OFS.Folder import Folder
+from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 import Products
 
 from interfaces.portal_types import ContentTypeInformation as ITypeInformation
@@ -40,6 +41,7 @@ from utils import UniqueObject
 from utils import SimpleItemWithProperties
 from utils import _dtmldir
 from utils import _checkPermission
+from utils import _wwwdir
 from utils import cookString
 from utils import getActionContext
 
@@ -53,10 +55,11 @@ class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
     _isTypeInformation = 1
 
     manage_options = ( SimpleItemWithProperties.manage_options[:1]
+                     + ( {'label':'Aliases',
+                          'action':'manage_aliases'}, )
                      + ActionProviderBase.manage_options
                      + SimpleItemWithProperties.manage_options[1:]
                      )
-
 
     security = ClassSecurityInfo()
 
@@ -145,7 +148,35 @@ class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
                           , visible=action.get( 'visible', 1 )
                           )
 
+        aliases = kw.get( 'aliases', _marker )
+        if aliases is _marker:
+            self._guessMethodAliases()
+        else:
+            self.setMethodAliases(aliases)
+
+    #
+    #   ZMI methods
+    #
+    security.declareProtected(ManagePortal, 'manage_aliases')
+    manage_aliases = PageTemplateFile( 'typeinfoAliases.zpt', _wwwdir )
+
+    security.declareProtected(ManagePortal, 'manage_setMethodAliases')
+    def manage_setMethodAliases(self, REQUEST):
+        """ Config method aliases.
+        """
+        form = REQUEST.form
+        aliases = {}
+        for k, v in form['aliases'].items():
+            v = v.strip()
+            if v:
+                aliases[k] = v
         
+        dict = {}
+        for k, v in form['methods'].items():
+            if aliases.has_key(k):
+                dict[ aliases[k] ] = v
+        self.setMethodAliases(dict)
+        REQUEST.RESPONSE.redirect('%s/manage_aliases' % self.absolute_url())
 
     #
     #   Accessors
@@ -311,6 +342,102 @@ class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
             ob.notifyWorkflowCreated()
 
         return ob
+
+    security.declareProtected(ManagePortal, 'getMethodAliases')
+    def getMethodAliases(self):
+        """ Get method aliases dict.
+        """
+        if not hasattr(self, '_aliases'):
+            self._guessMethodAliases()
+        dict = {}
+        aliases = self._aliases
+        for k, v in aliases.items():
+            path = list(v)
+            path.reverse()
+            dict[k] = '/'.join(path)
+        return dict
+
+    security.declareProtected(ManagePortal, 'setMethodAliases')
+    def setMethodAliases(self, aliases):
+        """ Set method aliases dict.
+        """
+        dict = {}
+        for k, v in aliases.items():
+            v = v.strip()
+            if v:
+                path = v.split('/')
+                path.reverse()
+                dict[ k.strip() ] = tuple(path)
+        if not getattr(self, '_aliases', None) == dict:
+            self._aliases = dict
+            return 1
+        else:
+            return 0
+
+    security.declarePublic('getMethodPath')
+    def getMethodPath(self, key):
+        """ Get reverse relative method path by alias.
+        """
+        if not hasattr(self, '_aliases'):
+            self._guessMethodAliases()
+        aliases = self._aliases
+        return aliases.get( key, () )
+
+    security.declarePublic('getMethodURL')
+    def getMethodURL(self, key):
+        """ Get relative method URL by alias.
+        """
+        path = list( self.getMethodPath(key) )
+        path.reverse()
+        return '/'.join(path)
+
+    security.declarePrivate('_guessMethodAliases')
+    def _guessMethodAliases(self):
+        """ Guess and set Method Aliases. Used for upgrading old TIs.
+        """
+        context = getActionContext(self)
+        actions = self.listActions()
+        ordered = []
+        dict = {}
+
+        # order actions and search 'mkdir' action 
+        for action in actions:
+            if action.getId() == 'view':
+                ordered.insert(0, action)
+            elif action.getId() == 'mkdir':
+                mkdirmethod = action.action(context).strip()
+                if mkdirmethod.startswith('/'):
+                    mkdirmethod = mkdirmethod[1:]
+                dict['mkdir'] = mkdirmethod
+            else:
+                ordered.append(action)
+
+        # search 'view' action
+        for action in ordered:
+            perms = action.getPermissions()
+            if not perms or View in perms:
+                viewmethod = action.action(context).strip()
+                if viewmethod.startswith('/'):
+                    viewmethod = viewmethod[1:]
+                if not viewmethod:
+                    viewmethod = '(Default)'
+                break
+        else:
+            viewmethod = '(Default)'
+        dict['view'] = viewmethod
+
+        # search default action
+        for action in ordered:
+            defmethod = action.action(context).strip()
+            if defmethod.startswith('/'):
+                defmethod = defmethod[1:]
+            if not defmethod:
+                break
+        else:
+            dict['(Default)'] = viewmethod
+
+        self.setMethodAliases(dict)
+        return 1
 
 InitializeClass( TypeInformation )
 
@@ -508,17 +635,23 @@ class TypesTool(UniqueObject, Folder, ActionProviderBase):
 
     security = ClassSecurityInfo()
 
-    manage_options = ( Folder.manage_options +
-                      ActionProviderBase.manage_options +
-                      ({ 'label' : 'Overview', 'action' : 'manage_overview' }
-                     , 
-                     ))
+    manage_options = ( Folder.manage_options[:1]
+                     + ( {'label':'Aliases',
+                          'action':'manage_aliases'}, )
+                     + ActionProviderBase.manage_options
+                     + ( {'label':'Overview',
+                          'action':'manage_overview'}, )
+                     + Folder.manage_options[1:]
+                     )
 
     #
     #   ZMI methods
     #
     security.declareProtected(ManagePortal, 'manage_overview')
     manage_overview = DTMLFile( 'explainTypesTool', _dtmldir )
+
+    security.declareProtected(ManagePortal, 'manage_aliases')
+    manage_aliases = PageTemplateFile( 'typesAliases.zpt', _wwwdir )
 
     def all_meta_types(self):
         """Adds TypesTool-specific meta types."""
@@ -617,6 +750,25 @@ class TypesTool(UniqueObject, Folder, ActionProviderBase):
         self._setObject(id, ob)
         if RESPONSE is not None:
             RESPONSE.redirect('%s/manage_main' % self.absolute_url())
+
+    security.declareProtected(ManagePortal, 'manage_setTIMethodAliases')
+    def manage_setTIMethodAliases(self, REQUEST):
+        """ Config method aliases.
+        """
+        form = REQUEST.form
+        aliases = {}
+        for k, v in form['aliases'].items():
+            v = v.strip()
+            if v:
+                aliases[k] = v
+        
+        for ti in self.listTypeInfo():
+            dict = {}
+            for k, v in form[ ti.getId() ].items():
+                if aliases.has_key(k):
+                    dict[ aliases[k] ] = v
+            ti.setMethodAliases(dict)
+        REQUEST.RESPONSE.redirect('%s/manage_aliases' % self.absolute_url())
 
     security.declareProtected(AccessContentsInformation, 'getTypeInfo')
     def getTypeInfo( self, contentType ):
@@ -737,5 +889,18 @@ class TypesTool(UniqueObject, Folder, ActionProviderBase):
                 actions.extend( type_info.listActions( info ) )
 
         return actions
+
+    security.declareProtected(ManagePortal, 'listMethodAliasKeys')
+    def listMethodAliasKeys(self):
+        """ List all defined method alias names.
+        """
+        dict = {}
+        for ti in self.listTypeInfo():
+            aliases = ti.getMethodAliases()
+            for k, v in aliases.items():
+                dict[k] = 1
+        rval = dict.keys()
+        rval.sort()
+        return rval
 
 InitializeClass( TypesTool )
