@@ -114,7 +114,8 @@ class WebTextDocument(Document):
             return Document.handleText(self, text, format=format,
                                        stx_level=stx_level or self._stx_level)
         else:
-            cooked = body = util.format_webtext(text)
+            body = text
+            cooked = util.format_webtext(body)
             headers = {}
             return headers, body, cooked, format
 
