@@ -9,6 +9,8 @@
 
         - issue_header
 
+        - issue_batch_nav
+
         - add_artifacts_table
     </span>
 
@@ -248,7 +250,7 @@
           - last_batch
       </span>
 
-      <table bgcolor="#eeeeee"
+      <table bgcolor="#eeeeee" width="100%"
              tal:define="url_query nocall: modules/ZTUtils/url_query;
                          make_query nocall: modules/ZTUtils/make_query;
                          base python: url_query(request, omit='b_start')">
