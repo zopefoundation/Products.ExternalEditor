@@ -1,16 +1,16 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
- 
+
 import string, re
 from OFS.PropertyManager import PropertyManager
 from DateTime.DateTime import DateTime
@@ -96,7 +96,7 @@ class DefaultDublinCoreImpl( PropertyManager ):
         "Dublin Core element - additional contributors to resource"
         # XXX: fixme
         return self.contributors
-    
+
     security.declarePublic( 'Date' )
     def Date( self ):
         "Dublin Core element - default date"
@@ -105,7 +105,7 @@ class DefaultDublinCoreImpl( PropertyManager ):
         if date is None:
             date = self.bobobase_modification_time()
         return date.ISO()
-    
+
     security.declarePublic( 'CreationDate' )
     def CreationDate( self ):
         """
@@ -113,21 +113,21 @@ class DefaultDublinCoreImpl( PropertyManager ):
         """
         # return unknown if never set properly
         return self.creation_date and self.creation_date.ISO() or 'Unknown'
-    
+
     security.declarePublic( 'EffectiveDate' )
     def EffectiveDate( self ):
         """
             Dublin Core element - date resource becomes effective.
         """
         return self.effective_date and self.effective_date.ISO() or 'None'
-    
+
     security.declarePublic( 'ExpirationDate' )
     def ExpirationDate( self ):
         """
             Dublin Core element - date resource expires.
         """
         return self.expiration_date and self.expiration_date.ISO() or 'None'
-    
+
     security.declarePublic( 'ModificationDate' )
     def ModificationDate( self ):
         """
@@ -206,7 +206,7 @@ class DefaultDublinCoreImpl( PropertyManager ):
         # allow for non-existent creation_date, existed always
         date = getattr( self, 'creation_date', None )
         return date is None and self.__FLOOR_DATE or date
-    
+
     security.declarePublic( 'effective' )
     def effective( self ):
         """
@@ -218,7 +218,7 @@ class DefaultDublinCoreImpl( PropertyManager ):
         if date is marker:
             date = getattr( self, 'creation_date', None )
         return date is None and self.__FLOOR_DATE or date
-    
+
     __CEILING_DATE = DateTime( 9999, 0 ) # never expires
 
     security.declarePublic( 'expires' )
@@ -229,7 +229,7 @@ class DefaultDublinCoreImpl( PropertyManager ):
         """
         date = getattr( self, 'expiration_date', None )
         return date is None and self.__CEILING_DATE or date
-    
+
     security.declarePublic( 'modified' )
     def modified( self ):
         """
@@ -302,7 +302,7 @@ class DefaultDublinCoreImpl( PropertyManager ):
             Dublin Core element - date resource becomes effective.
         """
         self.effective_date = self._datify( effective_date )
-    
+
     security.declareProtected( CMFCorePermissions.ModifyPortalContent
                              , 'setExpirationDate' )
     def setExpirationDate( self, expiration_date ):
@@ -310,7 +310,7 @@ class DefaultDublinCoreImpl( PropertyManager ):
             Dublin Core element - date resource expires.
         """
         self.expiration_date = self._datify( expiration_date )
-    
+
     security.declareProtected( CMFCorePermissions.ModifyPortalContent
                              , 'setFormat' )
     def setFormat( self, format ):
