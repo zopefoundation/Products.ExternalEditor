@@ -205,7 +205,7 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
                             'category': tdef.actbox_category,
                             'transition': tdef}))
         res.sort()
-        return map((lambda (id, val): val), res)
+        return [ result[1] for result in res ]
 
     security.declarePrivate('listGlobalActions')
     def listGlobalActions(self, info):
@@ -230,26 +230,24 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
                     if var_match_keys:
                         # Check the catalog for items in the worklist.
                         catalog = getToolByName(self, 'portal_catalog')
-                        dict = {}
+                        kw = {}
                         for k in var_match_keys:
                             v = qdef.getVarMatch(k)
-                            v_fmt = map(lambda x, info=info: x%info, v)
-                            dict[k] = v_fmt
-                        searchres = apply(catalog.searchResults, (), dict)
+                            kw[k] = [ x % info for x in v ]
+                        searchres = catalog.searchResults(**kw)
                         if not searchres:
                             continue
                     if fmt_data is None:
                         fmt_data = TemplateDict()
                         fmt_data._push(info)
-                    searchres_len = lambda searchres=searchres: len(searchres)
-                    fmt_data._push({'count': searchres_len})
+                    fmt_data._push({'count': len(searchres)})
                     res.append((id, {'name': qdef.actbox_name % fmt_data,
                                      'url': qdef.actbox_url % fmt_data,
                                      'permissions': (),  # Predetermined.
                                      'category': qdef.actbox_category}))
                     fmt_data._pop()
         res.sort()
-        return map((lambda (id, val): val), res)
+        return [ result[1] for result in res ]
 
     security.declarePrivate('isActionSupported')
     def isActionSupported(self, ob, action):
@@ -323,7 +321,7 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
                 % method_id)
         if not self._checkTransitionGuard(tdef, ob):
             raise Unauthorized(method_id)
-        res = apply(func, args, kw)
+        res = func(*args, **kw)
         try:
             self._changeStateOf(ob, tdef)
         except ObjectDeleted:
