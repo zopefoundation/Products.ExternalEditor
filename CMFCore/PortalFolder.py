@@ -100,6 +100,36 @@ from Acquisition import aq_parent, aq_inner, aq_base
 from DynamicType import DynamicType
 from utils import getToolByName
 
+factory_type_information = ( { 'id'             : 'Folder'
+                             , 'meta_type'      : 'Portal Folder'
+                             , 'description'    : """\
+Use folders to put content in categories."""
+                             , 'icon'           : 'folder_icon.gif'
+                             , 'product'        : 'CMFCore'
+                             , 'factory'        : 'manage_addPortalFolder'
+                             , 'filter_content_types' : 0
+                             , 'immediate_view' : 'folder_edit_form'
+                             , 'actions'        :
+                                ( { 'name'          : 'View'
+                                  , 'action'        : ''
+                                  , 'permissions'   : ('View',)
+                                  , 'category'      : 'folder'
+                                  }
+                                , { 'name'          : 'Edit'
+                                  , 'action'        : 'folder_edit_form'
+                                  , 'permissions'   : ('Manage properties',)
+                                  , 'category'      : 'folder'
+                                  }
+                                , { 'name'          : 'Syndication'
+                                  , 'action'        : 'synPropertiesForm'
+                                  , 'permissions'   : ('Modify properties',)
+                                  , 'category'      : 'folder'
+                                  }
+                                )
+                             }
+                           ,
+                           )
+
 #
 #   HACK! HACK! HACK! HACK! HACK! HACK! HACK! HACK! HACK!
 #

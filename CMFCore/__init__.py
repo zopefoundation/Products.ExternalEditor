@@ -175,5 +175,6 @@ def initialize(context):
                      , permission=ADD_FOLDERS_PERMISSION
                      , extra_constructors=(
                            PortalFolder.manage_addPortalFolder, )
+                     , fti=PortalFolder.factory_type_information
                      ).initialize( context )
 

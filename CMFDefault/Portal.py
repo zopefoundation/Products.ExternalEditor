@@ -85,128 +85,22 @@
  
 import Globals
 from Products.CMFCore.PortalObject import PortalObjectBase
-from Products.CMFCore.PortalFolder import manage_addPortalFolder
+from Products.CMFCore import PortalFolder
 from Products.CMFCore.TypesTool import ContentFactoryMetadata
 from Products.CMFCore.utils import getToolByName
 from DublinCore import DefaultDublinCoreImpl
 
+import Document, Image, File, Link, NewsItem, Favorite
+
+factory_type_information = ( Document.factory_type_information
+                           + Image.factory_type_information
+                           + File.factory_type_information
+                           + Link.factory_type_information
+                           + NewsItem.factory_type_information
+                           + Favorite.factory_type_information
+                           )
+
 members_roster = '''<dtml-return roster>'''
-
-factory_type_information = (
-    # Perhaps this ought to be in an external XML file.
-    {'id': 'News Item', 'meta_type': 'News Item', 'description':
-     'News Items contain short text articles and carry a title '
-     'as well as an optional description.', 'icon': 'newsitem_icon.gif',
-     'product':'CMFDefault', 'factory':'addNewsItem',
-     'immediate_view':'metadata_edit_form', 'actions_for':'newsitem',
-     },
-
-    {'id': 'Document', 'meta_type': 'Document', 'description':
-     'Documents can contain text that can be formatted using '
-     'Structured Text.', 'icon': 'document_icon.gif',
-     'product':'CMFDefault', 'factory':'addDocument',
-     'immediate_view':'metadata_edit_form', 'actions_for':'document',
-     },
-
-    {'id': 'File', 'meta_type': 'Portal File', 'description':
-     'File objects can contain arbitrary downloadable files.',
-     'icon': 'file_icon.gif',
-     'product':'CMFDefault', 'factory':'addFile',
-     'immediate_view':'metadata_edit_form', 'actions':
-     ({'name': 'View',
-       'action': 'file_view',
-       'permissions': ('View',)},
-      {'name': 'Download',
-       'action': '',
-       'permissions': ('View',)},
-      {'name': 'Edit',
-       'action': 'file_edit_form',
-       'permissions': ('Modify portal content',)},
-      {'name': 'Metadata',
-       'action': 'metadata_edit_form',
-       'permissions': ('Modify portal content',)},
-      ),
-     },
-
-    {'id': 'Image', 'meta_type': 'Portal Image', 'description':
-     'Image objects can be embedded in Portal documents.',
-     'icon': 'image_icon.gif',
-     'product':'CMFDefault', 'factory':'addImage',
-     'immediate_view':'metadata_edit_form', 'actions':
-     ({'name': 'View',
-       'action': 'image_view',
-       'permissions': ('View',)},
-      {'name': 'Edit',
-       'action': 'image_edit_form',
-       'permissions': ('Modify portal content',)},
-      {'name': 'Metadata',
-       'action': 'metadata_edit_form',
-       'permissions': ('Modify portal content',)},
-      ),
-     },
-
-    {'id': 'Link', 'meta_type': 'Link', 'description':
-     'Link items are URLs that come with additional information '
-     'such as a Title and a Description.', 'icon': 'link_icon.gif',
-     'product':'CMFDefault', 'factory':'addLink',
-     'immediate_view':'metadata_edit_form', 'actions_for':'link',
-     },
-
-    {'id': 'Folder', 'meta_type': 'Portal Folder', 'description':
-     'Use folders to put content in categories.', 'icon': 'folder_icon.gif',
-     'product':'CMFCore', 'factory':'manage_addPortalFolder',
-     'filter_content_types': 0,
-     'immediate_view':'folder_contents', 'actions':
-     ({'name': 'View',
-       'action': '',
-       'permissions': ('View',),
-       'category': 'folder'},
-      {'name': 'Change Folder',
-       'action': 'folder_edit_form',
-       'permissions': ('Manage properties',),
-       'category': 'folder'},
-      {'name': 'Syndication',
-       'action': 'synPropertiesForm',
-       'permissions': ('Manage properties'),
-       'category': 'folder'},
-      ),
-     },
-
-    {'id': 'Favorite', 'meta_type': 'Favorite', 'description':
-     'A Favorite is a Link to an intra-portal resource.',
-     'icon': 'link_icon.gif',
-     'product': 'CMFDefault', 'factory': 'addFavorite',
-     'immediate_view': 'metadata_edit_form', 'actions':
-     ({'name': 'View',
-       'action': 'favorite_view',
-       'permissions': ('View',)},
-      {'name': 'Edit',
-       'action': 'link_edit_form',
-       'permissions': ('Modify portal content',)},
-      {'name': 'Metadata',
-       'action': 'metadata_edit_form',
-       'permissions': ('Modify portal content',)},
-      ),
-     },
-
-    )
-
-for t in factory_type_information:
-    ### This is a shortcut.  Another reason to put the above
-    ### structure in an XML file.
-    af = t.get('actions_for', 0)
-    if af:
-        del t['actions_for']
-        t['actions'] = ({'name': 'View',
-                         'action': af + '_view',
-                         'permissions': ('View',)},
-                        {'name': 'Edit',
-                         'action': af + '_edit_form',
-                         'permissions': ('Modify portal content',)},
-                        {'name': 'Metadata',
-                         'action': 'metadata_edit_form',
-                         'permissions': ('Modify portal content',)},
-                        )
 
 class CMFSite ( PortalObjectBase
               , DefaultDublinCoreImpl
@@ -350,7 +244,7 @@ class PortalGenerator:
             id='cookie_authentication')
 
     def setupMembersFolder(self, p):
-        manage_addPortalFolder(p, 'Members')
+        PortalFolder.manage_addPortalFolder(p, 'Members')
         p.Members.manage_addProduct['OFSP'].manage_addDTMLMethod(
             'index_html', 'Member list', '<dtml-return roster>')
 
@@ -420,6 +314,7 @@ class PortalGenerator:
         self.setupPermissions(p)
         self.setupDefaultSkins(p)
         self.setupTypes(p)
+        self.setupTypes(p, PortalFolder.factory_type_information)
         self.setupWorkflow(p)
 
     def create(self, parent, id, create_userfolder):

@@ -102,6 +102,36 @@ from Products.CMFCore import CMFCorePermissions
 from Products.CMFCore.WorkflowCore import WorkflowAction, afterCreate
 
 
+factory_type_information = ( { 'id'             : 'File'
+                             , 'meta_type'      : 'Portal File'
+                             , 'description'    : """\
+File objects can contain arbitrary downloadable files."""
+                             , 'icon'           : 'file_icon.gif'
+                             , 'product'        : 'CMFDefault'
+                             , 'factory'        : 'addFile'
+                             , 'immediate_view' : 'metadata_edit_form'
+                             , 'actions'        :
+                                ( { 'name'          : 'View'
+                                  , 'action'        : 'file_view'
+                                  , 'permissions'   : ('View',)
+                                  }
+                                , { 'name'          : 'Download'
+                                  , 'action'        : ''
+                                  , 'permissions'   : ('View',)
+                                  }
+                                , { 'name'          : 'Edit'
+                                  , 'action'        : 'file_edit_form'
+                                  , 'permissions'   : ('Modify portal content',)
+                                  }
+                                , { 'name'          : 'Metadata'
+                                  , 'action'        : 'metadata_edit_form'
+                                  , 'permissions'   : ('Modify portal content',)
+                                  }
+                                )
+                             }
+                           ,
+                           )
+
 import OFS.Image
 
 def addFile( self

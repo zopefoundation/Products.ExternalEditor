@@ -98,6 +98,32 @@ from Products.CMFCore import CMFCorePermissions
 from AccessControl import ClassSecurityInfo
 from Products.CMFCore.WorkflowCore import WorkflowAction, afterCreate
 
+factory_type_information = ( { 'id'             : 'News Item'
+                             , 'meta_type'      : 'News Item'
+                             , 'description'    : """\
+News Items contain short text articles and carry a title as well as an optional description."""
+                             , 'icon'           : 'newsitem_icon.gif'
+                             , 'product'        : 'CMFDefault'
+                             , 'factory'        : 'addNewsItem'
+                             , 'immediate_view' : 'metadata_edit_form'
+                             , 'actions'        :
+                                ( { 'name'          : 'View'
+                                  , 'action'        : 'newsitem_view'
+                                  , 'permissions'   : ('View',)
+                                  }
+                                , { 'name'          : 'Edit'
+                                  , 'action'        : 'newsitem_edit_form'
+                                  , 'permissions'   : ('Modify portal content',)
+                                  }
+                                , { 'name'          : 'Metadata'
+                                  , 'action'        : 'metadata_edit_form'
+                                  , 'permissions'   : ('Modify portal content',)
+                                  }
+                                )
+                             }
+                           ,
+                           )
+
 def addNewsItem( self
                , id
                , title=''

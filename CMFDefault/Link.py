@@ -96,6 +96,32 @@ from DublinCore import DefaultDublinCoreImpl
 from Products.CMFCore import CMFCorePermissions
 from Products.CMFCore.WorkflowCore import WorkflowAction, afterCreate
 
+factory_type_information = ( { 'id'             : 'Link'
+                             , 'meta_type'      : 'Link'
+                             , 'description'    : """\
+Link items are URLs that come with additional information."""
+                             , 'icon'           : 'link_icon.gif'
+                             , 'product'        : 'CMFDefault'
+                             , 'factory'        : 'addLink'
+                             , 'immediate_view' : 'metadata_edit_form'
+                             , 'actions'        :
+                                ( { 'name'          : 'View'
+                                  , 'action'        : 'link_view'
+                                  , 'permissions'   : ('View',)
+                                  }
+                                , { 'name'          : 'Edit'
+                                  , 'action'        : 'link_edit_form'
+                                  , 'permissions'   : ('Modify portal content',)
+                                  }
+                                , { 'name'          : 'Metadata'
+                                  , 'action'        : 'metadata_edit_form'
+                                  , 'permissions'   : ('Modify portal content',)
+                                  }
+                                )
+                             }
+                           ,
+                           )
+
 
 def addLink( self
            , id

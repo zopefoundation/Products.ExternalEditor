@@ -98,6 +98,32 @@ from Products.CMFCore import CMFCorePermissions
 from Products.CMFCore.WorkflowCore import WorkflowAction, afterCreate
 from utils import parseHeadersBody, SimpleHTMLParser, bodyfinder, _dtmldir
 
+factory_type_information = ( { 'id'             : 'Document'
+                             , 'meta_type'      : 'Document'
+                             , 'description'    : """\
+Documents can contain text that can be formatted using 'Structured Text.'"""
+                             , 'icon'           : 'document_icon.gif'
+                             , 'product'        : 'CMFDefault'
+                             , 'factory'        : 'addDocument'
+                             , 'immediate_view' : 'metadata_edit_form'
+                             , 'actions'        :
+                                ( { 'name'          : 'View'
+                                  , 'action'        : 'document_view'
+                                  , 'permissions'   : ('View',)
+                                  }
+                                , { 'name'          : 'Edit'
+                                  , 'action'        : 'document_edit_form'
+                                  , 'permissions'   : ('Modify portal content',)
+                                  }
+                                , { 'name'          : 'Metadata'
+                                  , 'action'        : 'metadata_edit_form'
+                                  , 'permissions'   : ('Modify portal content',)
+                                  }
+                                )
+                             }
+                           ,
+                           )
+
 def addDocument(self, id, title='', description='', text_format='',
                 text=''):
     """ Add a Document """

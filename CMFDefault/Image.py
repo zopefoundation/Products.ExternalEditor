@@ -100,6 +100,31 @@ from DublinCore import DefaultDublinCoreImpl
 from Products.CMFCore import CMFCorePermissions
 from Products.CMFCore.WorkflowCore import WorkflowAction, afterCreate
 
+factory_type_information = ( { 'id'             : 'Image'
+                             , 'meta_type'      : 'Portal Image'
+                             , 'description'    : """\
+Image objects can be embedded in Portal documents."""
+                             , 'icon'           : 'image_icon.gif'
+                             , 'product'        : 'CMFDefault'
+                             , 'factory'        : 'addImage'
+                             , 'immediate_view' : 'metadata_edit_form'
+                             , 'actions'        :
+                                ( { 'name'          : 'View'
+                                  , 'action'        : 'image_view'
+                                  , 'permissions'   : ('View',)
+                                  }
+                                , { 'name'          : 'Edit'
+                                  , 'action'        : 'image_edit_form'
+                                  , 'permissions'   : ('Modify portal content',)
+                                  }
+                                , { 'name'          : 'Metadata'
+                                  , 'action'        : 'metadata_edit_form'
+                                  , 'permissions'   : ('Modify portal content',)
+                                  }
+                                )
+                             }
+                           ,
+                           )
 
 import OFS.Image
 

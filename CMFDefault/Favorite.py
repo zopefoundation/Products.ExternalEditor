@@ -96,6 +96,31 @@ from Link import Link
 
 from Products.CMFCore.WorkflowCore import afterCreate
 
+factory_type_information = ( { 'id'             : 'Favorite'
+                             , 'meta_type'      : 'Favorite'
+                             , 'description'    : """\
+A Favorite is a Link to an intra-portal resource."""
+                             , 'icon'           : 'link_icon.gif'
+                             , 'product'        : 'CMFDefault'
+                             , 'factory'        : 'addFavorite'
+                             , 'immediate_view' : 'metadata_edit_form'
+                             , 'actions'        :
+                                ( { 'name'          : 'View'
+                                  , 'action'        : 'favorite_view'
+                                  , 'permissions'   : ('View',)
+                                  }
+                                , { 'name'          : 'Edit'
+                                  , 'action'        : 'link_edit_form'
+                                  , 'permissions'   : ('Modify portal content',)
+                                  }
+                                , { 'name'          : 'Metadata'
+                                  , 'action'        : 'metadata_edit_form'
+                                  , 'permissions'   : ('Modify portal content',)
+                                  }
+                                )
+                             }
+                           ,
+                           )
 
 def addFavorite(self, id, title='', remote_url='', description=''):
     """
