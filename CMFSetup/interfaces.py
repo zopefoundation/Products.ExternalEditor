@@ -310,6 +310,48 @@ class IToolsetRegistry( Interface ):
         o Raise ValueError if 'tool_id' is in the "forbidden" list.
         """
 
+class IProfileRegistry( Interface ):
+
+    """ API for profile registry.
+    """
+    def getProfileInfo( profile_id ):
+
+        """ Return a mapping describing a registered filesystem profile.
+
+        o Keys include:
+
+          'id' -- the ID of the profile
+
+          'title' -- its title
+
+          'description' -- a textual description of the profile
+
+          'path' -- a path to the profile on the filesystem.
+        """
+
+    def listProfiles():
+
+        """ Return a list of IDs for registered profiles.
+        """
+
+    def listProfileInfo():
+
+        """ Return a list of mappings describing registered profiles.
+
+        o See 'getProfileInfo' for a description of the mappings' keys.
+        """
+
+    def registerProfile( profile_id
+                       , title
+                       , description
+                       , path
+                       ):
+        """ Add a new profile to tne registry.
+
+        o If an existing profile is already registered for 'profile_id',
+          raise KeyError.
+        """
+
 class ISetupTool( Interface ):
 
     """ API for SetupTool.

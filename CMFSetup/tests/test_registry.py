@@ -12,6 +12,7 @@ from conformance import ConformsToIStepRegistry
 from conformance import ConformsToIImportStepRegistry
 from conformance import ConformsToIExportStepRegistry
 from conformance import ConformsToIToolsetRegistry
+from conformance import ConformsToIProfileRegistry
 
 #==============================================================================
 #   Dummy handlers
@@ -1002,12 +1003,62 @@ _CONFUSED_TOOLSET_XML = """\
 </tool-setup>
 """
 
+class ProfileRegistryTests( BaseRegistryTests
+                          , ConformsToIProfileRegistry
+                          ): 
+
+    def _getTargetClass( self ):
+
+        from Products.CMFSetup.registry import ProfileRegistry
+        return ProfileRegistry
+
+    def test_empty( self ):
+
+        registry = self._makeOne()
+
+        self.assertEqual( len( registry.listProfiles() ), 0 )
+        self.assertEqual( len( registry.listProfiles() ), 0 )
+        self.assertRaises( KeyError, registry.getProfileInfo, 'nonesuch' )
+
+    def test_registerProfile_normal( self ):
+
+        PROFILE_ID = 'one'
+        TITLE = 'One'
+        DESCRIPTION = 'One profile'
+        PATH = '/path/to/one'
+
+        registry = self._makeOne()
+        registry.registerProfile( PROFILE_ID, TITLE, DESCRIPTION, PATH )
+
+        self.assertEqual( len( registry.listProfiles() ), 1 )
+        self.assertEqual( len( registry.listProfileInfo() ), 1 )
+
+        info = registry.getProfileInfo( PROFILE_ID )
+
+        self.assertEqual( info[ 'id' ], PROFILE_ID )
+        self.assertEqual( info[ 'title' ], TITLE )
+        self.assertEqual( info[ 'description' ], DESCRIPTION )
+        self.assertEqual( info[ 'path' ], PATH )
+
+    def test_registerProfile_duplicate( self ):
+
+        PROFILE_ID = 'one'
+        TITLE = 'One'
+        DESCRIPTION = 'One profile'
+        PATH = '/path/to/one'
+
+        registry = self._makeOne()
+        registry.registerProfile( PROFILE_ID, TITLE, DESCRIPTION, PATH )
+        self.assertRaises( KeyError
+                         , registry.registerProfile
+                         , PROFILE_ID, TITLE, DESCRIPTION, PATH )
 
 def test_suite():
     return unittest.TestSuite((
         unittest.makeSuite( ImportStepRegistryTests ),
         unittest.makeSuite( ExportStepRegistryTests ),
         unittest.makeSuite( ToolsetRegistryTests ),
+        unittest.makeSuite( ProfileRegistryTests ),
         ))
 
 if __name__ == '__main__':

@@ -2,13 +2,13 @@
 
 $Id$
 """
+from AccessControl import ModuleSecurityInfo
 
-#
-#   Export API for third-party products (XXX: not yet!)
-#
-#from SiteConfiguration import registerSetupStep
-#from SiteConfiguration import registerExportScript
+from permissions import ManagePortal
+from registry import _profile_registry as profile_registry
 
+security = ModuleSecurityInfo( 'Products.CMFSetup' )
+security.declareProtected( ManagePortal, 'profile_registry' )
 
 def initialize(context):
 
@@ -83,37 +83,10 @@ def initialize(context):
                                             ))
     registerExportScript('generateSkeleton', generateSkeleton)
 
-    from ActionsConfig import configureToolGeneratedActions
-    from ActionsConfig import exportToolGeneratedActions
-
-    registerSetupStep('configureToolGeneratedActions', '2004/05/10-01',
-                      configureToolGeneratedActions)
-    registerExportScript('exportToolGeneratedActions',
-                         exportToolGeneratedActions)
-
-    from ContentTypesConfig import installTypes, exportTypes
-    registerSetupStep('installTypes', '2004/05/10-01', installTypes)
-    registerExportScript('exportTypes', exportTypes)
-
     from ActionIconsConfig import configureActionIcons, exportActionIcons
     registerSetupStep('configureActionIcons', '2004/05/10-02',
                       configureActionIcons, ('installTools',))
     registerExportScript('exportActionIcons', exportActionIcons)
-
-    from SkinsConfig import configureSkins, exportSkins
-    registerSetupStep('configureSkins', '2004/05/10-01', configureSkins)
-    registerExportScript('exportSkins', exportSkins)
-
-    from WorkflowConfig import configureWorkflows, exportWorkflows
-    registerSetupStep('configureWorkflows', '2004/05/10-01',
-                      configureWorkflows, ('installTypes',))
-    registerExportScript('exportWorkflows', exportWorkflows)
-
-    from RolesPermissionsConfig import configureRolesPermissions
-    from RolesPermissionsConfig import exportRolesPermissions
-    registerSetupStep('configureRolesPermissions', '2004/05/10-01',
-                      configureRolesPermissions)
-    registerExportScript('exportRolesPermissions', exportRolesPermissions)
 
     from MembershipConfig import installMembershipToolContent
     from MembershipConfig import exportMembershipToolContent
@@ -122,10 +95,6 @@ def initialize(context):
                                                      'installTypes'))
     registerExportScript('exportMembershipToolContent',
                          exportMembershipToolContent)
-
-    from RemoveTools import removeInstalledTools
-    registerSetupStep('removeInstalledTools', '2004/05/10-1',
-                      removeInstalledTools, ('installTools',))
 
     from MemberDataConfig import configureMemberDataTool
     from MemberDataConfig import exportMemberDataToolConfig

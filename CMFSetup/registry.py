@@ -14,6 +14,7 @@ from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from interfaces import IImportStepRegistry
 from interfaces import IExportStepRegistry
 from interfaces import IToolsetRegistry
+from interfaces import IProfileRegistry
 from permissions import ManagePortal
 from utils import HandlerBase
 from utils import _xmldir
@@ -516,6 +517,91 @@ class ToolsetRegistry( Implicit ):
 
 InitializeClass( ToolsetRegistry )
 
+class ProfileRegistry( Implicit ):
+
+    """ Track registered profiles.
+    """
+    __implements__ = ( IProfileRegistry, )
+
+    security = ClassSecurityInfo()
+    security.setDefaultAccess( 'allow' )
+    
+    def __init__( self ):
+
+        self._clear()
+
+    security.declareProtected( ManagePortal, '' )
+    def getProfileInfo( self, profile_id ):
+
+        """ Return a mapping describing a registered profile.
+
+        o Keys include:
+
+          'id' -- the ID of the profile
+
+          'title' -- its title
+
+          'description' -- a textual description of the profile
+
+          'type' -- 'FILESYSTEM' or 'SNAPSHOT'
+
+          'path' -- a path to the profile (either within the ZODB, for
+                    snapshots, or on the filesystem).
+        """
+        result = self._profile_info[ profile_id ]
+        return result.copy()
+
+    security.declareProtected( ManagePortal, 'listProfiles' )
+    def listProfiles( self ):
+
+        """ Return a list of IDs for registered profiles.
+        """
+        return tuple( self._profile_ids )
+
+    security.declareProtected( ManagePortal, 'listProfileInfo' )
+    def listProfileInfo( self ):
+
+        """ Return a list of mappings describing registered profiles.
+
+        o See 'getProfileInfo' for a description of the mappings' keys.
+        """
+        return [ self.getProfileInfo( id ) for id in self.listProfiles() ]
+
+    security.declareProtected( ManagePortal, 'registerProfile' )
+    def registerProfile( self
+                       , profile_id
+                       , title
+                       , description
+                       , path
+                       ):
+        """ Add a new profile to tne registry.
+
+        o If an existing profile is already registered for 'profile_id',
+          raise KeyError.
+        """
+        if self._profile_info.get( profile_id ) is not None:
+            raise KeyError, 'Duplicate profile ID: %s' % profile_id
+
+        self._profile_ids.append( profile_id )
+
+        info = { 'id' : profile_id
+               , 'title' : title
+               , 'description' : description
+               , 'path' : path
+               }
+
+        self._profile_info[ profile_id ] = info
+
+    #   Helper methods
+    security.declarePrivate( '_clear' )
+    def _clear( self ):
+
+        self._profile_info = {}
+        self._profile_ids = []
+
+InitializeClass( ProfileRegistry )
+
+_profile_registry = ProfileRegistry()
 
 class _ImportStepRegistryParser( HandlerBase ):
 

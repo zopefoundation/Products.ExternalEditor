@@ -69,6 +69,15 @@ class ConformsToIToolsetRegistry:
 
         verifyClass( IToolsetRegistry, self._getTargetClass() )
 
+class ConformsToIProfileRegistry:
+
+    def test_IProfileRegistry_conformance( self ):
+
+        from Products.CMFSetup.interfaces import IProfileRegistry
+        from Interface.Verify import verifyClass
+
+        verifyClass( IProfileRegistry, self._getTargetClass() )
+
 class ConformsToISetupTool:
 
     def test_ISetupTool_conformance( self ):
