@@ -4,6 +4,10 @@ CMF 1.5.0-beta (unreleased)
 
     - DiscussionTool: Fixed two acquisition bugs.
       (Collector #119 and #201)
+    
+    - Change default CookieCrumbler Cache-Control header value from
+      "no-cache" to "private" to allow browser caches to cache cookie
+      authenticated pages but not proxies and HTTP accellerators.
 
 CMF 1.5.0-alpha (2004/07/09)
 

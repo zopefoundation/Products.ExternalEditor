@@ -88,7 +88,7 @@ class CookieCrumbler (Folder):
     unauth_page = ''
     logout_page = 'logged_out'
     local_cookie_path = 0
-    cache_header_value = 'no-cache'
+    cache_header_value = 'private'
 
     security.declarePrivate('delRequestVar')
     def delRequestVar(self, req, name):
