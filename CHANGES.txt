@@ -1,5 +1,8 @@
 External Editor Change Log
 
+    - Removed stderr writes to cure "Invalid File Descriptor" bugs on
+      Windows.
+
     - Added Photoshop plugin (win32)
 
     - Added HomeSite plugin (win32)
