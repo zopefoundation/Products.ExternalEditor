@@ -29,13 +29,15 @@ except ImportError:
     def wl_isLocked(ob):
         return 0
 
+ExternalEditorPermission = 'Use external editor'
+
 class ExternalEditor(Acquisition.Implicit):
     """Create a response that encapsulates the data needed by the
        ZopeEdit helper application
     """
     
     security = ClassSecurityInfo()
-    security.declareObjectProtected('Use external editor')
+    security.declareObjectProtected(ExternalEditorPermission)
     
     def __before_publishing_traverse__(self, self2, request):
         path = request['TraversalRequestNameStack']
@@ -127,3 +129,24 @@ class ExternalEditor(Acquisition.Implicit):
         return join(r, '\n')
 
 InitializeClass(ExternalEditor)
+
+def EditLink(self, object):
+    """Insert the external editor link to an object if appropriate"""
+    base = Acquisition.aq_base(object)
+    user = getSecurityManager().getUser()
+    editable = (hasattr(base, 'manage_FTPget')
+                or hasattr(base, 'EditableBody')
+                or hasattr(base, 'document_src')
+                or hasattr(base, 'read'))
+    if editable and user.has_permission(ExternalEditorPermission, object):
+        return ('<a href="%s/externalEdit_/%s" '
+                'title="Edit using external editor">'
+                '<img src="%s/misc_/ExternalEditor/edit_icon" '
+                'align="middle" hspace="2" border="0" alt="External Editor" />'
+                '</a>' % (object.aq_parent.absolute_url(), 
+                          object.getId(),
+                          object.REQUEST.BASEPATH1)
+               )
+    else:
+        return ''
+                

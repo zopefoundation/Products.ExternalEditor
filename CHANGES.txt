@@ -1,5 +1,9 @@
 External Editor Change Log
 
+    - Factored out external editor link generator. Product now registers
+      a global method "externalEditLink_" which can be called to generate
+      the external editor icon link for any object.
+
     - External editing is now governed by the "Use external editor" permission
       to allow non-managers to use it. Users must also have the permissions to
       edit/modify the objects they edit, plus do WebDAV locking if desired.

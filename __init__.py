@@ -17,25 +17,21 @@
 from Globals import ImageFile, DTMLFile
 from OFS.ObjectManager import ObjectManager
 from OFS.Application import Application
-from ExternalEditor import ExternalEditor
+from OFS.FindSupport import FindSupport
+from ExternalEditor import ExternalEditor, EditLink
 
 # Add the icon and the edit method to the misc_ namespace
 
 misc_ = {'edit_icon': ImageFile('edit_icon.gif', globals())}
 
+# Insert the global external editor resources
+methods = {'externalEdit_': ExternalEditor(),
+           'externalEditLink_': EditLink}
+
 # Monkey patch in our manage_main for Object Manager
-
 ObjectManager.manage_main = DTMLFile('manage_main', globals())
+print 'patched'
 
-# Monkey patch the application object
-exedit = Application.externalEdit_ = ExternalEditor()
-
-def initialize(context):
-    # Compensate for past inadequacies
-    app = context._ProductContext__app
-    if app.externalEdit_ is not exedit and \
-       app.externalEdit_.__class__  is ExternalEditor:
-        try:
-            del app.externalEdit_
-        except:
-            pass
+# Add our patch for the find results template
+#FindSupport.manage_findResult=DTMLFile('findResult', globals(),
+#                                       management_view='Find')

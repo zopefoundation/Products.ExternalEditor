@@ -98,7 +98,6 @@ function toggleSelect() {
    ><strong>Last Modified</strong><dtml-else>Last Modified</dtml-if></a></div>
   </td>
 </tr>
-<dtml-let parent_url="absolute_url()">
 <dtml-in objectItems sort_expr="skey" reverse_expr="rkey">
 <dtml-if sequence-odd>
 <tr class="row-normal">
@@ -133,19 +132,6 @@ function toggleSelect() {
   <a href="&dtml.url_quote-sequence-key;/manage_workspace">
   &dtml-sequence-key; <dtml-if title>(&dtml-title;)</dtml-if>
   </a>
-  <dtml-let explicit="_.getitem('sequence-item').aq_explicit">
-    <dtml-if expr="(_.hasattr(explicit, 'manage_FTPget')
-                   or _.hasattr(explicit, 'read')
-                   or _.hasattr(explicit, 'EditableBody')
-                   or _.hasattr(explicit, 'document_src'))
-                   and AUTHENTICATED_USER.has_permission(
-                        'Use external editor', explicit)">
-      <a href="&dtml-parent_url;/externalEdit_/&dtml.url_quote-sequence-key;"
-         title="Edit using external editor"
-      ><img src="&dtml-BASEPATH1;/misc_/ExternalEditor/edit_icon"
-            align="middle" hspace="2" border="0" alt="External Editor" /></a>
-    </dtml-if>
-  </dtml-let>
   <dtml-if locked_in_version>
     <dtml-if modified_in_version>
       <img src="&dtml-BASEPATH1;/p_/locked"
@@ -156,6 +142,7 @@ function toggleSelect() {
        (<em>&dtml-locked_in_version;</em>)
     </dtml-if>
   </dtml-if>
+  <dtml-var expr="externalEditLink_(this())">
   </div>
   </td>
 
@@ -190,7 +177,6 @@ function toggleSelect() {
   </dtml-with>
 </tr>
 </dtml-in>
-</dtml-let>
 </table>
 
 <table cellspacing="0" cellpadding="2" border="0">
@@ -266,3 +252,16 @@ window.parent.update_menu();
 </dtml-if>
 
 <dtml-var manage_page_footer>
+
+
+
+
+
+
+
+
+
+
+
+
+
