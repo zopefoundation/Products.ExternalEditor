@@ -68,14 +68,18 @@ def importSkinsTool( context ):
     site = context.getSite()
     encoding = context.getEncoding()
 
-    skins_tool = getToolByName( site, 'portal_skins' )
+    stool = getToolByName(site, 'portal_skins')
 
     if context.shouldPurge():
 
-        skins_tool._getSelections().clear()
+        stool.request_varname = 'portal_skin'
+        stool.allow_any = 0
+        stool.cookie_persistence = 0
 
-        for id in skins_tool.objectIds( DirectoryView.meta_type ):
-            skins_tool._delObject(id)
+        stool._getSelections().clear()
+
+        for id in stool.objectIds(DirectoryView.meta_type):
+            stool._delObject(id)
 
     text = context.readDataFile( _FILENAME )
 
@@ -84,21 +88,35 @@ def importSkinsTool( context ):
         stc = SkinsToolConfigurator( site, encoding )
         tool_info = stc.parseXML( text )
 
-        tool = getToolByName( site, 'portal_skins' )
+        if 'default_skin' in tool_info:
+            stool.default_skin = str(tool_info['default_skin'])
+        if 'request_varname' in tool_info:
+            stool.request_varname = str(tool_info['request_varname'])
+        if 'allow_any' in tool_info:
+            stool.allow_any = tool_info['allow_any'] and 1 or 0
+        if 'cookie_persistence' in tool_info:
+            stool.cookie_persistence = \
+                                    tool_info['cookie_persistence'] and 1 or 0
 
-        tool.default_skin = str( tool_info[ 'default_skin' ] )
-        tool.request_varname = str( tool_info[ 'request_var' ] )
-        tool.allow_any =  tool_info[ 'allow_arbitrary' ] and 1 or 0
-        tool.cookie_persistence =  tool_info[ 'persist_cookie' ] and 1 or 0
+        for dir_info in tool_info['skin_dirs']:
+            dir_id = dir_info['id']
+            if dir_id in stool.objectIds(DirectoryView.meta_type):
+                stool._delObject(dir_id)
+            createDirectoryView(stool, dir_info['directory'], dir_id)
 
-        for dir_info in tool_info[ 'skin_dirs' ]:
-
-            createDirectoryView( tool, dir_info[ 'directory' ],
-                                 dir_info[ 'id' ] )
-
-        for path_info in tool_info[ 'skin_paths' ]:
-            tool.addSkinSelection( path_info[ 'id' ],
-                                   ', '.join( path_info[ 'layers' ] ) )
+        for path_info in tool_info['skin_paths']:
+            path_id = path_info['id']
+            if path_id == '*':
+                for path_id, path in stool._getSelections().items():
+                    path = _updatePath(path, path_info['layers'])
+                    stool.addSkinSelection(path_id, path)
+            else:
+                if stool._getSelections().has_key(path_id):
+                    path = stool._getSelections()[path_id]
+                else:
+                    path = ''
+                path = _updatePath(path, path_info['layers'])
+                stool.addSkinSelection(path_id, path)
 
     #
     #   Purge and rebuild the skin path, now that we have added our stuff.
@@ -107,10 +125,26 @@ def importSkinsTool( context ):
     request = getattr(site, 'REQUEST', None)
     if request is not None:
         site._v_skindata = None
-        skins_tool.setupCurrentSkin(request)
+        stool.setupCurrentSkin(request)
 
     return 'Skins tool imported'
 
+def _updatePath(path, layer_infos):
+    path = [ name.strip() for name in path.split(',') if name.strip() ]
+
+    for layer in layer_infos:
+        if layer['name'] in path:
+            path.remove(layer['name'])
+        if 'insert-before' in layer:
+            try:
+                index = path.index(layer['insert-before'])
+                path.insert(index, layer['name'])
+                continue
+            except ValueError:
+                pass
+        path.append(layer['name'])
+
+    return str( ','.join(path) )
 
 def exportSkinsTool( context ):
 
@@ -219,11 +253,9 @@ class SkinsToolConfigurator(ConfiguratorBase):
         return {
           'skins-tool':
             { 'default_skin':       {},
-              'request_varname':    {KEY: 'request_var'},
-              'allow_any':          {KEY: 'allow_arbitrary', DEFAULT: False,
-                                     CONVERTER: self._convertToBoolean},
-              'cookie_persistence': {KEY: 'persist_cookie', DEFAULT: False,
-                                     CONVERTER: self._convertToBoolean},
+              'request_varname':    {},
+              'allow_any':          {CONVERTER: self._convertToBoolean},
+              'cookie_persistence': {CONVERTER: self._convertToBoolean},
               'skin-directory':     {KEY: 'skin_dirs', DEFAULT: ()},
               'skin-path':          {KEY: 'skin_paths', DEFAULT: ()} },
           'skin-directory':
@@ -231,8 +263,9 @@ class SkinsToolConfigurator(ConfiguratorBase):
               'directory':          {} },
           'skin-path':
             { 'id':                 {},
-              'layer':              {KEY: 'layers'} },
+              'layer':              {KEY: 'layers', DEFAULT: ()} },
           'layer':
-            { 'name':               {KEY: None} } }
+            { 'name':               {},
+              'insert-before':      {} } }
 
 InitializeClass(SkinsToolConfigurator)
