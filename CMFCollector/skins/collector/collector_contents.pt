@@ -2,7 +2,7 @@
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       metal:use-macro="here/main_template/macros/master">
 
-<span tal:replace="nothing">
+<span tal:condition="nothing">
   Template description: Batching view of the collector issues.
 </span>
 

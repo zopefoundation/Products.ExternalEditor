@@ -3,7 +3,7 @@
       metal:use-macro="here/main_template/macros/master">
 <body>
 
-<span tal:replace="nothing">
+<span tal:condition="nothing">
   Template description: Basic view of issue characteristics and transcript.
 </span>
 
