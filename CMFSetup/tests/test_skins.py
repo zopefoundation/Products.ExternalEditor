@@ -71,6 +71,9 @@ class DummySkinsTool( Folder ):
 
         self._setup_called = True
 
+    def clearCurrentSkin(self):
+        pass
+
 class DummyFSDV( Item ):
 
     meta_type = DirectoryView.DirectoryView.meta_type

@@ -124,8 +124,8 @@ def importSkinsTool( context ):
     #
     request = getattr(site, 'REQUEST', None)
     if request is not None:
-        site._v_skindata = None
-        stool.setupCurrentSkin(request)
+        site.clearCurrentSkin()
+        site.setupCurrentSkin(request)
 
     return 'Skins tool imported'
 
