@@ -116,7 +116,7 @@ from utils import _dtmldir, modifyRolesForPermission
 from WorkflowUIMixin import WorkflowUIMixin
 from Transitions import TRIGGER_AUTOMATIC, TRIGGER_USER_ACTION, \
      TRIGGER_WORKFLOW_METHOD
-from Expression import exprNamespace
+from Expression import StateChangeInfo, createExprContext
 
 Unauthorized = 'Unauthorized'
 
@@ -125,18 +125,6 @@ def checkId(id):
     if res != -1 and res is not None:
         raise ValueError, 'Illegal ID'
     return 1
-
-class NamespaceAccessor:
-    __allow_access_to_unprotected_subobjects__ = 1
-    def __init__(self, md):
-        self._getitem = md.getitem
-    def __getattr__(self, name):
-        try:
-            return self._getitem(name, 0)
-        except KeyError:
-            raise AttributeError, name
-    def __getitem__(self, name):
-        return self._getitem(name, 0)
 
 
 class DCWorkflowDefinition (WorkflowUIMixin, Folder):
@@ -154,7 +142,7 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
 
     states = None
     transitions = None
-    vars = None
+    variables = None
     worklists = None
     scripts = None
 
@@ -239,8 +227,8 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
 
                 # Not set yet.  Use a default.
                 elif vdef.default_expr is not None:
-                    md = exprNamespace(ob, self, status)
-                    value = vdef.default_expr(md)
+                    ec = createExprContext(StateChangeInfo(ob, self, status))
+                    value = vdef.default_expr(ec)
                 else:
                     value = vdef.default_value
 
@@ -431,8 +419,8 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
 
         # Not set yet.  Use a default.
         elif vdef.default_expr is not None:
-            md = exprNamespace(ob, self, status)
-            value = vdef.default_expr(md)
+            ec = createExprContext(StateChangeInfo(ob, self, status))
+            value = vdef.default_expr(ec)
         else:
             value = vdef.default_value
 
@@ -535,35 +523,42 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
         Private method.
         Puts object in a new state.
         '''
+        sci = None
+        econtext = None
         moved = 0
+
+        # Figure out the old and new states.
+        old_sdef = self._getWorkflowStateOf(ob)
+        old_state = old_sdef.getId()
         if tdef is None:
-            state = self.initial_state
+            new_state = self.initial_state
             former_status = {}
-            action = ''
         else:
-            state = tdef.new_state_id
-            if not state:
+            new_state = tdef.new_state_id
+            if not new_state:
                 # Stay in same state.
-                state = self._getWorkflowStateOf(ob, 1)
+                new_state = old_state
             former_status = self._getStatusOf(ob)
-            action = tdef.id
-            # Execute a script if specified.
-            if tdef.script_name:
-                script = self.scripts[tdef.script_name]
-                # Pass lots of info to the script in a single parameter.
-                md = exprNamespace(ob, self, former_status,
-                                   action, state, kwargs)
-                accessor = NamespaceAccessor(md)
-                try:
-                    script(accessor)  # May throw an exception.
-                except ObjectMoved, ex:
-                    ob = ex.getNewObject()
-                    moved = 1
-        sdef = self.states.get(state, None)
-        if sdef is None:
-            raise WorkflowException, 'Destination state undefined: ' + state
+        new_sdef = self.states.get(new_state, None)
+        if new_sdef is None:
+            raise WorkflowException, (
+                'Destination state undefined: ' + new_state)
+
+        # Execute a script if specified.
+        if tdef is not None and tdef.script_name:
+            script = self.scripts[tdef.script_name]
+            # Pass lots of info to the script in a single parameter.
+            sci = StateChangeInfo(
+                ob, self, former_status, tdef, old_sdef, new_sdef, kwargs)
+            try:
+                script(sci)  # May throw an exception.
+            except ObjectMoved, ex:
+                ob = ex.getNewObject()
+                moved = 1
+                # Don't re-raise
+
         # Update variables.
-        state_values = sdef.var_values
+        state_values = new_sdef.var_values
         if state_values is None: state_values = {}
         tdef_exprs = None
         if tdef is not None: tdef_exprs = tdef.var_exprs
@@ -572,31 +567,41 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
         for id, vdef in self.variables.items():
             if not vdef.for_status:
                 continue
+            expr = None
             if state_values.has_key(id):
                 value = state_values[id]
             elif tdef_exprs.has_key(id):
-                md = exprNamespace(ob, self, former_status,
-                                   action, state, kwargs)
-                value = tdef_exprs[id](md)
+                expr = tdef_exprs[id]
             elif vdef.default_expr is not None:
-                md = exprNamespace(ob, self, former_status,
-                                   action, state, kwargs)
-                value = vdef.default_expr(md)
+                expr = vdef.default_expr
             else:
                 value = vdef.default_value
+            if expr is not None:
+                # Evaluate an expression.
+                if econtext is None:
+                    # Lazily create the expression context.
+                    if sci is None:
+                        sci = StateChangeInfo(
+                            ob, self, former_status, tdef,
+                            old_sdef, new_sdef, kwargs)
+                    econtext = createExprContext(sci)
+                value = expr(econtext)
             status[id] = value
+
         # Update state.
-        status[self.state_var] = state
+        status[self.state_var] = new_state
         tool = aq_parent(aq_inner(self))
         tool.setStatusOf(self.id, ob, status)
+
         # Update role to permission assignments.
         self.updateRoleMappingsFor(ob)
 
+        # Return the new state object.
         if moved:
             # Re-raise.
             raise ObjectMoved(ob)
         else:
-            return sdef
+            return new_sdef
 
 
 Globals.InitializeClass(DCWorkflowDefinition)

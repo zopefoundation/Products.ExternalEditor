@@ -29,12 +29,11 @@
   <th align="right">Variables</th>
   <th></th>
  </tr>
- <dtml-in var_exprs sort>
+ <dtml-in getVariableExprs sort>
   <tr>
    <td></td>
    <td>
-    &dtml-sequence-key; = <dtml-var expr="getVarExprText(_['sequence-key'])"
-      fmt="html_quote">
+    &dtml-sequence-key; = &dtml-sequence-item;
    </td>
   </tr>
  </dtml-in>

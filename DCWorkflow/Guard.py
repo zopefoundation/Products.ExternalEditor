@@ -97,7 +97,7 @@ from AccessControl import ClassSecurityInfo
 
 from Products.CMFCore.CMFCorePermissions import ManagePortal
 
-from Expression import Expression, exprNamespace
+from Expression import Expression, StateChangeInfo, createExprContext
 from utils import _dtmldir
 
 
@@ -137,8 +137,8 @@ class Guard (Persistent):
                 return 0
         expr = self.expr
         if expr is not None:
-            md = exprNamespace(ob, wf_def)
-            res = expr(md)
+            econtext = createExprContext(StateChangeInfo(ob, wf_def))
+            res = expr(econtext)
             if not res:
                 return 0
         return 1

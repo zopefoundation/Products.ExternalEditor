@@ -1,31 +1,43 @@
 
-Expressions in DCWorkflow use the same convention as DTML expressions.
-The underscore character provides access to certain Python modules and
-builtins.  In addition to what is provided by DTML expressions, the
-following names are also available.
+Starting with version 0.3, expressions in DCWorkflow are TALES expressions.
+Some of the contexts have slightly different meanings from what is provided
+for expressions in page templates:
 
-- All scripts defined using the 'Scripts' tab.
+here             The content object
+container        The content object's container
+
+Several other contexts are also provided:
+
+state_change     A special object containing info about the state change
+transition       The transition object being executed
+status           The former status
+workflow         The workflow definition object
+scripts          The scripts in the workflow definition object
+
+state_change objects provide the following attributes:
+
+- 'status' is a mapping containing the workflow status.
 
 - 'object' is the object being modified by workflow.
 
 - 'workflow' is the workflow definition object.
 
-- 'transition' is the ID of the transition being executed.
+- 'transition' is the transition object being executed.
 
-- 'new_state' is the ID of the destination state of the transition.
+- 'old_state' is the former state object.
+
+- 'new_state' is the destination state object.
 
 - 'kwargs' is the keyword arguments passed to the doActionFor() method.
 
-- 'getHistory()', a function that returns a copy of the object's workflow
+- 'getHistory()', a method that returns a copy of the object's workflow
    history.
 
 - 'getPortal()', which returns the root of the portal.
-
-- 'getObjectContainer()', which returns the container of the object.
 
 - 'ObjectDeleted' and 'ObjectMoved', exceptions that can be raised by
   scripts to indicate to the workflow that an object has been moved or
   deleted.
 
-- All status variables, including the current state.
+- 'getDateTime' is a method that returns the DateTime of the transition.
 

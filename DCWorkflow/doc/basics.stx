@@ -50,5 +50,7 @@ role to permission mappings appropriate for that state.
 
 Finally, you can extend the workflow with scripts.  Scripts can be
 External Methods, Python Scripts, DTML methods, or any other callable
-Zope object.  They are accessible by name in expressions.
+Zope object.  They are accessible by name in expressions.  Scripts
+are invoked with a state_change object as the first argument; see
+expressions.stx.
 

@@ -111,7 +111,7 @@ class StateDefinition (SimpleItem):
     manage_options = (
         {'label': 'Properties', 'action': 'manage_properties'},
         {'label': 'Permissions', 'action': 'manage_permissions'},
-        {'label': 'Variables', 'action': 'manage_vars'},
+        {'label': 'Variables', 'action': 'manage_variables'},
         )
 
     title = ''
@@ -127,13 +127,6 @@ class StateDefinition (SimpleItem):
 
     def getId(self):
         return self.id
-
-    def getVarValues(self):
-        vv = self.var_values
-        if vv is None:
-            return []
-        else:
-            return vv.items()
 
     def getWorkflow(self):
         return aq_parent(aq_inner(aq_parent(aq_inner(self))))
@@ -151,7 +144,7 @@ class StateDefinition (SimpleItem):
         return self.getWorkflow().transitions.keys()
 
     def getAvailableVarIds(self):
-        return self.getWorkflow().vars.keys()
+        return self.getWorkflow().variables.keys()
 
     def getManagedPermissions(self):
         return list(self.getWorkflow().permissions)
@@ -189,6 +182,77 @@ class StateDefinition (SimpleItem):
         self.transitions = tuple(map(str, transitions))
         if REQUEST is not None:
             return self.manage_properties(REQUEST, 'Properties changed.')
+
+
+    _variables_form = DTMLFile('state_variables', _dtmldir)
+
+    def manage_variables(self, REQUEST, manage_tabs_message=None):
+        '''
+        '''
+        return self._variables_form(REQUEST,
+                                     management_view='Variables',
+                                     manage_tabs_message=manage_tabs_message,
+                                     )
+
+    def getVariableValues(self):
+        ''' get VariableValues for management UI
+        '''
+        vv = self.var_values
+        if vv is None:
+            return []
+        else:
+            return vv.items()
+    
+    def getWorkflowVariables(self):
+        ''' get all variables that are available form
+            workflow and not handled yet.
+        '''
+        wf_vars = self.getAvailableVarIds()
+        if self.var_values is None:
+                return wf_vars
+        ret = []
+        for vid in wf_vars:
+            if not self.var_values.has_key(vid):
+                ret.append(vid)
+        return ret
+
+    def addVariable(self,id,value,REQUEST=None):
+        ''' add a WorkflowVariable to State
+        '''
+        if self.var_values is None:
+            self.var_values = PersistentMapping()
+        
+        self.var_values[id] = value
+        
+        if REQUEST is not None:
+            return self.manage_variables(REQUEST, 'Variable added.')
+    
+    def deleteVariables(self,ids=[],REQUEST=None):
+        ''' delete a WorkflowVariable from State
+        '''
+        vv = self.var_values
+        for id in ids:
+            if vv.has_key(id):
+                del vv[id]
+                
+        if REQUEST is not None:
+            return self.manage_variables(REQUEST, 'Variables deleted.')
+
+    def setVariables(self, ids=[], REQUEST=None):
+        ''' set values for Variables set by this state
+        '''
+        if self.var_values is None:
+            self.var_values = PersistentMapping()
+ 
+        vv = self.var_values
+ 
+        if REQUEST is not None:
+            for id in vv.keys():
+                fname = 'varval_%s' % id
+                vv[id] = str(REQUEST[fname])
+            return self.manage_variables(REQUEST, 'Variables changed.')
+
+
 
     _permissions_form = DTMLFile('state_permissions', _dtmldir)
 

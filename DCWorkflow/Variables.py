@@ -162,6 +162,9 @@ class VariableDefinition (SimpleItem):
         self.default_value = str(default_value)
         if default_expr:
             self.default_expr = Expression(default_expr)
+        else:
+            self.default_expr = None
+            
         g = Guard()
         if g.changeFromProperties(props or REQUEST):
             self.info_guard = g

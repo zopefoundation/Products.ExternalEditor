@@ -91,7 +91,7 @@ __version__='$Revision$'[11:-2]
 from string import join, split, strip
 
 from OFS.SimpleItem import SimpleItem
-from Globals import DTMLFile
+from Globals import DTMLFile, PersistentMapping
 from Acquisition import aq_inner, aq_parent
 import Globals
 from AccessControl import ClassSecurityInfo
@@ -101,6 +101,7 @@ from Products.CMFCore.CMFCorePermissions import ManagePortal
 from ContainerTab import ContainerTab
 from Guard import Guard
 from utils import _dtmldir
+from Expression import Expression
 
 TRIGGER_AUTOMATIC = 0
 TRIGGER_USER_ACTION = 1
@@ -147,7 +148,11 @@ class TransitionDefinition (SimpleItem):
         if not self.var_exprs:
             return ''
         else:
-            return self.var_exprs.get(id, '')
+            expr = self.var_exprs.get(id, None)
+            if expr is not None:
+                return expr.text
+            else:
+                return ''
 
     def getWorkflow(self):
         return aq_parent(aq_inner(aq_parent(aq_inner(self))))
@@ -157,6 +162,9 @@ class TransitionDefinition (SimpleItem):
 
     def getAvailableScriptIds(self):
         return self.getWorkflow().scripts.keys()
+
+    def getAvailableVarIds(self):
+        return self.getWorkflow().variables.keys()
 
     _properties_form = DTMLFile('transition_properties', _dtmldir)
 
@@ -190,6 +198,87 @@ class TransitionDefinition (SimpleItem):
         if REQUEST is not None:
             return self.manage_properties(REQUEST, 'Properties changed.')
 
+    _variables_form = DTMLFile('transition_variables', _dtmldir)
+
+    def manage_variables(self, REQUEST, manage_tabs_message=None):
+        '''
+        '''
+        return self._variables_form(REQUEST,
+                                     management_view='Variables',
+                                     manage_tabs_message=manage_tabs_message,
+                                     )
+
+    def getVariableExprs(self):
+        ''' get variable exprs for management UI
+        '''
+        ve = self.var_exprs
+        if ve is None:
+            return []
+        else:
+            ret = []
+            for key in ve.keys():
+                ret.append((key,self.getVarExprText(key)))
+            return ret
+    
+    def getWorkflowVariables(self):
+        ''' get all variables that are available form
+            workflow and not handled yet.
+        '''
+        wf_vars = self.getAvailableVarIds()
+        if self.var_exprs is None:
+                return wf_vars
+        ret = []
+        for vid in wf_vars:
+            if not self.var_exprs.has_key(vid):
+                ret.append(vid)
+        return ret
+
+    def addVariable(self, id, text, REQUEST=None):
+        '''
+        Add a variable expression.
+        '''
+        if self.var_exprs is None:
+            self.var_exprs = PersistentMapping()
+        
+        expr = None
+        if text:
+          expr = Expression(str(text))
+        self.var_exprs[id] = expr
+        
+        if REQUEST is not None:
+            return self.manage_variables(REQUEST, 'Variable added.')
+    
+    def deleteVariables(self,ids=[],REQUEST=None):
+        ''' delete a WorkflowVariable from State
+        '''
+        ve = self.var_exprs
+        for id in ids:
+            if ve.has_key(id):
+                del ve[id]
+                
+        if REQUEST is not None:
+            return self.manage_variables(REQUEST, 'Variables deleted.')
+
+    def setVariables(self, ids=[], REQUEST=None):
+        ''' set values for Variables set by this state
+        '''
+        if self.var_exprs is None:
+            self.var_exprs = PersistentMapping()
+ 
+        ve = self.var_exprs
+ 
+        if REQUEST is not None:
+            for id in ve.keys():
+                fname = 'varexpr_%s' % id
+
+                val = REQUEST[fname]
+                expr = None
+                if val:
+                    expr = Expression(str(REQUEST[fname]))
+                ve[id] = expr
+
+            return self.manage_variables(REQUEST, 'Variables changed.')
+
 Globals.InitializeClass(TransitionDefinition)
 
 
@@ -215,7 +304,7 @@ class Transitions (ContainerTab):
             manage_tabs_message=manage_tabs_message,
             )
 
-    def addTransition(self, id, REQUEST=None):   #, RESPONSE=None):
+    def addTransition(self, id, REQUEST=None):
         '''
         '''
         tdef = TransitionDefinition(id)

@@ -92,94 +92,73 @@ import Globals
 from Globals import Persistent
 from Acquisition import aq_inner, aq_parent
 from AccessControl import getSecurityManager, ClassSecurityInfo
-from DocumentTemplate.DT_Util import TemplateDict, InstanceDict, Eval
+from DateTime import DateTime
 
 from Products.CMFCore.WorkflowCore import ObjectDeleted, ObjectMoved
-
-try:
-    # Zope 2.3.x
-    from DocumentTemplate.DT_Util import expr_globals
-except ImportError:
-    expr_globals = None
-
-try:
-    # Zope 2.4.x
-    from AccessControl.DTML import RestrictedDTML
-except ImportError:
-    class RestrictedDTML: pass
+from Products.PageTemplates.Expressions import getEngine
+from Products.PageTemplates.TALES import SafeMapping
+from Products.PageTemplates.PageTemplate import ModuleImporter
 
 
-class Expression (Persistent, RestrictedDTML):
+class Expression (Persistent):
     text = ''
-    _v_eval = None
+    _v_compiled = None
 
     security = ClassSecurityInfo()
 
     def __init__(self, text):
         self.text = text
-        if expr_globals is not None:
-            eval = Eval(text, expr_globals)
-        else:
-            eval = Eval(text)
-        self._v_eval = eval
+        self._v_compiled = getEngine().compile(text)
 
-    security.declarePrivate('validate')
-    def validate(self, inst, parent, name, value, md):
-        # Zope 2.3.x
-        return getSecurityManager().validate(inst, parent, name, value)
-
-    def __call__(self, md):
-        # md is a TemplateDict instance.
-        eval = self._v_eval
-        if eval is None:
-            text = self.text
-            if expr_globals is not None:
-                eval = Eval(text, expr_globals)
-            else:
-                eval = Eval(text)
-            self._v_eval = eval
-        md.validate = self.validate  # Zope 2.3.x
-        # Zope 2.4.x
-        md.guarded_getattr = getattr(self, 'guarded_getattr', None)
-        md.guarded_getitem = getattr(self, 'guarded_getitem', None)
-        return eval.eval(md)
+    def __call__(self, econtext):
+        compiled = self._v_compiled
+        if compiled is None:
+            compiled = self._v_compiled = getEngine().compile(self.text)
+        # ?? Maybe expressions should manipulate the security
+        # context stack.
+        res = compiled(econtext)
+        if isinstance(res, Exception):
+            raise res
+        #print 'returning %s from %s' % (`res`, self.text)
+        return res
 
 Globals.InitializeClass(Expression)
 
 
-def exprNamespace(object, workflow, status=None,
-                  transition=None, new_state=None, kwargs=None):
-    md = TemplateDict()
-    if kwargs is None:
-        kwargs = {}
-    if status is None:
-        tool = aq_parent(aq_inner(workflow))
-        status = tool.getStatusOf(workflow.id, object)
-        if status is None:
-            status = {}
-    md._push(status)
-    md._push(ExprVars(object, workflow))
-    d = {'object': object,
-         'workflow': workflow,
-         'transition': transition,
-         'new_state': new_state,
-         'kwargs': kwargs,
-         }
-    md._push(d)
-    md._push(workflow.scripts)  # Make scripts automatically available.
-    return md
-
-
-class ExprVars:
+class StateChangeInfo:
     '''
-    Provides names that are more expensive to compute.
+    Provides information for expressions and scripts.
     '''
+    _date = None
+
     ObjectDeleted = ObjectDeleted
     ObjectMoved = ObjectMoved
 
-    def __init__(self, ob, wf):
-        self._ob = ob
-        self._wf = wf
+    security = ClassSecurityInfo()
+    security.setDefaultAccess('allow')
+
+    def __init__(self, object, workflow, status=None, transition=None,
+                 old_state=None, new_state=None, kwargs=None):
+        if kwargs is None:
+            kwargs = {}
+        else:
+            # Don't allow mutation
+            kwargs = SafeMapping(kwargs)
+        if status is None:
+            tool = aq_parent(aq_inner(workflow))
+            status = tool.getStatusOf(workflow.id, object)
+            if status is None:
+                status = {}
+        if status:
+            # Don't allow mutation
+            status = SafeMapping(status)
+        self.object = object
+        self.workflow = workflow
+        self.old_state = old_state
+        self.new_state = new_state
+        self.transition = transition
+        self.status = status
+        self.kwargs = kwargs
 
     def __getitem__(self, name):
         if name[:1] != '_' and hasattr(self, name):
@@ -187,20 +166,49 @@ class ExprVars:
         raise KeyError, name
 
     def getHistory(self):
-        wf = self._wf
+        wf = self.workflow
         tool = aq_parent(aq_inner(wf))
         wf_id = wf.id
-        h = tool.getHistoryOf(wf_id, self._ob)
+        h = tool.getHistoryOf(wf_id, self.object)
         if h:
             return map(lambda dict: dict.copy(), h)  # Don't allow mutation
         else:
             return ()
 
     def getPortal(self):
-        ob = self._ob
+        ob = self.object
         while ob is not None and not getattr(ob, '_isPortalRoot', 0):
             ob = aq_parent(aq_inner(ob))
         return ob
 
-    def getObjectContainer(self):
-        return aq_parent(aq_inner(self._ob))
+    def getDateTime(self):
+        date = self._date
+        if not date:
+            date = self._date = DateTime()
+        return date
+
+Globals.InitializeClass(StateChangeInfo)
+
+
+def createExprContext(sci):
+    '''
+    An expression context provides names for TALES expressions.
+    '''
+    ob = sci.object
+    wf = sci.workflow
+    data = {
+        'here':         ob,
+        'container':    aq_parent(aq_inner(ob)),
+        'nothing':      None,
+        'root':         wf.getPhysicalRoot(),
+        'request':      ob.REQUEST,
+        'modules':      ModuleImporter,
+        'user':         getSecurityManager().getUser(),
+        'state_change': sci,
+        'transition':   sci.transition,
+        'status':       sci.status,
+        'workflow':     wf,
+        'scripts':      wf.scripts,
+        }
+    return getEngine().getContext(data)
+

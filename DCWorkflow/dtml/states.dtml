@@ -31,12 +31,12 @@
   </tr>
  </dtml-in>
  </dtml-let>
- <dtml-if getVarValues>
+ <dtml-if getVariableValues>
  <tr>
   <th align="right">Variables</th>
   <th></th>
  </tr>
- <dtml-in getVarValues sort>
+ <dtml-in getVariableValues sort>
   <tr>
    <td></td>
    <td>

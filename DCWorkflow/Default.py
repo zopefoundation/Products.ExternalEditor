@@ -105,11 +105,14 @@ r_owner = 'Owner'
 r_member = 'Member'
 
 
-def setupDefaultWorkflow(wf):
+
+def setupDefaultWorkflowRev2(wf):
     '''
+    Sets up a DCWorkflow with the addition of a visible state,
+    the show and hide transitions, and corresponding changes.
     wf is a DCWorkflow instance.
     '''
-    wf.setProperties(title='CMF default workflow rev 2')
+    wf.setProperties(title='CMF default workflow [Revision 2]')
 
     for s in ('private', 'visible', 'pending', 'published'):
         wf.states.addState(s)
@@ -208,29 +211,29 @@ def setupDefaultWorkflow(wf):
 
     vdef = wf.variables['action']
     vdef.setProperties(description='The last transition',
-                       default_expr='transition',
+                       default_expr='transition/getId',
                        for_status=1)
 
     vdef = wf.variables['actor']
     vdef.setProperties(description='The ID of the user who performed '
                        'the last transition',
-                       default_expr='_.SecurityGetUser().getUserName()',
+                       default_expr='user/getUserName',
                        for_status=1)
 
     vdef = wf.variables['comments']
     vdef.setProperties(description='Comments about the last transition',
-                       default_expr="kwargs.get('comment', '')",
+                       default_expr="python:state_change.kwargs.get('comment', '')",
                        for_status=1)
 
     vdef = wf.variables['review_history']
     vdef.setProperties(description='Provides access to workflow history',
-                       default_expr="getHistory()",
+                       default_expr="state_change/getHistory",
                        props={'guard_permissions':
                               p_request + ';' + p_review})
 
     vdef = wf.variables['time']
     vdef.setProperties(description='Time of the last transition',
-                       default_expr="_.DateTime()",
+                       default_expr="state_change/getDateTime",
                        for_status=1)
 
     ldef = wf.worklists['reviewer_queue']
@@ -241,12 +244,146 @@ def setupDefaultWorkflow(wf):
                               'guard_permissions':p_review})
     
 
-def createDefaultWorkflow(id):
+def createDefaultWorkflowRev2(id):
     '''
     '''
     ob = DCWorkflowDefinition(id)
-    setupDefaultWorkflow(ob)
+    setupDefaultWorkflowRev2(ob)
     return ob
 
-addWorkflowFactory(createDefaultWorkflow, id='default_workflow',
-                   title='Web-configurable workflow [default]')
+addWorkflowFactory(createDefaultWorkflowRev2, id='default_workflow',
+                   title='Web-configurable workflow [Revision 2]')
+
+
+
+
+
+
+
+
+
+def setupDefaultWorkflowClassic(wf):
+    '''
+    Sets up a DCWorkflow as close as possible to the old DefaultWorkflow,
+    with only the private, pending, and published states.
+    wf is a DCWorkflow instance.
+    '''
+    wf.setProperties(title='CMF default workflow [Classic]')
+
+    for s in ('private', 'pending', 'published'):
+        wf.states.addState(s)
+    for t in ('publish', 'reject', 'retract', 'submit'):
+        wf.transitions.addTransition(t)
+    for v in ('action', 'actor', 'comments', 'review_history', 'time'):
+        wf.variables.addVariable(v)
+    for l in ('reviewer_queue',):
+        wf.worklists.addWorklist(l)
+    for p in (p_access, p_modify, p_view):
+        wf.addManagedPermission(p)
+
+    wf.states.setInitialState('private')
+
+    sdef = wf.states['private']
+    sdef.setProperties(
+        title='Non-visible and editable only by owner',
+        transitions=('submit', 'publish',))
+    sdef.setPermission(p_access, 0, (r_manager, r_owner))
+    sdef.setPermission(p_view, 0, (r_manager, r_owner))
+    sdef.setPermission(p_modify, 0, (r_manager, r_owner))
+
+    sdef = wf.states['pending']
+    sdef.setProperties(
+        title='Waiting for reviewer',
+        transitions=('publish', 'reject', 'retract',))
+    sdef.setPermission(p_access, 1, (r_anon, r_manager, r_reviewer))
+    sdef.setPermission(p_view, 1, (r_anon, r_manager, r_reviewer))
+    sdef.setPermission(p_modify, 0, (r_manager, r_reviewer))
+
+    sdef = wf.states['published']
+    sdef.setProperties(
+        title='Public',
+        transitions=('reject', 'retract',))
+    sdef.setPermission(p_access, 1, (r_anon, r_manager))
+    sdef.setPermission(p_view, 1, (r_anon, r_manager))
+    sdef.setPermission(p_modify, 0, (r_manager))
+
+    tdef = wf.transitions['publish']
+    tdef.setProperties(
+        title='Reviewer publishes content',
+        new_state_id='published',
+        actbox_name='Publish',
+        actbox_url='%(content_url)s/content_publish_form',
+        props={'guard_permissions':p_review})
+
+    tdef = wf.transitions['reject']
+    tdef.setProperties(
+        title='Reviewer rejects submission',
+        new_state_id='private',
+        actbox_name='Reject',
+        actbox_url='%(content_url)s/content_reject_form',
+        props={'guard_permissions':p_review})
+
+    tdef = wf.transitions['retract']
+    tdef.setProperties(
+        title='Member retracts submission',
+        new_state_id='private',
+        actbox_name='Retract',
+        actbox_url='%(content_url)s/content_retract_form',
+        props={'guard_permissions':p_request})
+
+    tdef = wf.transitions['submit']
+    tdef.setProperties(
+        title='Member requests publishing',
+        new_state_id='pending',
+        actbox_name='Submit',
+        actbox_url='%(content_url)s/content_submit_form',
+        props={'guard_permissions':p_request})
+
+    wf.variables.setStateVar('review_state')
+
+    vdef = wf.variables['action']
+    vdef.setProperties(description='The last transition',
+                       default_expr='transition/getId',
+                       for_status=1)
+
+    vdef = wf.variables['actor']
+    vdef.setProperties(description='The ID of the user who performed '
+                       'the last transition',
+                       default_expr='user/getUserName',
+                       for_status=1)
+
+    vdef = wf.variables['comments']
+    vdef.setProperties(description='Comments about the last transition',
+                       default_expr="python:state_change.kwargs.get('comment', '')",
+                       for_status=1)
+
+    vdef = wf.variables['review_history']
+    vdef.setProperties(description='Provides access to workflow history',
+                       default_expr="state_change/getHistory",
+                       props={'guard_permissions':
+                              p_request + ';' + p_review})
+
+    vdef = wf.variables['time']
+    vdef.setProperties(description='Time of the last transition',
+                       default_expr="state_change/getDateTime",
+                       for_status=1)
+
+    ldef = wf.worklists['reviewer_queue']
+    ldef.setProperties(description='Reviewer tasks',
+                       actbox_name='Pending (%(count)d)',
+                       actbox_url='%(portal_url)s/search?review_state=pending',
+                       props={'var_match_review_state':'pending',
+                              'guard_permissions':p_review})
+    
+
+
+def createDefaultWorkflowClassic(id):
+    '''
+    '''
+    ob = DCWorkflowDefinition(id)
+    setupDefaultWorkflowClassic(ob)
+    return ob
+
+addWorkflowFactory(createDefaultWorkflowClassic, id='default_workflow',
+                   title='Web-configurable workflow [Classic]')
+
