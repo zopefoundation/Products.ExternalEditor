@@ -135,11 +135,45 @@ class RegistrationTool (RegistrationTool):
         if member is None:
             raise 'NotFound', 'The username you entered could not be found.'
     
-        return self.mail_password_template(
-            self, REQUEST,
-            member=member,
-            password=member.getPassword()
-            )
+        # Rather than have the template try to use the mailhost, we will
+        # render the message ourselves and send it from here (where we
+        # don't need to worry about 'UseMailHost' permissions).
+        mail_text = self.mail_password_template( self
+                                               , REQUEST
+                                               , member=member
+                                               , password=member.getPassword()
+                                               )
+    
+        host = self.MailHost
+        host.send( mail_text )
+
+        return self.mail_password_response( self, REQUEST )
+
+    def registeredNotify( self, new_member_id ):
+        """
+            Handle mailing the registration / welcome message.
+        """
+        membership = getToolByName( self, 'portal_membership' )
+        member = membership.getMemberById( new_member_id )
+
+        if member is None:
+            raise 'NotFound', 'The username you entered could not be found.'
+
+        password = member.getPassword()
+    
+        # Rather than have the template try to use the mailhost, we will
+        # render the message ourselves and send it from here (where we
+        # don't need to worry about 'UseMailHost' permissions).
+        mail_text = self.registered_notify_template( self
+                                                   , self.REQUEST
+                                                   , member=member
+                                                   , password=password
+                                                   )
+    
+        host = self.MailHost
+        host.send( mail_text )
+
+        return self.mail_password_response( self, self.REQUEST )
 
 
 default__class_init__(RegistrationTool)

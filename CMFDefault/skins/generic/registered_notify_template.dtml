@@ -1,5 +1,4 @@
 <dtml-with portal_properties>
-<dtml-sendmail mailhost="MailHost">
 To: <dtml-var email>
 From: "&dtml-email_from_name;" <&dtml-email_from_address;>
 Subject: Portal Membership Information
@@ -28,5 +27,4 @@ complete string.
 
 Portal Admin
 
-</dtml-sendmail>
 </dtml-with>
