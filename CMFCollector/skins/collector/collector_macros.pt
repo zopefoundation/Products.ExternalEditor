@@ -3,10 +3,14 @@
   <body>
 
     <span tal:replace="nothing">
-      Comment: Collector issue macros: collector_header, issue_header.
-    </span>
+      Collector issue macros:
 
-    <!-- This is the desktop area -->
+        - collector_header
+
+        - issue_header
+
+        - add_artifacts_table
+    </span>
 
     <div metal:define-macro="collector_header"
          tal:define="global collector_header_present python: 1;
@@ -44,7 +48,7 @@
         </tr>
       </table>
 
-    </div>
+    </div>  <!-- End macro: collector_header -->
 
     <div metal:define-macro="issue_header"
          tal:define="global collector_issue_header_present python: 1;
@@ -185,7 +189,7 @@
 
        </table>
 
-    </div>
+    </div>  <!-- End macro: collector_issue_header -->
 
     <div metal:define-macro="issue_batch_nav">
 
@@ -253,5 +257,26 @@
         </tr>
       </table>
     </div>
+
+    <div metal:define-macro="add_artifacts_table">
+
+      <table>
+
+        <tr>
+          <th align="left" valign="top"> Add </th>
+          <td align="left" NOWRAP>
+            <input type=radio name="filetype" value="File" checked> File or
+            <br>
+            <input type=radio name="filetype" value="Image"> Image
+          </td>
+          <td> <input type=file name="file" size="30"> </td>
+          <th align="right" valign="top"> (Optional) Id: </th>
+          <td> <input type=text name="fileid" size="12"> </td>
+        </tr>
+
+      </table>
+
+    </div>  <!-- End macro: add_artifacts_excerpt -->
+
   </body>
 </html>
