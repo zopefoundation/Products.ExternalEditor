@@ -34,7 +34,8 @@ from CollectorPermissions import *
 RULE = '_' * 40
 
 UPLOAD_PREFIX = "Uploaded: "
-uploadexp = re.compile('(%s)([^<,\n]*)([<,\n])' % UPLOAD_PREFIX, re.MULTILINE)
+uploadexp = re.compile('(%s)([^<,\n]*)([<,\n])'
+                       % UPLOAD_PREFIX, re.MULTILINE)
 
 factory_type_information = (
     {'id': 'Collector Issue',
@@ -44,7 +45,8 @@ factory_type_information = (
                      ' other support request.'),
      'product': 'CMFCollector',
      'factory': None,                   # So not included in 'New' add form
-     'allowed_content_types': ('Collector Issue Transcript', 'File', 'Image'), 
+     'allowed_content_types': ('Collector Issue Transcript',
+                               'File', 'Image'), 
      'immediate_view': 'collector_edit_form',
      'actions': ({'id': 'view',
                   'name': 'View',
@@ -98,7 +100,8 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
     def __init__(self,
                  id, container,
                  title='', description='',
-                 submitter_id=None, submitter_name=None, submitter_email=None,
+                 submitter_id=None, submitter_name=None,
+                 submitter_email=None,
                  kibitzers=None,
                  security_related=0,
                  topic=None, classification=None, importance=None, 
@@ -196,7 +199,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
 
     security.declareProtected(CMFCorePermissions.View, 'no_submitter_email')
     def no_submitter_email(self):
-        """True if there's no way to get an email address for the submitter."""
+        """True if there's no way to get email address for the submitter."""
         if self.submitter_email:
             return 0
         if self.submitter_id != str(self.acl_users._nobody):
@@ -357,7 +360,9 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         transcript._edit(self.TRANSCRIPT_FORMAT,
                          comment_header_str
                          + comment
-                         + ((action_number > 1) and ("\n" + RULE + "\n") or '')
+                         + ((action_number > 1)
+                            and ("\n" + RULE + "\n")
+                            or '')
                          + transcript.EditableBody())
         self.reindexObject()
         self._send_update_notice(action, username,
@@ -393,15 +398,17 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         # .dispatching setting:
         #
         # - Requester always
+        # - Person taking action always
         # - Supporters assigned to the issue always
-        # - Managers or managers and all supporters (according to dispatching):
+        # - Managers or managers + all supporters (according to dispatching):
         #   - When an issue is any state besides accepted
         #   - When an issue is being accepted
         #   - When an issue is accepted and moving to another state
         # - Any supporters being removed from the issue by the current action
+        #
+        # We're liberal about duplicates - they'll be filtered before send.
 
-        # We're liberal about duplicates - they'll be filtered before the send.
-        candidates = [self.submitter_id] + list(self.assigned_to())
+        candidates = [self.submitter_id, actor] + list(self.assigned_to())
         if orig_status and not ('accepted' == string.lower(new_status) == 
                                 string.lower(orig_status)):
             candidates.extend(self.aq_parent.managers)
@@ -573,7 +580,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         return util.cited_text(self.get_transcript().text)
 
     def _valid_actions(self):
-        """Return actions valid according to workflow and application logic."""
+        """Return actions valid according to workflow/application logic."""
 
         pa = getToolByName(self, 'portal_actions', None)
         allactions = pa.listFilteredActionsFor(self)
@@ -582,7 +589,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
 
     security.declareProtected(CMFCorePermissions.View, 'valid_actions_pairs')
     def valid_actions_pairs(self):
-        """Return ordered (prettyname, rawname) valid workflow action names."""
+        """Return ordered (prettyname, rawname) valid workflow actions."""
         # XXX I would do this with a python script method, but i'm hitting
         #     inability to assign to indexes (eg, 'list[x] = 1' or 
         #     'dict[x] = 1'), so having to resort to python code, sigh.
