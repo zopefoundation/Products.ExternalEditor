@@ -211,15 +211,29 @@ class Image( OFS.Image.Image
         PortalContent.manage_beforeDelete(self, item, container)
         OFS.Image.Image.manage_beforeDelete(self, item, container)
         
+    def _isNotEmpty(self, file):
+        """ Do various checks on 'file' to try to determine non emptiness. """
+        if not file:
+            return 0                    # Catches None, Missing.Value, ''
+        elif file and (type(file) is type('')):
+            return 1
+        elif getattr(file, 'filename', None):
+            return 1
+        elif not hasattr(file, 'read'):
+            return 0
+        else:
+            file.seek(0,2)              # 0 bytes back from end of file
+            t = file.tell()             # Report the location
+            file.seek(0)                # and return pointer back to 0
+            if t: return 1
+            else: return 0
 
     def edit(self, precondition='', file=''):
-        """
-            Update image.
-        """
+        """ Update image. """
         if precondition: self.precondition = precondition
         elif self.precondition: del self.precondition
 
-        if file.filename != '' and file.read() != '':
+        if self._isNotEmpty(file):
             self.manage_upload(file)
 
         self.setFormat(self.content_type)
