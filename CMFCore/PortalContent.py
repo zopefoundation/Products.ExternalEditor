@@ -95,7 +95,7 @@ from interfaces.Contentish import Contentish
 from DynamicType import DynamicType
 from utils import getToolByName, _checkPermission
 try: from webdav.WriteLockInterface import WriteLockInterface
-except ImportError: pass
+except ImportError: NoWL = 1
 from Acquisition import aq_base
 
 
@@ -108,8 +108,11 @@ class PortalContent(DynamicType, SimpleItem):
         Derived classes must implement the interface described in
         interfaces/DublinCore.py.
     """
-
-    __implements__ = (WriteLockInterface, Contentish,)
+    
+    if not NoWL:
+        __implements__ = (WriteLockInterface, Contentish,)
+    else:
+        __implements__ = (Contentish)
     isPortalContent = 1
     _isPortalContent = 1  # More reliable than 'isPortalContent'.
 
