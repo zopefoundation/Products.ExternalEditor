@@ -20,17 +20,6 @@ from os import path as os_path
 import re
 from types import StringType
 
-from Globals import package_home
-from Globals import HTMLFile
-from Globals import ImageFile
-from Globals import InitializeClass
-from Globals import MessageDialog
-try:
-    from Globals import UNIQUE
-except ImportError:
-    # for Zope versions before 2.5.0
-    from OFS.ObjectManager import UNIQUE
-
 from AccessControl import ClassSecurityInfo
 from AccessControl import getSecurityManager
 from AccessControl import ModuleSecurityInfo
@@ -39,6 +28,12 @@ from AccessControl.PermissionRole import rolesForPermissionOn
 from AccessControl.Role import gather_permissions
 from Acquisition import aq_get, aq_inner, aq_parent
 from ExtensionClass import Base
+from Globals import HTMLFile
+from Globals import ImageFile
+from Globals import InitializeClass
+from Globals import MessageDialog
+from Globals import package_home
+from Globals import UNIQUE
 from OFS.misc_ import misc_ as misc_images
 from OFS.misc_ import Misc_ as MiscImage
 from OFS.PropertyManager import PropertyManager
