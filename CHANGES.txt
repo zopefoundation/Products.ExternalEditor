@@ -26,7 +26,8 @@ CMF 1.3 beta2 (2002/06/30)
   New Features
 
     - Made the id of the current user available to old action providers
-      (DCWorkflow being a prime example) as 'user_id' (Tracker #495).
+      (DCWorkflow being a prime example) as 'user_id' (Tracker #495,
+      thanks to Luca Olivetti for the patch).
 
     - Modified the 'standard_error_message' page template to show the
       'error_log_url', if passed in (Zope 2.6 will pass this argument
@@ -48,7 +49,8 @@ CMF 1.3 beta2 (2002/06/30)
   Bugs Fixed
 
     - Made content_type_registry deal correctly with TypeInfos that have
-      a title (Tracker #465).
+      a title (Tracker #465, thanks to Juan Antonio Valiño García for
+      the patch).
 
     - Changed CMFDefault.MembershipTool to not create a member folder at
       member creation time when the memberareaCreationFlag is false
