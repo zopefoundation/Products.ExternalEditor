@@ -272,8 +272,8 @@ class PortalGenerator:
 
         mp('Set own password',        ['Member','Manager',],    1)
         mp('Set own properties',      ['Member','Manager',],    1)
-        mp('Add portal content',      ['Owner','Member','Manager',], 1)
-        mp('Add portal folders',      ['Owner','Member','Manager',], 1)
+        mp('Add portal content',      ['Owner','Manager',],     1)
+        mp('Add portal folders',      ['Owner','Manager',],     1)
         mp('Review portal content',   ['Reviewer','Manager',],  1)
         mp('Access future portal content',
                                       ['Reviewer','Manager',],  1)
@@ -284,7 +284,7 @@ class PortalGenerator:
         mp('Delete objects',          ['Owner','Manager',],     1)
         mp('FTP access',              ['Owner','Manager',],     1)
         mp('Manage properties',       ['Owner','Manager',],     1)
-        mp('Undo changes',            ['Owner','Member','Manager',], 1)
+        mp('Undo changes',            ['Owner','Manager',],     1)
         mp('View management screens', ['Owner','Manager',],     1)
 
     def setupDefaultSkins(self, p):
