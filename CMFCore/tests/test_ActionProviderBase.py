@@ -26,6 +26,8 @@ class ActionProviderBaseTests(TestCase):
                      )
         self.failUnless( apb._actions )
         self.failIf( apb._actions is old_actions )
+        # make sure a blank permission gets stored as an empty tuple
+        self.assertEqual( apb._actions[0].permissions, () )
 
     def test_changeActions( self ):
 

@@ -108,11 +108,15 @@ class ActionProviderBase:
             c_expr = Expression(text=str(condition))
         else:
             c_expr = ''
+        if permission:            
+            perm = (str(permission),)
+        else:
+            perm = ()
         al.append(ActionInformation(id=str(id)
                                          , title=str(name)
                                          , action=a_expr
                                          , condition=c_expr
-                                         , permissions=(str(permission),)
+                                         , permissions=perm
                                          , category=str(category)
                                          , visible=int(visible)
                                           ))

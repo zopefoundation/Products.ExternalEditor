@@ -44,6 +44,9 @@ New Features
 
 Bugs Fixed
 
+  - Fixed ActionProvidorBase for the case when no permission 
+    is specified for an action that is added TTW.
+
   - Fixed ActionsTool so that duplicate actions are stripped.
 
   - Caused CMFDefault Portal constructor to strip passed-in id
