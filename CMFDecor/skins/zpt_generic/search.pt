@@ -7,10 +7,10 @@
 
 <h3> Search Results </h3>
 
-<div tal:define="b_start string:0;b_start request/b_start | b_start;
+<div tal:define="b_start python:0;b_start request/b_start | b_start;
                  results here/portal_catalog;
 	             Batch python:modules['ZTUtils'].Batch;
-	             global batch python:Batch(results, 25, int(b_start), orphan=1);
+	             global batch python:Batch(results, 25, b_start, orphan=1);
                 ">
     <p>Found <span tal:define="pss modules/Products.PythonScripts.standard"
                tal:replace="python:pss.thousands_commas(len(results))">100</span> items 
@@ -59,15 +59,15 @@
 <div tal:condition="not:results"
      tal:replace="string:There are no items matching your specified criteria"></div>
 
- <p class="Desktop">
+ <p class="Desktop" tal:define="mq python:modules['ZTUtils'].make_query">
  <span tal:define="p batch/previous" tal:condition="p">
    <a href=""
-      tal:attributes="href python: here.searchQueryString( b_start=p.first )"
+      tal:attributes="href python: '?' + mq( request.form, b_start=p.first )"
    >Previous <span tal:replace="p/length">n</span> items</a>
  </span>&nbsp;&nbsp;
  <span tal:define="n batch/next" tal:condition="n">
    <a href=""
-      tal:attributes="href python: here.searchQueryString( b_start=n.first )"
+      tal:attributes="href python: '?' + mq( request.form, b_start=n.first )"
    >Next <span tal:replace="n/length">n</span> items</a>
  </span> 
  </p>
