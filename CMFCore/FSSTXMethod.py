@@ -64,8 +64,7 @@ class FSSTXMethod( FSObject ):
         """
             Create a ZODB (editable) equivalent of this object.
         """
-        # XXX:  do this soon
-        raise NotImplemented, "See next week's model."
+        raise NotImplementedError, "See next week's model."
 
     def _readFile( self, reparse ):
 

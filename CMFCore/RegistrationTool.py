@@ -160,6 +160,6 @@ class RegistrationTool(UniqueObject, SimpleItem, ActionProviderBase):
         '''Email a forgotten password to a member.  Raises an exception
         if user ID is not found.
         '''
-        raise 'NotImplemented'
+        raise NotImplementedError
 
 InitializeClass(RegistrationTool)

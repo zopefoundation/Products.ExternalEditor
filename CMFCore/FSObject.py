@@ -90,7 +90,7 @@ class FSObject(Acquisition.Implicit, Item, Cacheable):
 
     def _createZODBClone(self):
         """Create a ZODB (editable) equivalent of this object."""
-        raise NotImplemented, "This should be implemented in a subclass."
+        raise NotImplementedError, "This should be implemented in a subclass."
 
     def _readFile(self, reparse):
         """Read the data from the filesystem.
@@ -99,7 +99,7 @@ class FSObject(Acquisition.Implicit, Item, Cacheable):
         data if necessary.  'reparse' is set when reading the second
         time and beyond.
         """
-        raise NotImplemented, "This should be implemented in a subclass."
+        raise NotImplementedError, "This should be implemented in a subclass."
 
     # Refresh our contents from the filesystem if that is newer and we are
     # running in debug mode.
