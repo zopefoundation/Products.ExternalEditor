@@ -3,10 +3,10 @@
 [Setup]
 DisableStartupPrompt=yes
 AppName=Zope External Editor Helper Application
-AppVerName=Zope External Editor 0.6
+AppVerName=Zope External Editor 0.7
 AppPublisher=Casey Duncan, Zope Corporation
 AppPublisherURL=http://www.zope.com
-AppVersion=0.6
+AppVersion=0.7
 AppSupportURL=http://www.zope.org/Members/Caseman/ExternalEditor/
 AppUpdatesURL=http://www.zope.org/Members/Caseman/ExternalEditor/
 DefaultDirName={pf}\ZopeExternalEditor

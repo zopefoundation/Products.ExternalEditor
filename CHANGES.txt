@@ -1,5 +1,15 @@
 External Editor Change Log
 
+  3/31/03 - 0.7 Release
+
+    - You can now specify from the server that the helper app should
+      borrow a lock by passing borrow_lock=1 via the request, thus
+      suppressing the dialog box which appears by default. Thanks
+      to Shane Hathaway.
+
+    - Improved open file check in Word and Powerpoint plugins 
+      thanks to Yura Petrov.
+
     - Added plugins for Microsoft Word, Excel and Powerpoint.
 
     - Added the man page from the Debian distro. Thanks go out to

@@ -17,7 +17,7 @@
 
 # Zope External Editor Helper Application by Casey Duncan
 
-__version__ = '0.6'
+__version__ = '0.7'
 
 import sys, os, re
 import traceback
@@ -320,12 +320,12 @@ class ExternalEditor:
             else:
                 bin = command.lower().strip()
         else:
-            bin = None # TODO Add Unix command extraction
+            bin = command
 
         if bin is not None:
             # Try to load the plugin for this editor
-            import Plugins # Just to assert dependancy
             try:
+                import Plugins # Just to assert dependancy
                 module = 'Plugins.%s' % bin
                 Plugin = __import__(module, globals(), locals(), 
                                     ('EditorProcess',))

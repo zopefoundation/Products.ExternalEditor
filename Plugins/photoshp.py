@@ -36,7 +36,6 @@ class EditorProcess:
             try:
                 fileconn = ps.Open(file)
             except:
-                print 'open failure: ', i
                 i += 1
                 if i >= timeout:
                     raise RuntimeError('Could not launch Photoshop.')

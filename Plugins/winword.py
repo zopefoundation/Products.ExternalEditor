@@ -38,6 +38,7 @@ class EditorProcess:
                 sleep(1)
             else:
                 break
+        word.Visible = 1
         self.wordapp = word
         self.file = file
         
@@ -47,13 +48,13 @@ class EditorProcess:
             
     def isAlive(self):
         """Returns true if the editor process is still alive"""
-        head, tail = os.path.split(self.file)
-        head, tail = head.lower(), tail.lower()
-        for doc in self.wordapp.Documents:
-            if head == doc.Path.lower() and tail == doc.Name.lower():
-                return 1
-        return 0
-
+       	try:
+            self.wordapp.Documents(self.file)
+        except:
+            return 0
+        else:
+            return 1
+        
 def test():
     import os
     from time import sleep

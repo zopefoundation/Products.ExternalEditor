@@ -198,7 +198,7 @@ Zope External Editor
       editor by meta-type, the locking settings by domain and the remaining 
       options under general for a given object.
       
-  Editor Plugins (New in 0.6)
+  Editor Plugins
 
     For tighter client-side integration, external editor has a plugin system
     that allows it to interact directly with supported applications.
@@ -294,7 +294,7 @@ Zope External Editor
 
       <a href='edit' 
          attributes='href
-         string:${container/absolute_url}/externalEdit_/${here/getId}'>
+         string:${here/aq_parent/absolute_url}/externalEdit_/${here/getId}'>
          Edit Locally
       </a>
       
@@ -308,6 +308,16 @@ Zope External Editor
       
       return context.externalEdit_.index_html(
           context.REQUEST, context.RESPONSE, path='/my_stuff/document')
+
+    When integrating External Editor with a CMS that already uses DAV
+    locks, it will, by default allow users to borrow locks made on the server
+    after displaying a confirmation dialog box. Although you can make this
+    automatic by specifying 'always_borrow_locks = 1' in the External Editor
+    config file, it may be desireable to make this the default behavior when
+    using that server. To facilitate this, you can specify that locks 
+    should be automatically borrowed in the URL (New in 0.7)::
+
+      http://zopeserver/my_stuff/externalEdit_/document?borrow_lock=1
       
     External Editor also defines a global method that you can call to insert
     pencil icon links for appropriate objects. The method automatically checks
@@ -339,4 +349,4 @@ Zope External Editor
 
 --
 
-(c) 2002, Casey Duncan and Zope Corporation. All rights reserved.
+(c) 2003, Casey Duncan and Zope Corporation. All rights reserved.

@@ -11,7 +11,7 @@
 # FOR A PARTICULAR PURPOSE.
 # 
 ##############################################################################
-"""External Editor MSExcel Plugin
+"""External Editor msohtmed Plugin
 
 $Id$
 """
@@ -24,22 +24,23 @@ from win32com import client # Initialize Client module
 class EditorProcess:
     def __init__(self, file):
         """Launch editor process"""
-        excel = win32com.client.Dispatch('Excel.Application')
+        word = win32com.client.Dispatch('Word.Application')
         # Try to open the file, keep retrying until we succeed or timeout
         i = 0
         timeout = 45
         while i < timeout:
             try:
-                excel.Workbooks.Open(file)
+                word.Documents.Open(file, Format=8)
+		print 'Opening...'
             except:
                 i += 1
                 if i >= timeout:
-                    raise RuntimeError('Could not launch Excel.')
+                    raise RuntimeError('Could not launch Word.')
                 sleep(1)
             else:
                 break
-        excel.Visible = 1
-        self.excelapp = excel
+        word.Visible = 1
+        self.wordapp = word
         self.file = file
         
     def wait(self, timeout):
@@ -48,29 +49,26 @@ class EditorProcess:
             
     def isAlive(self):
         """Returns true if the editor process is still alive"""
-        head, tail = os.path.split(self.file)
-        head, tail = head.lower(), tail.lower()
-        for doc in self.excelapp.Workbooks:
-            if head == doc.Path.lower() and tail == doc.Name.lower():
-                return 1
-        return 0
-
+       	try:
+            self.wordapp.Documents(self.file)
+        except:
+            return 0
+        else:
+            return 1
+        
 def test():
     import os
     from time import sleep
     from tempfile import mktemp
     fn = mktemp('.html')
     f = open(fn, 'w')
-    f.write('<html>\n  <head></head>\n<body>\n'
-            '<table><tr><th>Column 1</th><th>Column 2</th></tr>' 
-            '<tr><td>1234</td><td>3689</td></tr>'
-            '<tr><td>2345</td><td>3789</td></tr>'
-            '<tr><td>3456</td><td>3889</td></tr>'
-            '</body>\n</html>')
+    #f.write('<html>\n  <head></head>\n'
+    #        '<body><h1>A Test Doc</h1></body>\n</html>')
+    f.write('<p>hmmm</p>')
     f.close()
-    print 'Connecting to Excel...'
+    print 'Connecting to Word...'
     f = EditorProcess(fn)
-    print 'Attached to %s %s' % (`f.excelapp`, f.excelapp.Version)
+    print 'Attached to %s %s' % (`f.wordapp`, f.wordapp.Version)
     print ('%s is open...' % fn),
     if f.isAlive():
         print 'yes'

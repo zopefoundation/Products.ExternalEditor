@@ -25,6 +25,7 @@ class EditorProcess:
     def __init__(self, file):
         """Launch editor process"""
         ppt = win32com.client.Dispatch('Powerpoint.Application')
+        ppt.Visible = 1
         # Try to open the file, keep retrying until we succeed or timeout
         i = 0
         timeout = 45
@@ -32,6 +33,7 @@ class EditorProcess:
             try:
                 ppt.Presentations.Open(file)
             except:
+                raise
                 i += 1
                 if i >= timeout:
                     raise RuntimeError('Could not launch Powerpoint.')
@@ -47,18 +49,18 @@ class EditorProcess:
             
     def isAlive(self):
         """Returns true if the editor process is still alive"""
-        head, tail = os.path.split(self.file)
-        head, tail = head.lower(), tail.lower()
-        for doc in self.powerpntapp.Presentations:
-            if head == doc.Path.lower() and tail == doc.Name.lower():
-                return 1
-        return 0
+        try:
+            self.powerpntapp.Presentations(self.file)
+        except:
+            return 0
+        else:
+            return 1
 
 def test():
     import os
     from time import sleep
     from tempfile import mktemp
-    fn = 'c:\\program files\\microsoft office\\office10\\1033\\quikanim.ppt'
+    fn = 'E:\Documents and Settings\Default User\Templates\powerpnt.ppt'
     print 'Connecting to Powerpoint...'
     f = EditorProcess(fn)
     print 'Attached to %s %s' % (`f.powerpntapp`, f.powerpntapp.Version)
