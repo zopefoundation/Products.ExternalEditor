@@ -108,6 +108,12 @@ import string
 def install(self):
     " Register the CMF Event with portal_types and friends "
     out = StringIO()
+    catalog = getToolByName(self, 'portal_catalog')
+    c_catalog = catalog._catalog
+    c_catalog.addIndex('start', 'FieldIndex')
+    c_catalog.addIndex('end', 'FieldIndex')
+    c_catalog.addColumn('start')
+    c_catalog.addColumn('end')
     typestool = getToolByName(self, 'portal_types')
     skinstool = getToolByName(self, 'portal_skins')
     metadatatool = getToolByName(self, 'portal_metadata')

@@ -154,7 +154,7 @@ SMALL {FONT-FAMILY: Arial,Helvetica; font-size: 2.75mm;}
 <hr></font></td>
 </tr>
 <tr><th valign="middle" align=right>Start Date</th>
-<dtml-with getEffectiveStrings mapping>
+<dtml-with getStartStrings mapping>
    <td> 
 		<select name="effectiveYear">
 		<dtml-in buildYears>
@@ -183,7 +183,7 @@ SMALL {FONT-FAMILY: Arial,Helvetica; font-size: 2.75mm;}
    </dtml-with>
 
    <th valign="middle" align="right"> Stop Date </th>
-   <dtml-with getExpirationStrings mapping>
+   <dtml-with getEndStrings mapping>
    <td> 
         <select name="expirationYear">
 		<dtml-in buildYears>

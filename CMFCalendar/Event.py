@@ -121,8 +121,10 @@ def addEvent(self
              , id
              , title=''
              , description=''
-             , effective_date = DateTime() 
-             , expiration_date = DateTime() 
+             , effective_date = None 
+             , expiration_date = None 
+             , start_date = DateTime() 
+             , end_date = DateTime()
              , location=''
              , contact_name=''
              , contact_email=''
@@ -137,6 +139,8 @@ def addEvent(self
                   , description
                   , effective_date
                   , expiration_date
+                  , start_date
+                  , end_date
                   , location
                   , contact_name
                   , contact_email
@@ -175,8 +179,10 @@ class Event(PortalContent, DefaultDublinCoreImpl):
                  , id
                  , title=''
                  , description=''
-                 , effective_date = DateTime() 
-                 , expiration_date = DateTime() 
+                 , effective_date = None 
+                 , expiration_date = None 
+                 , start_date = DateTime()
+                 , end_date = DateTime()
                  , location=''
                  , contact_name=''
                  , contact_email=''
@@ -187,33 +193,36 @@ class Event(PortalContent, DefaultDublinCoreImpl):
         self.id=id
         self.setTitle(title)
         self.setDescription(description)
-        self.setEffectiveDate(effective_date)
-        self.setExpirationDate(expiration_date)
+        self.effective_date = effective_date
+        self.expiration_date = expiration_date
+        self.setStartDate(start_date)
+        self.setEndDate(end_date)
         self.location=location
         self.contact_name=contact_name
         self.contact_email=contact_email
         self.contact_phone=contact_phone
         self.event_url=event_url
+
+    security.declarePrivate( '_datify' )
+    def _datify( self, attrib ):
+        if attrib == 'None':
+            attrib = None
+        elif not isinstance( attrib, DateTime ):
+            if attrib is not None:
+                attrib = DateTime( attrib )
+        return attrib
     
-    security.declarePublic('isEffective')
-    def isEffective(self, date):
+    security.declarePublic('getEndStrings')
+    def getEndStrings(self):
         """
-            Overloading the DC effective requires events to show up outside their effective
-            dates
         """
-        return 1 
+        return _dateStrings(self.end())
 
-    security.declarePublic('getExpirationStrings')
-    def getExpirationStrings(self):
+    security.declarePublic('getStartStrings')
+    def getStartStrings(self):
         """
         """
-        return _dateStrings(self.expiration_date)
-
-    security.declarePublic('getEffectiveStrings')
-    def getEffectiveStrings(self):
-        """
-        """
-        return _dateStrings(self.effective_date)
+        return _dateStrings(self.start())
 
     security.declareProtected(EventPermissions.ChangeEvents, 'edit')
     def edit(self
@@ -258,8 +267,8 @@ class Event(PortalContent, DefaultDublinCoreImpl):
                                  , stopAMPM
                                  )
  
-        self.setEffectiveDate(DateTime(efdate))
-        self.setExpirationDate(DateTime(exdate))
+        self.setStartDate(DateTime(efdate))
+        self.setEndDate(DateTime(exdate))
         if location is not None:
             self.location = location
         if contact_name is not None:
@@ -304,19 +313,49 @@ class Event(PortalContent, DefaultDublinCoreImpl):
             result.append(str(year))
         return result
 
+    security.declareProtected(EventPermissions.ChangeEvents, 'setStartDate')
+    def setStartDate(self, start):
+        """
+        Setting the event start date, when the event is scheduled to begin.
+        """
+        self.start_date = self._datify(start)
+    
+    security.declareProtected(EventPermissions.ChangeEvents, 'setEndDate')
+    def setEndDate(self, end):
+        """
+        Setting the event end date, when the event ends.
+        """
+        self.end_date = self._datify(end)
+
+    security.declarePublic('start')
+    def start(self):
+        """
+            Return our start time as a string.
+        """
+        date = getattr( self, 'start_date', None )
+        return date is None and self.created() or date
+
+    security.declarePublic('end')
+    def end(self):
+        """
+            Return our stop time as a string.
+        """
+        date = getattr( self, 'end_date', None )
+        return date is None and self.start() or date    
+
     security.declarePublic('getStartTimeString')
     def getStartTimeString( self ):
         """
             Return our start time as a string.
         """
-        return self.effective().AMPMMinutes() 
+        return self.start().AMPMMinutes() 
 
     security.declarePublic('getStopTimeString')
     def getStopTimeString( self ):
         """
             Return our stop time as a string.
         """
-        return self.expires().AMPMMinutes() 
+        return self.end().AMPMMinutes() 
 
 # Intialize the Event class, setting up security.
 InitializeClass(Event)

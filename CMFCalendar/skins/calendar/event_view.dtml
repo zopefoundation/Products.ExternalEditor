@@ -134,12 +134,12 @@ SMALL {FONT-FAMILY: Arial,Helvetica; font-size: 2.75mm;}
 </tr>
 <tr><th valign="middle" align="left" width="10%" NOWRAP>Start Date</th>
    <td> 
-	<dtml-var effective fmt=Date>	
+	<dtml-var start fmt=Date>	
 		</td>
 
    <th valign="middle" align="left" width="10%" NOWRAP> Stop Date </th> 
    <td> 
-        <dtml-var expires fmt=Date>
+        <dtml-var end fmt=Date>
               </td>
 
    </td>
@@ -148,11 +148,11 @@ SMALL {FONT-FAMILY: Arial,Helvetica; font-size: 2.75mm;}
 <TR>
 <th valign="Middle" align="left" width="10%" NOWRAP>Start Time</th>
 <TD>
-	<dtml-var effective fmt=AMPMMinutes>
+	<dtml-var start fmt=AMPMMinutes>
 </TD>
 <th valign="middle" align="left" width="10%" NOWRAP>Stop Time</th>
    <td>
-     <dtml-var expires fmt=AMPMMinutes>
+     <dtml-var end fmt=AMPMMinutes>
    </td>
 </tr>
 <tr><td colspan=4><hr></td></tr>
