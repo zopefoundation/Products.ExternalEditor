@@ -1,0 +1,64 @@
+<html xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="here/main_template/macros/master">
+<body>
+<div metal:fill-slot="main">
+<div class="Desktop"
+     tal:define="member python: here.portal_membership.getAuthenticatedMember(); 
+     review_state python: here.portal_workflow.getInfoFor(here, 'review_state');
+	 review_history python: here.portal_workflow.getInfoFor(here, 'review_history')">
+
+
+<h1> Reject <span tal:replace="here/getId">Me</span> </h1>
+<span tal:replace="request/message"
+   tal:condition="message|nothing"><hr></span>
+
+<p>Use this form to reject the publication of a content item and set its 
+   status to <b>Private</b>, thereby making it unavailable to 
+   other portal members and visitors.</p>
+
+
+<form method="post" action="content_status_modify">
+ <table class="FormLayout">
+  <tr>
+   <td valign=top align=left>
+    <strong>Status</strong>
+   </td>
+   <td valign=top align=left>
+     This item is currently in <b><span tal:replace="review_state">Private</span></b> status.
+     <input type="hidden" name="workflow_action" value="reject">
+   </td>
+  </tr>
+  <tr>
+   <td valign=top align=left colspan=2>
+    <strong><em>Comments</em></strong><br>
+    <textarea name="comment" cols="60" rows="5" wrap="soft"
+     style="width: 100%"></textarea>
+   </td>
+  </tr>
+  <tr>
+   <td></td>
+   <td><input type="submit" value=" Reject this Item "></td>
+  </tr>
+ </table>
+</form>
+
+<div tal:condition="review_history">
+      <p><strong>Reviewing history</strong>
+	  <br>
+    <div tal:repeat="items python: here.reverseList(review_history)">
+	<span tal:replace="python: items['time'].aCommon()"></span>
+	<span tal:replace="items/action"></span>
+  <span tal:condition="items/effective_date|nothing">
+  (effective: <span tal:replace="python: items['effective_date'].aCommon()"></span>)
+  </span>
+  
+  by <span tal:replace="items/actor">Actor</span><br>
+   <div tal:define="rhComments items/comments"
+		 tal:replace="rhComments">Comments</div>
+ </div>
+ </div>
+</div>
+</div>
+</body>
+</html>
