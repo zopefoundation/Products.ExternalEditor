@@ -105,22 +105,28 @@
                         plrlcmts python: (numcmts != 1) and 's' or '';
                         numuploads python: int(itemattrs['upload_number']);
                         plrluploads python: (numuploads != 1) and 's' or '';
-                        secure python: int(itemattrs['security_related'])">
+                        security python: int(itemattrs['security_related']);
+                        confidential python: split(item.review_state, '_')[-1]
+                                             == 'confidential'">
           <td> </td>
           <td> </td>
 
           <td NOWRAP colspan="2">
 
+            <!-- The color indicates whether the item is security-related, and
+                  parenthesizing indicates that a security-related item has not
+                  yet reached a completed state, ie is still confidential. -->
             <font color="SECURITY COLOR"
                   tal:attributes="color python: 
-                                        (secure and 'brown' or 'black')">
+                                        (security and 'brown' or 'black')">
               <em>
-                <span tal:content="python: cap(split(item.review_state,
-                                                     '_')[0])">
+                <span tal:content="python: (confidential and '(' or '')
+                                           + cap(split(item.review_state,
+                                                       '_')[0])
+                                           + (confidential and ')' or '')">
                   STATUS</span>
               </em>
             </font>
-              
 
             From
             <span tal:replace="item/Creator|nothing">SUBMITTER ID</span>
