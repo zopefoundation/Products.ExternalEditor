@@ -270,20 +270,24 @@ class Topic(PortalFolder):
 
 
     ### Criteria adding/editing/deleting
-    security.declareProtected(TopicPermissions.ChangeTopics, 'addCriteria')
-    def addCriteria(self, field, criteria_type):
+    security.declareProtected(TopicPermissions.ChangeTopics, 'addCriterion')
+    def addCriterion(self, field, criterion_type):
         """ Create a new search criteria in this topic """
         crit = None
         newid = 'crit__%s' % field
         for ct in self._criteriaTypes:
-            if criteria_type == ct.meta_type:
+            if criterion_type == ct.meta_type:
                 crit = ct(newid, field)
 
         if crit is None:
             # No criteria type matched passed in value
-            raise NameError, 'Unknown Criteria Type: %s' % criteria_type
+            raise NameError, 'Unknown Criterion Type: %s' % criterion_type
         
         self._setObject(newid, crit)
+
+    # Backwards compatibility (deprecated)
+    security.declareProtected(TopicPermissions.ChangeTopics, 'addCriteria')
+    addCriteria = addCriterion
 
     security.declareProtected(TopicPermissions.ChangeTopics, 'deleteCriterion')
     def deleteCriterion(self, criterion_id):
@@ -297,7 +301,10 @@ class Topic(PortalFolder):
     security.declarePublic(CMFCorePermissions.View, 'getCriterion')
     def getCriterion(self, criterion_id):
         """ Get the criterion object """
-        return self._getOb(criterion_id)
+        try:
+            return self._getOb( 'crit__%s' % criterion_id )
+        except AttributeError:
+            return self._getOb(criterion_id)
 
     security.declareProtected(TopicPermissions.AddTopics, 'addSubtopic')
     def addSubtopic(self, id):
