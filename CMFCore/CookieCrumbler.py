@@ -174,6 +174,9 @@ class CookieCrumbler (SimpleItemWithProperties):
         if not req[ 'REQUEST_METHOD' ] in ( 'GET', 'PUT', 'POST' ):
             return ATTEMPT_DISABLED
 
+        if req.environ.has_key( 'WEBDAV_SOURCE_PORT' ):
+            return ATTEMPT_DISABLED
+
         if not req._auth:
             if (req.has_key(self.pw_cookie) and
                 req.has_key(self.name_cookie)):
