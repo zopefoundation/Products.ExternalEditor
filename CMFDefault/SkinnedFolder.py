@@ -90,6 +90,8 @@ class SkinnedFolder(CMFCatalogAware, PortalFolder):
         """
         return self.getOwner( info=1 )[1]
 
+    # We derive from CMFCatalogAware first, so we are cataloged too.
+
 InitializeClass( SkinnedFolder )
 
 def addSkinnedFolder( self, id, title='', description='', REQUEST=None ):

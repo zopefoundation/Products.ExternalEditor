@@ -124,39 +124,4 @@ class PortalContent(DynamicType, CMFCatalogAware, SimpleItem):
         '''
         return self()
 
-    # Methods to support items that might be stored in attributes
-    # unknown to the content object, such as the DiscussionItemContainer
-    # "talkback".
-
-    security.declareProtected(AccessContentsInformation, 'opaqueItems')
-    def opaqueItems(self):
-        """
-        Returns opaque items (subelements that are contained
-        using something that is not an ObjectManager).
-        """
-        # Since 'talkback' is the only opaque item on content
-        # right now, I will return that. Should be replaced with
-        # a list of tuples for every opaque item!
-        if hasattr(aq_base(self), 'talkback'):
-            talkback = self.talkback
-            if talkback is not None:
-                return ((talkback.id, talkback),)
-        return ()
-
-    security.declareProtected(AccessContentsInformation, 'opaqueIds')
-    def opaqueIds(self):
-        """
-        Returns opaque ids (subelements that are contained
-        using something that is not an ObjectManager).
-        """
-        return [t[0] for t in self.opaqueItems()]
-
-    security.declareProtected(AccessContentsInformation, 'opaqueValues')
-    def opaqueValues(self):
-        """
-        Returns opaque values (subelements that are contained
-        using something that is not an ObjectManager).
-        """
-        return [t[1] for t in self.opaqueItems()]
-
 InitializeClass(PortalContent)

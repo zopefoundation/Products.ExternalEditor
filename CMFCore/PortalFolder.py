@@ -25,6 +25,7 @@ import CMFCorePermissions
 
 from CMFCorePermissions import View, ManageProperties, ListFolderContents
 from CMFCorePermissions import AddPortalFolders, AddPortalContent
+from CMFCatalogAware import CMFCatalogAware
 from OFS.Folder import Folder
 from OFS.ObjectManager import REPLACEABLE
 from Globals import DTMLFile
@@ -67,7 +68,7 @@ Use folders to put content in categories."""
                            )
 
 
-class PortalFolder( Folder, DynamicType ):
+class PortalFolder(DynamicType, CMFCatalogAware, Folder):
     """
         Implements portal content management, but not UI details.
     """
@@ -270,10 +271,10 @@ class PortalFolder( Folder, DynamicType ):
         """
              Implement dublin core type
         """
-        portal_types = getToolByName(self, 'portal_types')
-        ti = portal_types.getTypeInfo(self)
-        if ti is not None:
-            return ti.Title()
+        if hasattr(aq_base(self), 'getTypeInfo'):
+            ti = self.getTypeInfo()
+            if ti is not None:
+                return ti.Title()
         return self.meta_type
 
     security.declarePublic('encodeFolderFilter')
@@ -305,10 +306,16 @@ class PortalFolder( Folder, DynamicType ):
         """
         return None
 
-    def reindexObject( self, idxs=[] ):
-        """
-            Make content-assuming factory mechanism happy.
-        """
+    # Ensure pure PortalFolders don't get cataloged.
+    # XXX We may want to revisit this.
+
+    def indexObject(self):
+        pass
+
+    def unindexObject(self):
+        pass
+
+    def reindexObject(self, idxs=[]):
         pass
 
     def PUT_factory( self, name, typ, body ):
