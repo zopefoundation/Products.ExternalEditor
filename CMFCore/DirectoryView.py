@@ -441,6 +441,11 @@ class DirectoryViewSurrogate (Folder):
         d[name] = value
         setattr(d['_real'], name, value)
 
+    def __delattr__(self, name):
+        d = self.__dict__
+        del d[name]
+        delattr(d['_real'], name)
+
     security.declareProtected(ManagePortal, 'manage_propertiesForm')
     manage_propertiesForm = DTMLFile( 'dirview_properties', _dtmldir )
 

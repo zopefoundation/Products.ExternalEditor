@@ -158,6 +158,30 @@ class DirectoryViewTests( FSDVTest ):
         # Test that the .test1.py is ignored
         assert('#test1' not in self.ob.fake_skin.objectIds())
 
+    def test_surrogate_writethrough(self):
+        # CMF Collector 316: It is possible to cause ZODB writes because
+        # setting attributes on the non-persistent surrogate writes them 
+        # into the persistent DirectoryView as well. This is bad in situations
+        # where you only want to store markers and remove them before the
+        # transaction has ended - they never got removed because there was
+        # no equivalent __delattr__ on the surrogate that would clean up
+        # the persistent DirectoryView as well.
+        fs = self.ob.fake_skin
+        test_foo = 'My Foovalue'
+        fs.foo = test_foo
+
+        self.assertEqual(fs.foo, test_foo)
+        self.assertEqual(fs.__dict__['_real'].foo, test_foo)
+
+        del fs.foo
+
+        self.assertRaises(AttributeError, getattr, fs, 'foo')
+        self.assertRaises( AttributeError
+                         , getattr
+                         , fs.__dict__['_real']
+                         , 'foo'
+                         )
+
 
 class DirectoryViewFolderTests(FSDVTest):
 
