@@ -13,7 +13,7 @@
 	   global batch python:Batch(results, 25, int(b_start), orphan=1)">
     <p>Found <span tal:define="pss modules/Products.PythonScripts.standard"
                tal:replace="python:pss.thousands_commas(len(results))">100</span> items 
-		 <span tal:condition="exists request/SearchableText|nothing"
+		 <span tal:condition="exists: request/SearchableText|nothing"
 		       tal:replace="string:matching ${request/SearchableText}"></span>.
     </p>
 <table class="SearchResults">
