@@ -11,31 +11,36 @@
 # 
 ##############################################################################
 
-"""Basic workflow tool.
+""" Basic workflow tool.
+
 $Id$
 """
-__version__='$Revision$'[11:-2]
 
 import sys
-from utils import UniqueObject, _checkPermission, getToolByName, _dtmldir
+from string import join, split, replace, strip
+
 from OFS.Folder import Folder
 from Globals import InitializeClass, PersistentMapping, DTMLFile
 from AccessControl import ClassSecurityInfo
 from Acquisition import aq_base, aq_inner, aq_parent
-from WorkflowCore import WorkflowException, ObjectDeleted, ObjectMoved
+
 from CMFCorePermissions import ManagePortal
-from string import join, split, replace, strip
+from WorkflowCore import WorkflowException, ObjectDeleted, ObjectMoved
 
 from interfaces.portal_workflow import portal_workflow
 
-AUTO_MIGRATE_WORKFLOW_TOOLS = 0  # Set to 1 to auto-migrate
+from utils import UniqueObject
+from utils import _checkPermission
+from utils import getToolByName
+from utils import _dtmldir
 
+AUTO_MIGRATE_WORKFLOW_TOOLS = 0  # Set to 1 to auto-migrate
 
 _marker = []  # Create a new marker object.
 
 class WorkflowInformation:
-    """
-        Shim implementation of ActionInformation, to enable
+
+    """ Shim implementation of ActionInformation, to enable
         querying actions without mediation of the 'portal_actions' tool.
     """
     def __init__(self, object):
@@ -52,15 +57,16 @@ class WorkflowInformation:
 
 
 class WorkflowTool (UniqueObject, Folder):
-    '''
-    This tool accesses and changes the workflow state of content.
-    '''
+
+    """ Mediator tool, mapping workflow objects 
+    """
     id = 'portal_workflow'
     meta_type = 'CMF Workflow Tool'
     __implements__ = portal_workflow
 
     _chains_by_type = None  # PersistentMapping
     _default_chain = ('default_workflow',)
+    _default_cataloging = 1
 
     security = ClassSecurityInfo()
 
@@ -98,9 +104,9 @@ class WorkflowTool (UniqueObject, Folder):
 
     security.declareProtected( ManagePortal, 'manage_addWorkflowForm')
     def manage_addWorkflowForm(self, REQUEST):
-        '''
-        Form for adding workflows.
-        '''
+
+        """ Form for adding workflows.
+        """
         wft = []
         for key in _workflow_factories.keys():
             wft.append(key)
@@ -109,9 +115,9 @@ class WorkflowTool (UniqueObject, Folder):
 
     security.declareProtected( ManagePortal, 'manage_addWorkflow')
     def manage_addWorkflow(self, workflow_type, id, RESPONSE=None):
-        '''
-        Adds a workflow from the registered types.
-        '''
+
+        """ Adds a workflow from the registered types.
+        """
         factory = _workflow_factories[workflow_type]
         ob = factory(id)
         self._setObject(id, ob)
@@ -129,9 +135,9 @@ class WorkflowTool (UniqueObject, Folder):
 
     security.declareProtected( ManagePortal, 'manage_selectWorkflows')
     def manage_selectWorkflows(self, REQUEST, manage_tabs_message=None):
-        '''
-        Shows a management screen for changing type to workflow connections.
-        '''
+
+        """ Show a management screen for changing type to workflow connections.
+        """
         cbt = self._chains_by_type
         ti = self._listTypeInfo()
         types_info = []
@@ -156,9 +162,9 @@ class WorkflowTool (UniqueObject, Folder):
 
     security.declareProtected( ManagePortal, 'manage_changeWorkflows')
     def manage_changeWorkflows(self, default_chain, props=None, REQUEST=None):
-        '''
-        Changes which workflows apply to objects of which type.
-        '''
+
+        """ Changes which workflows apply to objects of which type.
+        """
         if props is None:
             props = REQUEST
         cbt = self._chains_by_type
@@ -203,13 +209,14 @@ class WorkflowTool (UniqueObject, Folder):
     #
     security.declarePrivate('getCatalogVariablesFor')
     def getCatalogVariablesFor(self, ob):
-        '''
-        Invoked by portal_catalog.  Allows workflows
-        to add variables to the catalog based on workflow status,
-        making it possible to implement queues.
-        Returns a mapping containing the catalog variables
-        that apply to ob.
-        '''
+
+        """ Returns a mapping of the catalog variables that apply to ob.
+
+        o Invoked by portal_catalog.
+        
+        o Allows workflows to add variables to the catalog based on
+          workflow status, making it possible to implement queues.
+        """
         wfs = self.getWorkflowsFor(ob)
         if wfs is None:
             return None
@@ -225,14 +232,18 @@ class WorkflowTool (UniqueObject, Folder):
 
     security.declarePrivate('listActions')
     def listActions(self, info):
-        '''
-        Invoked by the portal_actions tool.  Allows workflows to
-        include actions to be displayed in the actions box.
-        Object actions are supplied by workflows that apply
-        to the object.  Global actions are supplied by all
-        workflows.
-        Returns the actions to be displayed to the user.
-        '''
+
+        """ Returns a list of actions to be displayed to the user.
+
+        o Invoked by the portal_actions tool.
+        
+        o Allows workflows to include actions to be displayed in the
+          actions box.
+
+        o Object actions are supplied by workflows that apply to the object.
+        
+        o Global actions are supplied by all workflows.
+        """
         chain = self.getChainFor(info.content)
         did = {}
         actions = []
@@ -259,19 +270,23 @@ class WorkflowTool (UniqueObject, Folder):
 
     security.declarePublic('getActionsFor')
     def getActionsFor(self, ob):
-        '''
-        Return a list of action dictionaries for 'ob', just as though
-        queried via 'ActionsTool.listFilteredActionsFor'.
-        '''
+
+        """ Return a list of action dictionaries for 'ob', just as though
+            queried via 'ActionsTool.listFilteredActionsFor'.
+        """
         return self.listActions( WorkflowInformation( ob ) )
 
     security.declarePublic('doActionFor')
     def doActionFor(self, ob, action, wf_id=None, *args, **kw):
-        '''
-        Invoked by user interface code.
-        Allows the user to request a workflow action.  The workflow object
-        must perform its own security checks.
-        '''
+
+        """ Execute the given workflow action for the object.
+        
+        o Invoked by user interface code.
+
+        o Allows the user to request a workflow action.
+        
+        o The workflow object must perform its own security checks.
+        """
         wfs = self.getWorkflowsFor(ob)
         if wfs is None:
             wfs = ()
@@ -296,11 +311,15 @@ class WorkflowTool (UniqueObject, Folder):
 
     security.declarePublic('getInfoFor')
     def getInfoFor(self, ob, name, default=_marker, wf_id=None, *args, **kw):
-        '''
-        Invoked by user interface code.  Allows the user to request
-        information provided by the workflow.  The workflow object
-        must perform its own security checks.
-        '''
+
+        """ Return a given workflow-specific property for an object.
+        
+        o Invoked by user interface code.
+        
+        o Allows the user to request information provided by the workflow.
+        
+        o The workflow object must perform its own security checks.
+        """
         if wf_id is None:
             wfs = self.getWorkflowsFor(ob)
             if wfs is None:
@@ -334,10 +353,10 @@ class WorkflowTool (UniqueObject, Folder):
 
     security.declarePrivate('notifyCreated')
     def notifyCreated(self, ob):
-        '''
-        Notifies all applicable workflows after an object has been created
-        and put in its new place.
-        '''
+
+        """ Notify all applicable workflows that an object has been created
+            and put in its new place.
+        """
         wfs = self.getWorkflowsFor(ob)
         for wf in wfs:
             wf.notifyCreated(ob)
@@ -345,40 +364,44 @@ class WorkflowTool (UniqueObject, Folder):
 
     security.declarePrivate('notifyBefore')
     def notifyBefore(self, ob, action):
-        '''
-        Notifies all applicable workflows of an action before it happens,
-        allowing veto by exception.  Unless an exception is thrown, either
-        a notifySuccess() or notifyException() can be expected later on.
-        The action usually corresponds to a method name.
-        '''
+
+        """ Notifies all applicable workflows of an action before it
+            happens, allowing veto by exception.
+            
+        o Unless an exception is thrown, either a notifySuccess() or
+          notifyException() can be expected later on.
+
+        o The action usually corresponds to a method name.
+        """
         wfs = self.getWorkflowsFor(ob)
         for wf in wfs:
             wf.notifyBefore(ob, action)
 
     security.declarePrivate('notifySuccess')
     def notifySuccess(self, ob, action, result=None):
-        '''
-        Notifies all applicable workflows that an action has taken place.
-        '''
+
+        """ Notify all applicable workflows that an action has taken place.
+        """
         wfs = self.getWorkflowsFor(ob)
         for wf in wfs:
             wf.notifySuccess(ob, action, result)
 
     security.declarePrivate('notifyException')
     def notifyException(self, ob, action, exc):
-        '''
-        Notifies all applicable workflows that an action failed.
-        '''
+
+        """ Notify all applicable workflows that an action failed.
+        """
         wfs = self.getWorkflowsFor(ob)
         for wf in wfs:
             wf.notifyException(ob, action, exc)
 
     security.declarePrivate('getHistoryOf')
     def getHistoryOf(self, wf_id, ob):
-        '''
-        Invoked by workflow definitions.  Returns the history
-        of an object.
-        '''
+
+        """ Return the history of an object.
+        
+        o Invoked by workflow definitions.
+        """
         if hasattr(aq_base(ob), 'workflow_history'):
             wfh = ob.workflow_history
             return wfh.get(wf_id, None)
@@ -386,10 +409,11 @@ class WorkflowTool (UniqueObject, Folder):
 
     security.declarePrivate('getStatusOf')
     def getStatusOf(self, wf_id, ob):
-        '''
-        Invoked by workflow definitions.  Returns the last element of a
-        history.
-        '''
+
+        """ Return the last entry of a workflow history.
+
+        o Invoked by workflow definitions.
+        """
         wfh = self.getHistoryOf(wf_id, ob)
         if wfh:
             return wfh[-1]
@@ -397,9 +421,11 @@ class WorkflowTool (UniqueObject, Folder):
 
     security.declarePrivate('setStatusOf')
     def setStatusOf(self, wf_id, ob, status):
-        '''
-        Invoked by workflow definitions.  Appends to the workflow history.
-        '''
+
+        """ Append an entry to the workflow history.
+
+        o Invoked by workflow definitions.
+        """
         wfh = None
         has_history = 0
         if hasattr(aq_base(ob), 'workflow_history'):
@@ -421,7 +447,9 @@ class WorkflowTool (UniqueObject, Folder):
     #
     security.declareProtected( ManagePortal, 'setDefaultChain')
     def setDefaultChain(self, default_chain):
-        """ Set the default chain """
+
+        """ Set the default chain for this tool
+        """
         default_chain = replace(default_chain, ',', ' ')
         ids = []
         for wf_id in split(default_chain, ' '):
@@ -434,7 +462,9 @@ class WorkflowTool (UniqueObject, Folder):
 
     security.declareProtected( ManagePortal, 'setChainForPortalTypes')
     def setChainForPortalTypes(self, pt_names, chain):
-        """ Set a chain for a specific portal type """
+
+        """ Set a chain for a specific portal type.
+        """
         cbt = self._chains_by_type
         if cbt is None:
             self._chains_by_type = cbt = PersistentMapping()
@@ -451,8 +481,9 @@ class WorkflowTool (UniqueObject, Folder):
 
     security.declareProtected( ManagePortal, 'updateRoleMappings')
     def updateRoleMappings(self, REQUEST=None):
-        '''
-        '''
+
+        """ Allow workflows to update the role-permission mappings.
+        """
         wfs = {}
         for id in self.objectIds():
             wf = self.getWorkflowById(id)
@@ -469,6 +500,9 @@ class WorkflowTool (UniqueObject, Folder):
 
     security.declarePrivate('getWorkflowById')
     def getWorkflowById(self, wf_id):
+
+        """ Retrieve a given workflow.
+        """
         wf = getattr(self, wf_id, None)
         if getattr(wf, '_isAWorkflow', 0):
             return wf
@@ -477,6 +511,9 @@ class WorkflowTool (UniqueObject, Folder):
 
     security.declarePrivate('getDefaultChainFor')
     def getDefaultChainFor(self, ob):
+
+        """ Return the default chain, if applicable, for ob.
+        """
         types_tool = getToolByName( self, 'portal_types', None )
         if ( types_tool is not None
             and types_tool.getTypeInfo( ob ) is not None ):
@@ -486,9 +523,9 @@ class WorkflowTool (UniqueObject, Folder):
 
     security.declarePrivate('getChainFor')
     def getChainFor(self, ob):
-        '''
-        Returns the chain that applies to the given object.
-        '''
+
+        """ Returns the chain that applies to the given object.
+        """
         cbt = self._chains_by_type
         if type(ob) == type(''):
             pt = ob
@@ -513,9 +550,9 @@ class WorkflowTool (UniqueObject, Folder):
 
     security.declarePrivate('getWorkflowIds')
     def getWorkflowIds(self):
-        '''
-        Returns the list of workflow ids.
-        '''
+
+        """ Return the list of workflow ids.
+        """
         wf_ids = []
 
         for obj_name, obj in self.objectItems():
@@ -526,9 +563,9 @@ class WorkflowTool (UniqueObject, Folder):
 
     security.declarePrivate('getWorkflowsFor')
     def getWorkflowsFor(self, ob):
-        '''
-        Finds the Workflow objects for the type of the given object.
-        '''
+
+        """ Find the workflows for the type of the given object.
+        """
         res = []
         for wf_id in self.getChainFor(ob):
             wf = self.getWorkflowById(wf_id)
@@ -538,10 +575,10 @@ class WorkflowTool (UniqueObject, Folder):
 
     security.declarePrivate('wrapWorkflowMethod')
     def wrapWorkflowMethod(self, ob, method_id, func, args, kw):
-        '''
-        To be invoked only by WorkflowCore.
-        Allows a workflow definition to wrap a WorkflowMethod.
-        '''
+
+        """ To be invoked only by WorkflowCore.
+            Allows a workflow definition to wrap a WorkflowMethod.
+        """
         wf = None
         wfs = self.getWorkflowsFor(ob)
         if wfs:
@@ -564,6 +601,9 @@ class WorkflowTool (UniqueObject, Folder):
     #
     security.declarePrivate( '_listTypeInfo' )
     def _listTypeInfo(self):
+
+        """ List the portal types which are available.
+        """
         pt = getToolByName(self, 'portal_types', None)
         if pt is None:
             return ()
@@ -572,9 +612,10 @@ class WorkflowTool (UniqueObject, Folder):
 
     security.declarePrivate( '_invokeWithNotification' )
     def _invokeWithNotification(self, wfs, ob, action, func, args, kw):
-        '''
-        Private utility method.
-        '''
+
+        """ Private utility method:  call 'func', and deal with exceptions
+            indicating that the object has been deleted or moved.
+        """
         reindex = 1
         for w in wfs:
             w.notifyBefore(ob, action)
@@ -602,6 +643,10 @@ class WorkflowTool (UniqueObject, Folder):
 
     security.declarePrivate( '_recursiveUpdateRoleMappings' )
     def _recursiveUpdateRoleMappings(self, ob, wfs, catalog):
+
+        """ Update roles-permission mappings recursively, and
+            reindex special index.
+        """
         # Returns a count of updated objects.
         count = 0
         wf_ids = self.getChainFor(ob)
@@ -630,11 +675,23 @@ class WorkflowTool (UniqueObject, Folder):
                         v._p_deactivate()
         return count
 
+    security.declarePrivate( '_setDefaultCataloging' )
+    def _setDefaultCataloging( self, value ):
+
+        """ Toggle whether '_reindexWorkflowVariables' actually touches
+            the catalog (sometimes not desirable, e.g. when the workflow
+            objects do this themselves only at particular points).
+        """
+        self._default_cataloging = not not value
+
     security.declarePrivate('_reindexWorkflowVariables')
     def _reindexWorkflowVariables(self, ob):
-        '''
-        Reindex the variables that the workflow may have changed.
-        '''
+
+        """ Reindex the variables that the workflow may have changed.
+        """
+        if not self._default_cataloging:
+            return
+
         catalog = getToolByName(self, 'portal_catalog', None)
         if catalog is not None:
             # XXX We only need the keys here, no need to compute values.
