@@ -10,66 +10,88 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-
-"""Basic action list tool.
+""" Information about customizable actions.
 
 $Id$
 """
-__version__='$Revision$'[11:-2]
 
-from utils import SimpleItemWithProperties, _dtmldir, getToolByName
-import CMFCorePermissions
 from AccessControl import ClassSecurityInfo
+from Globals import InitializeClass
+from Globals import DTMLFile
 from Acquisition import aq_inner, aq_parent
-from Globals import InitializeClass, DTMLFile
 
-class ActionInformation(SimpleItemWithProperties):
-    """
-    Represent a single action which the user can select from a list
-    and execut in some context.
+from CMFCorePermissions import View
+from CMFCorePermissions import ManagePortal
+from utils import SimpleItemWithProperties
+from utils import _dtmldir
+from utils import getToolByName
+
+class ActionInformation( SimpleItemWithProperties ):
+
+    """ Represent a single selectable action.
+    
+    Actions generate links to views of content, or to specific methods
+    of the site.  They can be filtered via their conditions.
     """
     _isActionInformation = 1
     __allow_access_to_unprotected_subobjects__ = 1
 
-    manage_options = (SimpleItemWithProperties.manage_options[:1] +
-                      ({'label': 'Actions',
-                       'action': 'manage_editActionsForm'},) +
-                       SimpleItemWithProperties.manage_options[1:])
+    manage_options = ( SimpleItemWithProperties.manage_options[:1]
+                     + ( { 'label': 'Actions'
+                         , 'action': 'manage_editActionsForm'
+                         }
+                       ,
+                       )
+                     + SimpleItemWithProperties.manage_options[1:]
+                     )
     security = ClassSecurityInfo()
-    security.declareProtected(CMFCorePermissions.ManagePortal
-                            , 'manage_editProperties'
-                            , 'manage_changeProperties'
-                            , 'manage_propertiesForm'
+    security.declareProtected( ManagePortal
+                             , 'manage_editProperties'
+                             , 'manage_changeProperties'
+                             , 'manage_propertiesForm'
                              )
 
-    _basic_properties = (
-                         {'id': 'title', 'type': 'string', 'mode': 'w', 'label': 'Title'}
-                       , {'id': 'description', 'type': 'text', 'mode': 'w', 
-                         'label': 'Description'}
-                       , {'id': 'category', 'type': 'string', 'mode': 'w', 
-                         'label': 'Category'}
-                       , {'id': 'priority', 'type': 'boolean', 'mode':  'w', 'label': 'Priority'}
-                         )
-
+    _basic_properties = ( { 'id'    : 'title'
+                          , 'type'  : 'string'
+                          , 'mode'  : 'w'
+                          , 'label' : 'Title'
+                          }
+                        , { 'id'    : 'description'
+                          , 'type'  : 'text'
+                          , 'mode'  : 'w'
+                          , 'label' : 'Description'
+                          }
+                        , { 'id'    : 'category'
+                          , 'type'  : 'string'
+                          , 'mode'  : 'w'
+                          , 'label' : 'Category'
+                          }
+                        , { 'id'    : 'priority'
+                          , 'type'  : 'boolean'
+                          , 'mode'  :  'w'
+                          , 'label' : 'Priority'
+                          }
+                        )
     title = ''
     description = ''
     category = ''
     priority = 0
     visible = 1
-    _action = ''
+    action = ''
+    condition = ''
 
-    def __init__(self
-               , id
-               , title=''
-               , description=''
-               , category='object'
-               , condition=''
-               , permissions=()
-               , priority=10
-               , visible=1
-               , action=''):
-       """
-       Setup an instance
+    def __init__( self
+                , id
+                , title=''
+                , description=''
+                , category='object'
+                , condition=''
+                , permissions=()
+                , priority=10
+                , visible=1
+                , action=''
+                ):
+       """ Set up an instance.
        """
        self.id = id
        self.title = title
@@ -79,115 +101,95 @@ class ActionInformation(SimpleItemWithProperties):
        self.permissions = permissions
        self.priority = priority 
        self.visible = visible
-       self._action = action
+       self.action = action
 
 
-    security.declareProtected(CMFCorePermissions.View, 'Title')
+    security.declareProtected( View, 'Title' )
     def Title(self):
-        """
-        Return the Action title - name
-        """
-        if self.title:
-            return self.title
-        else:
-            return self.getId()
 
-    security.declareProtected(CMFCorePermissions.View, 'Description')
-    def Description(self):
+        """ Return the Action title.
         """
-        Return a description of the action
+        return self.title or self.getId()
+
+    security.declareProtected( View, 'Description' )
+    def Description( self ):
+
+        """ Return a description of the action.
         """
         return self.description
 
-    security.declarePrivate('testCondition')
-    def testCondition(self, ec):
-        """
-        Evaluate condition and return 0 or 1
+    security.declarePrivate( 'testCondition' )
+    def testCondition( self, ec ):
+
+        """ Evaluate condition using context, 'ec', and return 0 or 1.
         """
         if self.condition:
             return self.condition(ec)
         else:
             return 1
 
-    security.declarePublic('getAction')
-    def getAction(self, ec):
-        """
-        Return the action, which is an TALES expresssion
-        """
-        if self._action:
-            aa = self._action(ec)
-        else:
-            aa = ''
-        action = {}
-        action['id'] = self.id
-        action['name'] = self.Title()
-        action['url'] = aa 
-        action['permissions'] = self.getPermissions()
-        action['category'] = self.getCategory()
-        action['visible'] = self.getVisibility()
-        return action 
+    security.declarePublic( 'getAction' )
+    def getAction( self, ec ):
 
-    security.declarePublic('getActionExpression')
-    def getActionExpression(self):
+        """ Compute the action using context, 'ec'; return a mapping of
+            info about the action.
         """
-        If not an empty string or None, return the 
-        text of the expression otherwise return '' 
-        """
-        if self._action:
-            return self._action.text
-        else:
-            return self._action
+        info = {}
+        info['id'] = self.id
+        info['name'] = self.Title()
+        info['url'] = self.action and self.action( ec ) or ''
+        info['permissions'] = self.getPermissions()
+        info['category'] = self.getCategory()
+        info['visible'] = self.getVisibility()
+        return info 
 
-    security.declarePublic('getCondition')
+    security.declarePublic( 'getActionExpression' )
+    def getActionExpression( self ):
+
+        """ Return the text of the TALES expression for our URL.
+        """
+        return self.action and self.action.text or ''
+
+    security.declarePublic( 'getCondition' )
     def getCondition(self):
-        """
-        If not an empty string or None, return the 
-        text of the expression otherwise
-        return ''
-        """
-        if self.condition:
-            return self.condition.text
-        else:
-            return self.condition
 
-    security.declarePublic('getPermission')
-    def getPermissions(self):
+        """ Return the text of the TALES expression for our condition.
         """
-        Return the permission if any required for a user to
-        execute the action
+        return self.condition and self.condition.text or ''
+
+    security.declarePublic( 'getPermission' )
+    def getPermissions( self ):
+
+        """ Return the permission, if any, required to execute the action.
+
+        Return an empty tuple if no permission is required.
         """
         return self.permissions
 
-    security.declarePublic('getCategory')
-    def getCategory(self):
-        """
-        Return the category for which the action is
-        """
-        if self.category:
-            return self.category
-        else:
-            return 'object'
+    security.declarePublic( 'getCategory' )
+    def getCategory( self ):
 
-    security.declarePublic('getVisibility')
-    def getVisibility(self):
+        """ Return the category in which the action should be grouped.
         """
-        Return boolean for whether the action
-        is visible in the UI
+        return self.category or 'object'
+
+    security.declarePublic( 'getVisibility' )
+    def getVisibility( self ):
+
+        """ Return whether the action should be visible in the CMF UI.
         """
         return self.visible
 
-    security.declarePublic('getPriority')
+    security.declarePublic( 'getPriority' )
     def getPriority(self):
-        """
-        Return integer priority for sorting
-        Not used....keep and implement or toss?
-        """
-        if self.priority:
-            return self.priority
-        else:
-            return 10
 
-InitializeClass(ActionInformation)
+        """ Return integer priority for sorting.
+        
+        """
+        # XXX: Not used....keep and implement or toss?
+        return getattr( self, 'priority', 10 )
+
+InitializeClass( ActionInformation )
 
 class oai:
     #Provided for backwards compatability
@@ -195,7 +197,7 @@ class oai:
     # available actions.
     __allow_access_to_unprotected_subobjects__ = 1
 
-    def __init__(self, tool, folder, object=None):
+    def __init__( self, tool, folder, object=None ):
         self.portal = portal = aq_parent(aq_inner(tool))
         membership = getToolByName(tool, 'portal_membership')
         self.isAnonymous = membership.isAnonymousUser()

@@ -82,9 +82,6 @@ class ActionProviderBaseTests(unittest.TestCase):
                 if attr == 'name':    # WAAAA
                     attr = 'title'
 
-                if attr == 'action':    # WAAAA
-                    attr = '_action'
-
                 if attr == 'permission':    # WAAAA
                     attr = 'permissions'
                     value = ( value, )
