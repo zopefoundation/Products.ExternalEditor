@@ -6,8 +6,9 @@ context.portal_workflow.doActionFor(
     context,
     workflow_action,
     comment=comment)
- 
-return context.view(context,
-                    context.REQUEST,
-                    portal_status_message='Status changed.')
+
+context.REQUEST[ 'RESPONSE' ].redirect( '%s/view?%s'
+                   % ( context.absolute_url()
+                     , 'portal_status_message=Status+changed.'
+                     ) )
 
