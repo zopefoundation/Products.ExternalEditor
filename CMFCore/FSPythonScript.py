@@ -92,7 +92,8 @@ import new
 import Globals
 from AccessControl import ClassSecurityInfo, getSecurityManager
 from Products.PythonScripts.PythonScript import PythonScript
-from Shared.DC.Scripts.Script import Script, defaultBindings
+from Shared.DC.Scripts.Script import Script
+from ComputedAttribute import ComputedAttribute
 
 from utils import _dtmldir
 from CMFCorePermissions import ViewManagementScreens, View, FTPAccess
@@ -105,6 +106,7 @@ class FSPythonScript (FSObject, Script):
 
     meta_type = 'Filesystem Script (Python)'
     _params = _body = ''
+    _v_f = None
 
     manage_options=(
         (
@@ -119,10 +121,8 @@ class FSPythonScript (FSObject, Script):
     security = ClassSecurityInfo()
     security.declareObjectProtected(View)
     security.declareProtected(View, 'index_html',)
-
-    def __init__(self, id, filepath, fullname=None, properties=None):
-        FSObject.__init__(self, id, filepath, fullname, properties)
-        self.ZBindings_edit(defaultBindings)
+    # Prevent the bindings from being edited TTW
+    security.declarePrivate('ZBindings_edit','ZBindingsHTML_editForm','ZBindingsHTML_editAction')
 
     security.declareProtected(ViewManagementScreens, 'manage_main')
     manage_main = Globals.DTMLFile('custpy', _dtmldir)
@@ -143,7 +143,7 @@ class FSPythonScript (FSObject, Script):
         file = open(fp, 'r')
         try: data = file.read()
         finally: file.close()
-        self._write(data)
+        self._write(data, reparse)
 
     def _validateProxy(self, roles=None):
         pass
@@ -158,6 +158,12 @@ class FSPythonScript (FSObject, Script):
         self._updateFromFS()
         # Prepare the function.
         f = self._v_f
+        if f is None:
+            # Not yet compiled.
+            self._write(self._source, 1)
+            f = self._v_f
+            if f is None:
+                raise RuntimeError, '%s has errors.' % self._filepath
 
         __traceback_info__ = bound_names, args, kw, self.func_defaults
 
@@ -198,17 +204,15 @@ class FSPythonScript (FSObject, Script):
         return param_names
 
     def read(self):
-        ps = PythonScript(self.id)
-        ps._body = self._body
-        ps._params = self._params
-        return ps.read()
-        
+        self._updateFromFS()
+        return self._source
+                
     def document_src(self, REQUEST=None, RESPONSE=None):
         """Return unprocessed document source."""
 
         if RESPONSE is not None:
             RESPONSE.setHeader('Content-Type', 'text/plain')
-        return self.read()
+        return self._source
 
     def PrincipiaSearchSource(self):
         "Support for searching - the document's contents are searched."
@@ -224,17 +228,46 @@ class FSPythonScript (FSObject, Script):
         self.REQUEST.RESPONSE.setHeader('Content-Type', 'text/plain')
         return self.read()
 
-    def _write(self, text):
+    def _write(self, text, compile):
+        '''
+        Parses the source, storing the body, params, title, bindings,
+        and source in self.  If compile is set, compiles the
+        function.
+        '''
         ps = PythonScript(self.id)
         ps.write(text)
-        ps._makeFunction()
-        ps._editedBindings()
-        self._v_f = f = ps._v_f
+        if compile:
+            ps._makeFunction(1)
+            self._v_f = f = ps._v_f
+            if f is not None:
+                fc = f.func_code
+                self._setFuncSignature(f.func_defaults, fc.co_varnames,
+                                       fc.co_argcount)
+            else:
+                # There were errors in the compile.
+                self._setFuncSignature()  # No signature.
         self._body = ps._body
         self._params = ps._params
-        fc = f.func_code
-        self._setFuncSignature(f.func_defaults, fc.co_varnames,
-                               fc.co_argcount)
+        self.title = ps.title
+        self._setupBindings(ps.getBindingAssignments().getAssignedNames())
+        self._source = ps.read()  # Find out what the script sees.
+
+    def func_defaults(self):
+        # This ensures func_code and func_defaults are
+        # set when the code hasn't been compiled yet,
+        # just in time for mapply().  Truly odd, but so is mapply(). :P
+        self.func_defaults = None  # Overrides this method.
+        self._write(self._source, 1)
+        return self.func_defaults
+    func_defaults = ComputedAttribute(func_defaults, 1)
+
+    def func_code(self):
+        # See func_defaults.
+        self.func_code = None  # Overrides this method.
+        self._write(self._source, 1)
+        return self.func_code
+    func_code = ComputedAttribute(func_code, 1)
+
 
 Globals.InitializeClass(FSPythonScript)
 
