@@ -30,34 +30,33 @@ Installing CMFCollector
      2001.  The patch is in the CVS version (it's DCWorkflow.py, rev
      1.8), and will be in CMF 1.2.
 
-  To install CMFCollector, uncompress the CMFCollector product into
-  your zope/Products directory or link it there, e.g.::
+  To install CMFCollector:
+
+  - Uncompress the CMFCollector product into your zope/Products
+    directory or link it there, e.g.::
 
     ln -s /path/to/installation /path/to/zope/Products
 
-  In the root of your CMFSite installation (within the ZMI):
+  - In the root of your CMFSite installation (within the ZMI), add an
+    external method to the root of the CMF Site, with the following
+    configuration values:
 
-      1.  Add an external method to the root of the CMF Site.
+      o id: install_collector
 
-      2.  Use the following configuration values for the external
-          method:
+      o title (optional): Install Collector Content Types
 
-          o id: install_collector
+      o module name: CMFCollector.InstallCollector
 
-          o title (optional): Install Collector Content Types
+      o function name: install_collector
 
-          o module name: CMFCollector.InstallCollector
+    Go to the management screen for the newly added external method and
+    click the 'Try it' tab.
 
-          o function name: install_collector
+    The install function will execute and give information about the
+    steps it took to register and install the CMF Events into the CMF
+    Site instance.
 
-      3. Go to the management screen for the newly added external
-         method and click the 'Try it' tab.  
-
-  The install function will execute and give information about the
-  steps it took to register and install the CMF Events into the CMF
-  Site instance.
-
-  Finally, install the workflow:
+  - Finally, install the workflow:
 
      1. Put collector_issue_workflow.zexp in your site's import/
         directory.
