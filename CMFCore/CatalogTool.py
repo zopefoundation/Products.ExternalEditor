@@ -181,7 +181,8 @@ class CatalogTool (UniqueObject, ZCatalog):
         kw['allowedRolesAndUsers'] = list(user.getRoles()) + \
                                      ['Anonymous',
                                       'user:'+user.getUserName()]
-        if not _checkPermission('Access inactive portal content', self):
+        if not _checkPermission(
+            CMFCorePermissions.AccessInactivePortalContent, self ):
             if kw.has_key('Date') and None:
                 if kw.has_key('Date_usage'):
                     kw['Date'] = min(kw['Date'])
