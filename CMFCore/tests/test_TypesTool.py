@@ -154,9 +154,118 @@ class TypesToolTests( unittest.TestCase ):
         assert unpermitted_view != 'edit'
         assert unpermitted_view == 'view'
 
+class TypeInfoTests( unittest.TestCase ):
+    
+    def test_construction( self ):
+        ti = self._makeInstance( 'Foo'
+                               , description='Description'
+                               , meta_type='Foo'
+                               , icon='foo.gif'
+                               )
+        self.assertEqual( ti.getId(), 'Foo' )
+        self.assertEqual( ti.Type(), 'Foo' )
+        self.assertEqual( ti.Description(), 'Description' )
+        self.assertEqual( ti.Metatype(), 'Foo' )
+        self.assertEqual( ti.getIcon(), 'foo.gif' )
+
+    def test_allowType( self ):
+        ti = self._makeInstance( 'Foo' )
+        self.failIf( ti.allowType( 'Foo' ) )
+        self.failIf( ti.allowType( 'Bar' ) )
+
+        ti = self._makeInstance( 'Foo', allowed_content_types=( 'Bar', ) )
+        self.failUnless( ti.allowType( 'Bar' ) )
+
+        ti = self._makeInstance( 'Foo', filter_content_types=0 )
+        self.failUnless( ti.allowType( 'Foo' ) )
+
+    def test_allowDiscussion( self ):
+        ti = self._makeInstance( 'Foo' )
+        self.failIf( ti.allowDiscussion() )
+
+        ti = self._makeInstance( 'Foo', allow_discussion=1 )
+        self.failUnless( ti.allowDiscussion() )
+
+    def _ripActionValues( self, key, actions ):
+        return filter( None, map( lambda x, key=key: x.get( key, None )
+                                , actions
+                                ) )
+
+    def testActions( self ):
+        ti = self._makeInstance( 'Foo' )
+        self.failIf( ti.getActions() )
+
+        action_list = \
+        ( { 'id'            : 'view'
+          , 'name'          : 'View'
+          , 'action'        : 'foo_view'
+          , 'permissions'   : ( 'View', )
+          , 'category'      : 'object'
+          , 'visible'       : 1
+          }
+        , { 'name'          : 'Edit'                # Note: No ID passed
+          , 'action'        : 'foo_edit'
+          , 'permissions'   : ( 'Modify', )
+          , 'category'      : 'object'
+          , 'visible'       : 1
+          }
+        , { 'name'          : 'Object Properties'   # Note: No ID passed
+          , 'action'        : 'foo_properties'
+          , 'permissions'   : ( 'Modify', )
+          , 'category'      : 'object'
+          , 'visible'       : 1
+          }
+        , { 'id'            : 'slot'
+          , 'action'        : 'foo_slot'
+          , 'category'      : 'object'
+          , 'visible'       : 0
+          }
+        )
+
+        ti = self._makeInstance( 'Foo', actions=action_list )
+
+        actions = ti.getActions()
+        self.failUnless( actions )
+
+        ids = self._ripActionValues( 'id', actions )
+        self.failUnless( 'view' in ids )
+        self.failUnless( 'edit' in ids )
+        self.failUnless( 'objectproperties' in ids )
+        self.failUnless( 'slot' in ids )
+
+        names = self._ripActionValues( 'name', actions )
+        self.failUnless( 'View' in names )
+        self.failUnless( 'Edit' in names )
+        self.failUnless( 'Object Properties' in names )
+        self.failIf( 'slot' in names )
+        self.failIf( 'Slot' in names )
+        
+        visible = filter( None, map( lambda x:
+                                        x.get( 'visible', 0 ) and x['id']
+                                   , actions ) )
+        self.failUnless( 'view' in visible )
+        self.failUnless( 'edit' in visible )
+        self.failUnless( 'objectproperties' in visible )
+        self.failIf( 'slot' in visible )
+
+class FTITests( TypeInfoTests ):
+
+    def _makeInstance( self, id, **kw ):
+        return apply( FactoryTypeInformation, ( id, ), kw )
+
+    def test_ConstructInstance( self ):
+        pass
+
+class STITests( TypeInfoTests ):
+
+    def _makeInstance( self, id, **kw ):
+        return apply( ScriptableTypeInformation, ( id, ), kw )
+
 def test_suite():
     suite = unittest.TestSuite()
     suite.addTest( unittest.makeSuite( TypesToolTests ) )
+    suite.addTest( unittest.makeSuite( FTITests ) )
+    suite.addTest( unittest.makeSuite( STITests ) )
     return suite
 
 def run():

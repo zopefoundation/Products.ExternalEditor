@@ -186,6 +186,7 @@ class TypeInformation (SimpleItemWithProperties):
             Return the URL of the action whose ID is id.
         """
         for action in self.getActions():
+
             if action.has_key('id'):
                 if action['id'] == id:
                     return action['action']
@@ -193,8 +194,11 @@ class TypeInformation (SimpleItemWithProperties):
                 # Temporary backward compatibility.
                 if string.lower(action['name']) == id:
                     return action['action']
+
         if default is _marker:
-            raise TypeError, 'No action "%s" for type "%s"' % ( id, self.getId() )
+            raise TypeError, ( 'No action "%s" for type "%s"'
+                             % ( id, self.getId() )
+                             )
         else:
             return default
 
