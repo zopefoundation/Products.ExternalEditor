@@ -17,7 +17,7 @@
 
 # Zope External Editor Helper Application by Casey Duncan
 
-__version__ = '0.5'
+__version__ = '0.6'
 
 import sys, os, re
 import traceback
@@ -26,15 +26,6 @@ from ConfigParser import ConfigParser
 from httplib import HTTPConnection, HTTPSConnection
 from urlparse import urlparse
 import urllib
-
-try:
-    # See if ssl is available on this system
-    from socket import ssl
-except ImportError:
-    ssl_available = 0
-else:
-    ssl_available = 1
-    del ssl 
 
 win32 = sys.platform == 'win32'
 
@@ -163,10 +154,14 @@ class ExternalEditor:
                 except OSError:
                     pass # Sometimes we aren't allowed to delete it
             
-            if self.ssl and not ssl_available:
-                fatalError('SSL support is not available on this system. '
-                           'Make sure openssl is installed '
-                           'and reinstall Python.')
+            if self.ssl:
+                # See if ssl is available
+                try:
+                    from socket import ssl
+                except ImportError:
+                    fatalError('SSL support is not available on this system. '
+                               'Make sure openssl is installed '
+                               'and reinstall Python.')
             self.lock_token = None
             self.did_lock = 0
         except:
@@ -515,8 +510,6 @@ class ExternalEditor:
             
             response = NullResponse()
             response.reason = sys.exc_info()[1]
-            sys.stderr.write('\n-- Zope Request Traceback --\n')
-            traceback.print_exc(file=sys.stderr)
             
             try:
                 response.status, response.reason = response.reason
@@ -526,22 +519,11 @@ class ExternalEditor:
             return response
             
     def askRetryAfterError(self, response, operation, message=''):
-        """Dumps response data to stderr"""
+        """Dumps response data"""
         if not message \
            and response.getheader('Bobo-Exception-Type') is not None:
             message = '%s: %s' % (response.getheader('Bobo-Exception-Type'),
                                   response.getheader('Bobo-Exception-Value'))
-                                  
-        sys.stderr.write('Error occurred: %s:\n%d %s\n%s\n'
-                         % (operation, response.status, 
-                            response.reason, message))
-                            
-        if hasattr(response, 'msg'):
-            headers = ''.join(response.msg.headers)
-        else:
-            headers = ''
-            
-        sys.stderr.write('\n----\n%s\n%s\n----\n' % (headers, response.read()))
         return askRetryCancel('%s:\n%d %s\n%s' % (operation, response.status, 
                                                response.reason, message))
 
@@ -560,7 +542,6 @@ if win32:
 
     def errorDialog(message):
         MessageBox(message, title, MB_OK + MB_ICONERROR + MB_SYSTEMMODAL)
-        sys.stderr.write(message + '\n')
 
     def askRetryCancel(message):
         return MessageBox(message, title, 
@@ -618,7 +599,7 @@ else: # Posix platform
                 showerror(title, message)
                 has_tk()
         finally:
-            sys.stderr.write(message + '\n')
+            print message
 
     def askRetryCancel(message):
         if has_tk():
@@ -660,7 +641,6 @@ else: # Posix platform
 def fatalError(message, exit=1):
     """Show error message and exit"""
     errorDialog('FATAL ERROR: %s' % message)
-    traceback.print_exc(file=sys.stderr)
     # Write out debug info to a temp file
     debug_f = open(mktemp('-zopeedit-traceback.txt'), 'w')
     try:
