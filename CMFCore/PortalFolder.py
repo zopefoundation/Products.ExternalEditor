@@ -126,18 +126,6 @@ class PortalFolder( Folder, DynamicType ):
 
     security = ClassSecurityInfo()
 
-    
-
-    #
-    #   Each module defining a PortalContent derivative registers here.
-    #
-##    FOLDER_ACTION = 'manage_addProduct/CMFCore/manage_addPortalFolderForm'
-##    content_meta_types = ( { 'name'         : 'Portal Folder'
-##                           , 'action'       : FOLDER_ACTION
-##                           , 'permission'   : 'Add portal folders'
-##                           }
-##                         ,
-##                         )
     description = ''
 
     def __init__( self, id, title='' ):
