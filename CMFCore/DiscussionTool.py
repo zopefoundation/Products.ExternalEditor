@@ -17,7 +17,10 @@ $Id$
 
 from utils import UniqueObject, getToolByName
 from utils import getToolByName, _dtmldir
-import CMFCorePermissions
+from CMFCorePermissions import ReplyToItem
+from CMFCorePermissions import View
+from CMFCorePermissions import AccessContentsInformation
+from CMFCorePermissions import ManagePortal
 from OFS.SimpleItem import SimpleItem
 from Globals import InitializeClass, DTMLFile
 import Acquisition
@@ -37,7 +40,7 @@ class OldDiscussable(Acquisition.Implicit):
     def __init__( self, content ):
         self.content = content
 
-    security.declareProtected(CMFCorePermissions.ReplyToItem, 'createReply')
+    security.declareProtected(ReplyToItem, 'createReply')
     def createReply(self, title, text, REQUEST, RESPONSE):
         """
             Create a reply in the proper place
@@ -58,9 +61,8 @@ class OldDiscussable(Acquisition.Implicit):
         if not hasattr(home, 'Correspondence'):
             home.manage_addPortalFolder('Correspondence')
         location = home.Correspondence
-        location.manage_permission(CMFCorePermissions.View, ['Anonymous'], 1)
-        location.manage_permission(
-           CMFCorePermissions.AccessContentsInformation, ['Anonymous'], 1)
+        location.manage_permission(View, ['Anonymous'], 1)
+        location.manage_permission(AccessContentsInformation, ['Anonymous'], 1)
 
         # Find an unused id in location
         id = int(DateTime().timeTime())
@@ -69,7 +71,7 @@ class OldDiscussable(Acquisition.Implicit):
 
         return location, `id`
 
-    security.declareProtected(CMFCorePermissions.View, 'getReplyResults')
+    security.declareProtected(View, 'getReplyResults')
     def getReplyResults(self):
         """
             Return the ZCatalog results that represent this object's replies.
@@ -81,7 +83,7 @@ class OldDiscussable(Acquisition.Implicit):
         return catalog.searchResults(in_reply_to=
                                       urllib.unquote('/'+self.absolute_url(1)))
 
-    security.declareProtected(CMFCorePermissions.View, 'getReplies')
+    security.declareProtected(View, 'getReplies')
     def getReplies(self):
         """
             Return a sequence of the DiscussionResponse objects which are
@@ -116,8 +118,7 @@ class DiscussionTool (UniqueObject, SimpleItem):
     #
     #   ZMI methods
     #
-    security.declareProtected( CMFCorePermissions.ManagePortal
-                             , 'manage_overview' )
+    security.declareProtected(ManagePortal, 'manage_overview')
     manage_overview = DTMLFile( 'explainDiscussionTool', _dtmldir )
 
     #

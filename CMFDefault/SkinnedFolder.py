@@ -16,7 +16,9 @@
 
 from Products.CMFCore.PortalFolder import PortalFolder
 from Products.CMFCore.utils import getToolByName
-from Products.CMFCore import CMFCorePermissions
+from Products.CMFCore.CMFCorePermissions import View
+from Products.CMFCore.CMFCorePermissions import ManageProperties
+from Products.CMFCore.CMFCorePermissions import ListFolderContents
 from AccessControl import ClassSecurityInfo, Owned
 from Globals import InitializeClass
 from ComputedAttribute import ComputedAttribute
@@ -37,22 +39,19 @@ Skinned folders can define custom 'view' actions."""
                                 ( { 'id'            : 'view' 
                                   , 'name'          : 'View'
                                   , 'action'        : ''
-                                  , 'permissions'   :
-                                     (CMFCorePermissions.View,)
+                                  , 'permissions'   : (View,)
                                   , 'category'      : 'folder'
                                   }
                                 , { 'id'            : 'edit'
                                   , 'name'          : 'Edit'
                                   , 'action'        : 'folder_edit_form'
-                                  , 'permissions'   :
-                                     (CMFCorePermissions.ManageProperties,)
+                                  , 'permissions'   : (ManageProperties,)
                                   , 'category'      : 'folder'
                                   }
                                 , { 'id'            : 'foldercontents'
                                   , 'name'          : 'Folder contents'
                                   , 'action'        : 'folder_contents'
-                                  , 'permissions'   : 
-                                     (CMFCorePermissions.ListFolderContents,)
+                                  , 'permissions'   : (ListFolderContents,)
                                   , 'category'      : 'folder'
                                   }
                                 )
@@ -80,12 +79,12 @@ class SkinnedFolder(CMFCatalogAware, PortalFolder):
         else:
             return view()
 
-    security.declareProtected( CMFCorePermissions.View, 'view' )
+    security.declareProtected(View, 'view')
     view = __call__
 
     index_html = None  # This special value informs ZPublisher to use __call__
 
-    security.declareProtected( CMFCorePermissions.View, 'Creator' )
+    security.declareProtected(View, 'Creator')
     def Creator( self ):
         """
             Return the ID of our owner.

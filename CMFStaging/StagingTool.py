@@ -283,16 +283,18 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
             return None
 
 
-    security.declareProtected(
-        ManagePortal, 'manage_stagesForm' 'manage_editStages', 'getStagePaths')
-
+    security.declareProtected(ManagePortal, 'manage_stagesForm')
     manage_stagesForm = PageTemplateFile('stagesForm', _wwwdir)
 
+
+    security.declareProtected(ManagePortal, 'getStagePaths')
     def getStageItems(self):
         lst = self._stages.items()
         lst.sort()
         return lst
 
+
+    security.declareProtected(ManagePortal, 'manage_editStages')
     def manage_editStages(self, stages=(), RESPONSE=None):
         """Edits the stages."""
         ss = {}

@@ -24,7 +24,8 @@ from AccessControl import ClassSecurityInfo, Unauthorized
 from Expression import Expression
 from ActionInformation import ActionInformation
 from ActionProviderBase import ActionProviderBase
-from CMFCorePermissions import ManagePortal, UndoChanges, ListUndoableChanges
+from CMFCorePermissions import ManagePortal
+from CMFCorePermissions import ListUndoableChanges
 
 class UndoTool (UniqueObject, SimpleItem, ActionProviderBase):
     id = 'portal_undo'
@@ -52,8 +53,7 @@ class UndoTool (UniqueObject, SimpleItem, ActionProviderBase):
     #
     #   ZMI methods
     #
-    security.declareProtected( ManagePortal
-                             , 'manage_overview' )
+    security.declareProtected(ManagePortal, 'manage_overview')
     manage_overview = DTMLFile( 'explainUndoTool', _dtmldir )
 
     security.declarePrivate('listActions')
@@ -66,8 +66,7 @@ class UndoTool (UniqueObject, SimpleItem, ActionProviderBase):
     #
     #   'portal_undo' interface methods
     #
-    security.declareProtected( ListUndoableChanges
-                             , 'listUndoableTransactionsFor')
+    security.declareProtected(ListUndoableChanges, 'listUndoableTransactionsFor')
     def listUndoableTransactionsFor(self, object,
                                     first_transaction=None,
                                     last_transaction=None,

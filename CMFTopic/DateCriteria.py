@@ -18,9 +18,9 @@ $Id$
 from Products.CMFTopic.AbstractCriterion import AbstractCriterion
 from Products.CMFTopic.interfaces import Criterion
 from Products.CMFTopic.Topic import Topic
-from Products.CMFTopic.Topic import TopicPermissions
+from Products.CMFTopic import TopicPermissions
 
-from Products.CMFCore import CMFCorePermissions
+from Products.CMFCore.CMFCorePermissions import View
 
 from AccessControl import ClassSecurityInfo
 from DateTime.DateTime import DateTime
@@ -104,7 +104,7 @@ class FriendlyDateCriterion( AbstractCriterion ):
         else:
             raise ValueError, 'Date range not in set {old,ahead}'
 
-    security.declareProtected( CMFCorePermissions.View, 'getCriteriaItems' )
+    security.declareProtected(View, 'getCriteriaItems')
     def getCriteriaItems( self ):
         """
             Return a sequence of items to be used to build the catalog query.

@@ -21,7 +21,8 @@ from Globals import HTMLFile, HTML
 from Document import Document
 from utils import parseHeadersBody
 
-from Products.CMFCore import CMFCorePermissions
+from Products.CMFCore.CMFCorePermissions import View
+from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
 from AccessControl import ClassSecurityInfo
 from Products.CMFCore.WorkflowCore import WorkflowAction
 
@@ -37,20 +38,17 @@ News Items contain short text articles and carry a title as well as an optional 
                                 ( { 'id'            : 'view'
                                   , 'name'          : 'View'
                                   , 'action'        : 'newsitem_view'
-                                  , 'permissions'   : (
-                                      CMFCorePermissions.View, )
+                                  , 'permissions'   : (View,)
                                   }
                                 , { 'id'            : 'edit'
                                   , 'name'          : 'Edit'
                                   , 'action'        : 'newsitem_edit_form'
-                                  , 'permissions'   : (
-                                      CMFCorePermissions.ModifyPortalContent, )
+                                  , 'permissions'   : (ModifyPortalContent,)
                                   }
                                 , { 'id'            : 'metadata'
                                   , 'name'          : 'Metadata'
                                   , 'action'        : 'metadata_edit_form'
-                                  , 'permissions'   : (
-                                      CMFCorePermissions.ModifyPortalContent, )
+                                  , 'permissions'   : (ModifyPortalContent,)
                                   }
                                 )
                              }
@@ -87,7 +85,7 @@ class NewsItem( Document ):
 
     security = ClassSecurityInfo()
 
-    security.declareProtected( CMFCorePermissions.ModifyPortalContent, 'edit' )
+    security.declareProtected(ModifyPortalContent, 'edit')
     def edit( self, text, description=None, text_format=None ):
         """
             Edit the News Item

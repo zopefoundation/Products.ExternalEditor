@@ -44,7 +44,8 @@ import marshal
 import Globals
 from DateTime import DateTime
 from AccessControl import ClassSecurityInfo, User, getSecurityManager
-from Products.CMFCore import CMFCorePermissions, PortalContent
+from Products.CMFCore import PortalContent
+from Products.CMFCore.CMFCorePermissions import View
 from Products.CMFDefault.DublinCore import DefaultDublinCoreImpl
 
 from References import ReferenceCollection
@@ -69,13 +70,13 @@ you navigate efficiently.""",
       ({'id'            : 'view',
         'name'          : 'Workspace',
         'action'        : 'workspace_view',
-        'permissions'   : (CMFCorePermissions.View,),
+        'permissions'   : (View,),
         'category'      : 'object',
         },
        {'id'            : 'metadata',
         'name'          : 'Metadata',
         'action'        : 'metadata_edit_form',
-        'permissions'   : (CMFCorePermissions.View,),
+        'permissions'   : (View,),
         'category'      : 'object',
         },       
        )

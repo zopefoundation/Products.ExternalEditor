@@ -18,7 +18,7 @@ $Id$
 import OFS
 from utils import UniqueObject, SimpleItemWithProperties, _getAuthenticatedUser, _checkPermission
 from utils import getToolByName, _dtmldir, cookString
-import CMFCorePermissions
+from CMFCorePermissions import ManagePortal
 from OFS.SimpleItem import SimpleItem
 from Globals import InitializeClass, DTMLFile, package_home
 from urllib import quote
@@ -80,8 +80,7 @@ class ActionsTool(UniqueObject, OFS.Folder.Folder, ActionProviderBase):
     #
     #   ZMI methods
     #
-    security.declareProtected( CMFCorePermissions.ManagePortal
-                             , 'manage_overview' )
+    security.declareProtected(ManagePortal, 'manage_overview')
     manage_overview = DTMLFile( 'explainActionsTool', _dtmldir )
     manage_actionProviders = DTMLFile('manageActionProviders', _dtmldir)
 
@@ -97,15 +96,12 @@ class ActionsTool(UniqueObject, OFS.Folder.Folder, ActionProviderBase):
         """
         return self._actions
 
-    security.declareProtected( CMFCorePermissions.ManagePortal
-                             , 'listActionProviders'
-                             )
+    security.declareProtected(ManagePortal, 'listActionProviders')
     def listActionProviders(self):
        """ returns a sequence of action providers known by this tool """
        return self.action_providers
 
-    security.declareProtected(CMFCorePermissions.ManagePortal
-                            , 'manage_aproviders')
+    security.declareProtected(ManagePortal, 'manage_aproviders')
     def manage_aproviders(self
                         , apname=''
                         , chosen=()
@@ -132,9 +128,7 @@ class ActionsTool(UniqueObject, OFS.Folder.Folder, ActionProviderBase):
         
 
 
-    security.declareProtected( CMFCorePermissions.ManagePortal
-                             , 'addActionProvider'
-                             )
+    security.declareProtected(ManagePortal, 'addActionProvider')
     def addActionProvider( self, provider_name ):
         """ add the name of a new action provider """
         if hasattr( self, provider_name ):
@@ -142,9 +136,7 @@ class ActionsTool(UniqueObject, OFS.Folder.Folder, ActionProviderBase):
             p_new = p_old + ( provider_name, )
             self.action_providers = p_new
 
-    security.declareProtected( CMFCorePermissions.ManagePortal
-                             , 'deleteActionProvider'
-                             )
+    security.declareProtected(ManagePortal, 'deleteActionProvider')
     def deleteActionProvider( self, provider_name ):
         """ remove an action provider """
         if provider_name in self.action_providers:

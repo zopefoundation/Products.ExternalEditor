@@ -54,8 +54,7 @@ class RegistrationTool(UniqueObject, SimpleItem, ActionProviderBase):
     #
     #   ZMI methods
     #
-    security.declareProtected( ManagePortal
-                             , 'manage_overview' )
+    security.declareProtected(ManagePortal, 'manage_overview')
     manage_overview = DTMLFile( 'explainRegistrationTool', _dtmldir )
 
     #

@@ -943,15 +943,13 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
 
         return r
 
-    security.declareProtected(CMFWikiPermissions.Edit,
-                              'history_copy_page_to_present')
+    security.declareProtected(CMFWikiPermissions.Edit, 'history_copy_page_to_present')
     def history_copy_page_to_present(self, keys=[]):
         """Create a new object copy with the contents of an historic copy."""
         self.manage_historyCopy(keys=keys)
         self.reindexObject()
 
-    security.declareProtected(CMFWikiPermissions.View,
-                              'history_compare_versions')
+    security.declareProtected(CMFWikiPermissions.View, 'history_compare_versions')
     def history_compare_versions(self, keys=[], REQUEST=None):
         """Do history comparisons.
 

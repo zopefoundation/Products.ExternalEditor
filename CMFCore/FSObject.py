@@ -24,7 +24,9 @@ from OFS.SimpleItem import Item
 from DateTime import DateTime
 
 from utils import expandpath, getToolByName
-import CMFCorePermissions
+from CMFCorePermissions import View
+from CMFCorePermissions import ViewManagementScreens
+from CMFCorePermissions import ManagePortal
 
 class FSObject(Acquisition.Implicit, Item):
     """FSObject is a base class for all filesystem based look-alikes.
@@ -38,7 +40,7 @@ class FSObject(Acquisition.Implicit, Item):
     title = ''
 
     security = ClassSecurityInfo()
-    security.declareObjectProtected(CMFCorePermissions.View)
+    security.declareObjectProtected(View)
 
     _file_mod_time = 0
     _parsed = 0
@@ -60,8 +62,7 @@ class FSObject(Acquisition.Implicit, Item):
         except: pass
         self._readFile(0)
 
-    security.declareProtected(CMFCorePermissions.ViewManagementScreens,
-        'manage_doCustomize')
+    security.declareProtected(ViewManagementScreens, 'manage_doCustomize')
     def manage_doCustomize(self, folder_path, RESPONSE=None):
         """Makes a ZODB Based clone with the same data.
 
@@ -107,13 +108,13 @@ class FSObject(Acquisition.Implicit, Item):
                 self._file_mod_time = mtime
                 self._readFile(1)
 
-    security.declareProtected(CMFCorePermissions.View, 'get_size')
+    security.declareProtected(View, 'get_size')
     def get_size(self):
         """Get the size of the underlying file."""
         fp = expandpath(self._filepath)
         return path.getsize(fp)
 
-    security.declareProtected(CMFCorePermissions.View, 'getModTime')
+    security.declareProtected(View, 'getModTime')
     def getModTime(self):
         """Return the last_modified date of the file we represent.
 
@@ -122,8 +123,7 @@ class FSObject(Acquisition.Implicit, Item):
         self._updateFromFS()
         return DateTime(self._file_mod_time)
 
-    security.declareProtected(CMFCorePermissions.ViewManagementScreens,
-        'getObjectFSPath')
+    security.declareProtected(ViewManagementScreens, 'getObjectFSPath')
     def getObjectFSPath(self):
         """Return the path of the file we represent"""
         self._updateFromFS()
@@ -170,8 +170,7 @@ class BadFile( FSObject ):
     security = ClassSecurityInfo()
 
     showError = Globals.HTML( BAD_FILE_VIEW )
-    security.declareProtected( CMFCorePermissions.ManagePortal
-                             , 'manage_showError' )
+    security.declareProtected(ManagePortal, 'manage_showError')
     def manage_showError( self, REQUEST ):
         """
         """

@@ -25,8 +25,8 @@ from App.Common import package_home
 from OFS.ObjectManager import bad_id
 from OFS.Folder import Folder
 from AccessControl import ClassSecurityInfo
-from CMFCorePermissions import AccessContentsInformation, ManagePortal
-import CMFCorePermissions
+from CMFCorePermissions import AccessContentsInformation
+from CMFCorePermissions import ManagePortal
 from FSObject import BadFile
 from utils import expandpath, minimalpath
 from zLOG import LOG, ERROR
@@ -443,12 +443,10 @@ class DirectoryViewSurrogate (Folder):
         d[name] = value
         setattr(d['_real'], name, value)
 
-    security.declareProtected(ManagePortal,
-                              'manage_propertiesForm')
+    security.declareProtected(ManagePortal, 'manage_propertiesForm')
     manage_propertiesForm = DTMLFile( 'dirview_properties', _dtmldir )
 
-    security.declareProtected(ManagePortal,
-                              'manage_properties')
+    security.declareProtected(ManagePortal, 'manage_properties')
     def manage_properties( self, dirpath, REQUEST=None ):
         """
             Update the directory path of the DV.
@@ -458,16 +456,14 @@ class DirectoryViewSurrogate (Folder):
             REQUEST['RESPONSE'].redirect( '%s/manage_propertiesForm'
                                         % self.absolute_url() )
     
-    security.declareProtected(AccessContentsInformation,
-                              'getCustomizableObject')
+    security.declareProtected(AccessContentsInformation, 'getCustomizableObject')
     def getCustomizableObject(self):
         ob = aq_parent(aq_inner(self))
         while getattr(ob, '_isDirectoryView', 0):
             ob = aq_parent(aq_inner(ob))
         return ob
 
-    security.declareProtected(AccessContentsInformation,
-                              'listCustFolderPaths')
+    security.declareProtected(AccessContentsInformation, 'listCustFolderPaths')
     def listCustFolderPaths(self, adding_meta_type=None):
         '''
         Returns a list of possible customization folders
@@ -479,8 +475,7 @@ class DirectoryViewSurrogate (Folder):
         rval.sort()
         return rval
 
-    security.declareProtected(AccessContentsInformation,
-                             'getDirPath')
+    security.declareProtected(AccessContentsInformation, 'getDirPath')
     def getDirPath(self):
         return self.__dict__['_real']._dirpath
 

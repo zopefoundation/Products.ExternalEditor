@@ -20,7 +20,7 @@ from Products.CMFTopic.AbstractCriterion import AbstractCriterion
 from Products.CMFTopic.Topic import Topic
 from Products.CMFTopic.interfaces import Criterion
 
-from Products.CMFCore import CMFCorePermissions
+from Products.CMFCore.CMFCorePermissions import View
 
 from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
@@ -56,7 +56,7 @@ class SimpleStringCriterion( AbstractCriterion ):
         """
         self.value = str( value )
     
-    security.declareProtected( CMFCorePermissions.View, 'getCriteriaItems' )
+    security.declareProtected(View, 'getCriteriaItems')
     def getCriteriaItems( self ):
         """
             Return a sequence of criteria items, used by Topic.buildQuery.

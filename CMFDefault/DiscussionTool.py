@@ -20,7 +20,8 @@ from AccessControl import ClassSecurityInfo
 from OFS.SimpleItem import SimpleItem
 
 from Products.CMFCore.utils import UniqueObject, getToolByName
-from Products.CMFCore import CMFCorePermissions
+from Products.CMFCore.CMFCorePermissions import ManagePortal
+from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
 
 from utils import _dtmldir
 from DiscussionItem import DiscussionItemContainer
@@ -57,8 +58,7 @@ class DiscussionTool( UniqueObject, SimpleItem, ActionProviderBase ):
     #
     #   ZMI methods
     #
-    security.declareProtected( CMFCorePermissions.ManagePortal
-                             , 'manage_overview' )
+    security.declareProtected(ManagePortal, 'manage_overview')
     manage_overview = DTMLFile( 'explainDiscussionTool', _dtmldir )
 
     #
@@ -79,9 +79,7 @@ class DiscussionTool( UniqueObject, SimpleItem, ActionProviderBase ):
             the site default override.
         """
         mtool = getToolByName( self, 'portal_membership' )
-        if not mtool.checkPermission( CMFCorePermissions.ModifyPortalContent
-                                    , content
-                                    ):
+        if not mtool.checkPermission(ModifyPortalContent, content):
             raise "Unauthorized"
 
         if allowDiscussion is None or allowDiscussion == 'None':

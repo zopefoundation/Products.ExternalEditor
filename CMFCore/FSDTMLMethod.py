@@ -23,7 +23,9 @@ from AccessControl import ClassSecurityInfo, getSecurityManager, Permissions
 from OFS.DTMLMethod import DTMLMethod, decapitate, guess_content_type
 
 from utils import _dtmldir
-from CMFCorePermissions import View, ViewManagementScreens, FTPAccess
+from CMFCorePermissions import View
+from CMFCorePermissions import ViewManagementScreens
+from CMFCorePermissions import FTPAccess
 from DirectoryView import registerFileExtension, registerMetaType, expandpath
 from FSObject import FSObject
 try:
@@ -130,11 +132,12 @@ class FSDTMLMethod(RestrictedDTML, FSObject, Globals.HTML):
         return getSecurityManager().validate(inst, parent, name, value)
 
     security.declareProtected(FTPAccess, 'manage_FTPget')
-    security.declareProtected(ViewManagementScreens, 'PrincipiaSearchSource',
-        'document_src')
-
     manage_FTPget = DTMLMethod.manage_FTPget
+
+    security.declareProtected(ViewManagementScreens, 'PrincipiaSearchSource')
     PrincipiaSearchSource = DTMLMethod.PrincipiaSearchSource
+
+    security.declareProtected(ViewManagementScreens, 'document_src')
     document_src = DTMLMethod.document_src
 
 Globals.InitializeClass(FSDTMLMethod)

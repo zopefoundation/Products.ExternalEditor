@@ -25,7 +25,7 @@ from AccessControl import ClassSecurityInfo
 from Products.CMFCore.ActionProviderBase import ActionProviderBase
 from Products.CMFCore.ActionInformation import ActionInformation
 from Products.CMFCore.Expression import Expression
-from Products.CMFCore import CMFCorePermissions
+from Products.CMFCore.CMFCorePermissions import ManagePortal
 from utils import _dtmldir
 
 
@@ -37,7 +37,7 @@ class PropertiesTool(UniqueObject, SimpleItem, ActionProviderBase):
                             , description='Reconfigure the portal'
                             , action=Expression(
             text='string: ${portal_url}/reconfig_form')
-                            , permissions=(CMFCorePermissions.ManagePortal,)
+                            , permissions=(ManagePortal,)
                             , category='global'
                             , condition=None
                             , visible=1
@@ -54,8 +54,7 @@ class PropertiesTool(UniqueObject, SimpleItem, ActionProviderBase):
     #
     #   ZMI methods
     #
-    security.declareProtected( CMFCorePermissions.ManagePortal
-                             , 'manage_overview' )
+    security.declareProtected(ManagePortal, 'manage_overview')
     manage_overview = DTMLFile( 'explainPropertiesTool', _dtmldir )
 
     #
@@ -68,8 +67,7 @@ class PropertiesTool(UniqueObject, SimpleItem, ActionProviderBase):
         """
         return self._actions
 
-    security.declareProtected( CMFCorePermissions.ManagePortal
-                             , 'editProperties' )
+    security.declareProtected(ManagePortal, 'editProperties')
     def editProperties(self, props):
         '''Change portal settings'''
         aq_parent(aq_inner(self)).manage_changeProperties(props)

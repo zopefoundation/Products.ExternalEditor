@@ -50,26 +50,6 @@ _STXDWI = StructuredText.DocumentWithImages.__class__
 
 security = ModuleSecurityInfo( 'Products.CMFCore.utils' )
 
-security.declarePublic( 'getToolByName'
-                      , 'cookString'
-                      , 'tuplize'
-                      , 'format_stx'
-                      , 'keywordsplitter'
-                      , 'normalize'
-                      , 'expandpath'
-                      , 'minimalpath'
-                      )
-
-security.declarePrivate( '_getAuthenticatedUser'
-                       , '_checkPermission'
-                       , '_verifyActionPermissions'
-                       , '_getViewFor'
-                       , '_limitGrantedRoles'
-                       , '_mergedLocalRoles'
-                       , '_modifyPermissionMappings'
-                       , '_ac_inherited_permissions'
-                       )
-
 _dtmldir = os_path.join( package_home( globals() ), 'dtml' )
 
 
@@ -78,6 +58,7 @@ _dtmldir = os_path.join( package_home( globals() ), 'dtml' )
 #
 _marker = []  # Create a new marker object.
 
+security.declarePublic('getToolByName')
 def getToolByName(obj, name, default=_marker):
 
     """ Get the tool, 'toolname', by acquiring it.
@@ -97,6 +78,7 @@ def getToolByName(obj, name, default=_marker):
             raise AttributeError, name
         return tool
 
+security.declarePublic('cookString')
 def cookString(text):
 
     """ Make a Zope-friendly ID from 'text'.
@@ -109,6 +91,7 @@ def cookString(text):
     cooked = re.sub(rgx, "",text).lower()
     return cooked
 
+security.declarePublic('tuplize')
 def tuplize( valueName, value ):
 
     """ Make a tuple from 'value'.
@@ -126,9 +109,11 @@ def tuplize( valueName, value ):
 #
 #   Security utilities, callable only from unrestricted code.
 #
+security.declarePrivate('_getAuthenticatedUser')
 def _getAuthenticatedUser( self ):
     return getSecurityManager().getUser()
 
+security.declarePrivate('_checkPermission')
 def _checkPermission(permission, obj, StringType = type('')):
     roles = rolesForPermissionOn(permission, obj)
     if type(roles) is StringType:
@@ -137,6 +122,7 @@ def _checkPermission(permission, obj, StringType = type('')):
         return 1
     return 0
 
+security.declarePrivate('_verifyActionPermissions')
 def _verifyActionPermissions(obj, action):
     pp = action.get('permissions', ())
     if not pp:
@@ -146,6 +132,7 @@ def _verifyActionPermissions(obj, action):
             return 1
     return 0
 
+security.declarePrivate('_getViewFor')
 def _getViewFor(obj, view='view'):
     ti = obj.getTypeInfo()
     if ti is not None:
@@ -168,6 +155,7 @@ def _getViewFor(obj, view='view'):
 
 # If Zope ever provides a call to getRolesInContext() through
 # the SecurityManager API, the method below needs to be updated.
+security.declarePrivate('_limitGrantedRoles')
 def _limitGrantedRoles(roles, context, special_roles=()):
     # Only allow a user to grant roles already possessed by that user,
     # with the exception that all special_roles can also be granted.
@@ -185,6 +173,7 @@ def _limitGrantedRoles(roles, context, special_roles=()):
 
 limitGrantedRoles = _limitGrantedRoles  # XXX: Deprecated spelling
 
+security.declarePrivate('_mergedLocalRoles')
 def _mergedLocalRoles(object):
     """Returns a merging of object and its ancestors'
     __ac_local_roles__."""
@@ -213,6 +202,7 @@ def _mergedLocalRoles(object):
 
 mergedLocalRoles = _mergedLocalRoles    # XXX: Deprecated spelling
 
+security.declarePrivate('_ac_inherited_permissions')
 def _ac_inherited_permissions(ob, all=0):
     # Get all permissions not defined in ourself that are inherited
     # This will be a sequence of tuples with a name as the first item and
@@ -231,6 +221,7 @@ def _ac_inherited_permissions(ob, all=0):
        r = list(perms) + r
     return r
 
+security.declarePrivate('_modifyPermissionMappings')
 def _modifyPermissionMappings(ob, map):
     """
     Modifies multiple role to permission mappings.
@@ -303,11 +294,9 @@ class SimpleItemWithProperties (PropertyManager, SimpleItem):
 
 
     security = ClassSecurityInfo()
-    security.declarePrivate(
-        'manage_addProperty',
-        'manage_delProperties',
-        'manage_changePropertyTypes',
-        )
+    security.declarePrivate('manage_addProperty')
+    security.declarePrivate('manage_delProperties')
+    security.declarePrivate('manage_changePropertyTypes')
 
     def manage_propertiesForm(self, REQUEST, *args, **kw):
         'An override that makes the schema fixed.'
@@ -578,7 +567,8 @@ class CMFHtmlWithImages( HTMLWithImages ):
            getattr(self, self.element_types[c.getNodeName()])(c, level, output)
 
 CMFHtmlWithImages = CMFHtmlWithImages()
-            
+
+security.declarePublic('format_stx')
 def format_stx( text, level=1 ):
     """
         Render STX to HTML.
@@ -598,6 +588,7 @@ _format_stx = format_stx    # XXX: Deprecated spelling
 #
 KEYSPLITRE = re.compile(r'[,;]')
 
+security.declarePublic('keywordsplitter')
 def keywordsplitter( headers
                    , names=('Subject', 'Keywords',)
                    , splitter=KEYSPLITRE.split
@@ -614,6 +605,7 @@ def keywordsplitter( headers
 #
 #   Directory-handling utilities
 #
+security.declarePublic('normalize')
 def normalize(p):
     return os_path.abspath(os_path.normcase(os_path.normpath(p)))
 
@@ -622,6 +614,7 @@ normSOFTWARE_HOME = normalize(SOFTWARE_HOME)
 
 separators = (os.sep, os.altsep)
 
+security.declarePublic('expandpath')
 def expandpath(p):
     # Converts a minimal path to an absolute path.
     p = os_path.normpath(p)
@@ -632,6 +625,7 @@ def expandpath(p):
         return abs
     return os_path.join(normSOFTWARE_HOME, p)
 
+security.declarePublic('minimalpath')
 def minimalpath(p):
     # Trims INSTANCE_HOME or SOFTWARE_HOME from a path.
     p = os_path.abspath(p)

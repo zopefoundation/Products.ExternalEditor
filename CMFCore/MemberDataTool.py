@@ -28,7 +28,8 @@ from ZPublisher.Converters import type_converters
 from Acquisition import aq_inner, aq_parent, aq_base
 from AccessControl import ClassSecurityInfo
 from CMFCorePermissions import ViewManagementScreens
-import CMFCorePermissions
+from CMFCorePermissions import ManagePortal
+from CMFCorePermissions import SetOwnProperties
 from ActionProviderBase import ActionProviderBase
 
 _marker = []  # Create a new marker object.
@@ -60,16 +61,11 @@ class MemberDataTool (UniqueObject, SimpleItem, PropertyManager, ActionProviderB
     #
     #   ZMI methods
     #
-    security.declareProtected( CMFCorePermissions.ManagePortal
-                             , 'manage_overview' )
+    security.declareProtected(ManagePortal, 'manage_overview')
     manage_overview = DTMLFile( 'explainMemberDataTool', _dtmldir )
 
-    security.declareProtected( CMFCorePermissions.ViewManagementScreens
-                             , 'manage_showContents')
+    security.declareProtected(ViewManagementScreens, 'manage_showContents')
     manage_showContents = DTMLFile('memberdataContents', _dtmldir )
-
-    security.declareProtected( CMFCorePermissions.ViewManagementScreens
-                             , 'getContentsInformation',)
 
 
     def __init__(self):
@@ -223,7 +219,7 @@ class MemberData (SimpleItem):
     def getMemberId(self):
         return self.getUser().getUserName()
 
-    security.declareProtected(CMFCorePermissions.SetOwnProperties, 'setProperties')
+    security.declareProtected(SetOwnProperties, 'setProperties')
     def setProperties(self, properties=None, **kw):
         '''Allows the authenticated member to set his/her own properties.
         Accepts either keyword arguments or a mapping for the "properties"

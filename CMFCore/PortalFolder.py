@@ -20,10 +20,12 @@ ADD_CONTENT_PERMISSION = 'Add portal content'
 
 import sys
 import Globals, re, base64, marshal, string
-import CMFCorePermissions
 
-from CMFCorePermissions import View, ManageProperties, ListFolderContents
-from CMFCorePermissions import AddPortalFolders, AddPortalContent
+from CMFCorePermissions import View
+from CMFCorePermissions import ManageProperties
+from CMFCorePermissions import ListFolderContents
+from CMFCorePermissions import AddPortalFolders
+from CMFCorePermissions import AddPortalContent
 from CMFCatalogAware import CMFCatalogAware
 from OFS.Folder import Folder
 from OFS.ObjectManager import REPLACEABLE
@@ -85,23 +87,21 @@ class PortalFolder(DynamicType, CMFCatalogAware, Folder):
         self.id = id
         self.title = title
 
-    security.declareProtected( CMFCorePermissions.ManageProperties
-                             , 'setTitle')
+    security.declareProtected(ManageProperties, 'setTitle')
     def setTitle( self, title ):
         """
             Edit the folder title.
         """
         self.title = title
 
-    security.declareProtected( CMFCorePermissions.ManageProperties
-                             , 'setDescription')
+    security.declareProtected(ManageProperties, 'setDescription')
     def setDescription( self, description ):
         """
             Edit the folder description.
         """
         self.description = description
 
-    security.declareProtected(CMFCorePermissions.ManageProperties, 'edit')
+    security.declareProtected(ManageProperties, 'edit')
     def edit(self, title='', description=''):
         """
         Edit the folder title (and possibly other attributes later)
@@ -223,8 +223,7 @@ class PortalFolder(DynamicType, CMFCatalogAware, Folder):
         return map( lambda item: item[1],
                     self._filteredItems( ids, filter ) )
 
-    security.declareProtected( ListFolderContents
-                             , 'listFolderContents' )
+    security.declareProtected(ListFolderContents, 'listFolderContents')
     def listFolderContents( self, spec=None, contentFilter=None ):
         """
             Hook around 'contentValues' to let 'folder_contents'

@@ -15,9 +15,9 @@
 $Id$
 """
 
-from Products.CMFTopic import TopicPermissions
-
-from Products.CMFCore import CMFCorePermissions
+from Products.CMFTopic.TopicPermissions import ChangeTopics
+from Products.CMFTopic.TopicPermissions import AddTopics
+from Products.CMFCore.CMFCorePermissions import View
 from Products.CMFCore.utils import _checkPermission, _getViewFor,getToolByName
 from Products.CMFCore.PortalFolder import PortalFolder
 
@@ -43,22 +43,22 @@ factory_type_information = \
     ( { 'id'            : 'view'
       , 'name'          : 'View'
       , 'action'        : 'topic_view'
-      , 'permissions'   : (CMFCorePermissions.View, )
+      , 'permissions'   : (View,)
       }
     , { 'id'            : 'edit'
       , 'name'          : 'Edit'
       , 'action'        : 'topic_edit_form'
-      , 'permissions'   : (TopicPermissions.ChangeTopics, )
+      , 'permissions'   : (ChangeTopics,)
       }
     , { 'id'            : 'criteria'
       , 'name'          : 'Criteria'
       , 'action'        : 'topic_criteria_form'
-      , 'permissions'   : (TopicPermissions.ChangeTopics, )
+      , 'permissions'   : (ChangeTopics,)
       }
     , { 'id'            : 'subtopics'
       , 'name'          : 'Subtopics'
       , 'action'        : 'topic_subtopics_form'
-      , 'permissions'   : (TopicPermissions.ChangeTopics, )
+      , 'permissions'   : (ChangeTopics,)
       }
     )
   }
@@ -88,7 +88,7 @@ class Topic( PortalFolder ):
 
     security = ClassSecurityInfo()
 
-    security.declareObjectProtected( CMFCorePermissions.View )
+    security.declareObjectProtected(View)
 
     acquireCriteria = 1
     _criteriaTypes = []
@@ -96,7 +96,7 @@ class Topic( PortalFolder ):
     # Contentish interface methods
     # ----------------------------
 
-    security.declareProtected( CMFCorePermissions.View, 'icon' )
+    security.declareProtected(View, 'icon')
     def icon( self ):
         """
             For the ZMI.
@@ -125,7 +125,7 @@ class Topic( PortalFolder ):
 
     index_html = None  # This special value informs ZPublisher to use __call__
 
-    security.declareProtected( CMFCorePermissions.View, 'view' )
+    security.declareProtected(View, 'view')
     def view( self ):
         """
             Return the default view even if index_html is overridden.
@@ -139,7 +139,7 @@ class Topic( PortalFolder ):
             result.append( mt.meta_type )
         return tuple( result )
  
-    security.declareProtected( TopicPermissions.ChangeTopics, 'listCriteria' )
+    security.declareProtected(ChangeTopics, 'listCriteria')
     def listCriteria( self ):
         """
             Return a list of our criteria objects.
@@ -147,8 +147,7 @@ class Topic( PortalFolder ):
         return self.objectValues( self._criteria_metatype_ids() )
 
 
-    security.declareProtected( TopicPermissions.ChangeTopics
-                             , 'listCriteriaTypes' )
+    security.declareProtected(ChangeTopics, 'listCriteriaTypes')
     def listCriteriaTypes( self ):
         out = []
         for ct in self._criteriaTypes:
@@ -157,8 +156,7 @@ class Topic( PortalFolder ):
                 } )
         return out
     
-    security.declareProtected( TopicPermissions.ChangeTopics
-                             , 'listAvailableFields' )
+    security.declareProtected(ChangeTopics, 'listAvailableFields')
     def listAvailableFields( self ):
         """
             Return a list of available fields for new criteria.
@@ -171,14 +169,14 @@ class Topic( PortalFolder ):
             )
         return availfields
 
-    security.declareProtected( TopicPermissions.ChangeTopics, 'listSubtopics' )
+    security.declareProtected(ChangeTopics, 'listSubtopics')
     def listSubtopics( self ):
         """
             Return a list of our subtopics.
         """
         return self.objectValues( self.meta_type )
 
-    security.declareProtected( TopicPermissions.ChangeTopics, 'edit' )
+    security.declareProtected(ChangeTopics, 'edit')
     def edit( self, acquireCriteria, title=None, description=None ):
         """
             Set the flag which indicates whether to acquire criteria
@@ -189,7 +187,7 @@ class Topic( PortalFolder ):
             self.title = title
         self.description = description
         
-    security.declareProtected( CMFCorePermissions.View, 'buildQuery' )
+    security.declareProtected(View, 'buildQuery')
     def buildQuery( self ):
         """
             Construct a catalog query using our criterion objects.
@@ -211,7 +209,7 @@ class Topic( PortalFolder ):
         
         return result
     
-    security.declareProtected( CMFCorePermissions.View, 'queryCatalog' )
+    security.declareProtected(View, 'queryCatalog')
     def queryCatalog( self, REQUEST=None, **kw ):
         """
             Invoke the catalog using our criteria to augment any passed
@@ -223,7 +221,7 @@ class Topic( PortalFolder ):
 
 
     ### Criteria adding/editing/deleting
-    security.declareProtected( TopicPermissions.ChangeTopics, 'addCriterion' )
+    security.declareProtected(ChangeTopics, 'addCriterion')
     def addCriterion( self, field, criterion_type ):
         """
             Add a new search criterion.
@@ -241,11 +239,10 @@ class Topic( PortalFolder ):
         self._setObject( newid, crit )
 
     # Backwards compatibility (deprecated)
-    security.declareProtected( TopicPermissions.ChangeTopics, 'addCriteria' )
+    security.declareProtected(ChangeTopics, 'addCriteria')
     addCriteria = addCriterion
 
-    security.declareProtected( TopicPermissions.ChangeTopics
-                             , 'deleteCriterion' )
+    security.declareProtected(ChangeTopics, 'deleteCriterion')
     def deleteCriterion( self, criterion_id ):
         """
             Delete selected criterion.
@@ -256,7 +253,7 @@ class Topic( PortalFolder ):
             for cid in criterion_id:
                 self._delObject( cid )
 
-    security.declareProtected( CMFCorePermissions.View, 'getCriterion' )
+    security.declareProtected(View, 'getCriterion')
     def getCriterion( self, criterion_id ):
         """
             Get the criterion object.
@@ -266,7 +263,7 @@ class Topic( PortalFolder ):
         except AttributeError:
             return self._getOb( criterion_id )
 
-    security.declareProtected( TopicPermissions.AddTopics, 'addSubtopic' )
+    security.declareProtected(AddTopics, 'addSubtopic')
     def addSubtopic( self, id ):
         """
             Add a new subtopic.

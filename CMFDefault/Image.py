@@ -24,7 +24,8 @@ from Products.CMFCore.PortalContent import PortalContent
 import Globals
 from DublinCore import DefaultDublinCoreImpl
 
-from Products.CMFCore import CMFCorePermissions
+from Products.CMFCore.CMFCorePermissions import View
+from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
 from Products.CMFCore.WorkflowCore import WorkflowAction
 
 factory_type_information = ( { 'id'             : 'Image'
@@ -39,20 +40,17 @@ Image objects can be embedded in Portal documents."""
                                 ( { 'id'            : 'view'
                                   , 'name'          : 'View'
                                   , 'action'        : 'image_view'
-                                  , 'permissions'   : (
-                                      CMFCorePermissions.View, )
+                                  , 'permissions'   : (View,)
                                   }
                                 , { 'id'            : 'edit'
                                   , 'name'          : 'Edit'
                                   , 'action'        : 'image_edit_form'
-                                  , 'permissions'   : (
-                                      CMFCorePermissions.ModifyPortalContent, )
+                                  , 'permissions'   : (ModifyPortalContent,)
                                   }
                                 , { 'id'            : 'metadata'
                                   , 'name'          : 'Metadata'
                                   , 'action'        : 'metadata_edit_form'
-                                  , 'permissions'   : (
-                                      CMFCorePermissions.ModifyPortalContent, )
+                                  , 'permissions'   : (ModifyPortalContent,)
                                   }
                                 )
                              }
@@ -130,7 +128,7 @@ class Image( OFS.Image.Image
     icon = PortalContent.icon
 
     __ac_permissions__ = (
-        (CMFCorePermissions.ModifyPortalContent, ('edit',)),
+        (ModifyPortalContent, ('edit',)),
         )
     
     def __init__( self

@@ -32,7 +32,8 @@ from ActionProviderBase import ActionProviderBase
 from ActionInformation import ActionInformation
 from Expression import Expression
 import os
-import CMFCorePermissions
+from CMFCorePermissions import ManagePortal
+from CMFCorePermissions import AccessInactivePortalContent
 from Acquisition import aq_base
 
 
@@ -178,8 +179,7 @@ class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
     #
     #   ZMI methods
     #
-    security.declareProtected( CMFCorePermissions.ManagePortal
-                             , 'manage_overview' )
+    security.declareProtected(ManagePortal, 'manage_overview')
     manage_overview = DTMLFile( 'explainCatalogTool', _dtmldir )
 
     #
@@ -201,8 +201,7 @@ class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
         user = _getAuthenticatedUser(self)
         kw[ 'allowedRolesAndUsers' ] = self._listAllowedRolesAndUsers( user )
 
-        if not _checkPermission(
-            CMFCorePermissions.AccessInactivePortalContent, self ):
+        if not _checkPermission( AccessInactivePortalContent, self ):
             base = aq_base( self )
             now = DateTime()
             if hasattr( base, 'addIndex' ):   # Zope 2.4 and above

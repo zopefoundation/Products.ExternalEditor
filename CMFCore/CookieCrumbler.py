@@ -22,7 +22,8 @@ from utils import SimpleItemWithProperties
 from AccessControl import ClassSecurityInfo
 from ZPublisher import BeforeTraverse
 import Globals
-import CMFCorePermissions
+from CMFCorePermissions import ModifyCookieCrumblers
+from CMFCorePermissions import ViewManagementScreens
 from Globals import HTMLFile
 from zLOG import LOG, ERROR
 import sys
@@ -44,11 +45,9 @@ class CookieCrumbler (SimpleItemWithProperties):
     meta_type = 'Cookie Crumbler'
 
     security = ClassSecurityInfo()
-    security.declareProtected(CMFCorePermissions.ModifyCookieCrumblers,
-                              'manage_editProperties',
-                              'manage_changeProperties')
-    security.declareProtected(CMFCorePermissions.ViewManagementScreens,
-                              'manage_propertiesForm')
+    security.declareProtected(ModifyCookieCrumblers, 'manage_editProperties')
+    security.declareProtected(ModifyCookieCrumblers, 'manage_changeProperties')
+    security.declareProtected(ViewManagementScreens, 'manage_propertiesForm')
 
 
     _properties = ({'id':'auth_cookie', 'type': 'string', 'mode':'w',

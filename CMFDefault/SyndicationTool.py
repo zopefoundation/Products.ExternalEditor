@@ -99,8 +99,7 @@ class SyndicationTool (UniqueObject, SimpleItem, ActionProviderBase):
     security.declareProtected(ManagePortal, 'overview')
     overview = HTMLFile('synOverview', _dtmldir)
 
-    security.declareProtected(ManagePortal, \
-                              'propertiesForm')
+    security.declareProtected(ManagePortal, 'propertiesForm')
     propertiesForm = HTMLFile('synProps', _dtmldir)
 
     security.declareProtected(ManagePortal, 'policiesForm')

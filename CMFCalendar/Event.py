@@ -24,7 +24,7 @@ from Products.CMFCore.PortalContent import PortalContent
 from Products.CMFCore.WorkflowCore import WorkflowAction
 
 # Import permission names
-from Products.CMFCore import CMFCorePermissions
+from Products.CMFCore.CMFCorePermissions import View
 import EventPermissions
 
 # Factory type information -- makes Events objects play nicely
@@ -41,7 +41,7 @@ factory_type_information = (
      'actions': ({'id': 'view',
                   'name': 'View',
                   'action': 'event_view',
-                  'permissions': (CMFCorePermissions.View,)},
+                  'permissions': (View,)},
                  {'id': 'edit',
                   'name': 'Edit',
                   'action': 'event_edit_form',
@@ -105,7 +105,7 @@ class Event(PortalContent, DefaultDublinCoreImpl):
 
     # Declarative security
     security = ClassSecurityInfo()
-    security.declareObjectProtected(CMFCorePermissions.View)
+    security.declareObjectProtected(View)
     
     def __init__(self
                  , id

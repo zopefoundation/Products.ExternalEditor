@@ -19,7 +19,7 @@ from Products.CMFCore.utils import getToolByName, _dtmldir
 from OFS.SimpleItem import SimpleItem
 from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
-from Products.CMFCore import CMFCorePermissions
+from Products.CMFCore.CMFCorePermissions import ManagePortal
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
 class CalendarTool (UniqueObject, SimpleItem):
@@ -38,13 +38,11 @@ class CalendarTool (UniqueObject, SimpleItem):
     #
     #   ZMI methods
     #
-    security.declareProtected( CMFCorePermissions.ManagePortal
-                             , 'manage_overview' )    
+    security.declareProtected( ManagePortal, 'manage_overview' )
     manage_overview = PageTemplateFile('www/explainCalendarTool', globals(),
                                    __name__='manage_overview')
 
-    security.declareProtected( CMFCorePermissions.ManagePortal
-                             , 'manage_configure' )    
+    security.declareProtected( ManagePortal, 'manage_configure' )
     manage_configure = PageTemplateFile('www/configureCalendarTool', globals(),
                                    __name__='manage_configure')
     
@@ -52,8 +50,7 @@ class CalendarTool (UniqueObject, SimpleItem):
         self.calendar_types = ['Event']
         self.use_session = ""
 
-    security.declareProtected( CMFCorePermissions.ManagePortal
-                             , 'edit_configuration' )
+    security.declareProtected( ManagePortal, 'edit_configuration' )
     def edit_configuration(self, show_types, use_session):
         """ Change the configuration of the calendar tool """
         self.calendar_types = show_types

@@ -126,10 +126,11 @@ class FSPythonScript (FSObject, Script):
         finally:
             security.removeContext(self)
 
-    security.declareProtected(ViewManagementScreens,
-      'read', 'getModTime', 'get_size',
-      'ZScriptHTML_tryForm', 'PrincipiaSearchSource',
-      'document_src', 'params', 'body')
+    security.declareProtected(ViewManagementScreens, 'getModTime')
+    # getModTime defined in FSObject
+
+    security.declareProtected(ViewManagementScreens, 'ZScriptHTML_tryForm')
+    # ZScriptHTML_tryForm defined in Shared.DC.Scripts.Script.Script
 
     def ZScriptHTML_tryParams(self):
         """Parameters to test the script with."""
@@ -140,10 +141,12 @@ class FSPythonScript (FSObject, Script):
                 param_names.append(split(name, '=', 1)[0])
         return param_names
 
+    security.declareProtected(ViewManagementScreens, 'read')
     def read(self):
         self._updateFromFS()
         return self._source
-                
+
+    security.declareProtected(ViewManagementScreens, 'document_src')
     def document_src(self, REQUEST=None, RESPONSE=None):
         """Return unprocessed document source."""
 
@@ -151,12 +154,18 @@ class FSPythonScript (FSObject, Script):
             RESPONSE.setHeader('Content-Type', 'text/plain')
         return self._source
 
+    security.declareProtected(ViewManagementScreens, 'PrincipiaSearchSource')
     def PrincipiaSearchSource(self):
         "Support for searching - the document's contents are searched."
         return "%s\n%s" % (self._params, self._body)
 
+    security.declareProtected(ViewManagementScreens, 'params')
     def params(self): return self._params
+
+    security.declareProtected(ViewManagementScreens, 'body')
     def body(self): return self._body
+
+    security.declareProtected(ViewManagementScreens, 'get_size')
     def get_size(self): return len(self.read())
 
     security.declareProtected(FTPAccess, 'manage_FTPget')

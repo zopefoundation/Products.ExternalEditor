@@ -22,7 +22,9 @@ from Globals import PersistentMapping
 
 from Globals import InitializeClass, DTMLFile
 from AccessControl import ClassSecurityInfo, getSecurityManager
-from Products.CMFCore import CMFCorePermissions
+from Products.CMFCore.CMFCorePermissions import View
+from Products.CMFCore.CMFCorePermissions import ManagePortal
+from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
 from Products.CMFCore.ActionProviderBase import ActionProviderBase
 from utils import _dtmldir
 
@@ -47,7 +49,7 @@ class MetadataElementPolicy( SimpleItem ):
     #
     #   Mutator.
     #
-    security.declareProtected( CMFCorePermissions.ManagePortal , 'edit' )
+    security.declareProtected(ManagePortal , 'edit')
     def edit( self
             , is_required
             , supply_default
@@ -64,41 +66,41 @@ class MetadataElementPolicy( SimpleItem ):
     #
     #   Query interface
     #
-    security.declareProtected( CMFCorePermissions.View , 'isMultiValued' )
+    security.declareProtected(View , 'isMultiValued')
     def isMultiValued( self ):
         """
             Can this element hold multiple values?
         """
         return self.is_multi_valued
 
-    security.declareProtected( CMFCorePermissions.View , 'isRequired' )
+    security.declareProtected(View , 'isRequired')
     def isRequired( self ):
         """
             Must this element be supplied?
         """
         return self.is_required
     
-    security.declareProtected( CMFCorePermissions.View , 'supplyDefault' )
+    security.declareProtected(View , 'supplyDefault')
     def supplyDefault( self ):
         """
             Should the tool supply a default?
         """
         return self.supply_default
 
-    security.declareProtected( CMFCorePermissions.View , 'defaultValue' )
+    security.declareProtected(View , 'defaultValue')
     def defaultValue( self ):
         """
             If so, what is the default?
         """
         return self.default_value
 
-    security.declareProtected( CMFCorePermissions.View , 'enforceVocabulary' )
+    security.declareProtected(View , 'enforceVocabulary')
     def enforceVocabulary( self ):
         """
         """
         return self.enforce_vocabulary
 
-    security.declareProtected( CMFCorePermissions.View , 'allowedVocabulary' )
+    security.declareProtected(View , 'allowedVocabulary')
     def allowedVocabulary( self ):
         """
         """
@@ -136,14 +138,14 @@ class ElementSpec( SimpleItem ):
     def _makePolicy( self ):
         return MetadataElementPolicy( self.is_multi_valued )
 
-    security.declareProtected( CMFCorePermissions.View , 'isMultiValued' )
+    security.declareProtected(View , 'isMultiValued')
     def isMultiValued( self ):
         """
             Is this element multi-valued?
         """
         return self.is_multi_valued
 
-    security.declareProtected( CMFCorePermissions.View , 'getPolicy' )
+    security.declareProtected(View , 'getPolicy')
     def getPolicy( self, typ=None ):
         """
             Find the policy this element for objects whose type
@@ -154,7 +156,7 @@ class ElementSpec( SimpleItem ):
         except KeyError:
             return self.policies[ None ]
 
-    security.declareProtected( CMFCorePermissions.View , 'listPolicies' )
+    security.declareProtected(View , 'listPolicies')
     def listPolicies( self ):
         """
             Return a list of all policies for this element.
@@ -164,7 +166,7 @@ class ElementSpec( SimpleItem ):
             res.append((k, v.__of__(self)))
         return res
 
-    security.declareProtected( CMFCorePermissions.ManagePortal , 'addPolicy' )
+    security.declareProtected(ManagePortal , 'addPolicy')
     def addPolicy( self, typ ):
         """
             Add a policy to this element for objects whose type
@@ -178,7 +180,7 @@ class ElementSpec( SimpleItem ):
 
         self.policies[ typ ] = self._makePolicy()
 
-    security.declareProtected( CMFCorePermissions.ManagePortal, 'removePolicy' )
+    security.declareProtected(ManagePortal, 'removePolicy')
     def removePolicy( self, typ ):
         """
             Remove the policy from this element for objects whose type
@@ -247,12 +249,10 @@ class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
                      + SimpleItem.manage_options
                      )
 
-    security.declareProtected( CMFCorePermissions.ManagePortal
-                             , 'manage_overview' )
+    security.declareProtected(ManagePortal, 'manage_overview')
     manage_overview = DTMLFile( 'explainMetadataTool', _dtmldir )
 
-    security.declareProtected( CMFCorePermissions.ManagePortal
-                             , 'propertiesForm' )
+    security.declareProtected(ManagePortal, 'propertiesForm')
     propertiesForm = DTMLFile( 'metadataProperties', _dtmldir )
 
     security.declarePrivate('listActions')
@@ -262,8 +262,7 @@ class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
         """
         return self._actions
 
-    security.declareProtected( CMFCorePermissions.ManagePortal
-                             , 'editProperties' )
+    security.declareProtected(ManagePortal, 'editProperties')
     def editProperties( self
                       , publisher=None
                # TODO , initial_values_hook=None
@@ -286,12 +285,10 @@ class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
                                         + '?manage_tabs_message=Tool+updated.'
                                         )
 
-    security.declareProtected( CMFCorePermissions.ManagePortal
-                             , 'elementPoliciesForm' )
+    security.declareProtected(ManagePortal, 'elementPoliciesForm')
     elementPoliciesForm = DTMLFile( 'metadataElementPolicies', _dtmldir )
 
-    security.declareProtected( CMFCorePermissions.ManagePortal
-                             , 'addElementPolicy' )
+    security.declareProtected(ManagePortal, 'addElementPolicy')
     def addElementPolicy( self
                         , element
                         , content_type
@@ -324,8 +321,7 @@ class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
                + '&manage_tabs_message=Policy+added.'
                )
 
-    security.declareProtected( CMFCorePermissions.ManagePortal
-                             , 'removeElementPolicy' )
+    security.declareProtected(ManagePortal, 'removeElementPolicy')
     def removeElementPolicy( self
                            , element
                            , content_type
@@ -346,8 +342,7 @@ class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
                + '&manage_tabs_message=Policy+removed.'
                )
 
-    security.declareProtected( CMFCorePermissions.ManagePortal
-                             , 'updateElementPolicy' )
+    security.declareProtected(ManagePortal, 'updateElementPolicy')
     def updateElementPolicy( self
                            , element
                            , content_type
@@ -383,8 +378,7 @@ class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
     #
     #   Element spec manipulation.
     #
-    security.declareProtected( CMFCorePermissions.ManagePortal
-                             , 'listElementSpecs' )
+    security.declareProtected(ManagePortal, 'listElementSpecs')
     def listElementSpecs( self ):
         """
             Return a list of ElementSpecs representing
@@ -395,8 +389,7 @@ class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
             res.append((k, v.__of__(self)))
         return res
 
-    security.declareProtected( CMFCorePermissions.ManagePortal
-                             , 'getElementSpec' )
+    security.declareProtected(ManagePortal, 'getElementSpec')
     def getElementSpec( self, element ):
         """
             Return an ElementSpec representing the tool's knowledge
@@ -404,8 +397,7 @@ class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
         """
         return self.element_specs[ element ].__of__( self )
 
-    security.declareProtected( CMFCorePermissions.ManagePortal
-                             , 'addElementSpec' )
+    security.declareProtected(ManagePortal, 'addElementSpec')
     def addElementSpec( self, element, is_multi_valued, REQUEST=None ):
         """
             Add 'element' to our list of managed elements.
@@ -422,8 +414,7 @@ class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
                + '?manage_tabs_message=Element+' + element + '+added.'
                )
 
-    security.declareProtected( CMFCorePermissions.ManagePortal
-                             , 'removeElementSpec' )
+    security.declareProtected(ManagePortal, 'removeElementSpec')
     def removeElementSpec( self, element, REQUEST=None ):
         """
             Remove 'element' from our list of managed elements.
@@ -436,7 +427,7 @@ class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
                + '?manage_tabs_message=Element+' + element + '+removed.'
                )
 
-    security.declareProtected( CMFCorePermissions.ManagePortal, 'listPolicies' )
+    security.declareProtected(ManagePortal, 'listPolicies')
     def listPolicies( self, typ=None ):
         """
             Show all policies for a given content type, or the default
@@ -512,8 +503,7 @@ class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
         """
         return self.listAllowedVocabulary( 'Rights', content, content_type )
 
-    security.declareProtected( CMFCorePermissions.ModifyPortalContent
-                             , 'setInitialMetadata' )
+    security.declareProtected(ModifyPortalContent, 'setInitialMetadata')
     def setInitialMetadata( self, content ):
         """
             Set initial values for content metatdata, supplying
@@ -533,8 +523,7 @@ class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
         # TODO:  Call initial_values_hook, if present
 
 
-    security.declareProtected( CMFCorePermissions.View
-                             , 'validateMetadata' )
+    security.declareProtected(View, 'validateMetadata')
     def validateMetadata( self, content ):
         """
             Enforce portal-wide policies about DCI, e.g.,

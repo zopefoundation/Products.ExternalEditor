@@ -32,7 +32,8 @@ from Products.CMFDefault.SkinnedFolder import SkinnedFolder
 from WebTextDocument import addWebTextDocument
 
 # Import permission names
-from Products.CMFCore import CMFCorePermissions
+from Products.CMFCore.CMFCorePermissions import View
+from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
 from CollectorPermissions import *
 
 RULE = '_' * 40
@@ -201,7 +202,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         # time we may not have an acquisition context...
         self._collector_path = "/".join(collector.getPhysicalPath())
 
-    security.declareProtected(CMFCorePermissions.View, 'no_submitter_email')
+    security.declareProtected(View, 'no_submitter_email')
     def no_submitter_email(self):
         """True if there's no way to get email address for the submitter."""
         if self.submitter_email:
@@ -213,7 +214,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
                 return not email_pref
         return 1
 
-    security.declareProtected(CMFCorePermissions.View, 'CookedBody')
+    security.declareProtected(View, 'CookedBody')
     def CookedBody(self):
         """Rendered content."""
         body = self.get_transcript().CookedBody()
@@ -308,7 +309,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         return ((value is not None) and
                 (getattr(self, field_name, None) != value))
 
-    security.declareProtected(CMFCorePermissions.View, 'get_transcript')
+    security.declareProtected(View, 'get_transcript')
     def get_transcript(self):
         return self._getOb(TRANSCRIPT_NAME)
     
@@ -555,28 +556,28 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         """ """
         return len(self)
 
-    security.declareProtected(CMFCorePermissions.View, 'assigned_to')
+    security.declareProtected(View, 'assigned_to')
     def assigned_to(self):
         """Return the current supporters list, according to workflow."""
         wftool = getToolByName(self, 'portal_workflow')
         return wftool.getInfoFor(self, 'assigned_to', ()) or ()
 
-    security.declareProtected(CMFCorePermissions.View, 'is_assigned')
+    security.declareProtected(View, 'is_assigned')
     def is_assigned(self):
         """True iff the current user is among .assigned_to()."""
         username = str(getSecurityManager().getUser())
         return username in (self.assigned_to() or ())
 
-    security.declareProtected(CMFCorePermissions.View, 'status')
+    security.declareProtected(View, 'status')
     def status(self):
         """Return the current status according to workflow."""
         wftool = getToolByName(self, 'portal_workflow')
         return wftool.getInfoFor(self, 'state', 'Pending')
 
-    security.declareProtected(CMFCorePermissions.View, 'review_state')
+    security.declareProtected(View, 'review_state')
     review_state = status
 
-    security.declareProtected(CMFCorePermissions.View, 'confidential')
+    security.declareProtected(View, 'confidential')
     def confidential(self):
         """True if workflow has the issue marked confidential.
 
@@ -607,7 +608,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         return ("%s%s by %s on %s%s" %
                 (prefix, lead, str(user), DateTime().aCommon(), suffix))
 
-    security.declareProtected(CMFCorePermissions.View, 'cited_text')
+    security.declareProtected(View, 'cited_text')
     def cited_text(self):
         """Quote text for use in literal citations."""
         return util.cited_text(self.get_transcript().text)
@@ -620,7 +621,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         return [entry['name']
                 for entry in allactions.get('issue_workflow', [])]
 
-    security.declareProtected(CMFCorePermissions.View, 'valid_actions_pairs')
+    security.declareProtected(View, 'valid_actions_pairs')
     def valid_actions_pairs(self):
         """Return ordered (prettyname, rawname) valid workflow actions."""
         # XXX I would do this with a python script method, but i'm hitting
@@ -646,8 +647,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
     # The transcript indexes itself, we just need to index the salient
     # attribute-style issue data/metadata...
 
-    security.declareProtected(CMFCorePermissions.ModifyPortalContent,
-                              'indexObject')
+    security.declareProtected(ModifyPortalContent, 'indexObject')
     def indexObject(self):
         if self.invisible:
             return
@@ -656,16 +656,14 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
             if i is not None:
                 i.indexObject(self)
 
-    security.declareProtected(CMFCorePermissions.ModifyPortalContent,
-                              'unindexObject')
+    security.declareProtected(ModifyPortalContent, 'unindexObject')
     def unindexObject(self):
         for i in (self._get_internal_catalog(),
                   getToolByName(self, 'portal_catalog', None)):
             if i is not None:
                 i.unindexObject(self)
 
-    security.declareProtected(CMFCorePermissions.ModifyPortalContent,
-                              'reindexObject')
+    security.declareProtected(ModifyPortalContent, 'reindexObject')
     def reindexObject(self, idxs=[], internal_only=0):
         if self.invisible:
             return

@@ -10,26 +10,10 @@ from AccessControl import ModuleSecurityInfo
 
 security = ModuleSecurityInfo( 'Products.CMFDefault.utils' )
 
-security.declarePublic( 'formatRFC822Headers'
-                      , 'parseHeadersBody'
-                      , 'semi_split'
-                      , 'comma_split'
-                      , 'seq_strip'
-                      , 'tuplize'
-                      , 'scrubHTML'
-                      , 'isHTMLSafe'
-                      , 'bodyfinder'
-                      , 'html_headcheck'
-                      )
-
-security.declarePrivate( '_dtmldir'
-                       , '_bodyre'
-                       , '_endbodyre'
-                       , '_htfinder'
-                       )
-
+security.declarePrivate('_dtmldir')
 _dtmldir = os.path.join( package_home( globals() ), 'dtml' )
 
+security.declarePublic('formatRFC822Headers')
 def formatRFC822Headers( headers ):
 
     """ Convert the key-value pairs in 'headers' to valid RFC822-style
@@ -47,6 +31,7 @@ def formatRFC822Headers( headers ):
     return '\r\n'.join( munged )
 
 
+security.declarePublic('parseHeadersBody')
 def parseHeadersBody( body, headers=None, rc=re.compile( r'\n|\r\n' ) ):
 
     """ Parse any leading 'RFC-822'-ish headers from an uploaded
@@ -117,19 +102,22 @@ def parseHeadersBody( body, headers=None, rc=re.compile( r'\n|\r\n' ) ):
     return headers, '\n'.join( lines[ i+1: ] )
 
 
+security.declarePublic('semi_split')
 def semi_split(s):
 
     """ Split 's' on semicolons.
     """
     return map(lambda x: x.strip(), s.split( ';' ) )
 
+security.declarePublic('comma_split')
 def comma_split(s):
 
     """ Split 's' on commas.
     """
     return map(lambda x: x.strip(), s.split( ',') )
 
-def seq_strip (seq, stripper=lambda x: x.strip() ):
+security.declarePublic('seq_strip')
+def seq_strip(seq, stripper=lambda x: x.strip() ):
 
     """ Strip a sequence of strings.
     """
@@ -141,6 +129,7 @@ def seq_strip (seq, stripper=lambda x: x.strip() ):
 
     raise ValueError, "%s of unsupported sequencetype %s" % ( seq, type( seq ) )
 
+security.declarePublic('tuplize')
 def tuplize( valueName, value, splitter=lambda x: x.strip() ):
 
     if type( value ) == type( () ):
@@ -347,6 +336,7 @@ class StrippingParser( SGMLParser ):
             self.result = "%s</%s>" % (self.result, tag)
             remTag = '</%s>' % tag
 
+security.declarePublic('scrubHTML')
 def scrubHTML( html ):
 
     """ Strip illegal HTML tags from string text.
@@ -356,6 +346,7 @@ def scrubHTML( html ):
     parser.close()
     return parser.result
 
+security.declarePublic('isHTMLSafe')
 def isHTMLSafe( html ):
 
     """ Would current HTML be permitted to be saved?
@@ -367,10 +358,13 @@ def isHTMLSafe( html ):
     else:
         return 1
 
+security.declarePrivate('_bodyre')
 _bodyre = re.compile( r'^\s*<html.*<body.*?>', re.DOTALL | re.I )
 
+security.declarePrivate('_endbodyre')
 _endbodyre = re.compile( r'</body', re.DOTALL | re.I )
 
+security.declarePublic('bodyfinder')
 def bodyfinder( text ):
 
     bod = _bodyre.search( text )
@@ -383,8 +377,10 @@ def bodyfinder( text ):
     else:
         return text[bod.end():end.start()]
 
+security.declarePrivate('_htfinder')
 _htfinder = re.compile( r'<html', re.DOTALL | re.I )
 
+security.declarePublic('html_headcheck')
 def html_headcheck( html ):
 
     """ Return 'true' if document looks HTML-ish enough.

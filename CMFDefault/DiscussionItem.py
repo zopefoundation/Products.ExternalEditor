@@ -18,7 +18,10 @@ from Acquisition import Implicit, aq_base, aq_inner, aq_parent
 from OFS.Traversable import Traversable
 from DateTime import DateTime
 
-from Products.CMFCore import CMFCorePermissions
+from Products.CMFCore.CMFCorePermissions import View
+from Products.CMFCore.CMFCorePermissions import AccessContentsInformation
+from Products.CMFCore.CMFCorePermissions import ReplyToItem
+from Products.CMFCore.CMFCorePermissions import ManagePortal
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.PortalContent import PortalContent
 
@@ -40,8 +43,7 @@ interface."""
                                 ( { 'id'            : 'view'
                                   , 'name'          : 'View'
                                   , 'action'        : 'discussionitem_view'
-                                  , 'permissions'   : (
-                                      CMFCorePermissions.View, )
+                                  , 'permissions'   : (View,)
                                   }
                                 ,
                                 )
@@ -99,7 +101,7 @@ class DiscussionItem( Document
 
     security = ClassSecurityInfo()
 
-    security.declareProtected( CMFCorePermissions.View, 'Creator' )
+    security.declareProtected(View, 'Creator')
     def Creator( self ):
         """
             We need to return user who replied, rather than executable
@@ -111,7 +113,7 @@ class DiscussionItem( Document
     #
     #   DiscussionResponse interface
     #
-    security.declareProtected( CMFCorePermissions.View, 'inReplyTo' )
+    security.declareProtected(View, 'inReplyTo')
     def inReplyTo( self, REQUEST=None ):
         """
             Return the Discussable object to which we are a reply.
@@ -129,7 +131,7 @@ class DiscussionItem( Document
         talkback = tool.getDiscussionFor( self )
         return talkback._getReplyParent( self.in_reply_to )
 
-    security.declarePrivate( CMFCorePermissions.View, 'setReplyTo' )
+    security.declarePrivate(View, 'setReplyTo')
     def setReplyTo( self, reply_to ):
         """
             Make this object a response to the passed object.
@@ -139,7 +141,7 @@ class DiscussionItem( Document
         else:
             self.in_reply_to = None
     
-    security.declareProtected( CMFCorePermissions.View, 'parentsInThread' )
+    security.declareProtected(View, 'parentsInThread')
     def parentsInThread( self, size=0 ):
         """
             Return the list of items which are "above" this item in
@@ -178,11 +180,11 @@ class DiscussionItemContainer( Persistent, Implicit, Traversable ):
         self.id = 'talkback'
         self._container = PersistentMapping()
 
-    security.declareProtected( CMFCorePermissions.View, 'getId' )
+    security.declareProtected(View, 'getId')
     def getId( self ):
         return self.id
 
-    security.declareProtected( CMFCorePermissions.View, 'getReply' )
+    security.declareProtected(View, 'getReply')
     def getReply( self, reply_id ):
         """
             Return a discussion item, given its ID;  raise KeyError
@@ -191,7 +193,7 @@ class DiscussionItemContainer( Persistent, Implicit, Traversable ):
         return self._container.get( reply_id ).__of__(self)
 
     # Is this right?
-    security.declareProtected( CMFCorePermissions.View, '__bobo_traverse__' )
+    security.declareProtected(View, '__bobo_traverse__')
     def __bobo_traverse__(self, REQUEST, name):
         """
         This will make this container traversable
@@ -241,8 +243,7 @@ class DiscussionItemContainer( Persistent, Implicit, Traversable ):
     #
     #   OFS.ObjectManager query interface.
     #
-    security.declareProtected( CMFCorePermissions.AccessContentsInformation
-                             , 'objectIds' )
+    security.declareProtected(AccessContentsInformation, 'objectIds')
     def objectIds( self, spec=None ):
         """
             Return a list of the ids of our DiscussionItems.
@@ -252,8 +253,7 @@ class DiscussionItemContainer( Persistent, Implicit, Traversable ):
         return self._container.keys()
 
 
-    security.declareProtected( CMFCorePermissions.AccessContentsInformation
-                             , 'objectItems' )
+    security.declareProtected(AccessContentsInformation, 'objectItems')
     def objectItems(self, spec=None):
         """
             Return a list of (id, subobject) tuples for our DiscussionItems.
@@ -266,8 +266,7 @@ class DiscussionItemContainer( Persistent, Implicit, Traversable ):
         return r
 
 
-    security.declareProtected( CMFCorePermissions.AccessContentsInformation
-                             , 'objectValues' )
+    security.declareProtected(AccessContentsInformation, 'objectValues')
     def objectValues(self):
         """
             Return a list of our DiscussionItems.
@@ -277,7 +276,7 @@ class DiscussionItemContainer( Persistent, Implicit, Traversable ):
     #
     #   Discussable interface
     #
-    security.declareProtected( CMFCorePermissions.ReplyToItem, 'createReply' )
+    security.declareProtected(ReplyToItem, 'createReply')
     def createReply( self, title, text, Creator=None ):
         """
             Create a reply in the proper place
@@ -303,7 +302,7 @@ class DiscussionItemContainer( Persistent, Implicit, Traversable ):
 
         return id
 
-    security.declareProtected( CMFCorePermissions.ManagePortal, 'deleteReply' )
+    security.declareProtected(ManagePortal, 'deleteReply')
     def deleteReply( self, reply_id ):
         """ Remove a reply from this container """
         if self._container.has_key( reply_id ):
@@ -322,7 +321,7 @@ class DiscussionItemContainer( Persistent, Implicit, Traversable ):
             del self._container[reply_id]
 
 
-    security.declareProtected( CMFCorePermissions.View, 'hasReplies' )
+    security.declareProtected(View, 'hasReplies')
     def hasReplies( self, content_obj ):
         """
             Test to see if there are any dicussion items
@@ -333,7 +332,7 @@ class DiscussionItemContainer( Persistent, Implicit, Traversable ):
         else:
             return not not len( content_obj.talkback._getReplyResults() ) 
 
-    security.declareProtected( CMFCorePermissions.View, 'replyCount' )
+    security.declareProtected(View, 'replyCount')
     def replyCount( self, content_obj ):
         """ How many replies do i have? """
         outer = self._getDiscussable( outer=1 )
@@ -359,7 +358,7 @@ class DiscussionItemContainer( Persistent, Implicit, Traversable ):
 
         return count
 
-    security.declareProtected( CMFCorePermissions.View, 'getReplies' )
+    security.declareProtected(View, 'getReplies')
     def getReplies( self ):
         """
             Return a sequence of the DiscussionResponse objects which are
@@ -374,7 +373,7 @@ class DiscussionItemContainer( Persistent, Implicit, Traversable ):
 
         return objects
 
-    security.declareProtected( CMFCorePermissions.View, 'quotedContents' )
+    security.declareProtected(View, 'quotedContents')
     def quotedContents(self):
         """
             Return this object's contents in a form suitable for inclusion

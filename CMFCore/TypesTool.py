@@ -22,14 +22,16 @@ from utils import _dtmldir, _checkPermission, cookString, getToolByName
 import string
 from AccessControl import getSecurityManager, ClassSecurityInfo, Unauthorized
 from Acquisition import aq_base
-import Products, CMFCorePermissions
+import Products
 from ActionProviderBase import ActionProviderBase
 from ActionInformation import ActionInformation
 from Expression import Expression
 from zLOG import LOG, WARNING, ERROR
 import sys
 
-from CMFCorePermissions import View, ManagePortal, AccessContentsInformation
+from CMFCorePermissions import View
+from CMFCorePermissions import ManagePortal
+from CMFCorePermissions import AccessContentsInformation
 
 _marker = []  # Create a new marker.
 
@@ -46,11 +48,9 @@ class TypeInformation (SimpleItemWithProperties):
 
 
     security = ClassSecurityInfo()
-    security.declareProtected(CMFCorePermissions.ManagePortal,
-                              'manage_editProperties',
-                              'manage_changeProperties',
-                              'manage_propertiesForm',
-                              )
+    security.declareProtected(ManagePortal, 'manage_editProperties')
+    security.declareProtected(ManagePortal, 'manage_changeProperties')
+    security.declareProtected(ManagePortal, 'manage_propertiesForm')
 
 
     _basic_properties = (
@@ -479,7 +479,7 @@ class FactoryTypeInformation (TypeInformation):
         return default
 
     security.declarePublic('isConstructionAllowed')
-    def isConstructionAllowed ( self, container ):
+    def isConstructionAllowed( self, container ):
         """
         a. Does the factory method exist?
 
@@ -614,8 +614,7 @@ class TypesTool( UniqueObject, OFS.Folder.Folder, ActionProviderBase ):
     #
     #   ZMI methods
     #
-    security.declareProtected( CMFCorePermissions.ManagePortal
-                             , 'manage_overview' )
+    security.declareProtected(ManagePortal, 'manage_overview')
     manage_overview = DTMLFile( 'explainTypesTool', _dtmldir )
 
     security.declarePrivate('listActions')

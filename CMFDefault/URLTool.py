@@ -26,7 +26,8 @@ from AccessControl import ClassSecurityInfo
 from Products.CMFCore.ActionProviderBase import ActionProviderBase
 from Products.CMFCore.ActionInformation import ActionInformation
 from Products.CMFCore.Expression import Expression
-from Products.CMFCore import CMFCorePermissions
+from Products.CMFCore.CMFCorePermissions import View
+from Products.CMFCore.CMFCorePermissions import ManagePortal
 from utils import _dtmldir
 
 class URLTool (UniqueObject, SimpleItem, ActionProviderBase):
@@ -35,7 +36,7 @@ class URLTool (UniqueObject, SimpleItem, ActionProviderBase):
     _actions = []
 
     security = ClassSecurityInfo()
-    security.declareObjectProtected( CMFCorePermissions.View )
+    security.declareObjectProtected(View)
 
     manage_options = ( ActionProviderBase.manage_options +
                       ({ 'label' : 'Overview', 'action' : 'manage_overview' } 
@@ -46,8 +47,7 @@ class URLTool (UniqueObject, SimpleItem, ActionProviderBase):
     #
     #   ZMI methods
     #
-    security.declareProtected( CMFCorePermissions.ManagePortal
-                             , 'manage_overview' )
+    security.declareProtected(ManagePortal, 'manage_overview')
     manage_overview = DTMLFile( 'explainURLTool', _dtmldir )
 
     #

@@ -21,7 +21,8 @@ import urlparse
 from Globals import InitializeClass, DTMLFile
 from AccessControl import ClassSecurityInfo
 
-from Products.CMFCore import CMFCorePermissions
+from Products.CMFCore.CMFCorePermissions import View
+from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
 from Products.CMFCore.PortalContent import PortalContent, NoWL
 from Products.CMFCore.PortalContent import ResourceLockedError
 from Products.CMFCore.WorkflowCore import WorkflowAction
@@ -42,20 +43,17 @@ Link items are URLs that come with additional information."""
                                 ( { 'id'            : 'view'
                                   , 'name'          : 'View'
                                   , 'action'        : 'link_view'
-                                  , 'permissions'   : (
-                                      CMFCorePermissions.View, )
+                                  , 'permissions'   : (View,)
                                   }
                                 , { 'id'            : 'edit'
                                   , 'name'          : 'Edit'
                                   , 'action'        : 'link_edit_form'
-                                  , 'permissions'   : (
-                                      CMFCorePermissions.ModifyPortalContent, )
+                                  , 'permissions'   : (ModifyPortalContent,)
                                   }
                                 , { 'id'            : 'metadata'
                                   , 'name'          : 'Metadata'
                                   , 'action'        : 'metadata_edit_form'
-                                  , 'permissions'   : (
-                                      CMFCorePermissions.ModifyPortalContent, )
+                                  , 'permissions'   : (ModifyPortalContent,)
                                   }
                                 )
                              }
@@ -107,12 +105,10 @@ class Link( PortalContent
         self._edit(remote_url)
         self.format=self.URL_FORMAT
 
-    security.declareProtected( CMFCorePermissions.ModifyPortalContent
-                             , 'manage_edit' )
+    security.declareProtected(ModifyPortalContent, 'manage_edit')
     manage_edit = DTMLFile( 'zmi_editLink', _dtmldir )
 
-    security.declareProtected( CMFCorePermissions.ModifyPortalContent
-                             , 'manage_editLink' )
+    security.declareProtected(ModifyPortalContent, 'manage_editLink')
     def manage_editLink( self, remote_url, REQUEST=None ):
         """
             Update the Link via the ZMI.
@@ -146,7 +142,7 @@ class Link( PortalContent
             url = urlparse.urlunparse(tokens)
         self.remote_url = url
 
-    security.declareProtected( CMFCorePermissions.ModifyPortalContent, 'edit' )
+    security.declareProtected(ModifyPortalContent, 'edit')
 
     def edit(self, remote_url ):
         """ Update and reindex. """
@@ -155,14 +151,14 @@ class Link( PortalContent
 
     edit = WorkflowAction( edit )
 
-    security.declareProtected( CMFCorePermissions.View, 'SearchableText' )
+    security.declareProtected(View, 'SearchableText')
     def SearchableText(self):
         """
             text for indexing
         """
         return "%s %s" % (self.title, self.description)
 
-    security.declareProtected( CMFCorePermissions.View, 'getRemoteUrl' )
+    security.declareProtected(View, 'getRemoteUrl')
     def getRemoteUrl(self):
         """
             returns the remote URL of the Link
@@ -195,7 +191,7 @@ class Link( PortalContent
                           )
         
     ## FTP handlers
-    security.declareProtected( CMFCorePermissions.ModifyPortalContent, 'PUT')
+    security.declareProtected(ModifyPortalContent, 'PUT')
     def PUT(self, REQUEST, RESPONSE):
         """
             Handle HTTP / WebDAV / FTP PUT requests.
@@ -213,7 +209,7 @@ class Link( PortalContent
             RESPONSE.setStatus(423)
             return RESPONSE
 
-    security.declareProtected( CMFCorePermissions.View, 'manage_FTPget' )
+    security.declareProtected(View, 'manage_FTPget')
     def manage_FTPget(self):
         """
             Get the link as text for WebDAV src / FTP download.
@@ -226,7 +222,7 @@ class Link( PortalContent
 
         return bodytext
 
-    security.declareProtected( CMFCorePermissions.View, 'get_size' )
+    security.declareProtected(View, 'get_size')
     def get_size( self ):
         """
             Used for FTP and apparently the ZMI now too 

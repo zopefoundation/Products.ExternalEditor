@@ -40,14 +40,14 @@ class FSPropertiesObject (FSObject, PropertyManager):
     manage_main = Globals.DTMLFile('custprops', _dtmldir)
 
     # Declare all (inherited) mutating methods private.
-    security.declarePrivate('manage_addProperty',
-                            'manage_editProperties',
-                            'manage_delProperties',
-                            'manage_changeProperties',
-                            'manage_propertiesForm',
-                            'manage_propertyTypeForm',
-                            'manage_changePropertyTypes',)
-                               
+    security.declarePrivate('manage_addProperty')
+    security.declarePrivate('manage_editProperties')
+    security.declarePrivate('manage_delProperties')
+    security.declarePrivate('manage_changeProperties')
+    security.declarePrivate('manage_propertiesForm')
+    security.declarePrivate('manage_propertyTypeForm')
+    security.declarePrivate('manage_changePropertyTypes')
+
     security.declareProtected(ViewManagementScreens, 'manage_doCustomize')
     def manage_doCustomize(self, folder_path, RESPONSE=None):
         """Makes a ZODB Based clone with the same data.

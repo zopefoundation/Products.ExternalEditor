@@ -24,7 +24,8 @@ from AccessControl import ClassSecurityInfo, getSecurityManager
 
 from Products.CMFCore.PortalContent import PortalContent
 from Products.CMFCore.PortalContent import NoWL, ResourceLockedError
-from Products.CMFCore import CMFCorePermissions
+from Products.CMFCore.CMFCorePermissions import View
+from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
 from Products.CMFCore.WorkflowCore import WorkflowAction
 from Products.CMFCore.utils import format_stx, keywordsplitter
 from DublinCore import DefaultDublinCoreImpl
@@ -44,20 +45,17 @@ Documents can contain text that can be formatted using 'Structured Text.'"""
                                 ( { 'id'            : 'view' 
                                   , 'name'          : 'View'
                                   , 'action'        : 'document_view'
-                                  , 'permissions'   : (
-                                      CMFCorePermissions.View, )
+                                  , 'permissions'   : (View,)
                                   }
                                 , { 'id'            : 'edit'
                                   , 'name'          : 'Edit'
                                   , 'action'        : 'document_edit_form'
-                                  , 'permissions'   : (
-                                      CMFCorePermissions.ModifyPortalContent, )
+                                  , 'permissions'   : (ModifyPortalContent,)
                                   }
                                 , { 'id'            : 'metadata'
                                   , 'name'          : 'Metadata'
                                   , 'action'        : 'metadata_edit_form'
-                                  , 'permissions'   : (
-                                      CMFCorePermissions.ModifyPortalContent, )
+                                  , 'permissions'   : (ModifyPortalContent,)
                                   }
                                 )
                              }
@@ -113,12 +111,10 @@ class Document(PortalContent, DefaultDublinCoreImpl):
         self._edit( text=text, text_format=text_format )
         self.setFormat( text_format )
 
-    security.declareProtected(CMFCorePermissions.ModifyPortalContent,
-                              'manage_edit')
+    security.declareProtected(ModifyPortalContent, 'manage_edit')
     manage_edit = DTMLFile('zmi_editDocument', _dtmldir)
 
-    security.declareProtected(CMFCorePermissions.ModifyPortalContent,
-                              'manage_editDocument' )
+    security.declareProtected(ModifyPortalContent, 'manage_editDocument')
     def manage_editDocument( self, text, text_format, file='', REQUEST=None ):
         """ A ZMI (Zope Management Interface) level editing method """
         Document.edit( self, text_format=text_format, text=text, file=file )
@@ -153,7 +149,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
             self.cooked_text = format_stx(text=text, level=level)
             self.text = text
 
-    security.declareProtected( CMFCorePermissions.ModifyPortalContent, 'edit' )
+    security.declareProtected(ModifyPortalContent, 'edit')
     def edit( self
             , text_format
             , text
@@ -178,7 +174,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
         self._edit(text=text, text_format=text_format, safety_belt=safety_belt)
         self.reindexObject()
 
-    security.declareProtected(CMFCorePermissions.ModifyPortalContent, 'setMetadata')
+    security.declareProtected(ModifyPortalContent, 'setMetadata')
     def setMetadata(self, headers):
         headers['Format'] = self.Format()
         new_subject = keywordsplitter(headers)
@@ -280,7 +276,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
         return 1
 
     ### Content accessor methods
-    security.declareProtected(CMFCorePermissions.View, 'SearchableText')
+    security.declareProtected(View, 'SearchableText')
     def SearchableText(self):
         """ Used by the catalog for basic full text indexing """
         return "%s %s %s" % ( self.Title()
@@ -288,7 +284,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
                             , self.EditableBody()
                             )
 
-    security.declareProtected(CMFCorePermissions.View, 'CookedBody')
+    security.declareProtected(View, 'CookedBody')
     def CookedBody(self, stx_level=None, setlevel=0):
         """\
         The prepared basic rendering of an object.  For Documents, this
@@ -311,7 +307,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
                 self.cooked_text = cooked
             return cooked
 
-    security.declareProtected(CMFCorePermissions.View, 'EditableBody')
+    security.declareProtected(View, 'EditableBody')
     def EditableBody(self):
         """\
         The editable body of text.  This is the raw structured text, or
@@ -319,12 +315,12 @@ class Document(PortalContent, DefaultDublinCoreImpl):
         """
         return self.text
 
-    security.declareProtected(CMFCorePermissions.View, 'Description')
+    security.declareProtected(View, 'Description')
     def Description(self):
         """ Dublin core description, also important for indexing """
         return self.description
     
-    security.declareProtected(CMFCorePermissions.View, 'Format')
+    security.declareProtected(View, 'Format')
     def Format(self):
         """ Returns a content-type style format of the underlying source """
         if self.text_format == 'html':
@@ -333,8 +329,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
             return 'text/plain'
     
 
-    security.declareProtected(CMFCorePermissions.ModifyPortalContent,
-                             'setFormat' )
+    security.declareProtected(ModifyPortalContent, 'setFormat')
     def setFormat(self, value):
         value = str(value)
         if value == 'text/html' or value == 'html':
@@ -346,7 +341,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
     setFormat = WorkflowAction(setFormat)
 
     ## FTP handlers
-    security.declareProtected(CMFCorePermissions.ModifyPortalContent, 'PUT')
+    security.declareProtected(ModifyPortalContent, 'PUT')
 
     def PUT(self, REQUEST, RESPONSE):
         """ Handle HTTP (and presumably FTP?) PUT requests """
@@ -390,7 +385,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
         '</html>\n'
         )
 
-    security.declareProtected( CMFCorePermissions.View, 'manage_FTPget' )
+    security.declareProtected(View, 'manage_FTPget')
     def manage_FTPget(self):
         "Get the document body for FTP download (also used for the WebDAV SRC)"
         join = string.join
@@ -416,7 +411,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
 
         return bodytext
 
-    security.declareProtected( CMFCorePermissions.View, 'get_size' )
+    security.declareProtected(View, 'get_size')
     def get_size( self ):
         """ Used for FTP and apparently the ZMI now too """
         return len(self.manage_FTPget())

@@ -24,7 +24,8 @@ from SkinsContainer import SkinsContainer
 from Acquisition import aq_base
 from DateTime import DateTime
 from AccessControl import ClassSecurityInfo
-from CMFCorePermissions import ManagePortal, AccessContentsInformation
+from CMFCorePermissions import ManagePortal
+from CMFCorePermissions import AccessContentsInformation
 from ActionProviderBase import ActionProviderBase
 from ActionInformation import ActionInformation
 from Expression import Expression
@@ -39,8 +40,6 @@ try:
     SUPPORTS_PAGE_TEMPLATES=1
 except ImportError:
     SUPPORTS_PAGE_TEMPLATES=0
-
-import CMFCorePermissions
 
 
 def modifiedOptions():
@@ -86,8 +85,7 @@ class SkinsTool(UniqueObject, SkinsContainer, PortalFolder, ActionProviderBase):
     #
     #   ZMI methods
     #
-    security.declareProtected( CMFCorePermissions.ManagePortal
-                             , 'manage_overview' )
+    security.declareProtected(ManagePortal, 'manage_overview')
     manage_overview = DTMLFile( 'explainSkinsTool', _dtmldir )
 
     default_skin = ''

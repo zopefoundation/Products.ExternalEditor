@@ -29,7 +29,9 @@ from Products.PageTemplates.PageTemplate import PageTemplate
 from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate, Src
 
 from DirectoryView import registerFileExtension, registerMetaType, expandpath
-from CMFCorePermissions import ViewManagementScreens, View, FTPAccess
+from CMFCorePermissions import ViewManagementScreens
+from CMFCorePermissions import View
+from CMFCorePermissions import FTPAccess
 from FSObject import FSObject
 from utils import getToolByName
 
@@ -167,17 +169,21 @@ class FSPageTemplate(FSObject, Script, PageTemplate):
  
     # Copy over more methods
     security.declareProtected(FTPAccess, 'manage_FTPget')
-    security.declareProtected(View, 'get_size')
-    security.declareProtected(ViewManagementScreens, 'PrincipiaSearchSource',
-        'document_src')
-
-    pt_getContext = ZopePageTemplate.pt_getContext
-    ZScriptHTML_tryParams = ZopePageTemplate.ZScriptHTML_tryParams
     manage_FTPget = ZopePageTemplate.manage_FTPget
+
+    security.declareProtected(View, 'get_size')
     get_size = ZopePageTemplate.get_size
     getSize = get_size
+
+    security.declareProtected(ViewManagementScreens, 'PrincipiaSearchSource')
     PrincipiaSearchSource = ZopePageTemplate.PrincipiaSearchSource
+
+    security.declareProtected(ViewManagementScreens, 'document_src')
     document_src = ZopePageTemplate.document_src
+
+    pt_getContext = ZopePageTemplate.pt_getContext
+
+    ZScriptHTML_tryParams = ZopePageTemplate.ZScriptHTML_tryParams
 
 
 d = FSPageTemplate.__dict__

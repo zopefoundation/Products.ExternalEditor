@@ -20,7 +20,7 @@ from Products.CMFTopic.interfaces import Criterion
 from Products.CMFTopic.Topic import Topic
 from Products.CMFTopic import TopicPermissions
 
-from Products.CMFCore import CMFCorePermissions
+from Products.CMFCore.CMFCorePermissions import View
 
 from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
@@ -80,7 +80,7 @@ class ListCriterion( AbstractCriterion ):
 
         self.operator = operator
 
-    security.declareProtected( CMFCorePermissions.View, 'getCriteriaItems' )
+    security.declareProtected(View, 'getCriteriaItems')
     def getCriteriaItems( self ):
         """
             Return a tuple of query elements to be passed to the catalog

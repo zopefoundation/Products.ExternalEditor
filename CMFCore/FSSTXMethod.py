@@ -144,16 +144,14 @@ class FSSTXMethod( FSObject ):
         """
         return self.raw
 
-    security.declareProtected( ViewManagementScreens
-                             , 'PrincipiaSearchSource' )
+    security.declareProtected( ViewManagementScreens, 'PrincipiaSearchSource' )
     def PrincipiaSearchSource( self ):
         """
             Fetch our source for indexing in a catalog.
         """
         return self.raw
 
-    security.declareProtected( ViewManagementScreens
-                             , 'document_src' )
+    security.declareProtected( ViewManagementScreens, 'document_src' )
     def document_src( self ):
         """
             Fetch our source for indexing in a catalog.

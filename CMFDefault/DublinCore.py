@@ -23,7 +23,7 @@ from Products.CMFCore.interfaces.DublinCore import MutableDublinCore
 from utils import tuplize, _dtmldir, semi_split
 from Globals import InitializeClass, DTMLFile
 from AccessControl import ClassSecurityInfo
-from Products.CMFCore import CMFCorePermissions
+from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
 
 
 class DefaultDublinCoreImpl( PropertyManager ):
@@ -308,65 +308,56 @@ class DefaultDublinCoreImpl( PropertyManager ):
                 attrib = DateTime( attrib )
         return attrib
 
-    security.declareProtected( CMFCorePermissions.ModifyPortalContent
-                             , 'setTitle' )
+    security.declareProtected(ModifyPortalContent, 'setTitle')
     def setTitle( self, title ):
         "Dublin Core element - resource name"
         self.title = title
 
-    security.declareProtected( CMFCorePermissions.ModifyPortalContent
-                             , 'setSubject' )
+    security.declareProtected(ModifyPortalContent, 'setSubject')
     def setSubject( self, subject ):
         "Dublin Core element - resource keywords"
         self.subject = tuplize( 'subject', subject )
 
-    security.declareProtected( CMFCorePermissions.ModifyPortalContent
-                             , 'setDescription' )
+    security.declareProtected(ModifyPortalContent, 'setDescription')
     def setDescription( self, description ):
         "Dublin Core element - resource summary"
         self.description = description
 
-    security.declareProtected( CMFCorePermissions.ModifyPortalContent
-                             , 'setContributors' )
+    security.declareProtected(ModifyPortalContent, 'setContributors')
     def setContributors( self, contributors ):
         "Dublin Core element - additional contributors to resource"
         # XXX: fixme
         self.contributors = tuplize('contributors', contributors, semi_split)
 
-    security.declareProtected( CMFCorePermissions.ModifyPortalContent
-                             , 'setEffectiveDate' )
+    security.declareProtected(ModifyPortalContent, 'setEffectiveDate')
     def setEffectiveDate( self, effective_date ):
         """
             Dublin Core element - date resource becomes effective.
         """
         self.effective_date = self._datify( effective_date )
 
-    security.declareProtected( CMFCorePermissions.ModifyPortalContent
-                             , 'setExpirationDate' )
+    security.declareProtected(ModifyPortalContent, 'setExpirationDate')
     def setExpirationDate( self, expiration_date ):
         """
             Dublin Core element - date resource expires.
         """
         self.expiration_date = self._datify( expiration_date )
 
-    security.declareProtected( CMFCorePermissions.ModifyPortalContent
-                             , 'setFormat' )
+    security.declareProtected(ModifyPortalContent, 'setFormat')
     def setFormat( self, format ):
         """
             Dublin Core element - resource format
         """
         self.format = format
 
-    security.declareProtected( CMFCorePermissions.ModifyPortalContent
-                             , 'setLanguage' )
+    security.declareProtected(ModifyPortalContent, 'setLanguage')
     def setLanguage( self, language ):
         """
             Dublin Core element - resource language
         """
         self.language = language
 
-    security.declareProtected( CMFCorePermissions.ModifyPortalContent
-                             , 'setRights' )
+    security.declareProtected(ModifyPortalContent, 'setRights')
     def setRights( self, rights ):
         """
             Dublin Core element - resource copyright
@@ -402,12 +393,10 @@ class DefaultDublinCoreImpl( PropertyManager ):
         self.setLanguage( language )
         self.setRights( rights )
 
-    security.declareProtected( CMFCorePermissions.ModifyPortalContent
-                             , 'manage_metadata' )
+    security.declareProtected(ModifyPortalContent, 'manage_metadata')
     manage_metadata = DTMLFile( 'zmi_metadata', _dtmldir )
 
-    security.declareProtected( CMFCorePermissions.ModifyPortalContent
-                             , 'manage_editMetadata' )
+    security.declareProtected(ModifyPortalContent, 'manage_editMetadata')
     def manage_editMetadata( self
                            , title
                            , subject
@@ -431,8 +420,7 @@ class DefaultDublinCoreImpl( PropertyManager ):
                                 + '/manage_metadata'
                                 + '?manage_tabs_message=Metadata+updated.' )
 
-    security.declareProtected( CMFCorePermissions.ModifyPortalContent
-                             , 'editMetadata' )
+    security.declareProtected(ModifyPortalContent, 'editMetadata')
     def editMetadata(self
                    , title=''
                    , subject=()

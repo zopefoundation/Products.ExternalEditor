@@ -25,8 +25,10 @@ from Globals import InitializeClass, DTMLFile, MessageDialog, \
 from Acquisition import aq_base
 from AccessControl.User import nobody
 from AccessControl import ClassSecurityInfo
+from CMFCorePermissions import View
+from CMFCorePermissions import AccessContentsInformation
 from CMFCorePermissions import ManagePortal
-import CMFCorePermissions
+from CMFCorePermissions import SetOwnPassword
 from ActionProviderBase import ActionProviderBase
 
 default_member_content = '''Default page for %s
@@ -60,8 +62,7 @@ class MembershipTool (UniqueObject, SimpleItem, ActionProviderBase):
     #
     #   ZMI methods
     #
-    security.declareProtected( CMFCorePermissions.ManagePortal
-                             , 'manage_overview' )
+    security.declareProtected(ManagePortal, 'manage_overview')
     manage_overview = DTMLFile( 'explainMembershipTool', _dtmldir )
  
     #
@@ -70,7 +71,7 @@ class MembershipTool (UniqueObject, SimpleItem, ActionProviderBase):
     security.declareProtected(ManagePortal, 'manage_mapRoles')
     manage_mapRoles = DTMLFile('membershipRolemapping', _dtmldir )
  
-    security.declareProtected(CMFCorePermissions.SetOwnPassword, 'setPassword')
+    security.declareProtected(SetOwnPassword, 'setPassword')
     def setPassword(self, password, domains=None):
         '''Allows the authenticated member to set his/her own password.
         '''
@@ -243,9 +244,9 @@ class MembershipTool (UniqueObject, SimpleItem, ActionProviderBase):
             members.manage_addPortalFolder( id=member_id, title=f_title )
             f=getattr(members, member_id)
  
-            f.manage_permission(CMFCorePermissions.View,
+            f.manage_permission(View,
                                 ['Owner','Manager','Reviewer'], 0)
-            f.manage_permission(CMFCorePermissions.AccessContentsInformation,
+            f.manage_permission(AccessContentsInformation,
                                 ['Owner','Manager','Reviewer'], 0)  
 
             # Grant ownership to Member
@@ -333,7 +334,7 @@ class MembershipTool (UniqueObject, SimpleItem, ActionProviderBase):
         '''
         return map(self.wrapUser, self.__getPUS().getUsers())
 
-    security.declareProtected(CMFCorePermissions.View, 'searchMembers')
+    security.declareProtected(View, 'searchMembers')
     def searchMembers( self, search_param, search_term ):
         """ Search the membership """
         md = getToolByName( self, 'portal_memberdata' )
@@ -341,7 +342,7 @@ class MembershipTool (UniqueObject, SimpleItem, ActionProviderBase):
         return md.searchMemberDataContents( search_param, search_term )
 
         
-    security.declareProtected(CMFCorePermissions.View, 'getCandidateLocalRoles')
+    security.declareProtected(View, 'getCandidateLocalRoles')
     def getCandidateLocalRoles( self, obj ):
         """ What local roles can I assign? """
         member = self.getAuthenticatedMember()
@@ -354,7 +355,7 @@ class MembershipTool (UniqueObject, SimpleItem, ActionProviderBase):
 
         return tuple( member_roles )
 
-    security.declareProtected(CMFCorePermissions.View, 'setLocalRoles')
+    security.declareProtected(View, 'setLocalRoles')
     def setLocalRoles( self, obj, member_ids, member_role, reindex=1 ):
         """ Set local roles on an item """
         member = self.getAuthenticatedMember()
@@ -374,7 +375,7 @@ class MembershipTool (UniqueObject, SimpleItem, ActionProviderBase):
             # thus PortalContent and PortalFolder.
             obj.reindexObjectSecurity()
 
-    security.declareProtected(CMFCorePermissions.View, 'deleteLocalRoles')
+    security.declareProtected(View, 'deleteLocalRoles')
     def deleteLocalRoles( self, obj, member_ids, reindex=1 ):
         """ Delete local roles for members member_ids """
         member = self.getAuthenticatedMember()
