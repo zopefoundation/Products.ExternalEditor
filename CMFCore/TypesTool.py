@@ -442,9 +442,11 @@ class FactoryTypeInformation (TypeInformation):
 
         if hasattr(ob, '_setPortalTypeName'):
             ob._setPortalTypeName(self.getId())
+
         wf = getToolByName(ob, 'portal_workflow', None)
         if wf is not None:
             wf.notifyCreated(ob)
+
         return ob
 
 InitializeClass( FactoryTypeInformation )
@@ -497,8 +499,13 @@ class ScriptableTypeInformation( TypeInformation ):
 
         id = str(id)
         ob = apply(constructor, (container, id) + args, kw)
+
         if hasattr(ob, '_setPortalTypeName'):
             ob._setPortalTypeName(self.getId())
+
+        wf = getToolByName(ob, 'portal_workflow', None)
+        if wf is not None:
+            wf.notifyCreated(ob)
 
         return ob
 
@@ -755,6 +762,7 @@ class TypesTool( UniqueObject, OFS.Folder.Folder, ActionProviderBase ):
         
         ob = apply(info.constructInstance, (container, id) + args, kw)
 
+        # reindex after _setPortalTypeName has been called.
         ob.reindexObject()
 
         if RESPONSE is not None:
