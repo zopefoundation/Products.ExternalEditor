@@ -707,7 +707,7 @@ extension=.pt
 [meta-type:Z SQL Method]
 extension=.sql
 
-[content-type:text/*]
+[content-type:text/plain]
 extension=.txt
 
 [content-type:text/html]
@@ -715,6 +715,12 @@ extension=.html
 
 [content-type:text/xml]
 extension=.xml
+
+[content-type:text/css]
+extension=.css
+
+[content-type:text/javascript]
+extension=.js
 
 [content-type:image/*]
 editor=gimp

@@ -2,6 +2,9 @@ External Editor Change Log
 
   4/23/04 - 0.7.2 Release
 
+    - Change default configuration to use .txt extension for text/plain only. 
+      Add extensions for css and javascript files.
+
     - Fixed packaging bug in Windows binary which disabled several plugins.
       This fixes "Editor did not launch properly" errors for MSOffice
       among others.
