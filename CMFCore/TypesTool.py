@@ -698,7 +698,7 @@ class TypesTool( UniqueObject, OFS.Folder.Folder ):
         """
             Return a sequence of instances which implement the
             TypeInformation interface, one for each content
-            type regisetered in the portal.
+            type registered in the portal.
         """
         rval = []
         for t in self.objectValues():
