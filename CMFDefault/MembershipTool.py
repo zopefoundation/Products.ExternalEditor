@@ -231,7 +231,7 @@ class MembershipTool( BaseTool ):
         # Create Member's home folder.
         members.manage_addPortalFolder(id=member_id,
                                        title="%s's Home" % member_id)
-        f = getattr(members, member_id)
+        f = members._getOb(member_id)
 
         # Grant Ownership and Owner role to Member
         f.changeOwnership(member)
@@ -275,12 +275,14 @@ class MembershipTool( BaseTool ):
             id = member.getMemberId()
         members = self.getMembersFolder()
         if members:
-            if hasattr(aq_base(members), id):
-                folder = getattr(members, id)
+            try:
+                folder = members._getOb(id)
                 if verifyPermission and not _checkPermission(View, folder):
                     # Don't return the folder if the user can't get to it.
                     return None
                 return folder
+            except AttributeError:
+                pass
         return None
 
     def getHomeUrl(self, id=None, verifyPermission=0):
