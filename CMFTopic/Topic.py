@@ -30,7 +30,7 @@ from Acquisition import aq_parent, aq_inner, aq_base
 # with the Types Tool (portal_types )
 factory_type_information = (
   { 'id'             : 'Topic'
-  , 'content_icon'   : 'topic_icon.gif'
+  , 'icon'           : 'topic_icon.gif'
   , 'meta_type'      : 'Portal Topic'
   , 'description'    : 'Topics are canned queries for organizing content '
                        'with up to date queries into the catalog.'
@@ -87,22 +87,10 @@ class Topic( PortalFolder ):
     meta_type='Portal Topic'
 
     security = ClassSecurityInfo()
-
     security.declareObjectProtected(View)
 
     acquireCriteria = 1
     _criteriaTypes = []
-
-
-    security.declarePrivate( '_verifyActionPermissions' )
-    def _verifyActionPermissions( self, action ):
-        pp = action.get( 'permissions', () )
-        if not pp:
-            return 1
-        for p in pp:
-            if _checkPermission( p, self ):
-                return 1
-        return 0
 
     def __call__( self ):
         """
@@ -262,5 +250,4 @@ class Topic( PortalFolder ):
         ti.constructInstance(self, id)
         return self._getOb( id )
 
-# Intialize the Topic class, setting up security.
 InitializeClass( Topic )
