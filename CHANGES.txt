@@ -2,6 +2,13 @@ CMF 1.5alpha (unreleased)
 
   New Features
 
+    - ActionProviderBase, ActionInformation: Added methods to modify/edit 
+      actions. New method 'getActionObject' in 'ActionProviderBase' and 
+      'edit' method in 'ActionInformation' (Collector 195).
+      An action now may be modified/edited the following way::
+          
+        action_provider.getActionObject('object/view').edit(title='VIEW')
+
     - Topic objects now supoprt syndication (Collector #203).
 
     - PortalFolder and zpt skin: PortalFolder now inherits from OrderedFolder.
@@ -42,10 +49,10 @@ CMF 1.5alpha (unreleased)
       'ResourceLockedError' are now also available for TTW code.
       'EditingConflict' is a new CMF class replacing the old string exception.
 
-    - Callable Opaque Items, CMFCatalogAware: Added a marker interface
+    - Callable Opaque Items, CMFCatalogAware: Added an interface
       'ICallableOpaqueItemWithHooks'. CMF now calls the manage_after*
       and manage_before* hooks of a marked opaque item on copying,
-      moving or deleting the containing content object (gregweb).
+      moving or deleting the containing content object.
 
     - DublinCore: Creator element no longer depends on Ownership.
       (Collector #25)
