@@ -1,10 +1,20 @@
-After 1.5.0beta
+HEAD only (unreleased)
+
+  Bug Fixes
+
+    - ActionsTool: Removed deprecated support for oldstyle Action Providers.
+      If Action Providers don't implement the ActionProvider interface they
+      are now ignored.
+
+    - Workflow: Removed deprecated WorkflowMethod machinery.
+
+CMF 1.5.0beta2 (unreleased)
 
   New Features
 
     - Feature
 
-  Bugs Fixed
+  Bug Fixes
 
     - FSPageTemplate: Refine the XML content type detection so that
       addtional data such as encoding is preserved
@@ -12,7 +22,7 @@ After 1.5.0beta
 
     - ActionInformation: If a path expression ending in an object that
       gets called using __render_with_namespace__ (such as DTML objects
-      and Scripts (Python)) is used a KeyError for "here" would be thrown 
+      and Scripts (Python)) is used a KeyError for "here" would be thrown
       inside PageTemplates.ZRPythonExpr.call_with_ns. call_with_ns
       expects the namespace to contain "here", which the context coming
       from CMFCore.Expressions.createExprContext did not provide. Added
@@ -21,9 +31,3 @@ After 1.5.0beta
 
     - http://www.zope.org/Collectors/CMF/205: When pasting a content item,
       local roles were not changed to reflect the neew ownership.
-
-    - ActionsTool: Removed deprecated support for oldstyle Action Providers.
-      If Action Providers don't implement the ActionProvider interface they
-      are now ignored.
-
-    - Workflow: Removed deprecated WorkflowMethod machinery.
