@@ -11,6 +11,3 @@ After 1.5.0beta
       are now ignored.
 
     - Workflow: Removed deprecated WorkflowMethod machinery.
-
-    - RegistrationTool: An optional password can now be passed to 
-      registeredNotify() (Issue #277).
