@@ -1,0 +1,51 @@
+<dtml-if "REQUEST['open'] == 1">
+
+          <form ACTION="&dtml-absolute_url;/folder_contents" METHOD="POST">
+        <TABLE BORDER="0" CELLSPACING="0" CELLPADDING=2>
+        <TR>
+            <th colspan="2" align="left">Contents View Filter</th>
+        </TR>
+        <TR>
+           <TD ALIGN="left" VALIGN="TOP" WIDTH="*">Subject:</TD>
+           <TD ALIGN="left" VALIGN="TOP"><input type="text" name="Subject:tokens" 
+                                                value="<dtml-var expr="((REQUEST['open'] == 1)
+                                                                        and _.string.join(REQUEST['Subject']))
+                                                                       or ''">">
+           </TD>
+       </TR>
+      <TR>
+           <TD ALIGN="left" VALIGN="TOP" WIDTH="*">Content Type:</TD>
+           <TD ALIGN="left" VALIGN="TOP">
+             <select name="Type:list" multiple size="3">
+                   <dtml-in listContentTypes>
+                      <dtml-unless "_['sequence-item'] == 'Portal Folder'">
+                        <option value="<dtml-var sequence-item>" 
+                                <dtml-if expr="(REQUEST['Type'] == [])
+                                               or (_['sequence-item'] in REQUEST.get('Type', []))">Selected</dtml-if>>  <dtml-var sequence-item></option>
+                      </dtml-unless>
+                   </dtml-in></select>
+           </TD>
+       </TR>
+       <TR>
+           <td colspan="1" align="left"><input type="submit" name="setView" value="Set Filter"></FORM></td>
+<dtml-if "REQUEST['open'] == 1">
+    <td colspan="1" align="left">
+    <form action="&dtml-absolute_url;/folder_contents" METHOD="POST">
+    <input type="submit" name="closeView" value="Close View Filter">
+    <input type="hidden" name="open:int" value="0">
+    </form>
+</td>
+</dtml-if>
+<td colspan="1" align="left">
+<form action="&dtml-absolute_url;/clearCookie" METHOD="POST">
+   <input type="submit" name="clearFilter" value="Clear View Filter">
+   </form>
+       </td>
+       </TR>
+       </table>
+    <dtml-else>
+     <form action="&dtml-absolute_url;/folder_contents" METHOD="POST">
+        <input type="hidden" name="open:int" value="1">
+        <input type="submit" name="setview" value="Set View Filter">
+        </form>
+</dtml-if>

@@ -1,0 +1,15 @@
+<dtml-if expr="REQUEST['transition'] in
+  portal_workflow.listAllowableTransitionsFor(this())">
+  <dtml-let old_location="this().absolute_url()"
+    new_location="portal_workflow.changeStateFor(this(),
+    REQUEST['transition'], REQUEST['comment']).absolute_url()">
+  <dtml-if expr="old_location != new_location">
+    <dtml-call expr="RESPONSE.redirect(new_location + '/content_status_form')">
+  <dtml-else>
+    <dtml-return expr="view(_.None, _)">
+  </dtml-if>
+  </dtml-let>
+<dtml-else>
+  <dtml-return expr="view(_.None, _, portal_status_message=
+    'The specified workflow transition is not allowed.')">
+</dtml-if>

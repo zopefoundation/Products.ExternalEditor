@@ -1,0 +1,19 @@
+<dtml-call expr="editMetadata(
+    title=REQUEST.get('title', ''),
+    subject=REQUEST.get('subject', ()),
+    description=REQUEST.get('description', ''),
+    contributors=REQUEST.get('contributors', ()),
+    effective_date=REQUEST.get('effective_date', _.None),
+    expiration_date=REQUEST.get('expiration_date', _.None),
+    format=REQUEST.get('format', 'text/html'),
+    language=REQUEST.get('language', 'en-US'),
+    rights=REQUEST.get('rights', ''))">
+<dtml-if change_and_edit>
+ <dtml-call "REQUEST.set( 'next_action', 'Edit' )">
+<dtml-else>
+ <dtml-call "REQUEST.set( 'next_action', 'View' )">
+</dtml-if>
+<dtml-call "REQUEST['RESPONSE'].redirect( absolute_url()
+                        + '/' +  getTypeInfo().actionByName( next_action )
+                        + '?portal_status_message=Metadata+changed.'
+                        )">

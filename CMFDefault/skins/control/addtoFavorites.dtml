@@ -1,0 +1,17 @@
+<dtml-let homeFolder="portal_membership.getHomeFolder()">
+
+  <dtml-if expr="not _.hasattr(homeFolder, 'Favorites')">
+    <dtml-call expr="homeFolder.manage_addPortalFolder(id='Favorites', title='Favorites')">
+  </dtml-if>
+
+  <dtml-let targetFolder="_.getattr(homeFolder, 'Favorites')"
+                  new_id="'fav_' + _.str(_.int(ZopeTime()))"
+                 favPath="favorite[_.len(SERVER_URL):]"
+                  favObj="restrictedTraverse(favPath)">
+    <dtml-call expr="targetFolder.addFavorite(id=new_id, title=favObj.title, remote_url=favPath)">
+
+  </dtml-let>
+
+  <dtml-call expr="RESPONSE.redirect(favorite + '/view')">
+</dtml-let>
+

@@ -1,0 +1,100 @@
+<dtml-var standard_html_header>
+
+<div class="Desktop">
+
+<dtml-if message>
+ <p>&dtml-message;</p>
+ <hr>
+</dtml-if>
+
+
+<div class="Metadata">
+
+<h2>Resource Metadata </h2>
+
+<dtml-let effectiveString="effective_date and effective_date.ISO() or 'None'"
+          expirationString="expiration_date and expiration_date.ISO() or 'None'"
+>
+
+<form action="editMetadata" method="post">
+<table class="FormLayout">
+ <tr valign="top">
+  <th align="right">
+    <a href="&dtml-portal_url;/metadata_help#Identifier"> Identifier </a>
+  </th>
+  <td colspan="3"> <dtml-var Identifier>
+  </td>
+ </tr>
+ <tr valign="top">
+  <th align="right">
+    <a href="&dtml-portal_url;/metadata_help#Title"> Title </a>
+  </th>
+  <td colspan="3">
+   <input type="text"
+          name="title"
+          value="&dtml-Title;"
+          size="65">
+  </td>
+ </tr>
+ <tr valign="top">
+  <th align="right">
+    <a href="&dtml-portal_url;/metadata_help#Description"> Description </a>
+  </th>
+  <td colspan="3">
+   <textarea name="description:text" rows="5"
+             cols="65">&dtml-Description;</textarea>
+  </td>
+ </tr>
+ <tr valign="top">
+  <th align="right">
+    <a href="&dtml-portal_url;/metadata_help#Subject"> Subject </a>
+  </th>
+  <td>
+   <textarea name="subject:lines" rows="5"
+             cols="30"><dtml-in Subject><dtml-var sequence-item>
+</dtml-in></textarea>
+  </td>
+ </tr>
+ <tr valign="top">
+  <th align="right">
+    <a href="&dtml-portal_url;/metadata_help#Creation Date"> Created </a>
+  </th>
+  <td> <dtml-var CreationDate>
+  </td>
+  <th align="right">
+    <a href="&dtml-portal_url;/metadata_help#ModifiedDate"> Modified </a>
+  </th>
+  <td> <dtml-var ModificationDate>
+  </td>
+ </tr>
+ <tr valign="top">
+  <th align="right">
+    <a href="&dtml-portal_url;/metadata_help#EffectiveDate"> Effective </a>
+  </th>
+  <td> <input type="text" name="effective_date"
+                          value="&dtml-effectiveString;">
+  </td>
+  <th align="right">
+    <a href="&dtml-portal_url;/metadata_help#ExpirationDate"> Expires </a>
+  </th>
+  <td> <input type="text" name="expiration_date"
+                          value="&dtml-expirationString;">
+  </td>
+ </tr>
+ <tr valign="top">
+  <td> <br> </td>
+  <td>
+   <input type="submit" value=" Change ">
+  </td>
+ </tr>
+</table>
+</form>
+
+</dtml-let>
+
+</div>
+
+</div>
+
+<dtml-var standard_html_footer>
+

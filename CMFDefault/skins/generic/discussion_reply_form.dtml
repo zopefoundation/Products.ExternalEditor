@@ -1,0 +1,33 @@
+<dtml-var standard_html_header>
+
+<dtml-if expr="not _.hasattr(this(), 'talkback') and this().meta_type != 'Discussion Item'">
+  <dtml-call expr="portal_discussion.createDiscussionFor(this())">
+</dtml-if>
+
+<form method="POST" action="<dtml-var expr="absolute_url() + '/talkback'">">
+
+<table class="FormLayout">
+ <tr>
+  <th align="left">Subject (Title)</th>
+  <td><input name="title" value="<dtml-if title_override
+   ><dtml-var title_override><dtml-else><dtml-var title></dtml-if>"></td>
+ </tr>
+ <tr>
+  <td colspan="2">
+   <b>Reply body</b><br>
+   <textarea name="text" cols="70" rows="10" wrap="soft" style="width: 100%"
+    ><dtml-if text_override><dtml-var text_override
+    ></dtml-if></textarea>
+  </td>
+ </tr>
+ <tr>
+  <td></td>
+  <td>
+   <input type="submit" value="Preview" name="&dtml-id;/discussion_reply_preview:method">
+   <input type="submit" value="Reply" name="createReply:method">
+  </td>
+ </tr>
+</table>
+
+<dtml-var standard_html_footer>
+

@@ -1,0 +1,21 @@
+<dtml-var standard_html_header>
+
+<h3>&dtml-title;</h3>
+
+<dtml-if "_.hasattr(this(), 'parentsInThread') and parentsInThread(1)">
+ Above in thread:
+ <dtml-if "_.len(this().parentsInThread()) > 5">... :</dtml-if>
+ <dtml-in "parentsInThread(5)">
+  <a href="&dtml-absolute_url;">&dtml-title;</a>
+  <dtml-unless sequence-end>:</dtml-unless>
+ </dtml-in>
+</dtml-if>
+
+<dtml-tree branches="getReplies">
+ <a href="&dtml-absolute_url;"><img border=0 src="<dtml-var SCRIPT_NAME><dtml-var icon>"></a>
+ <a href="&dtml-absolute_url;">&dtml-title;</a>,
+ by <dtml-var Creator>
+ on <dtml-var Date>
+</dtml-tree>
+
+<dtml-var standard_html_footer>

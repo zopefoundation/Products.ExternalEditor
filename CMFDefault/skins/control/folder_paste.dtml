@@ -1,0 +1,2 @@
+<dtml-call expr="manage_pasteObjects(REQUEST['__cp'], REQUEST)">
+<dtml-return expr="folder_contents(_.None, _, portal_status_message='Pasted.')">

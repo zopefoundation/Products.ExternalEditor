@@ -1,0 +1,5 @@
+<dtml-call expr="edit(REQUEST['text_format'],
+                 REQUEST['text'], REQUEST.get('file', ''))">
+<dtml-let portal_status_message="'Document changed.'">
+<dtml-return document_edit_form>
+</dtml-let>

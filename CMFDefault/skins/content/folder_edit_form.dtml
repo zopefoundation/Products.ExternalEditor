@@ -1,0 +1,41 @@
+<dtml-var standard_html_header>
+ 
+<div class="Desktop">
+ 
+<dtml-if message>
+ <p>&dtml-message;</p>
+ <hr>
+</dtml-if>
+ 
+<div class="File">
+ 
+<h2>Edit &dtml-id;</h2>
+ 
+<form action="folder_edit" method="post">
+<table class="FormLayout">
+ 
+ <tr valign="top">
+  <th align="right"> Title
+  </th>
+  <td colspan="3">
+   <input type="text"
+          name="title"
+          value="&dtml-title;"
+          size="65">
+  </td>
+ </tr>
+
+ <tr valign="top">
+  <td> <br> </td>
+  <td>
+   <input type="submit" value=" Change ">
+  </td>
+ </tr>
+ 
+</table>
+</form>
+</div>
+ 
+</div>
+ 
+<dtml-var standard_html_footer> 

@@ -1,0 +1,12 @@
+<dtml-call expr="portal_registration.setProperties(REQUEST)">
+
+<dtml-if portal_skins>
+ <dtml-let reqvar="portal_skins.getRequestVarname()" memvar="'portal_skin'">
+  <dtml-if expr="REQUEST.has_key(memvar)">
+   <dtml-call expr="RESPONSE.setCookie(reqvar, REQUEST[memvar],
+     path='/', expires=(_.DateTime('GMT') + 365).rfc822())">
+  </dtml-if>
+ </dtml-let>
+</dtml-if>
+
+<dtml-return expr="personalize_form(_.None, _, portal_status_message='Member changed.')">

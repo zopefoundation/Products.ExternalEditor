@@ -1,0 +1,86 @@
+<dtml-var standard_html_header>
+
+<dtml-let member="portal_membership.getAuthenticatedMember()">
+
+<div class="Desktop">
+
+<h1> Member Preferences </h1>
+
+<dtml-if msg>
+ <p>&dtml-msg;</p>
+ <hr>
+</dtml-if>
+
+<p><a href="password_form">Click here</a> to change your password.</p>
+
+<form action="personalize" method="post">
+ <table class="FormLayout">
+  <tr>
+   <th>Email address</th>
+   <td><input type="text" name="email" value="<dtml-var "member.email" html_quote>"></td>
+  </tr>
+  <tr>
+   <th valign="top">Listed status</th>
+   <td>
+    <dtml-let listedChecked="member.listed and 'checked' or ''"
+              unlistedChecked="(not member.listed) and 'checked' or ''"
+    >
+     <input type="radio" name="listed" &dtml-listedChecked;
+            value="on" id="cb_listed" />
+     <label for="cb_listed">Listed</label>
+
+     <dl class="FieldHelp">
+       <dd>You will show up on the public membership roster.</dd>
+     </dl>
+
+     <input type="radio" name="listed" &dtml-unlistedChecked;
+            value="" id="cb_unlisted" />
+	<label for="cb_unlisted">Unlisted</label>
+     <dl class="FieldHelp">
+       <dd> You will <i>not</i> show up on the public membership roster.
+            Your Member folder will still be publicly accessible unless
+            you change its security settings.</dd>
+     </dl>
+
+    </dtml-let>
+   </td>
+  </tr>
+
+  <dtml-if portal_skins>
+   <tr>
+    <th>Skin</th>
+    <td>
+     <select name="portal_skin">
+      <dtml-in expr="portal_skins.getSkinSelections()">
+       <dtml-let sel="REQUEST.get('portal_skin', '') == _['sequence-item']
+                      and 'selected' or ''">
+        <option value="&dtml-sequence-item;" &dtml-sel;>
+         &dtml-sequence-item;</option>
+       </dtml-let>
+      </dtml-in>
+     </select>
+    </td>
+   </tr>
+  </dtml-if>
+
+  <dtml-comment>
+  <dtml-in "member.propertysheets.CommonProperties.propertyIds()">
+   <tr>
+    <th>&dtml-sequence-item;</th>
+    <td><input type="text" name="&dtml-sequence-item;" value="<dtml-var "_.getattr(member, _['sequence-item'])" html_quote>"></td>
+   </tr>
+  </dtml-in>
+  </dtml-comment>
+
+  <tr>
+   <td></td>
+   <td><input type="submit" value=" Change "></td>
+  </tr>
+ </table>
+</form>
+
+</dtml-let>
+
+</div>
+
+<dtml-var standard_html_footer>

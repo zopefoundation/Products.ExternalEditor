@@ -1,0 +1,77 @@
+<dtml-let isAnon="portal_membership.isAnonymousUser()"
+          AuthClass="isAnon and 'GuestActions' or 'MemberActions'"
+          uname="isAnon and 'Guest'
+                 or portal_membership.getAuthenticatedMember().getUserName()"
+          obj="this()"
+          actions="portal_actions.listFilteredActionsFor(obj)"
+          user_actions="actions['user']"
+          folder_actions="actions['folder']"
+          object_actions="actions['object']"
+          global_actions="actions['global']">
+
+<table class="ActionBox" width="100%">
+
+ <tr class="&dtml-AuthClass;">
+  <td class="ActionTitle">
+   <img src="&dtml-portal_url;/p_/User_icon" align="left" alt="User">
+   <dtml-var uname>
+  </td>
+ </tr>
+ <tr class="&dtml-AuthClass;">
+  <td>
+   <dtml-in user_actions mapping>
+    <a href="&dtml-url;"><dtml-var name></a><br>
+   </dtml-in>
+  </td>
+ </tr>
+
+<dtml-if folder_actions>
+ <tr class="&dtml-AuthClass;">
+  <td> <dtml-in folder_actions mapping>
+        <a href="&dtml-url;"><dtml-var name></a><br>
+       </dtml-in>
+  </td>
+ </tr>
+</dtml-if>
+
+<dtml-if object_actions>
+ <tr class="&dtml-AuthClass;">
+  <td class="ActionTitle">
+   <dtml-let icon="obj.icon"
+             mt="obj.meta_type"
+             objID="obj.id"
+   >
+     <img src="&dtml-portal_url;/&dtml-icon;" align="left"
+          alt="&dtml-meta_type;">
+     &dtml-objID;
+    </dtml-let>
+  </td>
+ </tr>
+ <tr class="&dtml-AuthClass;">
+  <td>
+     <dtml-if expr="_.hasattr(obj, 'review_state')">
+     Status: <dtml-var "obj.review_state"><br>
+     </dtml-if>
+
+  <dtml-in object_actions mapping>
+   <a href="&dtml-url;"><dtml-var name></a><br>
+  </dtml-in>
+
+  </td>
+ </tr>
+</dtml-if>
+
+<dtml-if global_actions>
+ <tr class="&dtml-AuthClass;">
+  <td>
+   <dtml-in global_actions mapping>
+    <a href="<dtml-var url>"><dtml-var name></a><br>
+   </dtml-in>
+  </td>
+ </tr>
+</dtml-if>
+
+</table>
+
+</dtml-let>
+

@@ -1,0 +1,93 @@
+<dtml-var standard_html_header>
+
+<div class="Desktop">
+
+<h1> Configure the Portal </h1>
+
+<p> This form is used to set the portal configuration options.</p>
+
+<dtml-with portal_properties only>
+
+<form action="&dtml.url-reconfig;" method="post">
+ <table class="FormLayout">
+  <tr>
+   <th valign="top" align="left"> Portal 'From' name
+   </th>
+   <td>
+    <input name="email_from_name" value="&dtml-email_from_name;">
+    <dl class="FieldHelp">
+     <dd> When the portal generates mail, it uses this name
+          as its (apparent) sender. </dd>
+    </dl>
+   </td>
+  </tr>
+  <tr>
+   <th valign="top" align="left"> Portal 'From' address
+   </th>
+   <td><input name="email_from_address" value="&dtml-email_from_address;">
+    <dl class="FieldHelp">
+     <dd> When the portal generates mail, it uses this address
+          as its (apparent) return address. </dd>
+    </dl>
+   </td>
+  </tr>
+  <tr>
+   <th valign="top" align="left"> SMTP server
+   </th>
+   <td>
+    <input name="smtp_server" value="&dtml-smtp_server;">
+    <dl class="FieldHelp">
+     <dd> This is the address of your local SMTP (out-going
+          mail) server.</dd>
+    </dl>
+   </td>
+  </tr>
+  <tr>
+   <th valign="top" align="left"> Portal title
+   </th>
+   <td>
+    <input name="title" value="&dtml-title;">
+    <dl class="FieldHelp">
+     <dd> This is the title which appears at the top of every
+          portal page.</dd>
+    </dl>
+  </td>
+  </tr>
+  <tr>
+   <th valign="top" align="left"> Portal description
+   </th>
+   <td>
+     <textarea cols="40" rows="6" name="description"
+        style="width: 100%">&dtml-description;</textarea>
+     <dl class="FieldHelp">
+      <dd> This description is made available via syndicated
+           content and elsewhere.  It should be fairly brief.</dd>
+     </dl>
+   </td>
+  </tr>
+  <tr>
+   <th valign="top" align="left"> Password policy
+   </th>
+   <td>
+    <dtml-let validateChecked="validate_email and 'checked' or ''"
+              allowEnterChecked="(not validate_email) and 'checked' or ''" >
+    <input type=radio name="validate_email:int"
+           value="1" &dtml-validateChecked; >
+           Generate and email members' initial password<br>
+    <input type=radio name="validate_email:int"
+           value="0" &dtml-allowEnterChecked; >
+           Allow members to select their initial password
+     </dtml-let>
+   </td>
+  </tr>
+  <tr>
+   <td></td>
+   <td colspan="2"><input type="Submit" value="Change"></td>
+  </tr>
+ </table>
+</form>
+</dtml-with>
+
+</div>
+
+<dtml-var standard_html_footer>

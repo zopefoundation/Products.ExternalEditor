@@ -1,0 +1,42 @@
+<dtml-var standard_html_header>
+
+<form>
+ <table>
+ <dtml-in "portal_catalog.indexes()">
+  <tr>
+   <th>&dtml-sequence-item;</th>
+   <td>
+    <input type="text" name="&dtml-sequence-item;" 
+     <dtml-if "REQUEST.form.has_key(_['sequence-item'])">
+      value="<dtml-var "REQUEST.form[_['sequence-item']]">"
+     </dtml-if>
+    >
+   </td>
+  </tr>
+ </dtml-in>
+ </table>
+ <input type="submit">
+</form>
+
+<dtml-if "REQUEST.form.keys()"><dtml-in portal_catalog>
+ <dtml-if sequence-start>
+  <table>
+  <tr>
+  <th>URL</th>
+  <dtml-in "portal_catalog.schema()">
+   <th>&dtml-sequence-item;</th>
+  </dtml-in>
+  </tr>
+ </dtml-if>
+ <tr>
+ <td><a href="/<dtml-var "portal_catalog.getpath(data_record_id_)">"><dtml-var "portal_catalog.getpath(data_record_id_)"></a></td>
+ <dtml-in "portal_catalog.schema()">
+  <td><dtml-var "_[_['sequence-item']]"></td>
+ </dtml-in>
+ </tr>
+ <dtml-if sequence-end>
+  </table>
+ </dtml-if>
+</dtml-in></dtml-if>
+
+<dtml-var standard_html_footer>

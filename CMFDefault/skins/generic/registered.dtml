@@ -1,0 +1,26 @@
+<dtml-var standard_html_header>
+
+<div class="Desktop">
+
+<h1> Success! </h1>
+
+<p> You have been registered as a member. </p>
+
+<dtml-if "portal_properties.validate_email">
+
+<p> You will receive an email shortly containing your password 
+    and instructions on how to activate your membership. </p>
+
+<dtml-else>
+
+<p> You can log on immediately by clicking
+    <a href="&dtml.url-logged_in;?__ac_name=&dtml.url_quote-username;&__ac_password=&dtml.url_quote-password;"
+    >here</a>. </p>
+
+</dtml-if>
+
+<p> <a href="&dtml.url-index_html;">Return to homepage</a> </p>
+
+</div>
+
+<dtml-var standard_html_footer>

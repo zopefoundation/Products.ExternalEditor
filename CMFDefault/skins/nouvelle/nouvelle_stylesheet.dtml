@@ -1,0 +1,342 @@
+<dtml-unless do_inline_css>
+<dtml-call "RESPONSE.setHeader('Content-Type','text/css')">
+</dtml-unless>
+<dtml-with stylesheet_properties>
+body {
+    background-color: &dtml-bg_color;;
+    color: &dtml-base_font_color;;
+    font-family:  &dtml-primary_font_family;;
+    font-size:  &dtml-base_font_size;;
+}
+
+a:link {
+    color: &dtml-link_color;;
+    text-decoration: none;
+}
+
+a:visited {
+    color: &dtml-vlink_color;;
+    text-decoration: none;
+}
+
+a:active {
+    color: &dtml-alink_color;
+    text-decoration: none;
+}
+
+a:hover {
+    color:  &dtml-hover_color;;
+}
+
+p {
+    font-size: &dtml-base_font_size;;
+    background-color:  &dtml-bg_color;;
+    color:  &dtml-base_font_color;;
+    font-family:  &dtml-primary_font_family;;
+}
+
+h1 {
+    font-size:  120%;
+    font-weight:  bold;
+    color:  &dtml-secondary_accent_color;;
+}
+
+h2 {
+    font-size:  115%;
+    background-color: &dtml-bg_color;;
+    color:  &dtml-base_font_color;;
+}
+
+h3 {
+    font-size:  110%;
+    background-color: &dtml-bg_color;;
+    color:  &dtml-base_font_color;;
+}
+
+.invisible {
+  font-size: 80%;
+  color: &dtml-bg_color;;
+}
+
+.mild {
+    color: #7f7f7f;
+}
+
+.DesktopStatusBar{
+  font-size: 80%;
+  font-family: &dtml-secondary_font_family;;
+  color: #ff0000;
+}
+
+table {
+    width: 100%;
+    border: 0;
+}
+
+table.Masthead {
+    background-color: &dtml-primary_accent_color;;
+}
+
+tr.Masthead td.PortalLogo {
+    background-color: &dtml-primary_accent_color;;
+    text-align: left;
+    vertical-align: top;
+}
+
+table.Masthead tr.Masthead td.PortalTitle {
+    text-align: left;
+    vertical-align: middle;
+}
+
+table.Masthead tr.Masthead td.PortalTitle h1 {
+    background-color:  &dtml-primary_accent_color;;
+    color: &dtml-primary_accent_font_color;;
+    font-family: &dtml-secondary_font_family;;
+    font-size: 120%;
+    font-weight: bold;
+}
+
+
+table.Masthead tr.Navhead {
+    background-color: &dtml-primary_accent_color;;
+}
+
+table.Masthead tr.Navhead td.NavBar {
+    color: &dtml-secondary_accent_color;;
+    font-size: 80%;
+    font-weight: normal;
+    text-align: right;
+    vertical-align: bottom;
+}
+
+table.Masthead tr.Navhead td.NavBar a:link {
+    color: &dtml-primary_accent_link_color;;
+}
+
+table.Masthead tr.Navhead td.NavBar a:visited {
+    color: &dtml-primary_accent_vlink_color;;
+}
+
+table.Masthead tr.Navhead td.NavBar a:active {
+    color: &dtml-primary_accent_alink_color;;
+}
+
+table.Masthead tr.Navhead td.NavBar a:hover {
+    color: &dtml-hover_color;;
+}
+
+td.SideBar {
+    width: 10%;
+    vertical-align: top;
+}
+
+table.ActionBox {
+    font-family: &dtml-primary_font_family;;
+    background-color: &dtml-primary_accent_color;;
+}
+
+table.ActionBox tr td {
+    font-size: 70%;
+}
+
+table.ActionBox tr.GuestActions {
+    background-color: &dtml-guest_actions_color;;
+}
+
+table.ActionBox tr.GuestActions td a:link {
+    color: &dtml-guest_actions_link_color;;
+    text-decoration:  none;
+}
+
+table.ActionBox tr.GuestActions td a:visited {
+    color: &dtml-guest_actions_link_color;;
+    text-decoration:  none;
+}
+
+table.ActionBox tr.GuestActions td a:active {
+    color: &dtml-guest_actions_link_color;;
+    text-decoration:  none;
+}
+
+table.ActionBox tr.GuestActions td a:hover {
+    color: &dtml-hover_color;;
+    text-decoration:  none;
+}
+
+table.ActionBox tr.MemberActions {
+    background-color: &dtml-secondary_accent_color;;
+}
+
+table.ActionBox tr.MemberActions td {
+    color: &dtml-secondary_accent_font_color;;
+}
+
+table.ActionBox tr td.ActionTitle {
+    font-weight: bold
+}
+
+table.ActionBox tr.MemberActions td a:link {
+    color: &dtml-secondary_accent_link_color;;
+    text-decoration:  none;
+}
+
+table.ActionBox tr.MemberActions td a:visited {
+    color: &dtml-secondary_accent_vlink_color;;
+    text-decoration:  none;
+}
+
+table.ActionBox tr.MemberActions td a:active{
+    color: &dtml-secondary_accent_alink_color;;
+    text-decoration:  none;
+}
+
+table.ActionBox tr.MemberActions td a:hover{
+color: &dtml-hover_color;;
+    text-decoration:  none;
+}
+
+td.Desktop {
+    vertical-align: top;
+}
+
+td.Desktop table tr {
+    vertical-align: top;
+}
+
+div.Desktop p {
+    font-size: 100%;
+    margin-right:100pt;
+    font-family: &dtml-primary_font_family;;
+}
+
+div.Desktop h1 {
+    font-size: 120%;
+    margin-right:100pt;
+    font-family: &dtml-secondary_font_family;;
+}
+
+div.AuthWarning {
+    text-align: center;
+    font-style: italic;
+}
+
+div.AuthWarning table {
+    border: 0;
+}
+
+div.AuthWarning tr.Hot {
+    color: #FF0000;
+}
+
+div.Error {
+    color:  #FF0000;
+}
+
+p.DesktopStatusBar {
+    font-size: 100%;
+    font-family: &dtml-secondary_font_family;;
+    font-style: italic;
+    font-weight: bold;
+}
+
+table.FormLayout {
+    width: auto
+}
+
+table.FormLayout tr {
+    vertical-align: top;
+}
+
+table.FormLayout th {
+    text-align: right;
+}
+
+table.FormLayout dl.FieldHelp dd {
+    font-size: 70%;
+}
+
+table.ContentsList {
+}
+
+table.ContentsList tr td img {
+    border: 0;
+}
+
+table.SearchResults {
+    width: auto;
+}
+
+table.SearchResults tr th {
+    text-align: left;
+}
+
+table.SearchResults tr td img {
+    border: 0;
+}
+
+table.Wizard {
+    width: auto;
+}
+
+table.Wizard tr {
+    vertical-align: top;
+}
+
+table.Wizard tr th {
+    text-align: right;
+}
+
+table.NewsItems {
+    border: 0;
+}
+
+
+td.NewsBorder {
+    background-color: &dtml-primary_accent_color;;
+}
+
+td.NewsListing {
+    background-color: &dtml-primary_accent_color;;
+    color:  &dtml-bg_color;;
+}
+
+.NewsLeadin {
+    background-color: &dtml-bg_color;;
+    color:  &dtml-primary_accent_color;;
+}
+
+.NewsByLine {
+    background-color:  &dtml-primary_accent_color;;
+    color:  &dtml-bg_color;;
+}
+
+.NewsDateline {
+    background-color:  &dtml-primary_accent_color;;
+    color:  &dtml-bg_color;;
+}
+
+td.NewsTitle {
+    background-color: &dtml-primary_accent_color;;
+    color: &dtml-primary_accent_font_color;;
+    text-align: center;
+    font-size: 90%;
+    font-weight: bold;
+}
+
+tr.NewsItemRow td {
+    background-color: &dtml-highlight_color;;
+    font-size: 70%;
+}
+
+p.NewsHeadline {
+    background-color:  &dtml-primary_accent_color;;
+}
+td.ListName {
+    background-color:  &dtml-primary_accent_color;;
+    color: &dtml-primary_accent_font_color;;
+    font-weight: bold;
+}
+td.ListDefinition {
+    font-style: italic;
+}
+</dtml-with>

@@ -1,0 +1,10 @@
+  <dtml-if localFooter>
+   <dtml-var localFooter>
+  </dtml-if>
+
+  </td>
+ </tr>
+</table>
+
+</body>
+</html>

@@ -1,0 +1,2 @@
+<dtml-call "REQUEST['RESPONSE'].expireCookie('__ac', path='/')">
+<dtml-call "REQUEST['RESPONSE'].redirect(URL1+'/logged_out')">

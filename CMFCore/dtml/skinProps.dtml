@@ -1,0 +1,76 @@
+<html><head><title>portal_skins properties</title></head>
+<body bgcolor="#ffffff">
+<dtml-var manage_tabs>
+<h2>Properties</h2>
+<form action="manage_properties" method="POST">
+<table>
+  <tr>
+     <th valign="top" align="left">Skin selections</th>
+     <td>
+       <table border="1"><tr><td>
+       <table>
+         <tr>
+           <th>Name</th>
+           <th>Layers (in order of precedence)</th>
+         </tr>
+         <dtml-in getSkinPaths>
+         <tr>
+           <td>
+             <input type="checkbox" name="chosen:list"
+              value="&dtml-sequence-key;">
+             &dtml-sequence-key;
+           </td>
+           <td>
+             <input type="text" name="skinpath_&dtml-sequence-key;"
+              value="&dtml-sequence-item;" size="50">
+           </td>
+         </tr>
+         </dtml-in>
+
+         <tr>
+           <td>
+             <input type="text" name="skinname" value="" size="20">
+           </td>
+           <td>
+             <input type="text" name="skinpath" value="" size="50">
+           </td>
+         </tr>
+
+         <tr>
+           <td colspan="2">
+             <input type="submit" name="add_skin" value=" Add ">
+             <input type="submit" name="del_skin" value=" Delete ">
+           </td>
+         </tr>
+
+       </table>
+       </td></tr></table>
+     </td>
+  </tr>
+  <tr>
+     <th valign="top" align="left">Default skin</th>
+     <td><select name="default_skin" size="1">
+       <dtml-in getSkinSelections>
+         <option value="&dtml-sequence-item;" <dtml-if
+          expr="_['sequence-item'] == getDefaultSkin()"
+          >selected="selected"</dtml-if>>&dtml-sequence-item;</option>
+       </dtml-in>
+     </select></td>
+  </tr>
+  <tr>
+     <th valign="top" align="left">REQUEST variable name</th>
+     <td><input type="text" name="request_varname"
+          value="&dtml-getRequestVarname;" size="25"></td>
+  </tr>
+  <tr>
+     <th valign="top" align="left">Skin flexibility</th>
+     <td><input type="checkbox" name="allow_any" id="cb_allowany"
+          <dtml-if getAllowAny>checked="checked"</dtml-if> />
+         <label for="cb_allowany">Allow arbitrary skins to be
+	 selected</label></td>
+  </tr>
+</table>
+<input type="submit" name="submit" value="Save">
+</form>
+</body>
+</html>

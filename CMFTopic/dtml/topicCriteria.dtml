@@ -1,0 +1,52 @@
+<dtml-var standard_html_header>
+
+<div class="Desktop">
+
+<div class="Topic">
+
+<h2> Topic Criteria: <dtml-var id> </h2>
+
+<form action="&dtml-absolute_url;" method="post">
+<table class="FormLayout">
+
+<dtml-in listCriteria>
+
+ <tr valign="top">
+  <td> <input type="checkbox" name="ids:list" value="&dtml-id;"> </td>
+  <td> <a href="&dtml-id;"> <dtml-var id> </a>
+  </td>
+ </tr>
+
+</dtml-in>
+
+ <tr valign="top">
+  <td> <br> </td>
+  <td>
+   <input type="submit" name="folder_rename_form:method" value="Rename">
+   <input type="submit" name="folder_cut:method" value="Cut">
+   <input type="submit" name="folder_copy:method" value="Copy">
+   <input type="submit" name="folder_paste:method" value="Paste">
+   <input type="submit" name="folder_delete:method" value="Delete">
+  </td>
+ </tr>
+
+</table>
+</form>
+
+<h2> Add: </h2>
+
+<ul>
+
+ <dtml-in criteriaMetatypes mapping>
+
+ <li> <a href="&dtml-action;"> <dtml-var name> </a> </p>
+
+ </dtml-in>
+
+</ul>
+
+</div>
+
+</div>
+
+<dtml-var standard_html_footer>

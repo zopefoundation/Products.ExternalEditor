@@ -1,0 +1,44 @@
+<dtml-call "REQUEST.set('isDesktop', 1)">
+<dtml-var standard_html_header>
+
+<dtml-if "not portal_membership.checkPermission('Access contents information'
+                                               , this())">
+ <dtml-call "RESPONSE.redirect(absolute_url())">
+</dtml-if>
+
+<!-- This is the desktop area -->
+<div class="Desktop">
+
+<h1> Add Content </h1>
+
+<form action="invokeFactory" method="POST">
+<table class="FormLayout">
+
+ <dtml-in allowedContentTypes>
+
+ <tr valign="top">
+  <td> <input type="radio" name="type_name" value="&dtml-getId;"
+        id="cb_&dtml-sequence-index;" /> </td>
+  <td colspan="2" class="ListName"> <label for="cb_&dtml-sequence-index;"
+	><dtml-var Type></label> </td>
+ <tr valign="top">
+  <td> <br> </td>
+  <td> <br> </td>
+  <td class="ListDefinition"> <dtml-var Description> </td>
+ </tr>
+
+ </dtml-in>
+
+ <tr valign="top">
+  <td> <br> </td>
+  <td colspan="2"> <strong> ID: </strong>
+       <input type="text" name="id" size="20">
+       <input type="submit" value="Add"> </td>
+ </tr>
+
+</table>
+</form>
+
+</div>
+
+<dtml-var standard_html_footer>

@@ -1,0 +1,49 @@
+<dtml-var standard_html_header>
+
+<h1> Add Simple Int Criterion </h1>
+
+<form action="addSimpleIntCriterion" method="post">
+<table>
+
+<dtml-let indexes="portal_catalog.indexes()">
+
+ <tr valign="top">
+  <th align="right"> Index ID: </th>
+  <td>
+   <select name="id">
+    <dtml-in indexes>
+     <option value="&dtml-sequence-item;"> <dtml-var sequence-item> </option>
+    </dtml-in>
+   </select>
+  </td>
+ </tr>
+
+ <tr valign="top">
+  <th align="right"> Value: </th>
+  <td>
+   <input type="text" name="value" size="40">
+  </td>
+ </tr>
+
+ <tr valign="top">
+  <th align="right"> Direction: </th>
+  <td>
+   <input type="radio" name="direction" value="min"> Minimum
+   <input type="radio" name="direction" value="max"> Maximum
+   <input type="radio" name="direction" value="min:max"> Min/Max
+  </td>
+ </tr>
+
+ <tr valign="top">
+  <td> <br> </td>
+  <td>
+   <input type="submit" value="Add">
+  </td>
+ </tr>
+
+</dtml-let>
+
+</table>
+</form>
+
+<dtml-var standard_html_footer>

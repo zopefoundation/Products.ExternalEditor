@@ -1,0 +1,58 @@
+<dtml-var standard_html_header>
+
+<dtml-let newsitems="portal_catalog.searchResults(meta_type='News Item',
+  sort_on='Date', sort_order='reverse', review_state='published')">
+
+<dtml-in newsitems size="10" start="batch_start" previous>
+ <p style="Desktop">
+ <a href="&dtml-URL;&dtml-sequence-query;batch_start=&dtml-previous-sequence-start-number;">
+ Next &dtml-previous-sequence-size; more recent articles
+ </a>
+ </p>
+</dtml-in>
+
+<dtml-in newsitems size="10" start="batch_start">
+ <dtml-if sequence-start>
+  <table cellspacing="0" border="0" width="90%">
+ </dtml-if>
+ <tr>
+  <td class="NewsListing" align="left" valign="top">
+   <p class="NewsHeadline"><a href="<dtml-var "portal_catalog.getpath(data_record_id_)">">
+    &dtml-title;
+   </a><br><span class="NewsByLine">By &dtml-Creator;</span>
+   </p>
+  </td>
+  <td class="NewsListing" align="right" valign="top">
+   <p class="NewsDateline">
+    <dtml-var Date>
+   </p>
+  </td>
+ </tr>
+ <tr>
+  <td colspan="2">
+   <p class="NewsLeadin">
+    &dtml-Description;
+   </p>
+   <p>&nbsp;</p>
+  </td>
+ </tr>
+ <dtml-if sequence-end>
+  </table>
+ </dtml-if>
+<dtml-else>
+ <p class="Desktop">
+  No news is good news!
+ </p>
+</dtml-in>
+
+<dtml-in newsitems size="10" start="batch_start" next>
+ <p class="Desktop">
+ <a href="&dtml-URL;&dtml-sequence-query;batch_start=&dtml-next-sequence-start-number;">
+ Next &dtml-next-sequence-size; older articles
+ </a>
+ </p>
+</dtml-in>
+
+</dtml-let>
+
+<dtml-var standard_html_footer>

@@ -1,0 +1,69 @@
+<dtml-var standard_html_header>
+
+<dtml-let member="portal_membership.getAuthenticatedMember()"
+  current_state="portal_workflow.getStateFor(this())"
+  transitions="portal_workflow.listAllowableTransitionsFor(this())">
+
+<div class="Desktop">
+
+<h1> Sumit Item for Review </h1>
+
+<dtml-if message>
+ <h2 class="DesktopTitle">&dtml-message;</h2>
+</dtml-if>
+
+<p>To make an item published, it
+   has to be reviewed by one of the site's Reviewers. 
+   A <b>published</b> item is available to the general
+   member base and anonymous visitors.</p>
+
+<p>Another way to control the visibility of an item is with its <b>effective
+   date</b>.  An item is not publicly available before its effective date,
+   <em>even if its status is <b>published</b></em>.</p>
+
+
+<form method="post" action="content_status_modify">
+ <table class="FormLayout">
+  <tr>
+   <td valign=top align=left>
+    <strong>Status</strong>
+   </td>
+   <td valign=top align=left>
+     This item is currently in <b><dtml-var expr="current_state"></b> status.
+     <input type="hidden" name="transition" value="pending">
+   </td>
+  </tr>
+  <tr>
+   <td valign=top align=left colspan=2>
+    <strong><em>Comments</em></strong><br>
+    <textarea name="comment" cols="60" rows="5" wrap="soft"
+     style="width: 100%"></textarea>
+   </td>
+  </tr>
+  <tr>
+   <td></td>
+   <td><input type="submit" value=" Submit Item "></td>
+  </tr>
+ </table>
+</form>
+
+<dtml-if review_history>
+ <p><strong>Reviewing history</strong><br>
+ <dtml-in review_history mapping reverse>
+  <dtml-var time fmt="aCommon"> &dtml-action;
+  <dtml-if effective_date>
+  (effective: <dtml-var effective_date fmt="aCommon">)
+  </dtml-if>
+  by &dtml-actor;<br>
+  <dtml-if "_['sequence-item']['comments']">
+   </p><dtml-var "_['sequence-item']['comments']" fmt="structured-text"><p>
+  </dtml-if>
+ </dtml-in>
+ </p>
+</dtml-if>
+
+</dtml-let>
+
+</div>
+
+<dtml-var standard_html_footer>

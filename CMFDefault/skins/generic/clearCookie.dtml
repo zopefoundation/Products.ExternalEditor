@@ -1,0 +1,2 @@
+<dtml-call "RESPONSE.expireCookie('folderfilter', path='/')">
+<dtml-call "RESPONSE.redirect(absolute_url() + '/folder_contents')">

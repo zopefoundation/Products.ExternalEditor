@@ -1,0 +1,20 @@
+<dtml-if expr="not portal_properties.validate_email">
+  <dtml-let failMessage="portal_registration.testPasswordValidity(password, confirm)">
+    <dtml-if failMessage>
+      <dtml-return expr="join_form(_.None, _, error=failMessage)">
+    </dtml-if>
+  </dtml-let>
+</dtml-if>
+<dtml-let failMessage="portal_registration.testPropertiesValidity(REQUEST)">
+  <dtml-if failMessage>
+    <dtml-return expr="join_form(_.None, _, error=failMessage)">
+  <dtml-else>
+    <dtml-let password="REQUEST.has_key('password') and REQUEST['password'] or portal_registration.generatePassword()">
+      <dtml-call expr="portal_registration.addMember(REQUEST['username'], password, properties=REQUEST)">
+      <dtml-if expr="portal_properties.validate_email or REQUEST.get('mail_me', 0)">
+        <dtml-call expr="registered_notify(_.None, _, password=password)">
+      </dtml-if>
+      <dtml-return registered>
+    </dtml-let>
+  </dtml-if>
+</dtml-let>

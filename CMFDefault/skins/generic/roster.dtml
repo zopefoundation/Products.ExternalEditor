@@ -1,0 +1,100 @@
+<dtml-var standard_html_header>
+
+<dtml-unless bs>
+ <dtml-call "REQUEST.set('bs', '25')">
+</dtml-unless>
+
+<div class="Desktop">
+
+<h1> Portal Members </h1>
+
+<dtml-let roster="portal_membership.getRoster()"
+          userMgr="portal_membership.checkPermission( 'Manage_users', Members )"
+>
+
+<table class="SearchResults">
+ <tr>
+  <td width="16"> <br>
+  </td>
+  <th> Member
+  </th>
+  <dtml-if userMgr>
+   <th> Listed?
+   </th>
+   <dtml-comment> We don't have a good interface for querying/setting roles
+   <th> Roles
+   </th>
+   </dtml-comment>
+  </dtml-if>
+ </tr>
+
+<dtml-in roster mapping size=bs orphan=1 start=qs>
+ <dtml-let homeUrl="portal_membership.getHomeUrl(id, verifyPermission=1)">
+ <tr>
+ <td> <br> </td>
+  <td> <dtml-if homeUrl>
+         <a href="&dtml-homeUrl;">&dtml-id;</a>
+       <dtml-else>
+          &dtml-id;
+       </dtml-if>
+  </td>
+ <dtml-if userMgr>
+  <td>
+   <dtml-if listed> Yes <dtml-else> No </dtml-if>
+  </td>
+<dtml-comment> We don't have a good interface for querying/setting roles
+  <td>
+   <dtml-var "_.string.join( portal_membership.getAuthenticatedMember().getRoles()
+                           , ',' )">
+  </td>
+</dtml-comment>
+ </dtml-if>
+ </tr>
+ </dtml-let>
+</dtml-in>
+
+ <tr>
+ </tr>
+
+ <tr>
+  <td> <br> </td>
+  <td>
+
+    <form>
+
+    <dtml-in roster size=bs orphan=1 start=qs previous>
+     <dtml-let sq=sequence-query
+               pssn=previous-sequence-start-number
+     >
+      <a href="&dtml-URL;&dtml-sq;qs=&dtml-pssn;" >Previous</a>
+    </dtml-let>
+    <dtml-else>
+      Previous
+    </dtml-in>
+
+    <input type="text" value="&dtml-bs;" name="bs" size="4">
+
+    <dtml-in roster size=bs orphan=1 start=qs next>
+     <dtml-let sq=sequence-query
+               nssn=next-sequence-start-number
+     >
+      <a href="&dtml-URL;&dtml-sq;qs=&dtml-nssn;">Next</a>
+     </dtml-let>
+    <dtml-else>
+      Next
+    </dtml-in>
+
+    </form>
+
+  </td>
+<dtml-comment> We don't have a good interface for querying/setting roles
+  <td> <br> </td>
+</dtml-comment>
+
+</table>
+
+</dtml-let>
+
+</div>
+
+<dtml-var standard_html_footer>

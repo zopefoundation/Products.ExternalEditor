@@ -1,0 +1,12 @@
+<dtml-var standard_html_header>
+
+<h3>Welcome to the PTK!</h3>
+
+<p>The first thing you should do is visit the
+ <a href="&dtml-portal_url;/reconfig_form">configuration form</a>.<br />
+ Then you might want to look at the
+ <a href="&dtml-portal_url;/manage">management interface</a> and
+ the <a href="&dtml-portal_url;">home page</a>.
+</p>
+
+<dtml-var standard_html_footer>

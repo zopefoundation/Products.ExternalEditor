@@ -1,0 +1,21 @@
+<dtml-var standard_html_header>
+
+<div class="Desktop">
+
+<div class="Topic">
+
+<h2> List Criterion: <dtml-var id> </h2>
+
+<h3> Value: </h3>
+
+<ul>
+ <dtml-in value>
+  <li> <dtml-var sequence-item> </li>
+ </dtml-in>
+</ul>
+
+</div>
+
+</div>
+
+<dtml-var standard_html_footer>

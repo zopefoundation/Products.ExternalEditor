@@ -1,0 +1,14 @@
+<dtml-var standard_html_header>
+<div class="Desktop">
+ <div class="Document">
+  <dtml-var content_byline>
+  <dtml-var cooked_text>
+
+  <div class="Discussion">
+   <dtml-var viewThreadsAtBottom>
+  </div>
+
+ </div>
+</div>
+
+<dtml-var standard_html_footer>

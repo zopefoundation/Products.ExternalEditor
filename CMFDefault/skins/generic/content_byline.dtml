@@ -1,0 +1,12 @@
+<p>
+ Created by
+ <dtml-let creator=Creator
+           home_url="portal_membership.getHomeUrl(creator)">
+  <dtml-if home_url>
+   <a href="&dtml-home_url;">&dtml-creator;</a>.
+  <dtml-else>
+   &dtml-creator;.
+  </dtml-if>
+ </dtml-let>
+ Last modified on <dtml-var bobobase_modification_time fmt="Date">
+</p>

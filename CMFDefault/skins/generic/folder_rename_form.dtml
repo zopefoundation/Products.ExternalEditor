@@ -1,0 +1,53 @@
+<dtml-var standard_html_header>
+
+<dtml-if expr="_.hasattr(REQUEST, 'ids') and REQUEST['ids']">
+<dtml-with expr="_.getitem(REQUEST['ids'][0], 0)">
+<dtml-if cb_isMoveable>
+
+<div class="Desktop">
+<H1> Rename <dtml-var meta_type> </H2>
+
+<FORM ACTION="folder_rename" METHOD="POST">
+<TABLE class="FormLayout">
+<TR>
+  <TD ALIGN="LEFT" VALIGN="TOP">
+  <IMG SRC="<dtml-var SCRIPT_NAME>/<dtml-var icon>" ALT="" BORDER="0">
+  </TD>
+  <TD ALIGN="LEFT" VALIGN="TOP">
+  <dtml-var id>
+  </TD>
+</TR>
+<TR>
+  <TD ALIGN="LEFT" VALIGN="TOP">
+  <STRONG>to:</STRONG>
+  </TD>
+  <TD ALIGN="LEFT" VALIGN="TOP">
+  <INPUT TYPE="TEXT" NAME="new_id" value="&dtml-id;" SIZE="20">
+  </TD>
+</TR>
+<TR>
+<TD></TD>
+<TD>
+  <INPUT TYPE="HIDDEN" NAME="id" VALUE="<dtml-var id html_quote>">
+  <INPUT TYPE="submit" VALUE=" Ok ">
+</TD>
+</TR>
+</TABLE>
+</FORM>
+<dtml-else>
+<FORM ACTION="folder_contents" METHOD="GET">
+<p>The item <EM><dtml-var id></EM> does not support this operation.</P>
+<INPUT TYPE="submit" NAME="submit" VALUE=" Ok ">
+</FORM>
+</dtml-if>
+
+</dtml-with>
+<dtml-else>
+<FORM ACTION="folder_contents" METHOD="GET">
+<p>You must select an item to rename.</p>
+<INPUT TYPE="submit" NAME="submit" VALUE=" Ok ">
+</FORM>
+
+</dtml-if>
+
+<dtml-var standard_html_footer>

@@ -1,0 +1,24 @@
+<dtml-var standard_html_header>
+
+<dtml-with portal_properties>
+
+<table cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+  <td valign="top" width="80%">
+
+<h1> Welcome to &dtml-title; </h1>
+
+<dl>
+ <dt> Overview </dt>
+ <dd> <dtml-var description> </dd>
+</dl>
+
+  </td>
+  <td valign="top" width="20%">
+   <dtml-var news_box>
+  </td>
+  </tr>
+ </table>
+
+</dtml-with>
+<dtml-var standard_html_footer>

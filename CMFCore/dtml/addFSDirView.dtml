@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML lang="en">
+<HEAD>
+<TITLE>Add Directory View</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF" LINK="#000099" VLINK="#555555">
+<H2>Add Directory View</H2>
+
+<P>
+<!-- Description here -->
+</P>
+
+<FORM ACTION="manage_addDirectoryView" METHOD="POST">
+<TABLE CELLSPACING="2">
+<TR>
+  <TD ALIGN="LEFT" VALIGN="TOP">
+  <EM><STRONG>Directory</STRONG></EM>
+  </TD>
+  <TD ALIGN="LEFT" VALIGN="TOP">
+  <select name="filepath" size="5">
+    <dtml-in manage_listAvailableDirectories>
+      <option value="&dtml-sequence-item;">&dtml-sequence-item;</option>
+    </dtml-in>
+  </select>
+  </TD>
+</TR>
+<TR>
+  <TD ALIGN="LEFT" VALIGN="TOP">
+  <STRONG>Id</STRONG>
+  </TD>
+  <TD ALIGN="LEFT" VALIGN="TOP">
+  <INPUT TYPE="TEXT" NAME="id" SIZE="40">
+  <br>
+  <em>(Leave blank to use the default.)</em>
+  </TD>
+</TR>
+
+<TR>
+<TD></TD>
+<TD>
+<BR><INPUT TYPE="SUBMIT" name="submit" VALUE=" Add ">
+</TD>
+</TR>
+</TABLE>
+</FORM>
+</BODY>
+</HTML>

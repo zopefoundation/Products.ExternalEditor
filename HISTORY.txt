@@ -1,0 +1,180 @@
+1.0 beta (2001/02/16)
+
+ * Add 'PortalFolder.allowedContentTypes' and supporting machinery
+   in type info objects, to permit configuration of the content
+   types addable to a given folder type.
+
+0.10alpha (2001/02/02)
+
+ * Fixed breakage of "reply" feature introduced by new
+   constructor regime (PTK Tracker #159).
+
+ * Make creation of an 'acl_users' in the portal itself optional.
+
+ * Add mapping of external roles (i.e., belonging to a user
+   retrieved from an acquired user folder) onto "portal-specific"
+   roles.  For example, users from the root user folder may
+   have the "Employee" role;  the 'portal_membership' tool can
+   map this role onto the "Member" role needed by the portal.
+
+ * Corrected HTML quoting of Document text (PTK Tracker #154).
+
+ * If content_url is not None and the user has their own member
+   folder (as returned by 'portal_membership.getHomeUrl') then
+   two new actions will show up in the user-related action box:
+
+   - "Add to Favorites", adds an item to the user's "Favorites"
+     folder, which will get created underneath the user's home
+     folder if not present.
+
+   - "My Favorites", linked to the Favorites folder (if the
+     member has one).
+
+ * Add 'Favorites' content type (derived from 'Link', optimized
+   for objects within the same site).
+
+ * Add 'PTKBase.interfaces.Contentish', an interface describing
+   non-metadata methods for all content objects.
+
+ * Added cool new portal icon -- thanks to Michael Bernstein!
+
+ * Add 'simple_metadata' and 'metadata_help' methods, for easing
+   "constructorish" capture of metadata.  Also demos "skinning"
+   object-specific DTML.
+
+ * Rearranged base classes to deal with the fact that SimpleItem
+   now has a _setId() method.
+
+ * Added a "quick start" script for creating a new INSTANCE_HOME
+   sandbox (e.g., to allow easy experimentation with new-style
+   portal).
+ 
+ * Remove "metadata" editing from most "normal" edit forms.
+
+ * Tweak stylesheets to make Netscrape 4.x more happy (links on
+   secondary accent areas wouldn't show).
+
+ * Enforced standard construction interface (only 'id' is
+   required) on all "stock" content types.
+
+ * Added default factory registration in 'portal_types' for all
+   "stock" content types.
+
+ * Add 'portal_types' tool, allowing registry of type / constructor
+   information about portal content which may be created in a given
+   portal instance (replaces 'Wizards' folder as type registry).
+
+ * Added the description property to those attributes shown on the
+   "view" screen for a file object (PTK Tracker #153).
+
+ * Added credentialsChanged hook which can now work with
+   CookieCrumblers.
+
+ * Added Shane Hathaway's CookieCrumbler product, which spoofs
+   HTTP Basic Auth for "don't know from cookies" user folders.
+
+ * Add object for mapping property lists as filesystem object (to
+   support parameterized stylesheet).  These objects are
+   customized as normal Folders, which allows a great deal of
+   flexibility.
+
+ * Corrected 'PTKDemo.File.edit' to avoid replacing file contents
+   with empty string when no file is uploaded (PTK Tracker #152).
+
+ * Remove distribution-tab verisons of TTW products.
+
+ * Remove derived UML model files (UML-HTML).
+
+ * Added the PortalGenerator class, which is a subclassable portal
+   instance creator, and created a new addable meta type.
+
+ * Removed ZClass dependency from PropertiesTool.
+
+ * Corrected glitch that 'PTKDemo.PortalObject.manage_options'
+   was inherited from ObjectManager rather than PortalFolder.
+
+ * Add 'PUT_factory' to PTKBase.PortalFolder (make it replaceable,
+   too!)
+
+ * Register PTKDemo content class metatypes with PTKBase.PortalFolder's
+   MIME-type registry.
+
+ * Unscrew PTKDemo.Document's dependence on vanished
+   NullPortalResource.
+
+ * Clean up CSS in DemoPortal (PTK Tracker #124).
+
+ * Remove dependency on PythonMethod in DemoPortal (PTK Tracker #151).
+
+ * Integrated user preference for "skin" with 'portal_skins'
+   options.
+
+ * Added capability to filter * 'PortalFolder.content{Ids,ValuesItems}'
+   based on metadata queries.
+
+ * Migrated skins from 'DemoPortal/Interfaces' folders into
+   filesystem skins directories.
+
+ * Improved integration of FSDTMLMethod and FSImage with output from
+   the FSDump product.
+
+ * New tab for the member data tool: 'contents' displays the number
+   of members stored in the member data tool and also the number
+   of "orphaned" members, meaning those that do not appear in the
+   underlying acl_users anymore. a button is provided to "prune"
+   those orphaned members.
+
+ * Added methods to examine the contents of the meber data tool and to
+   prune all those members who have been deleted out of the underlying
+   'acl_users'.
+
+ * Fixed bug when adding the mailhost during Portal initialization.
+
+ * Added the portal_memberdata tool, which can wrap any user object with
+   member properties.  Yeehaw!  the portal no longer needs a special
+   user folder!
+
+ * Add 'portal_skins' tool, enabling safe TTW customization of the default
+   portal UI, which will be delivered as filesystem-based skin folders.
+   Huge kudos to Shane Hathaway, who figured out a sane way to do this!
+
+ * Extend fix for PTK Tracker #149 to 'generic' and 'sweng' interfaces.
+
+ * Append '/view' to search results in order to allow navigation
+  to objects which don't use standard header/footer in their
+  'index_html', e.g., Images.  (PTK Tracker Issue #149)
+
+ * Add meta_type to DiscussionItem (PTK Tracker Issue #150).
+
+ * Integrate Dan Pierson's patch to show discussion threads inline
+   (PTK Tracker issue #93).
+
+ * Fix PTK Tracker #145 (PTKDemo/Portal.py or MailHost broken):  the
+   2000/12/08 hotfix removed the "legacy" name, 'manage_addMailHost'.
+
+ * Fix PTK Tracker #148 ('Table rows need vertical align')
+
+ * Fix PTK Tracker #147 ("PTKDemo's Metadata HTML is ugly").
+
+ * Fix PTK Tracker issue #136 ('CSS selection broken').
+
+ * Fix Tracker issue #141 ('Wizard product has broken subobjects list').
+
+ * Remove redundant 'description' arg from constructors (PTK Tracker
+   issue #142;  thanks to jon@totient.demon.co.uk for reporting this).
+
+ * Enable FTP upload/creation of NewsItems
+
+ * Add the ability to query and set DublinCore metadata via FTP:
+
+   - Updated PTKDemo.DemoDublinCore.DemoDublinCore to add a
+     method, 'getMetadataHeaders()', which builds a list of
+     DublinCore headers, suitable for inclusion in <meta> tags
+     or in "Structured Text Headers".  
+
+   - Updated PTKDemo.Document.Document to export/import the
+     metadata when accessed via FTP.
+
+ * Fix PortalFolder.all_meta_types() to allow non-content.
+
+ * Fix PortalFolder.listActions() to return a tuple, not a list

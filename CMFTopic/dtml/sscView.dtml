@@ -1,0 +1,15 @@
+<dtml-var standard_html_header>
+
+<div class="Desktop">
+
+<div class="Topic">
+
+<h2> Simple String Criterion: <dtml-var id> </h2>
+
+<h3> Value: <dtml-var value> </h3>
+
+</div>
+
+</div>
+
+<dtml-var standard_html_footer>

@@ -1,0 +1,15 @@
+<table class="PortalMenu">
+ <tr class="MenuTitle">
+  <td> Menu </td>
+ </tr>
+ <tr class="MenuBody">
+  <td> <a href="&dtml-portal_url;">Home</a><br>
+          <a href="&dtml.url-recent_news;">Breaking News</a><br>
+<dtml-comment>
+          <a href="">Site Info</a><br>
+          <a href="">Help</a><br>
+          <a href="">Zope Buzz</a><br>
+</dtml-comment>
+  </td>
+ </tr>
+</table>

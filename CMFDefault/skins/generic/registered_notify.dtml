@@ -1,0 +1,32 @@
+<dtml-with portal_properties>
+<dtml-sendmail mailhost="MailHost">
+To: <dtml-var email>
+From: "&dtml-email_from_name;" <&dtml-email_from_address;>
+Subject: Portal Membership Information
+
+You have been registered as a member of <dtml-var title>, which
+allows you to personalize your view of the Portal website and participate in
+the community.
+
+This describes the purpose of the portal:
+<dtml-var description>
+
+Visit us at &dtml-portal_url;
+
+Your login id and password are:
+
+Login ID: <dtml-var username>
+Password: <dtml-var password>
+
+You can use this URL to log on:
+
+&dtml.url-logged_in;?__ac_name=&dtml.url_quote-username;&__ac_password=&dtml.url_quote-password;
+
+Be aware that this URL might wrap over two lines. If your browser shows an error 
+message when you try to access the URL please make sure that you put in the 
+complete string.
+
+Portal Admin
+
+</dtml-sendmail>
+</dtml-with>

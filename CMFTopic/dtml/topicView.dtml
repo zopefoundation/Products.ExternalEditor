@@ -1,0 +1,54 @@
+<dtml-var standard_html_header>
+
+<div class="Desktop">
+
+<div class="Topic">
+
+<h2> Topic: <dtml-var title> </h2>
+
+<dtml-let results=queryCatalog>
+
+<dtml-in results size="20" start=qs>
+<dtml-let objURL="portal_catalog.getpath( data_record_id_ )">
+<dtml-if next-sequence>
+ <dtml-call "REQUEST.set('next-sequence'
+                        , _['next-sequence-start-number'])">
+</dtml-if>
+<dtml-if previous-sequence>
+ <dtml-call "REQUEST.set('previous-sequence'
+                        ,_['previous-sequence-start-number'])">
+</dtml-if>
+<dtml-if sequence-start>
+ <ul>
+</dtml-if>
+  <li> <a href="&dtml-objURL;"><dtml-var Title></a> </li>
+<dtml-if sequence-end>
+ </ul>
+</dtml-if>
+</dtml-let>
+</dtml-in>
+
+<dtml-if previous-sequence>
+ <a href="&dtml-URL;?qs=&dtml-previous-sequence;">Previous items</a>
+</dtml-if>
+<dtml-if next-sequence>
+ <a href="&dtml-URL;?qs=&dtml-next-sequence;">Next items</a>
+</dtml-if>
+
+</dtml-let>
+
+<h3> Query Parameters </h3>
+
+<ul>
+<dtml-with buildQuery>
+<dtml-in items>
+ <li> <dtml-var sequence-key> : <dtml-var sequence-item> </li>
+</dtml-in>
+</dtml-with>
+</ul>
+
+</div>
+
+</div>
+
+<dtml-var standard_html_footer>

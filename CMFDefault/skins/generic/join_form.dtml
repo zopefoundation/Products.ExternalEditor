@@ -1,0 +1,133 @@
+<dtml-var standard_html_header>
+
+<div class="Desktop">
+
+<h1>Become a member</h1>
+
+<dtml-if "portal_membership.getAuthenticatedMember().has_role('Member')">
+
+<p>You are already a member. You may use the <a href="personalize_form"
+   >personalization form</a> to change your membership information. </p>
+
+<dtml-else>
+
+<p> Becoming a member gives you the ability to personalize the site and
+    participate in the community.</p>
+
+<p> It does not cost any money to become a member and your email and other
+    personal information will remain private.</p>
+
+<dtml-if expr="portal_properties.validate_email">
+
+<p> You must submit a valid email address. This address will be used to
+    send you your randomly-generated password.  Once you have logged in
+    with this password, you may change it to anything you like.
+</p>
+
+</dtml-if>
+
+<dtml-if error>
+<div class="ErrorMessage">
+<dtml-var error>
+</dif>
+</dtml-if>
+
+<form action="register" method="POST">
+
+<input type="hidden" name="last_visit:date" value="<dtml-var ZopeTime>">
+<input type="hidden" name="prev_visit:date" value="<dtml-var ZopeTime>">
+
+<table class="FormLayout">
+ <tr>
+  <th> Login Name
+  </th>
+  <td>
+   <input type="text"
+          name="username" size="30"
+          value="<dtml-if username><dtml-var username></dtml-if>">
+  </td>
+ </tr>
+ <tr>
+  <th> Email Address
+  </th>
+  <td align="left" valign="top">
+   <input type="text" name="email" size="30"
+          value="<dtml-if email><dtml-var email></dtml-if>">
+  </td>
+ </tr>
+
+<dtml-unless expr="portal_properties.validate_email">
+ <tr>
+  <th> Password
+  </th>
+  <td align="left" valign="top">
+   <input type="password" name="password" size="30">
+  </td>
+ </tr>
+ <tr>
+  <th> Password (confirm)
+  </th>
+  <td align="left" valign="top">
+   <input type="password" name="confirm" size="30">
+  </td>
+ </tr>
+ <tr>
+  <th> Mail Password? 
+  </th>
+  <td>
+   <input type="checkbox" name="mail_me" size="30" id="cb_mailme" />
+   <em><label for="cb_mailme">Check this box to have your password 
+   mailed to you.</label></em>
+  </td>
+ </tr>
+</dtml-unless>
+
+<dtml-comment>  These items do not actually exist (yet?)
+ <tr>
+  <th> Full Name<br>(Optional)
+  </th>
+  <td>
+   <input type="text" name="full_name" size="30" 
+          value="<dtml-if full_name><dtml-var full_name></dtml-if>">
+  </td>
+ </tr>
+ <tr>
+  <th> Company<br>(Optional)
+  </th>
+  <td>
+   <input type="text" name="company" size="30"
+          value="<dtml-if company><dtml-var company></dtml-if>">
+   </td>
+ </tr>
+</dtml-comment>
+
+<dtml-comment>
+<dtml-in CommonProperties>
+<dtml-let property_name=sequence-item
+          current_value="_.has_key(property_name) and _[property_name] or ''">
+ <tr>
+  <th> <dtml-var sequence-item spacify>
+  </th>
+  <td>
+   <input type="text" name="<dtml-var sequence-item>" size="30"
+          value="&dtml-current_value;">
+  </td>
+ </tr>
+</dtml-let>
+</dtml-in>
+</dtml-comment>
+
+</dtml-if>
+
+ <tr>
+  <td><br></td>
+  <td>
+   <input type="submit" name="submit" value="Register"> 
+  </td>
+ </tr>
+</table>
+</form>
+
+</div>
+
+<dtml-var standard_html_footer>

@@ -1,0 +1,2 @@
+<dtml-call expr="portal_properties.editProperties(REQUEST)">
+<dtml-return expr="reconfig_form(_.None, _, portal_status_message='Settings changed')">

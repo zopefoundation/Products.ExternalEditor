@@ -1,0 +1,60 @@
+<dtml-if "_.hasattr(this(),'isEffective') and not isEffective( ZopeTime() )">
+<dtml-unless "portal_membership.checkPermission('Request review',this())
+           or portal_membership.checkPermission('Review portal content',this())">
+<dtml-var "RESPONSE.unauthorized()">
+</dtml-unless>
+</dtml-if>
+<html>
+ <head>  
+  <title><dtml-with portal_properties>&dtml-title;</dtml-with
+  ><dtml-if name="Title">: &dtml-Title;</dtml-if></title>
+  <dtml-var css_inline_or_link>
+ </head>
+<body>
+
+<dtml-var standard_top_bar>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr>
+   <!-- Vertical whitespace -->
+   <td colspan="4"><br /></td>
+  </tr>
+
+  <tr valign="top">
+   <td class="SideBar" width="15%" align="left" valign="top">
+    <dtml-comment>  Menu is now in top bar.
+    <dtml-var menu> <br />
+    </dtml-comment>
+    <dtml-var actions_box>
+   </td>
+
+   <!-- Horizontal whitespace -->
+   <td width="1%">&nbsp;</td>
+
+   <td class="Desktop" colspan="2" width="84%" valign="top">
+
+   <dtml-if "not portal_membership.isAnonymousUser() and
+             not _.hasattr(portal_membership.getAuthenticatedMember(),
+             'getMemberId')">
+   <div class="AuthWarning">
+    <table>
+     <tr class="Host">
+      <td> Warning! </td>
+     <tr>
+      <td> You are presently logged in as a user from outside
+           this portal.  Many parts of the portal will not work!
+           You may have to shut down and relaunch your browser to
+           log out, depending on how you originally logged in.
+      </td>
+     </tr>
+    </table>
+   </div>
+   </dtml-if>
+
+   <dtml-if portal_status_message>
+    <p class="DesktopStatusBar">&dtml-portal_status_message;</p>
+   </dtml-if>
+
+   <dtml-if localHeader>
+    <dtml-var localHeader>
+   </dtml-if>

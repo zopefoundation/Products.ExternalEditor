@@ -1,0 +1,105 @@
+<dtml-if portal_skins>
+ <dtml-if expr="portal_skins.updateSkinCookie()">
+  <dtml-call setupCurrentSkin>
+ </dtml-if>
+</dtml-if>
+
+<dtml-var standard_html_header>
+
+<dtml-with portal_properties>
+
+<dtml-if "portal_membership.isAnonymousUser()">
+ <dtml-call "REQUEST['RESPONSE'].expireCookie('__ac', path='/')">
+ <h1 class="DesktopTitle">Login failure</h1>
+
+ <!-- <p><a href="&dtml.url-mail_password_form;">I forgot my password!</a></p> -->
+
+ <p class="Desktop">You are not currently logged in.
+ Your username and or password may be incorrect.
+ Your browser may also not be configured to accept
+ HTTP cookies.
+ If you need help please contact 
+ <a href="mailto:&dtml-email_from_address;">&dtml-email_from_address;</a>.
+ </p>
+<dtml-else>
+
+<dtml-let member="portal_membership.getAuthenticatedMember()">
+
+ <dtml-if "member.login_time == _.DateTime('2000/01/01') and 
+           validate_email">
+ <dtml-comment>
+
+  First login by this user.  Display message and offer password changer form.
+  Init login times to now
+
+ </dtml-comment>
+
+ <dtml-call "portal_registration.setProperties(last_login_time=ZopeTime(),login_time=ZopeTime())">
+
+ <h1 class="DesktopTitle">
+  Welcome!
+ </h1>
+
+ <p class="Desktop">This is the first time that you've logged in to 
+    &dtml-title;. 
+    Before you start exploring you need to change your original password. 
+    This will ensure that the password we sent you via email cannot be used in 
+    a malicious manner.</p>
+
+ <p class="Desktop">
+  Please use the form below to change your password.
+ </p>
+
+<form action="change_password" method="post">
+ <input type="hidden" name="user" value="&dtml-member;">
+ <input type="hidden" name="domains:tokens" value="">
+ <input type="hidden" name="redirect" value="&dtml-portal_url;">
+ <table>
+   <tr valign="top" align="left">
+   <th>Username</th>
+   <td>&dtml-member;</td>
+  </tr>
+  <tr valign="top"  align="left">
+   <th>New password</th>
+   <td><input type="password" name="password"></td>
+  </tr>
+  <tr valign="top"  align="left">
+   <th>Confirm new password</th>
+   <td><input type="password" name="confirm"></td>
+  </tr>
+  <tr>
+   <td></td>
+   <td><input type="submit" value="Change password"></td>
+  </tr>
+ </table>
+</form>
+
+ <dtml-else>
+
+ <dtml-call "portal_registration.setProperties(last_login_time=member.login_time)">
+ <dtml-call "portal_registration.setProperties(login_time=ZopeTime())">
+
+<!-- ****** Enable the automatic redirect ***** -->
+<dtml-if name="came_from">
+  <dtml-call expr="RESPONSE.redirect(came_from)">
+</dtml-if>
+<!-- ****** Enable the automatic redirect ***** -->
+
+ <h1 class="DesktopTitle">Login success</h1>
+
+ <p class="Desktop">Welcome. You are currently logged in.
+<!--Don't forget to take a look at your
+<a href="<!--#var SCRIPT_NAME-->/Members/<!--#var "member.getUserName()" url_quote-->/update_html">personalization
+page</a>.-->
+</p>
+
+</dtml-if>
+
+</dtml-let>
+
+</dtml-if>
+
+</dtml-with>
+
+<dtml-var standard_html_footer>
+

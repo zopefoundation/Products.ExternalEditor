@@ -1,0 +1,2 @@
+<dtml-call expr="manage_copyObjects(REQUEST['ids'], REQUEST, RESPONSE)">
+<dtml-return expr="folder_contents(_.None, _, portal_status_message='Copied.')">

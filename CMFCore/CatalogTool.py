@@ -1,0 +1,225 @@
+##############################################################################
+# 
+# Zope Public License (ZPL) Version 1.0
+# -------------------------------------
+# 
+# Copyright (c) Digital Creations.  All rights reserved.
+# 
+# This license has been certified as Open Source(tm).
+# 
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+# 
+# 1. Redistributions in source code must retain the above copyright
+#    notice, this list of conditions, and the following disclaimer.
+# 
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions, and the following disclaimer in
+#    the documentation and/or other materials provided with the
+#    distribution.
+# 
+# 3. Digital Creations requests that attribution be given to Zope
+#    in any manner possible. Zope includes a "Powered by Zope"
+#    button that is installed by default. While it is not a license
+#    violation to remove this button, it is requested that the
+#    attribution remain. A significant investment has been put
+#    into Zope, and this effort will continue if the Zope community
+#    continues to grow. This is one way to assure that growth.
+# 
+# 4. All advertising materials and documentation mentioning
+#    features derived from or use of this software must display
+#    the following acknowledgement:
+# 
+#      "This product includes software developed by Digital Creations
+#      for use in the Z Object Publishing Environment
+#      (http://www.zope.org/)."
+# 
+#    In the event that the product being advertised includes an
+#    intact Zope distribution (with copyright and license included)
+#    then this clause is waived.
+# 
+# 5. Names associated with Zope or Digital Creations must not be used to
+#    endorse or promote products derived from this software without
+#    prior written permission from Digital Creations.
+# 
+# 6. Modified redistributions of any form whatsoever must retain
+#    the following acknowledgment:
+# 
+#      "This product includes software developed by Digital Creations
+#      for use in the Z Object Publishing Environment
+#      (http://www.zope.org/)."
+# 
+#    Intact (re-)distributions of any official Zope release do not
+#    require an external acknowledgement.
+# 
+# 7. Modifications are encouraged but must be packaged separately as
+#    patches to official Zope releases.  Distributions that do not
+#    clearly separate the patches from the original work must be clearly
+#    labeled as unofficial distributions.  Modifications which do not
+#    carry the name Zope may be packaged in any form, as long as they
+#    conform to all of the clauses above.
+# 
+# 
+# Disclaimer
+# 
+#   THIS SOFTWARE IS PROVIDED BY DIGITAL CREATIONS ``AS IS'' AND ANY
+#   EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+#   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+#   PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL DIGITAL CREATIONS OR ITS
+#   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+#   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+#   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+#   USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+#   ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+#   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+#   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+#   SUCH DAMAGE.
+# 
+# 
+# This software consists of contributions made by Digital Creations and
+# many individuals on behalf of Digital Creations.  Specific
+# attributions are listed in the accompanying credits file.
+# 
+##############################################################################
+
+"""Basic portal catalog.
+$Id$
+"""
+__version__='$Revision$'[11:-2]
+
+
+from utils import UniqueObject, _checkPermission, _getAuthenticatedUser
+from Products.ZCatalog.ZCatalog import ZCatalog
+from Globals import InitializeClass
+import urllib
+from DateTime import DateTime
+from string import join
+from AccessControl.PermissionRole import rolesForPermissionOn
+from AccessControl import ClassSecurityInfo
+from utils import mergedLocalRoles
+import CMFCorePermissions
+
+class IndexableObjectWrapper:
+
+    def __init__(self, ob):
+        self.ob = ob
+
+    def __getattr__(self, name):
+        return getattr(self.ob, name)
+
+    def allowedRolesAndUsers(self, permission='View'):
+        """
+        Return a list of roles and users with View permission.
+        Used by PortalCatalog to filter out items you're not allowed to see.
+        """
+        ob = self.ob
+        allowed = {}
+        for r in rolesForPermissionOn(permission, ob):
+            allowed[r] = 1
+        localroles = mergedLocalRoles(ob)
+        for user, roles in localroles.items():
+            for role in roles:
+                if allowed.has_key(role):
+                    allowed['user:' + user] = 1
+        if allowed.has_key('Owner'):
+            del allowed['Owner']
+        return list(allowed.keys())
+
+
+class CatalogTool (UniqueObject, ZCatalog):
+    '''This is a ZCatalog that filters catalog queries.
+    '''
+    id = 'portal_catalog'
+    meta_type = 'CMF Catalog'
+    security = ClassSecurityInfo()
+
+    def __init__(self):
+        ZCatalog.__init__(self, self.id)
+        self._initIndexes()
+
+    def _initIndexes(self):
+        # Reviewing indexes
+        self._catalog.addIndex('review_state', 'FieldIndex')
+        self._catalog.addIndex('Date', 'FieldIndex')
+        self._catalog.addIndex('allowedRolesAndUsers', 'KeywordIndex')
+        # Content indexes
+        self._catalog.addIndex('Creator', 'FieldIndex')
+        self._catalog.addIndex('Title', 'TextIndex')
+        self._catalog.addIndex('Description', 'TextIndex')
+        self._catalog.addIndex('SearchableText', 'TextIndex')
+        self._catalog.addIndex('Subject', 'KeywordIndex')
+        self._catalog.addIndex('in_reply_to', 'FieldIndex')
+        self._catalog.addIndex('created', 'FieldIndex')
+        self._catalog.addIndex('effective', 'FieldIndex')
+        self._catalog.addIndex('expires', 'FieldIndex')
+        # Catalog meta-data
+        self._catalog.addColumn('Subject')
+        self._catalog.addColumn('Title')
+        self._catalog.addColumn('Description')
+        self._catalog.addColumn('review_state')
+        self._catalog.addColumn('Creator')
+        self._catalog.addColumn('Date')
+        self._catalog.addColumn('icon')
+        self._catalog.addColumn('created')
+        self._catalog.addColumn('effective')
+        self._catalog.addColumn('expires')
+
+    # searchResults has inherited security assertions.
+    def searchResults(self, REQUEST=None, **kw):
+        '''Calls SiteIndex.searchResults() with extra arguments that
+        limit the results to what the user is allowed to see.
+        '''
+        if REQUEST is None:
+            REQUEST = self.REQUEST
+        user = _getAuthenticatedUser(self)
+        kw['allowedRolesAndUsers'] = list(user.getRoles()) + \
+                                     ['Anonymous',
+                                      'user:'+user.getUserName()]
+        if not _checkPermission('Access inactive portal content', self):
+            if kw.has_key('Date') and None: #XXX
+                if kw.has_key('Date_usage'):
+                    kw['Date'] = min(kw['Date'])
+                kw['Date'] = [kw['Date'], DateTime()]
+                kw['Date_usage'] = 'range:min:max'
+            else:
+                kw[ 'effective' ] = kw[ 'expires' ] = DateTime()
+                kw['effective_usage'] = 'range:max'
+                kw['expires_usage'] = 'range:min'
+
+        return apply(ZCatalog.searchResults, (self, REQUEST), kw)
+
+    __call__ = searchResults
+
+    def __url(self, ob):
+        return join(ob.getPhysicalPath(), '/')
+
+    def catalog_object(self, object, uid):
+        # Wraps the object with extra features just before cataloging.
+        w = IndexableObjectWrapper(object)
+        ZCatalog.catalog_object(self, w, uid)
+
+    security.declarePrivate('indexObject')
+    def indexObject(self, object):
+        '''Add to catalog.
+        '''
+        url = self.__url(object)
+        self.catalog_object(object, url)
+
+    security.declarePrivate('unindexObject')
+    def unindexObject(self, object):
+        '''Remove from catalog.
+        '''
+        url = self.__url(object)
+        self.uncatalog_object(url)
+
+    security.declarePrivate('reindexObject')
+    def reindexObject(self, object):
+        '''Update catalog after object data has changed.
+        '''
+        url = self.__url(object)
+        self.uncatalog_object(url)
+        self.catalog_object(object, url)
+
+
+InitializeClass(CatalogTool)

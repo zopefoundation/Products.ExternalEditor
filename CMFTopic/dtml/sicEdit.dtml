@@ -1,0 +1,46 @@
+<dtml-var standard_html_header>
+
+<div class="Desktop">
+
+<div class="Topic">
+
+<h2> Edit Simple String Criterion: <dtml-var id> </h2>
+
+<form action="&dtml-absolute_url;" method="post">
+<table class="FormLayout">
+
+ <tr valign="top">
+  <th align="right"> Value: </th>
+  <td> <input type="text" name="value" size="40" value="&dtml-value;">
+ </tr>
+
+ <tr valign="top">
+  <th align="right"> Direction: </th>
+  <td>
+   <dtml-let minChecked="direction=='min' and 'checked' or ''"
+             maxChecked="direction=='max' and 'checked' or ''"
+             minmaxChecked="direction=='min:max' and 'checked' or ''"
+   >
+   <input type="radio" name="direction"
+          value="min" &dtml-minChecked;> Minimum
+   <input type="radio" name="direction"
+          value="max" &dtml-maxChecked;> Maximum
+   <input type="radio" name="direction"
+          value="min:max" &dtml-minmaxChecked;> Min/Max
+   </dtml-let>
+  </td>
+ </tr>
+
+ <tr valign="top">
+  <td> <br> </td>
+  <td> <input type="submit" name="edit:method" value=" Change ">
+ </tr>
+
+</table>
+</form>
+
+</div>
+
+</div>
+
+<dtml-var standard_html_footer>
