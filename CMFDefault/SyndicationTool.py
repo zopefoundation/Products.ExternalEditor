@@ -246,7 +246,7 @@ class SyndicationTool (UniqueObject, SimpleItem):
         syInfo = getattr(obj, 'syndication_information',
                          None)
         if syInfo is not None:
-            del obj.syndication_information
+            obj._delObject('syndication_information')
         else:
             raise 'This object does not have Syndication Information'
 
