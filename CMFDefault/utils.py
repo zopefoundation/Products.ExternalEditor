@@ -237,16 +237,17 @@ class SimpleHTMLParser( SGMLParser ):
 VALID_TAGS = { 'a'          : 1
              , 'b'          : 1
              , 'base'       : 0
+             , 'big'        : 1
              , 'blockquote' : 1
              , 'body'       : 1
              , 'br'         : 0
              , 'caption'    : 1
              , 'cite'       : 1
              , 'code'       : 1
+             , 'dd'         : 1
              , 'div'        : 1
              , 'dl'         : 1
              , 'dt'         : 1
-             , 'dd'         : 1
              , 'em'         : 1
              , 'h1'         : 1
              , 'h2'         : 1
@@ -266,8 +267,11 @@ VALID_TAGS = { 'a'          : 1
              , 'ol'         : 1
              , 'p'          : 1
              , 'pre'        : 1
+             , 'small'      : 1
              , 'span'       : 1
              , 'strong'     : 1
+             , 'sub'        : 1
+             , 'sup'        : 1
              , 'table'      : 1
              , 'tbody'      : 1
              , 'td'         : 1

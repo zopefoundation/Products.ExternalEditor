@@ -168,6 +168,8 @@ CMF 1.5alpha (unreleased)
 
   Bug Fixes
 
+    - StrippingParser: Added 'big', 'small', 'sub' and 'sup' to valid tags.
+
     - _checkPermission: Added check for executable owner and proxy roles.
 
     - SkinsContainer: Fixed context wrappers returned by getSkinByPath().
