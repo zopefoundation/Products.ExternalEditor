@@ -4,6 +4,6 @@
   <property name="description"></property>
   <property name="email_from_address" type="string">postmaster@localhost</property>
   <property name="email_from_name" type="string">Portal Administrator</property>
-  <property name="validate_email" type="boolean"></property>
+  <property name="validate_email" type="boolean">False</property>
   <property name="default_charset" type="string"></property>
 </site>

@@ -327,7 +327,13 @@ class ConfiguratorBase(Implicit):
 
         prop_id = prop_map['id']
         prop = obj.getProperty(prop_id)
-        isTuple = isinstance(prop, tuple)
+
+        if isinstance(prop, tuple):
+            prop_value = ''
+            prop_elements = prop
+        else:
+            prop_value = prop
+            prop_elements = ()
 
         if 'd' in prop_map.get('mode', 'wd') and not prop_id == 'title':
             type = prop_map.get('type', 'string')
@@ -337,8 +343,8 @@ class ConfiguratorBase(Implicit):
             select_variable = None
 
         return { 'id': prop_id,
-                 'value': not isTuple and prop or '',
-                 'elements': isTuple and prop or (),
+                 'value': prop_value,
+                 'elements': prop_elements,
                  'type': type,
                  'select_variable': select_variable }
 
