@@ -3,9 +3,12 @@ Version 0.4.2
 
 - Fixed getInfoFor() using patch from Sebastien.Bigaret@inqual.com.  Thanks!
 
-- executeTransition(): Preserve (by copying) any existing, unchanged
-state vars, rather than setting them to default value or just omitting
-them, if there's no default.
+- executeTransition(): Optionally preserve (by copying) unchanged
+status variables.
+
+- Updated to ZPL 2.0.
+
+- Added scripts that get executed after a transition.
 
 Version 0.4.1
 
