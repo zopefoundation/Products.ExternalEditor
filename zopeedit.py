@@ -18,15 +18,22 @@ $Id$"""
 
 __version__ = '0.8'
 
-import sys, os, re
+import sys
+
+win32 = sys.platform == 'win32'
+
+if win32:
+    # prevent warnings from being turned into errors by py2exe
+    import warnings
+    warnings.filterwarnings('ignore')
+
+import os, re
 import traceback
 from tempfile import mktemp
 from ConfigParser import ConfigParser
 from httplib import HTTPConnection, HTTPSConnection
 from urlparse import urlparse
 import urllib
-
-win32 = sys.platform == 'win32'
 
 class Configuration:
     
