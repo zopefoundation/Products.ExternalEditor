@@ -113,7 +113,7 @@ class VersionsTool(UniqueObject, SimpleItemWithProperties):
 
     security.declareProtected(UseVersionControl, 'checkin')
     def checkin(self, object, message=''):
-        """Checks in a new version on the development stage."""
+        """Checks in a new version."""
         # Make sure we copy the current data.
         # XXX ZopeVersionControl tries to do this but isn't quite correct yet.
         get_transaction().commit(1)
@@ -123,7 +123,9 @@ class VersionsTool(UniqueObject, SimpleItemWithProperties):
         if not repo.isUnderVersionControl(object):
             repo.applyVersionControl(object)
         else:
-            repo.checkinResource(object, message)
+            info = repo.getVersionInfo(object)
+            if info.status == info.CHECKED_OUT:
+                repo.checkinResource(object, message)
 
 
     security.declareProtected(UseVersionControl, 'isUnderVersionControl')
@@ -184,6 +186,13 @@ class VersionsTool(UniqueObject, SimpleItemWithProperties):
             return repo.getVersionInfo(object).version_id
         else:
             return ''
+
+
+    security.declareProtected(UseVersionControl, 'getHistoryId')
+    def getHistoryId(self, object):
+        """Returns the version history ID of the object."""
+        repo = self._getVersionRepository()
+        return repo.getVersionInfo(object).history_id
 
 
     security.declareProtected(UseVersionControl, 'revertToVersion')
