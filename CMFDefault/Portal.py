@@ -223,96 +223,6 @@ class CMFSite ( PortalObjectBase
         ('Reply to item', ()),
         )
 
-    def createPortalTools(self, props):
-        """
-        Set up initial components  --  called by ZClass constructor
-        """
-        ################################################################
-        ### NOTE: this method will be removed soon. Shane 2001-01-19 ###
-        ################################################################
-
-        # Add tools.
-        addCMFCoreTool = self.manage_addProduct['CMFCore'].manage_addTool
-        addCMFCoreTool('PTK Basic Actions Tool', None)
-        addCMFCoreTool('PTK Basic Catalog', None)
-        addCMFCoreTool('PTK Basic Discussion Tool', None)
-        addCMFCoreTool('PTK Basic Workflow Tool', None)
-        addCMFCoreTool('PTK Basic Undo Tool', None)
-
-        addCMFBasicTool = self.manage_addProduct['CMFBasic'].manage_addTool
-        addCMFBasicTool('Membership Tool', None)
-        addCMFBasicTool('Registration Tool', None)
-        addCMFBasicTool('URL Tool', None)
-
-        # portal_properties is implemented as a ZClass.
-        propsTool = self.PortalProperties()
-        self._setObject(propsTool.id, propsTool)
-
-        # Add Members folder
-        manage_addPortalFolder(self, 'Members')
-        self.Members.manage_addProduct['OFSP'].manage_addDTMLMethod(
-            'index_html', 'Member list', members_roster)
-
-        # Create MailHost for mailing items from the portal
-        self.manage_addProduct['MailHost'].manage_addMailHost(
-            'MailHost', smtp_host='localhost')
-
-        # Determine membership storage and create acl_users.
-        db = props.get('database', None)
-        if not db:
-            pass
-        elif db == 'ZODB':
-            acl_users = self.ZODBMemberFolder()
-            self.this()._setObject('acl_users', acl_users)
-        elif db == 'LoginManager':
-            # Use ZPatterns, LoginManager, Membership, and MembershipZ.
-            from Products.LoginManager.LoginManager import \
-                 LoginManager, manage_addLoginManager
-            from Products.Membership.PersistentUserSource \
-                 import PersistentUserSource
-            manage_addLoginManager(self, 'Persistent User Source',
-                                   ['Basic Cookie Login', 'Basic Auth Login'],
-                                   0, 0, 0)
-            # self.acl_users was magically created by the above call
-            for us in self.acl_users.UserSourcesGroup.objectValues():
-                if us.meta_type == 'Persistent User Source':
-                    us.__of__(self.acl_users).manage_setStorage(
-                        'MembershipZ/LoginMember')
-                    break
-        else:
-            acl_users = self.SQLMemberFolder(db)
-            self.this()._setObject('acl_users', acl_users)
-
-        self.this().__allow_groups__=self.acl_users
-        
-        # Set up the suggested roles.
-        self.__ac_roles__ = ('Member', 'Reviewer',)
-
-        # Set up the suggested role to permission mappings.
-        mp = self.manage_permission
-        
-        mp('Manage portal',           ['Manager',],             1)
-        mp('Add portal member',       ['Anonymous','Manager',], 1)
-        mp('Set own password',        ['Member','Manager',],    1)
-        mp('Set own properties',      ['Member','Manager',],    1)
-        mp('Mail forgotten password', ['Anonymous','Manager',], 1)
-        mp('Add portal content',      ['Member','Manager',],    1)
-        mp('Add portal folders',      ['Member','Manager',],    1)
-        mp('Modify portal content',   ['Owner','Manager',],     1)
-        mp('Request review',          ['Owner','Manager',],     1)
-        mp('Review portal content',   ['Reviewer','Manager',],  1)
-        mp('Access future portal content',
-                                      ['Reviewer','Manager',],  1)
-        mp('List portal members',     ['Member','Manager',],    1)
-        mp('Reply to item',           ['Member','Manager',],    1)
-
-        # Add some other permissions mappings that may be helpful.
-        mp('Delete objects',          ['Owner','Manager',],     1)
-        mp('FTP access',              ['Owner','Manager',],     1)
-        mp('Manage properties',       ['Owner','Manager',],     1)
-        mp('Undo changes',            ['Owner','Member','Manager',], 1)
-        mp('View management screens', ['Owner','Manager',],     1)
-
     def isEffective( self, date ):
         """
             Override DefaultDublinCoreImpl's test, since we are always viewable.
@@ -422,7 +332,6 @@ class PortalGenerator:
             'MailHost', smtp_host='localhost')
 
     def setupUserFolder(self, p):
-        # Easily replaced.
         p.manage_addProduct['OFSP'].manage_addUserFolder()
 
     def setupCookieAuth(self, p):
