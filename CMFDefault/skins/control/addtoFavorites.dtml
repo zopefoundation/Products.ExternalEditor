@@ -10,6 +10,7 @@
   <dtml-let targetFolder="_.getattr( homeFolder, 'Favorites' )"
             new_id="'fav_' + _.str( _.int( ZopeTime() ) )"
             myPath="portal_url.getRelativeUrl( this() )"
+            objType="this().portal_type"
   >
     <dtml-call expr="targetFolder.invokeFactory( 'Favorite'
                                                , id=new_id
@@ -17,9 +18,14 @@
                                                , remote_url=myPath
                                                )">
 
-  </dtml-let>
 
-  <dtml-call expr="RESPONSE.redirect( absolute_url() + '/view')">
+<dtml-if expr="objType == 'Folder'">
+  <dtml-call expr="RESPONSE.redirect( absolute_url())">
+<dtml-else>
+  <dtml-call expr="RESPONSE.redirect( absolute_url()+ '/view')">
+</dtml-if>
+</dtml-let>
+
 </dtml-let>
 
 <dtml-var standard_html_footer>
