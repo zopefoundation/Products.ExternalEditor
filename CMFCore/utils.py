@@ -600,7 +600,7 @@ def keywordsplitter(headers,
 #   Directory-handling utilities
 #
 def normalize(p):
-    return path.abspath(path.normcase(p))
+    return path.abspath(path.normcase(path.normpath(p)))
 
 normINSTANCE_HOME = normalize(INSTANCE_HOME)
 normSOFTWARE_HOME = normalize(SOFTWARE_HOME)
@@ -609,6 +609,7 @@ separators = (os.sep, os.altsep)
 
 def expandpath(p):
     # Converts a minimal path to an absolute path.
+    p = path.normpath(p)
     if path.isabs(p):
         return p
     abs = path.join(normINSTANCE_HOME, p)
