@@ -11,10 +11,9 @@ from Products.CMFCore.utils import getToolByName
 
 uid_handler = getToolByName(context, 'portal_uidhandler')
 obj = uid_handler.getObject(traverse_subpath[0])
-portal_type = obj.getPortalTypeName()
 
-ptypes = getToolByName(context, 'portal_types')
-method = ptypes[portal_type].getActionById('view', None)
-if method:
-    return getattr(obj, method)()
+ti = obj.getTypeInfo()
+method_id = ti and ti.queryMethodID('view')
+if method_id:
+    return getattr(obj, method_id)()
 return obj()
