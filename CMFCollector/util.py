@@ -128,3 +128,10 @@ def process_comment(comment, strip=string.strip):
                     inpre = 1
         got.append(' ' + i)
     return string.join(got, '\n')
+
+def add_local_role(object, userid, roleid):
+    """Add object roleid for userid if not already there."""
+    roles = list(object.get_local_roles_for_userid(userid))
+    if roleid not in roles:
+        roles.append(roleid)
+        object.manage_setLocalRoles(userid, roles)
