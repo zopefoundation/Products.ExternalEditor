@@ -533,20 +533,7 @@ class ProfileRegistry( Implicit ):
     security.declareProtected( ManagePortal, '' )
     def getProfileInfo( self, profile_id ):
 
-        """ Return a mapping describing a registered profile.
-
-        o Keys include:
-
-          'id' -- the ID of the profile
-
-          'title' -- its title
-
-          'description' -- a textual description of the profile
-
-          'type' -- 'FILESYSTEM' or 'SNAPSHOT'
-
-          'path' -- a path to the profile (either within the ZODB, for
-                    snapshots, or on the filesystem).
+        """ See IProfileRegistry.
         """
         result = self._profile_info[ profile_id ]
         return result.copy()
@@ -554,16 +541,14 @@ class ProfileRegistry( Implicit ):
     security.declareProtected( ManagePortal, 'listProfiles' )
     def listProfiles( self ):
 
-        """ Return a list of IDs for registered profiles.
+        """ See IProfileRegistry.
         """
         return tuple( self._profile_ids )
 
     security.declareProtected( ManagePortal, 'listProfileInfo' )
     def listProfileInfo( self ):
 
-        """ Return a list of mappings describing registered profiles.
-
-        o See 'getProfileInfo' for a description of the mappings' keys.
+        """ See IProfileRegistry.
         """
         return [ self.getProfileInfo( id ) for id in self.listProfiles() ]
 
@@ -573,11 +558,9 @@ class ProfileRegistry( Implicit ):
                        , title
                        , description
                        , path
+                       , product=None
                        ):
-        """ Add a new profile to tne registry.
-
-        o If an existing profile is already registered for 'profile_id',
-          raise KeyError.
+        """ See IProfileRegistry.
         """
         if self._profile_info.get( profile_id ) is not None:
             raise KeyError, 'Duplicate profile ID: %s' % profile_id
@@ -588,6 +571,7 @@ class ProfileRegistry( Implicit ):
                , 'title' : title
                , 'description' : description
                , 'path' : path
+               , 'product' : product
                }
 
         self._profile_info[ profile_id ] = info

@@ -5,8 +5,12 @@ $Id$
 
 import unittest
 
+from Acquisition import Implicit
+from Acquisition import aq_parent
 from OFS.Folder import Folder
 from Products.CMFCore.ActionProviderBase import ActionProviderBase
+from Products.CMFCore.interfaces.portal_actions \
+    import ActionProvider as IActionProvider
 
 from common import BaseRegistryTests
 from common import DummyExportContext
@@ -14,7 +18,20 @@ from common import DummyImportContext
 
 class DummyTool( Folder, ActionProviderBase ):
 
-    pass
+    __implements__ = ( IActionProvider, )
+
+class DummyUser( Implicit ):
+
+    def getId( self ):
+        return 'dummy'
+
+class DummyMembershipTool( DummyTool ):
+
+    def isAnonymousUser( self ):
+        return False
+
+    def getAuthenticatedMember( self ):
+        return DummyUser().__of__( aq_parent( self ) )
 
 class DummyActionsTool( DummyTool ):
 
@@ -40,6 +57,8 @@ class _ActionSetup( BaseRegistryTests ):
 
         self.root.site = Folder( id='site' )
         site = self.root.site
+
+        site.portal_membership = DummyMembershipTool()
 
         site.portal_actions = DummyActionsTool()
         site.portal_actions.addActionProvider( 'portal_actions' )

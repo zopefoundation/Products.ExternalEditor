@@ -250,7 +250,7 @@ class SnapshotExportContext( Implicit ):
 
         # TODO: switch on content_type
         ob = self._createObjectByType( filename, text, content_type )
-        folder._setObject( filename, ob )
+        folder._setObject( str( filename ), ob ) # No Unicode IDs!
 
     security.declareProtected( ManagePortal, 'getSnapshotURL' )
     def getSnapshotURL( self ):
@@ -311,7 +311,8 @@ class SnapshotExportContext( Implicit ):
         for element in path:
 
             if element not in current.objectIds():
-                current._setObject( element, Folder( element ) )
+                # No Unicode IDs!
+                current._setObject( str( element ), Folder( element ) )
 
             current = current._getOb( element )
 

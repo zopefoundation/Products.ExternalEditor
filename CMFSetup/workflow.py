@@ -63,7 +63,8 @@ def importWorkflowTool( context ):
     if context.shouldPurge():
 
         tool.setDefaultChain( '' )
-        tool._chains_by_type.clear()
+        if tool._chains_by_type is not None:
+            tool._chains_by_type.clear()
 
         for workflow_id in tool.getWorkflowIds():
             tool._delObject( workflow_id )
@@ -160,11 +161,15 @@ def exportWorkflowTool( context ):
 
     for wf_id in wf_tool.getWorkflowIds():
 
-        wf_filename = _getWorkflowFilename( wf_id )
+        wf_dirname = wf_id.replace( ' ', '_' )
         wf_xml = configurator.generateWorkflowXML( wf_id )
 
         if wf_xml is not None:
-            context.writeDataFile( wf_filename, wf_xml, 'text/xml' )
+            context.writeDataFile( 'definition.xml'
+                                 , wf_xml
+                                 , 'text/xml'
+                                 , 'workflows/%s' % wf_dirname
+                                 )
 
     return 'Workflows exported.'
 
@@ -241,8 +246,11 @@ class WorkflowToolConfigurator( Implicit ):
         workflow_tool = getToolByName( self._site, 'portal_workflow' )
 
         result = [ ( None, workflow_tool._default_chain ) ]
-        overrides = workflow_tool._chains_by_type.items()
-        overrides.sort()
+        if workflow_tool._chains_by_type is None:
+            overrides = []
+        else:
+            overrides = workflow_tool._chains_by_type.items()
+            overrides.sort()
 
         result.extend( overrides )
 
@@ -1282,7 +1290,9 @@ def _initDCWorkflowWorklists( workflow, worklists ):
                        , props = props
                        )
 
-        w.var_matches = PersistentMapping( w_info[ 'match' ].items() )
+        w.var_matches = PersistentMapping()
+        for k, v in w_info[ 'match' ].items():
+            w.var_matches[ str( k ) ] = tuple( [ str(x) for x in v ] )
 
 def _initDCWorkflowScripts( workflow, scripts, context ):
 

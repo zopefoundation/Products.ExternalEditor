@@ -1026,9 +1026,15 @@ class ProfileRegistryTests( BaseRegistryTests
         TITLE = 'One'
         DESCRIPTION = 'One profile'
         PATH = '/path/to/one'
+        PRODUCT = 'TestProduct'
 
         registry = self._makeOne()
-        registry.registerProfile( PROFILE_ID, TITLE, DESCRIPTION, PATH )
+        registry.registerProfile( PROFILE_ID
+                                , TITLE
+                                , DESCRIPTION
+                                , PATH
+                                , PRODUCT
+                                )
 
         self.assertEqual( len( registry.listProfiles() ), 1 )
         self.assertEqual( len( registry.listProfileInfo() ), 1 )
@@ -1039,6 +1045,7 @@ class ProfileRegistryTests( BaseRegistryTests
         self.assertEqual( info[ 'title' ], TITLE )
         self.assertEqual( info[ 'description' ], DESCRIPTION )
         self.assertEqual( info[ 'path' ], PATH )
+        self.assertEqual( info[ 'product' ], PRODUCT )
 
     def test_registerProfile_duplicate( self ):
 

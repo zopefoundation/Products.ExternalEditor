@@ -9,6 +9,9 @@ from Acquisition import Implicit
 from Globals import InitializeClass
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
+from Products.CMFCore.ActionProviderBase import IActionProvider
+from Products.CMFCore.ActionProviderBase import IOldstyleActionProvider
+from Products.CMFCore.ActionInformation import getOAI
 from Products.CMFCore.utils import getToolByName
 
 from permissions import ManagePortal
@@ -145,6 +148,7 @@ class ActionProvidersConfigurator( Implicit ):
         """
         actions_tool = getToolByName( self._site, 'portal_actions' )
         faux = _FauxContent( content=None, isAnonymous=1 )
+        info = getOAI( self._site, faux )
         result = []
 
         for provider_id in actions_tool.listActionProviders():
@@ -155,7 +159,13 @@ class ActionProvidersConfigurator( Implicit ):
 
             provider = getToolByName( self._site, provider_id )
 
-            actions = provider.listActions( info=faux ) or []
+            if not IActionProvider.isImplementedBy( provider ):
+                continue
+
+            if IOldstyleActionProvider.isImplementedBy( provider ):
+                continue
+
+            actions = provider.listActions( info=info ) or []
             
             for action in actions:
 
@@ -220,6 +230,9 @@ class _FauxContent:
 
     def __init__( self, **kw ):
         self.__dict__.update( kw )
+
+    def absolute_url( self ):
+        return 'http://localhost/faux_content'
 
 class _ActionProviderParser( HandlerBase ):
 

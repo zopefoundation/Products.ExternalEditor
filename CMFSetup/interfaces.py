@@ -327,6 +327,9 @@ class IProfileRegistry( Interface ):
           'description' -- a textual description of the profile
 
           'path' -- a path to the profile on the filesystem.
+
+          'product' -- the name of the product to which 'path' is
+             relative (None for absolute paths).
         """
 
     def listProfiles():
@@ -345,11 +348,15 @@ class IProfileRegistry( Interface ):
                        , title
                        , description
                        , path
+                       , product=None
                        ):
         """ Add a new profile to tne registry.
 
         o If an existing profile is already registered for 'profile_id',
           raise KeyError.
+
+        o If 'product' is passed, then 'path' should be interpreted as
+          relative to the corresponding product directory.
         """
 
 class ISetupTool( Interface ):

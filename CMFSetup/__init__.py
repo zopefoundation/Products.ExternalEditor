@@ -10,45 +10,43 @@ from registry import _profile_registry as profile_registry
 security = ModuleSecurityInfo( 'Products.CMFSetup' )
 security.declareProtected( ManagePortal, 'profile_registry' )
 
-def initialize(context):
+def initialize( context ):
 
     from Products.CMFCore.utils import ToolInit, registerIcon
     from tool import SetupTool
 
-    TOOLS_AND_ICONS = ( ( SetupTool, 'www/tool.png' ),)
 
     ToolInit( 'CMFSetup Tools'
-            , tools=[ x[ 0 ] for x in TOOLS_AND_ICONS ]
+            , tools=[ SetupTool ]
             , product_name='Setup'
             , icon=None
             ).initialize( context )
 
-    for tool, icon in TOOLS_AND_ICONS:
-        registerIcon( tool, icon, globals() )
+    registerIcon(  SetupTool, 'www/tool.png', globals() )
 
-    return # XXX comment out the rest
+    from factory import addConfiguredSiteForm
+    from factory import addConfiguredSite
 
-    from SiteConfiguration import addConfiguredSiteForm
-    from SiteConfiguration import addConfiguredSite
-    from SiteConfiguration import listPaths
-
-    # Add SiteConfiguration constructor.
-    # We specify meta_type and interfaces because we don't actually register a
-    # class here, only a constructor.
-    #
-    # Note that the 'listPaths' bit is a hack to get that
-    # object added to the factory dispatcher, so that it will be available
-    # within the 'addConfiguredSiteForm' template.
-    #
+    # Add factory for a site which follows a profile.  We specify
+    # meta_type and interfaces because we don't actually register a
+    # class here, only a factory.
     context.registerClass( meta_type='Configured CMF Site'
-                         , permission='Create Configured CMF Site'
                          , constructors=( addConfiguredSiteForm
                                         , addConfiguredSite
-                                        , listPaths #  WTF?
                                         )
+                         , permissions=( 'Add CMF Sites', )
                          , interfaces=None
                          )
 
+
+    profile_registry.registerProfile( 'default'
+                                    , 'CMFSetup Default'
+                                    , 'Default profile (for testing)'
+                                    , 'profiles/default'
+                                    , 'CMFSetup'
+                                    )
+
+    return # XXX comment out the rest
 
     # XXX:  This is *all* policy, and belongs in an XML file!
 

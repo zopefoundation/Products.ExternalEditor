@@ -1,0 +1,47 @@
+<h1 tal:replace="structure here/manage_page_header" >PAGE HEADER</h1>
+
+<p class="form-help">
+Please select a setup profile (path) for this site
+</p>
+
+<form action="addConfiguredSite" method="post">
+<table cellspacing="0" cellpadding="2" border="0">
+  <tr>
+    <td align="left" valign="top">
+    <div class="form-label">
+    Site Id
+    </div>
+    </td>
+    <td align="left" valign="top">
+    <input type="text" name="site_id" />
+    </td>
+  </tr>
+  <tr>
+    <td align="left" valign="top">
+    <div class="form-label">
+    Setup profile
+    </div>
+    </td>
+    <td align="left" valign="top">
+    <select name="profile_id">
+      <option value="PROFILE_ID"
+              tal:repeat="info options/profiles"
+              tal:attributes="value info/id"
+              tal:content="info/title">PROFILE TITLE</option>
+    </select>
+    </td>
+  </tr>
+  <tr>
+    <td align="left" valign="top">
+    </td>
+    <td align="left" valign="top">
+    <div class="form-element">
+    <input class="form-element" type="submit" name="submit" 
+     value=" Add " /> 
+    </div>
+    </td>
+  </tr>
+</table>
+</form>
+<h1 tal:replace="structure here/manage_page_footer" >PAGE FOOTER</h1>
+

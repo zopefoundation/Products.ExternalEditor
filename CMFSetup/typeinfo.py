@@ -76,9 +76,13 @@ def exportTypesTool( context ):
 
     for type_id in types_tool.listContentTypes():
 
-        type_filename = _getTypeFilename( type_id )
+        type_filename = '%s.xml' % type_id.replace( ' ', '_' )
         type_xml = configurator.generateTypeXML( type_id )
-        context.writeDataFile( type_filename, type_xml, 'text/xml' )
+        context.writeDataFile( type_filename
+                             , type_xml
+                             , 'text/xml'
+                             , 'types'
+                             )
 
     # XXX: YAGNI?
     # exportScriptsFromContainer(types_tool, ('typestool_scripts',))

@@ -140,7 +140,9 @@ class DummyExportContext:
     def getSite( self ):
         return self._site
 
-    def writeDataFile( self, filename, text, content_type ):
+    def writeDataFile( self, filename, text, content_type, subdir=None ):
+        if subdir is not None:
+            filename = '%s/%s' % ( subdir, filename )
         self._wrote.append( ( filename, text, content_type ) )
 
 class DummyImportContext:
