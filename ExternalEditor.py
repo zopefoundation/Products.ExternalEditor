@@ -85,6 +85,8 @@ class ExternalEditor(Acquisition.Implicit):
         if title is not None:
             if callable(title):
                 title = title()
+            if isinstance(title, types.UnicodeType):
+                title = unicode.encode(title, 'utf-8')
             r.append('title:%s' % title)
                 
         if hasattr(Acquisition.aq_base(ob), 'content_type'):
