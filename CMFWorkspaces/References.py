@@ -24,7 +24,7 @@ import time
 
 from ExtensionClass import Base
 from Acquisition import aq_inner, aq_parent
-from ZODB import Persistent
+from Globals import Persistent
 import Globals
 from AccessControl import ClassSecurityInfo
 from Products.CMFCore.utils import getToolByName

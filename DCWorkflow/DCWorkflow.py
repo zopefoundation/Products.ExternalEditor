@@ -1,35 +1,29 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """ Web-configurable workflow.
 
 $Id$
 """
 
-# Python library
-from string import join
-
 # Zope
-from ZODB import Persistent
-from AccessControl import getSecurityManager, ClassSecurityInfo
+from AccessControl import ClassSecurityInfo
+from AccessControl import getSecurityManager
+from Acquisition import aq_inner, aq_parent
+from App.Undo import UndoSupport
+from DocumentTemplate.DT_Util import TemplateDict
+from Globals import InitializeClass
 from OFS.Folder import Folder
 from OFS.ObjectManager import bad_id
-from OFS.Traversable import Traversable
-from Globals import DTMLFile, PersistentMapping
-import Acquisition
-from Acquisition import aq_inner, aq_parent
-import Globals
-import App
-from DocumentTemplate.DT_Util import TemplateDict
 
 # CMFCore
 from Products.CMFCore.WorkflowCore import WorkflowException, \
@@ -83,7 +77,7 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
         {'label': 'Worklists', 'action': 'worklists/manage_main'},
         {'label': 'Scripts', 'action': 'scripts/manage_main'},
         {'label': 'Permissions', 'action': 'manage_permissions'},
-        ) + App.Undo.UndoSupport.manage_options
+        ) + UndoSupport.manage_options
 
     security = ClassSecurityInfo()
     security.declareObjectProtected(ManagePortal)
@@ -549,8 +543,8 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
         else:
             return new_sdef
 
+InitializeClass(DCWorkflowDefinition)
 
-Globals.InitializeClass(DCWorkflowDefinition)
 
 addWorkflowFactory(DCWorkflowDefinition, id='dc_workflow',
                    title='Web-configurable workflow')
