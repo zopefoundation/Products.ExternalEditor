@@ -264,6 +264,8 @@ class Topic(PortalFolder):
 
         if self.acquireCriteria:
             try:
+                # Tracker 290 asks to allow combinations, like this:
+                # parent = aq_parent(self)
                 parent = aq_parent(aq_inner(self))
                 result.update(parent.buildQuery())
             except:

@@ -1,0 +1,99 @@
+Overview
+
+ This document describes the process of getting the CMF from
+ the CVS repository, and installing it into your Zope.  It assumes
+ the following:
+
+  * You want to install the "latest-and-greatest" version of
+    the CMF from a CVS checkout.
+
+    - See "Installing CMF":INSTALL.txt to install from a tarball.
+
+    - See the note below [1] if you want to export or check out
+      the sources for a specific version from CVS.
+
+ *Please note that current versions of the CMF (1.1 and later)
+  require Zope 2.3.2 or later*
+
+  * For help with CVS in general, see the "CVS Online Manual",
+    http://www.loria.fr/~molli/cvs-index.html
+
+  * For direcitons on using the Zope CVS server, see "Public CVS
+    Access", http://classic.zope.org:8080/Community/CVS_public_access;
+    substitute 'CMF' for 'Zope2'.
+
+Installation
+
+  1. Fetch the CMF package from the Zope CVS repository::
+
+     $ cd /tmp
+     $ cvs -d :pserver:anonymous@cvs.zope.org:/cvs-repository login
+       <supply "anonymous" as the password>
+     $ cvs -d :pserver:anonymous@cvs.zope.org:/cvs-repository \
+       checkout -d CMF-head CMF
+
+     This checkout creats a directory, 'CMF-head', which contain
+     subdirectories:
+
+      - CMFCore
+
+      - CMFDefault
+
+      - CMFTopic
+
+      - CMFCalendar
+
+     and several others.
+
+  2. Copy or link each of these subdirectories into the 'Products' directory of
+     your Zope server (either SOFTWARE_HOME or INSTANCE_HOME) e.g.::
+
+      $ cd /var/zope/Products
+      $ mv /tmp/CMF-head/CMFDefault .
+      $ mv /tmp/CMF-head/CMFDefault .
+      $ mv /tmp/CMF-head/CMFTopic .
+
+  3. Verify filesystem products:
+
+     Start or restart your Zope server.  Check to see that the
+     following products are present in the Control_Panel / Products
+     list;  each should show a "normal" (non-broken) icon, and
+     should have a version number matching the release version of
+     the snapshot:
+
+      - CMFCore
+
+      - CMFDefault
+
+      - CMFTopic
+
+  4. Create a CMF Site:
+
+     From the management interface, somewhere in the "main"
+     section of your site (*not* the Control_Panel!),
+     select "Portal (New)" from the add list.  Fill out the
+     constructor form, and click the "Add" button.
+
+Refreshing your Checkout
+
+  Note that to refresh an existing CVS sandbox, you should
+  use 'cvs up -d -P' (assuming you want to remove obsolete
+  directories and retrieve any newly-added ones).
+
+Fetching a Previous Version
+
+.. [1]  A normal CVS checkout retrieves what is called the "head"
+  (the latest revision for each file) from the "main trunk"
+  (no unmerged branches).
+
+ Retrieving Sources for a Release
+
+   Sources for prior releases are tagged, using the release
+   version identifier, but with the periods replaced with
+   underscores.  For instance, version 1.1 of the CMF
+   was tagged as 'CMF-1_1-src'.  To fetch such a
+   release from CVS::
+
+    $ cvs -d :pserver:anonymous@cvs.zope.org:/cvs-repository \
+      checkout -r CMF-1_1-src CMF
+
