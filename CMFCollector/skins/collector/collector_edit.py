@@ -1,5 +1,5 @@
 ## Script (Python) "collector_edit.py"
-##parameters=title, description, email, abbrev, managers, supporters, dispatching, state_email, topics, classifications, importances, version_info_spiel
+##parameters=title, description, email, abbrev, managers, supporters, dispatching, participation, state_email, topics, classifications, importances, version_info_spiel
 ##title=Configure Collector
  
 from Products.PythonScripts.standard import url_quote_plus
@@ -11,6 +11,7 @@ changes = context.edit(title=title,
                        managers=managers,
                        supporters=supporters,
                        dispatching=dispatching,
+                       participation=participation,
                        state_email=state_email,
                        topics=topics,
                        classifications=classifications,
@@ -18,7 +19,7 @@ changes = context.edit(title=title,
                        version_info_spiel=version_info_spiel)
 
 if not changes:
-    changes = "No configuration changes"
+    changes = "No changes"
 else:
     changes = "Changed: " + changes
 
