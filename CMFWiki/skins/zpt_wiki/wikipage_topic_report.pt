@@ -27,8 +27,7 @@
             all its offspring.  You can get here from the
             <a href="TOC PAGE"
                tal:attributes="href string:${here/absolute_url}/wikipage_toc">
-              Wiki-Wide Table-of-Contents View
-            </a>.
+              Wiki-Wide Table-of-Contents View</a>.
           </p>
         </td>
       </tr>
