@@ -35,8 +35,7 @@ Zope External Editor Installation
     Windows 2000, use the binary distribution*
     
     Download the helper app archive and extract into the directory where you 
-    want to install it (it contains one executable Python module file).
-    C:\Program Files\ZopeEdit might be a good choice. 
+    want to install it: C:\Program Files\ZopeEdit might be a good choice. 
 
     Once you have the help application installed, you need to configure your
     browser to fire it off appropriately. To do so, create an entry in the
