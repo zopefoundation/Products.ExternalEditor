@@ -21,6 +21,7 @@ this_module = sys.modules[ __name__ ]
 factory_type_information = (
     (Collector.factory_type_information
      + CollectorIssue.factory_type_information
+     + Collector.catalog_factory_type_information
 
      + ({'id': 'Collector Issue Transcript',
          #     'content_icon': 'event_icon.gif',
@@ -51,7 +52,8 @@ factory_type_information = (
      )
     )
 
-contentClasses = (Collector.Collector, CollectorIssue.CollectorIssue)
+contentClasses = (Collector.Collector, CollectorIssue.CollectorIssue,
+                  Collector.CollectorCatalog)
 contentConstructors = (Collector.addCollector,
                        CollectorIssue.addCollectorIssue)
 z_bases = utils.initializeBasesPhase1(contentClasses, this_module)
