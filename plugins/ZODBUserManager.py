@@ -92,10 +92,11 @@ class ZODBUserManager( BasePlugin ):
 
         userid = self._login_to_userid.get( login, login )
 
-        if userid is None:
-            return None
+        reference = self._user_passwords.get(userid)
 
-        reference = self._user_passwords[ userid ]
+        if reference is None:
+            return None
+        
         if AuthEncoding.is_encrypted( reference ):
             if AuthEncoding.pw_validate( reference, password ):
                 return userid, login

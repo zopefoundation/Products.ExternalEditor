@@ -717,8 +717,14 @@ class PluggableAuthService( Folder ):
                     for authenticator_id, auth in authenticators:
 
                         try:
-                            user_id, name = auth.authenticateCredentials(
-                                                                credentials )
+                            uid_and_name = auth.authenticateCredentials(
+                                credentials )
+
+                            if uid_and_name is None:
+                                continue
+
+                            user_id, name = uid_and_name
+                            
                         except _SWALLOWABLE_PLUGIN_EXCEPTIONS:
                             LOG('PluggableAuthService', WARNING,
                                 'AuthenticationPlugin %s error' %
