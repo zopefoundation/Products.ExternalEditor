@@ -1,5 +1,6 @@
 from unittest import TestCase, TestSuite, makeSuite, main
 
+import Testing
 import Zope
 try:
     Zope.startup()
@@ -11,16 +12,16 @@ try:
 except ImportError:
     # for Zope versions before 2.6.0
     from Interface import verify_class_implementation as verifyClass
+
 from AccessControl.SecurityManagement import newSecurityManager
 
 from Products.CMFCore.MemberDataTool import MemberDataTool
+from Products.CMFCore.MembershipTool import MembershipTool
 from Products.CMFCore.PortalFolder import PortalFolder
 from Products.CMFCore.tests.base.dummy import DummySite
 from Products.CMFCore.tests.base.dummy import DummyTool
 from Products.CMFCore.tests.base.dummy import DummyUserFolder
 from Products.CMFCore.tests.base.testcase import SecurityTest
-
-from Products.CMFCore.MembershipTool import MembershipTool
 
 
 class MembershipToolTests(TestCase):
@@ -40,10 +41,10 @@ class MembershipToolSecurityTests(SecurityTest):
     def setUp(self):
         SecurityTest.setUp(self)
         self.site = DummySite('site').__of__(self.root)
-        self.mtool = MembershipTool().__of__(self.site)
+        self.site._setObject( 'portal_membership', MembershipTool() )
 
     def test_getCandidateLocalRoles(self):
-        mtool = self.mtool
+        mtool = self.site.portal_membership
         acl_users = self.site._setObject( 'acl_users', DummyUserFolder() )
 
         newSecurityManager(None, acl_users.user_foo)
@@ -54,7 +55,7 @@ class MembershipToolSecurityTests(SecurityTest):
         self.assertEqual( rval, ('Manager', 'Member', 'Owner', 'Reviewer') )
 
     def test_createMemberArea(self):
-        mtool = self.mtool
+        mtool = self.site.portal_membership
         members = self.site._setObject( 'Members', PortalFolder('Members') )
         acl_users = self.site._setObject( 'acl_users', DummyUserFolder() )
         wtool = self.site._setObject( 'portal_workflow', DummyTool() )
@@ -84,7 +85,7 @@ class MembershipToolSecurityTests(SecurityTest):
                           % str( f.get_local_roles() ) )
 
     def test_deleteMembers(self):
-        mtool = self.mtool
+        mtool = self.site.portal_membership
         members = self.site._setObject( 'Members', PortalFolder('Members') )
         acl_users = self.site._setObject( 'acl_users', DummyUserFolder() )
         utool = self.site._setObject( 'portal_url', DummyTool() )
@@ -104,6 +105,7 @@ class MembershipToolSecurityTests(SecurityTest):
         self.failIf( acl_users.getUserById('user_foo', None) )
         self.failIf( mdtool._members.has_key('user_foo') )
         self.failIf( hasattr(members.aq_self, 'user_foo') )
+
 
 def test_suite():
     return TestSuite((

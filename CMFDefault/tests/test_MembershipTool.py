@@ -12,38 +12,26 @@ try:
 except ImportError:
     # for Zope versions before 2.6.0
     from Interface import verify_class_implementation as verifyClass
+
 from AccessControl.SecurityManagement import newSecurityManager
 
 from Products.CMFCore.PortalFolder import PortalFolder
-from Products.CMFCore.tests.base.dummy import DummyFolder as DummyFolderBase
+from Products.CMFCore.tests.base.dummy import DummyFolder
+from Products.CMFCore.tests.base.dummy import DummySite
 from Products.CMFCore.tests.base.dummy import DummyTool
 from Products.CMFCore.tests.base.dummy import DummyUserFolder
 from Products.CMFCore.tests.base.testcase import SecurityTest
-
 from Products.CMFDefault.MembershipTool import MembershipTool
-
-
-class DummyFolder(DummyFolderBase):
-    def manage_addPortalFolder(self, id, title=''):
-        self._setObject( id, DummyFolder() )
-    def changeOwnership(self, user):
-        pass
-    def manage_setLocalRoles(self, userid, roles):
-        pass
-    def getPhysicalRoot(self):
-        return self
-    def unrestrictedTraverse(self, path, default=None, restricted=0):
-        return self.acl_users
 
 
 class MembershipToolTests(TestCase):
 
     def setUp(self):
-        self.site = DummyFolder()
-        self.mtool = MembershipTool().__of__(self.site)
+        self.site = DummySite('site')
+        self.site._setObject( 'portal_membership', MembershipTool() )
 
     def test_MembersFolder_methods(self):
-        mtool = self.mtool
+        mtool = self.site.portal_membership
         self.assertEqual( mtool.getMembersFolder(), None )
         self.site._setObject( 'Members', DummyFolder() )
         self.assertEqual( mtool.getMembersFolder(), self.site.Members )
@@ -68,8 +56,7 @@ class MembershipToolSecurityTests(SecurityTest):
 
     def setUp(self):
         SecurityTest.setUp(self)
-        self.site = DummyFolder()
-        self.site.id = 'testSite'
+        self.site = DummySite('site').__of__(self.root)
         self.site._setObject( 'portal_membership', MembershipTool() )
 
     def test_createMemberArea(self):
