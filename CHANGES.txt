@@ -1,5 +1,10 @@
 CMF 1.5.0-beta (unreleased)
 
+  New Features
+  
+    - CookieCrumber now supports logging the authenticated user id to
+      the access log just like basic auth.
+
   Bug Fixes
 
     - DiscussionTool: Fixed two acquisition bugs.

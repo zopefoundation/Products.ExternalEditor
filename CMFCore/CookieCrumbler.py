@@ -78,6 +78,8 @@ class CookieCrumbler (Folder):
                     'label':'Use cookie paths to limit scope'},
                    {'id':'cache_header_value', 'type': 'string', 'mode':'w',
                     'label':'Cache-Control header value'},
+                   {'id':'log_username', 'type':'boolean', 'mode': 'w',
+                    'label':'Log cookie auth username to access log'}
                    )
 
     auth_cookie = '__ac'
@@ -89,6 +91,7 @@ class CookieCrumbler (Folder):
     logout_page = 'logged_out'
     local_cookie_path = 0
     cache_header_value = 'private'
+    log_username = 1
 
     security.declarePrivate('delRequestVar')
     def delRequestVar(self, req, name):
@@ -125,6 +128,23 @@ class CookieCrumbler (Folder):
     security.declarePrivate('defaultExpireAuthCookie')
     def defaultExpireAuthCookie( self, resp, cookie_name ):
         resp.expireCookie( cookie_name, path=self.getCookiePath())
+    
+    def _setAuthHeader(self, ac, request, response):
+        """Set the auth headers for both the Zope and Medusa http request
+        objects.
+        """
+        request._auth = 'Basic %s' % ac
+        response._auth = 1
+        if self.log_username:
+            # Set the authorization header in the medusa http request
+            # so that the username can be logged to the Z2.log
+            try:
+                # Put the full-arm latex glove on now...
+                medusa_headers = response.stdout._request._header_cache
+            except AttributeError:
+                pass
+            else:
+                medusa_headers['authorization'] = request._auth
 
     security.declarePrivate('modifyRequest')
     def modifyRequest(self, req, resp):
@@ -157,8 +177,7 @@ class CookieCrumbler (Folder):
                 name = req[self.name_cookie]
                 pw = req[self.pw_cookie]
                 ac = encodestring('%s:%s' % (name, pw)).rstrip()
-                req._auth = 'Basic %s' % ac
-                resp._auth = 1
+                self._setAuthHeader(ac, req, resp)
                 if req.get(self.persist_cookie, 0):
                     # Persist the user name (but not the pw or session)
                     expires = (DateTime() + 365).toZone('GMT').rfc822()
@@ -187,8 +206,7 @@ class CookieCrumbler (Folder):
                         pass
                     else:
                         attempt = ATTEMPT_RESUME
-                        req._auth = 'Basic %s' % ac
-                        resp._auth = 1
+                        self._setAuthHeader(ac, req, resp)
                         self.delRequestVar(req, self.auth_cookie)
                         method = self.getCookieMethod(
                             'twiddleAuthCookie', None)
