@@ -99,7 +99,7 @@ from Globals import HTMLFile
 from AccessControl import getSecurityManager, ClassSecurityInfo
 from Acquisition import aq_parent, aq_inner, aq_base
 from DynamicType import DynamicType
-from utils import getToolByName
+from utils import getToolByName, _checkPermission
 
 factory_type_information = ( { 'id'             : 'Folder'
                              , 'meta_type'      : 'Portal Folder'
@@ -371,8 +371,7 @@ class PortalFolder( Folder, DynamicType ):
         # This method prevents people other than the portal manager
         # from overriding skinned names.
         if not allow_dup:
-            if not getSecurityManager().checkPermission(
-                'Manage portal', self):
+            if not _checkPermission( 'Manage portal', self):
                 ob = self
                 while ob is not None and not getattr(ob, '_isPortalRoot', 0):
                     ob = aq_parent(aq_inner(ob))
@@ -403,7 +402,7 @@ class PortalFolder( Folder, DynamicType ):
                     break
 
             if permission_name is not None:
-                if getSecurityManager().checkPermission(permission_name,self):
+                if _checkPermission(permission_name,self):
                     if not validate_src:
                         # We don't want to check the object on the clipboard
                         return

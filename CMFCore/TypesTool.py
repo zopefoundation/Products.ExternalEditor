@@ -91,7 +91,8 @@ __version__='$Revision$'[11:-2]
 
 import OFS
 from Globals import InitializeClass, DTMLFile
-from utils import UniqueObject, SimpleItemWithProperties, tuplize, _dtmldir
+from utils import UniqueObject, SimpleItemWithProperties, tuplize
+from utils import _dtmldir, _checkPermission
 import string
 from AccessControl import getSecurityManager, ClassSecurityInfo
 from Acquisition import aq_base
@@ -508,8 +509,7 @@ class ScriptableTypeInformation( TypeInformation ):
         order to construct an instance?
         """
         permission = self.permission
-        if permission and not getSecurityManager().checkPermission(
-            permission, container):
+        if permission and not _checkPermission( permission, container ):
             return 0
         return 1
 

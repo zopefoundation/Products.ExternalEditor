@@ -88,7 +88,7 @@
 
 
 import os
-from Products.CMFCore.utils import UniqueObject
+from Products.CMFCore.utils import UniqueObject, _checkPermission
 from OFS.SimpleItem import SimpleItem
 from Globals import HTMLFile, package_home, InitializeClass 
 import string
@@ -198,7 +198,7 @@ class SyndicationTool (UniqueObject, SimpleItem):
         Not Sitewide Properties.
         """
         mgr = SecurityManagement.getSecurityManager()
-        if not mgr.checkPermission( ManageProperties, obj ):
+        if not _checkPermission( ManageProperties, obj ):
             raise Unauthorized
         #import pdb; pdb.set_trace()
         syInfo = getattr(obj, 'syndication_information',

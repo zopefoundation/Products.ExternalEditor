@@ -84,8 +84,9 @@
 ##############################################################################
 
 from ExtensionClass import Base
-from AccessControl import ClassSecurityInfo
+from AccessControl import ClassSecurityInfo, getSecurityManager
 from AccessControl.Permission import Permission
+from AccessControl.PermissionRole import rolesForPermissionOn
 from AccessControl.Role import gather_permissions
 import Globals
 from Acquisition import aq_get, aq_inner, aq_parent
@@ -138,23 +139,16 @@ def tuplize( valueName, value ):
     if type(value) == type(''): return tuple( split( value ) )
     raise ValueError, "%s of unsupported type" % valueName
 
-try:
-    # Zope 2.2.x access control.
-    from AccessControl import getSecurityManager
-    def _getAuthenticatedUser(self):
-        return getSecurityManager().getUser()
-    def _checkPermission(permission, obj):
-        return getSecurityManager().checkPermission(permission, obj)
-except:
-    # Zope 2.1.x access control.
-    from AccessControl import User
-    def _getAuthenticatedUser(self):
-        u = self.REQUEST.get('AUTHENTICATED_USER', None)
-        if u is None:
-            u = User.nobody
-        return u
-    def _checkPermission(permission, obj):
-        return _getAuthenticatedUser(obj).has_permission(permission, obj)
+def _getAuthenticatedUser( self ):
+    return getSecurityManager().getUser()
+
+def _checkPermission(permission, obj, StringType = type('')):
+    roles = rolesForPermissionOn(permission, obj)
+    if type(roles) is StringType:
+        roles=[roles]
+    if _getAuthenticatedUser( obj ).allowed( obj, roles ):
+        return 1
+    return 0
 
 
 # If Zope ever provides a call to getRolesInContext() through

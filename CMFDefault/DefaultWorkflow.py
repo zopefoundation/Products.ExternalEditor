@@ -92,8 +92,8 @@ import Globals
 from Acquisition import aq_base, aq_inner, aq_parent
 from AccessControl import ClassSecurityInfo
 from DateTime import DateTime
-from Products.CMFCore.utils import modifyPermissionMappings, \
-     _checkPermission, getToolByName, SimpleItemWithProperties
+from Products.CMFCore.utils import modifyPermissionMappings, _checkPermission
+from Products.CMFCore.utils import getToolByName, SimpleItemWithProperties
 from Products.CMFCore.WorkflowCore import WorkflowException
 from Products.CMFCore.WorkflowTool import addWorkflowClass
 

@@ -92,7 +92,7 @@ from CMFCorePermissions import AccessContentsInformation, View, \
      ReviewPortalContent, ModifyPortalContent
 import CMFCorePermissions
 from DynamicType import DynamicType
-from utils import getToolByName
+from utils import getToolByName, _checkPermission
 
 from Acquisition import aq_base
 
@@ -197,7 +197,7 @@ class PortalContent(DynamicType, SimpleItem):
             return 1
         sm = getSecurityManager()
         for p in pp:
-            if sm.checkPermission(p, self):
+            if _checkPermission(p, self):
                 return 1
         return 0
 

@@ -3,6 +3,8 @@ import unittest
 import re, new
 import OFS.Folder, OFS.SimpleItem
 from AccessControl import SecurityManager
+from AccessControl.SecurityManagement import newSecurityManager
+import Acquisition
 from Products.CMFCore.TypesTool import TypesTool
 from Products.CMFCore.CatalogTool import CatalogTool
 from Products.CMFCore.PortalContent import PortalContent
@@ -20,6 +22,18 @@ class UnitTestSecurityPolicy:
         return 1
     
     def checkPermission( self, permission, object, context) :
+        return 1
+
+class UnitTestUser( Acquisition.Implicit ):
+    """
+        Stubbed out manager for unit testing purposes.
+    """
+    def getId( self ):
+        return 'unit_tester'
+    
+    getUserName = getId
+
+    def allowed( self, object, object_roles=None ):
         return 1
 
 class DummyContent( PortalContent, OFS.SimpleItem.Item ):
@@ -57,6 +71,7 @@ class PortalFolderTests( unittest.TestCase ):
         self._policy = UnitTestSecurityPolicy()
         SecurityManager.setSecurityPolicy(self._policy)
         self.root = Zope.app()
+        newSecurityManager( None, UnitTestUser().__of__( self.root ) )
     
     def tearDown( self ):
         get_transaction().abort()
@@ -158,6 +173,7 @@ class PortalFolderTests( unittest.TestCase ):
         assert 'foo' in catalog.uniqueValuesFor( 'id' )
         assert has_path( catalog._catalog, '/test/folder/sub/foo' )
 
+        #import pdb; pdb.set_trace()
         folder.manage_renameObject( id='sub', new_id='new_sub' )
         assert 'foo' in catalog.uniqueValuesFor( 'id' )
         assert len( catalog ) == 1

@@ -90,7 +90,7 @@ from Discussions import DiscussionResponse
 from Document import Document
 from DublinCore import DefaultDublinCoreImpl
 from DateTime import DateTime
-from Products.CMFCore.utils import getToolByName, _checkPermission
+from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.PortalContent import PortalContent
 import urllib, string
 
