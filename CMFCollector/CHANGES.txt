@@ -11,6 +11,27 @@ CMF Collector Update Notes
 
   See KNOWN_PROBLEMS.txt for pending bugs and problems to beware.
 
+
+  Changes after release 0.9b
+
+    Bug fixes
+
+      - Created a working test_all.py script so that the unit tests
+        actually run when invoking test_all
+
+      - Move to more canonical product structure by renaming
+        RELEASE_NOTES.txt to CHANGES.txt
+
+    Miscellaneous
+
+      - Removed super-stale TODO.txt
+
+      - Removed the collector_plone skins directory. It wasn't hooked 
+        up to anything, just checked in, and since there are a lot
+        of Plone-specific collectors it is doubtful collector_plone
+        would ever see maintenance.
+
+
   Version 0.9b,  Nov 7, 2002
 
     Fixed bug where non-manager (supporters and non-staff) could not

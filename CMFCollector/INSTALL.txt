@@ -45,7 +45,7 @@ Installing CMFCollector
     click the 'Test' tab.
 
     The install function will execute and give information about the
-    steps it took to register and install the CMF Events into the CMF
+    steps it took to register and install CMF Collector into the CMF
     Site instance.
 
   - Install the workflow:

@@ -22,7 +22,6 @@ from AccessControl import getSecurityManager
 
 from Products.CMFDefault.DublinCore import DefaultDublinCoreImpl
 from Products.CMFCore.PortalContent import PortalContent
-from Products.CMFCore.WorkflowCore import WorkflowAction
 from Products.CMFCore.CatalogTool import CatalogTool
 
 from Products.CMFDefault.SkinnedFolder import SkinnedFolder

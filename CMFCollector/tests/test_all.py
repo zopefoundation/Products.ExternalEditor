@@ -1,10 +1,39 @@
-"""Currently all stub, no substance."""
+##############################################################################
+#
+# Copyright (c) 2004 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE.
+#
+##############################################################################
+""" CMFSetup tests.
+
+$Id$
+"""
+
+from unittest import main
+import Testing
 import Zope
-from unittest import TestSuite,main
+Zope.startup()
+
 from Products.CMFCore.tests.base.utils import build_test_suite
 
+
+def suite():
+    return build_test_suite( 'Products.CMFCollector.tests'
+                           , [ 'test_CollectorSubset'
+                             ,
+                             ]
+                           )
+
 def test_suite():
-    return TestSuite()
+    # Just to silence the top-level test.py
+    return None
 
 if __name__ == '__main__':
-    main(defaultTest='test_suite')
+    main(defaultTest='suite')
+
