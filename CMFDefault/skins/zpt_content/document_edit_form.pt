@@ -2,63 +2,58 @@
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       metal:use-macro="here/main_template/macros/master">
 <body>
-<div metal:fill-slot="main">	  
+<div metal:fill-slot="main" i18n:domain="cmf_default">
 <div class="Desktop">
-<h2>Edit <span tal:replace="here/getId">ID</span></h2>
+<h2 i18n:translate="">Edit <span
+    tal:replace="here/getId" i18n:name="objectid">My ID</span></h2>
 
 <form action="document_edit" method="post" enctype="multipart/form-data"
       tal:attributes="action string:${here/absolute_url}/document_edit"
 >
 
  <input type="hidden" name="SafetyBelt" value=""
-        tal:attributes="value here/SafetyBelt">
+        tal:attributes="value here/SafetyBelt" />
 
 <table class="FormLayout">
  <tr>
-  <th>
-    Title
-  </th>
+  <th i18n:translate="">Title</th>
   <td>
    <span tal:replace="here/Title">Title</span>
   </td>
  </tr>
 
  <tr>
-  <th>
-    Description
-  </th>
+  <th i18n:translate="">Description</th>
   <td>
    <span tal:replace="here/Description">Description</span>
   </td>
  </tr>
 
  <tr>
-  <th>
-   Format
-  </th>
+  <th i18n:translate="">Format</th>
   <td>
    <input type="radio" name="text_format"
                      value="structured-text"
                      tal:attributes="checked python: path('here/text_format') == 'structured-text'" />
-   <label for="cb_structuredtext">structured-text</label>
+   <label for="cb_structuredtext" i18n:translate="">structured-text</label>
    <input type="radio" name="text_format" value="plain"
           tal:attributes="checked python: path('here/text_format') == 'plain'" />
-   <label for="cb_html">plain text</label>
+   <label for="cb_html" i18n:translate="">plain text</label>
    <input type="radio" name="text_format" value="html"
           tal:attributes="checked python: path('here/text_format') == 'html'" />
-   <label for="cb_html">html</label>
+   <label for="cb_html" i18n:translate="">html</label>
   </td>
  </tr>
 
  <tr>
-  <th> Upload </th>
+  <th i18n:translate="">Upload</th>
   <td>
-   <input type="file" name="file" size="25">
+   <input type="file" name="file" size="25" />
   </td>
  </tr>
 
  <tr>
-  <th class="TextField"> Edit </th>
+  <th class="TextField" i18n:translate="">Edit</th>
   <td class="TextField">
    <textarea name="text:text" rows="20" cols="80" wrap="soft"
                     tal:content="here/EditableBody"></textarea>
@@ -66,12 +61,15 @@
  </tr>
 
  <tr>
-  <td> <br> </td>
+  <td> <br /> </td>
   <td>
-    <input type="submit" name="choice" value=" Change ">
-    <input type="submit" name="choice" value=" Change and View ">
+   <input type="submit" name="change" value=" Change "
+          i18n:attributes="value" />
+   <input type="submit" name="change_and_view" value=" Change and View "
+          i18n:attributes="value" />
   </td>
  </tr>
+
 </table>
 </form>
 </div>

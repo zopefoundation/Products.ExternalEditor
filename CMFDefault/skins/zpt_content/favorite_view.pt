@@ -20,11 +20,12 @@
 
 </div>
 
-<div metal:fill-slot="main">
+<div metal:fill-slot="main" i18n:domain="cmf_default">
 
- <p> Link: <a href=""
+ <p i18n:translate="">Link: <a href=""
               tal:attributes="href here/getRemoteUrl"
               tal:content="here/getRemoteUrl"
+              i18n:name="link"
            >/index_html</a></p>
 
  <div class="Discussion">

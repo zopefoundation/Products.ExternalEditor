@@ -9,7 +9,7 @@
 
 </div>
 
-<div metal:define-macro="index_content">
+<div metal:define-macro="index_content" i18n:domain="cmf_default">
 
   <div tal:define="auth_filter nocall: modules/ZTUtils/LazyFilter;
                    default_types python:( 'Document'
@@ -25,7 +25,7 @@
                   ">
   <div tal:condition="items">
 
-  <h4> Content </h4>
+  <h4 i18n:translate=""> Content </h4>
 
   <ul>
    <li tal:repeat="item items">
@@ -33,7 +33,8 @@
       align="middle" border="0"
       tal:attributes="src   string:${item/portal_url}/${item/getIcon};
                       alt   string:${item/Type};
-                      title string:${item/Type}"></a>
+                      title string:${item/Type}"
+      i18n:attributes="alt title" /></a>
     <a href="item_url" tal:attributes="href item/absolute_url"
        tal:content="item/Title"> Title </a>
      <blockquote tal:condition="exists: item/Description"
@@ -49,7 +50,7 @@
 </div>
 
 
-<div metal:define-macro="index_links">
+<div metal:define-macro="index_links" i18n:domain="cmf_default">
 
   <div tal:define="auth_filter nocall: modules/ZTUtils/LazyFilter;
                    default_types python:( 'Link'
@@ -62,7 +63,7 @@
                    items python: auth_filter( raw_items, skip='View' );
                   ">
   <div tal:condition="items">
-  <h4> Related Resources </h4>
+  <h4 i18n:translate=""> Related Resources </h4>
 
   <ul>
    <li tal:repeat="item items">
@@ -70,7 +71,8 @@
       align="middle" border="0"
       tal:attributes="src   string:${item/portal_url}/${item/getIcon};
                       alt   string:${item/Type};
-                      title string:${item/Type}"></a>
+                      title string:${item/Type}"
+      i18n:attributes="alt title" /></a>
     <a href="item_url" tal:attributes="href item/absolute_url"
        tal:content="item/Title"> Title </a>
      <blockquote tal:condition="exists: item/Description"
@@ -85,11 +87,11 @@
 
 </div>
 
-<div metal:define-macro="index_folders">
+<div metal:define-macro="index_folders" i18n:domain="cmf_default">
 
   <div tal:define="auth_filter nocall: modules/ZTUtils/LazyFilter;
                    default_types python:( 'Folder'
-                                        , 
+                                        ,
                                         );
                    types types | here/show_folder_types | default_types;
                    raw_items python: here.contentValues(
@@ -97,7 +99,7 @@
                    items python: auth_filter( raw_items, skip='View' );
                   ">
   <div tal:condition="items">
-  <h4> Folders </h4>
+  <h4 i18n:translate=""> Folders </h4>
 
   <ul>
    <li tal:repeat="item items">
@@ -105,7 +107,8 @@
       align="middle" border="0"
       tal:attributes="src   string:${item/portal_url}/${item/getIcon};
                       alt   string:${item/Type};
-                      title string:${item/Type}"></a>
+                      title string:${item/Type}"
+      i18n:attributes="alt title" /></a>
     <a href="item_url" tal:attributes="href item/absolute_url"
        tal:content="item/TitleOrId"> Title </a>
      <blockquote tal:condition="exists: item/Description"
@@ -120,7 +123,7 @@
 
 </div>
 
-<div metal:define-macro="news_box">
+<div metal:define-macro="news_box" i18n:domain="cmf_default">
 
  <table class="NewsItems"
         cellspacing="0"
@@ -136,28 +139,28 @@
 		            global batch python:Batch(news, 10, 0, orphan=1)">
   <tr>
    <td class="NewsBorder" width="1" rowspan="13" bgcolor="#6699CC">
-    <img src="spacer.gif" alt=" " width="1" height="2" border="0">
+    <img src="spacer.gif" alt=" " width="1" height="2" border="0" />
    </td>
    <td valign="top" class="NewsTitle" width="100%">
-     <b>News</b>
+     <b i18n:translate="">News</b>
    </td>
   </tr>
   <tr class="NewsItemRow" tal:condition="news"
       tal:repeat="news batch">
    <td valign="top" wrap>
     <a href="" tal:attributes="href python:news.getURL()"
-       tal:content="news/Title"></a><br>
+       tal:content="news/Title"></a><br />
     <span tal:replace="news/Date">Date</span>
    </td>
   </tr>
   <tr class="NewsItemRow" tal:condition="python:not(news)">
-   <td valign="top">
+   <td valign="top" i18n:translate="">
      No news is no news.
    </td>
   </tr>
   <tr class="NewsItemRow">
    <td>
-     <a href="recent_news">More...</a>
+     <a href="recent_news" i18n:translate="">More...</a>
    </td>
   </tr>
 </tbody>

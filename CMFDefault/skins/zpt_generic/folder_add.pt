@@ -2,38 +2,39 @@
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       metal:use-macro="here/main_template/macros/master">
 <body>
-<div metal:fill-slot="main">	  
+<div metal:fill-slot="main" i18n:domain="cmf_default">
 <div class="Desktop">
-<h1>Add Folder</h1>
+<h1 i18n:translate="">Add Folder</h1>
 
-<p> A Folder contains other objects. Use Folders to organize your
-    web objects in to logical groups.</p>
+<p i18n:translate="">A Folder contains other objects. Use Folders to organize
+  your web objects in to logical groups.</p>
 
-<form action="manage_addPortalFolder" method="POST"
+<form action="manage_addPortalFolder" method="post"
       tal:attributes="action string:${here/absolute_url}/manage_addPortalFolder"
 >
 <table class="FormLayout">
  <tr>
   <td>
-   <strong>Id</strong>
+   <strong i18n:translate="">Id</strong>
   </td>
   <td align="left" valign="top">
-   <input type="text" name="id" size="40">
+   <input type="text" name="id" size="40" />
   </td>
  </tr>
  <tr>
   <td>
-   <em><strong>Title</strong></em>
+   <em><strong i18n:translate="">Title</strong></em>
   </td>
   <td align="left" valign="top">
-   <input type="text" name="title" size="40">
+   <input type="text" name="title" size="40" />
   </td>
  </tr>
- <tr><td colspan="2"><br></td></tr>
+ <tr><td colspan="2"><br /></td></tr>
  <tr>
-  <td><br></td>
+  <td><br /></td>
   <td>
-   <br><input type="submit" value=" Add ">
+   <br />
+   <input type="submit" value=" Add " i18n:attributes="value" />
   </td>
  </tr>
 </table>

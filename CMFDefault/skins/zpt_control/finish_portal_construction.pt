@@ -2,13 +2,13 @@
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       metal:use-macro="here/main_template/macros/master">
 <body>
-<div metal:fill-slot="main">
+<div metal:fill-slot="main" i18n:domain="cmf_default">
 
 <div class="Desktop">
 
-<h3>Welcome to the CMF!</h3>
+<h3 i18n:translate="">Welcome to the CMF!</h3>
 
-<p> The first thing you should do is visit the
+<p i18n:translate=""> The first thing you should do is visit the
  <a href="http://cmf.zope.org"
     tal:attributes="href string:${here/portal_url}/reconfig_form"
  >basic configuration form</a>.

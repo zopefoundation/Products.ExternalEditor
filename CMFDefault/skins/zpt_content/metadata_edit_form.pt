@@ -2,16 +2,16 @@
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       metal:use-macro="here/main_template/macros/master">
 <body>
-<div metal:fill-slot="main">	  
+<div metal:fill-slot="main" i18n:domain="cmf_default">
 <div class="Desktop">
 
 
 <span tal:replace="request/message"
-   tal:condition="request/message|nothing"><hr></span>
+   tal:condition="request/message|nothing"><hr /></span>
 
 <div class="Metadata">
 
-<h2>Standard Resource Metadata </h2>
+<h2 i18n:translate="">Standard Resource Metadata</h2>
 
 <form action="metadata_edit" method="post"
       tal:attributes="action string:${here/absolute_url}/metadata_edit"
@@ -20,23 +20,25 @@
 
  <tr valign="top">
 
-  <th>
-    Enable Discussion?
-  </th>
+  <th i18n:translate="">Enable Discussion?</th>
   <td>
     <select name="allowDiscussion"
             tal:define="val here/isDiscussable">
         <option value="None"
-                tal:attributes="selected python: val == None"> Default </option>
+                tal:attributes="selected python: val == None"
+                i18n:translate="">Default</option>
         <option value="0"
-                tal:attributes="selected python: val == 0"> Off </option>
+                tal:attributes="selected python: val == 0"
+                i18n:translate="">Off</option>
         <option value="1"
-                tal:attributes="selected python: val == 1"> On </option>
+                tal:attributes="selected python: val == 1"
+                i18n:translate="">On</option>
      </select>
   </td>
   <td colspan="2" align="right">
    <a href="full_metadata_edit_form"
       tal:attributes="href string:${here/absolute_url}/full_metadata_edit_form"
+      i18n:translate=""
      >Edit all metadata</a>
   </td>
 
@@ -44,27 +46,27 @@
 
  <tr valign="top">
 
-  <th align="right"> Identifier </th>
+  <th align="right" i18n:translate="">Identifier</th>
   <td colspan="3"> <span tal:replace="here/Identifier" /> </td>
 
  </tr>
 
  <tr valign="top">
 
-  <th align="right"> Title </th>
+  <th align="right" i18n:translate="">Title</th>
   <td colspan="3">
    <input type="text"
           name="title"
           value=""
           size="65"
-		  tal:attributes="value here/Title">
+          tal:attributes="value here/Title" />
   </td>
 
  </tr>
 
  <tr valign="top">
 
-  <th align="right"> Description </th>
+  <th align="right" i18n:translate="">Description</th>
   <td colspan="3">
    <textarea name="description:text" rows="5"
              cols="65" wrap="soft"
@@ -74,12 +76,12 @@
  </tr>
 
  <tr valign="top">
-       <th align="right"> Subject </th>
+       <th align="right" i18n:translate="">Subject</th>
   <td tal:define="subj_lines python: modules['string'].join(
                                          here.subjectsList(), '\n' )">
      <textarea name="subject:lines" rows="3" cols="20"
 	           tal:content="subj_lines"></textarea>
- <br> 
+   <br />
    <select name="subject:list" multiple>
      <option value=""
 		   tal:define="items python: here.portal_metadata.listAllowedSubjects(
@@ -90,16 +92,23 @@
 		   tal:attributes="value item; selected python: item in subjects"
 		   tal:content="item">
       </option>
-    </select> 
+    </select>
   </td>
 
-  <th align="right"> Format </th>
-  <td> <input type="text" name="format" value="" tal:attributes="value here/Format">
-  <br> <input type="submit" name="change" value=" Change ">
-  <br> <input type="submit" name="change_and_edit" value=" Change & Edit ">
-  <br> <input type="submit" name="change_and_view" value=" Change & View ">
+  <th align="right" i18n:translate="">Format</th>
+  <td>
+   <input type="text" name="format" value=""
+          tal:attributes="value here/Format" />
+   <br />
+   <input type="submit" name="change" value=" Change "
+          i18n:attributes="value" />
+   <br />
+   <input type="submit" name="change_and_edit" value=" Change & Edit "
+          i18n:attributes="value" />
+   <br />
+   <input type="submit" name="change_and_view" value=" Change & View "
+          i18n:attributes="value" />
   </td>
-
  </tr>
 
 </table>

@@ -23,10 +23,10 @@
 <head>
  <title tal:content="here/expanded_title"> Title goes here </title>
 
- <metal:block define-slot="base" /> 
+ <metal:block define-slot="base" />
 
  <link rel="stylesheet" href="zpt_stylesheet.css" type="text/css"
-       tal:attributes="href here/zpt_stylesheet.css/absolute_url">
+       tal:attributes="href here/zpt_stylesheet.css/absolute_url" />
 
 </head>
 
@@ -44,41 +44,42 @@
         width="100%" cellpadding="0" cellspacing="0" border="0">
 
   <tr>
-
-  <form action="search" method="GET"
-        tal:attributes="action string:${portal_url}/search">
-
    <td id="PortalLogo">
     <a href="." tal:attributes="href string:${portal_url}/"
     ><img src="Zope_logo.gif" alt="Zope Logo"
           border="0" width="87" height="38"
-          tal:attributes="src string:${portal_url}/Zope_logo.gif"></a> 
+          tal:attributes="src string:${portal_url}/Zope_logo.gif" /></a>
    </td>
 
    <td id="PortalTitle">
     <span tal:content="string:${portal_title}">Site Title</span>
    </td>
 
-   <td id="NavBar">
-    <a href="." tal:attributes="href string:${portal_url}/">home</a>&nbsp;
+   <td id="NavBar" i18n:domain="cmf_default">
+   <form action="search" method="get"
+         tal:attributes="action string:${portal_url}/search">
+    <a href="."
+       tal:attributes="href string:${portal_url}/"
+       i18n:translate="">home</a>&nbsp;
     <span tal:condition="membersfolder" tal:omit-tag="">
     <a href="roster"
        tal:attributes="href python: membersfolder.absolute_url()"
-       tal:content="python: membersfolder.getId().lower()">members</a>&nbsp;
+       tal:content="python: membersfolder.getId().lower()"
+       i18n:translate="">members</a>&nbsp;
     </span>
     <a href="recent_news"
-       tal:attributes="href string:${portal_url}/recent_news">news</a>&nbsp;
+       tal:attributes="href string:${portal_url}/recent_news"
+       i18n:translate="">news</a>&nbsp;
     <a href="search_form"
-       tal:attributes="href string:${portal_url}/search_form">search</a> 
+       tal:attributes="href string:${portal_url}/search_form"
+       i18n:translate="">search</a>
 
-    <input name="SearchableText" size="16">
-    <input border="0" type="image" name="go" value="go" src="go.gif"
-           align="middle" width="20" height="20"
-           tal:attributes="src string:${portal_url}/go.gif"> &nbsp;
+    <input name="SearchableText" size="16" />
+    <input type="image" name="go" value="go" src="go.gif"
+           align="middle"
+           tal:attributes="src string:${portal_url}/go.gif" /> &nbsp;
+   </form>
    </td>
-
-  </form>
-
   </tr>
 
  </table>
@@ -96,13 +97,14 @@
      tal:define="uname python: isAnon and 'Guest' or member.getUserName()" >
 
  <!-- hack around netscape 4.x to ensure table is solid -->
- <table width="100%" border="0" cellpadding="0" cellspacing="0">
+ <table width="100%" border="0" cellpadding="0" cellspacing="0"
+        i18n:domain="cmf_default">
  <tr>
  <td>
 
  <!-- user_menu_bar -->
  <table id="MemberActionsBox"
-        width="100%" border="0" cellpadding="0" cellspacing="0" >
+        width="100%" border="0" cellpadding="0" cellspacing="0">
 
   <tr>
 
@@ -111,10 +113,11 @@
     <td class="ActionLink" align="right">
       <span tal:repeat="action user_actions">
        <a href="" tal:attributes="href action/url"
-                  tal:content="action/name">Login</a
+                  tal:content="action/name" i18n:translate="">Login</a
        ><span tal:condition="not: repeat/action/end">&nbsp;|&nbsp;</span>
       </span>
-      <span tal:condition="nothing"><a href="join_form">Join</a></span>
+      <span tal:condition="nothing"><a href="join_form"
+                                       i18n:translate="">Join</a></span>
     </td>
 
    </tr>
@@ -137,12 +140,13 @@
         width="100%" border="0" cellpadding="0" cellspacing="0" >
  <tr>
  <td width="20%">
-  
+
   <!-- actions box -->
   <table class="ContextActionsBox"
          width="100%"
          style="float: left;"
-         metal:define-macro="actions_box">
+         metal:define-macro="actions_box"
+         i18n:domain="cmf_default">
 
    <!-- object actions -->
    <tr class="ContextActionsRow">
@@ -157,7 +161,8 @@
           height="16" width="16"
           tal:condition="icon"
           tal:attributes="src string:${portal_url}/${icon};
-                          alt typ; " /> &nbsp;
+                          alt typ; "
+          i18n:attributes="alt" /> &nbsp;
 
      <span tal:replace="structure objID">ID</span>
     </td>
@@ -172,15 +177,16 @@
      <span tal:repeat="action object_actions">
       <a href=""
          tal:attributes="href action/url"
-         tal:content="action/name">View</a><br>
+         tal:content="action/name"
+         i18n:translate="">View</a><br />
      </span>
 
      <span tal:condition="nothing">
-      <a href="">Edit</a><br>
+      <a href="">Edit</a><br />
      </span>
 
      <span tal:condition="nothing">
-      <a href="">Metadata</a><br>
+      <a href="">Metadata</a><br />
      </span>
 
     </td>
@@ -190,16 +196,21 @@
    <tr class="ContextActionsRow"
        tal:condition="workflow_actions" >
 
-    <td class="ActionLink"> 
+    <td class="ActionLink">
 
       <span class="ObjectStatus">
-        Status:  <span tal:replace="wf_state">Private</span><br>
+       <span tal:omit-tag=""
+             i18n:translate="">Status:</span>
+       <span tal:omit-tag=""
+             tal:content="wf_state"
+             i18n:translate="">Private</span><br />
       </span>
 
       <span tal:repeat="action workflow_actions">
        <a href="content_submit_form"
           tal:attributes="href action/url"
-          tal:content="action/name">Submit</a><br>
+          tal:content="action/name"
+          i18n:translate="">Submit</a><br />
       </span>
     </td>
    </tr>
@@ -208,11 +219,12 @@
    <tr class="ContextActionsRow"
        tal:condition="folder_actions"
    >
-    <td class="ActionLink"> 
+    <td class="ActionLink">
       <span tal:repeat="action folder_actions">
        <a href="../folder_contents"
           tal:attributes="href action/url"
-          tal:content="action/name">Folder contents</a><br>
+          tal:content="action/name"
+          i18n:translate="">Folder contents</a><br />
       </span>
     </td>
    </tr>
@@ -225,7 +237,8 @@
      <span tal:repeat="action global_actions">
       <a href="undo_form"
          tal:attributes="href action/url"
-         tal:content="action/name">Undo</a><br>
+         tal:content="action/name"
+         i18n:translate="">Undo</a><br />
      </span>
     </td>
    </tr>
@@ -244,7 +257,7 @@
  </td>
 
  <td width="2%">
- <br>
+  <br />
  </td>
 
  <td id="ForematterCell" width="78%">

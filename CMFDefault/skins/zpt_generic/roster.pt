@@ -9,9 +9,10 @@
 
 <div class="Desktop"
      metal:define-macro="roster"
+     i18n:domain="cmf_default"
 >
 
-<h3> Portal Members </h3>
+<h3 i18n:translate="">Portal Members</h3>
 
 <table class="SearchResults"
     tal:define="mtool here/portal_membership;
@@ -19,8 +20,8 @@
                                                   mtool.getMembersFolder() )">
 <tr>
   <td width="16"> <br /> </td>
-  <th>Member</th>
-  <th tal:condition="isUserManager">Listed?</th>
+  <th i18n:translate="">Member</th>
+  <th tal:condition="isUserManager" i18n:translate="">Listed?</th>
 </tr>
 <div tal:define="b_start string:0;b_start request/b_start | b_start;
                  members mtool/getRoster;
@@ -38,7 +39,7 @@
 	         tal:replace="id">ID</span>
   </td>
   <td tal:condition="isUserManager"
-      tal:define="listed members/listed">
+      tal:define="listed members/listed" i18n:translate="">
    <span tal:replace="python: listed and 'Yes' or 'No'">Yes...Or No</span>
   </td>
 </tr>
@@ -46,13 +47,17 @@
 <tr>
   <td> <br /> </td>
   <td>
-  <span tal:define="p batch/previous" tal:condition="p">
+   <span tal:define="p batch/previous" tal:condition="p">
     <a href=""
-       tal:attributes="href string:?b_start=${p/first}">Previous <span tal:replace="p/length">p</span> Members</a>
+       tal:attributes="href string:?b_start=${p/first}"
+       i18n:translate="">Previous <span tal:replace="p/length"
+                                        i18n:name="count">p</span> Members</a>
    </span>
    <span tal:define="n batch/next" tal:condition="n">
-      <a href=""
-         tal:attributes="href string:?b_start=${batch/end}">Next <span tal:replace="n/length">n</span> Members</a>
+    <a href=""
+       tal:attributes="href string:?b_start=${batch/end}"
+       i18n:translate="">Next <span tal:replace="n/length"
+                                    i18n:name="count">n</span> Members</a>
    </span>
   </td>
 </tr>

@@ -11,6 +11,7 @@
                  list_parent python:checkPerm( 'List folder contents', here
                                              , 'aq_parent' );
                 "
+     i18n:domain="cmf_default"
 >
 <div tal:condition="not: list_here"
       tal:define="response request/RESPONSE;
@@ -23,9 +24,9 @@
 <!-- This is the desktop area -->
 <div class="Desktop">
 
-<h1> Desktop </h1>
+<h1 i18n:translate="">Desktop</h1>
 
-<form action="" method="POST"
+<form action="" method="post"
       tal:attributes="action here/absolute_url">
  <table class="FormLayout">
   <tr>
@@ -41,14 +42,15 @@
           <a href="../folder_contents"
           ><img src="" alt="[Link]" border="0"
                 tal:attributes="src string:${here/portal_url}/UpFolder_icon.gif"
-          ></a>
+          /></a>
          </span>&nbsp;&nbsp;
          <span tal:condition="upNav">
-          Up to <a href="../folder_contents"
+          <span tal:omit-tag="" i18n:translate="">Up to</span>
+          <a href="../folder_contents"
                    tal:content="upID">Up ID</a>
          </span>
          <span tal:condition="python: not(upNav)">
-           <span class="mild">Root</span>
+           <span class="mild" i18n:translate="">Root</span>
          </span>
         </td>
       </tr>
@@ -69,7 +71,7 @@
       <!-- First column, first half batch in 'batch1'. -->
       <td colspan="1" align="left" width="49%">
        <table>
-        <tr align="top" tal:repeat="item batch1">
+        <tr valign="top" tal:repeat="item batch1">
          <td align="left" width="5" nowrap
              tal:define="folderish item/isPrincipiaFolderish;
                          portalish item/isPortalContent | nothing;
@@ -90,8 +92,8 @@
                              "
            ><img src="" alt="" border="0"
                  tal:attributes="src string:${here/portal_url}/${icon};
-                                 alt item/Type|nothing;
-                                "></a>
+                                 alt item/Type|nothing;"
+                 i18n:attributes="alt" /></a>
           </span>
          </td>
          <td>
@@ -101,7 +103,7 @@
           ><span tal:replace="item/getId">ID</span>
            <span tal:condition="item/Title"
                  tal:replace="string:(${item/Title})">(Title)</span></a>
-         </td>      
+         </td>
         </tr>
        </table>
       </td>
@@ -110,7 +112,7 @@
       <!-- Second column, second half batch in 'batch2'. -->
       <td colspan="1" width="49%">
        <table>
-        <tr align="top" tal:repeat="item batch2">
+        <tr valign="top" tal:repeat="item batch2">
          <td align="left" width="5" nowrap
              tal:define="folderish item/isPrincipiaFolderish;
                          portalish item/isPortalContent | nothing;
@@ -131,8 +133,8 @@
                              "
            ><img src="" alt="" border="0"
                  tal:attributes="src string:${here/portal_url}/${icon};
-                                 alt item/Type|nothing;
-                                "></a>
+                                 alt item/Type|nothing;"
+                 i18n:attributes="alt" /></a>
           </span>
          </td>
          <td>
@@ -142,19 +144,20 @@
           ><span tal:replace="item/getId">ID</span>
            <span tal:condition="item/Title"
                  tal:replace="string:(${item/Title})">(Title)</span></a>
-         </td>      
+         </td>
         </tr>
        </table>
       </td>
-        
+
      </tr>
- 
+
      <tr>
       <td align="left">
        <span tal:define="p batch1/previous" tal:condition="p">
         <a href=""
            tal:attributes="
                 href string:folder_contents?b_start=${p/previous/first}"
+           i18n:translate=""
         >Previous Items</a>
        </span>
       </td>
@@ -164,6 +167,7 @@
         <a href=""
            tal:attributes="
                 href string:folder_contents?b_start=${batch2/end}"
+           i18n:translate=""
         >Next Items</a>
        </span>
       </td>
@@ -171,23 +175,29 @@
     <!-- end contentList -->
     </table>
 
-    <table border="0" cellspacing="0" cellpadding=2>
+    <table border="0" cellspacing="0" cellpadding="2">
      <tr>
       <td align="left" valign="top" width="16"></td>
       <td align="left" valign="top">
       <span tal:condition="python: checkPerm('Add portal content', here)">
-        <input type="submit" name="folder_factories:method" value="New...">
+        <input type="submit" name="folder_factories:method" value="New..."
+               i18n:attributes="value" />
       </span>
       <span tal:condition="python: checkPerm('View management screens', here)">
-        <input type="submit" name="folder_rename_form:method" value="Rename">
-        <input type="submit" name="folder_cut:method" value="Cut"> 
-        <input type="submit" name="folder_copy:method" value="Copy">
+        <input type="submit" name="folder_rename_form:method" value="Rename"
+               i18n:attributes="value" />
+        <input type="submit" name="folder_cut:method" value="Cut"
+               i18n:attributes="value" />
+        <input type="submit" name="folder_copy:method" value="Copy"
+               i18n:attributes="value" />
         <span tal:condition="here/cb_dataValid">
-        <input type="submit" name="folder_paste:method" value="Paste">
+        <input type="submit" name="folder_paste:method" value="Paste"
+               i18n:attributes="value" />
         </span>
       </span>
       <span tal:condition="python: checkPerm('Delete objects', here)">
-        <input type="submit" name="folder_delete:method" value="Delete">
+        <input type="submit" name="folder_delete:method" value="Delete"
+               i18n:attributes="value" />
       </span>
       </td>
      </tr>

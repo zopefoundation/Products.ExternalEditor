@@ -2,16 +2,17 @@
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       metal:use-macro="here/main_template/macros/master">
 <body>
-<div metal:fill-slot="main">	  
+<div metal:fill-slot="main" i18n:domain="cmf_default">
 <div class="Desktop">
 
 
 <span tal:replace="request/message"
-   tal:condition="request/message|nothing"><hr></span>
+   tal:condition="request/message|nothing"><hr /></span>
 
 <div class="NewsItem">
 
-<h2>Edit <span tal:replace="here/getId">My ID</span></h2>
+<h2 i18n:translate="">Edit <span
+    tal:replace="here/getId" i18n:name="objectid">My ID</span></h2>
 
 <form action="newsitem_edit" method="post"
       tal:attributes="action string:${here/absolute_url}/newsitem_edit"
@@ -19,39 +20,35 @@
 <table class="FormLayout">
 
  <tr>
-  <th> Title
-  </th>
+  <th i18n:translate="">Title</th>
   <td> <span tal:replace="here/Title">My Title</span> </td>
  </tr>
 
  <tr>
-  <th>
-   Format
-  </th>
+  <th i18n:translate="">Format</th>
   <td>
    <input type="radio" name="text_format"
                      value="structured-text"
                      tal:attributes="checked python: path('here/text_format') == 'structured-text'" />
-   <label for="cb_structuredtext">structured-text</label>
+   <label for="cb_structuredtext" i18n:translate="">structured-text</label>
    <input type="radio" name="text_format" value="plain"
           tal:attributes="checked python: path('here/text_format') == 'plain'" />
-   <label for="cb_html">plain text</label>
+   <label for="cb_html" i18n:translate="">plain text</label>
    <input type="radio" name="text_format" value="html"
           tal:attributes="checked python: path('here/text_format') == 'html'" />
-   <label for="cb_html">html</label>
+   <label for="cb_html" i18n:translate="">html</label>
   </td>
  </tr>
 
  <tr>
-  <th class="TextField"> Lead-in </th>
+  <th class="TextField" i18n:translate="">Lead-in</th>
   <td class="TextField">
-   <textarea name="description:text" rows="10" wrap="soft"  
+   <textarea name="description:text" rows="10" wrap="soft"
              cols="65" tal:content="here/Description"></textarea>
   </td>
  </tr>
  <tr>
-  <th class="TextField"> Body
-  </th>
+  <th class="TextField" i18n:translate="">Body</th>
   <td class="TextField">
    <textarea name="text:text" rows="20" cols="65" wrap="soft"
              tal:content="here/EditableBody"></textarea>
@@ -59,10 +56,12 @@
  </tr>
 
  <tr>
-  <th> <br> 
+  <td> <br /> </td>
   <td>
-   <input type="submit" name="choice" value=" Change ">
-   <input type="submit" name="choice" value=" Change and View ">
+   <input type="submit" name="change" value=" Change "
+          i18n:attributes="value" />
+   <input type="submit" name="change_and_view" value=" Change and View "
+          i18n:attributes="value" />
   </td>
  </tr>
 

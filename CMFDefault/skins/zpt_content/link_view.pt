@@ -20,11 +20,12 @@
 
 </div>
 
-<div metal:fill-slot="main">
+<div metal:fill-slot="main" i18n:domain="cmf_default">
 
- <p> Link: <a href=""
+ <p i18n:translate="">Link: <a href=""
               tal:attributes="href here/remote_url"
               tal:content="here/remote_url"
+              i18n:name="link"
            >http://www.zope.org</a></p>
 
  <div class="Discussion">

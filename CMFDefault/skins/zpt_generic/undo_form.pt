@@ -3,11 +3,11 @@
       metal:use-macro="here/main_template/macros/master">
 <body>
 
-<div metal:fill-slot="main">
+<div metal:fill-slot="main" i18n:domain="cmf_default">
 
 <div class="Desktop">
 
-<h1> Undo Transactions </h1>
+<h1 i18n:translate="">Undo Transactions</h1>
 <div tal:define="utool here/portal_undo;
                  url here/portal_url;
                  transactions python:utool.listUndoableTransactionsFor(here)">
@@ -28,17 +28,17 @@
                l_end python:b_last+b_size;
               ">
 
-  <form action="undo" method="POST"
+  <form action="undo" method="post"
         tal:attributes="action_xxx string:${here/absolute_url}/undo"
   >
 
-   <p> This application's transactional feature allows you to easily
-       undo changes made to the application's settings or data. You can
+   <p i18n:translate="">This application's transactional feature allows you to
+       easily undo changes made to the application's settings or data. You can
        revert the application to a &quot;snapshot&quot; of its state
        at a previous point in time. </p>
 
-   <p> Select one or more transactions below and then click on the
-       &quot;Undo&quot; button to undo the transactions.  Note that
+   <p i18n:translate="">Select one or more transactions below and then click
+       on the &quot;Undo&quot; button to undo the transactions.  Note that
        even though a transaction is shown below, you will not be able
        to undo it if later transactions modified objects that were
        modified by the transaction. </p>
@@ -47,19 +47,20 @@
 
     <tr>
      <td colspan="2" align="center">
-      <input type="submit" value=" Undo ">
+      <input type="submit" value=" Undo " i18n:attributes="value" />
      </td>
     </tr>
 
     <tr>
-     <td><br></td>
+     <td><br /></td>
     </tr>
 
     <tbody tal:condition="request/first_transaction">
     <tr>
-     <td colspan=2 align=center>
+     <td colspan="2" align="center">
       <a href=""
          tal:attributes="href python:b_fmt%(url,e_start,e_end,b_size)"
+         i18n:translate=""
       >Later Transactions</a>
      </td>
     </tr>
@@ -68,43 +69,47 @@
     <tbody tal:repeat="items transactions">
     <tr>
      <td valign="top">
-      <input type=checkbox name="transaction_info:list" value=""
-             tal:attributes="value items/id">
+      <input type="checkbox" name="transaction_info:list" value=""
+             tal:attributes="value items/id" />
      </td>
      <td valign="top">
-	  <strong><span tal:replace="items/description" /></strong> by
+      <strong><span tal:replace="items/description" /></strong>
+      <span tal:omit-tag="" i18n:translate="">by</span>
       <strong>
        <span tal:condition="items/user_name|nothing">
-	     <span tal:replace="items/user_name" />
+        <span tal:replace="items/user_name" />
        </span>
        <span condition="python:not(items.description)">
-        <em>Zope</em>
+        <em i18n:translate="">Zope</em>
        </span>
-	  </strong> on <span tal:replace="python: items['time'].Month()" />
-                   <span tal:replace="python: items['time'].day()" />
-                at <span tal:replace="python: items['time'].Time()" />
-           
+      </strong>
+      <span tal:omit-tag="" i18n:translate="">on</span>
+      <span tal:replace="python: items['time'].Month()" />
+      <span tal:replace="python: items['time'].day()" />
+      <span tal:omit-tag="" i18n:translate="">at</span>
+      <span tal:replace="python: items['time'].Time()" />
      </td>
     </tr>
     </tbody>
 
     <tr>
-     <td colspan=2 align=center>
+     <td colspan="2" align="center">
       <span tal:condition="python: len(transactions) == b_size">
        <a href=""
           tal:attributes="href python:b_fmt%(url,l_start,l_end,b_size)"
+          i18n:translate=""
        >Earlier Transactions</a>
     </span>
      </td>
     </tr>
 
     <tr>
-     <td><br></td>
+     <td><br /></td>
     </tr>
 
     <tr>
      <td colspan="2" align="center">
-      <input type="submit" value=" Undo ">
+      <input type="submit" value=" Undo " i18n:attributes="value" />
      </td>
     </tr>
 
@@ -112,7 +117,7 @@
   </form>
  </div>
 
- <div tal:condition="python: not(transactions)">
+ <div tal:condition="python: not(transactions)" i18n:translate="">
   There are no transactions that can be undone.
  </div>
 

@@ -8,7 +8,7 @@
       metal:use-macro="here/main_template/macros/master">
 <body>
 
-<div metal:fill-slot="main">
+<div metal:fill-slot="main" i18n:domain="cmf_default">
 
  <div tal:define="p_props here/portal_properties;
                   p_url here/portal_url;
@@ -26,14 +26,15 @@
                                                                   , path='/')"
    />
 
-   <h1 class="DesktopTitle">Login failure</h1>
+   <h1 class="DesktopTitle" i18n:translate="">Login failure</h1>
 
-   <p class="Desktop">You are not currently logged in.  Your username
-      and or password may be incorrect.  Your browser may also not be
-      configured to accept HTTP cookies.  If you need help please contact 
+   <p class="Desktop" i18n:translate="">You are not currently logged in. Your
+     username and or password may be incorrect. Your browser may also not be
+     configured to accept HTTP cookies. If you need help please contact
       <a href="mailto:admin@here.com" title="Email Admin"
          tal:attributes="href string:mailto:${p_props/email_from_address}"
-         tal:content="p_props/email_from_address">Email Admin</a>.
+         tal:content="p_props/email_from_address"
+         i18n:name="admin_email">Email Admin</a>.
    </p>
   </div><!-- isAnon -->
 
@@ -41,54 +42,57 @@
        tal:define="first_time python:(
                     member.getProperty( 'login_time', None ) == never
                                        and p_props.validate_email )">
-  
+
 
    <div tal:condition="first_time">
     <div tal:define="dum_reg python:member.setProperties(
                                                 last_login_time=now,
                                                 login_time=now)" />
 
-    <h1 class="DesktopTitle">Welcome!</h1>
+    <h1 class="DesktopTitle" i18n:translate="">Welcome!</h1>
 
-    <p class="Desktop">
+    <p class="Desktop" i18n:translate="">
        This is the first time that you've logged in to
-       <span replace="p_props/title">Here</span>. 
-       Before you start exploring you need to change your original password. 
+       <span replace="p_props/title" i18n:name="portal_title">Here</span>.
+       Before you start exploring you need to change your original password.
        This will ensure that the password we sent you via email cannot be
        used in a malicious manner.</p>
 
-    <p class="Desktop">
+    <p class="Desktop" i18n:translate="">
        Please use the form below to change your password.</p>
 
     <form action="change_password" method="post"
           tal:attributes="action string:${p_url}/change_password"
     >
      <input type="hidden" name="user" value=""
-            tal:attributes="value member">
-     <input type="hidden" name="domains:tokens" value="">
+            tal:attributes="value member" />
+     <input type="hidden" name="domains:tokens" value="" />
      <input type="hidden" name="redirect" value=""
-            tal:attributes="value string:${p_url}/">
+            tal:attributes="value string:${p_url}/" />
 
      <table>
 
       <tr valign="top" align="left">
-       <th>Username</th>
+       <th i18n:translate="">Username</th>
        <td><span tal:replace="member">You</span></td>
       </tr>
 
       <tr valign="top"  align="left">
-       <th>New password</th>
-       <td><input type="password" name="password"></td>
+       <th i18n:translate="">New password</th>
+       <td><input type="password" name="password" /></td>
       </tr>
 
       <tr valign="top"  align="left">
-       <th>Confirm new password</th>
-       <td><input type="password" name="confirm"></td>
+       <th i18n:translate="">Confirm new password</th>
+       <td><input type="password" name="confirm" /></td>
       </tr>
 
       <tr>
        <td><br /></td>
-       <td><input type="submit" value="Change password"></td>
+       <td>
+        <input type="submit" value="Change password"
+               i18n:attributes="value" />
+       </td>
       </tr>
 
      </table>
@@ -100,7 +104,7 @@
    <div tal:condition="not: first_time">
 
     <div tal:define="d_reg python:member.setProperties(
-                                            last_login_time=member.login_time); 
+                                           last_login_time=member.login_time);
                      ereg python:member.setProperties(
                                             login_time=here.ZopeTime());
                     " />
@@ -112,9 +116,10 @@
                       " />
     </div>
 
-    <h1 class="DesktopTitle">Login success</h1>
+    <h1 class="DesktopTitle" i18n:translate="">Login success</h1>
 
-    <p class="Desktop">Welcome. You are currently logged in. </p>
+    <p class="Desktop" i18n:translate="">Welcome. You are currently logged
+      in.</p>
 
    </div><!-- not first_time -->
 

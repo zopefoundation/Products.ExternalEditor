@@ -6,12 +6,13 @@
      tal:define="searching python: request.get('role_submit', None );
                  mtool here/portal_membership;
                 "
+     i18n:domain="cmf_default"
 >
 
 <div tal:condition="python: not searching">
 <!-- Search -->
 
-<h2>Assign local roles: Search Members</h2>
+<h2 i18n:translate="">Assign local roles: Search Members</h2>
 
 <form method="post" action="folder_localrole_form"
       tal:attributes="action string:${here/absolute_url}/folder_localrole_form"
@@ -19,21 +20,24 @@
 
 <table class="FormLayout">
  <tr>
-  <th>Search by</th>
+  <th i18n:translate="">Search by</th>
   <td>
     <select name="search_param">
-      <option value="username">User Name</option>
-      <option value="email">Email Address</option>
+      <option value="username" i18n:translate="">User Name</option>
+      <option value="email" i18n:translate="">Email Address</option>
     </select>
   </td>
  </tr>
  <tr>
-   <th>Search Term</th>
-   <td><input type="text" name="search_term" size="30"></td>
+   <th i18n:translate="">Search Term</th>
+   <td><input type="text" name="search_term" size="30" /></td>
  </tr>
  <tr>
    <td><br /></td>
-   <td><input type="submit" name="role_submit" value=" Search "></td>
+   <td>
+    <input type="submit" name="role_submit" value=" Search "
+           i18n:attributes="value" />
+   </td>
  </tr>
 </table>
 
@@ -42,7 +46,7 @@
 
 <!-- End search -->
 </div>
- 
+
 <div tal:condition="searching"
      tal:define="search_param python: request.get( 'search_param', '' );
                  search_term  python: request.get( 'search_term', '' );
@@ -52,31 +56,31 @@
                 "
 >
 <!-- Assignment -->
- 
-<h2>Assign local roles: Search Results</h2>
+
+<h2 i18n:translate="">Assign local roles: Search Results</h2>
 
 <div tal:condition="found">
 
- <p>Select Member(s) and a role to assign:</p>
+ <p i18n:translate="">Select Member(s) and a role to assign:</p>
 
  <form method="post" action="folder_localrole_edit"
        tal:attributes="action string:${here/absolute_url}/folder_localrole_edit"
  >
-  <input type="hidden" name="change_type" value="add">
+  <input type="hidden" name="change_type" value="add" />
 
   <table class="FormLayout">
 
    <tr>
-    <td width="16"><br></td>
-    <th style="text-align:left;">User</th>
-    <th style="text-align:left;">Email address</th>
+    <td width="16"><br /></td>
+    <th style="text-align:left;" i18n:translate="">User</th>
+    <th style="text-align:left;" i18n:translate="">Email address</th>
    </tr>
 
    <tr tal:repeat="member found">
     <td width="16">
-     <input type="checkbox" name="member_ids:list" 
+     <input type="checkbox" name="member_ids:list"
             value=""
-            tal:attributes="value member/username">
+            tal:attributes="value member/username" />
     </td>
     <td tal:content="member/username"> Username 1 </td>
     <td tal:content="member/email"> Email 1 </td>
@@ -84,18 +88,18 @@
 
    <tr tal:condition="nothing">
     <td width="16">
-     <input type="checkbox" name="member_ids:list" value="">
+     <input type="checkbox" name="member_ids:list" value="" />
     </td>
     <td> Username 2 </td>
     <td> Email 2 </td>
    </tr>
 
    <tr>
-    <td colspan="3"><br></td>
+    <td colspan="3"><br /></td>
    </tr>
 
    <tr>
-    <th colspan="2">Role to assign:</th>
+    <th colspan="2" i18n:translate="">Role to assign:</th>
     <td>
      <select name="member_role"
              tal:define="roles python: mtool.getCandidateLocalRoles( here )">
@@ -108,12 +112,14 @@
    </tr>
 
    <tr>
-    <td colspan="3"><br></td>
+    <td colspan="3"><br /></td>
    </tr>
 
    <tr>
-    <td width="16"><br></td>
-    <td colspan="2"><input type="submit" value=" Assign Roles "></td>
+    <td width="16"><br /></td>
+    <td colspan="2">
+     <input type="submit" value=" Assign Roles " i18n:attributes="value" />
+    </td>
    </tr>
 
   </table>
@@ -122,31 +128,30 @@
 </div>
 
 <div tal:condition="python: not found">
-
- <p> Sorry, no members matched your search. </p>
-
+ <p i18n:translate="">Sorry, no members matched your search.</p>
 </div>
 
 <!-- End assignment -->
 </div>
 
-<hr>
+<hr />
 
-<h2>Currently assigned local roles</h2>
+<h2 i18n:translate="">Currently assigned local roles</h2>
 
-<p>These users currently have local roles assigned in this folder:</p>
+<p i18n:translate="">These users currently have local roles assigned in this
+  folder:</p>
 
 <form method="post" action="folder_localrole_edit"
       tal:attributes="action string:${here/absolute_url}/folder_localrole_edit"
 >
- <input type="hidden" name="change_type" value="delete">
- <input type="hidden" name="member_role" value="">
+ <input type="hidden" name="change_type" value="delete" />
+ <input type="hidden" name="member_role" value="" />
 
  <table class="FormLayout" tal:define="lroles here/get_local_roles">
  <tr>
-   <td width="16"><br></td>
-   <th style="text-align:left;">User</th>
-   <th style="text-align:left;">Role(s)</th>
+   <td width="16"><br /></td>
+   <th style="text-align:left;" i18n:translate="">User</th>
+   <th style="text-align:left;" i18n:translate="">Role(s)</th>
  </tr>
 
  <tbody tal:repeat="role_tuple lroles">
@@ -160,9 +165,8 @@
    <input type="checkbox" name="member_ids:list"
           value="id"
           tal:attributes="value user_name"
-          tal:condition="python: user_name != auth_name"
-   >
-   <br tal:condition="python: user_name == auth_name">
+          tal:condition="python: user_name != auth_name" />
+   <br tal:condition="python: user_name == auth_name" />
   </td>
   <td tal:content="user_name"> Username 1 </td>
   <td tal:content="python: modules['string'].join( roles, ', ' )">
@@ -173,7 +177,7 @@
 
  <tr tal:condition="nothing">
   <td width="16">
-   <input type="checkbox" name="member_ids:list" value="id">
+   <input type="checkbox" name="member_ids:list" value="id" />
   </td>
   <td> Username 2 </td>
   <td> Role3 </td>
@@ -181,19 +185,21 @@
 
  <tr tal:condition="nothing">
   <td width="16">
-   <br>
+   <br />
   </td>
   <td> Auth username </td>
   <td> Role1, Role2, Role3 </td>
  </tr>
 
  <tr>
-  <td colspan="3"><br></td>
+  <td colspan="3"><br /></td>
  </tr>
 
  <tr>
-   <td><br></td>
-   <td colspan="2"><input type="submit" value=" Delete "></td>
+   <td><br /></td>
+   <td colspan="2">
+    <input type="submit" value=" Delete " i18n:attributes="value" />
+   </td>
  </tr>
 
 </table>

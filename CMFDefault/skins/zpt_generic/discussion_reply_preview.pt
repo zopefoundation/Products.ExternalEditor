@@ -2,27 +2,29 @@
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       metal:use-macro="here/main_template/macros/master">
 <body>
-<div metal:fill-slot="main">
+<div metal:fill-slot="main" i18n:domain="cmf_default">
 
 <h3 tal:content="request/form/title"></h3>
 
 <div tal:define="pss modules/Products.PythonScripts.standard"
      tal:replace="structure python: pss.structured_text(request.form['text'])">Text Body</div>
 
-<form method="POST" action="talkback"
+<form method="post" action="talkback"
       tal:attributes="action string:${here/absolute_url}/talkback">
  <input type="hidden" name="title" value=""
-      tal:attributes="value request/form/title">
+        tal:attributes="value request/form/title" />
  <input type="hidden" name="text" value=""
-      tal:attributes="value request/form/text">
-  <input type="hidden" name="Creator" value=""
-         tal:attributes="value here/portal_membership/getAuthenticatedMember">
+        tal:attributes="value request/form/text" />
+ <input type="hidden" name="Creator" value=""
+        tal:attributes="value here/portal_membership/getAuthenticatedMember" />
  <table><tr>
   <td width="15%"></td>
   <td>
    <input type="submit" value="Edit" name=""
-          tal:attributes="name string:${here/getId}/discussion_reply_form:method">
-   <input type="submit" value="Reply" name="discussion_reply:method">
+          tal:attributes="name string:${here/getId}/discussion_reply_form:method"
+          i18n:attributes="value" />
+   <input type="submit" value="Reply" name="discussion_reply:method"
+          i18n:attributes="value" />
   </td>
  </tr></table>
 </form>
