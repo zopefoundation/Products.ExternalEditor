@@ -53,9 +53,8 @@
         <tr>
           <td> ISSUE TITLE </td>
           <td metal:fill-slot="issue_title_slot" colspan="3">
-            <input name="title" value="TITLE" size="TITLESIZE"
-                   tal:attributes="value python: here.Title();
-                                   size TITLELEN">
+            <input name="title" value="TITLE" size="65"
+                   tal:attributes="value python: here.Title()">
           </td>
         </tr>
 
@@ -89,16 +88,13 @@
         <tr>
           <td> FROM </td>
           <td>
-            <span metal:fill-slot="issue_submitter_id_slot"
-                  tal:define="pm python: here.portal_membership;
-                              member python: pm.getAuthenticatedMember()">
-              <input name="submitter_id" value="ID" size="7"
+            <span metal:fill-slot="issue_submitter_id_slot">
+              Id: <input name="submitter_id" value="ID" size="12"
                      tal:attributes="value python: here.submitter_id">
-                <font size="-1">Email:</font>
-                <input name="submitter_email" value="EMAIL" size="22"
-                     tal:attributes="value python:
-                                           here.submitter_email
-                                           or member.getProperty('email')">
+                <br>
+                  <font size="-1">Alt Email:</font>
+                  <input name="submitter_email" value="EMAIL" size="22"
+                         tal:attributes="value here/submitter_email|nothing">
             </span>
           </td>
         </tr>
