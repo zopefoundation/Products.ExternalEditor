@@ -1,7 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2002, 2003 Zope Corporation and Contributors.
-# All Rights Reserved.
+# Copyright (c) 2002 Zope Corporation and Contributors. All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
@@ -28,7 +27,6 @@ from interfaces.portal_actions import ActionProvider as IActionProvider
 
 
 class ActionProviderBase:
-
     """ Provide ActionTabs and management methods for ActionProviders
     """
 
@@ -36,7 +34,8 @@ class ActionProviderBase:
 
     security = ClassSecurityInfo()
 
-    _actions = []
+    _actions = ()
+
     _actions_form = DTMLFile( 'editToolsActions', _dtmldir )
 
     manage_options = ( { 'label' : 'Actions'
@@ -50,10 +49,9 @@ class ActionProviderBase:
     #
     security.declarePrivate( 'listActions' )
     def listActions( self, info=None ):
-
         """ Return all the actions defined by a provider.
         """
-        return self._actions or []
+        return self._actions or ()
 
     #
     #   ZMI methods

@@ -1,7 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2001-2003 Zope Corporation and Contributors.
-# All Rights Reserved.
+# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
@@ -38,14 +37,15 @@ _marker = []  # Create a new marker object.
 
 
 class MemberDataTool (UniqueObject, SimpleItem, PropertyManager, ActionProviderBase):
-    '''This tool wraps user objects, making them act as Member objects.
-    '''
+    """ This tool wraps user objects, making them act as Member objects.
+    """
 
     __implements__ = (IMemberDataTool, ActionProviderBase.__implements__)
 
     id = 'portal_memberdata'
     meta_type = 'CMF Member Data Tool'
-    _actions = []
+    _actions = ()
+
     _v_temps = None
     _properties = ()
 

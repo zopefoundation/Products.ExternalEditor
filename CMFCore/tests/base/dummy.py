@@ -168,10 +168,9 @@ class DummyTool(Implicit,ActionProviderBase):
     Action Provider
     """
 
-    _actions = [
-        DummyObject(),
-        DummyObject()
-        ]
+    _actions = ( DummyObject()
+               , DummyObject()
+               )
 
     root = 'DummyTool'
     

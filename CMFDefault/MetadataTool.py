@@ -1,7 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2001-2003 Zope Corporation and Contributors.
-# All Rights Reserved.
+# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
@@ -203,12 +202,9 @@ class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
 
     __implements__ = (IMetadataTool, ActionProviderBase.__implements__)
 
-    id              = 'portal_metadata'
-    meta_type       = 'Default Metadata Tool'
-
-    _actions = []
-
-    security = ClassSecurityInfo()
+    id = 'portal_metadata'
+    meta_type = 'Default Metadata Tool'
+    _actions = ()
 
     #
     #   Default values.
@@ -217,6 +213,8 @@ class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
     element_specs       = None
     #initial_values_hook = None
     #validation_hook     = None
+
+    security = ClassSecurityInfo()
 
     def __init__( self
                 , publisher=None

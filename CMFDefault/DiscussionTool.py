@@ -1,7 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2001-2003 Zope Corporation and Contributors.
-# All Rights Reserved.
+# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
@@ -43,7 +42,7 @@ class DiscussionTool( UniqueObject, SimpleItem, ActionProviderBase ):
 
     id = 'portal_discussion'
     meta_type = 'Default Discussion Tool'
-    _actions = [ActionInformation(id='reply'
+    _actions = (ActionInformation(id='reply'
                                 , title='Reply'
                                 , action=Expression(
                 text='string: ${object_url}/discussion_reply_form')
@@ -53,7 +52,9 @@ class DiscussionTool( UniqueObject, SimpleItem, ActionProviderBase ):
                                 , permissions=('Reply to item',)
                                 , category='object'
                                 , visible=1
-                                 )]
+                                 )
+               ,
+               )
 
     security = ClassSecurityInfo()
 

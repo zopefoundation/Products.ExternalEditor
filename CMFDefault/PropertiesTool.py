@@ -1,7 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2001-2003 Zope Corporation and Contributors.
-# All Rights Reserved.
+# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
@@ -38,7 +37,7 @@ class PropertiesTool(UniqueObject, SimpleItem, ActionProviderBase):
 
     id = 'portal_properties'
     meta_type = 'Default Properties Tool'
-    _actions = [ActionInformation(id='configPortal'
+    _actions = (ActionInformation(id='configPortal'
                             , title='Reconfigure Portal'
                             , description='Reconfigure the portal'
                             , action=Expression(
@@ -47,7 +46,9 @@ class PropertiesTool(UniqueObject, SimpleItem, ActionProviderBase):
                             , category='global'
                             , condition=None
                             , visible=1
-                             )] 
+                             )
+               ,
+               )
 
     security = ClassSecurityInfo()
 

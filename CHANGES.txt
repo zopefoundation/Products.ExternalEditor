@@ -61,6 +61,9 @@ Future
 
   Bug Fixes
 
+    - Action providers: Default _actions' are now tuples, not lists.
+      (Collector #123)
+
     - Document: Ensured that 'edit()' and 'PUT()' strip of xhtml headers and
       html headers including DOCTYPE declarations. (Collector #41)
 

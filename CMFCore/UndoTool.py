@@ -1,7 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2001-2003 Zope Corporation and Contributors.
-# All Rights Reserved.
+# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
@@ -34,13 +33,14 @@ from interfaces.portal_undo import portal_undo as IUndoTool
 
 
 class UndoTool (UniqueObject, SimpleItem, ActionProviderBase):
+    """ This tool is used to undo changes.
+    """
 
     __implements__ = (IUndoTool, ActionProviderBase.__implements__)
 
     id = 'portal_undo'
     meta_type = 'CMF Undo Tool'
-    # This tool is used to undo changes.
-    _actions = [ActionInformation(id='undo'
+    _actions = (ActionInformation(id='undo'
                                 , title='Undo'
                                 , action=Expression(
                text='string: ${portal_url}/undo_form')
@@ -49,8 +49,9 @@ class UndoTool (UniqueObject, SimpleItem, ActionProviderBase):
                                 , permissions=(ListUndoableChanges,)
                                 , category='global'
                                 , visible=1
-                                 )]
-
+                                 )
+               ,
+               )
 
     security = ClassSecurityInfo()
 

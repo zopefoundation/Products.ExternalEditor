@@ -1,7 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2001-2003 Zope Corporation and Contributors.
-# All Rights Reserved.
+# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
@@ -16,8 +15,9 @@
 $Id$
 """
 
-import OFS
 from Globals import InitializeClass, DTMLFile
+from OFS.Folder import Folder
+
 from utils import _checkPermission
 from utils import _dtmldir
 from utils import cookString
@@ -608,7 +608,7 @@ allowedTypes = [
     ]
 
 
-class TypesTool( UniqueObject, OFS.Folder.Folder, ActionProviderBase ):
+class TypesTool(UniqueObject, Folder, ActionProviderBase):
     """
         Provides a configurable registry of portal content types.
     """
@@ -617,11 +617,11 @@ class TypesTool( UniqueObject, OFS.Folder.Folder, ActionProviderBase ):
 
     id = 'portal_types'
     meta_type = 'CMF Types Tool'
-    _actions = []
+    _actions = ()
 
     security = ClassSecurityInfo()
 
-    manage_options = ( OFS.Folder.Folder.manage_options +
+    manage_options = ( Folder.manage_options +
                       ActionProviderBase.manage_options +
                       ({ 'label' : 'Overview', 'action' : 'manage_overview' }
                      , 

@@ -1,7 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2001-2003 Zope Corporation and Contributors.
-# All Rights Reserved.
+# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
@@ -43,17 +42,21 @@ default_member_content = '''Default page for %s
 '''
 
 class MembershipTool (UniqueObject, SimpleItem, ActionProviderBase):
-    # This tool accesses member data through an acl_users object.
-    # It can be replaced with something that accesses member data in
-    # a different way.
+    """ This tool accesses member data through an acl_users object.
+
+    It can be replaced with something that accesses member data in a
+    different way.
+    """
 
     __implements__ = (IMembershipTool, ActionProviderBase.__implements__)
 
     id = 'portal_membership'
     meta_type = 'CMF Membership Tool'
-    _actions = []
-    security = ClassSecurityInfo()
+    _actions = ()
+
     memberareaCreationFlag = 1
+
+    security = ClassSecurityInfo()
 
     manage_options=( ({ 'label' : 'Configuration'
                      , 'action' : 'manage_mapRoles'

@@ -1,7 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2001-2003 Zope Corporation and Contributors.
-# All Rights Reserved.
+# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
@@ -45,7 +44,8 @@ class ActionsTool(UniqueObject, Folder, ActionProviderBase):
     __implements__ = (IActionsTool, ActionProviderBase.__implements__)
 
     id = 'portal_actions'
-    _actions = [ActionInformation(id='folderContents'
+    meta_type = 'CMF Actions Tool'
+    _actions = (ActionInformation(id='folderContents'
                                 , title='Folder contents'
                                 , action=Expression(
                text='string: ${folder_url}/folder_contents')
@@ -64,9 +64,8 @@ class ActionsTool(UniqueObject, Folder, ActionProviderBase):
                                 , permissions=('List folder contents',)
                                 , category='folder'
                                 , visible=1
-                                 )]
-
-    meta_type = 'CMF Actions Tool'
+                                 )
+               )
 
     action_providers = ( 'portal_membership'
                        , 'portal_actions'
@@ -115,8 +114,8 @@ class ActionsTool(UniqueObject, Folder, ActionProviderBase):
             for item in providers:
                 if item not in chosen:
                     new_providers.append(item)
-            providers = tuple(new_providers)
-        self.action_providers = providers
+            providers = new_providers
+        self.action_providers = tuple(providers)
         if REQUEST is not None:
             return self.manage_actionProviders(self , REQUEST
                           , manage_tabs_message='Providers changed.')

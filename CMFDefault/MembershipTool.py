@@ -1,7 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2001-2003 Zope Corporation and Contributors.
-# All Rights Reserved.
+# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
@@ -51,7 +50,8 @@ class MembershipTool( BaseTool ):
 
     __implements__ = BaseTool.__implements__
 
-    _actions =[
+    meta_type = 'Default Membership Tool'
+    _actions = (
       AI( id='login'
         , title='Login'
         , description='Click here to Login'
@@ -112,10 +112,7 @@ class MembershipTool( BaseTool ):
                                    +  'getHomeFolder(), "Favorites")')
         , visible=1
         )
-    ]
-
-    meta_type = 'Default Membership Tool'
-
+    )
 
     security = ClassSecurityInfo()
 

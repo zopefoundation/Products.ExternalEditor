@@ -1,7 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2001-2003 Zope Corporation and Contributors.
-# All Rights Reserved.
+# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
@@ -40,7 +39,7 @@ class URLTool(UniqueObject, SimpleItem, ActionProviderBase):
 
     id = 'portal_url'
     meta_type = 'CMF URL Tool'
-    _actions = []
+    _actions = ()
 
     security = ClassSecurityInfo()
     security.declareObjectProtected(View)

@@ -1,7 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2001-2003 Zope Corporation and Contributors.
-# All Rights Reserved.
+# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
@@ -72,15 +71,16 @@ class IndexableObjectWrapper:
 
 
 class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
-    '''This is a ZCatalog that filters catalog queries.
-    '''
+    """ This is a ZCatalog that filters catalog queries.
+    """
 
     __implements__ = (ICatalogTool, ActionProviderBase.__implements__)
 
     id = 'portal_catalog'
     meta_type = 'CMF Catalog'
+    _actions = ()
+
     security = ClassSecurityInfo()
-    _actions = []
 
     manage_options = ( ZCatalog.manage_options +
                       ActionProviderBase.manage_options +

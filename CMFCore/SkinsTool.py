@@ -1,7 +1,6 @@
 ##############################################################################
 #
-# Copyright (c) 2001-2003 Zope Corporation and Contributors.
-# All Rights Reserved.
+# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
@@ -60,15 +59,15 @@ def modifiedOptions():
     return tuple(rval)
 
 class SkinsTool(UniqueObject, SkinsContainer, Folder, ActionProviderBase):
-    '''
-    This tool is used to supply skins to a portal.
-    '''
+    """ This tool is used to supply skins to a portal.
+    """
 
     __implements__ = (ISkinsTool, ActionProviderBase.__implements__)
 
     id = 'portal_skins'
     meta_type = 'CMF Skins Tool'
-    _actions = []
+    _actions = ()
+
     cookie_persistence = 0
 
     security = ClassSecurityInfo()
