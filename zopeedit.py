@@ -177,9 +177,13 @@ class ExternalEditor:
             raise
         
     def __del__(self):
-        # for security we always delete the files by default
         if getattr(self, 'clean_up', 1) and hasattr(self, 'content_file'):
+            # for security we always delete the files by default
             os.remove(self.content_file)
+
+        if hasattr(self, 'lock_token'):
+            # Try not to leave dangling locks on the server
+            self.unlock(interactive=0)
             
     def getEditorCommand(self):
         """Return the editor command"""
@@ -404,7 +408,7 @@ class ExternalEditor:
                 return 0
         return 1
                     
-    def unlock(self):
+    def unlock(self, interactive=1):
         """Remove webdav lock from edited zope object"""
         if not hasattr(self, 'lock_token'): 
             return 0
@@ -412,7 +416,7 @@ class ExternalEditor:
         headers = {'Lock-Token':self.lock_token}
         response = self.zopeRequest('UNLOCK', headers)
         
-        if response.status / 100 != 2:
+        if interactive and response.status / 100 != 2:
             # Captain, she's still locked!
             if self.askRetryAfterError(response, 
                                        'Unlock request failed'):

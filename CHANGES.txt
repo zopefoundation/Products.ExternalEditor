@@ -1,7 +1,11 @@
 External Editor Change Log
 
+  6/29/02 - 0.4.1 Release
+
+    - Fixed dangling dav lock bug on fatal errors. Thanks to Marc St-Jean.
+
     - Fixed content_type bug, now checks if it is callable. Thanks to Arnaud 
-      Bienvenu
+      Bienvenu.
 
     - Fixed bug with editing binary data on Windows. Thanks to Eric Kamm.
 
