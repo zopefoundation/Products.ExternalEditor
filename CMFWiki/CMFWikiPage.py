@@ -15,7 +15,7 @@ from OFS.DTMLDocument import DTMLDocument
 from OFS.Image import cookId
 from urllib import quote, unquote     # url quoting
 from StructuredText import html_with_references #, html_quote
-from DocumentTemplate.DT_Util import html_quote
+from DocumentTemplate.DT_Var import html_quote
 from wwml import translate_WMML
 from string import split,join,find,lstrip,lower
 import Acquisition
