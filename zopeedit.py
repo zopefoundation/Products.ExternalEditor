@@ -636,6 +636,12 @@ def fatalError(message, exit=1):
     """Show error message and exit"""
     errorDialog('FATAL ERROR: %s' % message)
     traceback.print_exc(file=sys.stderr)
+    # Write out debug info to a temp file
+    debug_f = open(mktemp('-zopeedit-traceback.txt'), 'w')
+    try:
+        traceback.print_exc(file=debug_f)
+    finally:
+        debug_f.close()
     if exit: 
         sys.exit(0)
 
