@@ -232,6 +232,7 @@ class SyndicationTool (UniqueObject, SimpleItem):
              raise 'Syndication Information Exists'
             syInfo = SyndicationInformation()
             obj._setObject('syndication_information', syInfo)
+            syInfo=obj._getOb('syndication_information')
             syInfo.syUpdatePeriod = self.syUpdatePeriod
             syInfo.syUpdateFrequency = self.syUpdateFrequency
             syInfo.syUpdateBase = self.syUpdateBase
