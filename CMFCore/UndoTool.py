@@ -43,7 +43,7 @@ class UndoTool (UniqueObject, SimpleItem, ActionProviderBase):
     _actions = (ActionInformation(id='undo'
                                 , title='Undo'
                                 , action=Expression(
-               text='string: ${portal_url}/undo_form')
+               text='string:${portal_url}/undo_form')
                                 , condition=Expression(
                text='member') 
                                 , permissions=(ListUndoableChanges,)
