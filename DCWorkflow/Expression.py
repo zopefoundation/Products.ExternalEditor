@@ -201,7 +201,7 @@ def createExprContext(sci):
         'container':    aq_parent(aq_inner(ob)),
         'nothing':      None,
         'root':         wf.getPhysicalRoot(),
-        'request':      ob.REQUEST,
+        'request':      getattr( ob, 'REQUEST', None ),
         'modules':      ModuleImporter,
         'user':         getSecurityManager().getUser(),
         'state_change': sci,
