@@ -1,6 +1,14 @@
 PluggableAuthService changelog
 
-  Version 1.0.1 (unreleased)
+  Version 1.0.2 (2004/07/15)
+
+    Bugs Fixed
+
+      - ZODBRoleManager and ZODBGroupManager needed the "two_lists" view,
+        and associated images, which migrated to the PluginRegsitry product
+        when they split;  restored them.
+
+  Version 1.0.1 (2004/05/18)
 
     Bugs Fixed
     
