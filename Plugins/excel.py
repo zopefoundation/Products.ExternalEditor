@@ -16,7 +16,7 @@
 $Id$
 """
 
-import os
+import os, types
 from time import sleep
 import win32com
 import pythoncom
@@ -70,6 +70,19 @@ class EditorProcess:
                 return 1
             else:
                 raise
+        except AttributeError, why:
+            # No one knows why this happens but sometimes while a user is
+            # editing, win32com\client\dynamic.py will raise an error
+            # signifying that the attributes we attempt to look up on the Excel
+            # document can't be found.  Ignore this and return 1 if so,
+            # waiting for the next go-around to check again (eventually we do
+            # get access to the attributes).
+            if (isinstance(why, types.StringType) or
+                isinstance(why, types.UnicodeType)):
+                if why.endswith('Path') or why.endswith('Name'):
+                    return 1
+            raise
+
 
 def test():
     import os
