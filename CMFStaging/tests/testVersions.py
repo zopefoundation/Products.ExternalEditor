@@ -100,7 +100,8 @@ class Tests(unittest.TestCase):
         self.assertEqual(old_id, current_id)
 
 
-    def testRevertThenCheckout(self):
+    def testRevertToStickyThenCheckout(self):
+        # Test that the versions tool automatically unsticks objects
         vt = self.tool
         content = self.root.content
         vt.checkin(content)
@@ -112,9 +113,6 @@ class Tests(unittest.TestCase):
         content = self.root.content  # XXX ZopeVersionControl requires this
 
         vt.auto_copy_forward = 0
-        # Can't normally check out when the object is in an old state
-        self.assertRaises(VersionControlError, vt.checkout, content)
-
         # Can't check out when the object is in the current state
         # but there's a sticky tag.
         vt.revertToVersion(content, new_id)
@@ -124,6 +122,34 @@ class Tests(unittest.TestCase):
         vt.revertToVersion(content, old_id)
         # Now we can check out, since the tool will remove the sticky tag
         # without losing data.
+        vt.checkout(content)
+        content = self.root.content  # XXX ZopeVersionControl requires this
+
+        current_id = vt.getVersionId(content)
+        self.assertNotEqual(current_id, old_id)
+        self.assertNotEqual(current_id, new_id)
+
+
+    def testRevertToOldThenCheckout(self):
+        # Test that the versions tool automatically copies old states forward
+        vt = self.tool
+        content = self.root.content
+        vt.checkin(content)
+        old_id = vt.getVersionId(content)
+        vt.checkout(content)
+        vt.checkin(content)
+        new_id = vt.getVersionId(content)
+        vt.revertToVersion(content, old_id)
+        content = self.root.content  # XXX ZopeVersionControl requires this
+        del content.__vc_info__.sticky  # Simulate non-sticky
+
+        vt.auto_copy_forward = 0
+        # Can't normally check out when the object is in an old state
+        self.assertRaises(VersionControlError, vt.checkout, content)
+
+        vt.auto_copy_forward = 1
+        # Now we can check out, since the tool will copy the old state forward
+        # before checking out.
         vt.checkout(content)
         content = self.root.content  # XXX ZopeVersionControl requires this
 

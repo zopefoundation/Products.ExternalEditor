@@ -122,12 +122,11 @@ class VersionsTool(UniqueObject, SimpleItemWithProperties):
         if not repo.isUnderVersionControl(obj):
             repo.applyVersionControl(obj)
         elif self.auto_copy_forward:
-            info = repo.getVersionInfo(obj)
-            stuck = (info.sticky and info.sticky[0] != 'B')
-            if stuck:
-                # The object has a sticky tag.  Get it unstuck by
-                # copying the old state forward after the object
-                # has been checked out.
+            if not repo.isResourceUpToDate(obj, require_branch=1):
+                # The object is not at the latest revision or has a
+                # sticky tag.  Get it unstuck by copying the old state
+                # forward after the object has been checked out.
+                info = repo.getVersionInfo(obj)
                 old_state = repo.getVersionOfResource(
                     info.history_id, info.version_id)
                 # Momentarily revert to the branch.
