@@ -1,6 +1,4 @@
-## Script (Python) "validateFile"
 ##parameters=file='', **kw
-##title=
 ##
 try:
     upload = file.read()

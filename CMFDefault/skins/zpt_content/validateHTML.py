@@ -1,6 +1,4 @@
-## Script (Python) "validateHTML"
 ##parameters=text, description='', **kw
-##title=
 ##
 from Products.CMFDefault.exceptions import IllegalHTML
 from Products.CMFDefault.utils import scrubHTML
