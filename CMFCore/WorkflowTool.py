@@ -662,7 +662,11 @@ class WorkflowTool (UniqueObject, Folder):
                 count = count + 1
                 if hasattr(aq_base(ob), 'reindexObject'):
                     # Reindex security-related indexes
-                    ob.reindexObject(idxs=['allowedRolesAndUsers'])
+                    try:
+                        ob.reindexObject(idxs=['allowedRolesAndUsers'])
+                    except TypeError:
+                        # Catch attempts to reindex portal_catalog.
+                        pass
         if hasattr(aq_base(ob), 'objectItems'):
             obs = ob.objectItems()
             if obs:
