@@ -24,8 +24,7 @@ message = ''
 
 
 if not mtool.checkPermission(ListFolderContents, context):
-    ti = context.getTypeInfo()
-    target = ti.getActionInfo('folder/view', context)['url']
+    target = context.getActionInfo('folder/view')['url']
     context.REQUEST.RESPONSE.redirect(target)
     return None
 
@@ -52,8 +51,7 @@ elif items_delete:
         message = 'Please select one or more items to delete first.'
 
 elif items_new:
-    ti = context.getTypeInfo()
-    target = ti.getActionInfo('folder/new', context)['url']
+    target = context.getActionInfo('folder/new')['url']
     context.REQUEST.RESPONSE.redirect(target)
     return None
 
@@ -71,8 +69,7 @@ elif items_paste:
 
 elif items_rename:
     if ids:
-        ti = context.getTypeInfo()
-        target = ti.getActionInfo('folder/rename_items', context)['url']
+        target = context.getActionInfo('folder/rename_items')['url']
         query = make_query( ids=list(ids) )
         context.REQUEST.RESPONSE.redirect( '%s?%s' % (target, query) )
         return None
@@ -116,10 +113,12 @@ for item in batch_obj:
     item_icon = item.getIcon(1)
     item_id = item.getId()
     if item.isPrincipiaFolderish:
-        item_url = atool.getActionInfo('folder/folderContents', item)['url']
+        try:
+            item_url = atool.getActionInfo('folder/folderContents', item)['url']
+        except ValueError:
+            item_url = item.getActionInfo('folder/view')['url']
     else:
-        ti = item.getTypeInfo()
-        item_url = ti.getActionInfo('object/view', item)['url']
+        item_url = item.getActionInfo('object/view')['url']
     items.append( { 'checkbox': items_manage_allowed and
                                 ('cb_%s' % item_id) or '',
                     'icon': item_icon and

@@ -43,8 +43,7 @@ if change or change_and_view:
             message = 'Document changed.'
 
     if ok and change_and_view:
-        ti = context.getTypeInfo()
-        target = ti.getActionInfo('object/view', context)['url']
+        target = context.getActionInfo('object/view')['url']
         query = make_query(portal_status_message=message)
         context.REQUEST.RESPONSE.redirect( '%s?%s' % (target, query) )
         return None
@@ -56,8 +55,7 @@ if message:
 control = {}
 
 buttons = []
-ti = context.getTypeInfo()
-target = ti.getActionInfo('object/edit', context)['url']
+target = context.getActionInfo('object/edit')['url']
 buttons.append( {'name': 'change', 'value': 'Change'} )
 buttons.append( {'name': 'change_and_view', 'value': 'Change and View'} )
 control['form'] = { 'action': target,

@@ -48,8 +48,7 @@ for item in raw_items:
 control['batch'] = { 'listItemInfos': tuple(items) }
 
 buttons = []
-ti = context.getTypeInfo()
-target = ti.getActionInfo('folder/rename_items', context)['url']
+target = context.getActionInfo('folder/rename_items')['url']
 buttons.append( {'name': 'rename', 'value': 'Rename'} )
 buttons.append( {'name': 'cancel', 'value': 'Cancel'} )
 control['form'] = { 'action': target,
