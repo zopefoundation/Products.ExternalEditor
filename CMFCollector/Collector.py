@@ -501,7 +501,9 @@ class CollectorCatalog(CatalogTool):
                   'action_number',
                   'upload_number',
                   )
+        custom = tuple([col for col in custom if col not in standard])
         return standard + custom
+
 
 InitializeClass(CollectorCatalog)
 
