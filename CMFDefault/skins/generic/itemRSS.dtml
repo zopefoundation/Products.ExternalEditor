@@ -1,17 +1,17 @@
-<item rdf:about="<dtml-var Identifier>">
-<title><dtml-var Title></title>
-<link><dtml-var Identifier></link>
+<item rdf:about="&dtml-Identifier;">
+<title>&dtml-Title;</title>
+<link>&dtml-Identifier;</link>
 <description>
-<dtml-var Description>
+&dtml-Description;
 </description>
-<dc:publisher><dtml-var Publisher></dc:publisher>
+<dc:publisher>&dtml-Publisher;</dc:publisher>
 <dtml-in listCreators>
-<dc:creator><dtml-var sequence-item></dc:creator>
+<dc:creator>&dtml-sequence-item;</dc:creator>
 </dtml-in>
-<dc:rights><dtml-var Rights></dc:rights>
+<dc:rights>&dtml-Rights;</dc:rights>
 <dtml-in Subject>
 <dc:subject>
-<dtml-var sequence-item>
+&dtml-sequence-item;
 </dc:subject>
 </dtml-in>
 <dc:date><dtml-var "this().modified().HTML4()"></dc:date>
