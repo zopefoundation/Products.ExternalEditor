@@ -180,7 +180,7 @@ class MembershipTool( BaseTool ):
         """ Create a member area for 'member_id'.
         """
         members = self.getMembersFolder()
-        if members is not None and not hasattr(members, member_id):
+        if members is not None and member_id not in members.objectIds():
             f_title = "%s's Home" % member_id
             members.manage_addPortalFolder( id=member_id, title=f_title )
             f=getattr(members, member_id)

@@ -96,6 +96,8 @@ CMF 1.4 alpha
 
   Bug Fixes
 
+    - MembershipTool (CMFDefault): Fixed acquisition bug. (Collector #102)
+
     - Skinnable: Changed docstring for setupCurrentSkin and added 
       docstring to changeSkin: the latter is now used to set skin
       manually mid-request. (Collector #27)
