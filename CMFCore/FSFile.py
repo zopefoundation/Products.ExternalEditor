@@ -53,15 +53,6 @@ class FSFile(FSObject):
 
     def _createZODBClone(self):
         return File(self.getId(), '', self._readFile(1))
-    def _get_content_type(self, file, body, id, content_type=None):
-        headers=getattr(file, 'headers', None)
-        if headers and headers.has_key('content-type'):
-            content_type=headers['content-type']
-        else:
-            if type(body) is not type(''): body=body.data
-            content_type, enc=guess_content_type(
-                getattr(file, 'filename',id), body, content_type)
-        return content_type
 
     def _get_content_type(self, file, body, id, content_type=None):
         headers=getattr(file, 'headers', None)
