@@ -460,6 +460,8 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
 
             self.assertEqual( info[ 'meta_type' ], expected[ 0 ] )
             self.assertEqual( info[ 'body' ], expected[ 1 ] )
+            self.assertEqual( info[ 'filename' ]
+                            , expected[ 2 ] % WF_ID )
 
 
     def test_listWorkflowInfo_empty( self ):
@@ -653,14 +655,16 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
         self._initStates( dcworkflow )
         self._initTransitions( dcworkflow )
         self._initWorklists( dcworkflow )
+        self._initScripts( dcworkflow )
 
         configurator = self._makeOne( site ).__of__( site )
 
         self._compareDOM( configurator.generateWorkflowXML( WF_ID )
-                        , _NORMAL_WORKFLOW_EXPORT % ( WF_ID
-                                                    , WF_TITLE
-                                                    , WF_INITIAL_STATE
-                                                    ) )
+                        , _NORMAL_WORKFLOW_EXPORT
+                          % { 'workflow_id' : WF_ID
+                            , 'title' : WF_TITLE
+                            , 'initial_state' : WF_INITIAL_STATE
+                            } )
 
     def test_parseToolXML_empty( self ):
 
@@ -765,11 +769,12 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
         , worklists
         , permissions
         , scripts
-        ) = configurator.parseWorkflowXML( _NORMAL_WORKFLOW_EXPORT
-                                         % ( WF_ID
-                                           , WF_TITLE
-                                           , WF_INITIAL_STATE
-                                           ) )
+        ) = configurator.parseWorkflowXML(
+                          _NORMAL_WORKFLOW_EXPORT
+                          % { 'workflow_id' : WF_ID
+                            , 'title' : WF_TITLE
+                            , 'initial_state' : WF_INITIAL_STATE
+                            } )
 
         self.assertEqual( workflow_id, WF_ID )
         self.assertEqual( title, WF_TITLE )
@@ -796,11 +801,12 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
         , worklists
         , permissions
         , scripts
-        ) = configurator.parseWorkflowXML( _NORMAL_WORKFLOW_EXPORT
-                                         % ( WF_ID
-                                           , WF_TITLE
-                                           , WF_INITIAL_STATE
-                                           ) )
+        ) = configurator.parseWorkflowXML( 
+                          _NORMAL_WORKFLOW_EXPORT
+                          % { 'workflow_id' : WF_ID
+                            , 'title' : WF_TITLE
+                            , 'initial_state' : WF_INITIAL_STATE
+                            } )
 
         self.assertEqual( len( states ), len( _WF_STATES ) )
 
@@ -846,11 +852,12 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
         , worklists
         , permissions
         , scripts
-        ) = configurator.parseWorkflowXML( _NORMAL_WORKFLOW_EXPORT
-                                         % ( WF_ID
-                                           , WF_TITLE
-                                           , WF_INITIAL_STATE
-                                           ) )
+        ) = configurator.parseWorkflowXML( 
+                          _NORMAL_WORKFLOW_EXPORT
+                          % { 'workflow_id' : WF_ID
+                            , 'title' : WF_TITLE
+                            , 'initial_state' : WF_INITIAL_STATE
+                            } )
 
         self.assertEqual( len( transitions ), len( _WF_TRANSITIONS ) )
 
@@ -911,11 +918,12 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
         , worklists
         , permissions
         , scripts
-        ) = configurator.parseWorkflowXML( _NORMAL_WORKFLOW_EXPORT
-                                         % ( WF_ID
-                                           , WF_TITLE
-                                           , WF_INITIAL_STATE
-                                           ) )
+        ) = configurator.parseWorkflowXML( 
+                          _NORMAL_WORKFLOW_EXPORT
+                          % { 'workflow_id' : WF_ID
+                            , 'title' : WF_TITLE
+                            , 'initial_state' : WF_INITIAL_STATE
+                            } )
 
         self.assertEqual( len( variables ), len( _WF_VARIABLES ) )
 
@@ -968,11 +976,12 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
         , worklists
         , permissions
         , scripts
-        ) = configurator.parseWorkflowXML( _NORMAL_WORKFLOW_EXPORT
-                                         % ( WF_ID
-                                           , WF_TITLE
-                                           , WF_INITIAL_STATE
-                                           ) )
+        ) = configurator.parseWorkflowXML( 
+                          _NORMAL_WORKFLOW_EXPORT
+                          % { 'workflow_id' : WF_ID
+                            , 'title' : WF_TITLE
+                            , 'initial_state' : WF_INITIAL_STATE
+                            } )
 
         self.assertEqual( len( worklists ), len( _WF_WORKLISTS ) )
 
@@ -1027,17 +1036,63 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
         , worklists
         , permissions
         , scripts
-        ) = configurator.parseWorkflowXML( _NORMAL_WORKFLOW_EXPORT
-                                         % ( WF_ID
-                                           , WF_TITLE
-                                           , WF_INITIAL_STATE
-                                           ) )
+        ) = configurator.parseWorkflowXML( 
+                          _NORMAL_WORKFLOW_EXPORT
+                          % { 'workflow_id' : WF_ID
+                            , 'title' : WF_TITLE
+                            , 'initial_state' : WF_INITIAL_STATE
+                            } )
 
         self.assertEqual( len( permissions ), len( _WF_PERMISSIONS ) )
 
         for permission in permissions:
 
             self.failUnless( permission in _WF_PERMISSIONS )
+
+    def test_parseWorkflowXML_normal_scripts( self ):
+
+        from Products.CMFSetup.workflow import TRIGGER_TYPES
+
+        WF_ID = 'normal'
+        WF_TITLE = 'Normal DCWorkflow'
+        WF_INITIAL_STATE = 'closed'
+
+        site = self._initSite()
+
+        configurator = self._makeOne( site ).__of__( site )
+
+        ( workflow_id
+        , title
+        , state_variable
+        , initial_state
+        , states
+        , transitions
+        , variables
+        , worklists
+        , permissions
+        , scripts
+        ) = configurator.parseWorkflowXML( 
+                          _NORMAL_WORKFLOW_EXPORT
+                          % { 'workflow_id' : WF_ID
+                            , 'title' : WF_TITLE
+                            , 'initial_state' : WF_INITIAL_STATE
+                            } )
+
+        self.assertEqual( len( scripts ), len( _WF_SCRIPTS ) )
+
+        for script in scripts:
+
+            script_id = script[ 'script_id' ]
+            self.failUnless( script_id in _WF_SCRIPTS )
+
+            expected = _WF_SCRIPTS[ script_id ]
+
+            self.assertEqual( script[ 'meta_type' ], expected[ 0 ] )
+
+            # Body is not kept as part of the workflow XML
+
+            self.assertEqual( script[ 'filename' ]
+                            , expected[ 2 ] % workflow_id )
 
 
 _WF_PERMISSIONS = \
@@ -1249,12 +1304,15 @@ return 'after_kill'
 _WF_SCRIPTS = \
 { 'before_open':    ( PythonScript.meta_type
                     , _BEFORE_OPEN_SCRIPT
+                    , 'workflows/%s/before_open.py'
                     )
 , 'after_close':    ( PythonScript.meta_type
                     , _AFTER_CLOSE_SCRIPT
+                    , 'workflows/%s/after_close.py'
                     )
 , 'after_kill':     ( PythonScript.meta_type
                     , _AFTER_KILL_SCRIPT
+                    , 'workflows/%s/after_kill.py'
                     )
 }
 
@@ -1315,10 +1373,10 @@ _EMPTY_WORKFLOW_EXPORT = """\
 _NORMAL_WORKFLOW_EXPORT = """\
 <?xml version="1.0"?>
 <dc-workflow
-    workflow_id="%s"
-    title="%s"
+    workflow_id="%(workflow_id)s"
+    title="%(title)s"
     state_variable="state" 
-    initial_state="%s">
+    initial_state="%(initial_state)s">
  <permission>Open content for modifications</permission>
  <permission>Modify content</permission>
  <permission>Query history</permission>
@@ -1517,6 +1575,21 @@ _NORMAL_WORKFLOW_EXPORT = """\
     <guard-permission>Open content for modifications</guard-permission>
    </guard>
  </variable>
+ <script
+    script_id="after_close"
+    type="Script (Python)"
+    filename="workflows/%(workflow_id)s/after_close.py"
+    />
+ <script
+    script_id="after_kill"
+    type="Script (Python)"
+    filename="workflows/%(workflow_id)s/after_kill.py"
+    />
+ <script
+    script_id="before_open"
+    type="Script (Python)"
+    filename="workflows/%(workflow_id)s/before_open.py"
+    />
 </dc-workflow>
 """
 

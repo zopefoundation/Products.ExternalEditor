@@ -174,4 +174,14 @@
         tal:content="variable/guard_expr">EXPRESSION</guard-expression>
    </guard>
  </variable>
+ <script
+        script_id="SCRIPT_ID"
+        type="Script (Python)"
+        filename="/path/to/SCRIPT_ID.py"
+        tal:repeat="script workflow/script_info"
+        tal:attributes="script_id script/id;
+                        type script/meta_type;
+                        filename script/filename;
+                       "
+        />
 </dc-workflow>

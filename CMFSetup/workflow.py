@@ -230,7 +230,7 @@ class WorkflowToolConfigurator( Implicit ):
         variables = _extractVariableNodes( root )
         worklists = _extractWorklistNodes( root )
         permissions = _extractPermissionNodes( root )
-        scripts = []
+        scripts = _extractScriptNodes( root )
 
         return ( workflow_id
                , title
@@ -597,14 +597,22 @@ class WorkflowToolConfigurator( Implicit ):
 
           'body' -- the text of the script
 
+          'filename' -- the name of the file to / from which the script
+            is stored / loaded
         """
         result = []
 
-        for k, v in workflow.scripts.objectItems():
+        items = workflow.scripts.objectItems()
+        items.sort()
+
+        for k, v in items:
+
+            filename = _getScriptFilename( workflow.getId(), k, v.meta_type )
 
             info = { 'id'                   : k
                    , 'meta_type'            : v.meta_type
                    , 'body'                 : v.read()
+                   , 'filename'             : filename
                    }
 
             result.append( info )
@@ -673,6 +681,14 @@ def _getWorkflowFilename( workflow_id ):
     """ Return the name of the file which holds info for a given type.
     """
     return 'workflows/%s/definition.xml' % workflow_id.replace( ' ', '_' )
+
+def _getScriptFilename( workflow_id, script_id, meta_type ):
+
+    """ Return the name of the file which holds the script.
+    """
+    wf_dir = workflow_id.replace( ' ', '_' )
+    suffix = _METATYPE_SUFFIXES[ meta_type ]
+    return 'workflows/%s/%s.%s' % ( wf_dir, script_id, suffix )
 
 def _extractStateNodes( root, encoding=None ):
 
@@ -808,6 +824,26 @@ def _extractWorklistNodes( root, encoding=None ):
 
     return result
 
+def _extractScriptNodes( root, encoding=None ):
+
+    result = []
+
+    for s_node in root.getElementsByTagName( 'script' ):
+
+
+        info = { 'script_id' : _getNodeAttribute( s_node, 'script_id' )
+               , 'meta_type' : _getNodeAttribute( s_node, 'type' , encoding )
+               }
+
+        filename = _queryNodeAttribute( s_node, 'filename' , None, encoding )
+
+        if filename is not None:
+            info[ 'filename' ] = filename
+
+        result.append( info )
+
+    return result
+
 def _extractPermissionNodes( root, encoding=None ):
 
     result = []
@@ -901,3 +937,13 @@ def _extractMatchNode( parent, encoding=None ):
         result[ name ] = values.split()
 
     return result
+
+from Products.PythonScripts.PythonScript import PythonScript
+from Products.ExternalMethod.ExternalMethod import ExternalMethod
+from OFS.DTMLMethod import DTMLMethod
+
+_METATYPE_SUFFIXES = \
+{ PythonScript.meta_type : 'py'
+, ExternalMethod.meta_type : 'em'
+, DTMLMethod.meta_type : 'dtml'
+}
