@@ -12,12 +12,12 @@ try:
     context.edit(title=title
              , description=description
              , eventType=event_type
-             , effectiveDay=effectiveYear
+             , effectiveDay=effectiveDay
              , effectiveMo=effectiveMo
-             , effectiveYear=effectiveDay
-             , expirationDay=expirationYear
+             , effectiveYear=effectiveYear
+             , expirationDay=expirationDay
              , expirationMo=expirationMo
-             , expirationYear=expirationDay
+             , expirationYear=expirationYear
              , start_time=start_time
              , startAMPM=startAMPM
              , stopAMPM=stopAMPM
