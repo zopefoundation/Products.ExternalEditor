@@ -38,6 +38,9 @@ CMFUid Readme
         and IUniqueIdBrainQuery for more efficient queries by returning 
         catalog brains instead of objects).
         
+        The current implementation of get/queryBrain and get/queryObject 
+        do not return invisible objects (and brains of invisible objects).
+        
         Have a look at the interfaces.
         
         CMFUid's functionality is used by CMFDefault's favorite content type 
