@@ -157,9 +157,7 @@ class FSPythonScript (FSObject, Script):
         """
         self._updateFromFS()
         # Prepare the function.
-        f = getattr(self, '_v_f', None)
-        if f is None:
-            f = self._makeFunction(1)
+        f = self._v_f
 
         __traceback_info__ = bound_names, args, kw, self.func_defaults
 
@@ -230,11 +228,13 @@ class FSPythonScript (FSObject, Script):
         ps = PythonScript(self.id)
         ps.write(text)
         ps._makeFunction()
-        self._v_f = ps._v_f
+        ps._editedBindings()
+        self._v_f = f = ps._v_f
         self._body = ps._body
         self._params = ps._params
-        self.func_code = ps.func_code
-    
+        fc = f.func_code
+        self._setFuncSignature(f.func_defaults, fc.co_varnames,
+                               fc.co_argcount)
 
 Globals.InitializeClass(FSPythonScript)
 
