@@ -15,6 +15,8 @@
 $Id$
 """
 
+from Products.CMFCore.utils import getToolByName
+
 from Portal import PortalGenerator
 
 
@@ -35,6 +37,10 @@ def importVarious(context):
         addCMFUidTool('Unique Id Annotation Tool', None)
         addCMFUidTool('Unique Id Generator Tool', None)
         addCMFUidTool('Unique Id Handler Tool', None)
+
+    # add custom skin folder
+    stool = getToolByName(site, 'portal_skins')
+    stool.manage_addProduct['OFSP'].manage_addFolder(id='custom')
 
     gen = PortalGenerator()
     gen.setupMailHost(site)
