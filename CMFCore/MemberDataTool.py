@@ -135,7 +135,7 @@ class MemberDataTool (UniqueObject, SimpleItem, PropertyManager):
 
     security.declareProtected( CMFCorePermissions.ViewManagementScreens
                              , 'manage_showContents')
-    manage_showContents = DTMLFile('dtml/memberdataContents', _dtmldir )
+    manage_showContents = DTMLFile('memberdataContents', _dtmldir )
 
     security.declareProtected( CMFCorePermissions.ViewManagementScreens
                              , 'getContentsInformation',)
