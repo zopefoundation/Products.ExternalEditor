@@ -3,24 +3,30 @@
 $Id$
 """
 from AccessControl import ModuleSecurityInfo
-from Products.CMFCore.permissions import setDefaultRoles
+
+try:
+    from Products.CMFCore import permissions as core_permissions
+except ImportError: # CMF < 1.5
+    from Products.CMFCore import CMFCorePermissions as core_permissions
+
+setDefaultRoles = core_permissions.setDefaultRoles
 
 security = ModuleSecurityInfo('Products.CMFCollector.permissions')
 
 security.declarePublic('View')
-from Products.CMFCore.permissions import View
+View = core_permissions.View
 
 security.declarePublic('AddPortalContent')
-from Products.CMFCore.permissions import AddPortalContent
+AddPortalContent = core_permissions.AddPortalContent
 
 security.declarePublic('AccessInactivePortalContent')
-from Products.CMFCore.permissions import AccessInactivePortalContent
+AccessInactivePortalContent = core_permissions.AccessInactivePortalContent
 
 security.declarePublic('AccessFuturePortalContent')
-from Products.CMFCore.permissions import AccessFuturePortalContent
+AccessFuturePortalContent = core_permissions.AccessFuturePortalContent
 
 security.declarePublic('ModifyPortalContent')
-from Products.CMFCore.permissions import ModifyPortalContent
+ModifyPortalContent = core_permissions.ModifyPortalContent
 
 security.declarePublic('ViewCollector')
 ViewCollector = View
@@ -49,3 +55,5 @@ setDefaultRoles(EditCollectorIssue, ('Manager', 'Reviewer'))
 security.declarePublic('SupportIssue')
 SupportIssue = 'Support collector issue'
 setDefaultRoles(SupportIssue, ('Manager', 'Reviewer'))
+
+del setDefaultRoles, core_permissions
