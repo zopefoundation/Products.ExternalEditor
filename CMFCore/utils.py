@@ -83,6 +83,8 @@
 # 
 ##############################################################################
 
+from types import StringType
+
 from ExtensionClass import Base
 from AccessControl import ClassSecurityInfo, getSecurityManager
 from AccessControl.Permission import Permission
@@ -218,18 +220,36 @@ def modifyPermissionMappings(ob, map):
     '''
     # This mimics what AccessControl/Role.py does.
     # Needless to say, it's crude. :-(
-    map = map.copy()  # Safety.
-    for perm in ac_inherited_permissions(ob, 1):
-        name, value = perm[:2]
-        if map.has_key(name):
-            for (role, allow) in map[name].items():
-                p = Permission(name, value, ob)
-                p.setRole(role, allow)  # Will only modify if it should.
-            del map[name]
-    if map:
-        for name, (role, allow) in map.items():
-            p = Permission(name, (), ob)
-            p.setRole(role, allow)
+    something_changed = 0
+    perm_info = ac_inherited_permissions(ob, 1)
+    for name, settings in map.items():
+        cur_roles = rolesForPermissionOn(name, ob)
+        t = type(cur_roles)
+        if t is StringType:
+            cur_roles = [cur_roles]
+        else:
+            cur_roles = list(cur_roles)
+        changed = 0
+        for (role, allow) in settings.items():
+            if not allow:
+                if role in cur_roles:
+                    changed = 1
+                    cur_roles.remove(role)
+            else:
+                if role not in cur_roles:
+                    changed = 1
+                    cur_roles.append(role)
+        if changed:
+            data = ()  # The list of methods using this permission.
+            for perm in perm_info:
+                n, d = perm[:2]
+                if n == name:
+                    data = d
+                    break
+            p = Permission(name, data, ob)
+            p.setRoles(tuple(cur_roles))
+            something_changed = 1
+    return something_changed
 
 
 from Globals import HTMLFile
