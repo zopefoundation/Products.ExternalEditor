@@ -37,15 +37,11 @@
                  TITLELEN python: 35;
                  DESCRLEN python: 120;
                  b_start python: request.get('b_start', 0);
-                 items python: here.listFolderContents();
-                 batch python:
-                    Batch(items, BATCHSIZE, int(b_start), orphan=0);
+                 items here/collector_search;
+                 batch python: Batch(items, BATCHSIZE, int(b_start), orphan=0);
                  prev batch/previous;
                  next batch/next|nothing;
                  last_batch python: max(int(here.length()) - BATCHSIZE, 1)">
-
-  <form action="" METHOD="POST"
-        tal:attributes="action here/absolute_url">
 
     <div metal:use-macro="here/collector_macros/macros/issue_batch_nav">
       ISSUE-BATCH NAVIGATION
@@ -53,40 +49,52 @@
 
     <table class="FormLayout">
       <tbody tal:repeat="item batch">
-        <tr valign="top">
-          <td tal:define="icon item/getIcon|item/icon|nothing">
+
+        <tr tal:define="itemattrs python: here.collector_issue_subject_attrs(item);
+                        itemurl item/getURL;
+                        itemtype item/Type|nothing;
+                        icon item/getIcon|item/icon|nothing">
+
+          <td>
              <a href=""
-                tal:attributes="href python: item.absolute_url()">
+                tal:attributes="href item/getURL">
                 <img src="" alt="" border="0"
                      tal:condition="icon"
-                     tal:attributes="src python: here.portal_url()
-                                                 + '/' + icon;
-                                     alt item/Type|nothing"></a>
+                     tal:attributes="src icon;
+                                     alt itemtype">
+                <span tal:replace="itemtype"
+                      tal:condition="not: icon"></span>
+            </a>
+          </td>
+
+          <td>
+            <a href="ITEMURL" tal:attributes="href item/getURL">
+              <span tal:replace="item/id">ID</span> </a>
           </td>
           <td NOWRAP>
-            <a href=""
-               tal:attributes="href python: item.absolute_url()">
-              <span tal:replace="item/getId">ID</span>
+            <a href="ITEMURL" tal:attributes="href item/getURL">
               <b><span tal:condition="item/Title"
                        tal:replace="python:
-                                     item.Title()[:TITLELEN]
-                                    + (item.Title()[TITLELEN:] and '...')">
+                                     item.Title[:TITLELEN]
+                                    + (item.Title[TITLELEN:] and '...')">
               TITLE</span></b></a>
-          <br>
-            <span tal:condition="item/security_related">
-              <font color="red">Security</font></span>
-            <span tal:content="python: cap(item.status())">
-            STATUS</span>
-            <span tal:replace="python: '%s/%s'
-                                       % (cap(item.topic),
-                                          cap(item.classification))">
-             TOPIC/CLASSIFICATION</span>
+            <br>
+              <span tal:condition="python: int(itemattrs['security_related'])">
+                <font color="red">Security</font></span>
+              <em><span tal:content="python: cap(item.review_state)">
+                STATUS</span></em>
+              <span tal:replace="python: '%s/%s'
+                                       % (cap(itemattrs['topic']),
+                                          cap(itemattrs['classification']))">
+                TOPIC/CLASSIFICATION
+              </span>
           </td>
+
           <td NOWRAP
-              tal:define="numcmts python: item.action_number;
+              tal:define="numcmts python: int(itemattrs['action_number'])-1;
                           plrlcmts python: (numcmts != 1) and 's' or '';
-                          numarts python: len(item.objectIds())-1;
-                          plrlarts python: (numarts != 1) and 's' or ''">
+                          numuploads python: int(itemattrs['upload_number']);
+                          plrluploads python: (numuploads != 1) and 's' or ''">
             <span tal:condition="numcmts">
               <span tal:replace="numcmts">NUM COMMENTS</span>
               followup<span tal:replace="plrlcmts">S?</span>
@@ -94,15 +102,15 @@
             <span tal:condition="not: numcmts"
                   tal:replace="nothing"></span>
 
-              <div tal:condition="numarts">
-                <span tal:replace="numarts">NUM ARTIFACTS</span>
-                upload<span tal:replace="plrlarts">S?</span>
+              <div tal:condition="numuploads">
+                <span tal:replace="numuploads">NUM ARTIFACTS</span>
+                upload<span tal:replace="plrluploads">S?</span>
               </div>
           </td>
+
           <td NOWRAP
-              tal:define="crdate python: item.creation_date.aCommon();
-                       moddate python:
-                            DateTime(item.ModificationDate()).aCommon()">
+              tal:define="crdate python: item.created.aCommon();
+                          moddate python: item.modified.aCommon()">
             <span tal:replace="crdate">CREATEDATE</span>
             <div tal:condition="python: crdate != moddate">
               Last Mod: <span tal:replace="moddate">MODDATE</span>
@@ -110,16 +118,17 @@
           </td>
         </tr>
 
-        <tr tal:condition="item/description">
+        <tr tal:condition="item/Description">
           <td>
           </td>
-          <td colspan="6">
+          <td colspan="7">
             <font color="gray"
-                  tal:content="python: item.description[:DESCRLEN]
-                               + (item.description[DESCRLEN:] and '...')">
-            DESCRIPTION</font>
+                  tal:content="python: item.Description[:DESCRLEN]
+                               + (item.Description[DESCRLEN:] and '...')">
+              DESCRIPTION</font>
           </td>
         </tr>
+
       </tbody>
     </table>
 
@@ -127,11 +136,7 @@
       ISSUE-BATCH NAVIGATION
     </div>
 
-  </form>
   <form action="collector_search" method="get">
-  <input type="hidden" name="Type" value="Collector Issue">
-  <input type="hidden" name="path" value=""
-         tal:attributes="value python: here.absolute_url(1)">
   Fulltext Search:  <input type="text" name="SearchableText" size="40">
   <div>
     Requestor:  <select name="Creator:list" multiple size="5">
