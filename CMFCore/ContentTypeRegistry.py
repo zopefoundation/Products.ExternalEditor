@@ -463,7 +463,7 @@ class ContentTypeRegistry( SimpleItem ):
         self.predicates[ predicate_id ] = ( klass( predicate_id ), None )
         self.predicate_ids = self.predicate_ids + ( predicate_id, )
 
-    security.declareProtected( ManagePortal, 'addPredicate' )
+    security.declareProtected( ManagePortal, 'updatePredicate' )
     def updatePredicate( self, predicate_id, predicate, typeObjectName ):
         """
             Update a predicate in this element.

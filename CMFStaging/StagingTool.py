@@ -247,7 +247,7 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
                     container._delObject(id)
 
 
-    security.declareProtected(StageObjects, 'versions')
+    security.declareProtected(StageObjects, 'getVersionIds')
     def getVersionIds(self, object):
         """Retrieves object version identifiers in the different stages."""
         return self._getObjectVersionIds(object)
@@ -287,7 +287,7 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
     manage_stagesForm = PageTemplateFile('stagesForm', _wwwdir)
 
 
-    security.declareProtected(ManagePortal, 'getStagePaths')
+    security.declareProtected(ManagePortal, 'getStageItems')
     def getStageItems(self):
         lst = self._stages.items()
         lst.sort()

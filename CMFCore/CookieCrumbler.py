@@ -89,7 +89,7 @@ class CookieCrumbler (SimpleItemWithProperties):
     def getCookieMethod( self, name='setAuthCookie', default=None ):
         return getattr( self.aq_inner.aq_parent, name, default )
 
-    security.declarePrivate('setDefaultAuthCookie')
+    security.declarePrivate('defaultSetAuthCookie')
     def defaultSetAuthCookie( self, resp, cookie_name, cookie_value ):
         resp.setCookie( cookie_name, cookie_value, path='/')
 
