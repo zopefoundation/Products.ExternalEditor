@@ -19,27 +19,10 @@ from Products.PluggableAuthService.tests.conformance \
 from Products.PluggableAuthService.tests.conformance \
     import IGroupsPlugin_conformance
 
-from Products.PluggableAuthService.tests.test_PluggableAuthService \
-    import FauxContainer
-
-class FauxPAS( FauxContainer ):
-
-    def __init__( self ):
-        self._id = 'acl_users'
-        
-    def searchPrincipals( self, **kw ):
-        id = kw.get( 'id' )
-        return [ { 'id': id } ]
+from Products.PluggableAuthService.plugins.tests.helpers \
+     import FauxPAS, FauxSmartPAS, DummyUser
 
 class DummyGroup:
-
-    def __init__( self, id ):
-        self._id = id
-
-    def getId( self ):
-        return self._id
-
-class DummyUser:
 
     def __init__( self, id ):
         self._id = id
@@ -119,10 +102,36 @@ class ZODBGroupManagerTests( unittest.TestCase
         zgm.addGroup( 'group' )
 
         user = DummyUser( 'userid' )
-        
+
         zgm.addPrincipalToGroup( user.getId(), 'group' )
         groups = zgm.getGroupsForPrincipal( user )
         self.assertEqual( groups, ( 'group', ) )
+
+    def test_addPrincipalToGroupThenRemovePrincipal( self ):
+
+        root = FauxSmartPAS()
+        root.user_ids['foo'] = 'foo'
+
+        zgm = self._makeOne( id='groups' ).__of__( root )
+
+        zgm.addGroup( 'group', 'group_title', 'group_desc' )
+        self.assertEqual( len( zgm.listAssignedPrincipals( 'group' ) ), 0 )
+
+        new = zgm.addPrincipalToGroup( 'foo', 'group' )
+
+        self.failUnless( new )
+
+        assigned = [x[1] for x in zgm.listAssignedPrincipals( 'group' )]
+
+        self.assertEqual( len( assigned ), 1 )
+        self.assertEqual( assigned[0], 'foo' )
+
+        del root.user_ids['foo']
+
+        assigned = [x[1] for x in zgm.listAssignedPrincipals( 'group' )]
+
+        self.assertEqual( len( assigned ), 1 )
+        self.assertEqual( assigned[0], '<foo: not found>' )
 
     def test_removePrincipalFromGroup( self ):
 
