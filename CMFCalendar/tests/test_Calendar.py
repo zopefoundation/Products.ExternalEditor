@@ -101,7 +101,13 @@ class TestCalendar(unittest.TestCase):
         self.assertEqual(self.Tool.getCalendarStates(), ('pending', 'published'))
 
     def test_Days(self):
-        assert self.Tool.getDays() == ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
+        import locale
+        old_locale = locale.getlocale(locale.LC_ALL)[0]
+        locale.setlocale(locale.LC_ALL, 'C')
+        try:
+            self.assertEqual(self.Tool.getDays(), ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'])
+        finally:
+            locale.setlocale(locale.LC_ALL, old_locale)
 
     def XXX_test_sessions(self):
 
