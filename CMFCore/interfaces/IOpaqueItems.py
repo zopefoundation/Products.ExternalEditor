@@ -49,6 +49,6 @@ class ICallableOpaqueItemEvents(Interface):
         """Before delete event hook.
         """
     
-    def manage_afterAdd(self, item, container):
+    def manage_afterAdd(item, container):
         """After add event hook.
         """
