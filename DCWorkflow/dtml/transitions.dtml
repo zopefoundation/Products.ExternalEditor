@@ -4,7 +4,7 @@
 <table border="0" cellspacing="0" cellpadding="2" width="100%">
 <dtml-in values sort=id>
  <tr bgcolor="#eeeeee">
-  <th align="left" colspan=2">
+  <th align="left" colspan="2">
    <input type="checkbox" name="ids:list" value="&dtml-id;" />
    <a href="&dtml.url_quote-id;/manage_properties">&dtml-id;</a>
    &nbsp;
