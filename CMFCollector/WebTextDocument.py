@@ -114,16 +114,8 @@ class WebTextDocument(Document):
             return Document.handleText(self, text, format=format,
                                        stx_level=stx_level or self._stx_level)
         else:
-            cooked = body = ''
-            parser = SimpleHTMLParser()
-            parser.feed(text)
-            headers = parser.metatags
-            if parser.title:
-                headers['Title'] = parser.title
-            bodyfound = bodyfinder(text)
-            if bodyfound:
-                body = bodyfound
-                cooked = util.format_webtext(bodyfound)
+            cooked = body = util.format_webtext(text)
+            headers = {}
             return headers, body, cooked, format
 
 InitializeClass(WebTextDocument)
