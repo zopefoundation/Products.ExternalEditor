@@ -6,7 +6,9 @@
 <table>
   <tr>
      <th valign="top" align="left">Skin selections</th>
-     <td>
+  </tr>
+  <tr>
+     <td colspan="2">
        <table border="1"><tr><td>
        <table>
          <tr>
@@ -22,7 +24,7 @@
            </td>
            <td>
              <input type="text" name="skinpath_&dtml-sequence-key;"
-              value="&dtml-sequence-item;" size="50">
+              value="&dtml-sequence-item;" size="70">
            </td>
          </tr>
          </dtml-in>
@@ -32,7 +34,7 @@
              <input type="text" name="skinname" value="" size="20">
            </td>
            <td>
-             <input type="text" name="skinpath" value="" size="50">
+             <input type="text" name="skinpath" value="" size="70">
            </td>
          </tr>
 
@@ -46,6 +48,9 @@
        </table>
        </td></tr></table>
      </td>
+  </tr>
+  <tr>
+   <td> <br /> </td>
   </tr>
   <tr>
      <th valign="top" align="left">Default skin</th>
