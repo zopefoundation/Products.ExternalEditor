@@ -156,18 +156,11 @@ class ActionsTool(UniqueObject, Folder, ActionProviderBase):
             provider = getattr(self, provider_name)
             if IActionProvider.isImplementedBy(provider):
                 actions.extend( provider.listActionInfos(object=object) )
-            else:
-                # for Action Providers written for CMF versions before 1.5
-                actions.extend( self._listActionInfos(provider, object) )
 
         # Include actions from object.
         if object is not None:
-            base = aq_base(object)
-            if IActionProvider.isImplementedBy(base):
+            if IActionProvider.isImplementedBy(object):
                 actions.extend( object.listActionInfos(object=object) )
-            elif hasattr(base, 'listActions'):
-                # for objects written for CMF versions before 1.5
-                actions.extend( self._listActionInfos(object, object) )
 
         # Reorganize the actions by category.
         filtered_actions={'user':[],
@@ -191,71 +184,5 @@ class ActionsTool(UniqueObject, Folder, ActionProviderBase):
     # listFilteredActions() is an alias.
     security.declarePublic('listFilteredActions')
     listFilteredActions = listFilteredActionsFor
-
-    #
-    #   Helper method for backwards compatibility
-    #
-    def _listActionInfos(self, provider, object):
-        """ for Action Providers written for CMF versions before 1.5
-        """
-        warn('ActionProvider interface not up to date. In CMF 1.6 '
-             'portal_actions will ignore listActions() of \'%s\'.'
-             % provider.getId(),
-             DeprecationWarning)
-        info = getOAI(self, object)
-        actions = provider.listActions(info)
-
-        action_infos = []
-        if actions and not isinstance(actions[0], dict):
-            ec = getExprContext(self, object)
-            for ai in actions:
-                if not ai.getVisibility():
-                    continue
-                permissions = ai.getPermissions()
-                if permissions:
-                    category = ai.getCategory()
-                    if (object is not None and
-                        (category.startswith('object') or
-                         category.startswith('workflow'))):
-                        context = object
-                    elif (info['folder'] is not None and
-                          category.startswith('folder')):
-                        context = info['folder']
-                    else:
-                        context = info['portal']
-                    for permission in permissions:
-                        allowed = _checkPermission(permission, context)
-                        if allowed:
-                            break
-                    if not allowed:
-                        continue
-                if not ai.testCondition(ec):
-                    continue
-                action_infos.append( ai.getAction(ec) )
-        else:
-            for i in actions:
-                if not i.get('visible', 1):
-                    continue
-                permissions = i.get('permissions', None)
-                if permissions:
-                    category = i['category']
-                    if (object is not None and
-                        (category.startswith('object') or
-                         category.startswith('workflow'))):
-                        context = object
-                    elif (info['folder'] is not None and
-                          category.startswith('folder')):
-                        context = info['folder']
-                    else:
-                        context = info['portal']
-
-                    for permission in permissions:
-                        allowed = _checkPermission(permission, context)
-                        if allowed:
-                            break
-                    if not allowed:
-                        continue
-                action_infos.append(i)
-        return action_infos
 
 InitializeClass(ActionsTool)
