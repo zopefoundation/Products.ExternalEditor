@@ -25,13 +25,21 @@
  <tr valign="top">
   <th align="right"> Title
   </th>
-  <td colspan="3">
+  <td colspan="2">
    <input type="text"
           name="title"
           value=""
      tal:attributes="value here/title"
-          size="65">
+          size="45">
   </td>
+  <td> Abbreviation:
+   <input type="text"
+          name="abbrev"
+          value=""
+      tal:attributes="value here/abbrev|nothing"
+          size="5">
+  </td>
+ </tr>
   
  <tr valign="top">
   <th align="right"> Description
@@ -41,6 +49,20 @@
              cols="50"
        tal:content="here/description">
    </textarea>
+  </td>
+ </tr>
+  
+ <tr valign="top">
+  <th align="right"> Collector Email
+  </th>
+  <td colspan="2"
+      tal:define="email python: getattr(here, 'email',
+                                        getattr(member, 'email', ''))">
+          <input type="text" name="email" size=30
+                 value="EMAIL"
+                 tal:attributes="value email">
+  </td>
+  <td> <font color="gray"> Administrative email address - Mandatory </font>
   </td>
  </tr>
   
