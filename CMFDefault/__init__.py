@@ -173,6 +173,7 @@ cmfdefault_globals=globals()
 
 # Make the skins available as DirectoryViews.
 registerDirectory('skins', globals())
+registerDirectory('help', globals())
 
 def initialize( context ):
 

@@ -1,0 +1,66 @@
+Site Manager Goals
+
+  * Provide an online collaboration environment for an organization
+    or community.
+
+    - "Create a CMF site",:reateCMFSite
+
+      Create a new CMF instance through the ZMI.  A single form. 
+
+    - "Configure CMF site":ConfigureCMFSite
+
+      Assume this means the properties associated with the CMF
+      Site instance.  Could also mean content_type_registry and
+      cookie_authentication. 
+
+  * Maintain an overall site structure and organization.
+
+    - "Create CMF Folder":CreateCMFFolder
+
+      A single form
+
+    - "Create CMF Topic":CreateCMFTopic
+
+      Almost complete
+
+    - "Configure CMF Topic":ConfigureCMFTopic
+
+      This should be brief description plus a pointer back to
+      "Create CMF Topic"
+
+    - "Configure what types of content can be created by
+       members":ConfigureAllowedContentTypes
+
+      Not sure where this is accomplished.  The only permissions
+      I see are Add portal content, events, folders, members,
+      topics.  But I don't see "Add portal document" or "Add
+      portal image".
+
+  * Implement security policies for the site.
+
+    - "Configure security for a content object
+       or folder":ConfigureObjectSecurity
+
+      This should be stolen from the Zope book.  The 3 pages is
+      based on the assumption that specific permissions should be
+      discussed for default content types.
+
+  * Implement workflow policies for the site.
+
+    - "Associate a workflow with a content
+       type":AssociateWorkflowWithContentType
+
+      portal_workflow, a single form
+
+  * Implement metadata policies for the site.
+
+    - "Configure required metadata for a content
+       type":ConfigureRequiredMetadata
+
+      portal_metadata, relatively complex form
+
+  * Implement syndication policies for the site.
+
+    - "Configure what content is released via
+       syndication":ConfigureContentSyndication
+

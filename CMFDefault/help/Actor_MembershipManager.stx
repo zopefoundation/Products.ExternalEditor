@@ -1,0 +1,32 @@
+Membership Manager Goals
+
+  * Empower many users to collaborate on content production
+
+    - "Add a new member to the site using a
+       standard user folder":AddMemberToUserFolder
+        
+        o Difference between user folder within CMF and outside the
+        CMF.
+
+        o Add a new user form
+
+        o Creating a user folder (for My Stuff)
+
+        o Membership roster
+
+  * Delegate responsibilities to site members
+
+    - "Change member information and abilities":ChangeMemberInformation
+
+      o Discussion of delegating responsbility through changing a
+        user's roles.  Example, permissioning a subfolder of the
+        site for management by one role and content creation by
+        another role.  Assigning those roles to users delegates
+        responsibility.
+
+  * Ensure that only appropriate users have access to the site
+
+    - "Browse member roster":BrowseMemberRoster
+
+    - "Remove a member from the site":RemoveMemberFromSite
+
