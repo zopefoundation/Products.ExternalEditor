@@ -1,6 +1,6 @@
 <html metal:define-macro="master">
  <head>
-  <title tal:define="ob_title here/Title; global portal_title container/title" tal:content="string:${portal_title}: ${ob_title}">The title</title>
+  <title tal:define="ob_title here/Title; portal_title here/title" tal:content="string:${portal_title}: ${ob_title}">The title</title>
   
 <link rel="stylesheet" href="zpt_stylesheet.css" type="text/css"
       tal:attributes="href here/zpt_stylesheet/absolute_url">
@@ -23,7 +23,7 @@
               </td>
 
               <td class="PortalTitle" width="43%" align="left" valign="middle" height="32"> 
-                <span tal:content="portal_title">Site 
+                <span tal:define="portal_title here/title" tal:content="string:${portal_title}">Site 
                 Title</span> </td>
 
               <td class="NavBar" align="right" valign="middle" width="50%" wrap="no" height="32" NOWRAP> 
@@ -54,7 +54,7 @@
          UserName
      </td>
 	 <td class="MemberActionsList" align="right">
-   <span tal:repeat="action user_actions"><a href="" tal:attributes="href action/url" tal:content="action/name">Action List</a> | </span>
+   <span tal:repeat="action user_actions"><a href="" tal:attributes="href action/url" tal:content="action/name">Login</a> | </span>
   </td>
   </tr>
   </table>
@@ -82,7 +82,7 @@
    <td class="Desktop" colspan="" width="84%" valign="top" tal:attributes="colspan python: not isAnon and '2' or '3'">
    <table cellpadding="5">
    <tr>
-   <td class="Desktop" width="100%" valign="top">
+   <td width="100%">
    <p tal:condition="request/portal_status_message|nothing" tal:content="request/portal_status_message" class="DesktopStatusBar"></p>
    <div metal:define-slot="main"/>
    </td>
@@ -93,3 +93,4 @@
   </table>
  </body>
 </html>
+

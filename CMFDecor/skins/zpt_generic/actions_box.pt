@@ -24,7 +24,7 @@
  </tr>
  <tr class=""
      tal:attributes="class AuthClass">
-  <td tal:define="review_state python:here.portal_workflow.getInfoFor(here, 'review_state', '')"> 
+  <td tal:define="review_state python:here.portal_workflow.getInfoFor(here, 'review_state', '')">
     <span tal:condition="review_state">Status:  <span tal:replace="review_state">Private</span><br></span>
     <span tal:repeat="action object_actions"><a href="" tal:attributes="href action/url" tal:content="action/name">Action</a><br></span>
   </td>
@@ -48,3 +48,4 @@
 </table>
 </div>
 </div>
+

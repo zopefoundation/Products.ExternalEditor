@@ -39,6 +39,7 @@ td {
     font-size: 100%;
     font-family:  Verdana, Helvetica, sans-serif;
     color:  #000000;
+    verticle-align: top;
 }
 
 h1 {
@@ -79,17 +80,18 @@ table {
     border: 0;
 }
 
-table.Masthead {
-    background-color: #336699;
+.Masthead {
+    background: #336699;
+    background-image: none;
 }
 
-tr.Masthead td.PortalLogo {
+.PortalLogo {
     background-color: #336699;
     text-align: left;
     vertical-align: middle;
 }
 
-table.Masthead tr.Masthead td.PortalTitle {
+.PortalTitle {
     text-align: left;
     color: #FFFFFF;
     vertical-align: middle;
@@ -99,11 +101,11 @@ table.Masthead tr.Masthead td.PortalTitle {
     margin-left: 1em;
 }
 
-table.Masthead tr.Navhead {
+.Navhead {
     background-color: #336699;
 }
 
-table.Masthead tr.Masthead td.NavBar {
+.NavBar {
     color: #FFFFFF;
     font-size: 100%;
     font-weight: normal;
@@ -111,28 +113,28 @@ table.Masthead tr.Masthead td.NavBar {
     vertical-align: middle;
 }
 
-table.Masthead tr.Masthead td.NavBar a:link {
+.NavBar a:link {
     font-size: 80%;
     font-weight: normal;
     color: #FFFFFF;
     text-decoration: none;
 }
 
-table.Masthead tr.Masthead td.NavBar a:visited {
+.NavBar a:visited {
     font-size: 80%;
     font-weight: normal;
     color: #FFFFFF;
     text-decoration: none;
 }
 
-table.Masthead tr.Masthead td.NavBar a:active {
+.NavBar a:active {
     font-size: 80%;
     font-weight: normal;
     color: #FFFFFF;
     text-decoration: none;
 }
 
-table.Masthead tr.Masthead td.NavBar a:hover {
+.NavBar a:hover {
     font-size: 80%;
     font-weight: normal;
     color: #5599CC;
@@ -231,14 +233,6 @@ table.ActionBox tr.MemberActions td a:hover{
 }
 
 .aTitle { font-family: Verdana, Helvetica, sans-serif; font-weight: bold; font-size: 25px; }
-
-td.Desktop {
-    vertical-align: top;
-}
-
-td.Desktop table tr {
-    vertical-align: top;
-}
 
 div.Description {
     font-size: 80%;
@@ -419,7 +413,7 @@ td.NewsListing {
     font-weight: bold;
 }
 
-td..NewsByLine {
+td.NewsByLine {
     background-color:  #CCCCCC;
     color:  #336699;
     font-size: 80%;
@@ -458,3 +452,4 @@ tr.NewsItemRow td {
 p.NewsHeadline {
     background-color:  #336699;
 }
+
