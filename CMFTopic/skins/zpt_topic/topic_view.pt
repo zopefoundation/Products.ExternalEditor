@@ -34,10 +34,8 @@
     <h4>Topic Matches: </h4>
     <div tal:repeat="match batch" tal:condition="batch">
         <a href=""
-            tal:attributes="href python:here.portal_catalog.getpath(match.data_record_id_)"
-            tal:content="match/Title">
-                Match Title
-            </a>
+            tal:attributes="href string:${match/getURL}/view"
+            tal:content="match/Title"> Match Title </a>
     </div>
 
 

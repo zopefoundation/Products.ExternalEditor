@@ -22,7 +22,7 @@
 <dtml-let results=queryCatalog>
 <h4>Topic matches: </h4>
 <dtml-in results size="20" start=qs>
-<dtml-let objURL="portal_catalog.getpath(data_record_id_)">
+<dtml-let objURL="getURL() + '/view'">
 <dtml-if next-sequence>
  <dtml-call "REQUEST.set('next-sequence',
                          _['next-sequence-start-number'])">
