@@ -289,7 +289,8 @@ class PortalGenerator:
         if wftool is None:
             return
         try:
-            from DCWorkflow.Default import createDefaultWorkflowClassic
+            from Products.DCWorkflow.Default \
+                    import createDefaultWorkflowClassic
         except ImportError:
             return
         id = 'default_workflow'
