@@ -114,6 +114,33 @@ class PortalFolderTests( unittest.TestCase ):
         assert not foo.after_add_called
         assert foo.before_delete_called
 
+    def test_catalogUnindexAndIndex( self ):
+        #
+        # Test is a new object does get cataloged upon _setObject
+        # and uncataloged upon manage_deleteObjects
+        #
+        self.root._setObject( 'test', PortalFolder( 'test', '' ) )
+        test = self.root.test
+
+        self.root._setObject( 'portal_types', TypesTool() )
+        types_tool = self.root.portal_types
+
+        self.root._setObject( 'portal_catalog', CatalogTool() )
+        catalog = self.root.portal_catalog
+        assert len( catalog ) == 0
+
+        test._setObject( 'foo', DummyContent( 'foo' , 1 ) )
+        foo = test.foo
+        assert foo.after_add_called
+        assert not foo.before_delete_called
+        assert len( catalog ) == 1
+
+        foo.reset()
+        test._delObject( 'foo' )
+        assert not foo.after_add_called
+        assert foo.before_delete_called
+        assert len( catalog ) == 0
+
     def test_tracker261( self ):
 
         #
