@@ -34,6 +34,7 @@ from webdav.LockItem import LockItem
 # Permission names
 LockObjects = 'WebDAV Lock items'
 UnlockObjects = 'WebDAV Unlock items'
+BreakLock = 'Manage portal'
 
 _wwwdir = os.path.join(os.path.dirname(__file__), 'www') 
 
@@ -96,6 +97,19 @@ class LockTool(UniqueObject, SimpleItemWithProperties):
         lockitem = LockItem(user)
         object.wl_setLock(lockitem.getLockToken(), lockitem)
 
+
+    security.declareProtected(UnlockObjects, 'breaklock')
+    def breaklock(self, object, message=''):
+        """emergency breaklock...."""
+        locker = self.locker(object)
+        if not _checkPermission(UnlockObjects, object):
+            raise LockingError, ("You cannot unlock %s:  lock is held by %s" % 
+                                 (pathOf(object), locker))
+        object.wl_clearLocks()
+        if self.auto_version:
+            vt = getToolByName(self, 'portal_versions', None)
+            if vt is not None:
+                vt.checkin(object, message)
 
     security.declareProtected(UnlockObjects, 'unlock')
     def unlock(self, object, message=''):
