@@ -130,10 +130,9 @@ class FSMetadata:
             f.close()
             props = {}
             for line in lines:
-                try: key, value = split(line, '=',1)
-                except: pass
-                else:
-                    props[strip(key)] = strip(value)
+                kv = line.split('=', 1)
+                if len(kv) == 2:
+                    props[kv[0].strip()] = kv[1].strip()
             return props
     
     def _old_readSecurity(self):
