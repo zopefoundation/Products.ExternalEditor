@@ -56,9 +56,10 @@
 
     <div metal:define-macro="issue_header"
          tal:define="global collector_issue_header_present python: 1;
-                     TITLELEN python: 40;
+                     TITLELEN python: 45;
                      crdate python: here.creation_date.aCommon();
                      DateTime nocall: modules/DateTime/DateTime;
+                     split nocall: modules/string/split;
                      moddate python:
                                 DateTime(here.ModificationDate()).aCommon();
                      datesdiff python: crdate != moddate;
@@ -85,15 +86,18 @@
 
          <tr>
            <td align="right"> Title: </td>
-           <td colspan="2">
+           <td colspan="3">
              <strong>
                <span tal:replace="python: here.title[:TITLELEN]
                                           + (here.title[TITLELEN+1:]
                                              and '...')">TITLE</span>
              </strong>
            </td>
-           <td tal:condition="here/security_related">
-                Security Related -
+         </tr>
+
+         <tr tal:condition="here/security_related">
+           <td align="right"> Security: </td>
+           <td colspan="3"> Security Related -
              <font color="BROWN or BLACK"
                    tal:attributes="color python: (here.confidential() and 'red'
                                                   or 'black')"
@@ -145,9 +149,15 @@
          <tr>
 
            <td align="right">Status:</td>
-           <td>
+           <td tal:define="base python: split(here.status(), '_')[0];
+                           paren here/confidential">
               <code>
-                <span tal:content="here/status">STATUS</span>
+                <span tal:replace="python: '%s%s%s'
+                                           % ((paren and '(') or '',
+                                              base,
+                                              (paren and ')') or '')">
+                  STATUS
+                </span>
               </code>
            </td>
 
