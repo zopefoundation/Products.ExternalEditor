@@ -264,10 +264,6 @@ class PortalGenerator:
             'custom, zpt_topic, zpt_content, zpt_generic,'
             + 'zpt_control, Images',
             make_default=1)
-        ps.addSkinSelection('Nouvelle',
-            'nouvelle, custom, topic, content, generic, control, Images')
-        ps.addSkinSelection('No CSS',
-            'no_css, custom, topic, content, generic, control, Images')
         p.setupCurrentSkin()
 
     def setupTypes(self, p, initial_types=factory_type_information):

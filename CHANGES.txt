@@ -9,6 +9,8 @@ HEAD only (unreleased)
 
   Bug Fixes
 
+    - CMFDefault and CMFTopic skins: Removed deprecated DTML skins and layers.
+
     - FSFile: Allow setting a content_type value using a .metadata file
       (http://www.zope.org/Collectors/CMF/281)
 
