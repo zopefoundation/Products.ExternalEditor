@@ -72,6 +72,7 @@ def collector_webtext_migration(self):
             transcript._edit('webtext', text)      # Cook the text.
             transcript._p_mtime = was_p_mtime
             transcript.creation_date = was_creation_date
+            transcript.meta_type = "Collector Issue Transcript"
     if total_changed:
         self.reinstate_catalog()
         return ("Converted %d of %d issues, and reinstated catalog"
