@@ -30,6 +30,9 @@ from CMFCorePermissions import ViewManagementScreens, View, FTPAccess
 from DirectoryView import registerFileExtension, registerMetaType, expandpath
 from FSObject import FSObject
 
+from OFS.Cache import Cacheable
+
+_marker = []
 
 class bad_func_code:
     co_varnames = ()
@@ -51,6 +54,7 @@ class FSPythonScript (FSObject, Script):
              'action':'ZScriptHTML_tryForm',
              'help': ('PythonScripts', 'PythonScript_test.stx')},
             )
+            + Cacheable.manage_options
         )
 
     # Use declarative security
@@ -103,6 +107,26 @@ class FSPythonScript (FSObject, Script):
 
         Calling a Python Script is an actual function invocation.
         """
+        # do caching
+        keyset = None
+        if self.ZCacheable_isCachingEnabled():
+            # Prepare a cache key.
+            keyset = kw.copy()
+            asgns = self.getBindingAssignments()
+            name_context = asgns.getAssignedName('name_context', None)
+            if name_context:
+                keyset[name_context] = self.aq_parent.getPhysicalPath()
+            name_subpath = asgns.getAssignedName('name_subpath', None)
+            if name_subpath:
+                keyset[name_subpath] = self._getTraverseSubpath()
+            # Note: perhaps we should cache based on name_ns also.
+            keyset['*'] = args
+            result = self.ZCacheable_get(keywords=keyset, default=_marker)
+            if result is not _marker:
+                # Got a cached value.
+                return result
+
+        
         # Prepare the function.
         f = self._v_f
         if f is None:
@@ -131,6 +155,9 @@ class FSPythonScript (FSObject, Script):
         security.addContext(self)
         try:
             result = apply(f, args, kw)
+            if keyset is not None:
+                # Store the result in the cache.
+                self.ZCacheable_set(result, keywords=keyset)           
             return result
         finally:
             security.removeContext(self)

@@ -28,12 +28,16 @@ from CMFCorePermissions import ViewManagementScreens
 from CMFCorePermissions import FTPAccess
 from DirectoryView import registerFileExtension, registerMetaType, expandpath
 from FSObject import FSObject
+
 try:
     # Zope 2.4.x
     from AccessControl.DTML import RestrictedDTML
 except ImportError:
     class RestrictedDTML: pass
 
+from OFS.Cache import Cacheable
+
+_marker = []  # Create a new marker object.
 
 class FSDTMLMethod(RestrictedDTML, FSObject, Globals.HTML):
     """FSDTMLMethods act like DTML methods but are not directly
@@ -47,7 +51,10 @@ class FSDTMLMethod(RestrictedDTML, FSObject, Globals.HTML):
             {'label':'View', 'action':'',
              'help':('OFSP','DTML-DocumentOrMethod_View.stx')},
             )
+            +Cacheable.manage_options
         )
+
+    _cache_namespace_keys=()
 
     # Use declarative security
     security = ClassSecurityInfo()
@@ -105,6 +112,12 @@ class FSDTMLMethod(RestrictedDTML, FSObject, Globals.HTML):
 
         self._updateFromFS()
 
+        if not self._cache_namespace_keys:
+            data = self.ZCacheable_get(default=_marker)
+            if data is not _marker:
+                # Return cached results.
+                return data
+
         kw['document_id']   =self.getId()
         kw['document_title']=self.title
 
@@ -117,10 +130,14 @@ class FSDTMLMethod(RestrictedDTML, FSObject, Globals.HTML):
                 r=apply(Globals.HTML.__call__, (self, client, REQUEST), kw)
                 if RESPONSE is None: result = r
                 else: result = decapitate(r, RESPONSE)
+                if not self._cache_namespace_keys:
+                    self.ZCacheable_set(result)
                 return result
 
             r=apply(Globals.HTML.__call__, (self, client, REQUEST), kw)
             if type(r) is not type('') or RESPONSE is None:
+                if not self._cache_namespace_keys:
+                    self.ZCacheable_set(result)
                 return r
 
         finally: security.removeContext(self)
@@ -133,7 +150,29 @@ class FSDTMLMethod(RestrictedDTML, FSObject, Globals.HTML):
                 c, e=guess_content_type(self.getId(), r)
             RESPONSE.setHeader('Content-Type', c)
         result = decapitate(r, RESPONSE)
+        if not self._cache_namespace_keys:
+            self.ZCacheable_set(result)
         return result
+
+    def getCacheNamespaceKeys(self):
+        '''
+        Returns the cacheNamespaceKeys.
+        '''
+        return self._cache_namespace_keys
+        
+    def setCacheNamespaceKeys(self, keys, REQUEST=None):
+        '''
+        Sets the list of names that should be looked up in the
+        namespace to provide a cache key.
+        '''
+        ks = []
+        for key in keys:
+            key = strip(str(key))
+            if key:
+                ks.append(key)
+        self._cache_namespace_keys = tuple(ks)
+        if REQUEST is not None:
+            return self.ZCacheable_manage(self, REQUEST)
 
     # Zope 2.3.x way:
     def validate(self, inst, parent, name, value, md=None):

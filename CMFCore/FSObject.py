@@ -28,7 +28,9 @@ from CMFCorePermissions import View
 from CMFCorePermissions import ViewManagementScreens
 from CMFCorePermissions import ManagePortal
 
-class FSObject(Acquisition.Implicit, Item):
+from OFS.Cache import Cacheable
+
+class FSObject(Acquisition.Implicit, Item, Cacheable):
     """FSObject is a base class for all filesystem based look-alikes.
     
     Subclasses of this class mimic ZODB based objects like Image and
@@ -52,6 +54,10 @@ class FSObject(Acquisition.Implicit, Item):
             self.__dict__.update(properties)
             if fullname and properties.get('keep_extension', 0):
                 id = fullname
+
+            cache = properties.get('cache')
+            if cache:
+                self.ZCacheable_setManagerId(cache)
 
         self.id = id
         self.__name__ = id # __name__ is used in traceback reporting
@@ -104,6 +110,8 @@ class FSObject(Acquisition.Implicit, Item):
             try:    mtime=stat(fp)[8]
             except: mtime=0
             if not parsed or mtime != self._file_mod_time:
+                # if we have to read the file again, remove the cache
+                self.ZCacheable_invalidate()
                 self._readFile(1)
                 self._file_mod_time = mtime
                 self._parsed = 1

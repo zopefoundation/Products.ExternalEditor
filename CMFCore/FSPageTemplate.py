@@ -37,6 +37,10 @@ from utils import getToolByName
 
 xml_detect_re = re.compile('^\s*<\?xml\s+')
 
+from OFS.Cache import Cacheable
+
+_marker = []  # Create a new marker object.
+
 class FSPageTemplate(FSObject, Script, PageTemplate):
     "Wrapper for Page Template"
      
@@ -47,7 +51,8 @@ class FSPageTemplate(FSObject, Script, PageTemplate):
             {'label':'Customize', 'action':'manage_main'},
             {'label':'Test', 'action':'ZScriptHTML_tryForm'},
             )
-        )
+            +Cacheable.manage_options
+        ) 
 
     security = ClassSecurityInfo()
     security.declareObjectProtected(View)
@@ -69,8 +74,8 @@ class FSPageTemplate(FSObject, Script, PageTemplate):
         obj.write(self.read())
         return obj
 
-    def ZCacheable_isCachingEnabled(self):
-        return 0
+#    def ZCacheable_isCachingEnabled(self):
+#        return 0
 
     def _readFile(self, reparse):
         fp = expandpath(self._filepath)
@@ -162,8 +167,49 @@ class FSPageTemplate(FSObject, Script, PageTemplate):
             response = None
         # Read file first to get a correct content_type default value.
         self._updateFromFS()
-        # call "inherited"
-        result = self._ZPT_exec( bound_names, args, kw )
+        
+        if not kw.has_key('args'):
+            kw['args'] = args
+        bound_names['options'] = kw
+
+        try:
+            response = self.REQUEST.RESPONSE
+            if not response.headers.has_key('content-type'):
+                response.setHeader('content-type', self.content_type)
+        except AttributeError:
+            pass
+            
+        security=getSecurityManager()
+        bound_names['user'] = security.getUser()
+
+        # Retrieve the value from the cache.
+        keyset = None
+        if self.ZCacheable_isCachingEnabled():
+            # Prepare a cache key.
+            keyset = {
+                      # Why oh why?
+                      # All this code is cut and paste
+                      # here to make sure that we 
+                      # dont call _getContext and hence can't cache
+                      # Annoying huh?
+                      'here': self.aq_parent.getPhysicalPath(),
+                      'bound_names': bound_names}
+            result = self.ZCacheable_get(keywords=keyset)
+            if result is not None:
+                # Got a cached value.
+                return result
+
+        # Execute the template in a new security context.
+        security.addContext(self)
+        try:
+            result = self.pt_render(extra_context=bound_names)
+            if keyset is not None:
+                # Store the result in the cache.
+                self.ZCacheable_set(result, keywords=keyset)
+            return result
+        finally:
+            security.removeContext(self)
+        
         return result
  
     # Copy over more methods

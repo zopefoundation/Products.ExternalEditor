@@ -421,6 +421,8 @@ class DirectoryViewSurrogate (Folder):
     all_meta_types = ()
     _isDirectoryView = 1
 
+#    _is_wrapperish = 1
+
     security = ClassSecurityInfo()
 
     def __init__(self, real, data, objects):
@@ -447,7 +449,7 @@ class DirectoryViewSurrogate (Folder):
         if REQUEST is not None:
             REQUEST['RESPONSE'].redirect( '%s/manage_propertiesForm'
                                         % self.absolute_url() )
-    
+
     security.declareProtected(AccessContentsInformation, 'getCustomizableObject')
     def getCustomizableObject(self):
         ob = aq_parent(aq_inner(self))

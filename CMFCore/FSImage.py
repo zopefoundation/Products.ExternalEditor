@@ -28,6 +28,8 @@ from CMFCorePermissions import ViewManagementScreens, View, FTPAccess
 from FSObject import FSObject
 from DirectoryView import registerFileExtension, registerMetaType, expandpath
 
+from OFS.Cache import Cacheable
+
 class FSImage(FSObject):
     """FSImages act like images but are not directly
     modifiable from the management interface."""
@@ -39,7 +41,7 @@ class FSImage(FSObject):
 
     manage_options=(
         {'label':'Customize', 'action':'manage_main'},
-        )
+        ) + Cacheable.manage_options
 
     security = ClassSecurityInfo()
     security.declareObjectProtected(View)
@@ -63,6 +65,7 @@ class FSImage(FSObject):
         finally:
             file.close()
         if reparse or self.content_type == 'unknown/unknown':
+            self.ZCacheable_invalidate()
             ct, width, height = getImageInfo( data )
             self.content_type = ct
             self.width = width
@@ -117,6 +120,7 @@ class FSImage(FSObject):
         RESPONSE.setHeader('Content-Type', self.content_type)
         RESPONSE.setHeader('Content-Length', len(data))
 
+        self.ZCacheable_set(None)
         return data
 
     security.declareProtected(View, 'getContentType')
