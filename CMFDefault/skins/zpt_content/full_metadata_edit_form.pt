@@ -13,7 +13,10 @@
 <div class="Metadata">
 
 <h2>Resource Metadata </h2>
-<form action="metadata_edit" method="post">
+
+<form action="metadata_edit" method="post"
+      tal:attributes="action string:${here/absolute_url}/metadata_edit"
+>
 <table class="FormLayout">
  <tr>
   <th>

@@ -28,7 +28,9 @@
                l_end python:b_last+b_size;
               ">
 
-  <form action="undo" method="POST">
+  <form action="undo" method="POST"
+        tal:attributes="action_xxx string:${here/absolute_url}/undo"
+  >
 
    <p> This application's transactional feature allows you to easily
        undo changes made to the application's settings or data. You can

@@ -9,7 +9,7 @@
 <div tal:define="pss modules/Products.PythonScripts.standard"
      tal:replace="structure python: pss.structured_text(request.form['text'])">Text Body</div>
 
-<form method="POST" action=""
+<form method="POST" action="talkback"
       tal:attributes="action python: here.absolute_url() + '/talkback'">
  <input type="hidden" name="title" value=""
       tal:attributes="value python: request.form['title']">

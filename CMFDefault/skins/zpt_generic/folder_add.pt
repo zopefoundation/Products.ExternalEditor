@@ -7,9 +7,11 @@
 <h1>Add Folder</h1>
 
 <p> A Folder contains other objects. Use Folders to organize your
-    web objects in to logical groups.</P>
+    web objects in to logical groups.</p>
 
-<form action="manage_addPortalFolder" method="POST">
+<form action="manage_addPortalFolder" method="POST"
+      tal:attributes="action string:${here/absolute_url}/manage_addPortalFolder"
+>
 <table class="FormLayout">
  <tr>
   <td>

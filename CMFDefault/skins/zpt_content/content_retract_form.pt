@@ -9,12 +9,15 @@
 
 
 <h1> Retract <span tal:replace="here/getId">Me</span> </h1>
+
 <p>Use this form to retract a content item by setting its 
    status to <b>Private</b>, thereby making it unavailable to
    other portal members and visitors.</p>
 
 
-<form method="post" action="content_status_modify">
+<form method="post" action="content_status_modify"
+      tal:attributes="action string:${here/absolute_url}/content_status_modify"
+>
   <input type="hidden" name="workflow_action" value="retract">
   <table class="FormLayout">
     <tr>

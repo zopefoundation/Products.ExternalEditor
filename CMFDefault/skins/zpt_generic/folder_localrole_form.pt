@@ -13,7 +13,9 @@
 
 <h2>Assign local roles: Search Members</h2>
 
-<form method="post" action="folder_localrole_form">
+<form method="post" action="folder_localrole_form"
+      tal:attributes="action string:${here/absolute_url}/folder_localrole_form"
+>
 
 <table class="FormLayout">
  <tr>
@@ -57,7 +59,9 @@
 
  <p>Select Member(s) and a role to assign:</p>
 
- <form method="post" action="folder_localrole_edit">
+ <form method="post" action="folder_localrole_edit"
+       tal:attributes="action string:${here/absolute_url}/folder_localrole_edit"
+ >
   <input type="hidden" name="change_type" value="add">
 
   <table class="FormLayout">
@@ -132,11 +136,13 @@
 
 <p>These users currently have local roles assigned in this folder:</p>
 
-<form method="post" action="folder_localrole_edit">
-<input type="hidden" name="change_type" value="delete">
-<input type="hidden" name="member_role" value="">
+<form method="post" action="folder_localrole_edit"
+      tal:attributes="action string:${here/absolute_url}/folder_localrole_edit"
+>
+ <input type="hidden" name="change_type" value="delete">
+ <input type="hidden" name="member_role" value="">
 
-<table class="FormLayout" tal:define="lroles here/get_local_roles">
+ <table class="FormLayout" tal:define="lroles here/get_local_roles">
  <tr>
    <td width="16"><br></td>
    <th style="text-align:left;">User</th>

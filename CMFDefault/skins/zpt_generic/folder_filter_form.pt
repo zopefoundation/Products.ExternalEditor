@@ -6,40 +6,54 @@
         " />
 </span>
 <span tal:condition="python:request.get('open_filter_form', 0)">
-    <span tal:define="
-        dummy1 python:request.RESPONSE.setCookie('show_filter_form', path='/', expires='Wed, 19 Feb 2020 14:28:00 GMT', value='1');
-        dummy2 python:request.set('show_filter_form', '1')
-        " />
+    <span tal:define="dummy1 python:request.RESPONSE.setCookie(
+                                      'show_filter_form',
+                                      path='/',
+                                      expires='Wed, 19 Feb 2020 14:28:00 GMT',
+                                      value='1');
+                      dummy2 python:request.set('show_filter_form', '1');
+                     " />
 </span>
 <form action="" method="POST"
-    tal:define="showfilter request/show_filter_form|nothing; hidefilter python:not showfilter; formaction python:here.absolute_url() + '/folder_contents'"
-    tal:attributes="action formaction"
-    >
+      tal:define="showfilter request/show_filter_form|nothing;
+                  hidefilter python:not showfilter;
+                 "
+      tal:attributes="action string:${here/absolute_url}/folder_contents"
+>
 <table class="FormLayout"
     tal:condition="showfilter"
-    tal:define="Type python:(); Subject python:'';filter python:here.decodeFolderFilter(request.get('folderfilter', ''))">
+    tal:define="filter python:here.decodeFolderFilter(
+                                        request.get('folderfilter', '') );
+                Type python:filter.get( 'Type', [] );
+                Subject python:filter.get( 'Subject', () );
+               ">
 <tr>
     <td colspan="2" align="left" valign="top">
-        Contents View Filter
+        Contents View Filter <em tal:content="filter">filter here</em>
     </td>
 </tr>
 <tr>
     <td align="left" valign="top" width="*">Subject:</td>
     <td align="left" valign="top">
-     <input type="text" name="filter_by_Subject:tokens"
-      value="" tal:attributes="value python:modules['string'].join(Subject, ' ')" />
+     <input type="text" name="filter_by_Subject:tokens" value=""
+            tal:attributes="value python:modules['string'].join(Subject, ' ');
+                           " />
     </td>
 </tr>
 <tr>
     <td align="left" valign="top" width="*">Content Type:</td>
     <td align="left" valign="top">
         <select name="filter_by_Type:list" multiple size="3"
-            tal:define="types python:here.portal_types.listContentTypes( container=container )">
-            <option value="&dtml-sequence-item;"
+            tal:define="types python:here.portal_types.listContentTypes()">
+                                        container=here )">
+            <option value="type"
                 tal:repeat="type types"
-                tal:attributes="value type"
-                >
-            <span tal:replace="type" /></option>
+                tal:attributes="value type;
+                                selected python:type in Type;
+                               "
+                tal:content="type"
+                > type </option>
+            <option tal:condition="nothing">Foo</option>
         </select>
     </td>
 </tr>

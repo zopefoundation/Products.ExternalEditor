@@ -2,78 +2,98 @@
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       metal:use-macro="here/main_template/macros/master">
 <body>
+
 <div metal:fill-slot="main">
-  <div tal:define="member python: here.portal_membership.getAuthenticatedMember()">
 
-  <div tal:condition="python: not(here.portal_membership.checkPermission( 'Set own properties'
-                                                                        , here))">
-    <span tal:define="red_str string: ${here/portal_url}/login_form?came_from=${here/absolute_url};
-                      redirect python: request.RESPONSE.redirect( red_str )"></span>
-  </div>
-<div class="Desktop">
+ <div tal:define="mtool here/portal_membership;
+                  member mtool/getAuthenticatedMember;
+                 ">
 
-<h1> Member Preferences </h1>
-<span tal:replace="request/msg"
-   tal:condition="request/msg|nothing"><hr></span>
-   
-<p><a href="password_form">Click here</a> to change your password.</p>
+  <div tal:condition="python: not( mtool.checkPermission( 'Set own properties'
+                                                        , here ) )">
+    <span tal:define="purl here/portal_url;
+                      aurl here/absolute_url;
+                      rurl string:${purl}/login_form?came_from=${aurl};
+                      response request/RESPONSE;
+                      redirect python:response.redirect( rurl )" />
 
-<form action="personalize" method="post">
- <table class="FormLayout">
-  <tr>
-   <th>Email address</th>
-   <td><input type="text" name="email" value=""
-              tal:attributes="value member/email|nothing">
-   </td>
-  </tr>
-  <tr>
-   <th valign="top">Listed status</th>
-   <td>
-     <input type="radio" name="listed" 
-	        tal:attributes="checked member/listed|nothing"
-            value="on" id="cb_listed" />
-     <label for="cb_listed">Listed</label>
+  </div><!-- not Set own properties -->
 
-     <dl class="FieldHelp">
-       <dd>You will show up on the public membership roster.</dd>
-     </dl>
+  <div class="Desktop">
 
-     <input type="radio" name="listed" 
-	        tal:attributes="checked python: hasattr(member,'listed') and not(member.getProperty( 'listed' ) )"
-            value="" id="cb_unlisted" />
-	<label for="cb_unlisted">Unlisted</label>
-     <dl class="FieldHelp">
-       <dd> You will <i>not</i> show up on the public membership roster.
-            Your Member folder will still be publicly accessible unless
-            you change its security settings.</dd>
-     </dl>
-   </td>
-  </tr>
-  <div tal:condition="here/portal_skins | nothing">
-   <tr>
-    <th>Skin</th>
-    <td>
-     <select name="portal_skin">
+   <h1> Member Preferences </h1>
+
+   <span tal:replace="request/msg"
+         tal:condition="request/msg|nothing" />
+      
+   <p><a href="password_form">Click here</a> to change your password.</p>
+
+   <form action="personalize" method="post"
+         tal:attributes="action string:${here/portal_url}/personalize"
+   >
+    <table class="FormLayout">
+
+     <tr>
+      <th>Email address</th>
+      <td><input type="text" name="email" value=""
+                 tal:attributes="value member/email|nothing">
+      </td>
+     </tr>
+
+     <tr>
+      <th valign="top">Listed status</th>
+      <td tal:define="listed member/listed|nothing">
+        <input type="radio" name="listed" 
+               tal:attributes="checked listed"
+               value="on" id="cb_listed" />
+        <label for="cb_listed">Listed</label>
+
+        <dl class="FieldHelp">
+          <dd>You will show up on the public membership roster.</dd>
+        </dl>
+
+        <input type="radio" name="listed" 
+               tal:attributes="checked python:( hasattr(member,'listed')
+                                  and not(member.getProperty( 'listed' ) ) )"
+               value="" id="cb_unlisted" />
+       <label for="cb_unlisted">Unlisted</label>
+        <dl class="FieldHelp">
+          <dd> You will <i>not</i> show up on the public membership roster.
+               Your Member folder will still be publicly accessible unless
+               you change its security settings.</dd>
+        </dl>
+      </td>
+     </tr>
+
+     <tr tal:condition="here/portal_skins|nothing">
+      <th>Skin</th>
+      <td tal:define="s_tool here/portal_skins;
+                      current request/portal_skin|nothing;
+                     ">
+       <select name="portal_skin">
         <option value=""
-		  tal:define="skins python: here.portal_skins.getSkinSelections()"
-		  tal:repeat="skin skins"
-		  tal:attributes="value skin; selected python: request.get('portal_skin', '') == skin"
-		  tal:content="skin">
-		</option>
-     </select>
-    </td>
-   </tr>
-  </div>
-  <tr>
-   <td></td>
-   <td><input type="submit" value=" Change "></td>
-  </tr>
- </table>
-</form>
+                tal:define="skins python:s_tool.getSkinSelections()"
+                tal:repeat="skin skins"
+                tal:attributes="value skin;
+                                selected python:current == skin"
+                tal:content="skin"> skin </option>
+       </select>
+      </td>
+     </tr>
 
-  </div>
-</div>
-</div>
+     <tr>
+      <td><br /></td>
+      <td><input type="submit" value=" Change "></td>
+     </tr>
+    </table>
+   </form>
+
+  </div><!-- class="Desktop" -->
+
+ </div><!-- tal:define="mtool" -->
+
+</div><!-- metal:fill-slot="main" -->
+
 </body>
 </html>
 

@@ -6,7 +6,9 @@
 <div class="Desktop">
 <h2>Edit: <span tal:replace="here/getId">My ID</span></h2>
  
-<form action="folder_edit" method="post">
+<form action="folder_edit" method="post"
+      tal:attributes="action string:${here/absolute_url}/folder_edit"
+>
 <table class="FormLayout">
  
  <tr valign="top">

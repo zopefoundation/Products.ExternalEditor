@@ -2,124 +2,167 @@
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       metal:use-macro="here/main_template/macros/master">
 <body>
-<div metal:fill-slot="main">	  
-<div class="Desktop" tal:define="global portal_syndication here/portal_syndication">
+
+<div metal:fill-slot="main">      
+
+<div class="Desktop"
+     tal:define="s_tool here/portal_syndication;
+                 s_site_allowed s_tool/isSiteSyndicationAllowed;
+                 s_here_allowed python:s_tool.isSyndicationAllowed(here);
+                 s_allowed python:s_site_allowed and s_here_allowed;
+                ">
+
 <h2>Default Syndication Properties</h2>
-    <div tal:condition="python: portal_syndication.isSiteSyndicationAllowed() and portal_syndication.isSyndicationAllowed(here)">
-        <form action="editSynProperties" method="post">
-        <table width="100%" border="0">
-        <tr>
-            <th colspan="2" valign="top" align="left">Channel Properties</th>
-        </tr>
-        <tr>
-            <td colspan="2">
-                <table width="90%" border="1">
-                    <tr>
-                        <td>
-                          <table>
-                             <tr>
-                               <td valign="top" height="30">Channel Title:  </td>
-                               <td valign="top" height="30" tal:content="here/Title">
-                                 Title
-                               </td>
-                            </tr>
-                            <tr>
-                              <td valign="top" height="30">Channel Description:  </td>
-                              <td valign="top" height="30" tal:content="here/Description">
-                                 Description
-                              </td>
-                            </tr>
-                          </table>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
-<table width="100%" border="0">
-  <tr>
-     <th valign="top" align="left">Sy Module Properties</th>
-  </tr>
-  <tr>
-     <td colspan="2">
-       <table width="90%" border="1"><tr><td>
-       <table>
+
+<div tal:condition="python:s_allowed">
+
+ <form action="editSynProperties" method="post"
+       tal:attributes="action string:${here/absolute_url}/editSynProperties"
+ >
+
+  <table width="100%" border="0">
+
+   <tr>
+    <th colspan="2" valign="top" align="left">Channel Properties</th>
+   </tr>
+
+   <tr>
+    <td colspan="2">
+
+     <table width="90%" border="1">
+      <tr>
+       <td>
+
+        <table>
          <tr>
-           <th align="left">Element</th>
-           <th align="left">Default Value</th>
+          <td valign="top" height="30">Channel Title:  </td>
+          <td valign="top" height="30"
+              tal:content="here/Title"> Title </td>
          </tr>
+
          <tr>
-           <td>
-             UpdatePeriod
-           </td>
-           <td>
-		<select name="updatePeriod">
-     <option value="hourly"
-		   tal:define="upd python: portal_syndication.getUpdatePeriod(here)"
-		   tal:repeat="item portal_syndication/buildUpdatePeriods"
-		   tal:attributes="value python: item[0]; selected python: item[0] == upd"
-		   tal:content="python: item[1]">Hourly
-      </option>
-    </select> 
-           </td>
+          <td valign="top" height="30">Channel Description:  </td>
+          <td valign="top" height="30"
+              tal:content="here/Description"> Description </td>
          </tr>
+
+        </table>
+
+       </td>
+      </tr>
+     </table>
+
+    </td>
+   </tr>
+
+  </table>
+
+  <table width="100%" border="0">
+
+   <tr>
+    <th valign="top" align="left">Sy Module Properties</th>
+   </tr>
+
+   <tr>
+    <td colspan="2">
+
+     <table width="90%" border="1">
+      <tr>
+       <td>
+
+        <table>
+
          <tr>
-           <td>
-             UpdateFrequency
-           </td>
-           <td>
-             <input type="text" name="updateFrequency" size="3" value=""
-			  tal:attributes="value python: portal_syndication.getUpdateFrequency(here)">
-           </td>
+          <th align="left">Element</th>
+          <th align="left">Default Value</th>
          </tr>
-		 <tr>
-           <td>
-             UpdateBase
-           </td>
-           <td>
-             <input type="text" name="updateBase:date" value="" size="25"
-			  tal:attributes="value python: portal_syndication.getUpdateBase(here)">
-           </td>
-         </tr>
-           <tr>
-           <td>
-             Max Syndicated Items
-           </td>
-           <td>
-             <input type="text" name="max_items" value=""  size="3"            
-			  tal:attributes="value python: portal_syndication.getMaxItems(here)">
-           </td>
-         </tr>
+
          <tr>
-           <td colspan="2">
-             <input type="submit" name="edit" value=" Save ">
+          <td> UpdatePeriod </td>
+          <td>
+           <select name="updatePeriod">
+            <option value="hourly"
+                    tal:define="upd python:s_tool.getUpdatePeriod(here)"
+                    tal:repeat="item s_tool/buildUpdatePeriods"
+                    tal:attributes="value python:item[0];
+                                    selected python:item[0] == upd"
+                    tal:content="python: item[1]">Hourly
+            </option>
+           </select> 
            </td>
          </tr>
 
-       </table>
-       </td></tr></table>
-     </td>
-  </tr>
-  <tr>
-   <td> <br /> </td>
-  </tr>
-</table>
-</form>
-<form action="disableSyndication" method="post">
-<input type="submit" value="Disable Syndication">
-<input type="hidden" name="isAllowed:int" value="0">
-      </form>
+         <tr>
+          <td> UpdateFrequency </td>
+          <td>
+           <input type="text" name="updateFrequency" size="3" value=""
+                  tal:attributes="value python:s_tool.getUpdateFrequency(here)"
+           >
+          </td>
+         </tr>
+
+         <tr>
+          <td> UpdateBase </td>
+          <td>
+           <input type="text" name="updateBase:date" value="" size="25"
+                  tal:attributes="value python:s_tool.getUpdateBase(here)">
+          </td>
+         </tr>
+
+         <tr>
+          <td> Max Syndicated Items </td>
+          <td>
+           <input type="text" name="max_items" value=""  size="3"            
+                  tal:attributes="value python:s_tool.getMaxItems(here)">
+          </td>
+         </tr>
+         <tr>
+          <td colspan="2"><input type="submit" name="edit" value=" Save "></td>
+         </tr>
+
+        </table>
+
+       </td>
+      </tr>
+     </table>
+
+    </td>
+   </tr>
+
+   <tr>
+    <td> <br /> </td>
+   </tr>
+
+  </table>
+ </form>
+
+ <form action="disableSyndication" method="post"
+       tal:attributes="action string:${here/absolute_url}/disableSyndication"
+ >
+  <input type="submit" value="Disable Syndication">
+  <input type="hidden" name="isAllowed:int" value="0">
+ </form>
+
+</div><!--  s_allowed -->
+
+<div tal:condition="python: s_site_allowed and not(s_here_allowed)">
+
+ <form action="enableSyndication" method="post"
+       tal:attributes="action string:${here/absolute_url}/enableSyndication"
+ >
+  <input type="hidden" name="isAllowed:int" value="1"> 
+  <input type="submit" value="Enable Syndication">
+  </form>
+
+</div><!-- s_site_allowed and not s_here_allowed -->
+
+<div tal:condition="python:not(s_allowed)">
+ <h4>Syndication is Disabled</h4>
 </div>
-<div tal:condition="python: here.portal_syndication.isSiteSyndicationAllowed() and not(here.portal_syndication.isSyndicationAllowed(here))">
-<form action="enableSyndication" method="post">
-<input type="hidden" name="isAllowed:int" value="1"> 
-<input type="submit" value="Enable Syndication">
-</form>
-</div>
-<div tal:condition="python: not(here.portal_syndication.isSiteSyndicationAllowed() and here.portal_syndication.isSyndicationAllowed(here))">
-<h4>Syndication is Disabled</h4>
-</div>
-</div>
-</div>
+
+</div><!-- class="Desktop -->
+
+</div><!-- metal:fill-slot="main" -->
+
 </body>
 </html>

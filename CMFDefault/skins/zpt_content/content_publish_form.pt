@@ -18,7 +18,9 @@
    <em>even if its status is <b>published</b></em>.</p>
 
 
-<form method="post" action="content_status_modify">
+<form method="post" action="content_status_modify"
+      tal:attributes="action string:${here/absolute_url}/content_status_modify"
+>
   <input type="hidden" name="workflow_action" value="publish">
   <table class="FormLayout">
     <tr>

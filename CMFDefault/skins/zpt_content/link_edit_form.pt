@@ -13,7 +13,9 @@
 
 <h2>Edit <span tal:replace="here/getId">My ID</span></h2>
 
-<form action="link_edit" method="post">
+<form action="link_edit" method="post"
+      tal:attributes="action string:${here/absolute_url}/link_edit"
+>
 <table class="FormLayout">
  <tr>
   <th>

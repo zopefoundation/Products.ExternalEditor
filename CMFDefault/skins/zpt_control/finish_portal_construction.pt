@@ -8,13 +8,17 @@
 
 <h3>Welcome to the CMF!</h3>
 
-<p>The first thing you should do is visit the
+<p> The first thing you should do is visit the
  <a href="http://cmf.zope.org"
-    tal:attributes="href python: here.portal_url() + '/reconfig_form'">basic configuration form</a>.<br />
- Then visit the <a href="http://cmf.zope.org"
- 				   tal:attributes="href python: here.portal_url() + '/manage'">management interface</a> and
- the <a href="http://cmf.zope.org"
-         tal:attributes="href python: here.portal_url()">home page</a>.
+    tal:attributes="href string:${here/portal_url}/reconfig_form"
+ >basic configuration form</a>.
+<br />
+ Then visit the
+  <a href="/manage"
+ 	 tal:attributes="href string:${here/portal_url}/manage"
+  >management interface</a> and the
+  <a href="/"
+     tal:attributes="href string:${here/portal_url}">home page</a>.
 </p>
 </div>
 </div>

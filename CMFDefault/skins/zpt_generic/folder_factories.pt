@@ -9,7 +9,9 @@
 </div>
 <div class="Desktop">
 <h1> Add Content </h1>
-<form action="invokeFactory" method="POST">
+<form action="invokeFactory" method="POST"
+      tal:attributes="action string:${here/absolute_url}/invokeFactory"
+>
 <table class="FormLayout">
 <tr>
 <td>

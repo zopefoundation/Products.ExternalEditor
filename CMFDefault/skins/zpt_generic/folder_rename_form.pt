@@ -3,47 +3,64 @@
       metal:use-macro="here/main_template/macros/master">
 <body>
 <div metal:fill-slot="main">
+
 <div class="Desktop">
+
 <h3> Rename Items </h3>
-<table class="FormLayout"
-       tal:condition="here/folder_rename_items">
-	   <form action="folder_rename" method="POST">
+
+<div tal:condition="here/folder_rename_items" >
+
+<form action="folder_rename" method="POST"
+      tal:attributes="action string:${here/absolute_url}/folder_rename"
+>
+
+ <table class="FormLayout">
+
   <tr tal:repeat="item here/folder_rename_items">
+ 
     <td align="left" valign="top" width="8%">
       <span tal:replace="structure item/iconHTML">Type Image</span>
     </td>
+   
     <td align="left" valign="top" width="20%" nowrap>
       <span tal:replace="item/getId">ID</span>
       <input type="hidden" name="ids:list" value=""
-	         tal:attributes="value item/getId">
+             tal:attributes="value item/getId">
     </td>
+
     <td align="left" valign="top" width="5%">
       <strong>to</strong>
     </td>
+
     <td align="left" valign="top">
       <input type="text" name="new_ids:list" value=""
-	         tal:attributes="value item/getId" size="20">
+             tal:attributes="value item/getId" size="20">
     </td>
   </tr>
 
   <tr>
-    <td colspan=4>
-      <input type="submit" value=" Ok ">
-    </td>
+    <td colspan="4"> <input type="submit" value=" Ok "> </td>
   </tr>
-  </form>
-</table>
 
+ </table>
 
+</form>
 
-<div tal:condition="python: not(here.folder_rename_items())">
-  <form action="folder_contents" method="GET">
+</div><!-- tal:condition="here/folder_rename_items" -->
+
+<div tal:condition="not: here/folder_rename_items">
+
+<form action="folder_contents" method="GET"
+      tal:attributes="action string:${here/absolute_url}/content_status_modify"
+>
   <p>You must select one or more items to rename.</p>
   <input type="submit" value=" Ok ">
-  </form>
+</form>
 </div>
-</div>
-</div>
+
+</div><!-- class="Desktop"-->
+
+</div><!-- metal:fill-slot="main" -->
+
 </body>
 </html>
-

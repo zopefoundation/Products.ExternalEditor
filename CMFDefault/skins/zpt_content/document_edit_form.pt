@@ -6,7 +6,9 @@
 <div class="Desktop">
 <h2>Edit <span tal:replace="here/getId">ID</span></h2>
 
-<form action="document_edit" method="post" enctype="multipart/form-data">
+<form action="document_edit" method="post" enctype="multipart/form-data"
+      tal:attributes="action string:${here/absolute_url}/document_edit"
+>
 
  <input type="hidden" name="SafetyBelt" value=""
         tal:attributes="value here/SafetyBelt">

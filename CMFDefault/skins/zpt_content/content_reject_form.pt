@@ -9,10 +9,14 @@
 
 
 <h1> Reject <span tal:replace="here/getId">Me</span> </h1>
+
 <p>Use this form to reject the publication of a content item and set its 
    status to <b>Private</b>, thereby making it unavailable to 
    other portal members and visitors.</p>
-<form method="post" action="content_status_modify">
+
+<form method="post" action="content_status_modify"
+      tal:attributes="action string:${here/absolute_url}/content_status_modify"
+>
 <input type="hidden" name="workflow_action" value="reject">
  <table class="FormLayout">
   <tr>

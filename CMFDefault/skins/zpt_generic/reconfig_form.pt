@@ -13,7 +13,8 @@
 <div tal:define="pprops here/portal_properties">
 
 <form action="" method="Post"
-      tal:attributes="action python:here.portal_url() + '/reconfig'">
+      tal:attributes="action string:${here/portal_url}/reconfig"
+>
  <table class="FormLayout">
   <tr>
    <th valign="top" align="left"> Portal 'From' name

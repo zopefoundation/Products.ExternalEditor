@@ -6,7 +6,9 @@
 <div class="Desktop">
 <h1 class="Desktop">Log in</h1>
 
-<form action="" method="post" tal:attributes="action python: here.portal_url() + '/logged_in'">
+<form action="" method="post"
+      tal:attributes="action python: here.portal_url() + '/logged_in'"
+>
 
 <!-- ****** Enable the automatic redirect ***** -->
 <span tal:condition="exists: request/came_from">
