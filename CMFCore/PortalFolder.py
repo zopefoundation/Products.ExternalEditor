@@ -18,7 +18,6 @@ $Id$
 import base64
 import marshal
 import re
-from sys import exc_info
 from warnings import warn
 
 from AccessControl import ClassSecurityInfo
@@ -26,18 +25,8 @@ from AccessControl import getSecurityManager
 from Acquisition import aq_parent, aq_inner, aq_base
 from Globals import DTMLFile
 from Globals import InitializeClass
-from OFS.Folder import Folder
+from OFS.OrderedFolder import OrderedFolder
 from OFS.ObjectManager import REPLACEABLE
-
-try:
-    from OFS.OrderSupport import OrderSupport
-    if not 'subset_ids' in \
-            OrderSupport.moveObjectsByDelta.im_func.func_code.co_varnames:
-        # for Zope versions before 2.7.1
-        from OrderSupport import OrderSupport
-except ImportError:
-    # for Zope versions before 2.7.0
-    from OrderSupport import OrderSupport
 
 from CMFCatalogAware import CMFCatalogAware
 from exceptions import AccessControl_Unauthorized
@@ -105,22 +94,20 @@ factory_type_information = (
 )
 
 
-class PortalFolder(DynamicType, CMFCatalogAware, OrderSupport, Folder):
+class PortalFolder(DynamicType, CMFCatalogAware, OrderedFolder):
     """
         Implements portal content management, but not UI details.
     """
     meta_type = 'Portal Folder'
     portal_type = 'Folder'
 
-    __implements__ = (DynamicType.__implements__, OrderSupport.__implements__,
-                      Folder.__implements__)
+    __implements__ = (DynamicType.__implements__, OrderedFolder.__implements__)
 
     security = ClassSecurityInfo()
 
     description = ''
 
-    manage_options = ( OrderSupport.manage_options +
-                       Folder.manage_options[1:] +
+    manage_options = ( OrderedFolder.manage_options +
                        CMFCatalogAware.manage_options )
 
     def __init__( self, id, title='' ):
@@ -409,11 +396,6 @@ class PortalFolder(DynamicType, CMFCatalogAware, OrderSupport, Folder):
             self._checkId(id)
         except BadRequest:
             return 0
-        except:
-            # for Zope versions before 2.7.0
-            if exc_info()[0] == 'Bad Request':
-                return 0
-            raise  # Some other exception.
         else:
             return 1
 
