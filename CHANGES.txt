@@ -6,8 +6,7 @@ HEAD only (unreleased)
 
   Bug Fixes
 
-    - FSFile, FSImage: Made available to caching policy manager as
-      standard content. (http://zope.org/Collectors/CMF/299)
+    - 
 
   Others
 
