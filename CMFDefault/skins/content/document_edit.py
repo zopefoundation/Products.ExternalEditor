@@ -2,6 +2,8 @@
 ##parameters=text_format, text, file='', SafetyBelt='', choice=' Change '
 ##title=Edit a document
 try:
+    from Products.CMFDefault.utils import scrubHTML
+    text = scrubHTML( text ) # Strip Javascript, etc.
     context.edit( text_format
                 , text
                 , file
@@ -20,8 +22,8 @@ try:
                                                 ) )
 except Exception, msg:
     target_action = context.getTypeInfo().getActionById( 'edit' )
-    context.REQUEST.RESPONSE.redirect('%s/%s?portal_status_message=%s' % (
-                                                                       context.absolute_url()
-                                                                     , target_action
-                                                                     , msg
-                                                                     ))
+    context.REQUEST.RESPONSE.redirect(
+        '%s/%s?portal_status_message=%s' % ( context.absolute_url()
+                                           , target_action
+                                           , msg
+                                           ) )

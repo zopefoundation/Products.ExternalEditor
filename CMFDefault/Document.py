@@ -23,7 +23,7 @@ from Products.CMFCore.PortalContent import PortalContent
 from Products.CMFCore.PortalContent import NoWL, ResourceLockedError
 from Products.CMFCore import CMFCorePermissions
 from Products.CMFCore.WorkflowCore import WorkflowAction
-from Products.CMFCore.utils import _format_stx, keywordsplitter
+from Products.CMFCore.utils import format_stx, keywordsplitter
 from DublinCore import DefaultDublinCoreImpl
 from utils import parseHeadersBody, formatRFC822Headers
 from utils import SimpleHTMLParser, bodyfinder, _dtmldir
@@ -147,7 +147,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
             self.text = text
             self.cooked_text = html_quote(text).replace('\n','<br>')
         else:
-            self.cooked_text = _format_stx(text=text, level=level)
+            self.cooked_text = format_stx(text=text, level=level)
             self.text = text
 
     security.declareProtected( CMFCorePermissions.ModifyPortalContent, 'edit' )
@@ -302,7 +302,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
             or (stx_level == self._stx_level)):
             return self.cooked_text
         else:
-            cooked = _format_stx(self.text, stx_level)
+            cooked = format_stx(self.text, stx_level)
             if setlevel:
                 self._stx_level = stx_level
                 self.cooked_text = cooked

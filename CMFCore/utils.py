@@ -48,6 +48,28 @@ from StructuredText.HTMLWithImages import HTMLWithImages
 
 _STXDWI = StructuredText.DocumentWithImages.__class__
 
+security = ModuleSecurityInfo( 'Products.CMFCore.utils' )
+
+security.declarePublic( 'getToolByName'
+                      , 'cookString'
+                      , 'tuplize'
+                      , 'format_stx'
+                      , 'keywordsplitter'
+                      , 'normalize'
+                      , 'expandpath'
+                      , 'minimalpath'
+                      )
+
+security.declarePrivate( '_getAuthenticatedUser'
+                       , '_checkPermission'
+                       , '_verifyActionPermissions'
+                       , '_getViewFor'
+                       , '_limitGrantedRoles'
+                       , '_mergedLocalRoles'
+                       , '_modifyPermissionMappings'
+                       , '_ac_inherited_permissions'
+                       )
+
 _dtmldir = os_path.join( package_home( globals() ), 'dtml' )
 
 
@@ -146,7 +168,7 @@ def _getViewFor(obj, view='view'):
 
 # If Zope ever provides a call to getRolesInContext() through
 # the SecurityManager API, the method below needs to be updated.
-def limitGrantedRoles(roles, context, special_roles=()):
+def _limitGrantedRoles(roles, context, special_roles=()):
     # Only allow a user to grant roles already possessed by that user,
     # with the exception that all special_roles can also be granted.
     user = _getAuthenticatedUser(context)
@@ -161,7 +183,9 @@ def limitGrantedRoles(roles, context, special_roles=()):
         if role not in special_roles and role not in user_roles:
             raise 'Unauthorized', 'Too many roles specified.'
 
-def mergedLocalRoles(object):
+limitGrantedRoles = _limitGrantedRoles  # XXX: Deprecated spelling
+
+def _mergedLocalRoles(object):
     """Returns a merging of object and its ancestors'
     __ac_local_roles__."""
     # Modified from AccessControl.User.getRolesInContext().
@@ -187,7 +211,9 @@ def mergedLocalRoles(object):
         break
     return merged
 
-def ac_inherited_permissions(ob, all=0):
+mergedLocalRoles = _mergedLocalRoles    # XXX: Deprecated spelling
+
+def _ac_inherited_permissions(ob, all=0):
     # Get all permissions not defined in ourself that are inherited
     # This will be a sequence of tuples with a name as the first item and
     # an empty tuple as the second.
@@ -205,14 +231,14 @@ def ac_inherited_permissions(ob, all=0):
        r = list(perms) + r
     return r
 
-def modifyPermissionMappings(ob, map):
+def _modifyPermissionMappings(ob, map):
     """
     Modifies multiple role to permission mappings.
     """
     # This mimics what AccessControl/Role.py does.
     # Needless to say, it's crude. :-(
     something_changed = 0
-    perm_info = ac_inherited_permissions(ob, 1)
+    perm_info = _ac_inherited_permissions(ob, 1)
     for name, settings in map.items():
         cur_roles = rolesForPermissionOn(name, ob)
         t = type(cur_roles)
@@ -553,7 +579,7 @@ class CMFHtmlWithImages( HTMLWithImages ):
 
 CMFHtmlWithImages = CMFHtmlWithImages()
             
-def _format_stx( text, level=1 ):
+def format_stx( text, level=1 ):
     """
         Render STX to HTML.
     """
@@ -564,6 +590,8 @@ def _format_stx( text, level=1 ):
     doc = CMFDocumentClass( st )
     html = CMFHtmlWithImages( doc, level )
     return html
+
+_format_stx = format_stx    # XXX: Deprecated spelling
 
 #
 #   Metadata Keyword splitter utilities

@@ -11,10 +11,10 @@
 # 
 ##############################################################################
 
-"""Basic portal catalog.
+""" Basic portal catalog.
+
 $Id$
 """
-__version__='$Revision$'[11:-2]
 
 
 import os
@@ -27,7 +27,7 @@ from DateTime import DateTime
 from string import join
 from AccessControl.PermissionRole import rolesForPermissionOn
 from AccessControl import ClassSecurityInfo
-from utils import mergedLocalRoles
+from utils import _mergedLocalRoles
 from ActionProviderBase import ActionProviderBase
 from ActionInformation import ActionInformation
 from Expression import Expression
@@ -57,7 +57,7 @@ class IndexableObjectWrapper:
         allowed = {}
         for r in rolesForPermissionOn('View', ob):
             allowed[r] = 1
-        localroles = mergedLocalRoles(ob)
+        localroles = _mergedLocalRoles(ob)
         for user, roles in localroles.items():
             for role in roles:
                 if allowed.has_key(role):

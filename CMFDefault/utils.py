@@ -6,6 +6,27 @@ import re
 import os
 
 from Globals import package_home
+from AccessControl import ModuleSecurityInfo
+
+security = ModuleSecurityInfo( 'Products.CMFDefault.utils' )
+
+security.declarePublic( 'formatRFC822Headers'
+                      , 'parseHeadersBody'
+                      , 'semi_split'
+                      , 'comma_split'
+                      , 'seq_strip'
+                      , 'tuplize'
+                      , 'scrubHTML'
+                      , 'isHTMLSafe'
+                      , 'bodyfinder'
+                      , 'html_headcheck'
+                      )
+
+security.declarePrivate( '_dtmldir'
+                       , '_bodyre'
+                       , '_endbodyre'
+                       , '_htfinder'
+                       )
 
 _dtmldir = os.path.join( package_home( globals() ), 'dtml' )
 
@@ -362,13 +383,13 @@ def bodyfinder( text ):
     else:
         return text[bod.end():end.start()]
 
-htfinder = re.compile( r'<html', re.DOTALL | re.I )
+_htfinder = re.compile( r'<html', re.DOTALL | re.I )
 
 def html_headcheck( html ):
 
     """ Return 'true' if document looks HTML-ish enough.
     """
-    if not htfinder.search(html):
+    if not _htfinder.search(html):
         return 0
 
     lines = re.split(r'[\n\r]+?', html)

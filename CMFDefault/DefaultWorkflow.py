@@ -10,19 +10,20 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-'''
-A simple submit/review/publish workflow.
+''' A simple submit/review/publish workflow.
+
 $Id$
 '''
-__version__='$Revision$'[11:-2]
 
 import sys
 import Globals
 from Acquisition import aq_base, aq_inner, aq_parent
 from AccessControl import ClassSecurityInfo
 from DateTime import DateTime
-from Products.CMFCore.utils import modifyPermissionMappings, _checkPermission
-from Products.CMFCore.utils import getToolByName, SimpleItemWithProperties
+from Products.CMFCore.utils import _modifyPermissionMappings
+from Products.CMFCore.utils import _checkPermission
+from Products.CMFCore.utils import getToolByName
+from Products.CMFCore.utils import SimpleItemWithProperties
 from Products.CMFCore.WorkflowCore import WorkflowException
 from Products.CMFCore.WorkflowTool import addWorkflowClass
 
@@ -301,12 +302,13 @@ class DefaultWorkflowDefinition (SimpleItemWithProperties):
 
         # Modify role to permission mappings directly.
 
-        return modifyPermissionMappings(ob,
-            {'View': {'Anonymous': anon_view,
-                      'Reviewer': reviewer_view,
-                      'Owner': 1,
-                      },
-             'Modify portal content': {'Owner': owner_modify}})
+        new_map = { 'View': { 'Anonymous': anon_view
+                            , 'Reviewer': reviewer_view
+                            , 'Owner': 1
+                            }
+                  , 'Modify portal content': {'Owner': owner_modify}
+                  }
+        return _modifyPermissionMappings(ob, new_map)
 
 Globals.InitializeClass(DefaultWorkflowDefinition)
 

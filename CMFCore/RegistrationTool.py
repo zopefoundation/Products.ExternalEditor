@@ -11,28 +11,36 @@
 # 
 ##############################################################################
 
-"""Basic user registration tool.
+""" Basic user registration tool.
+
 $Id$
 """
-__version__='$Revision$'[11:-2]
 
-
-from utils import UniqueObject
-from utils import _checkPermission, _getAuthenticatedUser, limitGrantedRoles
-from utils import getToolByName, _dtmldir
+from Globals import InitializeClass
+from Globals import DTMLFile
 from OFS.SimpleItem import SimpleItem
-from Globals import InitializeClass, DTMLFile
 from AccessControl import ClassSecurityInfo
-from CMFCorePermissions import AddPortalMember, MailForgottenPassword, \
-     SetOwnPassword, SetOwnProperties
-import CMFCorePermissions
-import string, random
+
 from ActionProviderBase import ActionProviderBase
 
+from CMFCorePermissions import AddPortalMember
+from CMFCorePermissions import MailForgottenPassword
+from CMFCorePermissions import SetOwnPassword
+from CMFCorePermissions import SetOwnProperties
+from CMFCorePermissions import ManagePortal
 
-class RegistrationTool (UniqueObject, SimpleItem, ActionProviderBase):
-    # This tool creates and modifies users by making calls
-    # to portal_membership.
+from utils import UniqueObject
+from utils import _checkPermission
+from utils import _getAuthenticatedUser
+from utils import _limitGrantedRoles
+from utils import getToolByName
+from utils import _dtmldir
+
+
+class RegistrationTool(UniqueObject, SimpleItem, ActionProviderBase):
+
+    """ Create and modify users by making calls to portal_membership.
+    """
     id = 'portal_registration'
     meta_type = 'CMF Registration Tool'
 
@@ -46,7 +54,7 @@ class RegistrationTool (UniqueObject, SimpleItem, ActionProviderBase):
     #
     #   ZMI methods
     #
-    security.declareProtected( CMFCorePermissions.ManagePortal
+    security.declareProtected( ManagePortal
                              , 'manage_overview' )
     manage_overview = DTMLFile( 'explainRegistrationTool', _dtmldir )
 
@@ -83,6 +91,7 @@ class RegistrationTool (UniqueObject, SimpleItem, ActionProviderBase):
         '''Generates a password which is guaranteed to comply
         with the password policy.
         '''
+        import string, random
         chars = string.lowercase[:26] + string.uppercase[:26] + string.digits
         result = []
         for n in range(6):
@@ -115,7 +124,7 @@ class RegistrationTool (UniqueObject, SimpleItem, ActionProviderBase):
 
         # Limit the granted roles.
         # Anyone is always allowed to grant the 'Member' role.
-        limitGrantedRoles(roles, self, ('Member',))
+        _limitGrantedRoles(roles, self, ('Member',))
 
         membership = getToolByName(self, 'portal_membership')
         membership.addMember(id, password, roles, domains, properties)

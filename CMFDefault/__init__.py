@@ -14,6 +14,14 @@
 """
 
 ADD_CONTENT_PERMISSION = 'Add portal content'
+
+from AccessControl import ModuleSecurityInfo
+
+prod_security = ModuleSecurityInfo( 'Products' )
+prod_security.declarePublic( 'CMFDefault' )
+
+security = ModuleSecurityInfo( 'Products.CMFDefault' )
+security.declarePublic( 'utils' )
  
 import Portal
 import Document, Link, NewsItem, File, Image, Favorite, SkinnedFolder
