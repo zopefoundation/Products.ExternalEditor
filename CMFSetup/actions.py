@@ -200,8 +200,6 @@ class ActionProvidersConfigurator( Implicit ):
         parser = _ActionProviderParser( encoding )
         parseString( text, parser )
 
-        actions_tool = getToolByName( self._site, 'portal_actions' )
-
         for provider_id in parser._provider_ids:
 
             p_info = { 'id' : provider_id, 'actions' : [] }

@@ -13,6 +13,8 @@ CMFSetup Product README
     The 'portal_setup' tool knows how to export / import configurations
     and scripts for the following tools:
 
+      - ( ) removal / creation of specified tools
+
       - (x) itself :)
 
       - (x) the role / permission map on the site object
@@ -36,13 +38,11 @@ CMFSetup Product README
 
             o content type definitions, including actions
 
-      - ( ) 'portal_workflow'
+      - (x) 'portal_workflow'
 
             o bindings of workflows to content types
 
             o DCWorkflow definitions, including supporting scripts
-
-      - ( ) removal / creation of specified tools
 
       - ( ) 'portal_catalogs'
             (Products.CMFCore.CatalogTool.CatalogTool)
