@@ -1,5 +1,16 @@
 1.1 beta
 
+ - Added SeatBelts to documents.
+
+ - CMF Document now uses StructuredTextNG for structured text
+   handling.  Nicely enough, it uses the "with images" features, and
+   also enables named and inner links.
+
+ - CMF Document exposes two new accessor methods for getting at the
+   "cooked" and editable body, 'CookedBody()', and 'EditableBody()'.
+   Using the 'cooked_text' and 'text' instance attributes should be
+   considered deprecated.
+
  - Make sure that we update the catalog after editing metadata
    (thanks to robert@rocad.ch for pointing this out).
 
