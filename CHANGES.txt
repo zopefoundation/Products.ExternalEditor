@@ -1,6 +1,8 @@
 External Editor Change Log
 
-  0.8 Release
+  11/7/03 - 0.7.1 Release (affects win32 binary only)
+
+    - Fix encoding bug in windows binary. Thanks to Chris McDonough.
   
     - Added tip for configuring IE to save files over SSL. Thanks to
       Jonah Bossewitch.

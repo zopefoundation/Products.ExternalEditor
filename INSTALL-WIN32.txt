@@ -120,7 +120,9 @@ Zope External Editor Installation
       
     - If you are using IE connecting to Zope over SSL (HTTPS), and you receive
       errors that the file could not be opened or downloaded, or you receive
-      errors from External Editor that the file was not found. Have a look
-      at the following MS support article::
-      
-        http://support.microsoft.com/default.aspx?scid=kb;en-us;302109
+      errors from External Editor that the file was not found try the following:
+
+      - Go to Tools->Internet Options and click on the advanced tab
+
+      - Under security (near the bottom) uncheck "Do not save encrypted files 
+        to disk"
