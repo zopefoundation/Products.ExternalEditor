@@ -18,6 +18,14 @@
 
 <div metal:fill-slot="main">
 
+<div tal:condition="not: collector_header_present|nothing">
+  <span tal:condition="nothing"> If master has no macro "header"... </span>
+  <div metal:use-macro="here/collector_macros/macros/collector_header">
+    COLLECTOR HEADER
+  </div>
+
+</div>
+
 <!-- This is the desktop area -->
 <div class="Desktop"
      tal:define="Batch python:modules['ZTUtils'].Batch;

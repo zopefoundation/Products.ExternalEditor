@@ -19,6 +19,13 @@
 
 <div metal:fill-slot="main">
 
+  <div tal:condition="not: collector_issue_header_present|nothing">
+    <span tal:condition="nothing"> When master has no macro "header"... </span>
+    <div metal:use-macro="here/collector_macros/macros/issue_header">
+      ISSUE HEADER
+    </div>
+  </div>
+
   <div metal:define-macro="transcript">
 
     <table tal:define="transcript here/get_transcript">
