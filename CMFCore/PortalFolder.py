@@ -25,6 +25,15 @@ from Globals import DTMLFile
 from Globals import InitializeClass
 from OFS.Folder import Folder
 from OFS.ObjectManager import REPLACEABLE
+try:
+    from OFS.OrderSupport import OrderSupport
+    if not 'subset_ids' in \
+            OrderSupport.moveObjectsByDelta.im_func.func_code.co_varnames:
+        # for Zope versions before 2.7.1
+        from OrderSupport import OrderSupport
+except ImportError:
+    # for Zope versions before 2.7.0
+    from OrderSupport import OrderSupport
 from Acquisition import aq_parent, aq_inner, aq_base
 
 from CMFCatalogAware import CMFCatalogAware
@@ -92,21 +101,23 @@ factory_type_information = (
 )
 
 
-class PortalFolder(DynamicType, CMFCatalogAware, Folder):
+class PortalFolder(DynamicType, CMFCatalogAware, OrderSupport, Folder):
     """
         Implements portal content management, but not UI details.
     """
     meta_type = 'Portal Folder'
     portal_type = 'Folder'
 
-    __implements__ = (DynamicType.__implements__, Folder.__implements__)
+    __implements__ = (DynamicType.__implements__, OrderSupport.__implements__,
+                      Folder.__implements__)
 
     security = ClassSecurityInfo()
 
     description = ''
 
-    manage_options = Folder.manage_options + \
-                     CMFCatalogAware.manage_options
+    manage_options = ( OrderSupport.manage_options +
+                       Folder.manage_options[1:] +
+                       CMFCatalogAware.manage_options )
 
     def __init__( self, id, title='' ):
         self.id = id
