@@ -161,13 +161,13 @@ class DiscussionTool (UniqueObject, SimpleItem, ActionProviderBase):
         # Return actions for reply and show replies
         if object is not None or info is None:
             info = getOAI(self, object)
-        content = info.content
+        content = info.object
         if content is None or not self.isDiscussionAllowedFor(content):
             return ()
 
         discussion = self.getDiscussionFor(content)
         if discussion.aq_base == content.aq_base:
-            discussion_url = info.content_url
+            discussion_url = info.object_url
         else:
             discussion_url = discussion.absolute_url()
 

@@ -511,11 +511,13 @@ class oai:
         else:
             self.folder_url = self.portal_url
             self.folder = portal
-        self.content = object
+
+        # The name "content" is deprecated and will go away in CMF 1.7!
+        self.object = self.content = object
         if object is not None:
-            self.content_url = object.absolute_url()
+            self.content_url = self.object_url = object.absolute_url()
         else:
-            self.content_url = None
+            self.content_url = self.object_url = None
 
     def __getitem__(self, name):
         # Mapping interface for easy string formatting.
@@ -524,3 +526,4 @@ class oai:
         if hasattr(self, name):
             return getattr(self, name)
         raise KeyError, name
+

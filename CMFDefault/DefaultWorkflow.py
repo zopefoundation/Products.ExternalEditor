@@ -84,7 +84,7 @@ class DefaultWorkflowDefinition (SimpleItemWithProperties):
         Allows this workflow to
         include actions to be displayed in the actions box.
         Called only when this workflow is applicable to
-        info.content.
+        info.object.
         Returns the actions to be displayed to the user.
         '''
         if info.isAnonymous:
@@ -93,8 +93,8 @@ class DefaultWorkflowDefinition (SimpleItemWithProperties):
         # The following operation is quite expensive.
         # We don't need to perform it if the user
         # doesn't have the required permission.
-        content = info.content
-        content_url = info.content_url
+        content = info.object
+        content_url = info.object_url
         content_creator = content.Creator()
         pm = getToolByName(self, 'portal_membership')
         current_user = pm.getAuthenticatedMember().getId()

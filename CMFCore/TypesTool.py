@@ -874,7 +874,7 @@ class TypesTool(UniqueObject, IFAwareObjectManager, Folder,
         actions = list( self._actions )
 
         if object is None and info is not None:
-            object = info.content
+            object = info.object
         if object is not None:
             type_info = self.getTypeInfo(object)
             if type_info is not None:

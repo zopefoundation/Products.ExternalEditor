@@ -181,10 +181,10 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
         Allows this workflow to
         include actions to be displayed in the actions box.
         Called only when this workflow is applicable to
-        info.content.
+        info.object.
         Returns the actions to be displayed to the user.
         '''
-        ob = info.content
+        ob = info.object
         sdef = self._getWorkflowStateOf(ob)
         if sdef is None:
             return None

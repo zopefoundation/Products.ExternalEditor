@@ -40,8 +40,9 @@ class ActionProviderBase:
 
     _actions_form = DTMLFile( 'editToolsActions', _dtmldir )
 
-    manage_options = ( { 'label' : 'Actions'
+    manage_options = ( { 'label'  : 'Actions'
                        , 'action' : 'manage_editActionsForm'
+                       , 'help'   : ('CMFCore', 'Actions.stx')
                        }
                      ,
                      )

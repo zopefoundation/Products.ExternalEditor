@@ -48,7 +48,10 @@ def createCPContext( content, view_method, keywords, time=None ):
     if time is None:
         time = DateTime()
 
+    # The name "content" is deprecated and will go away in CMF 1.7,
+    # please use "object" in your policy
     data = { 'content'  : content
+           , 'object'   : content
            , 'view'     : view_method
            , 'keywords' : keywords
            , 'request'  : getattr( content, 'REQUEST', {} )
@@ -68,8 +71,8 @@ class CachingPolicy:
           - class membership is defined by 'predicate', a TALES expression
             with access to the following top-level names:
 
-            'content' -- the content object itself
-
+            'object' -- the object itself
+            
             'view' -- the name of the view method
 
             'keywords' -- keywords passed to the request
@@ -82,10 +85,12 @@ class CachingPolicy:
 
             'nothing' -- None
 
+            'time' -- A DateTime object for the current date and time
+
           - The "Last-modified" HTTP response header will be set using
             'mtime_func', which is another TALES expression evaluated
             against the same namespace.  If not specified explicitly,
-            uses 'content/modified'.
+            uses 'object/modified'.
 
           - The "Expires" HTTP response header and the "max-age" token of
             the "Cache-control" header will be set using 'max_age_secs',
@@ -130,7 +135,7 @@ class CachingPolicy:
             predicate = 'python:1'
 
         if not mtime_func:
-            mtime_func = 'content/modified'
+            mtime_func = 'object/modified'
 
         if max_age_secs is not None:
             max_age_secs = int( max_age_secs )
@@ -265,8 +270,9 @@ class CachingPolicyManager( SimpleItem ):
     #
     #   ZMI
     #
-    manage_options = ( ( { 'label' : 'Policies'
+    manage_options = ( ( { 'label'  : 'Policies'
                          , 'action' : 'manage_cachingPolicies'
+                         , 'help'   : ('CMFCore', 'CPMPolicies.stx')
                          }
                        ,
                        )
@@ -292,7 +298,7 @@ class CachingPolicyManager( SimpleItem ):
     def addPolicy( self
                  , policy_id
                  , predicate        # TALES expr (def. 'python:1')
-                 , mtime_func       # TALES expr (def. 'content/modified')
+                 , mtime_func       # TALES expr (def. 'object/modified')
                  , max_age_secs     # integer, seconds (def. 0)
                  , no_cache         # boolean (def. 0)
                  , no_store         # boolean (def. 0)
@@ -325,7 +331,7 @@ class CachingPolicyManager( SimpleItem ):
     def updatePolicy( self
                     , policy_id
                     , predicate         # TALES expr (def. 'python:1')
-                    , mtime_func        # TALES expr (def. 'content/modified')
+                    , mtime_func        # TALES expr (def. 'object/modified')
                     , max_age_secs      # integer, seconds
                     , no_cache          # boolean (def. 0)
                     , no_store          # boolean (def. 0)

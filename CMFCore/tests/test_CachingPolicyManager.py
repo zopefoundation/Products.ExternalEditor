@@ -62,7 +62,7 @@ class CachingPolicyTests(TestCase):
     def test_typePredicate( self ):
 
         policy = self._makePolicy( 'typePredicate'
-                           , predicate='python:content.Type() == "Dummy"' )
+                           , predicate='python:object.Type() == "Dummy"' )
         context = self._makeContext()
         headers = policy.getHeaders( context )
 
@@ -73,7 +73,7 @@ class CachingPolicyTests(TestCase):
     def test_typePredicateMiss( self ):
 
         policy = self._makePolicy( 'typePredicate'
-                        , predicate='python:content.Type() == "Foolish"' )
+                        , predicate='python:object.Type() == "Foolish"' )
         context = self._makeContext()
         headers = policy.getHeaders( context )
 

@@ -146,9 +146,6 @@ def initialize(context):
     utils.registerIcon(FSZSQLMethod.FSZSQLMethod,
                        'images/fssqlmethod.gif', globals())
 
-    context.registerHelpTitle('CMF Core Help')
-    context.registerHelp(directory='interfaces')
-
     utils.ToolInit( 'CMF Core Tool'
                   , tools=tools
                   , product_name='CMFCore'
@@ -162,3 +159,16 @@ def initialize(context):
                            PortalFolder.manage_addPortalFolder, )
                      , fti=PortalFolder.factory_type_information
                      ).initialize( context )
+
+    # make registerHelp work with 2 directories
+    help = context.getProductHelp()
+    lastRegistered = help.lastRegistered
+    context.registerHelp(directory='help', clear=1)
+    context.registerHelp(directory='interfaces', clear=1)
+    if help.lastRegistered != lastRegistered:
+        help.lastRegistered = None
+        context.registerHelp(directory='help', clear=1)
+        help.lastRegistered = None
+        context.registerHelp(directory='interfaces', clear=0)
+    context.registerHelpTitle('CMF Core Help')
+

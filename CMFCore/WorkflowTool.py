@@ -246,7 +246,7 @@ class WorkflowTool(UniqueObject, Folder, ActionProviderBase):
         """
         if object is not None or info is None:
             info = getOAI(self, object)
-        chain = self.getChainFor(info.content)
+        chain = self.getChainFor(info.object)
         did = {}
         actions = []
 
