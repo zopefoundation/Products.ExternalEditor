@@ -148,13 +148,6 @@ class WorkflowToolConfigurator( Implicit ):
 
         return workflow_info
 
-    security.declareProtected( ManagePortal, 'generateToolXML' )
-    def generateToolXML( self ):
-
-        """ Pseudo API.
-        """
-        return self._toolConfig()
-
     security.declareProtected( ManagePortal, 'listWorkflowInfo' )
     def listWorkflowInfo( self ):
 
@@ -189,6 +182,20 @@ class WorkflowToolConfigurator( Implicit ):
 
         return result
 
+    security.declareProtected( ManagePortal, 'generateToolXML' )
+    def generateToolXML( self ):
+
+        """ Pseudo API.
+        """
+        return self._toolConfig()
+
+    security.declareProtected( ManagePortal, 'generateWorkflowXML' )
+    def generateWorkflowXML( self, workflow_id ):
+
+        """ Pseudo API.
+        """
+        return self._workflowConfig( workflow_id=workflow_id )
+
     #
     #   Helper methods
     #
@@ -197,6 +204,12 @@ class WorkflowToolConfigurator( Implicit ):
                                   , _xmldir
                                   , __name__='toolConfig'
                                   )
+
+    security.declarePrivate( '_workflowConfig' )
+    _workflowConfig = PageTemplateFile( 'wtcWorkflowExport.xml'
+                                      , _xmldir
+                                      , __name__='workflowConfig'
+                                      )
 
     security.declarePrivate( '_extractDCWorkflowInfo' )
     def _extractDCWorkflowInfo( self, workflow, workflow_info ):
@@ -290,9 +303,9 @@ class WorkflowToolConfigurator( Implicit ):
                    , 'update_always'        : bool( v.update_always )
                    , 'default_value'        : v.default_value
                    , 'default_expr'         : v.getDefaultExprText()
-                   , 'guard_permissions'    : guard.getPermissionsText()
-                   , 'guard_roles'          : guard.getRolesText()
-                   , 'guard_groups'         : guard.getGroupsText()
+                   , 'guard_permissions'    : guard.permissions
+                   , 'guard_roles'          : guard.roles
+                   , 'guard_groups'         : guard.groups
                    , 'guard_expr'           : guard.getExprText()
                    }
 
@@ -337,11 +350,20 @@ class WorkflowToolConfigurator( Implicit ):
 
         for k, v in workflow.states.objectItems():
 
+            groups = v.group_roles and list( v.group_roles.items() ) or []
+            groups = [ x for x in groups if x[1] ]
+            groups.sort()
+
+            variables = list( v.getVariableValues() )
+            variables.sort()
+
             info = { 'id'           : k
                    , 'title'        : v.title
                    , 'description'  : v.description
                    , 'transitions'  : v.transitions
                    , 'permissions'  : self._extractStatePermissions( v )
+                   , 'groups'       : groups
+                   , 'variables'    : variables
                    }
 
             result.append( info )
@@ -444,9 +466,9 @@ class WorkflowToolConfigurator( Implicit ):
                    , 'actbox_url'           : v.actbox_url
                    , 'actbox_category'      : v.actbox_category
                    , 'variables'            : v.getVariableExprs()
-                   , 'guard_permissions'    : guard.getPermissionsText()
-                   , 'guard_roles'          : guard.getRolesText()
-                   , 'guard_groups'         : guard.getGroupsText()
+                   , 'guard_permissions'    : guard.permissions
+                   , 'guard_roles'          : guard.roles
+                   , 'guard_groups'         : guard.groups
                    , 'guard_expr'           : guard.getExprText()
                    }
 
@@ -504,9 +526,9 @@ class WorkflowToolConfigurator( Implicit ):
                    , 'actbox_name'          : v.actbox_name
                    , 'actbox_url'           : v.actbox_url
                    , 'actbox_category'      : v.actbox_category
-                   , 'guard_permissions'    : guard.getPermissionsText()
-                   , 'guard_roles'          : guard.getRolesText()
-                   , 'guard_groups'         : guard.getGroupsText()
+                   , 'guard_permissions'    : guard.permissions
+                   , 'guard_roles'          : guard.roles
+                   , 'guard_groups'         : guard.groups
                    , 'guard_expr'           : guard.getExprText()
                    }
 

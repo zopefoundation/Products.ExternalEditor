@@ -11,7 +11,6 @@
                         title workflow/title;
                         state_variable workflow/state_variable;
                         initial_state workflow/initial_state">
-                       ">
  <permission
         tal:repeat="permission workflow/permissions"
         tal:content="permission">PERMISSION</permission>
@@ -20,9 +19,6 @@
         for_catalog="True"
         for_status="True"
         update_always="True" 
-        default_value=""
-        default_expression=""
-        guard_roles="Request review; Review portal content" 
         tal:repeat="variable workflow/variable_info"
         tal:attributes="variable_id variable/id;
                         for_catalog variable/for_catalog;
@@ -56,9 +52,6 @@
  </variable>
  <worklist
         worklist_id="reviewer_queue"
-        action_name="Pending (%(count)d)"
-        action_url="%(portal_url)s/search?review_state=pending"
-        action_category="global" 
         tal:repeat="worklist workflow/worklist_info"
         tal:attributes="worklist_id worklist/id">
   <span
@@ -105,8 +98,7 @@
         tal:replace="state/description">DESCRIPTION</span>
   <permission
         name=""
-        acquired="1"
-        roles=""
+        acquired="True"
         tal:repeat="perm state/permissions"
         tal:attributes="name perm/name;
                         acquired perm/acquired;
@@ -123,8 +115,8 @@
   <assignment
         name="VAR_NAME"
         tal:repeat="var state/variables"
-        tal:attributes="name python:var[0]"
-        tal:content="python:var[1]">VALUE</assignment>
+        tal:attributes="name python: var[0]"
+        tal:content="python: var[1]">VALUE</assignment>
  </state>
  <transition
         transition_id="Publish"
@@ -138,7 +130,7 @@
                         title transition/title;
                         new_state transition/new_state_id;
                         trigger transition/trigger_type;
-                        before_script transition/before_script_name;
+                        before_script transition/script_name;
                         after_script transition/after_script_name;
                        ">
   <span
@@ -169,6 +161,6 @@
         name="VAR_NAME"
         tal:repeat="var transition/variables"
         tal:attributes="name python:var[0]"
-        tal:content="python:var[1];">EXPRESSION</assignment>
+        tal:content="python:var[1]">EXPRESSION</assignment>
  </transition>
 </dc-workflow>

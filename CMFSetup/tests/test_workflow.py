@@ -45,16 +45,26 @@ class _GuardChecker:
 
     def _assertGuard( self, info, permissions, roles, groups, expr ):
 
-        self.assertEqual( info[ 'guard_permissions' ]
-                        , '; '.join( permissions ) )
+        self.assertEqual( len( info[ 'guard_permissions' ] )
+                        , len( permissions ) )
 
-        self.assertEqual( info[ 'guard_roles' ]
-                        , '; '.join( roles ) )
+        for expected in permissions:
+            self.failUnless( expected in info[ 'guard_permissions' ] )
 
-        self.assertEqual( info[ 'guard_groups' ]
-                        , '; '.join( groups ) )
+        self.assertEqual( len( info[ 'guard_roles' ] )
+                        , len( roles ) )
+
+        for expected in roles:
+            self.failUnless( expected in info[ 'guard_roles' ] )
+
+        self.assertEqual( len( info[ 'guard_groups' ] )
+                        , len( groups ) )
+
+        for expected in groups:
+            self.failUnless( expected in info[ 'guard_groups' ] )
 
         self.assertEqual( info[ 'guard_expr' ], expr )
+
 
 class _WorkflowSetup( BaseRegistryTests ):
 
@@ -94,6 +104,8 @@ class _WorkflowSetup( BaseRegistryTests ):
 
     def _initStates( self, dcworkflow ):
         
+        dcworkflow.groups = _WF_GROUPS
+
         for k, v in _WF_STATES.items():
 
             dcworkflow.states.addState( k )
@@ -323,6 +335,18 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
 
                 for ep_role in ep_roles:
                     self.failUnless( ep_role in fp[ 'roles' ] )
+
+            groups = info[ 'groups' ]
+            self.assertEqual( len( groups ), len( expected[ 4 ] ) )
+
+            for i in range( len( groups ) ):
+                self.assertEqual( groups[ i ], expected[ 4 ][ i ] )
+
+            variables = info[ 'variables' ]
+            self.assertEqual( len( variables ), len( expected[ 5 ] ) )
+
+            for var_id, expr in variables:
+                self.assertEqual( expr, expected[ 5 ][ var_id ] )
 
     def test_getWorkflowInfo_dcworkflow_transitions( self ):
 
@@ -576,8 +600,6 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
 
     def test_generateToolXML_mixed( self ):
 
-        site = self._initSite()
-
         WF_ID_NON = 'non_dcworkflow'
         WF_TITLE_NON = 'Non-DCWorkflow'
         WF_ID_DC = 'dcworkflow'
@@ -597,6 +619,48 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
 
         self._compareDOM( configurator.generateToolXML(), _NORMAL_TOOL_EXPORT )
 
+    def test_generateWorkflowXML_empty( self ):
+
+        WF_ID = 'empty'
+        WF_TITLE = 'Empty DCWorkflow'
+        WF_INITIAL_STATE = 'initial'
+
+        site = self._initSite()
+        dcworkflow = self._initDCWorkflow( WF_ID )
+        dcworkflow.title = WF_TITLE
+        dcworkflow.initial_state = WF_INITIAL_STATE
+
+        configurator = self._makeOne( site ).__of__( site )
+
+        self._compareDOM( configurator.generateWorkflowXML( WF_ID )
+                        , _EMPTY_WORKFLOW_EXPORT % ( WF_ID
+                                                   , WF_TITLE
+                                                   , WF_INITIAL_STATE
+                                                   ) )
+
+    def test_generateWorkflowXML_normal( self ):
+
+        WF_ID = 'normal'
+        WF_TITLE = 'Empty DCWorkflow'
+        WF_INITIAL_STATE = 'closed'
+
+        site = self._initSite()
+        dcworkflow = self._initDCWorkflow( WF_ID )
+        dcworkflow.title = WF_TITLE
+        dcworkflow.initial_state = WF_INITIAL_STATE
+        dcworkflow.permissions = _WF_PERMISSIONS
+        self._initVariables( dcworkflow )
+        self._initStates( dcworkflow )
+        self._initTransitions( dcworkflow )
+        self._initWorklists( dcworkflow )
+
+        configurator = self._makeOne( site ).__of__( site )
+
+        self._compareDOM( configurator.generateWorkflowXML( WF_ID )
+                        , _NORMAL_WORKFLOW_EXPORT % ( WF_ID
+                                                    , WF_TITLE
+                                                    , WF_INITIAL_STATE
+                                                    ) )
 
 
 _WF_PERMISSIONS = \
@@ -604,6 +668,11 @@ _WF_PERMISSIONS = \
 , 'Modify content'
 , 'Query history'
 , 'Restore expired content'
+)
+
+_WF_GROUPS = \
+( 'Content_owners'
+, 'Content_assassins'
 )
 
 _WF_VARIABLES = \
@@ -655,7 +724,7 @@ _WF_STATES = \
              , ( 'close', 'kill', 'expire' )
              , { 'Modify content':  [ 'Owner', 'Manager' ] }
              , [ ( 'Content_owners', ( 'Owner', ) ) ]
-             , { 'is_opened':  True, 'is_closed':  True }
+             , { 'is_opened':  True, 'is_closed':  False }
              )
 , 'killed':  ( 'Killed'
              , 'Permanently unavailable'
@@ -716,7 +785,7 @@ _WF_TRANSITIONS = \
              , { 'killed_by' : 'string:${user/getId}' }
              , ()
              , ()
-             , ( 'Content assassins', )
+             , ( 'Content_assassins', )
              , ""
              )
 , 'expire':  ( 'Expire'
@@ -854,6 +923,221 @@ _NORMAL_TOOL_EXPORT = """\
   </default>
  </bindings>
 </workflow-tool>
+"""
+
+_EMPTY_WORKFLOW_EXPORT = """\
+<?xml version="1.0"?>
+<dc-workflow
+    workflow_id="%s"
+    type="DCWorkflow"
+    title="%s"
+    state_variable="state" 
+    initial_state="%s">
+</dc-workflow>
+"""
+
+_NORMAL_WORKFLOW_EXPORT = """\
+<?xml version="1.0"?>
+<dc-workflow
+    workflow_id="%s"
+    type="DCWorkflow"
+    title="%s"
+    state_variable="state" 
+    initial_state="%s">
+ <permission>Open content for modifications</permission>
+ <permission>Modify content</permission>
+ <permission>Query history</permission>
+ <permission>Restore expired content</permission>
+ <variable
+    variable_id="killed_by"
+    for_catalog="True"
+    for_status="False"
+    update_always="True">
+   Killed by
+   <default>
+    <value>n/a</value>
+   </default>
+   <guard>
+    <role>Hangman</role>
+    <role>Sherrif</role>
+   </guard>
+ </variable>
+ <variable
+    variable_id="when_expired"
+    for_catalog="True"
+    for_status="False"
+    update_always="True">
+   Expired when
+   <default>
+    <expression>nothing</expression>
+   </default>
+   <guard>
+    <permission>Query history</permission>
+    <permission>Open content for modifications</permission>
+   </guard>
+ </variable>
+ <variable
+    variable_id="when_opened"
+    for_catalog="True"
+    for_status="False"
+    update_always="True">
+   Opened when
+   <default>
+    <expression>python:None</expression>
+   </default>
+   <guard>
+    <permission>Query history</permission>
+    <permission>Open content for modifications</permission>
+   </guard>
+ </variable>
+ <worklist
+    worklist_id="alive_list">
+  Worklist for content not yet expired / killed
+  <action
+    category="workflow"
+    url="string:${portal_url}/expired_items">Expired items</action>
+  <guard>
+   <permission>Restore expired content</permission>
+  </guard>
+  <match name="state" values="open; closed"/>
+ </worklist>
+ <worklist
+    worklist_id="expired_list">
+  Worklist for expired content
+  <action
+    category="workflow"
+    url="string:${portal_url}/expired_items">Expired items</action>
+  <guard>
+   <permission>Restore expired content</permission>
+  </guard>
+  <match name="state" values="expired"/>
+ </worklist>
+ <state
+    state_id="expired"
+    title="Expired">
+  Expiration date has passed
+  <permission
+    acquired="True"
+    name="Modify content">
+   <role>Owner</role>
+   <role>Manager</role>
+  </permission>
+  <exit-transition
+    transition_id="open"/>
+  <assignment
+    name="is_closed">False</assignment>
+  <assignment
+    name="is_opened">False</assignment>
+ </state>
+ <state
+    state_id="opened"
+    title="Opened">
+  Open for modifications
+  <permission
+    acquired="True"
+    name="Modify content">
+   <role>Owner</role>
+   <role>Manager</role>
+  </permission>
+  <exit-transition
+    transition_id="close"/>
+  <exit-transition
+    transition_id="kill"/>
+  <exit-transition
+    transition_id="expire"/>
+  <assignment
+    name="is_closed">False</assignment>
+  <assignment
+    name="is_opened">True</assignment>
+ </state>
+ <state
+    state_id="closed"
+    title="Closed">
+  Closed for modifications
+  <permission
+    acquired="False"
+    name="Modify content">
+  </permission>
+  <exit-transition
+    transition_id="open"/>
+  <exit-transition
+    transition_id="kill"/>
+  <exit-transition
+    transition_id="expire"/>
+  <assignment
+    name="is_closed">True</assignment>
+  <assignment
+    name="is_opened">False</assignment>
+ </state>
+ <state
+    state_id="killed"
+    title="Killed">
+  Permanently unavailable
+ </state>
+ <transition
+    transition_id="close"
+    title="Close"
+    trigger="USER"
+    new_state="closed"
+    before_script=""
+    after_script="after_close">
+  Close the object for modifications
+  <action
+    category="workflow"
+    url="string:${object_url}/close_for_modifications">Close</action>
+  <guard>
+   <role>Owner</role>
+   <role>Manager</role>
+  </guard>
+ </transition>
+ <transition
+    transition_id="expire"
+    title="Expire"
+    trigger="AUTOMATIC"
+    new_state="expired"
+    before_script=""
+    after_script="">
+  Retire objects whose expiration is past.
+  <guard>
+   <expression>python: object.expiration() &lt;= object.ZopeTime()</expression>
+  </guard>
+  <assignment
+    name="when_expired">object/ZopeTime</assignment>
+ </transition>
+ <transition
+    transition_id="open"
+    title="Open"
+    trigger="USER"
+    new_state="opened"
+    before_script="before_open"
+    after_script="">
+  Open the object for modifications
+  <action
+    category="workflow"
+    url="string:${object_url}/open_for_modifications">Open</action>
+  <guard>
+   <permission>Open content for modifications</permission>
+  </guard>
+  <assignment name="when_opened">object/ZopeTime</assignment>
+ </transition>
+ <transition
+    transition_id="kill"
+    title="Kill"
+    trigger="USER"
+    new_state="killed"
+    before_script=""
+    after_script="after_kill">
+  Make the object permanently unavailable.
+  <action
+    category="workflow"
+    url="string:${object_url}/kill_object">Kill</action>
+  <guard>
+   <group>Content_assassins</group>
+  </guard>
+  <assignment
+    name="killed_by">string:${user/getId}</assignment>
+ </transition>
+</dc-workflow>
 """
 
 

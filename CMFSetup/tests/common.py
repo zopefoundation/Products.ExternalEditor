@@ -12,6 +12,12 @@ class DOMComparator:
 
     def _compareDOM( self, found_text, expected_text, debug=False ):
 
+        found_lines = [ x.strip() for x in found_text.splitlines() ]
+        found_text = '\n'.join( filter( None, found_lines ) )
+
+        expected_lines = [ x.strip() for x in expected_text.splitlines() ]
+        expected_text = '\n'.join( filter( None, expected_lines ) )
+
         from xml.dom.minidom import parseString
         found = parseString( found_text )
         expected = parseString( expected_text )
