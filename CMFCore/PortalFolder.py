@@ -144,24 +144,6 @@ class PortalFolder( Folder, DynamicType ):
         self.id = id
         self.title = title
 
-    def all_meta_types( self ):
-        names = {}
-        types = []
-
-##        for cmt in self.content_meta_types:
-##            names[ cmt[ 'name' ] ] = 1
-##            types.append( cmt )
-
-        superTypes = PortalFolder.inheritedAttribute(
-            'all_meta_types' )( self )
-
-        for smt in superTypes:
-            if not names.has_key( smt[ 'name' ] ):
-                names[ smt[ 'name' ] ] = 1
-                types.append( smt )
-
-        return tuple( types )
-
     security.declareProtected(CMFCorePermissions.ManageProperties, 'edit')
     def edit(self, title='', description=''):
         """
