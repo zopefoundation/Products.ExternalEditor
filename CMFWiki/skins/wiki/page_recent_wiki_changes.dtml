@@ -1,0 +1,1 @@
+<dtml-var "RESPONSE.redirect(this().wiki_base_url() + '/recent_wiki_changes')">
