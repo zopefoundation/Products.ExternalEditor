@@ -346,11 +346,11 @@ class PortalGenerator:
 
     def setupDefaultProperties(self, p, title, description,
                                email_from_address, email_from_name,
-                               validate_email, default_charset):
+                               validate_email, default_charset=''):
         p._setProperty('email_from_address', email_from_address, 'string')
         p._setProperty('email_from_name', email_from_name, 'string')
         p._setProperty('validate_email', validate_email and 1 or 0, 'boolean')
-        p._setProperty('default_charset', '', 'string')
+        p._setProperty('default_charset', default_charset, 'string')
         p.title = title
         p.description = description
 
