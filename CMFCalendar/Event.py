@@ -27,7 +27,6 @@ from Products.CMFCore.WorkflowCore import WorkflowAction
 from Products.CMFCore.CMFCorePermissions import View, ModifyPortalContent
 from Products.CMFDefault.utils import formatRFC822Headers, html_headcheck
 from Products.CMFDefault.utils import SimpleHTMLParser, bodyfinder, parseHeadersBody
-from Products.CMFDefault.Document import Document
 from Products.CMFCore.utils import keywordsplitter
 
 import EventPermissions
@@ -318,7 +317,7 @@ class Event(PortalContent, DefaultDublinCoreImpl):
         return self.end().AMPMMinutes() 
 
     security.declarePrivate('handleText')
-    def handleText(self, text, format=None, stx_level=None):
+    def handleText(self, text, format=None):
         """ Handles the raw text, returning headers, body, cooked, format """
         headers = {}
         if format == 'html':
