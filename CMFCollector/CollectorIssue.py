@@ -90,8 +90,9 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
 
     action_number = 0
 
-    ACTIONS_ORDER = ['Accept', 'Resign', 'Assign',
-                     'Resolve', 'Reject', 'Defer'] 
+    ACTIONS_ORDER = ['Accept', 'Assign',
+                     'Resolve', 'Reject', 'Defer',
+                     'Resign'] 
 
     # Accumulated instance-data backwards-compatability values:
     _collector_path = None
