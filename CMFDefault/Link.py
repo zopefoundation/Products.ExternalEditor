@@ -124,23 +124,6 @@ class Link( PortalContent
                                         + '?manage_tabs_message=Link+updated'
                                         )
 
-    security.declareProtected( CMFCorePermissions.ModifyPortalContent
-                             , 'manage_edit' )
-    manage_edit = DTMLFile( 'zmi_editLink', _dtmldir )
-
-    security.declareProtected( CMFCorePermissions.ModifyPortalContent
-                             , 'manage_editLink' )
-    def manage_editLink( self, remote_url, REQUEST=None ):
-        """
-            Update the Link via the ZMI.
-        """
-        self._edit( remote_url )
-        if REQUEST is not None:
-            REQUEST['RESPONSE'].redirect( self.absolute_url()
-                                        + '/manage_edit'
-                                        + '?manage_tabs_message=Link+updated'
-                                        )
-
     security.declarePrivate( '_edit' )
     def _edit( self, remote_url ):
         """
