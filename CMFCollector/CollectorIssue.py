@@ -154,9 +154,8 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
                                        effective_date=effective_date,
                                        expiration_date=expiration_date)
 
-        if modification_date is None:
-            modification_date = self.creation_date
-        self.modification_date = modification_date
+        if modification_date:
+            self.setModificationDate(DateTime(modification_date))
 
     def _set_submitter_specs(self, submitter_id,
                              submitter_name, submitter_email):
@@ -300,8 +299,11 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         else:
             transcript.edit(self.TRANSCRIPT_FORMAT,
                             transcript.EditableBody())            
+
+        self.notifyModified()
         self.reindexObject()
         self._send_update_notice('Edit', username)
+
         return ", ".join(changes)
 
     def _changed(self, field_name, value):
@@ -374,10 +376,13 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
                             and ("\n" + RULE + "\n")
                             or '')
                          + transcript.EditableBody())
+
+        self.notifyModified()
         self.reindexObject()
         got = self._send_update_notice(action, username,
                                        orig_status, additions, removals,
                                        file=file, fileid=fileid)
+
         return got
 
     def _supporters_diff(self, orig_supporters):
