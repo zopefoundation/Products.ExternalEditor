@@ -83,6 +83,13 @@ class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
 
     def __init__(self):
         ZCatalog.__init__(self, self.getId())
+        
+        if not hasattr(self, 'Vocabulary'):
+            # As of 2.6, the Catalog no longer adds a vocabulary in itself
+            from Products.PluginIndexes.TextIndex.Vocabulary import Vocabulary
+            vocabulary = Vocabulary('Vocabulary', 'Vocabulary', globbing=1)
+            self._setObject('Vocabulary', vocabulary)
+            
         self._initIndexes()
 
     #
