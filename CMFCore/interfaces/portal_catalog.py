@@ -91,7 +91,7 @@ __version__='$Revision$'[11:-2]
 
 from Interface import Attribute, Base
 
-class portal_catalog():
+class portal_catalog(Base):
     '''This tool interacts with a customized ZCatalog.
     '''
     id = Attribute('id', 'Must be set to "portal_catalog"')

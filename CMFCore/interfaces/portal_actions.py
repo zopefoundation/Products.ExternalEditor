@@ -117,7 +117,7 @@ class portal_actions(Base):
         '''
 
 
-class ActionProvider():
+class ActionProvider(Base):
     '''The interface expected of an object that can provide actions.
     '''
 
