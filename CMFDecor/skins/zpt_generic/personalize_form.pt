@@ -41,7 +41,7 @@
      </dl>
 
      <input type="radio" name="listed" 
-	        tal:attributes="checked python: hasattr(member,'listed') and not(member.listed)"
+	        tal:attributes="checked python: hasattr(member,'listed') and not(member.getProperty( 'listed' ) )"
             value="" id="cb_unlisted" />
 	<label for="cb_unlisted">Unlisted</label>
      <dl class="FieldHelp">

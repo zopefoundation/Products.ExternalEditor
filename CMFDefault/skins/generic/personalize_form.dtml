@@ -25,13 +25,14 @@
  <table class="FormLayout">
   <tr>
    <th>Email address</th>
-   <td><input type="text" name="email" value="<dtml-var "member.email" html_quote>"></td>
+   <td><input type="text" name="email" 
+              value="<dtml-var "member.getProperty( 'email' )" html_quote>"></td>
   </tr>
   <tr>
    <th valign="top">Listed status</th>
    <td>
-    <dtml-let listedChecked="member.listed and 'checked' or ''"
-              unlistedChecked="(not member.listed) and 'checked' or ''"
+    <dtml-let listedChecked="member.getProperty( 'listed' )  and 'checked' or ''"
+              unlistedChecked="(not member.getProperty( 'listed' )) and 'checked' or ''"
     >
      <input type="radio" name="listed" &dtml-listedChecked;
             value="on" id="cb_listed" />
