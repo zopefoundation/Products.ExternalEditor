@@ -49,7 +49,7 @@
 
 </div>
 
-<div tal:condition="options/errors_log_url | nothing">
+<div tal:condition="options/error_log_url | nothing">
   <hr noshade />
   <a href="error_log_url" tal:attributes="href options/error_log_url">
     Show Error Log Entry
