@@ -78,7 +78,8 @@
           </td>
         </tr>
 
-        <tr tal:condition="not: authenticated">
+        <tr tal:condition="python: not authenticated and
+                                   here.participation != 'anyone'">
           <td> &nbsp; </td>
           <td colspan="3">
             <font color="brown" size="-1">
