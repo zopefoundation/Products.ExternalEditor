@@ -14,6 +14,7 @@ DefaultGroupName=Zope External Editor
 AllowNoIcons=yes
 LicenseFile=..\LICENSE.txt
 ChangesAssociations=yes
+OutputBaseFilename=zopeedit-setup
 
 [Registry]
 ; Register file type for use by helper app

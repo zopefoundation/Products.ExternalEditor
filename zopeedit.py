@@ -17,10 +17,9 @@
 
 # Zope External Editor Helper Application by Casey Duncan
 
-__version__ = '0.3'
+__version__ = '0.4'
 
 import sys, os
-from os import path
 import traceback
 from tempfile import mktemp
 from ConfigParser import ConfigParser
@@ -93,13 +92,13 @@ class ExternalEditor:
             # Read the configuration file
             if win32:
                 # Check the home dir first and then the program dir
-                config_path = path.expanduser('~\\ZopeEdit.ini')
-                global_config = path.join(sys.path[0], 'ZopeEdit.ini')
-                if not path.exists(config_path) \
+                config_path = os.path.expanduser('~\\ZopeEdit.ini')
+                global_config = os.path.join(sys.path[0] or '', 'ZopeEdit.ini')
+                if not os.path.exists(config_path) \
                    and os.path.exists(global_config):
                     config_path = global_config
             else:
-                config_path = path.expanduser('~/.zope-external-edit')
+                config_path = os.path.expanduser('~/.zope-external-edit')
                 
             self.config = Configuration(config_path)
 
@@ -136,10 +135,10 @@ class ExternalEditor:
             
             if self.options.has_key('temp_dir'):
                 while 1:
-                    temp = path.expanduser(self.options['temp_dir'])
+                    temp = os.path.expanduser(self.options['temp_dir'])
                     temp = os.tempnam(temp)
                     content_file = '%s%s' % (temp, content_file)
-                    if not path.exists(content_file):
+                    if not os.path.exists(content_file):
                         break
             else:
                 content_file = mktemp(content_file)
@@ -290,7 +289,7 @@ class ExternalEditor:
         save_interval = float(self.options.get('save_interval'))
         use_locks = int(self.options.get('use_locks', 0))
         launch_success = 0
-        last_mtime = path.getmtime(self.content_file)
+        last_mtime = os.path.getmtime(self.content_file)
         command = self.getEditorCommand()
         if command.find('%1') > -1:
             command = command.replace('%1', self.content_file)
@@ -303,7 +302,7 @@ class ExternalEditor:
             
         while 1:
             editor.wait(save_interval or 2)
-            mtime = path.getmtime(self.content_file)
+            mtime = os.path.getmtime(self.content_file)
             
             if (save_interval or not editor.isAlive()) and mtime != last_mtime:
                 # File was modified
@@ -602,23 +601,6 @@ def fatalError(message, exit=1):
     if exit: 
         sys.exit(0)
 
-def whereIs(filename): 
-    """Given a filename, returns the full path to it based
-       on the PATH environment variable. If no file was found, None is returned
-    """
-    pathExists = os.path.exists
-    
-    if pathExists(filename):
-        return filename
-        
-    pathJoin = os.path.join
-    paths = os.environ['PATH'].split(os.pathsep)
-    
-    for path in paths:
-        file_path = pathJoin(path, filename)
-        if pathExists(file_path):
-            return file_path
-
 default_configuration = """\
 # Zope External Editor helper application configuration
 
@@ -685,10 +667,22 @@ extension=.png"""
 
 if __name__ == '__main__':
     try:
+        args = sys.argv
+        
+        if '--version' in args or '-v' in args:
+            credits = ('Zope External Editor %s\n'
+                       'By Casey Duncan, Zope Corporation\n'
+                       'http://www.zope.com/') % __version__
+            if win32:
+                errorDialog(credits)
+            else:
+                print credits
+            sys.exit()
+
         input_file = sys.argv[1]
     except IndexError:
         fatalError('Input file name missing.\n'
-                   'Usage: zopeedit.py inputfile')
+                   'Usage: zopeedit inputfile')
     try:
         ExternalEditor(input_file).launch()
     except KeyboardInterrupt:
