@@ -2,6 +2,9 @@ CMF 1.5.0beta (2004/08/06)
 
   New Features
 
+    - The CMF is now under the terms of version 2.1 of the Zope Public
+      License (ZPL), it was previously under ZPL version 2.0.
+
     - TypeInfos: Marked getActionById as deprecated.
       Use getActionInfo if you need an URL or getMethodPath if you need a
       method.
