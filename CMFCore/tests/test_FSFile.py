@@ -65,7 +65,7 @@ class FSFileTests( RequestTest, FSDVTest):
         #   ICK!  'HTTPResponse.getHeader' doesn't case-flatten the key!
         #
         self.assertEqual( self.RESPONSE.getHeader( 'Content-Length'.lower() )
-                        , len( ref ) )
+                        , str(len(ref)) )
         self.assertEqual( self.RESPONSE.getHeader( 'Content-Type'.lower() )
                         , 'application/octet-stream' )
         self.assertEqual( self.RESPONSE.getHeader( 'Last-Modified'.lower() )
