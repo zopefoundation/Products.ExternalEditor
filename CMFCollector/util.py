@@ -72,6 +72,22 @@ def get_email_fullname(self, userid):
         return (name, email)
     return (None, None)
 
+def safeGetProperty(userobj, property, default=None):
+    """Defaulting user.getProperty(), allowing for variant user folders."""
+    try:
+        return userobj.getProperty(property, default)
+    except TypeError:
+        try:
+            # Some (eg, our LDAP user folder) support getProperty but not
+            # defaulting:
+            return userobj.getProperty(property)
+        except:
+            return default
+    except AttributeError:
+        # Some don't support getProperty:
+        return getattr(userobj, property, default)
+        
+
 def cited_text(text, rfind=string.rfind, strip=string.strip):
     """Quote text for use in literal citations.
 
