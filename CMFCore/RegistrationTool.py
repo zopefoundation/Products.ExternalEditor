@@ -168,11 +168,9 @@ class RegistrationTool (UniqueObject, SimpleItem):
         limitGrantedRoles(roles, self, ('Member',))
 
         membership = getToolByName(self, 'portal_membership')
-        membership.addMember(id, password, roles, domains)
-        member = membership.getMemberById(id)
-        if properties is not None:
-            member.setMemberProperties(properties)
+        membership.addMember(id, password, roles, domains, properties)
 
+        member = membership.getMemberById(id)
         self.afterAdd(member, id, password, properties)
         return member
 

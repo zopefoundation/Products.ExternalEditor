@@ -362,7 +362,7 @@ class MembershipTool (UniqueObject, SimpleItem):
         return map(self.wrapUser, self.__getPUS().getUsers())
 
     security.declarePrivate('addMember')
-    def addMember(self, id, password, roles, domains):
+    def addMember(self, id, password, roles, domains, properties=None):
         '''Adds a new member to the user folder.  Security checks will have
         already been performed.  Called by portal_registration.
         '''
@@ -377,6 +377,12 @@ class MembershipTool (UniqueObject, SimpleItem):
                     source.__of__(self).addUser(id, password, roles, domains)
                     return
             raise "Can't add Member", "No supported UserSources"
+
+        if properties is not None:
+            membership = getToolByName(self, 'portal_membership')
+            member = membership.getMemberById(id)
+            member.setMemberProperties(properties)
+
 
     security.declarePrivate('listActions')
     def listActions(self, info):

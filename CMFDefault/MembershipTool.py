@@ -132,12 +132,12 @@ class MembershipTool ( Products.CMFCore.MembershipTool.MembershipTool ):
                                'listed':member.listed})
         return roster
 
-    def addMember(self, id, password, roles, domains):
+    def addMember(self, id, password, roles, domains, properties=None):
         '''Adds a new member to the user folder.  Security checks will have
         already been performed.  Called by portal_registration.
         '''
         Products.CMFCore.MembershipTool.MembershipTool.addMember( self, id, password
-                                                                , roles, domains )
+                                                                , roles, domains, properties )
         member = self.getMemberById(id)
         if hasattr(getattr(member, 'aq_base', member), 'getUser'):
             user = member.getUser()
