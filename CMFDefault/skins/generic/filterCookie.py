@@ -1,8 +1,4 @@
 ## Script (Python) "filterCookie.py $Revision$"
-##bind context=context
-##bind namespace=
-##bind script=script
-##bind subpath=traverse_subpath
 ##parameters=
 ##title=Manage filter cookie
 ##

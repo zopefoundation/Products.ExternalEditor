@@ -1,9 +1,4 @@
 ## Script (Python) "folder_localrole_edit"
-##bind container=container
-##bind context=context
-##bind namespace=
-##bind script=script
-##bind subpath=traverse_subpath
 ##parameters=change_type
 ##title=Set local roles
 ##

@@ -1,6 +1,5 @@
 ## Script (Python) "register"
 ##title=Register a user
-##bind namespace=_
 ##parameters=password='password', confirm='confirm'
 REQUEST=context.REQUEST
 portal_properties = context.portal_properties

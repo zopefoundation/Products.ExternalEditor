@@ -1,6 +1,5 @@
 ## Script (Python) "personalize"
 ##title=Personalization Handler.
-##bind namespace=_
 ##parameters=
 REQUEST=context.REQUEST
 member = context.portal_membership.getAuthenticatedMember()

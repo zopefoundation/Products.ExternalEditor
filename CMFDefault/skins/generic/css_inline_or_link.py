@@ -1,6 +1,10 @@
 ## Script (Python) "css_inline_or_link"
 ##parameters=
+##bind container=container
+##bind context=context
 ##bind namespace=_
+##bind script=script
+##bind subpath=traverse_subpath
 ##title=Browser detection for stylesheet handling
 
 import string

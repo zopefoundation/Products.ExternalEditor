@@ -1,5 +1,9 @@
 ## Script (Python) "iconHTML"
+##bind container=container
+##bind context=context
 ##bind namespace=_
+##bind script=script
+##bind subpath=traverse_subpath
 ##title=Returns the HTML for the current object's icon, if it is available
 ##parameters=
 

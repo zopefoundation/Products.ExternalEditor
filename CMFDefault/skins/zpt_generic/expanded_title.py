@@ -1,9 +1,4 @@
 ## Script (Python) "expanded_title"
-##bind container=container
-##bind context=context
-##bind namespace=
-##bind script=script
-##bind subpath=traverse_subpath
 ##parameters=
 ##title=Build title which includes site title
 ##

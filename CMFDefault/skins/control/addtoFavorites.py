@@ -1,6 +1,5 @@
 ## Script (Python) "addtoFavorites"
 ##title=Add item to favourites
-##bind namespace=_
 ##parameters=
 homeFolder=context.portal_membership.getHomeFolder()
 

@@ -1,8 +1,4 @@
 ## Script (Python) "breadcrumbs.py $Revision$"
-##bind context=context
-##bind namespace=
-##bind script=script
-##bind subpath=traverse_subpath
 ##parameters=include_root=1
 ##title=Return breadcrumbs
 ##

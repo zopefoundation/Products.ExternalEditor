@@ -1,9 +1,4 @@
 ## Script (Python) "setup_talkback_tree"
-##bind container=container
-##bind context=context
-##bind namespace=
-##bind script=script
-##bind subpath=traverse_subpath
 ##parameters=tree_root
 ##title=Standard Tree
 ##
