@@ -15,10 +15,7 @@
 $Id$
 """
 
-from xml.dom.minidom import parseString as domParseString
-
 from AccessControl import ClassSecurityInfo
-from Acquisition import Implicit
 from Globals import InitializeClass
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
@@ -27,11 +24,10 @@ from Products.CMFCore.ActionProviderBase import IActionProvider
 from Products.CMFCore.utils import getToolByName
 
 from permissions import ManagePortal
-from utils import _coalesceTextNodeChildren
-from utils import _getNodeAttribute
-from utils import _getNodeAttributeBoolean
 from utils import _xmldir
-from utils import HandlerBase
+from utils import ConfiguratorBase
+from utils import CONVERTER, DEFAULT, KEY
+
 
 #
 #   Configurator entry points
@@ -80,10 +76,10 @@ def importActionProviders( context ):
 
     if text is not None:
 
-        apc = ActionProvidersConfigurator( site ).__of__( site )
-        info_list = apc.parseXML( text, encoding )
+        apc = ActionProvidersConfigurator( site, encoding )
+        tool_info = apc.parseXML( text )
 
-        for p_info in info_list:
+        for p_info in tool_info[ 'providers' ]:
 
             if p_info[ 'id' ] not in actions_tool.listActionProviders():
 
@@ -91,7 +87,7 @@ def importActionProviders( context ):
 
             provider = getToolByName( site, p_info[ 'id' ] )
             provider._actions = [ ActionInformation(**a_info)
-                                  for a_info in p_info['actions'] ]
+                                  for a_info in p_info[ 'actions' ] ]
 
     return 'Action providers imported.'
 
@@ -130,20 +126,10 @@ def exportActionProviders( context ):
     return 'Action providers exported.'
 
 
-class ActionProvidersConfigurator( Implicit ):
-
+class ActionProvidersConfigurator(ConfiguratorBase):
     """ Synthesize XML description of site's action providers.
     """
     security = ClassSecurityInfo()
-    security.setDefaultAccess( 'allow' )
-
-    def __init__( self, site ):
-        self._site = site
-
-    _providers = PageTemplateFile( 'apcExport.xml'
-                                 , _xmldir
-                                 , __name__='_providers'
-                                 )
 
     security.declareProtected( ManagePortal, 'listProviderInfo' )
     def listProviderInfo( self ):
@@ -172,79 +158,29 @@ class ActionProvidersConfigurator( Implicit ):
 
         return result
 
-    security.declareProtected( ManagePortal, 'generateXML' )
-    def generateXML( self ):
+    def _getExportTemplate(self):
 
-        """ Pseudo API.
-        """
-        return self._providers()
+        return PageTemplateFile('apcExport.xml', _xmldir)
 
-    security.declareProtected( ManagePortal, 'parseXML' )
-    def parseXML( self, text, encoding=None ):
+    def _getImportMapping(self):
 
-        """ Pseudo API.
-        """
-        reader = getattr( text, 'read', None )
+        return {
+          'actions-tool':
+             { 'action-provider': {KEY: 'providers'} },
+          'action-provider':
+             { 'id':              {},
+               'action':          {KEY: 'actions', DEFAULT: ()} },
+          'action':
+             { 'action_id':       {KEY: 'id'},
+               'title':           {},
+               'description':     {CONVERTER: self._convertToUnique},
+               'category':        {},
+               'condition_expr':  {KEY: 'condition'},
+               'permission':      {KEY: 'permissions', DEFAULT: ()},
+               'category':        {},
+               'visible':         {CONVERTER: self._convertToBoolean},
+               'url_expr':        {KEY: 'action'} },
+          'permission':
+             { '#text':           {KEY: None} } }
 
-        if reader is not None:
-            text = reader()
-
-        dom = domParseString(text)
-
-        root = dom.getElementsByTagName('actions-tool')[0]
-        return _extractActionProviderNodes(root, encoding)
-
-InitializeClass( ActionProvidersConfigurator )
-
-
-def _extractActionProviderNodes(parent, encoding=None):
-
-    result = []
-
-    for ap_node in parent.getElementsByTagName('action-provider'):
-
-        id = _getNodeAttribute(ap_node, 'id', encoding)
-        actions = _extractActionNodes(ap_node, encoding)
-
-        result.append( { 'id': id, 'actions': actions } )
-
-    return result
-
-def _extractActionNodes(parent, encoding=None):
-
-    result = []
-
-    for a_node in parent.getElementsByTagName('action'):
-
-        def _es(key):
-            return _getNodeAttribute(a_node, key, encoding)
-
-        action_id      = _es('action_id')
-        title          = _es('title')
-        category       = _es('category')
-        condition_expr = _es('condition_expr')
-        permissions    = _extractPermissionNodes(a_node, encoding)
-        category       = _es('category')
-        visible        = _getNodeAttributeBoolean(a_node, 'visible')
-        url_expr       = _es('url_expr')
-
-        result.append( { 'id': action_id,
-                         'title': title,
-#                         'description': description,
-                         'category': category,
-                         'condition': condition_expr,
-                         'permissions': permissions,
-                         'visible': visible,
-                         'action': url_expr } )
-
-    return result
-
-def _extractPermissionNodes(parent, encoding=None):
-
-    result = []
-
-    for p_node in parent.getElementsByTagName('permission'):
-        value = _coalesceTextNodeChildren(p_node, encoding)
-        result.append(value)
-
-    return tuple(result)
+InitializeClass(ActionProvidersConfigurator)

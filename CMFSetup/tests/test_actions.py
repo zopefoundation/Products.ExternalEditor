@@ -176,11 +176,11 @@ class ActionProvidersConfiguratorTests( _ActionSetup ):
         site = self._initSite( 0, 0 )
         configurator = self._makeOne( site )
 
-        info_list = configurator.parseXML( _EMPTY_EXPORT )
+        tool_info = configurator.parseXML( _EMPTY_EXPORT )
 
-        self.assertEqual( len( info_list ), 1 )
+        self.assertEqual( len( tool_info[ 'providers' ] ), 1 )
 
-        info = info_list[ 0 ]
+        info = tool_info[ 'providers' ][ 0 ]
         self.assertEqual( info[ 'id' ], 'portal_actions' )
         self.assertEqual( len( info[ 'actions' ] ), 0 )
 
@@ -189,15 +189,15 @@ class ActionProvidersConfiguratorTests( _ActionSetup ):
         site = self._initSite( 1, 1 )
 
         configurator = self._makeOne( site )
-        info_list = configurator.parseXML( _NORMAL_EXPORT )
+        tool_info = configurator.parseXML( _NORMAL_EXPORT )
 
-        self.assertEqual( len( info_list ), 3 )
+        self.assertEqual( len( tool_info['providers'] ), 3 )
 
-        info = info_list[ 0 ]
+        info = tool_info[ 'providers' ][ 0 ]
         self.assertEqual( info[ 'id' ], 'portal_actions' )
         self.assertEqual( len( info[ 'actions' ] ), 0 )
 
-        info = info_list[ 1 ]
+        info = tool_info[ 'providers' ][ 1 ]
         self.assertEqual( info[ 'id' ], 'portal_foo' )
         self.assertEqual( len( info[ 'actions' ] ), 1 )
 
@@ -211,7 +211,7 @@ class ActionProvidersConfiguratorTests( _ActionSetup ):
         self.assertEqual( action[ 'category' ], 'dummy' )
         self.assertEqual( action[ 'visible' ], True )
 
-        info = info_list[ 2 ]
+        info = tool_info[ 'providers' ][ 2 ]
         self.assertEqual( info[ 'id' ], 'portal_bar' )
         self.assertEqual( len( info[ 'actions' ] ), 1 )
 

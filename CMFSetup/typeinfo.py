@@ -15,12 +15,8 @@
 $Id$
 """
 
-from xml.dom.minidom import parseString as domParseString
-from xml.sax import parseString
-
 import Products
 from AccessControl import ClassSecurityInfo
-from Acquisition import Implicit
 from Globals import InitializeClass
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
@@ -28,15 +24,11 @@ from Products.CMFCore.TypesTool import FactoryTypeInformation
 from Products.CMFCore.TypesTool import ScriptableTypeInformation
 from Products.CMFCore.utils import getToolByName
 
-from actions import _extractActionNodes
 from permissions import ManagePortal
-from utils import _coalesceTextNodeChildren
-from utils import _extractDescriptionNode
-from utils import _getNodeAttribute
-from utils import _queryNodeAttribute
-from utils import _queryNodeAttributeBoolean
 from utils import _xmldir
-from utils import HandlerBase
+from utils import ConfiguratorBase
+from utils import CONVERTER, DEFAULT, KEY
+
 
 #
 #   Entry points
@@ -59,24 +51,25 @@ def importTypesTool( context ):
         for type in types_tool.objectIds():
             types_tool._delObject(type)
 
-    configurator = TypeInfoConfigurator( site )
+    ttc = TypesToolConfigurator( site, encoding )
     text = context.readDataFile( _TOOL_FILENAME )
+    tool_info = ttc.parseXML( text )
 
-    for type_id, type_filename in configurator.parseToolXML(text, encoding):
+    tic = TypeInfoConfigurator( site, encoding )
 
-        text = context.readDataFile( type_filename )
-        info_list = configurator.parseTypeXML(text, encoding)
+    for type_info in tool_info[ 'types' ]:
 
-        for info in info_list:
+        text = context.readDataFile( type_info[ 'filename' ] )
+        info = tic.parseXML( text )
 
-            for mt_info in Products.meta_types:
-                if mt_info['name'] == info['kind']:
-                    type_info = mt_info['instance'](**info)
-                    break
-            else:
-                raise ValueError('unknown kind \'%s\'' % info['kind'])
+        for mt_info in Products.meta_types:
+            if mt_info['name'] == info['kind']:
+                type_info = mt_info['instance'](**info)
+                break
+        else:
+            raise ValueError('unknown kind \'%s\'' % info['kind'])
 
-            types_tool._setObject( str( info[ 'id' ] ), type_info )
+        types_tool._setObject( str( info[ 'id' ] ), type_info )
 
 
     # XXX: YAGNI?
@@ -91,15 +84,17 @@ def exportTypesTool( context ):
     """
     site = context.getSite()
     types_tool = getToolByName( site, 'portal_types' )
-    configurator = TypeInfoConfigurator( site ).__of__( site )
 
-    tool_xml = configurator.generateToolXML()
+    ttc = TypesToolConfigurator( site ).__of__( site )
+    tic = TypeInfoConfigurator( site ).__of__( site )
+
+    tool_xml = ttc.generateXML()
     context.writeDataFile( _TOOL_FILENAME, tool_xml, 'text/xml' )
 
     for type_id in types_tool.listContentTypes():
 
         type_filename = '%s.xml' % type_id.replace( ' ', '_' )
-        type_xml = configurator.generateTypeXML( type_id )
+        type_xml = tic.generateXML( type_id=type_id )
         context.writeDataFile( type_filename
                              , type_xml
                              , 'text/xml'
@@ -111,14 +106,63 @@ def exportTypesTool( context ):
 
     return 'Types tool exported'
 
-class TypeInfoConfigurator( Implicit ):
+
+class TypesToolConfigurator(ConfiguratorBase):
 
     security = ClassSecurityInfo()
-    security.setDefaultAccess('allow')
 
-    def __init__( self, site ):
+    security.declareProtected( ManagePortal, 'listTypeInfo' )
+    def listTypeInfo( self ):
 
-        self._site = site
+        """ Return a list of mappings for each type info in the site.
+
+        o These mappings are pretty much equivalent to the stock
+          'factory_type_information' elements used everywhere in the
+          CMF.
+        """
+        result = []
+        typestool = getToolByName( self._site, 'portal_types' )
+
+        type_ids = typestool.listContentTypes()
+
+        for type_id in type_ids:
+            info = {'id': type_id}
+
+            if ' ' in type_id:
+                info['filename'] = _getTypeFilename(type_id)
+
+            result.append(info)
+
+        return result
+
+    def _getExportTemplate(self):
+
+        return PageTemplateFile('ticToolExport.xml', _xmldir)
+
+    def _getImportMapping(self):
+
+        return {
+          'types-tool':
+            { 'type':     {KEY: 'types', DEFAULT: (),
+                           CONVERTER: self._convertTypes} },
+          'type':
+            { 'id':       {},
+              'filename': {DEFAULT: '%(id)s'} } }
+
+    def _convertTypes(self, val):
+
+        for type in val:
+            if type['filename'] == type['id']:
+                type['filename'] = _getTypeFilename( type['filename'] )
+
+        return val
+
+InitializeClass(TypesToolConfigurator)
+
+
+class TypeInfoConfigurator(ConfiguratorBase):
+
+    security = ClassSecurityInfo()
 
     security.declareProtected( ManagePortal, 'getTypeInfo' )
     def getTypeInfo( self, type_id ):
@@ -136,73 +180,6 @@ class TypeInfoConfigurator( Implicit ):
             raise ValueError, 'Unknown type: %s' % type_id
         else:
             return self._makeTIMapping( ti )
-
-    security.declareProtected( ManagePortal, 'listTypeInfo' )
-    def listTypeInfo( self ):
-
-        """ Return a list of mappings for each type info in the site.
-
-        o These mappings are pretty much equivalent to the stock
-          'factory_type_information' elements used everywhere in the
-          CMF.
-        """
-        result = []
-        typestool = getToolByName( self._site, 'portal_types' )
-
-        type_ids = typestool.listContentTypes()
-
-        for type_id in type_ids:
-            mapping = self.getTypeInfo( type_id )
-            result.append( mapping )
-
-        return result
-
-    security.declareProtected( ManagePortal, 'generateToolXML' )
-    def generateToolXML( self ):
-
-        """ Pseudo API.
-        """
-        return self._toolConfig()
-
-    security.declareProtected( ManagePortal, 'generateTypeXML' )
-    def generateTypeXML( self, type_id ):
-
-        """ Pseudo API.
-        """
-        return self._typeConfig( type_id=type_id )
-
-    security.declareProtected( ManagePortal, 'parseToolXML' )
-    def parseToolXML( self, xml, encoding=None ):
-
-        """ Pseudo API.
-        """
-        parser = _TypesToolParser( encoding )
-        parseString( xml, parser )
-        return parser._types
-
-    security.declareProtected( ManagePortal, 'parseTypeXML' )
-    def parseTypeXML( self, xml, encoding=None ):
-
-        """ Pseudo API.
-        """
-        dom = domParseString(xml)
-
-        return _extractTypeInfoNode(dom, encoding)
-
-    #
-    #   Helper methods
-    #
-    security.declarePrivate( '_toolConfig' )
-    _toolConfig = PageTemplateFile( 'ticToolExport.xml'
-                                  , _xmldir
-                                  , __name__='toolConfig'
-                                  )
-
-    security.declarePrivate( '_typeConfig' )
-    _typeConfig = PageTemplateFile( 'ticTypeExport.xml'
-                                  , _xmldir
-                                  , __name__='typeConfig'
-                                  )
 
     security.declarePrivate( '_makeTIMapping' )
     def _makeTIMapping( self, ti ):
@@ -243,114 +220,65 @@ class TypeInfoConfigurator( Implicit ):
 
         return result
 
+    def _getExportTemplate(self):
 
-InitializeClass( TypeInfoConfigurator )
+        return PageTemplateFile('ticTypeExport.xml', _xmldir)
 
-class _TypesToolParser( HandlerBase ):
+    def _getImportMapping(self):
 
-    security = ClassSecurityInfo()
+        return {
+          'type-info':
+            { 'id':                   {},
+              'kind':                 {},
+              'title':                {DEFAULT: '%(id)s'},
+              'description':          {CONVERTER: self._convertToUnique},
+              'meta_type':            {DEFAULT: '%(id)s'},
+              'icon':                 {DEFAULT: '%(id)s.png'},
+              'immediate_view':       {DEFAULT: '%(id)s_edit'},
+              'global_allow':         {DEFAULT: True,
+                                       CONVERTER: self._convertToBoolean},
+              'filter_content_types': {DEFAULT: False,
+                                       CONVERTER: self._convertToBoolean},
+              'allowed_content_type': {KEY: 'allowed_content_types'},
+              'allow_discussion':     {DEFAULT: False,
+                                       CONVERTER: self._convertToBoolean},
+              'aliases':              {CONVERTER: self._convertAliases},
+              'action':               {KEY: 'actions'},
+              'product':              {},
+              'factory':              {},
+              'constructor_path':     {},
+              'permission':           {} },
+          'allowed_content_type':
+            { '#text':                {KEY: None} },
+          'aliases':
+            { 'alias':                {KEY: None} },
+          'alias':
+            { 'from':                 {},
+              'to':                   {} },
+          'action':
+            { 'action_id':            {KEY: 'id'},
+              'title':                {},
+              'description':          {CONVERTER: self._convertToUnique},
+              'category':             {},
+              'condition_expr':       {KEY: 'condition'},
+              'permission':           {KEY: 'permissions', DEFAULT: ()},
+              'category':             {},
+              'visible':              {CONVERTER: self._convertToBoolean},
+              'url_expr':             {KEY: 'action'} },
+          'permission':
+            { '#text':                {KEY: None} } }
 
-    def __init__( self, encoding ):
+    def _convertAliases(self, val):
 
-        self._encoding = encoding
-        self._types = []
+        result = {}
 
-    security.declarePrivate( 'startElement' )
-    def startElement( self, name, attrs ):
+        for alias in val[0]:
+            result[ alias['from'] ] = alias['to']
 
-        if name == 'types-tool':
-            pass
+        return result
 
-        if name == 'type':
+InitializeClass(TypeInfoConfigurator)
 
-            id = self._extract( attrs, 'id' )
-            filename = self._extract( attrs, 'filename', id )
-
-            if filename == id:
-                filename = _getTypeFilename( filename )
-
-            self._types.append( ( id, filename ) )
-
-InitializeClass( _TypesToolParser )
-
-
-def _extractTypeInfoNode(parent, encoding=None):
-
-    result = []
-
-    ti_node = parent.getElementsByTagName('type-info')[0]
-
-    def _es(key):
-        return _getNodeAttribute(ti_node, key, encoding)
-
-    def _qs(key, default=None):
-        return _queryNodeAttribute(ti_node, key, default, encoding)
-
-    def _qb(key, default=None):
-        return _queryNodeAttributeBoolean(ti_node, key, default)
-
-    type_id               = _es('id')
-    kind                  = _es('kind')
-    title                 = _qs('title', type_id)
-    description           = _extractDescriptionNode(ti_node, encoding)
-    meta_type             = _qs('meta_type', type_id)
-    icon                  = _qs('icon', '%s.png' % type_id)
-    immediate_view        = _qs('immediate_view', '%s_edit' % type_id)
-    global_allow          = _qb('global_allow', True)
-    filter_content_types  = _qb('filter_content_types', False)
-    allowed_content_types = _extractAllowedContentTypeNodes(ti_node, encoding)
-    allow_discussion      = _qb('allow_discussion', False)
-    aliases               = _extractAliasesNode(ti_node, encoding)
-    actions               = _extractActionNodes(ti_node, encoding)
-
-    info = { 'id': type_id,
-             'kind': kind,
-             'title': title,
-             'description': description,
-             'meta_type': meta_type,
-             'icon': icon,
-             'immediate_view': immediate_view,
-             'global_allow': global_allow,
-             'filter_content_types': filter_content_types,
-             'allowed_content_types': allowed_content_types,
-             'allow_discussion': allow_discussion,
-             'aliases': aliases,
-             'actions': actions }
-
-    if kind == FactoryTypeInformation.meta_type:
-        info['product'] = _es('product')
-        info['factory'] = _es('factory')
-    elif kind == ScriptableTypeInformation.meta_type:
-        info['constructor_path'] = _es('constructor_path')
-        info['permission'] = _es('permission')
-
-    result.append(info)
-
-    return result
-
-def _extractAllowedContentTypeNodes(parent, encoding=None):
-
-    result = []
-
-    for act_node in parent.getElementsByTagName('allowed_content_type'):
-        value = _coalesceTextNodeChildren(act_node, encoding)
-        result.append(value)
-
-    return tuple(result)
-
-def _extractAliasesNode(parent, encoding=None):
-
-    result = {}
-
-    aliases = parent.getElementsByTagName('aliases')[0]
-    for alias in aliases.getElementsByTagName('alias'):
-
-        alias_from = _getNodeAttribute(alias, 'from', encoding)
-        alias_to = _getNodeAttribute(alias, 'to', encoding)
-
-        result[alias_from] = alias_to
-
-    return result
 
 def _getTypeFilename( type_id ):
 

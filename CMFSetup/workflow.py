@@ -27,12 +27,15 @@ from Products.CMFCore.utils import getToolByName
 from Products.DCWorkflow.DCWorkflow import DCWorkflowDefinition
 
 from permissions import ManagePortal
-from utils import _xmldir
-from utils import _getNodeAttribute
-from utils import _queryNodeAttribute
-from utils import _getNodeAttributeBoolean
 from utils import _coalesceTextNodeChildren
 from utils import _extractDescriptionNode
+from utils import _getNodeAttribute
+from utils import _getNodeAttributeBoolean
+from utils import _queryNodeAttribute
+from utils import _xmldir
+from utils import ConfiguratorBase
+from utils import CONVERTER, DEFAULT, KEY
+
 
 TRIGGER_TYPES = ( 'AUTOMATIC', 'USER' )
 
@@ -85,14 +88,16 @@ def importWorkflowTool( context ):
 
     if text is not None:
 
-        wtc = WorkflowToolConfigurator( site ).__of__( site )
-        workflows, bindings = wtc.parseToolXML( text, encoding )
+        wftc = WorkflowToolConfigurator( site, encoding )
+        tool_info = wftc.parseXML( text )
 
-        for workflow_id, meta_type, filename in workflows:
+        wfdc = WorkflowDefinitionConfigurator( site )
 
-            if meta_type == DCWorkflowDefinition.meta_type:
+        for info in tool_info[ 'workflows' ]:
 
-                wf_text = context.readDataFile( filename )
+            if info[ 'meta_type' ] == DCWorkflowDefinition.meta_type:
+
+                wf_text = context.readDataFile( info[ 'filename' ] )
 
                 ( workflow_id
                 , title
@@ -104,7 +109,7 @@ def importWorkflowTool( context ):
                 , worklists
                 , permissions
                 , scripts
-                ) = wtc.parseWorkflowXML(wf_text, encoding)
+                ) = wfdc.parseWorkflowXML( wf_text, encoding )
 
                 workflow_id = str( workflow_id ) # No unicode!
 
@@ -128,7 +133,7 @@ def importWorkflowTool( context ):
             else:
                 pass # TODO: handle non-DCWorkflows
 
-        for type_id, workflow_ids in bindings.items():
+        for type_id, workflow_ids in tool_info[ 'bindings' ].items():
 
             chain = ','.join( workflow_ids )
             if type_id is None:
@@ -165,16 +170,17 @@ def exportWorkflowTool( context ):
 
     """
     site = context.getSite()
-    configurator = WorkflowToolConfigurator( site ).__of__( site )
+    wftc = WorkflowToolConfigurator( site ).__of__( site )
+    wfdc = WorkflowDefinitionConfigurator( site ).__of__( site )
     wf_tool = getToolByName( site, 'portal_workflow' )
-    text = configurator.generateToolXML()
+    text = wftc.generateXML()
 
     context.writeDataFile( _FILENAME, text, 'text/xml' )
 
     for wf_id in wf_tool.getWorkflowIds():
 
         wf_dirname = wf_id.replace( ' ', '_' )
-        wf_xml = configurator.generateWorkflowXML( wf_id )
+        wf_xml = wfdc.generateWorkflowXML( wf_id )
 
         if wf_xml is not None:
             context.writeDataFile( 'definition.xml'
@@ -186,37 +192,14 @@ def exportWorkflowTool( context ):
     return 'Workflows exported.'
 
 
-class WorkflowToolConfigurator( Implicit ):
-
-    """ Synthesize XML description of site's workflows.
+class WorkflowToolConfigurator(ConfiguratorBase):
+    """ Synthesize XML description of site's workflow tool.
     """
     security = ClassSecurityInfo()
-    security.setDefaultAccess( 'allow' )
 
-    def __init__( self, site ):
-        self._site = site
-
-    _providers = PageTemplateFile( 'wtcExport.xml'
-                                 , _xmldir
-                                 , __name__='_workflows'
-                                 )
-
-    security.declareProtected( ManagePortal, 'getWorkflowInfo' )
-    def getWorkflowInfo( self, workflow_id ):
-
+    security.declareProtected(ManagePortal, 'getWorkflowInfo')
+    def getWorkflowInfo(self, workflow_id):
         """ Return a mapping describing a given workflow.
-
-        o Keys in the mappings:
-
-          'id' -- the ID of the workflow within the tool
-
-          'meta_type' -- the workflow's meta_type
-
-          'title' -- the workflow's title property
-
-        o See '_extractDCWorkflowInfo' below for keys present only for
-          DCWorkflow definitions.
-
         """
         workflow_tool = getToolByName( self._site, 'portal_workflow' )
         workflow = workflow_tool.getWorkflowById( workflow_id )
@@ -227,7 +210,7 @@ class WorkflowToolConfigurator( Implicit ):
                         }
 
         if workflow.meta_type == DCWorkflowDefinition.meta_type:
-            self._extractDCWorkflowInfo( workflow, workflow_info )
+            workflow_info['filename'] = _getWorkflowFilename(workflow_id)
 
         return workflow_info
 
@@ -268,12 +251,94 @@ class WorkflowToolConfigurator( Implicit ):
 
         return result
 
-    security.declareProtected( ManagePortal, 'generateToolXML' )
-    def generateToolXML( self ):
+    def _getExportTemplate(self):
 
-        """ Pseudo API.
+        return PageTemplateFile('wtcToolExport.xml', _xmldir)
+
+    def _getImportMapping(self):
+
+        return {
+          'workflow-tool':
+            { 'workflow':       {KEY: 'workflows', DEFAULT: (),
+                                 CONVERTER: self._convertWorkflows},
+              'bindings':       {CONVERTER: self._convertBindings} },
+          'workflow':
+            { 'workflow_id':    {},
+              'meta_type':      {DEFAULT: '%(workflow_id)s'},
+              'filename':       {DEFAULT: '%(workflow_id)s'} },
+          'bindings':
+            { 'default':        {KEY: 'bindings'},
+              'type':           {KEY: 'bindings'} },
+          'default':
+            { 'type_id':        {DEFAULT: None},
+              'bound-workflow': {KEY: 'bound_workflows', DEFAULT: ()} },
+          'type':
+            { 'type_id':        {DEFAULT: None},
+              'bound-workflow': {KEY: 'bound_workflows', DEFAULT: ()} },
+          'bound-workflow':
+            { 'workflow_id':    {KEY: None} } }
+
+    def _convertWorkflows(self, val):
+
+        for wf in val:
+            if wf['meta_type'] == DCWorkflowDefinition.meta_type:
+                if wf['filename'] == wf['workflow_id']:
+                    wf['filename'] = _getTypeFilename( wf['filename'] )
+            else:
+                wf['filename'] = None
+
+        return val
+
+    def _convertBindings(self, val):
+
+        result = {}
+
+        for binding in val[0]['bindings']:
+            result[ binding['type_id'] ] = binding['bound_workflows']
+
+        return result
+
+InitializeClass(WorkflowToolConfigurator)
+
+
+class WorkflowDefinitionConfigurator( Implicit ):
+    """ Synthesize XML description of site's workflows.
+    """
+    security = ClassSecurityInfo()
+
+    def __init__( self, site ):
+        self._site = site
+
+    security.declareProtected( ManagePortal, 'getWorkflowInfo' )
+    def getWorkflowInfo( self, workflow_id ):
+
+        """ Return a mapping describing a given workflow.
+
+        o Keys in the mappings:
+
+          'id' -- the ID of the workflow within the tool
+
+          'meta_type' -- the workflow's meta_type
+
+          'title' -- the workflow's title property
+
+        o See '_extractDCWorkflowInfo' below for keys present only for
+          DCWorkflow definitions.
+
         """
-        return self._toolConfig()
+        workflow_tool = getToolByName( self._site, 'portal_workflow' )
+        workflow = workflow_tool.getWorkflowById( workflow_id )
+
+        workflow_info = { 'id'          : workflow_id
+                        , 'meta_type'   : workflow.meta_type
+                        , 'title'       : workflow.title_or_id()
+                        }
+
+        if workflow.meta_type == DCWorkflowDefinition.meta_type:
+            self._extractDCWorkflowInfo( workflow, workflow_info )
+
+        return workflow_info
+
 
     security.declareProtected( ManagePortal, 'generateWorkflowXML' )
     def generateWorkflowXML( self, workflow_id ):
@@ -286,24 +351,6 @@ class WorkflowToolConfigurator( Implicit ):
             return None
 
         return self._workflowConfig( workflow_id=workflow_id )
-
-    security.declareProtected( ManagePortal, 'parseToolXML' )
-    def parseToolXML( self, xml, encoding=None ):
-
-        """ Pseudo API.
-        """
-        reader = getattr(xml, 'read', None)
-        if reader is not None:
-            xml = reader()
-
-        dom = domParseString(xml)
-
-        root = dom.getElementsByTagName('workflow-tool')[0]
-
-        workflows = _extractWorkflowNodes(root, encoding)
-        bindings = _extractBindingsNode(root, encoding)
-
-        return workflows, bindings
 
     security.declareProtected( ManagePortal, 'parseWorkflowXML' )
     def parseWorkflowXML( self, xml, encoding=None ):
@@ -337,15 +384,6 @@ class WorkflowToolConfigurator( Implicit ):
                , permissions
                , scripts
                )
-
-    #
-    #   Helper methods
-    #
-    security.declarePrivate( '_toolConfig' )
-    _toolConfig = PageTemplateFile( 'wtcToolExport.xml'
-                                  , _xmldir
-                                  , __name__='toolConfig'
-                                  )
 
     security.declarePrivate( '_workflowConfig' )
     _workflowConfig = PageTemplateFile( 'wtcWorkflowExport.xml'
@@ -750,7 +788,7 @@ class WorkflowToolConfigurator( Implicit ):
 
         return result
 
-InitializeClass( WorkflowToolConfigurator )
+InitializeClass( WorkflowDefinitionConfigurator )
 
 
 def _getWorkflowFilename( workflow_id ):
@@ -766,72 +804,6 @@ def _getScriptFilename( workflow_id, script_id, meta_type ):
     wf_dir = workflow_id.replace( ' ', '_' )
     suffix = _METATYPE_SUFFIXES[ meta_type ]
     return 'workflows/%s/%s.%s' % ( wf_dir, script_id, suffix )
-
-def _extractWorkflowNodes(parent, encoding=None):
-
-    result = []
-
-    for wf_node in parent.getElementsByTagName('workflow'):
-
-        workflow_id = _getNodeAttribute(wf_node, 'workflow_id', encoding)
-        meta_type = _queryNodeAttribute(wf_node, 'meta_type', workflow_id,
-                                        encoding)
-        if meta_type == DCWorkflowDefinition.meta_type:
-            filename = _queryNodeAttribute(wf_node, 'filename', workflow_id,
-                                           encoding)
-            if filename == workflow_id:
-                filename = _getWorkflowFilename(filename)
-        else:
-            filename = None
-
-        result.append( (workflow_id, meta_type, filename) )
-
-    return result
-
-def _extractBindingsNode(parent, encoding=None):
-
-    result = {}
-
-    b_node = parent.getElementsByTagName('bindings')[0]
-    default = _extractDefaultChainNode(b_node, encoding)
-    result.update(default)
-    types = _extractTypeNodes(b_node, encoding)
-    result.update(types)
-
-    return result
-
-def _extractDefaultChainNode(parent, encoding=None):
-
-    result = {}
-
-    d_node = parent.getElementsByTagName('default')[0]
-    bound_workflows = _extractBoundWorkflowNodes(d_node, encoding)
-    result[None] = bound_workflows
-
-    return result
-
-def _extractTypeNodes(parent, encoding=None):
-
-    result = {}
-
-    for t_node in parent.getElementsByTagName('type'):
-
-        type_id = _getNodeAttribute(t_node, 'type_id', encoding)
-        bound_workflows = _extractBoundWorkflowNodes(t_node, encoding)
-        result[type_id] = bound_workflows
-
-    return result
-
-def _extractBoundWorkflowNodes(parent, encoding=None):
-
-    result = []
-
-    for t_node in parent.getElementsByTagName('bound-workflow'):
-
-        value = _getNodeAttribute(t_node, 'workflow_id', encoding)
-        result.append(value)
-
-    return tuple(result)
 
 def _extractStateNodes( root, encoding=None ):
 

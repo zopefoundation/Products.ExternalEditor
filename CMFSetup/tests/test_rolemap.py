@@ -174,10 +174,10 @@ class RolemapConfiguratorTests( BaseRegistryTests ):
         existing_roles = list( getattr( site, '__ac_roles__', [] ) )[:]
         configurator = self._makeOne( site )
 
-        roles, permissions = configurator.parseXML( _EMPTY_EXPORT )
+        rolemap_info = configurator.parseXML( _EMPTY_EXPORT )
 
-        self.assertEqual( len( roles ), 4 )
-        self.assertEqual( len( permissions ), 0 )
+        self.assertEqual( len( rolemap_info[ 'roles' ] ), 4 )
+        self.assertEqual( len( rolemap_info[ 'permissions' ] ), 0 )
 
     def test_parseXML_added_role( self ):
 
@@ -185,7 +185,8 @@ class RolemapConfiguratorTests( BaseRegistryTests ):
         site = self.root.site
         configurator = self._makeOne( site )
 
-        roles, permissions = configurator.parseXML( _ADDED_ROLE_EXPORT )
+        rolemap_info = configurator.parseXML( _ADDED_ROLE_EXPORT )
+        roles = rolemap_info[ 'roles' ]
 
         self.assertEqual( len( roles ), 5 )
         self.failUnless( 'Anonymous' in roles )
@@ -202,10 +203,10 @@ class RolemapConfiguratorTests( BaseRegistryTests ):
         site = self.root.site
         configurator = self._makeOne( site )
 
-        roles, permissions = configurator.parseXML( _ACQUIRED_EXPORT )
+        rolemap_info = configurator.parseXML( _ACQUIRED_EXPORT )
 
-        self.assertEqual( len( permissions ), 1 )
-        permission = permissions[ 0 ]
+        self.assertEqual( len( rolemap_info[ 'permissions' ] ), 1 )
+        permission = rolemap_info[ 'permissions' ][ 0 ]
 
         self.assertEqual( permission[ 'name' ], ACI )
         self.failUnless( permission[ 'acquire' ] )
@@ -223,10 +224,10 @@ class RolemapConfiguratorTests( BaseRegistryTests ):
         site = self.root.site
         configurator = self._makeOne( site )
 
-        roles, permissions = configurator.parseXML( _UNACQUIRED_EXPORT )
+        rolemap_info = configurator.parseXML( _UNACQUIRED_EXPORT )
 
-        self.assertEqual( len( permissions ), 1 )
-        permission = permissions[ 0 ]
+        self.assertEqual( len( rolemap_info[ 'permissions' ] ), 1 )
+        permission = rolemap_info[ 'permissions' ][ 0 ]
 
         self.assertEqual( permission[ 'name' ], ACI )
         self.failIf( permission[ 'acquire' ] )
@@ -244,7 +245,8 @@ class RolemapConfiguratorTests( BaseRegistryTests ):
         site = self.root.site
         configurator = self._makeOne( site )
 
-        roles, permissions = configurator.parseXML( _COMBINED_EXPORT )
+        rolemap_info = configurator.parseXML( _COMBINED_EXPORT )
+        roles = rolemap_info[ 'roles' ]
 
         self.assertEqual( len( roles ), 5 )
         self.failUnless( 'Anonymous' in roles )
@@ -253,8 +255,8 @@ class RolemapConfiguratorTests( BaseRegistryTests ):
         self.failUnless( 'Owner' in roles )
         self.failUnless( 'ZZZ' in roles )
 
-        self.assertEqual( len( permissions ), 1 )
-        permission = permissions[ 0 ]
+        self.assertEqual( len( rolemap_info[ 'permissions' ] ), 1 )
+        permission = rolemap_info[ 'permissions' ][ 0 ]
 
         self.assertEqual( permission[ 'name' ], ACI )
         self.failIf( permission[ 'acquire' ] )

@@ -78,6 +78,112 @@ class _TypeInfoSetup( BaseRegistryTests ):
 
         return self.root.site
 
+class TypesToolConfiguratorTests( _TypeInfoSetup ):
+
+    def _getTargetClass( self ):
+
+        from Products.CMFSetup.typeinfo import TypesToolConfigurator
+        return TypesToolConfigurator
+
+    def test_listTypeInfo_empty( self ):
+
+        site = self._initSite()
+        configurator = self._makeOne( site ).__of__( site )
+
+        self.assertEqual( len( configurator.listTypeInfo() ), 0 )
+
+    def test_listTypeInfo_filled ( self ):
+
+        site = self._initSite( _TI_LIST )
+        configurator = self._makeOne( site ).__of__( site )
+
+        self.assertEqual( len( configurator.listTypeInfo() ), len( _TI_LIST ) )
+
+        info_list = configurator.listTypeInfo()
+        self.assertEqual( len( info_list ), len( _TI_LIST ) )
+
+        _marker = object()
+
+        for i in range( len( _TI_LIST ) ):
+            found = info_list[ i ]
+            expected = _TI_LIST[ i ]
+            self.assertEqual( found[ 'id' ], expected[ 'id' ] )
+            self.failUnless( found.get( 'filename', _marker ) is _marker )
+
+    def test_listTypeInfo_with_filename ( self ):
+
+        site = self._initSite( _TI_LIST_WITH_FILENAME )
+        configurator = self._makeOne( site ).__of__( site )
+
+        info_list = configurator.listTypeInfo()
+        self.assertEqual( len( info_list ), len( _TI_LIST_WITH_FILENAME ) )
+
+        for i in range( len( _TI_LIST_WITH_FILENAME ) ):
+            found = info_list[ i ]
+            expected = _TI_LIST_WITH_FILENAME[ i ]
+            self.assertEqual( found[ 'id' ], expected[ 'id' ] )
+            self.assertEqual( found[ 'filename' ]
+                            , 'types/%s.xml'
+                                % expected[ 'id' ].replace( ' ', '_' )
+                            )
+
+    def test_generateXML_empty( self ):
+
+        site = self._initSite()
+        configurator = self._makeOne( site ).__of__( site )
+        self._compareDOM( configurator.generateXML(), _EMPTY_TOOL_EXPORT )
+
+    def test_generateXML_normal( self ):
+
+        site = self._initSite( _TI_LIST )
+        configurator = self._makeOne( site ).__of__( site )
+        self._compareDOM( configurator.generateXML(), _NORMAL_TOOL_EXPORT )
+
+    def test_generateXML_explicit_filename( self ):
+
+        site = self._initSite( _TI_LIST_WITH_FILENAME )
+        configurator = self._makeOne( site ).__of__( site )
+        self._compareDOM( configurator.generateXML(), _FILENAME_EXPORT )
+
+    def test_parseXML_empty( self ):
+
+        site = self._initSite()
+        configurator = self._makeOne( site ).__of__( site )
+
+        tool_info = configurator.parseXML( _EMPTY_TOOL_EXPORT )
+        self.assertEqual( len( tool_info[ 'types' ] ), 0 )
+
+    def test_parseXML_normal( self ):
+
+        site = self._initSite()
+        configurator = self._makeOne( site ).__of__( site )
+
+        tool_info = configurator.parseXML( _NORMAL_TOOL_EXPORT )
+        self.assertEqual( len( tool_info[ 'types' ] ), 2 )
+
+        type_info = tool_info[ 'types' ][ 0 ]
+        self.assertEqual( type_info[ 'id' ], 'foo' )
+        self.assertEqual( type_info[ 'filename' ], 'types/foo.xml' )
+        type_info = tool_info[ 'types' ][ 1 ]
+        self.assertEqual( type_info[ 'id' ], 'bar' )
+        self.assertEqual( type_info[ 'filename' ], 'types/bar.xml' )
+
+    def test_parseXML_with_filename( self ):
+
+        site = self._initSite()
+        configurator = self._makeOne( site ).__of__( site )
+
+        tool_info = configurator.parseXML( _FILENAME_EXPORT )
+        self.assertEqual( len( tool_info[ 'types' ] ), 2 )
+
+        type_info = tool_info[ 'types' ][ 0 ]
+        self.assertEqual( type_info[ 'id' ], 'foo object' )
+        self.assertEqual( type_info[ 'filename' ], 'types/foo_object.xml' )
+        type_info = tool_info[ 'types' ][ 1 ]
+        self.assertEqual( type_info[ 'id' ], 'bar object' )
+        self.assertEqual( type_info[ 'filename' ], 'types/bar_object.xml' )
+
+
 class TypeInfoConfiguratorTests( _TypeInfoSetup ):
 
     def _getTargetClass( self ):
@@ -185,155 +291,55 @@ class TypeInfoConfiguratorTests( _TypeInfoSetup ):
                           ):
                 self.assertEqual( a_expected[ lk ], a_found[ rk ] )
 
-    def test_listTypeInfo_empty( self ):
-
-        site = self._initSite()
-        configurator = self._makeOne( site ).__of__( site )
-
-        self.assertEqual( len( configurator.listTypeInfo() ), 0 )
-
-    def test_listTypeInfo_filled ( self ):
+    def test_generateXML_FTI( self ):
 
         site = self._initSite( _TI_LIST )
         configurator = self._makeOne( site ).__of__( site )
-
-        self.assertEqual( len( configurator.listTypeInfo() ), len( _TI_LIST ) )
-
-        info_list = configurator.listTypeInfo()
-        self.assertEqual( len( info_list ), len( _TI_LIST ) )
-
-        _marker = object()
-
-        for i in range( len( _TI_LIST ) ):
-            found = info_list[ i ]
-            expected = _TI_LIST[ i ]
-            self.assertEqual( found[ 'id' ], expected[ 'id' ] )
-            self.failUnless( found.get( 'filename', _marker ) is _marker )
-
-    def test_listTypeInfo_with_filename ( self ):
-
-        site = self._initSite( _TI_LIST_WITH_FILENAME )
-        configurator = self._makeOne( site ).__of__( site )
-
-        info_list = configurator.listTypeInfo()
-        self.assertEqual( len( info_list ), len( _TI_LIST_WITH_FILENAME ) )
-
-        for i in range( len( _TI_LIST_WITH_FILENAME ) ):
-            found = info_list[ i ]
-            expected = _TI_LIST_WITH_FILENAME[ i ]
-            self.assertEqual( found[ 'id' ], expected[ 'id' ] )
-            self.assertEqual( found[ 'filename' ]
-                            , 'types/%s.xml'
-                                % expected[ 'id' ].replace( ' ', '_' )
-                            )
-
-    def test_generateToolXML_empty( self ):
-
-        site = self._initSite()
-        configurator = self._makeOne( site ).__of__( site )
-        self._compareDOM( configurator.generateToolXML(), _EMPTY_TOOL_EXPORT )
-
-    def test_generateToolXML_normal( self ):
-
-        site = self._initSite( _TI_LIST )
-        configurator = self._makeOne( site ).__of__( site )
-        self._compareDOM( configurator.generateToolXML(), _NORMAL_TOOL_EXPORT )
-
-    def test_generateToolXML_explicit_filename( self ):
-
-        site = self._initSite( _TI_LIST_WITH_FILENAME )
-        configurator = self._makeOne( site ).__of__( site )
-        self._compareDOM( configurator.generateToolXML(), _FILENAME_EXPORT )
-
-    def test_generateTypeXML_FTI( self ):
-
-        site = self._initSite( _TI_LIST )
-        configurator = self._makeOne( site ).__of__( site )
-        self._compareDOM( configurator.generateTypeXML( 'foo' )
+        self._compareDOM( configurator.generateXML( type_id='foo' )
                         , _FOO_EXPORT % 'foo' )
 
-    def test_generateTypeXML_STI( self ):
+    def test_generateXML_STI( self ):
 
         site = self._initSite( _TI_LIST )
         configurator = self._makeOne( site ).__of__( site )
-        self._compareDOM( configurator.generateTypeXML( 'bar' )
+        self._compareDOM( configurator.generateXML( type_id='bar' )
                         , _BAR_EXPORT % 'bar' )
 
-    def test_parseToolXML_empty( self ):
-
-        site = self._initSite()
-        configurator = self._makeOne( site ).__of__( site )
-
-        id_file_list = configurator.parseToolXML( _EMPTY_TOOL_EXPORT )
-        self.assertEqual( len( id_file_list ), 0 )
-
-    def test_parseToolXML_normal( self ):
-
-        site = self._initSite()
-        configurator = self._makeOne( site ).__of__( site )
-
-        id_file_list = configurator.parseToolXML( _NORMAL_TOOL_EXPORT )
-        self.assertEqual( len( id_file_list ), 2 )
-
-        self.assertEqual( id_file_list[ 0 ][ 0 ], 'foo' )
-        self.assertEqual( id_file_list[ 0 ][ 1 ], 'types/foo.xml' )
-        self.assertEqual( id_file_list[ 1 ][ 0 ], 'bar' )
-        self.assertEqual( id_file_list[ 1 ][ 1 ], 'types/bar.xml' )
-
-    def test_parseToolXML_with_filename( self ):
-
-        site = self._initSite()
-        configurator = self._makeOne( site ).__of__( site )
-
-        id_file_list = configurator.parseToolXML( _FILENAME_EXPORT )
-        self.assertEqual( len( id_file_list ), 2 )
-
-        self.assertEqual( id_file_list[ 0 ][ 0 ], 'foo object' )
-        self.assertEqual( id_file_list[ 0 ][ 1 ], 'types/foo_object.xml' )
-        self.assertEqual( id_file_list[ 1 ][ 0 ], 'bar object' )
-        self.assertEqual( id_file_list[ 1 ][ 1 ], 'types/bar_object.xml' )
-
-    def test_parseTypeXML_FTI( self ):
+    def test_parseXML_FTI( self ):
 
         site = self._initSite()
         tool = site.portal_types
         configurator = self._makeOne( site ).__of__( site )
         self.assertEqual( len( tool.objectIds() ), 0 )
 
-        info_list = configurator.parseTypeXML( _FOO_EXPORT % 'foo' )
+        info = configurator.parseXML( _FOO_EXPORT % 'foo' )
 
-        self.assertEqual( len( info_list ), 1 )
-
-        info = info_list[ 0 ]
         self.assertEqual( info[ 'id' ], 'foo' )
         self.assertEqual( info[ 'title' ], 'Foo' )
         self.assertEqual( len( info[ 'aliases' ] ), 2 )
 
-    def test_parseTypeXML_STI( self ):
+    def test_parseXML_STI( self ):
 
         site = self._initSite()
         tool = site.portal_types
         configurator = self._makeOne( site ).__of__( site )
         self.assertEqual( len( tool.objectIds() ), 0 )
 
-        info_list = configurator.parseTypeXML( _BAR_EXPORT % 'bar' )
-        self.assertEqual( len( info_list ), 1 )
+        info = configurator.parseXML( _BAR_EXPORT % 'bar' )
 
-        info = info_list[ 0 ]
         self.assertEqual( info[ 'id' ], 'bar' )
         self.assertEqual( info[ 'title' ], 'Bar' )
         self.assertEqual( len( info[ 'aliases' ] ), 2 )
 
-    def test_parseTypeXML_actions( self ):
+    def test_parseXML_actions( self ):
 
         site = self._initSite()
         tool = site.portal_types
         configurator = self._makeOne( site ).__of__( site )
 
-        type_info_list = configurator.parseTypeXML( _FOO_EXPORT % 'foo' )
+        info = configurator.parseXML( _FOO_EXPORT % 'foo' )
 
-        type_info = type_info_list[ 0 ]
-        action_info_list = type_info[ 'actions' ]
+        action_info_list = info[ 'actions' ]
         self.assertEqual( len( action_info_list ), 3 )
 
         action_info = action_info_list[ 0 ]
@@ -703,6 +709,7 @@ class Test_importTypesTool( _TypeInfoSetup ):
 
 def test_suite():
     return unittest.TestSuite((
+        unittest.makeSuite( TypesToolConfiguratorTests ),
         unittest.makeSuite( TypeInfoConfiguratorTests ),
         unittest.makeSuite( Test_exportTypesTool ),
         unittest.makeSuite( Test_importTypesTool ),

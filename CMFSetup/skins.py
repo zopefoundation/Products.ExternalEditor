@@ -18,10 +18,8 @@ $Id$
 """
 
 import re
-from xml.sax import parseString
 
 from AccessControl import ClassSecurityInfo
-from Acquisition import Implicit
 from Globals import InitializeClass
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
@@ -31,9 +29,10 @@ from Products.CMFCore.DirectoryView import createDirectoryView
 from Products.CMFCore.DirectoryView import DirectoryView
 
 from permissions import ManagePortal
-from utils import HandlerBase
-from utils import _resolveDottedName
 from utils import _xmldir
+from utils import ConfiguratorBase
+from utils import CONVERTER, DEFAULT, KEY
+
 
 #
 #   Entry points
@@ -82,29 +81,24 @@ def importSkinsTool( context ):
 
     if text is not None:
 
-        stc = SkinsToolConfigurator( site ).__of__( site )
-
-        ( default_skin
-        , request_var
-        , allow_arbitrary
-        , persist_cookie
-        , skin_dirs
-        , skin_paths
-        ) = stc.parseXML( text, encoding )
+        stc = SkinsToolConfigurator( site, encoding )
+        tool_info = stc.parseXML( text )
 
         tool = getToolByName( site, 'portal_skins' )
 
-        tool.default_skin = str( default_skin )
-        tool.request_varname = str( request_var )
-        tool.allow_any =  allow_arbitrary and 1 or 0
-        tool.cookie_persistence =  persist_cookie and 1 or 0
+        tool.default_skin = str( tool_info[ 'default_skin' ] )
+        tool.request_varname = str( tool_info[ 'request_var' ] )
+        tool.allow_any =  tool_info[ 'allow_arbitrary' ] and 1 or 0
+        tool.cookie_persistence =  tool_info[ 'persist_cookie' ] and 1 or 0
 
-        for id, directory in skin_dirs:
+        for dir_info in tool_info[ 'skin_dirs' ]:
 
-            createDirectoryView( tool, directory, id )
+            createDirectoryView( tool, dir_info[ 'directory' ],
+                                 dir_info[ 'id' ] )
 
-        for path_name, layers in skin_paths:
-            tool.addSkinSelection( path_name, ', '.join( layers ) )
+        for path_info in tool_info[ 'skin_paths' ]:
+            tool.addSkinSelection( path_info[ 'id' ],
+                                   ', '.join( path_info[ 'layers' ] ) )
 
     #
     #   Purge and rebuild the skin path, now that we have added our stuff.
@@ -148,17 +142,23 @@ def exportSkinsTool( context ):
     return 'Skins tool exported.'
 
 
-class SkinsToolConfigurator( Implicit ):
+class SkinsToolConfigurator(ConfiguratorBase):
 
     security = ClassSecurityInfo()
-    security.setDefaultAccess('allow')
 
     _COMMA_SPLITTER = re.compile( r',[ ]*' )
 
-    def __init__( self, site ):
+    security.declareProtected(ManagePortal, 'getToolInfo' )
+    def getToolInfo( self ):
 
-        self._site = site
-        self._skins_tool = getToolByName( site, 'portal_skins' )
+        """ Return the tool's settings.
+        """
+        stool = getToolByName(self._site, 'portal_skins')
+
+        return { 'default_skin': stool.default_skin,
+                 'request_varname': stool.request_varname,
+                 'allow_any': stool.allow_any,
+                 'cookie_persistence': stool.cookie_persistence }
 
     security.declareProtected(ManagePortal, 'listSkinPaths' )
     def listSkinPaths( self ):
@@ -171,9 +171,11 @@ class SkinsToolConfigurator( Implicit ):
 
           'path' -- sequence of layer IDs
         """
+        stool = getToolByName(self._site, 'portal_skins')
+
         return [ { 'id' : k
                  , 'path' : self._COMMA_SPLITTER.split( v )
-                 } for k, v in self._skins_tool.getSkinPaths() ]
+                 } for k, v in stool.getSkinPaths() ]
 
     security.declareProtected(ManagePortal, 'listFSDirectoryViews' )
     def listFSDirectoryViews( self ):
@@ -187,7 +189,9 @@ class SkinsToolConfigurator( Implicit ):
           'directory' -- filesystem path of the FSDV.
         """
         result = []
-        fsdvs = self._skins_tool.objectItems( DirectoryView.meta_type )
+        stool = getToolByName(self._site, 'portal_skins')
+
+        fsdvs = stool.objectItems( DirectoryView.meta_type )
         fsdvs.sort()
 
         for id, fsdv in fsdvs:
@@ -203,121 +207,29 @@ class SkinsToolConfigurator( Implicit ):
 
         return result
 
-    security.declareProtected(ManagePortal, 'getDefaultSkin' )
-    def getDefaultSkin( self ):
+    def _getExportTemplate(self):
 
-        """ Return the tool's default skin name.
-        """
-        return self._skins_tool.default_skin
+        return PageTemplateFile('stcExport.xml', _xmldir)
 
-    security.declareProtected(ManagePortal, 'getRequestVarName' )
-    def getRequestVarName( self ):
+    def _getImportMapping(self):
 
-        """ Return the tool's skin request variable name.
-        """
-        return self._skins_tool.request_varname
+        return {
+          'skins-tool':
+            { 'default_skin':       {},
+              'request_varname':    {KEY: 'request_var'},
+              'allow_any':          {KEY: 'allow_arbitrary', DEFAULT: False,
+                                     CONVERTER: self._convertToBoolean},
+              'cookie_persistence': {KEY: 'persist_cookie', DEFAULT: False,
+                                     CONVERTER: self._convertToBoolean},
+              'skin-directory':     {KEY: 'skin_dirs', DEFAULT: ()},
+              'skin-path':          {KEY: 'skin_paths', DEFAULT: ()} },
+          'skin-directory':
+            { 'id':                 {},
+              'directory':          {} },
+          'skin-path':
+            { 'id':                 {},
+              'layer':              {KEY: 'layers'} },
+          'layer':
+            { 'name':               {KEY: None} } }
 
-    security.declareProtected(ManagePortal, 'getAllowAny' )
-    def getAllowAny( self ):
-
-        """ Return the tool's "allow arbitrary skin paths" setting (a boolean).
-        """
-        return self._skins_tool.allow_any
-
-    security.declareProtected(ManagePortal, 'getCookiePersistence' )
-    def getCookiePersistence( self ):
-
-        """ Return the tool's cookie persistence setting (a boolean).
-        """
-        return self._skins_tool.cookie_persistence
-
-    security.declareProtected(ManagePortal, 'generateXML' )
-    def generateXML(self):
-
-        """ Pseudo API.
-        """
-        return self._skinsConfig()
-
-    security.declareProtected( ManagePortal, 'parseXML' )
-    def parseXML( self, text, encoding=None ):
-
-        """ Pseudo API.
-        """
-        reader = getattr( text, 'read', None )
-
-        if reader is not None:
-            text = reader()
-
-        parser = _SkinsParser( encoding )
-        parseString( text, parser )
-
-        return ( parser._default_skin
-               , parser._request_var
-               , parser._allow_arbitrary
-               , parser._persist_cookie
-               , parser._skin_dirs
-               , parser._skin_paths
-               )
-
-    #
-    #   Helper methods
-    #
-    security.declarePrivate( '_skinsConfig' )
-    _skinsConfig = PageTemplateFile( 'stcExport.xml'
-                                   , _xmldir
-                                   , __name__='skinsConfig'
-                                   )
-
-InitializeClass( SkinsToolConfigurator )
-
-
-class _SkinsParser( HandlerBase ):
-
-    security = ClassSecurityInfo()
-    security.declareObjectPrivate()
-    security.setDefaultAccess( 'deny' )
-
-    def __init__( self, encoding ):
-
-        self._encoding = encoding
-        self._skin_dirs = []
-        self._skin_paths = []
-        self._default_skin = None
-        self._request_var = None
-        self._allow_arbitrary = False
-        self._persist_cookie = False
-
-    def startElement( self, name, attrs ):
-
-        if name == 'skins-tool':
-            self._default_skin = self._extract( attrs, 'default_skin' )
-            self._request_var = self._extract( attrs, 'request_varname' )
-            self._allow_arbitrary = self._extractBoolean( attrs
-                                                        , 'allow_any'
-                                                        , False
-                                                        )
-            self._persist_cookie = self._extractBoolean( attrs
-                                                       , 'cookie_persistence'
-                                                       , False
-                                                       )
-
-        elif name == 'skin-directory':
-
-            self._skin_dirs.append( ( self._extract( attrs, 'id' )
-                                    , self._extract( attrs, 'directory' )
-                                    ) )
-
-        elif name == 'skin-path':
-
-            path_name = self._extract( attrs,'id' )
-            self._skin_paths.append( ( path_name, [] ) )
-
-        elif name == 'layer':
-
-            path_name, layers = self._skin_paths[ -1 ]
-            layers.append( self._extract( attrs, 'name' ) )
-
-        else:
-            raise ValueError, 'Unknown element %s' % name
-
-InitializeClass( _SkinsParser )
+InitializeClass(SkinsToolConfigurator)

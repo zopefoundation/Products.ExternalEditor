@@ -224,14 +224,228 @@ class _WorkflowSetup( BaseRegistryTests ):
 
             dcworkflow.scripts._setObject( k, script )
 
-class WorkflowToolConfiguratorTests( _WorkflowSetup
-                                   , _GuardChecker
-                                   ):
-
+class WorkflowToolConfiguratorTests( _WorkflowSetup ):
+    
     def _getTargetClass( self ):
 
         from Products.CMFSetup.workflow import WorkflowToolConfigurator
         return WorkflowToolConfigurator
+
+    def test_listWorkflowInfo_empty( self ):
+
+        site = self._initSite()
+
+        configurator = self._makeOne( site ).__of__( site )
+
+        self.assertEqual( len( configurator.listWorkflowInfo() ), 0 )
+
+    def test_listWorkflowInfo_mixed( self ):
+
+        from Products.DCWorkflow.DCWorkflow import DCWorkflowDefinition
+
+        site = self._initSite()
+
+        WF_ID_NON = 'non_dcworkflow'
+        WF_TITLE_NON = 'Non-DCWorkflow'
+        WF_ID_DC = 'dcworkflow'
+        WF_TITLE_DC = 'DCWorkflow'
+
+        site = self._initSite()
+
+        wf_tool = site.portal_workflow
+        nondcworkflow = DummyWorkflow( WF_TITLE_NON )
+        nondcworkflow.title = WF_TITLE_NON
+        wf_tool._setObject( WF_ID_NON, nondcworkflow )
+
+        dcworkflow = self._initDCWorkflow( WF_ID_DC )
+        dcworkflow.title = WF_TITLE_DC
+
+        configurator = self._makeOne( site ).__of__( site )
+
+        info_list = configurator.listWorkflowInfo()
+
+        self.assertEqual( len( info_list ), 2 )
+
+        non_info = [ x for x in info_list if x[ 'id' ] == WF_ID_NON ][0]
+        self.assertEqual( non_info[ 'title' ], WF_TITLE_NON )
+        self.assertEqual( non_info[ 'meta_type' ], DummyWorkflow.meta_type )
+
+        dc_info = [ x for x in info_list if x[ 'id' ] == WF_ID_DC ][0]
+        self.assertEqual( dc_info[ 'title' ], WF_TITLE_DC )
+        self.assertEqual( dc_info[ 'meta_type' ]
+                        , DCWorkflowDefinition.meta_type )
+        self.assertEqual( dc_info[ 'filename' ]
+                        , 'workflows/%s/definition.xml' % WF_ID_DC )
+
+    def test_listWorkflowChains_no_default( self ):
+
+        site = self._initSite()
+        configurator = self._makeOne( site ).__of__( site )
+
+        chains = configurator.listWorkflowChains()
+
+        default_chain = [ x[1] for x in chains if x[0] is None ][0]
+        self.assertEqual( len( default_chain ), 0 )
+
+    def test_listWorkflowChains_with_default( self ):
+
+        site = self._initSite()
+        site.portal_workflow._default_chain = ( 'foo', 'bar' )
+        configurator = self._makeOne( site ).__of__( site )
+
+        chains = configurator.listWorkflowChains()
+
+        self.assertEqual( chains[ 0 ][ 0 ], None )
+        default_chain = chains[ 0 ][ 1 ]
+        self.assertEqual( len( default_chain ), 2 )
+        self.assertEqual( default_chain[ 0 ], 'foo' )
+        self.assertEqual( default_chain[ 1 ], 'bar' )
+
+    def test_listWorkflowChains_no_overrides( self ):
+
+        site = self._initSite()
+        configurator = self._makeOne( site ).__of__( site )
+
+        chains = configurator.listWorkflowChains()
+
+        self.assertEqual( len( chains ), 1 )
+
+    def test_listWorkflowChains_with_overrides( self ):
+
+        site = self._initSite()
+        site.portal_workflow._chains_by_type[ 'qux' ] = ( 'foo', 'bar' )
+        configurator = self._makeOne( site ).__of__( site )
+
+        chains = configurator.listWorkflowChains()
+
+        self.assertEqual( len( chains ), 2 )
+
+        self.assertEqual( chains[ 0 ][ 0 ], None )
+        default_chain = chains[ 0 ][ 1 ]
+        self.assertEqual( len( default_chain ), 0 )
+
+        self.assertEqual( chains[ 1 ][ 0 ], 'qux' )
+        qux_chain = chains[ 1 ][ 1 ]
+        self.assertEqual( len( qux_chain ), 2 )
+        self.assertEqual( qux_chain[ 0 ], 'foo' )
+        self.assertEqual( qux_chain[ 1 ], 'bar' )
+
+    def test_listWorkflowChains_default_chain_plus_overrides( self ):
+
+        site = self._initSite()
+        site.portal_workflow._default_chain = ( 'foo', 'bar' )
+        site.portal_workflow._chains_by_type[ 'qux' ] = ( 'baz', )
+        configurator = self._makeOne( site ).__of__( site )
+
+        chains = configurator.listWorkflowChains()
+
+        self.assertEqual( chains[ 0 ][ 0 ], None )
+        default_chain = chains[ 0 ][ 1 ]
+        self.assertEqual( len( default_chain ), 2 )
+        self.assertEqual( default_chain[ 0 ], 'foo' )
+        self.assertEqual( default_chain[ 1 ], 'bar' )
+
+        self.assertEqual( chains[ 1 ][ 0 ], 'qux' )
+        qux_chain = chains[ 1 ][ 1 ]
+        self.assertEqual( len( qux_chain ), 1 )
+        self.assertEqual( qux_chain[ 0 ], 'baz' )
+
+    def test_generateXML_empty( self ):
+
+        site = self._initSite()
+        configurator = self._makeOne( site ).__of__( site )
+        self._compareDOM( configurator.generateXML(), _EMPTY_TOOL_EXPORT )
+
+    def test_generateXML_default_chain_plus_overrides( self ):
+
+        site = self._initSite()
+        site.portal_workflow._default_chain = ( 'foo', 'bar' )
+        site.portal_workflow._chains_by_type[ 'qux' ] = ( 'baz', )
+
+        configurator = self._makeOne( site ).__of__( site )
+
+        self._compareDOM( configurator.generateXML()
+                        , _OVERRIDE_TOOL_EXPORT )
+
+    def test_generateXML_mixed( self ):
+
+        WF_ID_NON = 'non_dcworkflow'
+        WF_TITLE_NON = 'Non-DCWorkflow'
+        WF_ID_DC = 'dcworkflow'
+        WF_TITLE_DC = 'DCWorkflow'
+
+        site = self._initSite()
+
+        wf_tool = site.portal_workflow
+        nondcworkflow = DummyWorkflow( WF_TITLE_NON )
+        nondcworkflow.title = WF_TITLE_NON
+        wf_tool._setObject( WF_ID_NON, nondcworkflow )
+
+        dcworkflow = self._initDCWorkflow( WF_ID_DC )
+        dcworkflow.title = WF_TITLE_DC
+
+        configurator = self._makeOne( site ).__of__( site )
+
+        self._compareDOM( configurator.generateXML(), _NORMAL_TOOL_EXPORT )
+
+    def test_parseXML_empty( self ):
+
+        site = self._initSite()
+        configurator = self._makeOne( site ).__of__( site )
+
+        tool_info = configurator.parseXML( _EMPTY_TOOL_EXPORT )
+
+        self.assertEqual( len( tool_info[ 'workflows' ] ), 0 )
+        self.assertEqual( len( tool_info[ 'bindings' ] ), 1 )
+
+    def test_parseXML_default_chain_plus_overrides( self ):
+
+        site = self._initSite()
+        configurator = self._makeOne( site ).__of__( site )
+
+        tool_info = configurator.parseXML( _OVERRIDE_TOOL_EXPORT )
+
+        self.assertEqual( len( tool_info[ 'workflows' ] ), 0 )
+        self.assertEqual( len( tool_info[ 'bindings' ] ), 2 )
+
+        default = tool_info[ 'bindings' ][ None ]
+        self.assertEqual( len( default ), 2 )
+        self.assertEqual( default[ 0 ], 'foo' )
+        self.assertEqual( default[ 1 ], 'bar' )
+
+        override = tool_info[ 'bindings' ][ 'qux' ]
+        self.assertEqual( len( override ), 1 )
+        self.assertEqual( override[ 0 ], 'baz' )
+
+    def test_parseXML_normal( self ):
+
+        site = self._initSite()
+        configurator = self._makeOne( site ).__of__( site )
+
+        tool_info = configurator.parseXML( _NORMAL_TOOL_EXPORT )
+
+        self.assertEqual( len( tool_info[ 'workflows' ] ), 2 )
+
+        info = tool_info[ 'workflows' ][ 0 ]
+        self.assertEqual( info[ 'workflow_id' ], 'non_dcworkflow' )
+        self.assertEqual( info[ 'meta_type' ], DummyWorkflow.meta_type )
+        self.assertEqual( info[ 'filename' ], None )
+
+        info = tool_info[ 'workflows' ][ 1 ]
+        self.assertEqual( info[ 'workflow_id' ], 'dcworkflow' )
+        self.assertEqual( info[ 'meta_type' ], DCWorkflowDefinition.meta_type )
+        self.assertEqual( info[ 'filename' ],
+                          'workflows/dcworkflow/definition.xml' )
+
+        self.assertEqual( len( tool_info[ 'bindings' ] ), 1 )
+
+
+class WorkflowDefinitionConfiguratorTests( _WorkflowSetup, _GuardChecker ):
+
+    def _getTargetClass( self ):
+
+        from Products.CMFSetup.workflow import WorkflowDefinitionConfigurator
+        return WorkflowDefinitionConfigurator
 
     def test_getWorkflowInfo_non_dcworkflow( self ):
 
@@ -511,165 +725,7 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
             self.assertEqual( info[ 'filename' ]
                             , expected[ 2 ] % WF_ID )
 
-
-    def test_listWorkflowInfo_empty( self ):
-
-        site = self._initSite()
-
-        configurator = self._makeOne( site ).__of__( site )
-
-        self.assertEqual( len( configurator.listWorkflowInfo() ), 0 )
-
-    def test_listWorkflowInfo_mixed( self ):
-
-        from Products.DCWorkflow.DCWorkflow import DCWorkflowDefinition
-
-        site = self._initSite()
-
-        WF_ID_NON = 'non_dcworkflow'
-        WF_TITLE_NON = 'Non-DCWorkflow'
-        WF_ID_DC = 'dcworkflow'
-        WF_TITLE_DC = 'DCWorkflow'
-
-        site = self._initSite()
-
-        wf_tool = site.portal_workflow
-        nondcworkflow = DummyWorkflow( WF_TITLE_NON )
-        nondcworkflow.title = WF_TITLE_NON
-        wf_tool._setObject( WF_ID_NON, nondcworkflow )
-
-        dcworkflow = self._initDCWorkflow( WF_ID_DC )
-        dcworkflow.title = WF_TITLE_DC
-
-        configurator = self._makeOne( site ).__of__( site )
-
-        info_list = configurator.listWorkflowInfo()
-
-        self.assertEqual( len( info_list ), 2 )
-
-        non_info = [ x for x in info_list if x[ 'id' ] == WF_ID_NON ][0]
-        self.assertEqual( non_info[ 'title' ], WF_TITLE_NON )
-        self.assertEqual( non_info[ 'meta_type' ], DummyWorkflow.meta_type )
-
-        dc_info = [ x for x in info_list if x[ 'id' ] == WF_ID_DC ][0]
-        self.assertEqual( dc_info[ 'title' ], WF_TITLE_DC )
-        self.assertEqual( dc_info[ 'meta_type' ]
-                        , DCWorkflowDefinition.meta_type )
-        self.assertEqual( dc_info[ 'filename' ]
-                        , 'workflows/%s/definition.xml' % WF_ID_DC )
-
-    def test_listWorkflowChains_no_default( self ):
-
-        site = self._initSite()
-        configurator = self._makeOne( site ).__of__( site )
-
-        chains = configurator.listWorkflowChains()
-
-        default_chain = [ x[1] for x in chains if x[0] is None ][0]
-        self.assertEqual( len( default_chain ), 0 )
-
-    def test_listWorkflowChains_with_default( self ):
-
-        site = self._initSite()
-        site.portal_workflow._default_chain = ( 'foo', 'bar' )
-        configurator = self._makeOne( site ).__of__( site )
-
-        chains = configurator.listWorkflowChains()
-
-        self.assertEqual( chains[ 0 ][ 0 ], None )
-        default_chain = chains[ 0 ][ 1 ]
-        self.assertEqual( len( default_chain ), 2 )
-        self.assertEqual( default_chain[ 0 ], 'foo' )
-        self.assertEqual( default_chain[ 1 ], 'bar' )
-
-    def test_listWorkflowChains_no_overrides( self ):
-
-        site = self._initSite()
-        configurator = self._makeOne( site ).__of__( site )
-
-        chains = configurator.listWorkflowChains()
-
-        self.assertEqual( len( chains ), 1 )
-
-    def test_listWorkflowChains_with_overrides( self ):
-
-        site = self._initSite()
-        site.portal_workflow._chains_by_type[ 'qux' ] = ( 'foo', 'bar' )
-        configurator = self._makeOne( site ).__of__( site )
-
-        chains = configurator.listWorkflowChains()
-
-        self.assertEqual( len( chains ), 2 )
-
-        self.assertEqual( chains[ 0 ][ 0 ], None )
-        default_chain = chains[ 0 ][ 1 ]
-        self.assertEqual( len( default_chain ), 0 )
-
-        self.assertEqual( chains[ 1 ][ 0 ], 'qux' )
-        qux_chain = chains[ 1 ][ 1 ]
-        self.assertEqual( len( qux_chain ), 2 )
-        self.assertEqual( qux_chain[ 0 ], 'foo' )
-        self.assertEqual( qux_chain[ 1 ], 'bar' )
-
-    def test_listWorkflowChains_default_chain_plus_overrides( self ):
-
-        site = self._initSite()
-        site.portal_workflow._default_chain = ( 'foo', 'bar' )
-        site.portal_workflow._chains_by_type[ 'qux' ] = ( 'baz', )
-        configurator = self._makeOne( site ).__of__( site )
-
-        chains = configurator.listWorkflowChains()
-
-        self.assertEqual( chains[ 0 ][ 0 ], None )
-        default_chain = chains[ 0 ][ 1 ]
-        self.assertEqual( len( default_chain ), 2 )
-        self.assertEqual( default_chain[ 0 ], 'foo' )
-        self.assertEqual( default_chain[ 1 ], 'bar' )
-
-        self.assertEqual( chains[ 1 ][ 0 ], 'qux' )
-        qux_chain = chains[ 1 ][ 1 ]
-        self.assertEqual( len( qux_chain ), 1 )
-        self.assertEqual( qux_chain[ 0 ], 'baz' )
-
-    def test_generateToolXML_empty( self ):
-
-        site = self._initSite()
-        configurator = self._makeOne( site ).__of__( site )
-        self._compareDOM( configurator.generateToolXML(), _EMPTY_TOOL_EXPORT )
-
-    def test_generateToolXML_default_chain_plus_overrides( self ):
-
-        site = self._initSite()
-        site.portal_workflow._default_chain = ( 'foo', 'bar' )
-        site.portal_workflow._chains_by_type[ 'qux' ] = ( 'baz', )
-
-        configurator = self._makeOne( site ).__of__( site )
-
-        self._compareDOM( configurator.generateToolXML()
-                        , _OVERRIDE_TOOL_EXPORT )
-
-    def test_generateToolXML_mixed( self ):
-
-        WF_ID_NON = 'non_dcworkflow'
-        WF_TITLE_NON = 'Non-DCWorkflow'
-        WF_ID_DC = 'dcworkflow'
-        WF_TITLE_DC = 'DCWorkflow'
-
-        site = self._initSite()
-
-        wf_tool = site.portal_workflow
-        nondcworkflow = DummyWorkflow( WF_TITLE_NON )
-        nondcworkflow.title = WF_TITLE_NON
-        wf_tool._setObject( WF_ID_NON, nondcworkflow )
-
-        dcworkflow = self._initDCWorkflow( WF_ID_DC )
-        dcworkflow.title = WF_TITLE_DC
-
-        configurator = self._makeOne( site ).__of__( site )
-
-        self._compareDOM( configurator.generateToolXML(), _NORMAL_TOOL_EXPORT )
-
-    def test_generateWorkflowXML_empty( self ):
+    def test_generateXML_empty( self ):
 
         WF_ID = 'empty'
         WF_TITLE = 'Empty DCWorkflow'
@@ -778,56 +834,6 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
                             , 'initial_state' : WF_INITIAL_STATE
                             , 'workflow_filename' : WF_ID_2.replace(' ', '_')
                             } )
-
-    def test_parseToolXML_empty( self ):
-
-        site = self._initSite()
-        configurator = self._makeOne( site ).__of__( site )
-
-        workflows, bindings = configurator.parseToolXML( _EMPTY_TOOL_EXPORT )
-
-        self.assertEqual( len( workflows ), 0 )
-        self.assertEqual( len( bindings ), 1 )
-
-    def test_parseToolXML_default_chain_plus_overrides( self ):
-
-        site = self._initSite()
-        configurator = self._makeOne( site ).__of__( site )
-
-        workflows, bindings = configurator.parseToolXML( _OVERRIDE_TOOL_EXPORT )
-
-        self.assertEqual( len( workflows ), 0 )
-        self.assertEqual( len( bindings ), 2 )
-
-        default = bindings[ None ]
-        self.assertEqual( len( default ), 2 )
-        self.assertEqual( default[ 0 ], 'foo' )
-        self.assertEqual( default[ 1 ], 'bar' )
-
-        override = bindings[ 'qux' ]
-        self.assertEqual( len( override ), 1 )
-        self.assertEqual( override[ 0 ], 'baz' )
-
-    def test_parseToolXML_normal( self ):
-
-        site = self._initSite()
-        configurator = self._makeOne( site ).__of__( site )
-
-        workflows, bindings = configurator.parseToolXML( _NORMAL_TOOL_EXPORT )
-
-        self.assertEqual( len( workflows ), 2 )
-
-        wfid, meta_type, filename = workflows[ 0 ]
-        self.assertEqual( wfid, 'non_dcworkflow' )
-        self.assertEqual( meta_type, DummyWorkflow.meta_type )
-        self.assertEqual( filename, None )
-
-        wfid, meta_type, filename = workflows[ 1 ]
-        self.assertEqual( wfid, 'dcworkflow' )
-        self.assertEqual( meta_type, DCWorkflowDefinition.meta_type )
-        self.assertEqual( filename, 'workflows/dcworkflow/definition.xml' )
-
-        self.assertEqual( len( bindings ), 1 )
 
     def test_parseWorkflowXML_empty( self ):
 
@@ -2305,6 +2311,7 @@ class Test_importWorkflow( _WorkflowSetup
 def test_suite():
     return unittest.TestSuite((
         unittest.makeSuite( WorkflowToolConfiguratorTests ),
+        unittest.makeSuite( WorkflowDefinitionConfiguratorTests ),
         unittest.makeSuite( Test_exportWorkflow ),
         unittest.makeSuite( Test_importWorkflow ),
         ))

@@ -15,18 +15,16 @@
 $Id$
 """
 
-from xml.dom.minidom import parseString as domParseString
-
 from AccessControl import ClassSecurityInfo
 from AccessControl.Permission import Permission
-from Acquisition import Implicit
 from Globals import InitializeClass
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
 from permissions import ManagePortal
-from utils import _getNodeAttribute
-from utils import _getNodeAttributeBoolean
 from utils import _xmldir
+from utils import ConfiguratorBase
+from utils import CONVERTER, DEFAULT, KEY
+
 
 #
 #   Configurator entry points
@@ -79,8 +77,8 @@ def importRolemap( context ):
 
     if text is not None:
 
-        rc = RolemapConfigurator( site ).__of__( site )
-        roles, permissions = rc.parseXML(text, encoding)
+        rc = RolemapConfigurator( site, encoding )
+        rolemap_info = rc.parseXML( text )
 
         immediate_roles = list( getattr( site, '__ac_roles__', [] ) )[:]
         already = {}
@@ -88,7 +86,7 @@ def importRolemap( context ):
         for role in site.valid_roles():
             already[ role ] = 1
 
-        for role in roles:
+        for role in rolemap_info[ 'roles' ]:
 
             if already.get( role ) is None:
                 immediate_roles.append( role )
@@ -97,7 +95,7 @@ def importRolemap( context ):
         immediate_roles.sort()
         site.__ac_roles__ = tuple( immediate_roles )
 
-        for permission in permissions:
+        for permission in rolemap_info[ 'permissions' ]:
 
             site.manage_permission( permission[ 'name' ]
                                   , permission[ 'roles' ]
@@ -141,20 +139,10 @@ def exportRolemap( context ):
     return 'Role / permission map exported.'
 
 
-class RolemapConfigurator( Implicit ):
-
+class RolemapConfigurator(ConfiguratorBase):
     """ Synthesize XML description of sitewide role-permission settings.
     """
     security = ClassSecurityInfo()
-    security.setDefaultAccess( 'allow' )
-
-    def __init__( self, site ):
-        self._site = site
-
-    _rolemap = PageTemplateFile( 'rmeExport.xml'
-                               , _xmldir
-                               , __name__='_rolemap'
-                               )
 
     security.declareProtected( ManagePortal, 'listRoles' )
     def listRoles( self ):
@@ -200,57 +188,25 @@ class RolemapConfigurator( Implicit ):
 
         return permissions
 
-    security.declareProtected( ManagePortal, 'generateXML' )
-    def generateXML( self ):
+    def _getExportTemplate(self):
 
-        """ Pseudo API.
-        """
-        return self._rolemap()
+        return PageTemplateFile('rmeExport.xml', _xmldir)
 
-    security.declareProtected( ManagePortal, 'parseXML' )
-    def parseXML( self, xml, encoding=None ):
+    def _getImportMapping(self):
 
-        """ Pseudo API.
-        """
-        dom = domParseString(xml)
+        return {
+          'rolemap':
+            { 'roles':       {CONVERTER: self._convertToUnique},
+              'permissions': {CONVERTER: self._convertToUnique} },
+          'roles':
+            { 'role':        {KEY: None} },
+          'role':
+            { 'name':        {KEY: None} },
+          'permissions':
+            { 'permission':  {KEY: None, DEFAULT: ()} },
+          'permission':
+            { 'name':        {},
+              'role':        {KEY: 'roles'},
+              'acquire':     {CONVERTER: self._convertToBoolean} } }
 
-        return _extractRolemapNode(dom, encoding)
-
-InitializeClass( RolemapConfigurator )
-
-
-def _extractRolemapNode(parent, encoding=None):
-
-    rm_node = parent.getElementsByTagName('rolemap')[0]
-
-    r_node = rm_node.getElementsByTagName('roles')[0]
-    roles = _extractRoleNodes(r_node, encoding)
-
-    p_node = rm_node.getElementsByTagName('permissions')[0]
-    permissions = _extractPermissionNodes(p_node, encoding)
-
-    return roles, permissions
-
-def _extractPermissionNodes(parent, encoding=None):
-
-    result = []
-
-    for p_node in parent.getElementsByTagName('permission'):
-        name    = _getNodeAttribute(p_node, 'name', encoding)
-        roles   = _extractRoleNodes(p_node, encoding)
-        acquire = _getNodeAttributeBoolean(p_node, 'acquire')
-        result.append( { 'name': name,
-                         'roles': roles,
-                         'acquire': acquire } )
-
-    return tuple(result)
-
-def _extractRoleNodes(parent, encoding=None):
-
-    result = []
-
-    for r_node in parent.getElementsByTagName('role'):
-        value = _getNodeAttribute(r_node, 'name', encoding)
-        result.append(value)
-
-    return tuple(result)
+InitializeClass(RolemapConfigurator)

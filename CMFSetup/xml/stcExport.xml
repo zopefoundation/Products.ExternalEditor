@@ -4,19 +4,20 @@
             request_varname="request_varname"
             allow_any="False"
             cookie_persistence="False"
-            tal:attributes="default_skin here/getDefaultSkin;
-                            request_varname here/getRequestVarName;
-                            allow_any here/getAllowAny;
-                            cookie_persistence here/getCookiePersistence;
+            tal:define="info context/getToolInfo"
+            tal:attributes="default_skin info/default_skin;
+                            request_varname info/request_varname;
+                            allow_any info/allow_any;
+                            cookie_persistence info/cookie_persistence;
                            ">
  <skin-directory id="content"
                  directory="CMFDefault/skins/content"
-                 tal:repeat="fsdv here/listFSDirectoryViews"
+                 tal:repeat="fsdv context/listFSDirectoryViews"
                  tal:attributes="id fsdv/id;
                                  directory fsdv/directory;
                                 " />
  <skin-path id="Basic"
-            tal:repeat="skin here/listSkinPaths"
+            tal:repeat="skin context/listSkinPaths"
             tal:attributes="id skin/id" >
   <layer name="generic"
          tal:repeat="layer skin/path"

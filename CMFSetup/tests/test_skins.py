@@ -208,20 +208,14 @@ class SkinsToolConfiguratorTests( _SkinsSetup ):
         self.assertEqual( len( skins_tool.objectItems() ), 3 )
 
         configurator = self._makeOne( site ).__of__( site )
-        ( default_skin
-        , request_var
-        , allow_arbitrary
-        , persist_cookie
-        , skin_dirs
-        , skin_paths
-        ) = configurator.parseXML( _EMPTY_EXPORT )
+        tool_info = configurator.parseXML( _EMPTY_EXPORT )
 
-        self.assertEqual( default_skin, "default_skin" )
-        self.assertEqual( request_var, "request_varname" )
-        self.failIf( allow_arbitrary )
-        self.failIf( persist_cookie )
-        self.assertEqual( len( skin_dirs ), 0 )
-        self.assertEqual( len( skin_paths ), 0 )
+        self.assertEqual( tool_info[ 'default_skin' ], "default_skin" )
+        self.assertEqual( tool_info[ 'request_var' ], "request_varname" )
+        self.failIf( tool_info[ 'allow_arbitrary' ] )
+        self.failIf( tool_info[ 'persist_cookie' ] )
+        self.assertEqual( len( tool_info[ 'skin_dirs' ] ), 0 )
+        self.assertEqual( len( tool_info[ 'skin_paths' ] ), 0 )
 
     def test_parseXML_normal( self ):
 
@@ -236,20 +230,14 @@ class SkinsToolConfiguratorTests( _SkinsSetup ):
         self.assertEqual( len( skins_tool.objectItems() ), 0 )
 
         configurator = self._makeOne( site ).__of__( site )
-        ( default_skin
-        , request_var
-        , allow_arbitrary
-        , persist_cookie
-        , skin_dirs
-        , skin_paths
-        ) = configurator.parseXML( _NORMAL_EXPORT )
+        tool_info = configurator.parseXML( _NORMAL_EXPORT )
 
-        self.assertEqual( default_skin, "basic" )
-        self.assertEqual( request_var, "skin_var" )
-        self.failUnless( allow_arbitrary )
-        self.failUnless( persist_cookie )
-        self.assertEqual( len( skin_dirs ), 3 )
-        self.assertEqual( len( skin_paths ), 2 )
+        self.assertEqual( tool_info[ 'default_skin' ], "basic" )
+        self.assertEqual( tool_info[ 'request_var' ], "skin_var" )
+        self.failUnless( tool_info[ 'allow_arbitrary' ] )
+        self.failUnless( tool_info[ 'persist_cookie' ] )
+        self.assertEqual( len( tool_info[ 'skin_dirs' ] ), 3 )
+        self.assertEqual( len( tool_info[ 'skin_paths' ] ), 2 )
 
 
 
