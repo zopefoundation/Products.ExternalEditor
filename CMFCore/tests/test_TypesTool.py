@@ -4,7 +4,7 @@ import Zope
 Zope.startup()
 from Interface.Verify import verifyClass
 
-from types import DictType
+from warnings import filterwarnings
 
 from AccessControl import Unauthorized
 from AccessControl.SecurityManagement import newSecurityManager
@@ -55,6 +55,8 @@ class TypesToolTests(SecurityTest):
         """
         Are the correct, permitted methods returned for actions?
         """
+        filterwarnings('ignore', category=DeprecationWarning)
+
         site = self.site
         portal = site._setObject( 'portal', PortalFolder(id='portal') )
         portal.manage_addProduct = { 'FooProduct' : DummyFactory(portal) }
@@ -230,6 +232,7 @@ class TypeInfoTests(TestCase):
         self.failIf( 'slot' in visible )
 
     def test_getActionById( self ):
+        filterwarnings('ignore', category=DeprecationWarning)
 
         ti = self._makeInstance( 'Foo' )
         marker = []
@@ -311,7 +314,7 @@ class TypeInfoTests(TestCase):
         del ti._aliases
         self.failIf( hasattr(ti, '_aliases') )
         ti._actions = FTIDATA_CMF13[0]['actions']
-        self.failUnless( isinstance( ti._actions[0], DictType ) )
+        self.failUnless( isinstance(ti._actions[0], dict) )
 
         # migrate FTI
         ti.getMethodPath('view')
@@ -327,7 +330,7 @@ class TypeInfoTests(TestCase):
         del ti._aliases
         self.failIf( hasattr(ti, '_aliases') )
         ti._actions = FTIDATA_CMF13_FOLDER[0]['actions']
-        self.failUnless( isinstance( ti._actions[0], DictType ) )
+        self.failUnless( isinstance(ti._actions[0], dict) )
 
         # migrate FTI
         ti.getMethodPath('view')

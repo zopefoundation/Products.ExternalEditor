@@ -26,7 +26,7 @@ from Globals import DTMLFile
 from Globals import InitializeClass
 from OFS.Folder import Folder
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
-from zLOG import LOG, WARNING, ERROR
+from zLOG import LOG, ERROR
 import Products
 
 from ActionProviderBase import ActionProviderBase
@@ -174,8 +174,8 @@ class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
     security.declareProtected(View, 'Type')
     def Type(self):
         """ Deprecated. Use Title(). """
-        LOG('CMFCore.TypesTool', WARNING,
-            'TypeInformation.Type() is deprecated, use Title().')
+        warn('TypeInformation.Type() is deprecated, use Title().',
+             DeprecationWarning)
         return self.Title()
 
     security.declareProtected(View, 'Title')
@@ -270,7 +270,8 @@ class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
             Return the URL of the action whose ID is id.
         """
         warn('getActionById() is deprecated and will be removed in CMF 1.6. '
-             'In most cases getActionInfo() will be the right replacement.',
+             'Please use getActionInfo()[\'url\'] if you need an URL or '
+             'getMethodPath()[0] if you need a method.',
              DeprecationWarning)
         context = getActionContext( self )
         for action in self.listActions():
@@ -866,9 +867,9 @@ class TypesTool(UniqueObject, Folder, ActionProviderBase):
         for t in self.listTypeInfo( container ):
 
             if by_metatype:
-                LOG('CMFCore.TypesTool', WARNING,
-                    'TypeInformation.listContentTypes(by_metatype=1) '
-                   +'is deprecated.')
+                warn('TypeInformation.listContentTypes(by_metatype=1) is '
+                     'deprecated.',
+                     DeprecationWarning)
                 name = t.Metatype()
             else:
                 name = t.getId()
