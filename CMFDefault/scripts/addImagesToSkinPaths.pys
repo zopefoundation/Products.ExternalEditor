@@ -1,0 +1,41 @@
+## Script (Python) "addImagesToSkinPaths"
+##bind container=container
+##bind context=context
+##bind namespace=
+##bind script=script
+##bind subpath=traverse_subpath
+##parameters=
+##title=Add the name 'Images' to all skin paths.
+##
+# The Folder 'Images' in portal_skins is no longer directly referenced,
+# and should now be part of all skin paths. This script adds 'Images' to
+# all skins defined in the portal.
+# 
+# Use this by creating a PythonScript object by the name 
+# 'addImagesToSkinPaths' in your Portal, with this file as initial 
+# content. Run it by selecting the 'Test' tab. You will need to have the
+# 'Manage portal' permission in order to be able to execute this method.
+
+import string
+
+ps = context.portal_skins
+skins = ps.getSkinSelections()
+
+for skin in skins:
+    path = ps.getSkinPath(skin)
+    path = string.split(path, ',')
+    path = map(string.strip, path)
+
+    if 'Images' not in path:
+        path.append('Images')
+        path = string.join(path, ', ')
+
+        # addSkinSelection will replace existing skins as well.
+        ps.addSkinSelection(skin, path)
+        
+        print "Added 'Images' folder to %s skin." % `skin`
+
+    else:
+        print "Skipping %s skin, already has 'Images' in it's path." % `skin`
+
+return printed
