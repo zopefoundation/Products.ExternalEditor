@@ -1,14 +1,15 @@
 ##############################################################################
 #
-# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+# Copyright (c) 2001-2003 Zope Corporation and Contributors.
+# All Rights Reserved.
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """ Basic action list tool.
 
@@ -26,14 +27,11 @@ from ActionInformation import ActionInformation, oai
 from ActionProviderBase import ActionProviderBase
 from TypesTool import TypeInformation
 from CMFCorePermissions import ManagePortal
-
-from utils import UniqueObject
-from utils import SimpleItemWithProperties
-from utils import _getAuthenticatedUser
 from utils import _checkPermission
-from utils import getToolByName
 from utils import _dtmldir
-from utils import cookString
+from utils import getToolByName
+from utils import SimpleItemWithProperties
+from utils import UniqueObject
 
 from interfaces.portal_actions import portal_actions as IActionsTool
 

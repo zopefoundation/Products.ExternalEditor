@@ -1,14 +1,15 @@
 ##############################################################################
 #
-# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+# Copyright (c) 2002, 2003 Zope Corporation and Contributors.
+# All Rights Reserved.
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """ Information about customizable actions.
 
@@ -17,14 +18,12 @@ $Id$
 
 from AccessControl import ClassSecurityInfo
 from Globals import InitializeClass
-from Globals import DTMLFile
 from Acquisition import aq_inner, aq_parent
 from OFS.SimpleItem import SimpleItem
 
 from Expression import Expression
 from CMFCorePermissions import View
 from CMFCorePermissions import ManagePortal
-from utils import _dtmldir
 from utils import getToolByName
 
 class ActionInformation( SimpleItem ):

@@ -1,6 +1,7 @@
 ##############################################################################
 #
-# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
+# Copyright (c) 2001-2003 Zope Corporation and Contributors.
+# All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
@@ -10,11 +11,11 @@
 # FOR A PARTICULAR PURPOSE
 #
 ##############################################################################
-
 """Caching tool implementation.
 
 $Id$
 """
+
 from App.Common import rfc1123_date
 
 from AccessControl import ClassSecurityInfo
@@ -38,8 +39,6 @@ from Products.CMFCore.CMFCorePermissions import View
 from Products.CMFCore.CMFCorePermissions import ManagePortal
 from Products.CMFCore.Expression import Expression
 
-from Products.CMFCore.utils import _getAuthenticatedUser
-from Products.CMFCore.utils import _checkPermission
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.utils import _dtmldir
 import time

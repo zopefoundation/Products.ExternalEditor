@@ -1,35 +1,34 @@
 ##############################################################################
 #
-# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+# Copyright (c) 2001-2003 Zope Corporation and Contributors.
+# All Rights Reserved.
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """ Basic portal catalog.
 
 $Id$
 """
 
-import os
-from utils import UniqueObject, _checkPermission, _getAuthenticatedUser
-from utils import getToolByName, _dtmldir
 from Products.ZCatalog.ZCatalog import ZCatalog
 from Globals import InitializeClass, package_home, DTMLFile
-import urllib
 from DateTime import DateTime
-from string import join
 from AccessControl.PermissionRole import rolesForPermissionOn
 from AccessControl import ClassSecurityInfo
+from utils import _checkPermission
+from utils import _dtmldir
+from utils import _getAuthenticatedUser
 from utils import _mergedLocalRoles
+from utils import UniqueObject
 from ActionProviderBase import ActionProviderBase
 from ActionInformation import ActionInformation
 from Expression import Expression
-import os
 from CMFCorePermissions import ManagePortal
 from CMFCorePermissions import AccessInactivePortalContent
 from Acquisition import aq_base
@@ -221,7 +220,7 @@ class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
     __call__ = searchResults
 
     def __url(self, ob):
-        return join(ob.getPhysicalPath(), '/')
+        return '/'.join( ob.getPhysicalPath() )
 
     manage_catalogFind = DTMLFile( 'catalogFind', _dtmldir )
 

@@ -1,6 +1,7 @@
 ##############################################################################
 #
-# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
+# Copyright (c) 2001-2003 Zope Corporation and Contributors.
+# All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
@@ -15,8 +16,11 @@
 $Id$
 """
 
-import Globals, AccessControl, Products
+import Products
 from AccessControl import Permissions
+from AccessControl.Permission import _registeredPermissions
+from AccessControl.Permission import pname
+from Globals import ApplicationDefaultPermissions
 
 # General Zope permissions
 View = Permissions.view
@@ -32,13 +36,13 @@ def setDefaultRoles(permission, roles):
     Sets the defaults roles for a permission.
     '''
     # XXX This ought to be in AccessControl.SecurityInfo.
-    registered = AccessControl.Permission._registeredPermissions
+    registered = _registeredPermissions
     if not registered.has_key(permission):
         registered[permission] = 1
         Products.__ac_permissions__=(
             Products.__ac_permissions__+((permission,(),roles),))
-        mangled = AccessControl.Permission.pname(permission)
-        setattr(Globals.ApplicationDefaultPermissions, mangled, roles)
+        mangled = pname(permission)
+        setattr(ApplicationDefaultPermissions, mangled, roles)
 
 # Note that we can only use the default Zope roles in calls to
 # setDefaultRoles().  The default Zope roles are:
@@ -52,7 +56,7 @@ ListFolderContents = 'List folder contents'
 setDefaultRoles( ListFolderContents, ( 'Manager', 'Owner' ) )
 
 ListUndoableChanges = 'List undoable changes'
-setDefaultRoles( ListUndoableChanges, ( 'Manager', 'Member' ) )
+setDefaultRoles( ListUndoableChanges, ('Manager',) )  # + Member
 
 AccessInactivePortalContent = 'Access inactive portal content'
 setDefaultRoles(AccessInactivePortalContent, ('Manager',))
@@ -73,7 +77,7 @@ ManageProperties = 'Manage properties'
 setDefaultRoles(ManageProperties, ('Owner','Manager',))
 
 ListPortalMembers = 'List portal members'
-setDefaultRoles(ListPortalMembers, ('Manager', 'Member'))
+setDefaultRoles( ListPortalMembers, ('Manager',) )  # + Member
 
 AddPortalFolders = 'Add portal folders'
 setDefaultRoles(AddPortalFolders, ('Owner','Manager'))  # + Member

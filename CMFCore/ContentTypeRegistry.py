@@ -1,14 +1,15 @@
 ##############################################################################
 #
-# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+# Copyright (c) 2001-2003 Zope Corporation and Contributors.
+# All Rights Reserved.
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """ Basic Site content type registry
 
@@ -23,7 +24,7 @@ from ZPublisher.mapply import mapply
 from CMFCorePermissions import ManagePortal
 from utils import _dtmldir, getToolByName
 
-import re, os, string, urllib
+import re, os, urllib
 
 from interfaces.ContentTypeRegistry \
         import ContentTypeRegistryPredicate as IContentTypeRegistryPredicate
@@ -48,20 +49,20 @@ class MajorMinorPredicate( SimpleItem ):
         self.id = id
 
     security.declareProtected( ManagePortal, 'getMajorType' )
-    def getMajorType( self, join=string.join ):
-        """
+    def getMajorType(self):
+        """ Get major content types.
         """
         if self.major is None:
             return 'None'
-        return join( self.major )
+        return ' '.join(self.major)
 
     security.declareProtected( ManagePortal, 'getMinorType' )
-    def getMinorType( self, join=string.join ):
-        """
+    def getMinorType(self):
+        """ Get minor content types.
         """
         if self.minor is None:
             return 'None'
-        return join( self.minor )
+        return ' '.join(self.minor)
 
     security.declareProtected( ManagePortal, 'edit' )
     def edit( self, major, minor, COMMA_SPLIT=re.compile( r'[, ]' ) ):
@@ -134,12 +135,12 @@ class ExtensionPredicate( SimpleItem ):
         self.id = id
 
     security.declareProtected( ManagePortal, 'getExtensions' )
-    def getExtensions( self, join=string.join ):
-        """
+    def getExtensions(self):
+        """ Get filename extensions. 
         """
         if self.extensions is None:
             return 'None'
-        return join( self.extensions )
+        return ' '.join(self.extensions)
 
     security.declareProtected( ManagePortal, 'edit' )
     def edit( self, extensions, COMMA_SPLIT=re.compile( r'[, ]' ) ):
