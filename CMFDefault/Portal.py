@@ -332,6 +332,8 @@ def manage_addCMFSite(self, id, title='Portal', description='',
     Adds a portal instance.
     '''
     gen = PortalGenerator()
+    from string import strip
+    id = strip(id)
     p = gen.create(self, id, create_userfolder)
     gen.setupDefaultProperties(p, title, description,
                                email_from_address, email_from_name,
