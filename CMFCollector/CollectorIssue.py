@@ -44,7 +44,7 @@ DEFAULT_TRANSCRIPT_FORMAT = 'stx'
 
 factory_type_information = (
     {'id': 'Collector Issue',
-#     'content_icon': 'images/puzzlepieceoutline.gif',
+     'content_icon': 'collector_issue_icon.gif',
      'meta_type': 'CMF Collector Issue',
      'description': ('A Collector Issue represents a bug report or'
                      ' other support request.'),
@@ -121,7 +121,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
 
         user = getSecurityManager().getUser()
         if submitter_id is None:
-            self.submitter_id = str(user)
+            submitter_id = str(user)
         self.submitter_id = submitter_id
         if submitter_name is None:
             if hasattr(user, 'full_name'):
@@ -158,7 +158,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         return self._cook_links(self.get_transcript().CookedBody(stx_level=3))
 
     def _cook_links(self, text, email=0):
-        """Cook text so URLs and artifact references are hrefs.
+        """Cook text so URLs and upload references are hrefs.
 
         If optional arg 'email' is true, then we just provide urls for uploads
         (assuming the email client will take care of linkifying URLs)."""
@@ -399,6 +399,9 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         """Add new artifact, and return object."""
         self.invokeFactory(type, id)
         it = self._getOb(id)
+        # Acquire view and access permissions from container
+        it.manage_permission('View', acquire=1)
+        it.manage_permission('Access contents information', acquire=1)
         it.description = description
         it.manage_upload(file)
         return it
