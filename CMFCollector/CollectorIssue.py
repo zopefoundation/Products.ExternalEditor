@@ -354,28 +354,36 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         didids = []; gotemails = []     # Duplicate prevention.
 
         # Who to notify:
+        # 
         # We want to noodge only assigned supporters while it's being worked
-        # on, ie assigned supporters are corresponding about it, otherwise
-        # everyone gets updates:
+        # on, ie assigned supporters are corresponding about it.  Otherwise,
+        # either the dispatchers (managers) and assigned supporters get
+        # notices, or everyone gets notices, depending on the collector's
+        # .dispatching setting:
+        #
         # - Requester always
-        # - All supporters:
+        # - Supporters assigned to the issue always
+        # - Managers or managers and all supporters (according to dispatching):
         #   - When an issue is any state besides accepted
         #   - When an issue is being accepted
         #   - When an issue is accepted and moving to another state
-        # - Relevant supporters when an issue is accepted:
-        #   - those supporters assigned to the issue
-        #   - any supporters being removed from or added to an issue.
-        candidates = [self.submitter_id]
+        # - Any supporters being removed from the issue by the current action
+
+        # We're liberal about duplicates - they'll be filtered before the send.
+        candidates = [self.submitter_id] + self.assigned_to()
         if orig_status and not ('accepted' == string.lower(new_status) == 
                                 string.lower(orig_status)):
-            candidates.extend(self.aq_parent.supporters)
+            candidates.extend(self.aq_parent.managers)
+            if not self.aq_parent.dispatching:
+                candidates.extend(self.aq_parent.supporters)
         else:
             candidates.extend(self.assigned_to())
-            if removals:
-                # Notify supporters being removed from the issue (confirms 
-                # their action, if they're resigning, and informs them if
-                # manager is deassigning them).
-                candidates.extend(removals)
+
+        if removals:
+            # Notify supporters being removed from the issue (confirms 
+            # their action, if they're resigning, and informs them if
+            # manager is deassigning them).
+            candidates.extend(removals)
 
         for userid in candidates:
             if userid in didids:
