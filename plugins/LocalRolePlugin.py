@@ -16,15 +16,12 @@
 
 $Id$
 """
-from Acquisition import aq_inner, aq_parent
 from AccessControl import ClassSecurityInfo
 from Globals import InitializeClass
 
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
 from Products.PluggableAuthService.interfaces.plugins import IRolesPlugin
-
-from Products.PluggableAuthService.permissions import ManageUsers
 
 from Products.PluggableAuthService.plugins.BasePlugin import BasePlugin
 
