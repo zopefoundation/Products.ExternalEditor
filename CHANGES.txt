@@ -97,6 +97,9 @@
 
  Bug fixes
 
+  - Modified error-logging code to avoid potential leaks of
+    traceback frame.
+
   - Made 'Document.manage_FTPget' use EditableBody, rather than
     accessing 'text' attribute directly (improves reusability).
     Likewise 'Document.SearchableText'.

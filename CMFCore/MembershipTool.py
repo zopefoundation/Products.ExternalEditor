@@ -196,10 +196,13 @@ class MembershipTool (UniqueObject, SimpleItem):
                 from zLOG import LOG, ERROR
                 import sys
                 type,value,tb = sys.exc_info()
-                LOG('CMFCore.MembershipTool',
-                    ERROR,
-                    'Error during wrapUser:',
-                    "\nType:%s\nValue:%s\n" % (type,value))
+                try:
+                    LOG('CMFCore.MembershipTool',
+                        ERROR,
+                        'Error during wrapUser:',
+                        "\nType:%s\nValue:%s\n" % (type,value))
+                finally:
+                    tb = None       # Avoid leaking frame
                 pass
         # Failed.
         return u

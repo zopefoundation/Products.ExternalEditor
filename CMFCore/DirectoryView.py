@@ -171,11 +171,14 @@ class DirectoryInformation:
                 from zLOG import LOG, ERROR
                 import sys, traceback
                 type,value,tb = sys.exc_info()
-                LOG( 'DirectoryView'
-                   , ERROR
-                   , 'Error during prepareContents:'
-                   , traceback.format_exception( type, value, tb )
-                   )
+                try:
+                    LOG( 'DirectoryView'
+                    , ERROR
+                    , 'Error during prepareContents:'
+                    , traceback.format_exception( type, value, tb )
+                    )
+                finally:
+                    tb = None       # Avoid leaking frame
                 self.data = {}
                 self.objects = ()
                     
@@ -243,13 +246,19 @@ class DirectoryInformation:
                         from zLOG import LOG, ERROR
                         import sys, traceback
                         typ, val, tb = sys.exc_info()
-                        exc_lines = traceback.format_exception( typ, val, tb )
-                        LOG( 'DirectoryView', ERROR, join( exc_lines, '\n' ) )
-                        ob = BadFile( name
-                                    , e_filepath
-                                    , exc_str=join( exc_lines, '\r\n' )
-                                    , fullname=entry
-                                    )
+                        try:
+                            exc_lines = traceback.format_exception( typ
+                                                                  , val
+                                                                  , tb )
+                            LOG( 'DirectoryView', ERROR
+                               , join( exc_lines, '\n' ) )
+                            ob = BadFile( name
+                                        , e_filepath
+                                        , exc_str=join( exc_lines, '\r\n' )
+                                        , fullname=entry
+                                        )
+                        finally:
+                            tb = None   # Avoid leaking frame!
                     ob_id = ob.getId()
                     data[ob_id] = ob
                     objects.append({'id': ob_id, 'meta_type': ob.meta_type})
