@@ -87,7 +87,7 @@
 
 ADD_CONTENT_PERMISSION = 'Add portal content'
 
-import Globals, StructuredText, string
+import Globals, StructuredText, string, utils
 from StructuredText.HTMLWithImages import HTMLWithImages
 from Globals import DTMLFile, InitializeClass
 from AccessControl import ClassSecurityInfo
@@ -235,9 +235,9 @@ class Document(PortalContent, DefaultDublinCoreImpl):
         if format == 'html':
             parser = SimpleHTMLParser()
             parser.feed(text)
+            headers.update(parser.metatags)
             if parser.title:
                 headers['Title'] = parser.title
-            headers.update(parser.metatags)
             bodyfound = bodyfinder.search(text)
             if bodyfound:
                 cooked = body = bodyfound.group('bodycontent')
@@ -292,9 +292,8 @@ class Document(PortalContent, DefaultDublinCoreImpl):
         """ Handle HTTP (and presumably FTP?) PUT requests """
         self.dav__init(REQUEST, RESPONSE)
         body = REQUEST.get('BODY', '')
-        bodyfound = bodyfinder.search(body)
         guessedformat = REQUEST.get_header('Content-Type', 'text/plain')
-        ishtml = (guessedformat == 'text/html') or (bodyfound is not None)
+        ishtml = (guessedformat == 'text/html') or utils.html_headcheck(body)
 
         if ishtml: self.setFormat('text/html')
         else: self.setFormat('text/plain')
@@ -307,7 +306,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
     _htmlsrc = (
         '<html>\n <head>\n'
         ' <title>%(title)s</title>\n'
-        ' %(metatags)s'
+        '%(metatags)s\n'
         ' </head>\n'
         ' <body>\n%(body)s\n </body>\n'
         '</html>\n'
@@ -317,10 +316,17 @@ class Document(PortalContent, DefaultDublinCoreImpl):
     def manage_FTPget(self):
         "Get the document body for FTP download (also used for the WebDAV SRC)"
         join = string.join
+        lower = string.lower
         hdrlist = self.getMetadataHeaders()
         if self.Format() == 'text/html':
-            hdrtext = join(map(lambda x: '<meta name="%s" content="%s" />' %(
-                x[0], x[1]), hdrlist), '\n')
+            hdrtext = ''
+            for name, content in hdrlist:
+                if lower(name) == 'title':
+                    continue
+                else:
+                    hdrtext = '%s\n <meta name="%s" content="%s" />' % (
+                        hdrtext, name, content)
+
             bodytext = self._htmlsrc % {
                 'title': self.Title(),
                 'metatags': hdrtext,

@@ -138,3 +138,18 @@ class SimpleHTMLParser(SGMLParser):
 
 bodyfinder = re.compile(r'<body.*?>(?P<bodycontent>.*?)</body>',
                         re.DOTALL|re.I)
+htfinder = re.compile(r'<html.*?>', re.DOTALL|re.I)
+
+def html_headcheck(html):
+    """ Returns 'true' if document looks HTML-ish enough """
+    if not htfinder.search(html):
+        return 0
+    lines = re.split(r'[\n\r]+?', html)
+    for line in lines:
+        line = strip(line)
+        if not line:
+            continue
+        elif lower(line[:5]) == '<html':
+            return 1
+        elif line[:2] not in ('<!', '<?'):
+            return 0
