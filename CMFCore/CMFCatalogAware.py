@@ -73,8 +73,7 @@ class CMFCatalogAware:
             path = '/'.join(self.getPhysicalPath())
             for brain in catalog.searchResults(path=path):
                 ob = brain.getObject()
-                try: s = ob._p_changed
-                except: s = 0
+                s = getattr(ob, '_p_changed', 0)
                 catalog.reindexObject(ob, idxs=['allowedRolesAndUsers'])
                 if s is None: ob._p_deactivate()
             # Reindex the object itself, as the PathIndex only gave us
@@ -164,8 +163,7 @@ class CMFCatalogAware:
         opaque_values = self.opaqueValues()
         for subobjects in values, opaque_values:
             for ob in subobjects:
-                try: s = ob._p_changed
-                except: s = 0
+                s = getattr(ob, '_p_changed', 0)
                 if hasattr(aq_base(ob), name):
                     getattr(ob, name)(*args)
                 if s is None: ob._p_deactivate()
