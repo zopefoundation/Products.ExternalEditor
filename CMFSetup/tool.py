@@ -9,11 +9,12 @@ from Globals import InitializeClass
 from OFS.Folder import Folder
 
 from Products.CMFCore.utils import UniqueObject
+from Products.CMFCore.utils import getToolByName
 
 from interfaces import ISetupTool
 from permissions import ManagePortal
 from context import ImportContext
-from context import ExportContext
+from context import TarballExportContext
 from registry import ImportStepRegistry
 from registry import ExportStepRegistry
 
@@ -40,6 +41,10 @@ class SetupTool( UniqueObject, Folder ):
 
         self._import_registry = ImportStepRegistry()
         self._export_registry = ExportStepRegistry()
+        self._export_registry.registerStep( 'step_registries'
+                                          , exportStepRegistries
+                                          , 'Export import / export steps.'
+                                          )
 
     security.declareProtected( ManagePortal, 'getProfileProduct' )
     def getProfileProduct( self ):
@@ -159,12 +164,38 @@ class SetupTool( UniqueObject, Folder ):
 
         """ See ISetupTool.
         """
+        context = TarballExportContext( self )
+        handler = self._export_registry.getStep( step_id )
+
+        if handler is None:
+            raise ValueError( 'Invalid export step: %s' % step_id )
+
+        message = handler( context )
+
+        return { 'steps' : [ step_id ]
+               , 'messages' : { step_id : message }
+               , 'tarball' : context.getArchive()
+               }
 
     security.declareProtected(ManagePortal, 'runAllExportSteps')
     def runAllExportSteps( self ):
 
         """ See ISetupTool.
         """
+        context = TarballExportContext( self )
+
+        steps = self._export_registry.listSteps()
+        messages = {}
+        for step_id in steps:
+
+            handler = self._export_registry.getStep( step_id )
+            messages[ step_id ] = handler( context )
+
+
+        return { 'steps' : steps
+               , 'messages' : messages
+               , 'tarball' : context.getArchive()
+               }
 
     security.declareProtected( ManagePortal, 'createSnapshot')
     def createSnapshot( self, snapshot_id ):
@@ -241,3 +272,19 @@ class SetupTool( UniqueObject, Folder ):
         return handler( context )
 
 InitializeClass( SetupTool )
+
+
+def exportStepRegistries( context ):
+
+    """ Built-in handler for exporting import / export step registries.
+    """
+    site = context.getSite()
+    tool = getToolByName( site, 'portal_setup' )
+
+    import_steps_xml = tool.getImportStepRegistry().exportAsXML()
+    context.writeDataFile( 'import_steps.xml', import_steps_xml, 'text/xml' )
+
+    export_steps_xml = tool.getExportStepRegistry().exportAsXML()
+    context.writeDataFile( 'export_steps.xml', export_steps_xml, 'text/xml' )
+
+    return 'Step registries exported'

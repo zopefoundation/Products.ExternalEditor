@@ -5,6 +5,10 @@ Wrappers representing the state of an import / export operation.
 $Id$
 """
 import os
+import time
+from tarfile import TarFile
+from tarfile import TarInfo
+from StringIO import StringIO
 
 from AccessControl import ClassSecurityInfo
 from Acquisition import Implicit
@@ -142,3 +146,41 @@ class ExportContext( Implicit ):
         file.close()
 
 InitializeClass( ExportContext )
+
+class TarballExportContext( ExportContext ):
+
+    __implements__ = ( IExportContext, )
+
+    security = ClassSecurityInfo()
+
+    def __init__( self, tool ):
+
+        self._site = aq_parent( aq_inner( tool ) )
+        timestamp = time.gmtime()
+        archive_name = ( 'portal_setup-%4d%02d%02d%02d%02d%02d.tar.gz'
+                       % timestamp[:6] )
+
+        self._archive_stream = StringIO()
+        self._archive = TarFile.open( archive_name, 'w:gz'
+                                    , self._archive_stream )
+
+    security.declareProtected( ManagePortal, 'writeDataFile' )
+    def writeDataFile( self, filename, text, content_type, subdir=None ):
+
+        """ See IExportContext.
+        """
+        if subdir is not None:
+            filename = os.path.join( subdir, filename )
+
+        stream = StringIO( text )
+        info = TarInfo( filename )
+        info.size = len( text )
+        self._archive.addfile( info, stream )
+
+    security.declareProtected( ManagePortal, 'getArchive' )
+    def getArchive( self ):
+
+        """ Close the archive, and return it as a big string.
+        """
+        self._archive.close()
+        return self._archive_stream.getvalue()

@@ -5,11 +5,14 @@ $Id$
 
 import unittest
 import os
+from StringIO import StringIO
 
-from common import TestBase
+from common import FilesystemTestBase
+from common import TarballTester
 from conformance import ConformsToISetupTool
 
-class SetupToolTests( TestBase
+class SetupToolTests( FilesystemTestBase
+                    , TarballTester
                     , ConformsToISetupTool
                     ):
 
@@ -24,7 +27,7 @@ class SetupToolTests( TestBase
 
         return self._getTargetClass()( *args, **kw )
 
-    def _makeSite( self, title ):
+    def _makeSite( self, title="Don't care" ):
 
         from OFS.Folder import Folder
 
@@ -46,7 +49,9 @@ class SetupToolTests( TestBase
         self.assertEqual( len( import_registry.listSteps() ), 0 )
 
         export_registry = tool.getExportStepRegistry()
-        self.assertEqual( len( export_registry.listSteps() ), 0 )
+        export_steps = export_registry.listSteps() 
+        self.assertEqual( len( export_steps ), 1 )
+        self.assertEqual( export_steps[ 0 ], 'step_registries' )
 
     def test_getProfileDirectory_relative_no_product( self ):
 
@@ -189,8 +194,7 @@ class SetupToolTests( TestBase
 
     def test_runImportStep_nonesuch( self ):
 
-        TITLE = 'original title'
-        site = self._makeSite( TITLE )
+        site = self._makeSite()
 
         tool = self._makeOne().__of__( site )
 
@@ -265,8 +269,7 @@ class SetupToolTests( TestBase
 
     def test_runImportStep_default_purge( self ):
 
-        TITLE = 'original title'
-        site = self._makeSite( TITLE )
+        site = self._makeSite()
 
         tool = self._makeOne().__of__( site )
         registry = tool.getImportStepRegistry()
@@ -281,8 +284,7 @@ class SetupToolTests( TestBase
 
     def test_runImportStep_explicit_purge( self ):
 
-        TITLE = 'original title'
-        site = self._makeSite( TITLE )
+        site = self._makeSite()
 
         tool = self._makeOne().__of__( site )
         registry = tool.getImportStepRegistry()
@@ -297,8 +299,7 @@ class SetupToolTests( TestBase
 
     def test_runImportStep_skip_purge( self ):
 
-        TITLE = 'original title'
-        site = self._makeSite( TITLE )
+        site = self._makeSite()
 
         tool = self._makeOne().__of__( site )
         registry = tool.getImportStepRegistry()
@@ -313,8 +314,7 @@ class SetupToolTests( TestBase
 
     def test_runImportStep_consistent_context( self ):
 
-        TITLE = 'original title'
-        site = self._makeSite( TITLE )
+        site = self._makeSite()
 
         tool = self._makeOne().__of__( site )
 
@@ -328,8 +328,7 @@ class SetupToolTests( TestBase
 
     def test_runAllImportSteps_empty( self ):
 
-        TITLE = 'original title'
-        site = self._makeSite( TITLE )
+        site = self._makeSite()
         tool = self._makeOne().__of__( site )
 
         result = tool.runAllImportSteps()
@@ -371,8 +370,7 @@ class SetupToolTests( TestBase
 
     def test_runAllImportSteps_sorted_explicit_purge( self ):
 
-        TITLE = 'original title'
-        site = self._makeSite( TITLE )
+        site = self._makeSite()
         tool = self._makeOne().__of__( site )
 
         registry = tool.getImportStepRegistry()
@@ -397,8 +395,7 @@ class SetupToolTests( TestBase
 
     def test_runAllImportSteps_sorted_skip_purge( self ):
 
-        TITLE = 'original title'
-        site = self._makeSite( TITLE )
+        site = self._makeSite()
         tool = self._makeOne().__of__( site )
 
         registry = tool.getImportStepRegistry()
@@ -421,6 +418,169 @@ class SetupToolTests( TestBase
         self.assertEqual( result[ 'steps' ][ 2 ], 'dependent' )
         self.failIf( site.purged )
 
+    def test_runExportStep_nonesuch( self ):
+
+        site = self._makeSite()
+        tool = self._makeOne().__of__( site )
+
+        self.assertRaises( ValueError, tool.runExportStep, 'nonesuch' )
+
+    def test_runExportStep_step_registry( self ):
+
+        from test_registry import _EMPTY_IMPORT_XML
+
+        site = self._makeSite()
+        site.portal_setup = self._makeOne()
+        tool = site.portal_setup
+
+        result = tool.runExportStep( 'step_registries' )
+
+        self.assertEqual( len( result[ 'steps' ] ), 1 )
+        self.assertEqual( result[ 'steps' ][ 0 ], 'step_registries' )
+        self.assertEqual( result[ 'messages' ][ 'step_registries' ]
+                        , 'Step registries exported'
+                        )
+        fileish = StringIO( result[ 'tarball' ] )
+
+        self._verifyTarballContents( fileish, [ 'import_steps.xml'
+                                              , 'export_steps.xml'
+                                              ] )
+        self._verifyTarballEntryXML( fileish, 'import_steps.xml'
+                                   , _EMPTY_IMPORT_XML )
+        self._verifyTarballEntryXML( fileish, 'export_steps.xml'
+                                   , _DEFAULT_STEP_REGISTRIES_EXPORT_XML )
+
+    def test_runAllExportSteps_default( self ):
+
+        from test_registry import _EMPTY_IMPORT_XML
+
+        site = self._makeSite()
+        site.portal_setup = self._makeOne()
+        tool = site.portal_setup
+
+        result = tool.runAllExportSteps()
+
+        self.assertEqual( len( result[ 'steps' ] ), 1 )
+        self.assertEqual( result[ 'steps' ][ 0 ], 'step_registries' )
+        self.assertEqual( result[ 'messages' ][ 'step_registries' ]
+                        , 'Step registries exported'
+                        )
+        fileish = StringIO( result[ 'tarball' ] )
+
+        self._verifyTarballContents( fileish, [ 'import_steps.xml'
+                                              , 'export_steps.xml'
+                                              ] )
+        self._verifyTarballEntryXML( fileish, 'import_steps.xml'
+                                   , _EMPTY_IMPORT_XML )
+        self._verifyTarballEntryXML( fileish, 'export_steps.xml'
+                                   , _DEFAULT_STEP_REGISTRIES_EXPORT_XML )
+
+    def test_runAllExportSteps_extras( self ):
+
+        from test_registry import _EMPTY_IMPORT_XML
+
+        site = self._makeSite()
+        site.portal_setup = self._makeOne()
+        tool = site.portal_setup
+
+        import_reg = tool.getImportStepRegistry()
+        import_reg.registerStep( 'dependable', '1'
+                               , _underscoreSiteTitle, ( 'purging', ) )
+        import_reg.registerStep( 'dependent', '1'
+                               , _uppercaseSiteTitle, ( 'dependable', ) )
+        import_reg.registerStep( 'purging', '1'
+                               , _purgeIfRequired )
+
+        export_reg = tool.getExportStepRegistry()
+        export_reg.registerStep( 'properties'
+                               , _exportPropertiesINI )
+
+        result = tool.runAllExportSteps()
+
+        self.assertEqual( len( result[ 'steps' ] ), 2 )
+
+        self.failUnless( 'properties' in result[ 'steps' ] )
+        self.assertEqual( result[ 'messages' ][ 'properties' ]
+                        , 'Exported properties'
+                        )
+
+        self.failUnless( 'step_registries' in result[ 'steps' ] )
+        self.assertEqual( result[ 'messages' ][ 'step_registries' ]
+                        , 'Step registries exported'
+                        )
+
+        fileish = StringIO( result[ 'tarball' ] )
+
+        self._verifyTarballContents( fileish, [ 'import_steps.xml'
+                                              , 'export_steps.xml'
+                                              , 'properties.ini'
+                                              ] )
+        self._verifyTarballEntryXML( fileish, 'import_steps.xml'
+                                   , _EXTRAS_STEP_REGISTRIES_IMPORT_XML )
+        self._verifyTarballEntryXML( fileish, 'export_steps.xml'
+                                   , _EXTRAS_STEP_REGISTRIES_EXPORT_XML )
+        self._verifyTarballEntry( fileish, 'properties.ini'
+                                , _PROPERTIES_INI % site.title  )
+
+
+_DEFAULT_STEP_REGISTRIES_EXPORT_XML = """\
+<?xml version="1.0"?>
+<export-steps>
+ <export-step id="step_registries"
+              handler="Products.CMFSetup.tool.exportStepRegistries"
+              title="Export import / export steps.">
+  
+ </export-step>
+</export-steps>
+"""
+
+_EXTRAS_STEP_REGISTRIES_EXPORT_XML = """\
+<?xml version="1.0"?>
+<export-steps>
+ <export-step id="properties"
+              handler="Products.CMFSetup.tests.test_tool._exportPropertiesINI"
+              title="properties">
+  
+ </export-step>
+ <export-step id="step_registries"
+              handler="Products.CMFSetup.tool.exportStepRegistries"
+              title="Export import / export steps.">
+  
+ </export-step>
+</export-steps>
+"""
+
+_EXTRAS_STEP_REGISTRIES_IMPORT_XML = """\
+<?xml version="1.0"?>
+<import-steps>
+ <import-step id="dependable"
+              version="1"
+              handler="Products.CMFSetup.tests.test_tool._underscoreSiteTitle"
+              title="dependable">
+  <dependency step="purging" />
+  
+ </import-step>
+ <import-step id="dependent"
+              version="1"
+              handler="Products.CMFSetup.tests.test_tool._uppercaseSiteTitle"
+              title="dependent">
+  <dependency step="dependable" />
+  
+ </import-step>
+ <import-step id="purging"
+              version="1"
+              handler="Products.CMFSetup.tests.test_tool._purgeIfRequired"
+              title="purging">
+  
+ </import-step>
+</import-steps>
+"""
+
+_PROPERTIES_INI = """\
+[Default]
+Title=%s
+"""
+
 def _underscoreSiteTitle( context ):
 
     site = context.getSite()
@@ -438,6 +598,15 @@ def _purgeIfRequired( context ):
     site = context.getSite()
     purged = site.purged = context.shouldPurge()
     return purged and 'Purged' or 'Unpurged'
+
+def _exportPropertiesINI( context ):
+
+    site = context.getSite()
+    text = _PROPERTIES_INI % site.title
+
+    context.writeDataFile( 'properties.ini', text, 'text/plain' )
+
+    return 'Exported properties'
 
 def test_suite():
     return unittest.TestSuite((

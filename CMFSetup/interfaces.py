@@ -238,7 +238,7 @@ class IExportStepRegistry( IStepRegistry ):
 
         o 'id' is the unique identifier for this step
 
-        o 'step' should implement IExportPlugin.
+        o 'handler' should implement IExportPlugin.
 
         o 'title' is a one-line UI description for this step.
           If None, the first line of the documentation string of the step
@@ -328,14 +328,32 @@ class ISetupTool( Interface ):
 
     def runExportStep( step_id ):
 
-        """ Return a tarball containing artifacts from one export step.
+        """ Generate a tarball containing artifacts from one export step.
 
         o 'step_id' identifies the export step.
+
+        o Return a mapping, with keys:
+
+          'steps' -- a sequence of IDs of the steps run.
+
+          'messages' -- a dictionary holding messages returned from each
+            step
+
+          'tarball' -- the stringified tar-gz data.
         """
 
     def runAllExportSteps():
 
-        """ Return a tarball created using all export steps.
+        """ Generate a tarball containing artifacts from all export steps.
+
+        o Return a mapping, with keys:
+
+          'steps' -- a sequence of IDs of the steps run.
+
+          'messages' -- a dictionary holding messages returned from each
+            step
+
+          'tarball' -- the stringified tar-gz data.
         """
 
     def createSnapshot( snapshot_id ):

@@ -2,16 +2,12 @@
 """
 import os
 import shutil
+from tarfile import TarFile
 
 from Products.CMFCore.tests.base.testcase import SecurityRequestTest
 
 
-class BaseRegistryTests( SecurityRequestTest ):
-
-    def _makeOne( self, *args, **kw ):
-
-        # Derived classes must implement _getTargetClass
-        return self._getTargetClass()( *args, **kw )
+class DOMComparator:
 
     def _compareDOM( self, found_text, expected_text ):
 
@@ -19,6 +15,13 @@ class BaseRegistryTests( SecurityRequestTest ):
         found = parseString( found_text )
         expected = parseString( expected_text )
         self.assertEqual( found.toxml(), expected.toxml() )
+
+class BaseRegistryTests( SecurityRequestTest, DOMComparator ):
+
+    def _makeOne( self, *args, **kw ):
+
+        # Derived classes must implement _getTargetClass
+        return self._getTargetClass()( *args, **kw )
 
 def _clearTestDirectory( root_path ):
 
@@ -41,7 +44,7 @@ def _makeTestFile( filename, root_path, contents ):
     file.close()
     return fqpath
 
-class TestBase( SecurityRequestTest ):
+class FilesystemTestBase( SecurityRequestTest ):
 
     def _makeOne( self, *args, **kw ):
 
@@ -64,6 +67,37 @@ class TestBase( SecurityRequestTest ):
     def _makeFile( self, filename, contents ):
 
         return _makeTestFile( filename, self._PROFILE_PATH, contents )
+
+
+class TarballTester( DOMComparator ):
+
+    def _verifyTarballContents( self, fileish, toc_list ):
+
+        fileish.seek( 0L )
+        tarfile = TarFile.open( 'foo.tar.gz', fileobj=fileish, mode='r:gz' )
+        items = tarfile.getnames()
+        items.sort()
+        toc_list.sort()
+
+        self.assertEqual( len( items ), len( toc_list ) )
+        for i in range( len( items ) ):
+            self.assertEqual( items[ i ], toc_list[ i ] )
+
+    def _verifyTarballEntry( self, fileish, entry_name, data ):
+
+        fileish.seek( 0L )
+        tarfile = TarFile.open( 'foo.tar.gz', fileobj=fileish, mode='r:gz' )
+        extract = tarfile.extractfile( entry_name )
+        found = extract.read()
+        self.assertEqual( found, data )
+
+    def _verifyTarballEntryXML( self, fileish, entry_name, data ):
+
+        fileish.seek( 0L )
+        tarfile = TarFile.open( 'foo.tar.gz', fileobj=fileish, mode='r:gz' )
+        extract = tarfile.extractfile( entry_name )
+        found = extract.read()
+        self._compareDOM( found, data )
 
 def dummy_handler( context ):
 

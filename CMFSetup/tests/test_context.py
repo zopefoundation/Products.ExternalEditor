@@ -5,12 +5,15 @@ $Id$
 
 import unittest
 import os
+from StringIO import StringIO
 
 from OFS.Folder import Folder
 
 from Products.CMFCore.tests.base.testcase import SecurityRequestTest
 
-from common import TestBase
+from common import FilesystemTestBase
+from common import TarballTester
+from common import _makeTestFile
 from conformance import ConformsToISetupContext
 from conformance import ConformsToIImportContext
 from conformance import ConformsToIExportContext
@@ -20,7 +23,7 @@ class DummySite( Folder ):
 
     pass
 
-class ImportContextTests( TestBase
+class ImportContextTests( FilesystemTestBase
                         , ConformsToISetupContext
                         , ConformsToIImportContext
                         ):
@@ -254,7 +257,7 @@ class ImportContextTests( TestBase
         self.failUnless( 'CVS' in names )
 
 
-class ExportContextTests( TestBase
+class ExportContextTests( FilesystemTestBase
                         , ConformsToISetupContext
                         , ConformsToIExportContext
                         ):
@@ -324,11 +327,73 @@ class ExportContextTests( TestBase
         self.assertEqual( open( fqname, 'rb' ).read(), digits )
 
 
+class TarballExportContextTests( FilesystemTestBase
+                               , TarballTester
+                               , ConformsToISetupContext
+                               , ConformsToIExportContext
+                               ):
+
+    _PROFILE_PATH = '/tmp/TECT_tests'
+
+    def _getTargetClass( self ):
+
+        from Products.CMFSetup.context import TarballExportContext
+        return TarballExportContext
+
+    def test_writeDataFile_simple( self ):
+
+        from string import printable
+
+        site = DummySite( 'site' ).__of__( self.root )
+        ctx = self._getTargetClass()( site )
+
+        ctx.writeDataFile( 'foo.txt', printable, 'text/plain' ) 
+
+        fileish = StringIO( ctx.getArchive() )
+
+        self._verifyTarballContents( fileish, [ 'foo.txt' ] )
+        self._verifyTarballEntry( fileish, 'foo.txt', printable )
+
+    def test_writeDataFile_multiple( self ):
+
+        from string import printable
+        from string import digits
+
+        site = DummySite( 'site' ).__of__( self.root )
+        ctx = self._getTargetClass()( site )
+
+        ctx.writeDataFile( 'foo.txt', printable, 'text/plain' ) 
+        ctx.writeDataFile( 'bar.txt', digits, 'text/plain' ) 
+
+        fileish = StringIO( ctx.getArchive() )
+
+        self._verifyTarballContents( fileish, [ 'foo.txt', 'bar.txt' ] )
+        self._verifyTarballEntry( fileish, 'foo.txt', printable )
+        self._verifyTarballEntry( fileish, 'bar.txt', digits )
+
+    def test_writeDataFile_subdir( self ):
+
+        from string import printable
+        from string import digits
+
+        site = DummySite( 'site' ).__of__( self.root )
+        ctx = self._getTargetClass()( site )
+
+        ctx.writeDataFile( 'foo.txt', printable, 'text/plain' ) 
+        ctx.writeDataFile( 'bar/baz.txt', digits, 'text/plain' ) 
+
+        fileish = StringIO( ctx.getArchive() )
+
+        self._verifyTarballContents( fileish, [ 'foo.txt', 'bar/baz.txt' ] )
+        self._verifyTarballEntry( fileish, 'foo.txt', printable )
+        self._verifyTarballEntry( fileish, 'bar/baz.txt', digits )
+
 
 def test_suite():
     return unittest.TestSuite((
         unittest.makeSuite( ImportContextTests ),
         unittest.makeSuite( ExportContextTests ),
+        unittest.makeSuite( TarballExportContextTests ),
         ))
 
 if __name__ == '__main__':
