@@ -344,11 +344,11 @@ class ExternalEditor:
                 command = '%s %s' % (command, self.content_file)
 
             editor = EditorProcess(command)
+            
+        launch_success = editor.isAlive()
         
         if use_locks:
             self.lock()
-            
-        launch_success = editor.isAlive()
 	    
         while 1:
             editor.wait(save_interval or 2)

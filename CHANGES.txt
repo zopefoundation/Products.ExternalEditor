@@ -2,6 +2,10 @@ External Editor Change Log
 
   Next Release
   
+    - Check if the editor was launched before locking the file in Zope. This
+      prevents errors if the editor is closed before the lock request 
+      completes.
+  
     - Do not ask the user what editor to use on Posix platforms. Instead just
       tell the user to edit the config file. The askstring()
       function does not work with a hidden root Tk window in Python 2.3.4.
