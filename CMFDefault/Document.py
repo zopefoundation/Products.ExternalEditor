@@ -132,8 +132,8 @@ def addDocument(self, id, title='', description='', text_format='',
     """ Add a Document """
     o = Document(id, title, description, text_format, text)
     self._setObject(id,o)
-    afterCreate(self.this()._getOb(id))
-    
+
+
 class CMFHtmlWithImages(HTMLWithImages):
     """ Special subclass of HTMLWithImages, overriding document() """
     def document(self, doc, level, output):
@@ -228,7 +228,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
     def handleText(self, text, format=None):
         """ Handles the raw text, returning headers, body, cooked, format """
         headers = {}
-        body = cooked = ""
+        body = cooked = text
         if not format:
             format = self.guessFormat(text)
 
