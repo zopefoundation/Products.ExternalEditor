@@ -1,5 +1,11 @@
 The Zope Content Managment Framework
 
+  This is a list of audiences and their needs.
+
+  Prospective Client and Information Architect
+
+    Overview of CMF architecture and features
+
   Content Author
 
     Overview of Content Authoring
@@ -10,7 +16,7 @@ The Zope Content Managment Framework
 
     Using Structured Text
 
-    Leveraging Metadata
+    What is Metadata, how to use it and why to use it
 
     Integration with Authoring Tools
 
@@ -40,8 +46,7 @@ The Zope Content Managment Framework
 
   Site Developer
 
-    Scripting Portal Services
+    Scripting Portal Services (workflow, etc.)
 
-    Finding API Docs
+    API Docs for scriptable portal objects/services
 
-    Scripting Workflow
