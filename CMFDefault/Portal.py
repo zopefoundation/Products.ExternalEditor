@@ -295,6 +295,31 @@ class PortalGenerator:
         for t in initial_types:
             cfm = apply(ContentFactoryMetadata, (), t)
             tool._setObject(t['id'], cfm)
+        
+    def setupMimetypes(self, p):
+        p.manage_addProduct[ 'CMFCore' ].manage_addRegistry()
+        reg = p.content_type_registry
+
+        reg.addPredicate( 'link', 'extension' )
+        reg.getPredicate( 'link' ).edit( extensions="url, link" )
+        reg.assignTypeName( 'link', 'Link' )
+
+        reg.addPredicate( 'news', 'extension' )
+        reg.getPredicate( 'news' ).edit( extensions="news" )
+        reg.assignTypeName( 'news', 'News Item' )
+
+        reg.addPredicate( 'document', 'major_minor' )
+        reg.getPredicate( 'document' ).edit( major="text", minor="" )
+        reg.assignTypeName( 'document', 'Document' )
+
+        reg.addPredicate( 'image', 'major_minor' )
+        reg.getPredicate( 'image' ).edit( major="image", minor="" )
+        reg.assignTypeName( 'image', 'Image' )
+
+        reg.addPredicate( 'file', 'major_minor' )
+        reg.getPredicate( 'file' ).edit( major="application", minor="" )
+        reg.assignTypeName( 'file', 'File' )
+
 
     def setupWorkflow(self, p):
         tool = getToolByName(p, 'portal_workflow', None)
@@ -317,6 +342,7 @@ class PortalGenerator:
         self.setupTypes(p)
         self.setupTypes(p, PortalFolder.factory_type_information)
         self.setupTypes(p, Topic.factory_type_information)
+        self.setupMimetypes(p)
         self.setupWorkflow(p)
 
     def create(self, parent, id, create_userfolder):
