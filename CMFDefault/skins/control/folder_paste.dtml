@@ -1,5 +1,5 @@
-<dtml-if expr="REQUEST.has_key( 'ids' )">
-  <dtml-call expr="manage_pasteObjects(REQUEST['__cp'], REQUEST)">
+<dtml-if cb_dataValid>
+  <dtml-call expr="manage_pasteObjects(REQUEST['__cp'])">
   <dtml-call expr="REQUEST['RESPONSE'].redirect(
                '%s/folder_contents?portal_status_message=Pasted.'
                % absolute_url() )">

@@ -151,7 +151,9 @@ Folder contents display.
     <INPUT TYPE="SUBMIT" NAME="folder_rename_form:method" VALUE="Rename">
     <INPUT TYPE="SUBMIT" NAME="folder_cut:method" VALUE="Cut"> 
     <INPUT TYPE="SUBMIT" NAME="folder_copy:method" VALUE="Copy">
+    <dtml-if cb_dataValid>
     <INPUT TYPE="SUBMIT" NAME="folder_paste:method" VALUE="Paste">
+    </dtml-if>
   </dtml-if>
   <dtml-if expr="portal_membership.checkPermission('Delete objects', this())">
     <INPUT TYPE="SUBMIT" NAME="folder_delete:method" VALUE="Delete">
