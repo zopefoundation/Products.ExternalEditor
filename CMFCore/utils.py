@@ -42,6 +42,8 @@ from OFS.SimpleItem import SimpleItem
 from Products.PageTemplates.Expressions import getEngine
 from Products.PageTemplates.Expressions import SecureModuleImporter
 
+from CMFCoreExceptions import AccessControl_Unauthorized
+
 
 security = ModuleSecurityInfo( 'Products.CMFCore.utils' )
 
@@ -165,8 +167,8 @@ def _getViewFor(obj, view='view'):
                 __traceback_info__ = ( ti.getId(), target )
                 return obj.restrictedTraverse( target )
 
-        raise 'Unauthorized', ('No accessible views available for %s' %
-                               '/'.join(obj.getPhysicalPath()))
+        raise AccessControl_Unauthorized( 'No accessible views available for '
+                                    '%s' % '/'.join( obj.getPhysicalPath() ) )
     else:
         raise 'Not Found', ('Cannot find default view for "%s"' %
                             '/'.join(obj.getPhysicalPath()))
@@ -188,7 +190,7 @@ def _limitGrantedRoles(roles, context, special_roles=()):
         return
     for role in roles:
         if role not in special_roles and role not in user_roles:
-            raise 'Unauthorized', 'Too many roles specified.'
+            raise AccessControl_Unauthorized('Too many roles specified.')
 
 limitGrantedRoles = _limitGrantedRoles  # XXX: Deprecated spelling
 

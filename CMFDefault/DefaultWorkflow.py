@@ -20,18 +20,18 @@ from AccessControl import ClassSecurityInfo
 from DateTime import DateTime
 from Globals import InitializeClass
 
+from Products.CMFCore.CMFCoreExceptions import AccessControl_Unauthorized
 from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
 from Products.CMFCore.CMFCorePermissions import RequestReview
 from Products.CMFCore.CMFCorePermissions import ReviewPortalContent
 from Products.CMFCore.CMFCorePermissions import View
-from Products.CMFCore.utils import _modifyPermissionMappings
+from Products.CMFCore.interfaces.portal_workflow \
+        import WorkflowDefinition as IWorkflowDefinition
 from Products.CMFCore.utils import _checkPermission
+from Products.CMFCore.utils import _modifyPermissionMappings
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.utils import SimpleItemWithProperties
 from Products.CMFCore.WorkflowTool import addWorkflowClass
-
-from Products.CMFCore.interfaces.portal_workflow \
-        import WorkflowDefinition as IWorkflowDefinition
 
 
 class DefaultWorkflowDefinition (SimpleItemWithProperties):
@@ -184,31 +184,31 @@ class DefaultWorkflowDefinition (SimpleItemWithProperties):
 
         if action == 'submit':
             if not allow_request:
-                raise 'Unauthorized', 'Not authorized'
+                raise AccessControl_Unauthorized('Not authorized')
             elif review_state != 'private':
-                raise 'Unauthorized', 'Already in submit state'
+                raise AccessControl_Unauthorized('Already in submit state')
             self.setReviewStateOf(ob, 'pending', action, comment)
 
         elif action == 'retract':
             if not allow_request:
-                raise 'Unauthorized', 'Not authorized'
+                raise AccessControl_Unauthorized('Not authorized')
             elif review_state == 'private':
-                raise 'Unauthorized', 'Already private'
+                raise AccessControl_Unauthorized('Already private')
             content_creator = ob.Creator()
             pm = getToolByName(self, 'portal_membership')
             current_user = pm.getAuthenticatedMember().getId()
             if (content_creator != current_user) and not allow_review:
-                raise 'Unauthorized', 'Not creator or reviewer'
+                raise AccessControl_Unauthorized('Not creator or reviewer')
             self.setReviewStateOf(ob, 'private', action, comment)
 
         elif action == 'publish':
             if not allow_review:
-                raise 'Unauthorized', 'Not authorized'
+                raise AccessControl_Unauthorized('Not authorized')
             self.setReviewStateOf(ob, 'published', action, comment)
 
         elif action == 'reject':
             if not allow_review:
-                raise 'Unauthorized', 'Not authorized'
+                raise AccessControl_Unauthorized('Not authorized')
             self.setReviewStateOf(ob, 'private', action, comment)
 
     security.declarePrivate('isInfoSupported')

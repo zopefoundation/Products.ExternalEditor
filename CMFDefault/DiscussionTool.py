@@ -19,19 +19,20 @@ from Globals import InitializeClass, DTMLFile
 from AccessControl import ClassSecurityInfo
 from OFS.SimpleItem import SimpleItem
 
-from Products.CMFCore.utils import UniqueObject, getToolByName
+from Products.CMFCore.ActionInformation import ActionInformation
+from Products.CMFCore.ActionProviderBase import ActionProviderBase
+from Products.CMFCore.CMFCoreExceptions import AccessControl_Unauthorized
 from Products.CMFCore.CMFCorePermissions import ManagePortal
 from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
 from Products.CMFCore.CMFCorePermissions import ReplyToItem
-
-from utils import _dtmldir
-from DiscussionItem import DiscussionItemContainer
-from Products.CMFCore.ActionInformation import ActionInformation
-from Products.CMFCore.ActionProviderBase import ActionProviderBase
 from Products.CMFCore.Expression import Expression
-
 from Products.CMFCore.interfaces.portal_discussion \
         import portal_discussion as IDiscussionTool
+from Products.CMFCore.utils import getToolByName
+from Products.CMFCore.utils import UniqueObject
+
+from DiscussionItem import DiscussionItemContainer
+from utils import _dtmldir
 
 
 class DiscussionNotAllowed( Exception ):
@@ -82,7 +83,7 @@ class DiscussionTool( UniqueObject, SimpleItem, ActionProviderBase ):
         """
         mtool = getToolByName( self, 'portal_membership' )
         if not mtool.checkPermission(ModifyPortalContent, content):
-            raise "Unauthorized"
+            raise AccessControl_Unauthorized
 
         if allowDiscussion is None or allowDiscussion == 'None':
             if hasattr(content, 'allow_discussion'):

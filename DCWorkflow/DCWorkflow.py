@@ -26,6 +26,7 @@ from OFS.Folder import Folder
 from OFS.ObjectManager import bad_id
 
 # CMFCore
+from Products.CMFCore.CMFCoreExceptions import AccessControl_Unauthorized
 from Products.CMFCore.CMFCorePermissions import ManagePortal
 from Products.CMFCore.interfaces.portal_workflow \
         import WorkflowDefinition as IWorkflowDefinition
@@ -42,7 +43,6 @@ from Transitions import TRIGGER_AUTOMATIC, TRIGGER_USER_ACTION, \
      TRIGGER_WORKFLOW_METHOD
 from Expression import StateChangeInfo, createExprContext
 
-Unauthorized = 'Unauthorized'
 
 def checkId(id):
     res = bad_id(id)
@@ -266,13 +266,13 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
         if sdef is None:
             raise WorkflowException, 'Object is in an undefined state'
         if action not in sdef.transitions:
-            raise Unauthorized
+            raise AccessControl_Unauthorized
         tdef = self.transitions.get(action, None)
         if tdef is None or tdef.trigger_type != TRIGGER_USER_ACTION:
             raise WorkflowException, (
                 'Transition %s is not triggered by a user action' % action)
         if not self._checkTransitionGuard(tdef, ob):
-            raise Unauthorized
+            raise AccessControl_Unauthorized
         self._changeStateOf(ob, tdef, kw)
 
     security.declarePrivate('isWorkflowMethodSupported')
@@ -302,14 +302,14 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
         if sdef is None:
             raise WorkflowException, 'Object is in an undefined state'
         if method_id not in sdef.transitions:
-            raise Unauthorized
+            raise AccessControl_Unauthorized
         tdef = self.transitions.get(method_id, None)
         if tdef is None or tdef.trigger_type != TRIGGER_WORKFLOW_METHOD:
             raise WorkflowException, (
                 'Transition %s is not triggered by a workflow method'
                 % method_id)
         if not self._checkTransitionGuard(tdef, ob):
-            raise Unauthorized
+            raise AccessControl_Unauthorized
         res = apply(func, args, kw)
         try:
             self._changeStateOf(ob, tdef)
