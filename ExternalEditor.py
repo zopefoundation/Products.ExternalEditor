@@ -16,11 +16,10 @@
 
 # Zope External Editor Product by Casey Duncan
 
-from string import join
+from string import join # For Zope 2.3 compatibility
 import Acquisition
 from AccessControl.SecurityManagement import getSecurityManager
 from webdav.common import rfc1123_date
-import base64
 
 class ExternalEditor(Acquisition.Implicit):
     """Create a response that encapsulates the data needed by the
@@ -51,8 +50,11 @@ class ExternalEditor(Acquisition.Implicit):
         r.append('url:%s' % ob.absolute_url())
         r.append('meta_type:%s' % ob.meta_type)
         
-        if hasattr(ob, 'content_type'):
-            r.append('content_type:%s' % ob.content_type)
+        if hasattr(Acquisition.aq_base(ob), 'content_type'):
+            if callable(ob.content_type):
+                r.append('content_type:%s' % ob.content_type())
+            else:
+                r.append('content_type:%s' % ob.content_type)
             
         if REQUEST._auth[-1] == '\n':
             auth = REQUEST._auth[:-1]

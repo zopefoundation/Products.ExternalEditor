@@ -1,5 +1,8 @@
 External Editor Change Log
 
+    - Fixed content_type bug, now checks if it is callable. Thanks to Arnaud 
+      Bienvenu
+
     - Fixed bug with editing binary data on Windows. Thanks to Eric Kamm.
 
     - Fixed bug setting the editor on Posix platforms.
