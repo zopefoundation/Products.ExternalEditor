@@ -3,6 +3,14 @@ from Products.CMFDefault.Document import Document
 #" 
 DOCTYPE = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">'''
 
+HTML_TEMPLATE = '''\
+<html><head>
+ <title>%(title)s</title>
+</head>
+<body bgcolor="#efe843">%(body)s</body>
+</html>
+'''
+
 BASIC_HTML = '''\
 <html>
  <head>
@@ -139,6 +147,18 @@ class DocumentTests(unittest.TestCase):
         assert d.Format() == 'text/html'
         assert d.Description() == 'Describe me'
 
+    def test_BigHtml(self):
+        d = Document('foo')
+        s = []
+        looper = '<li> number %s</li>'
+        for i in range(12000): s.append(looper % i)
+        body = '<ul>\n%s\n</ul>' % string.join(s, '\n')
+        html = HTML_TEMPLATE % {'title': 'big document',
+                                'body': body}
+        d.edit(text_format=None, text=html)
+        assert d.CookedBody() == body
+        
+
     def test_EditStructuredTextWithHTML(self):
         d = Document('foo')
         d.edit(text_format=None, text=STX_WITH_HTML)
@@ -235,6 +255,8 @@ class DocumentTests(unittest.TestCase):
         assert len( d.Subject() ) == 2
         assert 'plain' in d.Subject()
         assert 'STX' in d.Subject()
+
+    
 
 
 class TestDocumentPUT(unittest.TestCase):

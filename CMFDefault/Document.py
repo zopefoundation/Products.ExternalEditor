@@ -262,9 +262,9 @@ class Document(PortalContent, DefaultDublinCoreImpl):
             headers.update(parser.metatags)
             if parser.title:
                 headers['Title'] = parser.title
-            bodyfound = bodyfinder.search(text)
+            bodyfound = bodyfinder(text)
             if bodyfound:
-                cooked = body = bodyfound.group('bodycontent')
+                cooked = body = bodyfound
         else:
             headers, body = parseHeadersBody(text, headers)
             cooked = _format_stx(text=body, level=level)
