@@ -186,6 +186,7 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
                 if tdef.actbox_name:
                     if self._checkTransitionGuard(tdef, ob):
                         res.append((tid, {
+                            'id': tid,
                             'name': tdef.actbox_name % info,
                             'url': tdef.actbox_url % info,
                             'permissions': (),  # Predetermined.
