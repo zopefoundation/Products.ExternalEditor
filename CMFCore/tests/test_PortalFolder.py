@@ -46,6 +46,7 @@ from Products.CMFCore.tests.base.tidata import FTIDATA_DUMMY
 from Products.CMFCore.tests.base.utils import has_path
 from Products.CMFCore.TypesTool import FactoryTypeInformation as FTI
 from Products.CMFCore.TypesTool import TypesTool
+from Products.CMFCore.WorkflowTool import WorkflowTool
 
 
 def extra_meta_types():
@@ -210,6 +211,19 @@ class PortalFolderTests(SecurityTest):
         self.failIf( foo.after_add_called )
         self.failUnless( foo.before_delete_called )
         self.assertEqual( len(ctool), 0 )
+
+    def test_portalfolder_cataloging(self):
+        #
+        # Test to ensure a portal folder itself is *not* cataloged upon
+        # instantiation (Tracker issue 309)
+        #
+        ttool = self.site._setObject( 'portal_types', TypesTool() )
+        ctool = self.site._setObject( 'portal_catalog', CatalogTool() )
+        wftool = self.site._setObject( 'portal_workflow', WorkflowTool() )
+        test = self._makeOne('test')
+        wftool.notifyCreated(test)
+        self.assertEqual( len(ctool), 0 )
+
 
     def test_tracker261(self):
 

@@ -333,6 +333,9 @@ class PortalFolder(DynamicType, CMFCatalogAware, OrderedFolder):
     def reindexObject(self, idxs=[]):
         pass
 
+    def reindexObjectSecurity(self):
+        pass
+
     def PUT_factory( self, name, typ, body ):
         """ Factory for PUT requests to objects which do not yet exist.
 
