@@ -41,6 +41,26 @@ BASIC_HTML = '''\
 </html>
 '''
 
+# A document with an html-qualifying *portion*.
+FAUX_HTML_LEADING_TEXT = '''\
+The following would look like HTML but for this leading text:
+
+<html>
+ <head>
+  <title>Title in tag</title>
+  <meta name="description" content="Describe me">
+  <meta name="contributors" content="foo@bar.com; baz@bam.net;
+    Benotz, Larry J (larry@benotz.stuff)">
+  <meta name="title" content="Title in meta">
+  <meta name="subject" content="content management">
+  <meta name="keywords" content="unit tests, framework; ,zope ">
+ </head>
+ <body bgcolor="#ffffff">
+  <h1>Not a lot here</h1>
+ </body>
+</html>
+'''
+
 ENTITY_IN_TITLE = '''\
 <html>
  <head>
