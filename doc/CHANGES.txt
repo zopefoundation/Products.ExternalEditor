@@ -4,6 +4,10 @@ PluggableAuthService changelog
 
     Features Added
 
+      - CookieAuth plugin now encodes and decodes cookies in the same
+        format as CookieCrumbler to provide compatibility between
+        sites running PAS and CC.
+
       - Add a publicly callable "logout" method on the PluggableAuthService
         instance that will call resetCredentials on all activated 
         ICredentialsRest plugins, thus effecting a logout.
