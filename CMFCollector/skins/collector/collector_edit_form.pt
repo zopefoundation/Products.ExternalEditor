@@ -1,8 +1,14 @@
+<span tal:condition="nothing"
+      tal:define="has_edit_priv nocall: here/edit">
+  This span ensures that the visitor has edit privilege, by fetching - but not
+  displaying - the protected collector.edit method.
+</span>
+
 <html xmlns:tal="http://xml.zope.org/namespaces/tal"
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       metal:use-macro="here/main_template/macros/master">
 
-<span tal:replace="nothing">
+<span tal:condition="nothing">
   Template description: Form for configuring the collector.
 </span>
 
@@ -17,6 +23,7 @@
 </div>
 
 <div metal:fill-slot="main">	  
+
 <h2> Configure Collector </h2>
  
 <form action="collector_edit" method="post">
@@ -32,12 +39,19 @@
      tal:attributes="value here/title"
           size="45">
   </td>
-  <td> Abbreviation:
+ </tr>
+  
+ <tr valign="top">
+  <th> Abbreviation </th>
+  <td colspan="4">
    <input type="text"
           name="abbrev"
           value=""
       tal:attributes="value here/abbrev|nothing"
           size="5">
+    <font color="gray" size="-1">
+      Collector email subject-line prefix
+    </font>
   </td>
  </tr>
   
@@ -66,28 +80,20 @@
           <table>
             <tr>
               <td>
-                <input type="text" name="email" size=30
+                <input type="text" name="email" size=25
                        value="EMAIL"
                        tal:attributes="value email">
               </td>
               <td>
-                <font color="gray"> "From" address for notifications </font>
+                <font color="gray" size="-1">
+                  Collector email "From" address
+                </font>
               </td>
             </tr>
           </table>
   </td>
  </tr>
-  
- <tr valign="top">
-  <th> </th>
-  <td colspan="3">
-       <font color="gray"> <em> Note that staff changes cause reindexing of
-              all issues, so catalog local-roles/visibility caching
-              tracks - it'll take a while! </em>
-       </font>
-  </td>
- </tr>
-  
+
  <tr valign="top">
   <th align="right"> Managers
   </th>
@@ -97,11 +103,11 @@
 </textarea>
   </td>
   <td colspan="2">
-          <font color="gray"> Managers configure the collector, and receive
-            new requests.  Managers can accept issues, but must be on
-            Supporters roster to be assigned.  (Managers may remove
-            <em>themselves</em> from management roster - they must have
-            another manager do so.)
+          <font size="-1" color="gray">
+            Managers configure the collector, and receive request notices.
+            Managers can accept issues, but must be on Supporters roster to be
+            assigned.  (Managers cannot remove <em>themselves</em> from
+            management roster.)
           </font>
   </td>
  </tr>
@@ -115,9 +121,10 @@
 </textarea>
   </td>
   <td colspan="2">
-          <font color="gray"> Supporters can be assigned to requests.  They
-            may or may not receive initial request notifications, depending on
-            the "dispatching" setting below.
+          <font size="-1" color="gray">
+            Supporters can be assigned to requests.  They may or may not
+            receive initial request notifications, depending on the
+            "dispatching" setting below.
           </font>
   </td>
  </tr>
@@ -126,17 +133,32 @@
   <th align="right"> Dispatcher Mode
   </th>
   <td colspan="3">
-    <input type="radio" name="dispatching:int" value="0"
-           tal:attributes="checked not: here/dispatching|nothing">
-          Off
-            <font color="gray">
-              Managers and supporters receive pending-issue notices </font>
-    <br>
-    <input type="radio" name="dispatching:int" value="1"
-           tal:attributes="checked here/dispatching|nothing">
-          On
-            <font color="gray">
-              Only managers recieve pending-issue notices </font>
+          <table>
+            <tr>
+              <td NOWRAP>
+                <input type="radio" name="dispatching:int" value="0"
+                       tal:attributes="checked not: here/dispatching|nothing">
+                  Off
+              </td>
+              <td>
+                <font color="gray" size="-1">
+                  Managers and supporters receive pending-issue notices
+                </font>
+              </td>
+            </tr>
+            <tr>
+              <td NOWRAP>
+                <input type="radio" name="dispatching:int" value="1"
+                       tal:attributes="checked here/dispatching|nothing">
+                  On
+              </td>
+              <td>
+                <font color="gray" size="-1">
+                  Only managers receive pending-issue notices
+                </font>
+              </td>
+            </tr>
+          </table>
   </td>
  </tr>
   
@@ -169,8 +191,9 @@
  <tr valign="top">
   <th align="right"> Version Info Spiel </th>
   <td colspan=3>
-    <font size="-1" color="gray"> Something to prompt requesters for useful
-    version info... </font>
+          <font size="-1" color="gray" size="-1">
+            Something to prompt requesters for useful version info...
+          </font>
     <br> 
    <textarea name="version_info_spiel:text" rows="3" cols="50">
 <span tal:replace="here/version_info_spiel|nothing">
@@ -181,10 +204,9 @@
  <tr valign="top">
   <th> Reinstate catalog </th>
   <td colspan="4">
-    <font color="gray">
-      Some product updates require reinstating the catalog and reindexing
-      issues - rare!  Collector product RELEASE_NOTES.txt will advise when
-      necessary.
+    <font color="gray" size="-1">
+      Rarely, product updates require internal catalog reinit and reindex.
+      Collector product RELEASE_NOTES.txt will indicate when necessary.
     </font>
     <br>
     <input type="radio" name="recatalog:int" value="0" CHECKED>No
