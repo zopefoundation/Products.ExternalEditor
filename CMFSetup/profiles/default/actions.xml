@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<actions-tool>
+ <action-provider id="portal_membership">
+  <action action_id="login" title="Login" category="user"
+          action_expr="string:${portal_url}/login_form"
+          condition_expr="not: member" visible="1"
+          permission="View"/>
+  <action action_id="preferences" title="Preferences"
+          category="user"
+          action_expr="string:${portal_url}/personalize_form"
+          condition_expr="member" visible="1"
+          permission="View"/>
+  <action action_id="logout" title="Log out" category="user"
+          action_expr="string:${portal_url}/logout"
+          condition_expr="member" visible="1"
+          permission="View"/>
+  <action action_id="addFavorite" title="Add to favorites"
+          category="user"
+          action_expr="string:${object_url}/addtoFavorites"
+          condition_expr="portal/portal_membership/getHomeFolder"
+          visible="1" permission="View"/>
+  <action action_id="mystuff" title="My stuff"
+          category="user"
+          action_expr="string:${portal/portal_membership/getHomeUrl}/folder_contents"
+          condition_expr="python: member and portal.portal_membership.getHomeFolder()"
+          visible="1" permission="View"/>
+  <action action_id="favorites" title="My favorites"
+          category="user"
+          action_expr="string:${portal/portal_membership/getHomeUrl}/Favorites/folder_contents"
+          condition_expr="python: member and hasattr(portal.portal_membership.getHomeFolder(), &quot;Favorites&quot;)"
+          visible="1" permission="View"/>
+  <action action_id="manage_members" title="Manage members"
+          category="global"
+          action_expr="string:${portal_url}/members_manage_form"
+          condition_expr="" visible="1"
+          permission="Manage users"/>
+  <action action_id="logged_in" title="Logged in"
+          category="user"
+          action_expr="string:${portal_url}/logged_in"
+          condition_expr="" visible="0" permission="View"/>
+ </action-provider>
+ <action-provider id="portal_actions">
+  <action action_id="folderContents" title="Folder contents"
+          category="folder"
+          action_expr="string:${folder_url}/folder_contents"
+          condition_expr="python: folder is not object"
+          visible="1" permission="List folder contents"/>
+ </action-provider>
+ <action-provider id="portal_registration">
+  <action action_id="join" title="Join" category="user"
+          action_expr="string:${portal_url}/join_form"
+          condition_expr="not: member" visible="1"
+          permission="Add portal member"/>
+ </action-provider>
+ <action-provider id="portal_types">
+ </action-provider>
+ <action-provider id="portal_discussion">
+  <action action_id="reply" title="Reply" category="object"
+          action_expr="string:${object_url}/discussion_reply_form"
+          condition_expr="python: object is not None and portal.portal_discussion.isDiscussionAllowedFor(object)"
+          visible="1" permission="Reply to item"/>
+ </action-provider>
+ <action-provider id="portal_undo">
+  <action action_id="undo" title="Undo" category="global"
+          action_expr="string:${portal_url}/undo_form"
+          condition_expr="member" visible="1"
+          permission="List undoable changes"/>
+ </action-provider>
+ <action-provider id="portal_syndication">
+  <action action_id="syndication" title="Syndication"
+          category="object"
+          action_expr="string:${folder_url}/synPropertiesForm"
+          condition_expr="python: folder is object"
+          visible="1" permission="Manage properties"/>
+ </action-provider>
+ <action-provider id="portal_workflow">
+ </action-provider>
+ <action-provider id="portal_properties">
+  <action action_id="configPortal"
+          title="Reconfigure Portal" category="global"
+          action_expr="string:${portal_url}/reconfig_form"
+          condition_expr="" visible="1"
+          permission="Manage portal"/>
+ </action-provider>
+</actions-tool>
+
