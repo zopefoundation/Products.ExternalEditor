@@ -37,6 +37,11 @@
             Issue <span tal:replace="here/id">ID</span>
           </font>
         </th>
+        <td tal:condition="here/no_submitter_email" align="right">
+          <em>
+            Note: We have no submitter address, so they won't get followups.
+          </em>
+        </td>
       </tr>
 
       <tr>
