@@ -1,4 +1,4 @@
-"""Skin path configuration management
+""" Skin path configuration management
 
 Setup step and export script
 
@@ -168,12 +168,6 @@ class SkinsToolConfigurator( Implicit ):
         """
         return self._skins_tool.cookie_persistence
 
-    security.declarePrivate( '_skinsConfig' )
-    _skinsConfig = PageTemplateFile( 'stcExport.xml'
-                                   , _xmldir
-                                   , __name__='skinsConfig'
-                                   )
-
     security.declareProtected(ManagePortal, 'generateXML' )
     def generateXML(self):
 
@@ -192,6 +186,15 @@ class SkinsToolConfigurator( Implicit ):
             text = reader()
 
         parseString( text, _SkinsParser( self._site ) )
+
+    #
+    #   Helper methods
+    #
+    security.declarePrivate( '_skinsConfig' )
+    _skinsConfig = PageTemplateFile( 'stcExport.xml'
+                                   , _xmldir
+                                   , __name__='skinsConfig'
+                                   )
 
 InitializeClass( SkinsToolConfigurator )
 
