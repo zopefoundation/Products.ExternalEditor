@@ -90,8 +90,9 @@ __version__='$Revision$'[11:-2]
 
 
 from utils import UniqueObject, _getAuthenticatedUser, _checkPermission
+from utils import getToolByName, _dtmldir
 from OFS.SimpleItem import SimpleItem
-from Globals import InitializeClass
+from Globals import InitializeClass, DTMLFile
 from string import split
 from AccessControl import ClassSecurityInfo
 
@@ -105,10 +106,21 @@ class UndoTool (UniqueObject, SimpleItem):
 
 
     security = ClassSecurityInfo()
-    security.declareProtected(UndoChanges,
-                              'listUndoableTransactionsFor', 'undo',)
 
+    manage_options = ( { 'label' : 'Overview', 'action' : 'manage_overview' }
+                     , 
+                     ) + SimpleItem.manage_options
 
+    #
+    #   ZMI methods
+    #
+    security.declareProtected( CMFCorePermissions.ManagePortal
+                             , 'manage_overview' )
+    manage_overview = DTMLFile( 'explainUndoTool', _dtmldir )
+
+    #
+    #   'portal_undo' interface methods
+    #
     security.declareProtected(UndoChanges, 'listUndoableTransactionsFor')
     def listUndoableTransactionsFor(self, object,
                                     first_transaction=None,

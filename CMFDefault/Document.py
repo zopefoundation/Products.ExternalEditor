@@ -88,12 +88,12 @@
 ADD_CONTENT_PERMISSION = 'Add portal content'
 
 import Globals, string
-from Globals import HTMLFile, HTML
+from Globals import DTMLFile, HTML, InitializeClass
 from Discussions import Discussable
 from AccessControl import ClassSecurityInfo
 from Products.CMFCore.PortalContent import PortalContent
 from DublinCore import DefaultDublinCoreImpl
-from utils import parseHeadersBody, SimpleHTMLParser, bodyfinder
+from utils import parseHeadersBody, SimpleHTMLParser, bodyfinder, _dtmldir
 
 from Products.CMFCore import CMFCorePermissions
 from Products.CMFCore.WorkflowCore import WorkflowAction, afterCreate
@@ -119,11 +119,6 @@ class Document(PortalContent, DefaultDublinCoreImpl):
 
     # Declarative security (replaces __ac_permissions__)
     security = ClassSecurityInfo()
-    security.declareProtected(CMFCorePermissions.View,
-                              'manage_FTPget',
-                              'Format', 'Description',)
-    security.declareProtected(CMFCorePermissions.ModifyPortalContent,
-                              'edit', 'setFormat',)
 
     def __init__(self, id, title='', description='', text_format='', text=''):
         DefaultDublinCoreImpl.__init__(self)
@@ -134,7 +129,23 @@ class Document(PortalContent, DefaultDublinCoreImpl):
         self.text_format=text_format
         self.edit(text_format, text)
 
-    def edit(self, text_format, text, file=''):
+    security.declareProtected( CMFCorePermissions.ModifyPortalContent
+                             , 'manage_edit' )
+    manage_edit = DTMLFile( 'zmi_editDocument', _dtmldir )
+
+    security.declareProtected( CMFCorePermissions.ModifyPortalContent
+                             , 'manage_editDocument' )
+    def manage_editDocument( self, text_format, text, file='', REQUEST=None ):
+        """
+        """
+        self._edit( text_format, text, file )
+        if REQUEST is not None:
+            REQUEST[ 'RESPONSE' ].redirect( self.absolute_url()
+                                     + '/manage_edit'
+                                     + '?manage_tabs_message=Document+updated'
+                                          )
+
+    def _edit(self, text_format, text, file=''):
         """
         Edit the Document
         """
@@ -179,7 +190,9 @@ class Document(PortalContent, DefaultDublinCoreImpl):
                           rights=headers['Rights'],
                           )
         self._parse()
-    edit = WorkflowAction(edit)
+
+    security.declareProtected( CMFCorePermissions.ModifyPortalContent, 'edit' )
+    edit = WorkflowAction(_edit)
 
     def _parse(self):
         """\
@@ -196,14 +209,18 @@ class Document(PortalContent, DefaultDublinCoreImpl):
             
     _format_text=HTML('''<dtml-var text fmt="structured-text">''')
 
+
+    security.declareProtected( CMFCorePermissions.View, 'SearchableText' )
     def SearchableText(self):
         "text for indexing"
         return "%s %s %s" % (self.title, self.description, self.text)
 
+    security.declareProtected( CMFCorePermissions.View, 'Description' )
     def Description(self):
         "description for indexing"
         return self.description
     
+    security.declareProtected( CMFCorePermissions.View, 'Format' )
     def Format(self):
         """ """
         if self.text_format == 'html':
@@ -211,6 +228,9 @@ class Document(PortalContent, DefaultDublinCoreImpl):
         else:
             return 'text/plain'
     
+
+    security.declareProtected( CMFCorePermissions.ModifyPortalContent
+                             , 'setFormat' )
     def setFormat(self, value):
         value = str(value)
         if value == 'text/html':
@@ -220,6 +240,8 @@ class Document(PortalContent, DefaultDublinCoreImpl):
     setFormat = WorkflowAction(setFormat)
 
     ## FTP handlers
+    security.declareProtected( CMFCorePermissions.ModifyPortalContent
+                             , 'PUT' )
     def PUT(self, REQUEST, RESPONSE):
         """Handle HTTP (and presumably FTP?) PUT requests"""
         self.dav__init(REQUEST, RESPONSE)
@@ -247,6 +269,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
         '</html>\n'
         )
 
+    security.declareProtected( CMFCorePermissions.View, 'manage_FTPget' )
     def manage_FTPget(self):
         "Get the document body for FTP download (also used for the WebDAV SRC)"
         join = string.join
@@ -266,9 +289,9 @@ class Document(PortalContent, DefaultDublinCoreImpl):
 
         return bodytext
 
+    security.declareProtected( CMFCorePermissions.View, 'get_size' )
     def get_size( self ):
         " "
         return len(self.manage_FTPget())
 
-Globals.default__class_init__(Document)
-
+InitializeClass( Document )

@@ -84,9 +84,8 @@
 ##############################################################################
 import string, urllib
 
-import Globals
 from DateTime import DateTime
-from Globals import HTMLFile
+from Globals import InitializeClass
 from OFS.SimpleItem import SimpleItem
 from AccessControl import ClassSecurityInfo
 from CMFCorePermissions import AccessContentsInformation, View, \
@@ -112,8 +111,18 @@ class PortalContent(DynamicType, SimpleItem):
     isPortalContent = 1
     _isPortalContent = 1  # More secure than 'isPortalContent'.
 
-    manage_options = (({'label':'View', 'action':'view'},) +
-                      SimpleItem.manage_options)
+    manage_options = ( ( { 'label'  : 'Dublin Core'
+                         , 'action' : 'manage_metadata'
+                         }
+                       , { 'label'  : 'Edit'
+                         , 'action' : 'manage_edit'
+                         }
+                       , { 'label'  : 'View'
+                         , 'action' : 'view'
+                         }
+                       )
+                     + SimpleItem.manage_options
+                     )
 
     security = ClassSecurityInfo()
 
@@ -217,4 +226,4 @@ class PortalContent(DynamicType, SimpleItem):
         else:
             return []
 
-Globals.InitializeClass(PortalContent)
+InitializeClass(PortalContent)
