@@ -83,7 +83,7 @@ CMF TODO's
         (x) Tracker #509:  "Join" action not protected by right
                            permission
 
-      - ( ) Membership fixes
+      - (x) Membership fixes
 
         (x) Tracker #485:  "External" users don't get member folder
                            (patch)
