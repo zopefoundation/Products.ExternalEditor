@@ -1,0 +1,14 @@
+PluggableAuthService changelog
+
+  Version 1.0.1 (unreleased)
+
+    Bugs Fixed
+    
+      - CookieAuth plugin didn't successfully set cookies (first, because
+        of a NameError, then, due to a glitch with long lines).
+
+      - Missing ZPL in most modules.
+
+  Version 1.0 (2004/04/29)
+
+    - Initial release
