@@ -97,6 +97,27 @@ class portal_actions(Base):
     '''
     id = Attribute('id', 'Must be set to "portal_actions"')
 
+    # listActionProviders__roles__ = ( 'Manager', )
+    def listActionProviders():
+        """ Lists all action provider names registered with the 
+        actions tool.
+        """
+
+    # addActionProvider__roles__ = ( 'Manager', )
+    def addActionProvider( provider_name ):
+        """ Add a new action provider to the providers known by the actions
+        tool. A provider must implement listActions.
+        The provider is only added is the actions tool can find the 
+        object corresponding to the provider_name
+        """
+
+    # deleteActionProvider__roles__ = ( 'Manager', )
+    def deleteActionProvider( provider_name ):
+        """ Deletes an action provider name from the providers known to
+        the actions tool. The deletion only takes place if provider_name
+        is actually found among the known action providers.
+        """
+
     # listFilteredActionsFor__roles__ = None
     def listFilteredActionsFor(object):
         '''Gets all actions available to the user and returns a mapping
