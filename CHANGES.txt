@@ -1,5 +1,12 @@
 HEAD only (unreleased)
 
+  Others
+
+    - CMFWiki: The package as distributed with CMF itself has been
+      deprecated and removed. Please use the better-supported 
+      CMFWiki package that comes as part of Simon Michael's ZWiki
+      package. More information at http://zwiki.org.
+
   Bug Fixes
 
     - FSFile: Allow setting a content_type value using a .metadata file
