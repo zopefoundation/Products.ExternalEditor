@@ -35,6 +35,9 @@
   - (__future__) Added DCWorkflow (through-the-web configurable
     workflows) to the core set of CMF products.
 
+  - Improved tracebacks from broken FSDTMLMethods, which no longer
+    indicate that every problem is in RestrictedDTML.
+
   - Made it possible to add CookieCrumblers in nested folders.
     You can just drop in a cookie crumbler anywhere to change the
     login form for that area of the site.  In fact, now you don't
