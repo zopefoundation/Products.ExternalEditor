@@ -48,6 +48,10 @@ CMF TODO's
 
       - Tracker #514:  Document STX messing up anchors
 
+      - Tracker #515:  Improper default button for discussion reply
+
+      - Tracker #516:  Preview, then edit broken for ZPT discussion replies.
+
       - Tracker #519:  CMFDefault.MembershipTool always creates member
                        folder
 
@@ -59,7 +63,7 @@ CMF TODO's
 
         ( ) Tracker #475:  FDC has broken ZPT edit form
 
-      - ( ) STX Fixes
+      - ( ) STX Fixes (Seb Bacon)
 
         ( ) Tracker #476:  STX gobbling paragraphs with parens
 
@@ -91,7 +95,7 @@ CMF TODO's
         ( ) Tracker #519:  CMFDefault.MembershipTool always creates
                            member folder
 
-      - ( ) Folder fixes
+      - ( ) Folder fixes (Florent Guillaume?)
 
         ( ) Tracker #483:  listFolderContents doesn't filter properly
 
@@ -118,6 +122,11 @@ CMF TODO's
 
         ( ) Tracker #513:  deleteReply is genocidal
 
-      - (/) Documentation fixes
+        ( ) Tracker #515:  Improper default button for discussion reply
+
+        ( ) Tracker #516:  Preview, then edit broken for ZPT discussion
+                           replies.
+
+      - (/) Documentation fixes (Tres Seaver)
 
         (/) Tracker #489:  Dependency on TAL breaks Zope 2.4.x
