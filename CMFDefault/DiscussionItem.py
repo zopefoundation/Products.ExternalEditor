@@ -206,6 +206,7 @@ class DiscussionItemContainer(Persistent, Implicit):
     __ac_permissions__ = ( ( 'Access contents information'
                            , ( 'objectIds'
                              , 'objectValues'
+                             , 'objectItems'
                              )
                            )
                          , ( 'View'
@@ -239,12 +240,24 @@ class DiscussionItemContainer(Persistent, Implicit):
             except:
                 REQUEST.RESPONSE.notFoundError("%s\n%s" % (name, ''))
 
-    def objectIds(self):
+    def objectIds(self, spec=None):
         """
         return a list of ids of DiscussionItems in
         this DiscussionItemContainer
         """
         return self._container.keys()
+
+    def objectItems(self, spec=None):
+        """
+        Returns a list of (id, subobject) tuples of the current object.
+        If 'spec' is specified, returns only objects whose meta_type
+        match 'spec'
+        """
+        r=[]
+        a=r.append
+        g=self._container.get
+        for id in self.objectIds(spec): a((id, g(id)))
+        return r
 
     def objectValues(self):
         """
