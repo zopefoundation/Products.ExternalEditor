@@ -2,7 +2,7 @@ Installing CMF 1.5x
 
   Requirements
 
-    - Zope v. 2.6.4 and later
+    - Zope v. 2.7.0 and later
 
   Assumptions
 
