@@ -18,31 +18,39 @@ $Id$
 from Globals import HTMLFile
 from Globals import InitializeClass
 
-from Products.CMFCore.CMFCorePermissions import AccessFuturePortalContent
-from Products.CMFCore.CMFCorePermissions import AddPortalContent
-from Products.CMFCore.CMFCorePermissions import AddPortalFolders
-from Products.CMFCore.CMFCorePermissions import DeleteObjects
-from Products.CMFCore.CMFCorePermissions import FTPAccess
-from Products.CMFCore.CMFCorePermissions import ListPortalMembers
-from Products.CMFCore.CMFCorePermissions import ListUndoableChanges
-from Products.CMFCore.CMFCorePermissions import ManagePortal
-from Products.CMFCore.CMFCorePermissions import ManageProperties
-from Products.CMFCore.CMFCorePermissions import ReplyToItem
-from Products.CMFCore.CMFCorePermissions import ReviewPortalContent
-from Products.CMFCore.CMFCorePermissions import SetOwnPassword
-from Products.CMFCore.CMFCorePermissions import SetOwnProperties
-from Products.CMFCore.CMFCorePermissions import UndoChanges
-from Products.CMFCore.CMFCorePermissions import View
-from Products.CMFCore.CMFCorePermissions import ViewManagementScreens
 from Products.CMFCore.PortalObject import PortalObjectBase
 from Products.CMFCore import PortalFolder
 from Products.CMFCore.TypesTool import ContentFactoryMetadata
 from Products.CMFCore.utils import getToolByName
-from Products.CMFTopic import Topic, topic_globals
-from DublinCore import DefaultDublinCoreImpl
+from Products.CMFTopic import Topic
+from Products.CMFTopic import topic_globals
 
-import Document, Image, File, Link, NewsItem, Favorite
-import DiscussionItem, SkinnedFolder
+from DublinCore import DefaultDublinCoreImpl
+from permissions import AccessFuturePortalContent
+from permissions import AddPortalContent
+from permissions import AddPortalFolders
+from permissions import DeleteObjects
+from permissions import FTPAccess
+from permissions import ListPortalMembers
+from permissions import ListUndoableChanges
+from permissions import ManagePortal
+from permissions import ManageProperties
+from permissions import ReplyToItem
+from permissions import ReviewPortalContent
+from permissions import SetOwnPassword
+from permissions import SetOwnProperties
+from permissions import UndoChanges
+from permissions import View
+from permissions import ViewManagementScreens
+
+import Document
+import Image
+import File
+import Link
+import NewsItem
+import Favorite
+import DiscussionItem
+import SkinnedFolder
 
 factory_type_information = ( Document.factory_type_information
                            + Image.factory_type_information

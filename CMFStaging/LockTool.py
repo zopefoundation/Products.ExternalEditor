@@ -22,21 +22,24 @@ $Id$
 import os
 
 from Acquisition import aq_parent
-from Globals import InitializeClass, DTMLFile
-from AccessControl import ClassSecurityInfo, getSecurityManager
-from Products.CMFCore.utils import UniqueObject, getToolByName, \
-     SimpleItemWithProperties, _checkPermission
-from Products.CMFCore.CMFCorePermissions import ManagePortal, \
-     ModifyPortalContent
+from Globals import InitializeClass
+from Globals import DTMLFile
+from AccessControl import ClassSecurityInfo
+from AccessControl import getSecurityManager
 from webdav.WriteLockInterface import WriteLockInterface
 from webdav.LockItem import LockItem
 from zExceptions import Unauthorized
 
-from staging_utils import verifyPermission
+from Products.CMFCore.utils import UniqueObject
+from Products.CMFCore.utils import getToolByName
+from Products.CMFCore.utils import SimpleItemWithProperties
+from Products.CMFCore.utils import _checkPermission
 
-# Permission names
-LockObjects = 'WebDAV Lock items'
-UnlockObjects = 'WebDAV Unlock items'
+from permissions import ManagePortal
+from permissions import ModifyPortalContent
+from permissions import LockObjects
+from permissions import UnlockObjects
+from staging_utils import verifyPermission
 
 _wwwdir = os.path.join(os.path.dirname(__file__), 'www') 
 

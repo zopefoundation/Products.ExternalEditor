@@ -23,7 +23,11 @@ This makes it easy to present both flowed paragraphs and source code (and
 other literal text), without having to know and navigate the nuances of HTML
 and/or structured text."""
 
-import os, urllib, string, re
+import os
+import urllib
+import string
+import re
+
 from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo, getSecurityManager
 from Acquisition import aq_base
@@ -33,8 +37,8 @@ import util                             # Collector utilities.
 from Products.CMFDefault.Document import Document
 from Products.CMFDefault.utils import SimpleHTMLParser, bodyfinder
 
-from Products.CMFCore import CMFCorePermissions
-from CollectorPermissions import *
+from permissions import View
+from permissions import ModifyPortalContent
 
 factory_type_information = (
     {'id': 'WebText Document',
@@ -49,13 +53,13 @@ factory_type_information = (
      # XXX May need its own forms, in order to inhibit formatting option.
      'actions': ({'name': 'View',
                   'action': 'string:${object_url}/document_view',
-                  'permissions': (CMFCorePermissions.View,)},
+                  'permissions': (View,)},
                  {'name': 'Edit',
                   'action': 'string:${object_url}/document_edit_form',
-                  'permissions': (CMFCorePermissions.ModifyPortalContent,)},
+                  'permissions': (ModifyPortalContent,)},
                  {'name': 'Metadata',
                   'action': 'string:${object_url}/metadata_edit_form',
-                  'permissions': (CMFCorePermissions.ModifyPortalContent,)},
+                  'permissions': (ModifyPortalContent,)},
                  ),
      },
     )

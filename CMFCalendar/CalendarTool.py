@@ -24,9 +24,9 @@ from Globals import InitializeClass
 from OFS.SimpleItem import SimpleItem
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
-from Products.CMFCore.CMFCorePermissions import ManagePortal
 from Products.CMFCore.utils import UniqueObject
 
+from permissions import ManagePortal
 
 class CalendarTool (UniqueObject, SimpleItem):
     """ a calendar tool for encapsualting how calendars work and are displayed """

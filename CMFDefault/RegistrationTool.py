@@ -24,8 +24,9 @@ from Products.CMFCore.ActionInformation import ActionInformation
 from Products.CMFCore.Expression import Expression
 from Products.CMFCore.ActionProviderBase import ActionProviderBase
 from Products.CMFCore.RegistrationTool import RegistrationTool as BaseTool
-from Products.CMFCore.CMFCorePermissions import AddPortalMember
-from Products.CMFCore.CMFCorePermissions import ManagePortal
+
+from permissions import AddPortalMember
+from permissions import ManagePortal
 from utils import _dtmldir
 
 

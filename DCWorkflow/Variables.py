@@ -17,17 +17,16 @@ $Id$
 
 from OFS.SimpleItem import SimpleItem
 from Globals import DTMLFile
-from Acquisition import aq_inner, aq_parent
-import Globals
+from Globals import InitializeClass
+from Acquisition import aq_inner
+from Acquisition import aq_parent
 from AccessControl import ClassSecurityInfo
-
-from Products.CMFCore.CMFCorePermissions import ManagePortal
 
 from ContainerTab import ContainerTab
 from Guard import Guard
 from Expression import Expression
+from permissions import ManagePortal
 from utils import _dtmldir
-
 
 class VariableDefinition (SimpleItem):
     """Variable definition"""
@@ -105,7 +104,7 @@ class VariableDefinition (SimpleItem):
         if REQUEST is not None:
             return self.manage_properties(REQUEST, 'Properties changed.')
 
-Globals.InitializeClass(VariableDefinition)
+InitializeClass(VariableDefinition)
 
 
 class Variables (ContainerTab):
@@ -164,4 +163,4 @@ class Variables (ContainerTab):
         if REQUEST is not None:
             return self.manage_main(REQUEST, 'Set state variable.')
 
-Globals.InitializeClass(Variables)
+InitializeClass(Variables)

@@ -44,16 +44,19 @@ import marshal
 import Globals
 import webdav
 from DateTime import DateTime
-from AccessControl import ClassSecurityInfo, User, getSecurityManager
+from AccessControl import ClassSecurityInfo
+from AccessControl import User
+from AccessControl import getSecurityManager
+
 from Products.CMFCore import PortalContent
-from Products.CMFCore.CMFCorePermissions import View
 from Products.CMFDefault.DublinCore import DefaultDublinCoreImpl
 
 from References import ReferenceCollection
+from permissions import View
+from permissions import ManageWorkspaces
 
 
 # Permission name
-ManageWorkspaces = 'Manage Workspaces'
 
 
 factory_type_information = (

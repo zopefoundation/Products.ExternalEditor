@@ -2,10 +2,10 @@
 ##parameters=text, description, text_format=None, change_and_view=''
 ##title=Edit a news item
 ##
-from Products.CMFCore.CMFCoreExceptions import IllegalHTML
-from Products.CMFCore.CMFCoreExceptions import ResourceLockedError
-from Products.CMFDefault.utils import scrubHTML
 from Products.PythonScripts.standard import urlencode
+from Products.CMFDefault.exceptions import IllegalHTML
+from Products.CMFDefault.exceptions import ResourceLockedError
+from Products.CMFDefault.utils import scrubHTML
 
 try:
     text = scrubHTML( text ) # Strip Javascript, etc.

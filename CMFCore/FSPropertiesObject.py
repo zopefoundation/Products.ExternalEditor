@@ -23,8 +23,10 @@ from ZPublisher.Converters import get_converter
 from AccessControl import ClassSecurityInfo
 
 from utils import _dtmldir
-from DirectoryView import registerFileExtension, registerMetaType, expandpath
-from CMFCorePermissions import ViewManagementScreens
+from DirectoryView import registerFileExtension
+from DirectoryView import registerMetaType
+from DirectoryView import expandpath
+from permissions import ViewManagementScreens
 from FSObject import FSObject
 
 class FSPropertiesObject (FSObject, PropertyManager):

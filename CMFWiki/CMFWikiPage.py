@@ -8,35 +8,51 @@ Integrated into Zope CMF by Chris McDonough (chrism@digicool.com)
 """
 __version__="$Revision$"[11:-2]
 
-from types import *
 import string, re, os
-from Globals import InitializeClass, package_home
+from string import split,join,find,lstrip,lower
+from types import *
+from struct import pack, unpack
+from urllib import quote, unquote     # url quoting
+
+from Globals import InitializeClass
+from Globals import package_home
 from OFS.DTMLDocument import DTMLDocument
 from OFS.Image import cookId
-from urllib import quote, unquote     # url quoting
 from StructuredText import html_with_references #, html_quote
 from DocumentTemplate.DT_Var import html_quote
-from wwml import translate_WMML
-from string import split,join,find,lstrip,lower
-import Acquisition
-from Acquisition import aq_base, aq_inner, aq_parent
-from AccessControl import getSecurityManager, ClassSecurityInfo
+from Acquisition import Implicit
+from Acquisition import aq_base
+from Acquisition import aq_inner
+from Acquisition import aq_parent
+from AccessControl import getSecurityManager
+from AccessControl import ClassSecurityInfo
 from AccessControl.Permission import Permission
 from Persistence import Persistent
 from DateTime import DateTime
-from struct import pack, unpack
+
+from Products.CMFCore.PortalContent import PortalContent
+from Products.CMFCore.utils import _getViewFor
+from Products.CMFDefault.SkinnedFolder import SkinnedFolder
+from Products.CMFDefault.Image import Image
+from Products.CMFDefault.File import File
+from Products.CMFDefault.DublinCore import DefaultDublinCoreImpl
+
 from ZWikiRegexes import urlchars, url, urlexp, bracketedexpr,\
      bracketedexprexp, underlinedexpr, underlinedexprexp, wikiname1,\
      wikiname2, simplewikilinkexp, wikiending, urllinkending, wikilink,\
      wikilinkexp, wikilink_, interwikilinkexp, remotewikiurlexp,\
      protected_lineexp, antidecaptext, antidecapexp, commentsdelim,\
      preexp, unpreexp, citedexp, cite_prefixexp, intl_char_entities
-import CMFWikiPermissions
-from Products.CMFCore.PortalContent import PortalContent
-from Products.CMFCore.utils import _getViewFor
-from Products.CMFDefault.SkinnedFolder import SkinnedFolder
-from Products import CMFDefault
-from Products.CMFDefault.DublinCore import DefaultDublinCoreImpl
+
+from wwml import translate_WMML
+from permissions import View
+from permissions import Move
+from permissions import Edit
+from permissions import Comment
+from permissions import Create
+from permissions import Regulate
+from permissions import FTPRead
+
 DISABLE_JAVASCRIPT = 1
 
 class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
@@ -63,11 +79,11 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
                        ]
     # mapping of action category (used by forms) to permission name
     _perms = {
-        'move':CMFWikiPermissions.Move,
-        'edit':CMFWikiPermissions.Edit,
-        'comment':CMFWikiPermissions.Comment,
-        'create':CMFWikiPermissions.Create,
-        'regulate':CMFWikiPermissions.Regulate
+        'move':Move,
+        'edit':Edit,
+        'comment':Comment,
+        'create':Create,
+        'regulate':Regulate
         }
     # mapping of mnemonic pseudorole name (used by forms) to actual role name
     _roles_map = {
@@ -103,12 +119,12 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
                  )
     # permission defaults
     set = security.setPermissionDefault
-    set(CMFWikiPermissions.Edit, ('Owner', 'Manager', 'Authenticated'))
-    set(CMFWikiPermissions.FTPRead, ('Owner', 'Manager'))
-    set(CMFWikiPermissions.Regulate, ('Owner', 'Manager'))
-    set(CMFWikiPermissions.Create, ('Owner', 'Manager', 'Authenticated'))
-    set(CMFWikiPermissions.Move, ('Owner', 'Manager'))
-    set(CMFWikiPermissions.Comment, ('Owner', 'Manager', 'Authenticated'))
+    set(Edit, ('Owner', 'Manager', 'Authenticated'))
+    set(FTPRead, ('Owner', 'Manager'))
+    set(Regulate, ('Owner', 'Manager'))
+    set(Create, ('Owner', 'Manager', 'Authenticated'))
+    set(Move, ('Owner', 'Manager'))
+    set(Comment, ('Owner', 'Manager', 'Authenticated'))
     set = None
 
     def __init__(self, __name__='', source_string='', mapping=None):
@@ -122,11 +138,11 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
         try: return self.id()
         except TypeError: return self.id
 
-    security.declareProtected(CMFWikiPermissions.View, 'SearchableText')
+    security.declareProtected(View, 'SearchableText')
     def SearchableText(self):
         return self.raw
 
-    security.declareProtected(CMFWikiPermissions.View, '__call__')
+    security.declareProtected(View, '__call__')
     def __call__(self, client=None, REQUEST={}, RESPONSE=None, **kw):
         '''
         Invokes the default view.
@@ -417,7 +433,7 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
         # otherwise, leave alone
         return match.group(0)
 
-    security.declareProtected(CMFWikiPermissions.Edit, 'manage_edit')
+    security.declareProtected(Edit, 'manage_edit')
     def manage_edit(self, data, title, REQUEST=None):
         """Do standard manage_edit kind of stuff,but use our special edit."""
         self.edit(text=data, title=title)
@@ -426,7 +442,7 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
             message="Content changed."
             return self.manage_main(self,REQUEST,manage_tabs_message=message)
 
-    security.declareProtected(CMFWikiPermissions.Move, 'delete')
+    security.declareProtected(Move, 'delete')
     def delete(self):
         """ Deletes this page from the folder """
         id = self.getId()
@@ -436,7 +452,7 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
         folder._delObject(id)
         self.unindexObject()
 
-    security.declareProtected(CMFWikiPermissions.Move, 'rename')
+    security.declareProtected(Move, 'rename')
     def rename(self, new_id):
         """ Renames this page """
         old_id = self.getId()
@@ -455,7 +471,7 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
         self.indexObject()
         return self.wiki_page_url()
 
-    security.declareProtected(CMFWikiPermissions.Comment, 'comment')
+    security.declareProtected(Comment, 'comment')
     def comment(self, comment, ack_requested=None):
         """ Handles comments """
         self.comment_number = self.comment_number + 1
@@ -476,7 +492,7 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
         self._set_text(t)
         self.reindexObject()
 
-    security.declareProtected(CMFWikiPermissions.Edit, 'edit')
+    security.declareProtected(Edit, 'edit')
     def edit(self, text=None, type=None, title='', log=None, timeStamp=None):
         """
         Handles edits.
@@ -528,7 +544,7 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
         pass in REQUEST, it should go away at some point"""
         return getSecurityManager().checkPermission(self._perms[op], self)
     
-    security.declareProtected(CMFWikiPermissions.Regulate, 'setSubOwner')
+    security.declareProtected(Regulate, 'setSubOwner')
     def setSubOwner(self, which):
         """Set how owner role of pages created from this page is determined.
         Which must be one of:
@@ -569,7 +585,7 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
             else:
                 self.manage_setLocalRoles(username, list(roles))
 
-    security.declareProtected(CMFWikiPermissions.Regulate, 'setOp')
+    security.declareProtected(Regulate, 'setOp')
     def setOp(self, op, usernames, category):
         """Set who can do a particular operation."""
         if category is None:
@@ -582,7 +598,7 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
             username and \
                      self.manage_addLocalRoles(username,[this_local_role])
 
-    security.declareProtected(CMFWikiPermissions.Regulate, 'setRegulations')
+    security.declareProtected(Regulate, 'setRegulations')
     def setRegulations(self, d):
         """Set regulations for CMFWiki page """
         offspring = None
@@ -652,7 +668,7 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
                 usernames[username] = 1
         return tuple(usernames.keys())
 
-    security.declareProtected(CMFWikiPermissions.Create, 'create_page')
+    security.declareProtected(Create, 'create_page')
     def create_page(self, page, text='', title='', log=None,
                     page_type='structuredtext'):
         """Create a new page."""
@@ -729,8 +745,8 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
         
     # we want a Wiki page's manage_upload method to be
     # protected by something other than 'Change DTML Methods'
-    security.declareProtected(CMFWikiPermissions.Edit, 'manage_upload')
-    security.declareProtected(CMFWikiPermissions.Create, 'create_file')
+    security.declareProtected(Edit, 'manage_upload')
+    security.declareProtected(Create, 'create_file')
     def create_file(self, id, file='', filetype='file', title='',
                     precondition='', content_type=''):
         # Lifted from OFS/Image.py:File:manage_addFile
@@ -753,11 +769,9 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
         folder=self._my_folder()
 
         if string.lower(filetype) == 'image':
-            obj = CMFDefault.Image.Image(
-                id, title,'', content_type, precondition)
+            obj = Image(id, title,'', content_type, precondition)
         else:
-            obj = CMFDefault.File.File(
-                id,title,'', content_type, precondition)
+            obj = File(id,title,'', content_type, precondition)
         folder._setObject(id, obj)
         folder._getOb(id).manage_upload(file)
 
@@ -943,13 +957,13 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
 
         return r
 
-    security.declareProtected(CMFWikiPermissions.Edit, 'history_copy_page_to_present')
+    security.declareProtected(Edit, 'history_copy_page_to_present')
     def history_copy_page_to_present(self, keys=[]):
         """Create a new object copy with the contents of an historic copy."""
         self.manage_historyCopy(keys=keys)
         self.reindexObject()
 
-    security.declareProtected(CMFWikiPermissions.View, 'history_compare_versions')
+    security.declareProtected(View, 'history_compare_versions')
     def history_compare_versions(self, keys=[], REQUEST=None):
         """Do history comparisons.
 
@@ -989,7 +1003,7 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
         return self.quotedHTML(self._st_data or self.xread())
 
     # jim's safety belts for warning of http & ftp edit conflicts
-    security.declareProtected(CMFWikiPermissions.FTPRead, 'manage_FTPget')
+    security.declareProtected(FTPRead, 'manage_FTPget')
     def manage_FTPget(self):
         "Get source for FTP download"
 
@@ -1015,7 +1029,7 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
                             , self._st_data or self.xread()
                             )
 
-    security.declareProtected(CMFWikiPermissions.Edit, 'PUT')
+    security.declareProtected(Edit, 'PUT')
     def PUT( self
            , REQUEST
            , RESPONSE
@@ -1138,7 +1152,7 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
                     backlinks.append({'pageid':pageid, 'isparent':0})
         return backlinks
     
-    security.declareProtected(CMFWikiPermissions.View, 'text')
+    security.declareProtected(View, 'text')
     def text(self, REQUEST=None, RESPONSE=None):
         """ document source """
         if RESPONSE is not None:
@@ -1155,7 +1169,7 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
         """return the base url path for the current wiki"""
         return '/' + self._my_folder().absolute_url(relative=1)
 
-    security.declareProtected(CMFWikiPermissions.Move, 'reparent')
+    security.declareProtected(Move, 'reparent')
     def reparent(self, parents=None):
         """Reset parents property according to request."""
         if parents is None:
@@ -1416,7 +1430,7 @@ def within_literal(upto, after, state, text,
 InitializeClass(CMFWikiPage)
 
 
-class WikiNesting(Acquisition.Implicit):
+class WikiNesting(Implicit):
     """Given a wiki dir, generate nesting relationship from parents info.
 
     In a nesting, nodes are represented as:
@@ -1808,54 +1822,54 @@ factory_type_information = (
   , 'actions'        : ( { 'id': 'view'
                          , 'name': 'View'
                          , 'action': 'string:${object_url}/wikipage_view'
-                         , 'permissions': (CMFWikiPermissions.View,)
+                         , 'permissions': (View,)
                          }
                        , { 'id': 'comment'
                          , 'name': 'Comment'
                          , 'action':
                                   'string:${object_url}/wikipage_comment_form'
-                         , 'permissions': (CMFWikiPermissions.Comment,)
+                         , 'permissions': (Comment,)
                          }
                        , { 'id': 'edit'
                          , 'name': 'Edit'
                          , 'action': 'string:${object_url}/wikipage_edit_form'
-                         , 'permissions': (CMFWikiPermissions.Edit,)
+                         , 'permissions': (Edit,)
                          }
                        , { 'id': 'history'
                          , 'name': 'History'
                          , 'action': 'string:${object_url}/wikipage_history'
-                         , 'permissions': (CMFWikiPermissions.View,)
+                         , 'permissions': (View,)
                          }
                        , { 'id': 'backlinks'
                          , 'name': 'Backlinks'
                          , 'action': 'string:${object_url}/wikipage_backlinks'
-                         , 'permissions': (CMFWikiPermissions.View,)
+                         , 'permissions': (View,)
                          }
                        , { 'id': 'advanced'
                          , 'name': 'Advanced'
                          , 'action':
                                  'string:${object_url}/wikipage_advanced_form'
-                         , 'permissions': (CMFWikiPermissions.View,)
+                         , 'permissions': (View,)
                          }
                        , { 'id': 'toc'
                          , 'name': 'Wiki Contents'
                          , 'category': 'folder'
                          , 'action': 'string:${object_url}/wikipage_toc'
-                         , 'permissions': (CMFWikiPermissions.View,)
+                         , 'permissions': (View,)
                          }
                        , { 'id': 'recent_changes'
                          , 'name': 'Recent Changes'
                          , 'category': 'folder'
                          , 'action':
                                  'string:${object_url}/wikipage_recentchanges'
-                         , 'permissions': (CMFWikiPermissions.View,)
+                         , 'permissions': (View,)
                          }
                        , { 'id': 'create'
                          , 'name': 'Create'
                          , 'category': 'folder'
                          , 'action':
                                    'string:${object_url}/wikipage_create_form'
-                         , 'permissions': (CMFWikiPermissions.Create,)
+                         , 'permissions': (Create,)
                          , 'visible': 0
                          }
                        )
@@ -1874,31 +1888,31 @@ Loosely organized (yet structured) content can be added to Wikis.
                          , 'name': 'Wiki Contents'
                          , 'category': 'folder'
                          , 'action': 'string:${object_url}/wiki_toc'
-                         , 'permissions': (CMFWikiPermissions.View,)
+                         , 'permissions': (View,)
                          }
                        , { 'id': 'view'
                          , 'name': 'FrontPage'
                          , 'category': 'folder'
                          , 'action': 'string:${object_url}/FrontPage'
-                         , 'permissions': (CMFWikiPermissions.View,)
+                         , 'permissions': (View,)
                          }
                        , { 'id': 'all'
                          , 'name': 'All Pages'
                          , 'category': 'folder'
                          , 'action': 'string:${object_url}/wiki_allpages'
-                         , 'permissions': (CMFWikiPermissions.View,)
+                         , 'permissions': (View,)
                          }
                        , { 'id': 'recent_changes'
                          , 'name': 'Recent Changes'
                          , 'category': 'folder'
                          , 'action': 'string:${object_url}/wiki_recentchanges'
-                         , 'permissions': (CMFWikiPermissions.View,)
+                         , 'permissions': (View,)
                          }
                        , { 'id': 'wikihelp'
                          , 'name': 'WikiHelp'
                          , 'category': 'folder'
                          , 'action': 'string:${object_url}/WikiHelp'
-                         , 'permissions': (CMFWikiPermissions.View,)
+                         , 'permissions': (View,)
                          }
                        )
   }

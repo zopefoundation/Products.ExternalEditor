@@ -15,22 +15,29 @@
 $Id$
 """
 
-from StructuredText.HTMLWithImages import HTMLWithImages
-from Globals import DTMLFile, InitializeClass
-from AccessControl import ClassSecurityInfo, getSecurityManager
+from Globals import DTMLFile
+from Globals import InitializeClass
+from AccessControl import ClassSecurityInfo
+from AccessControl import getSecurityManager
 from Acquisition import aq_base
+from DocumentTemplate.DT_Util import html_quote
+from StructuredText.HTMLWithImages import HTMLWithImages
 
 from Products.CMFCore.PortalContent import PortalContent
-from Products.CMFCore.CMFCoreExceptions import EditingConflict
-from Products.CMFCore.CMFCoreExceptions import ResourceLockedError
-from Products.CMFCore.CMFCorePermissions import View
-from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
-from Products.CMFCore.utils import format_stx, keywordsplitter
+from Products.CMFCore.utils import format_stx
+from Products.CMFCore.utils import keywordsplitter
+
 from DublinCore import DefaultDublinCoreImpl
-from utils import parseHeadersBody, formatRFC822Headers
-from utils import SimpleHTMLParser, bodyfinder, _dtmldir
+from exceptions import EditingConflict
+from exceptions import ResourceLockedError
+from permissions import View
+from permissions import ModifyPortalContent
+from utils import parseHeadersBody
+from utils import formatRFC822Headers
+from utils import SimpleHTMLParser
+from utils import bodyfinder
+from utils import _dtmldir
 from utils import html_headcheck
-from DocumentTemplate.DT_Util import html_quote
 
 factory_type_information = (
   { 'id'             : 'Document'

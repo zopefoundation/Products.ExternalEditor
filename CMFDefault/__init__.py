@@ -15,10 +15,6 @@
 $Id$
 """
 
-from Products import CMFCore
-
-from Products.CMFCore.CMFCorePermissions import AddPortalContent
-
 from Products.CMFCore.DirectoryView import registerDirectory
 from Products.CMFCore.utils import initializeBasesPhase1
 from Products.CMFCore.utils import initializeBasesPhase2
@@ -27,6 +23,7 @@ from Products.CMFCore.utils import ContentInit
 from Products.CMFCore.utils import registerIcon
 
 import utils
+from permissions import AddPortalContent
  
 import Portal
 import Document

@@ -21,15 +21,15 @@ from Acquisition import Implicit, aq_base, aq_inner, aq_parent
 from OFS.Traversable import Traversable
 from DateTime import DateTime
 
-from Products.CMFCore.CMFCorePermissions import AccessContentsInformation
-from Products.CMFCore.CMFCorePermissions import ManagePortal
-from Products.CMFCore.CMFCorePermissions import ReplyToItem
-from Products.CMFCore.CMFCorePermissions import View
 from Products.CMFCore.interfaces.Discussions import Discussable
 from Products.CMFCore.interfaces.Discussions import DiscussionResponse
 from Products.CMFCore.utils import getToolByName
 
 from Document import Document
+from permissions import AccessContentsInformation
+from permissions import ManagePortal
+from permissions import ReplyToItem
+from permissions import View
 
 
 factory_type_information = (

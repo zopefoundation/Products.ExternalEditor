@@ -25,9 +25,9 @@ from interfaces.Contentish import Contentish
 from DynamicType import DynamicType
 from utils import _getViewFor
 from CMFCatalogAware import CMFCatalogAware
-from CMFCoreExceptions import ResourceLockedError
-from CMFCorePermissions import FTPAccess
-from CMFCorePermissions import View
+from exceptions import ResourceLockedError
+from permissions import FTPAccess
+from permissions import View
 
 
 # Old names that some third-party packages may need.

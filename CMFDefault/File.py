@@ -21,11 +21,11 @@ from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
 
 from Products.CMFCore.PortalContent import PortalContent
-from DublinCore import DefaultDublinCoreImpl
-
-from Products.CMFCore.CMFCorePermissions import View
-from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
 from Products.CMFCore.WorkflowCore import WorkflowAction
+
+from DublinCore import DefaultDublinCoreImpl
+from permissions import View
+from permissions import ModifyPortalContent
 
 
 factory_type_information = (

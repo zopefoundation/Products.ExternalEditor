@@ -25,8 +25,8 @@ from OFS.SimpleItem import SimpleItem
 from Products.PageTemplates.Expressions import getEngine
 from Products.PageTemplates.Expressions import SecureModuleImporter
 
-from CMFCorePermissions import ManagePortal
-from CMFCorePermissions import View
+from permissions import ManagePortal
+from permissions import View
 from Expression import Expression
 from interfaces.CachingPolicyManager \
         import CachingPolicyManager as ICachingPolicyManager

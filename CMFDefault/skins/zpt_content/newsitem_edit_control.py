@@ -8,9 +8,10 @@
 ##title=
 ##
 from ZTUtils import make_query
-from Products.CMFCore.CMFCoreExceptions import IllegalHTML
-from Products.CMFCore.CMFCoreExceptions import ResourceLockedError
+from Products.CMFDefault.exceptions import IllegalHTML
+from Products.CMFDefault.exceptions import ResourceLockedError
 from Products.CMFDefault.utils import scrubHTML
+
 message = ''
 
 

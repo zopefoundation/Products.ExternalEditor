@@ -18,16 +18,23 @@ $Id$
 import os
 
 from Globals import DTMLFile
-import Globals
+from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
 from Acquisition import aq_get
-from Products.CMFCore.CMFCorePermissions import ManagePortal
+
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
+from permissions import ManagePortal
 from Guard import Guard
 from utils import _dtmldir
 
 try:
+    #
+    #   XXX: 2004/04/28  This factoring *has* to go;  if necessary,
+    #         this module could have a hook function, which the dependent
+    #         module could replace.
+    #
+
     # If base_cms exists, include the roles it defines.
     from Products.base_cms.permissions import getDefaultRolePermissionMap
 except ImportError:
@@ -210,4 +217,4 @@ class WorkflowUIMixin:
         from DocumentTemplate.DT_Var import structured_text
         return structured_text(text)
 
-Globals.InitializeClass(WorkflowUIMixin)
+InitializeClass(WorkflowUIMixin)

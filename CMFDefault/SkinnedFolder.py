@@ -20,15 +20,15 @@ from Acquisition import aq_base
 from Globals import InitializeClass
 
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
-from Products.CMFCore.CMFCorePermissions import AddPortalContent
-from Products.CMFCore.CMFCorePermissions import ListFolderContents
-from Products.CMFCore.CMFCorePermissions import ManageProperties
-from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
-from Products.CMFCore.CMFCorePermissions import View
 from Products.CMFCore.PortalFolder import PortalFolder
 from Products.CMFCore.utils import _getViewFor
 
 from DublinCore import DefaultDublinCoreImpl
+from permissions import AddPortalContent
+from permissions import ListFolderContents
+from permissions import ManageProperties
+from permissions import ModifyPortalContent
+from permissions import View
 
 factory_type_information = (
   { 'id'             : 'Skinned Folder'

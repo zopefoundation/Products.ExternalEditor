@@ -26,8 +26,8 @@ from utils import UniqueObject
 from Expression import Expression
 from ActionInformation import ActionInformation
 from ActionProviderBase import ActionProviderBase
-from CMFCorePermissions import ListUndoableChanges
-from CMFCorePermissions import ManagePortal
+from permissions import ListUndoableChanges
+from permissions import ManagePortal
 
 from interfaces.portal_undo import portal_undo as IUndoTool
 

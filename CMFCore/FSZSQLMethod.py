@@ -15,11 +15,14 @@ import Globals
 from AccessControl import ClassSecurityInfo
 from zLOG import LOG,ERROR
 
-from Products.CMFCore.CMFCorePermissions import View, ViewManagementScreens
-from Products.CMFCore.DirectoryView import registerFileExtension, registerMetaType, expandpath
-from Products.CMFCore.FSObject import FSObject
-
 from Products.ZSQLMethods.SQL import SQL
+
+from permissions import View
+from permissions import ViewManagementScreens
+from DirectoryView import registerFileExtension
+from DirectoryView import registerMetaType
+from DirectoryView import expandpath
+from FSObject import FSObject
 
 from utils import _dtmldir
 

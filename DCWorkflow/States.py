@@ -17,16 +17,18 @@ $Id$
 
 from types import TupleType
 
-from Acquisition import aq_inner, aq_parent
-import Globals
-from Globals import DTMLFile, PersistentMapping
+from Acquisition import aq_inner
+from Acquisition import aq_parent
+from Globals import DTMLFile
+from Globals import PersistentMapping
+from Globals import InitializeClass
 from OFS.SimpleItem import SimpleItem
 from AccessControl import ClassSecurityInfo
 
-from Products.CMFCore.CMFCorePermissions import ManagePortal
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
 from ContainerTab import ContainerTab
+from permissions import ManagePortal
 from utils import _dtmldir
 
 
@@ -249,7 +251,7 @@ class StateDefinition (SimpleItem):
                 "%s/manage_groups?manage_tabs_message=Groups+changed."
                 % self.absolute_url())
 
-Globals.InitializeClass(StateDefinition)
+InitializeClass(StateDefinition)
 
 
 class States (ContainerTab):
@@ -302,4 +304,4 @@ class States (ContainerTab):
         if REQUEST is not None:
             return self.manage_main(REQUEST, 'Initial state selected.')
 
-Globals.InitializeClass(States)
+InitializeClass(States)

@@ -34,9 +34,9 @@ from interfaces.portal_types import ContentTypeInformation as ITypeInformation
 from interfaces.portal_types import portal_types as ITypesTool
 
 from ActionProviderBase import ActionProviderBase
-from CMFCorePermissions import AccessContentsInformation
-from CMFCorePermissions import ManagePortal
-from CMFCorePermissions import View
+from permissions import AccessContentsInformation
+from permissions import ManagePortal
+from permissions import View
 from utils import UniqueObject
 from utils import SimpleItemWithProperties
 from utils import _dtmldir

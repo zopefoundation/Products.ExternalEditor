@@ -20,9 +20,10 @@ import sys
 
 from Products.CMFCore import utils
 from Products.CMFCore.DirectoryView import registerDirectory
-from Products.CMFCore.CMFCorePermissions import AddPortalFolders
 
-import Workspace, OrganizationTool
+import Workspace
+import OrganizationTool
+from permissions import AddPortalFolders
 
 
 registerDirectory('skins', globals())

@@ -23,7 +23,7 @@ from Acquisition import aq_base, aq_inner, aq_parent
 from OFS.SimpleItem import SimpleItem
 
 from Expression import Expression
-from CMFCorePermissions import View
+from permissions import View
 from utils import getToolByName
 
 

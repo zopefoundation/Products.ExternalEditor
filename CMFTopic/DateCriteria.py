@@ -19,12 +19,11 @@ from AccessControl import ClassSecurityInfo
 from DateTime.DateTime import DateTime
 from Globals import InitializeClass
 
-from Products.CMFCore.CMFCorePermissions import View
-
-from Products.CMFTopic import TopicPermissions
-from Products.CMFTopic.AbstractCriterion import AbstractCriterion
-from Products.CMFTopic.interfaces import Criterion
-from Products.CMFTopic.Topic import Topic
+from permissions import View
+from permissions import ChangeTopics
+from AbstractCriterion import AbstractCriterion
+from interfaces import Criterion
+from Topic import Topic
 
 
 class FriendlyDateCriterion( AbstractCriterion ):
@@ -68,7 +67,7 @@ class FriendlyDateCriterion( AbstractCriterion ):
         """
         return self._defaultDateOptions
 
-    security.declareProtected( TopicPermissions.ChangeTopics, 'getEditForm' )
+    security.declareProtected( ChangeTopics, 'getEditForm' )
     def getEditForm( self ):
         """
             Return the name of the skin method used by Topic to edit
@@ -76,7 +75,7 @@ class FriendlyDateCriterion( AbstractCriterion ):
         """
         return 'friendlydatec_editform'
 
-    security.declareProtected( TopicPermissions.ChangeTopics, 'edit' )
+    security.declareProtected( ChangeTopics, 'edit' )
     def edit( self
             , value=None
             , operation='min'

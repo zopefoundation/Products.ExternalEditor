@@ -25,9 +25,9 @@ from Shared.DC.Scripts.Script import Script
 from Products.PageTemplates.PageTemplate import PageTemplate
 from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate, Src
 
-from CMFCorePermissions import FTPAccess
-from CMFCorePermissions import View
-from CMFCorePermissions import ViewManagementScreens
+from permissions import FTPAccess
+from permissions import View
+from permissions import ViewManagementScreens
 from DirectoryView import registerFileExtension
 from DirectoryView import registerMetaType
 from FSObject import FSObject

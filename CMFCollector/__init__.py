@@ -10,16 +10,22 @@
 # FOR A PARTICULAR PURPOSE
 #
 ##############################################################################
-
-from Products.CMFDefault import Portal
-import Collector, CollectorIssue, WebTextDocument, CollectorSubset
-import Products.CMFCore
-
-from Products.CMFCore import utils, CMFCorePermissions
-from Products.CMFCore.DirectoryView import registerDirectory
-import CollectorPermissions
-
 import sys
+
+from Products.CMFCore import utils
+from Products.CMFCore.DirectoryView import registerDirectory
+from Products.CMFDefault import Portal
+
+import Collector
+import CollectorIssue
+import WebTextDocument
+import CollectorSubset
+from permissions import View
+from permissions import AddPortalContent
+from permissions import AddCollectorIssue
+from permissions import EditCollectorIssue
+from permissions import AddCollectorIssueFollowup
+
 this_module = sys.modules[ __name__ ]
 
 factory_type_information = (
@@ -41,18 +47,18 @@ factory_type_information = (
                { 'id': 'view',
                  'name': 'View',
                  'action': 'string:${object_url}/../',
-                 'permissions': (CMFCorePermissions.View,) },
+                 'permissions': (View,) },
                { 'id': 'addcomment',
                  'name': 'Add Comment',
                  'action':
                      'string:${object_url}/collector_transcript_comment_form',
                  'permissions':
-                          (CollectorPermissions.AddCollectorIssueFollowup,) },
+                          (AddCollectorIssueFollowup,) },
                { 'id': 'edittranscript',
                  'name': 'Edit Transcript',
                  'action':
                         'string:${object_url}/collector_transcript_edit_form',
-                 'permissions': (CollectorPermissions.EditCollectorIssue,) },
+                 'permissions': (EditCollectorIssue,) },
              ),
          },
         )
@@ -80,12 +86,12 @@ def initialize(context):
 
     context.registerClass(Collector.Collector,
                           constructors = (Collector.addCollector,),
-                          permission = CMFCorePermissions.AddPortalContent)
+                          permission = AddPortalContent)
 
     context.registerClass(CollectorIssue.CollectorIssue,
                           constructors = (CollectorIssue.addCollectorIssue,),
-                          permission = CollectorPermissions.AddCollectorIssue)
+                          permission = AddCollectorIssue)
 
     context.registerClass(CollectorSubset.CollectorSubset,
                           constructors = (CollectorSubset.addCollectorSubset,),
-                          permission = CMFCorePermissions.AddPortalContent)
+                          permission = AddPortalContent)

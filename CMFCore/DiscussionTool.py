@@ -21,10 +21,10 @@ from Acquisition import Implicit
 from AccessControl import ClassSecurityInfo
 
 from ActionProviderBase import OldstyleActionProviderBase
-from CMFCorePermissions import AccessContentsInformation
-from CMFCorePermissions import ManagePortal
-from CMFCorePermissions import ReplyToItem
-from CMFCorePermissions import View
+from permissions import AccessContentsInformation
+from permissions import ManagePortal
+from permissions import ReplyToItem
+from permissions import View
 from interfaces.Discussions import OldDiscussable as IOldDiscussable
 from interfaces.portal_discussion \
         import oldstyle_portal_discussion as IOldstyleDiscussionTool

@@ -1,7 +1,12 @@
-from Products.CMFCore.CMFCorePermissions import View
-Move = 'Move CMFWiki Page'
-Edit = 'Edit CMFWiki Page'
-Comment = 'Add CMFWiki Comment'
-Create = 'Create CMFWiki Page'
-Regulate = 'Change CMFWiki Regulations'
-FTPRead = 'FTP access'
+""" Backward compatibility;  see Products.CMFWiki.permissions
+
+$Id$
+"""
+
+from permissions import *
+
+from warnings import warn
+
+warn( "The module, 'Products.CMFWiki.CMFWikiPermissions' is a deprecated "
+      "compatiblity alias for 'Products.CMFWiki.permissions';  please use "
+      "the new module instead.", DeprecationWarning)

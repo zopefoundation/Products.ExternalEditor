@@ -16,15 +16,19 @@ $Id$
 """
 
 import sys
-import re, base64, marshal
+import re
+import base64
+import marshal
 from warnings import warn
 
 from AccessControl import ClassSecurityInfo
 from AccessControl import getSecurityManager
+from Acquisition import aq_parent, aq_inner, aq_base
 from Globals import DTMLFile
 from Globals import InitializeClass
 from OFS.Folder import Folder
 from OFS.ObjectManager import REPLACEABLE
+
 try:
     from OFS.OrderSupport import OrderSupport
     if not 'subset_ids' in \
@@ -34,18 +38,17 @@ try:
 except ImportError:
     # for Zope versions before 2.7.0
     from OrderSupport import OrderSupport
-from Acquisition import aq_parent, aq_inner, aq_base
 
 from CMFCatalogAware import CMFCatalogAware
-from CMFCoreExceptions import AccessControl_Unauthorized
-from CMFCoreExceptions import zExceptions_Unauthorized
-from CMFCorePermissions import AddPortalContent
-from CMFCorePermissions import AddPortalFolders
-from CMFCorePermissions import ChangeLocalRoles
-from CMFCorePermissions import ListFolderContents
-from CMFCorePermissions import ManagePortal
-from CMFCorePermissions import ManageProperties
-from CMFCorePermissions import View
+from exceptions import AccessControl_Unauthorized
+from exceptions import zExceptions_Unauthorized
+from permissions import AddPortalContent
+from permissions import AddPortalFolders
+from permissions import ChangeLocalRoles
+from permissions import ListFolderContents
+from permissions import ManagePortal
+from permissions import ManageProperties
+from permissions import View
 from DynamicType import DynamicType
 from utils import _checkPermission
 from utils import getToolByName

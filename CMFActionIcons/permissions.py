@@ -14,7 +14,12 @@
 
 $Id$
 """
+from AccessControl import ModuleSecurityInfo
 
+security = ModuleSecurityInfo('Products.CMFActionIcons.permissions')
+
+security.declarePublic('View')
 from AccessControl.Permissions import view as View
 
-from Products.CMFCore.CMFCorePermissions import ManagePortal
+security.declarePublic('ManagePortal')
+from Products.CMFCore.permissions import ManagePortal

@@ -7,8 +7,9 @@
 ##parameters=member_id='', member_email='', password='', confirm='', send_password='', add='', cancel=''
 ##title=
 ##
-from Products.CMFCore.CMFCorePermissions import ManageUsers
 from Products.CMFCore.utils import getToolByName
+from Products.CMFDefault.permissions import ManageUsers
+
 mtool = getToolByName(script, 'portal_membership')
 ptool = getToolByName(script, 'portal_properties')
 rtool = getToolByName(script, 'portal_registration')

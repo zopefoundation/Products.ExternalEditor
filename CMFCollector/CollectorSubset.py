@@ -1,12 +1,18 @@
-from Products.CMFCore.PortalContent import PortalContent
-from Products.CMFDefault.DublinCore import DefaultDublinCoreImpl
-from Products.CMFCore.CMFCorePermissions import View, ModifyPortalContent
+""" Classes:  CollectorSubset
+
+$Id$
+"""
+from urllib import urlencode
 
 from Acquisition import aq_parent
 from AccessControl import ClassSecurityInfo
 from Globals import InitializeClass
 
-from urllib import urlencode
+from Products.CMFCore.PortalContent import PortalContent
+from Products.CMFDefault.DublinCore import DefaultDublinCoreImpl
+
+from permissions import View
+from permissions import ModifyPortalContent
 
 factory_type_information = \
 ( { 'id'            : 'Collector Subset'

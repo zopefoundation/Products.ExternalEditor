@@ -29,9 +29,15 @@ from Products.CMFDefault.SkinnedFolder import SkinnedFolder
 
 import util
 
-# Import permission names
-from Products.CMFCore import CMFCorePermissions
-from CollectorPermissions import *
+from permissions import View
+from permissions import AddPortalContent
+from permissions import AccessInactivePortalContent
+from permissions import AccessFuturePortalContent
+from permissions import ViewCollector
+from permissions import AddCollectorIssue
+from permissions import EditCollectorIssue
+from permissions import AddCollectorIssueFollowup
+from permissions import ManageCollector
 
 from CollectorIssue import addCollectorIssue, CollectorIssue
 
@@ -162,7 +168,7 @@ class Collector(SkinnedFolder):
         catalog = CollectorCatalog()
         self._setObject(catalog.id, catalog)
 
-    security.declareProtected(CMFCorePermissions.View, 'get_internal_catalog')
+    security.declareProtected(View, 'get_internal_catalog')
     def get_internal_catalog(self):
         """ """
         return self._getOb(INTERNAL_CATALOG_ID)
@@ -385,7 +391,7 @@ class Collector(SkinnedFolder):
                                roles=target_roles,
                                acquire=1)
         # Adjust who can add "attachments":
-        self.manage_permission(CMFCorePermissions.AddPortalContent,
+        self.manage_permission(AddPortalContent,
                                roles=target_roles,
                                acquire=1)
 
@@ -415,7 +421,7 @@ class Collector(SkinnedFolder):
             # and AddPortalContent permissions.
             for m in i.ac_inherited_permissions(1):
                 if m[0] in [AddCollectorIssueFollowup,
-                            CMFCorePermissions.AddPortalContent]:
+                            AddPortalContent]:
                     perm = Permission.Permission(m[0], m[1], i)
                     roles = perm.getRoles()
                     if type(roles) == type(()):
@@ -439,11 +445,11 @@ class Collector(SkinnedFolder):
         got.sort()
         return got
 
-    security.declareProtected(CMFCorePermissions.View, 'Subject')
+    security.declareProtected(View, 'Subject')
     def Subject(self):
         return self.topics
 
-    security.declareProtected(CMFCorePermissions.View, 'length')
+    security.declareProtected(View, 'length')
     def length(self):
         """Use length protocol."""
         return self.__len__()
@@ -543,13 +549,13 @@ def addCollector(self, id, title='', description='', abbrev='',
     it.manage_permission(AddCollectorIssueFollowup,
                          roles=['Reviewer', 'Manager', 'Owner'],
                          acquire=1)
-    it.manage_permission(CMFCorePermissions.AddPortalContent,
+    it.manage_permission(AddPortalContent,
                          roles=['Reviewer', 'Manager', 'Owner'],
                          acquire=1)
-    it.manage_permission(CMFCorePermissions.AccessInactivePortalContent,
+    it.manage_permission(AccessInactivePortalContent,
                          roles=['Anonymous', 'Reviewer', 'Manager', 'Owner'],
                          acquire=1)
-    it.manage_permission(CMFCorePermissions.AccessFuturePortalContent,
+    it.manage_permission(AccessFuturePortalContent,
                          roles=['Anonymous', 'Reviewer', 'Manager', 'Owner'],
                          acquire=1)
     if REQUEST is not None:

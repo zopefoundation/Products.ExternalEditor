@@ -22,15 +22,17 @@ from Globals import DTMLFile
 from Globals import InitializeClass
 from OFS.PropertyManager import PropertyManager
 
-from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
-from Products.CMFCore.CMFCorePermissions import View
 from Products.CMFCore.interfaces.DublinCore import CatalogableDublinCore
 from Products.CMFCore.interfaces.DublinCore import DublinCore
 from Products.CMFCore.interfaces.DublinCore import MutableDublinCore
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.WorkflowCore import WorkflowAction
 
-from utils import tuplize, _dtmldir, semi_split
+from permissions import ModifyPortalContent
+from permissions import View
+from utils import tuplize
+from utils import _dtmldir
+from utils import semi_split
 
 _marker=[]
 

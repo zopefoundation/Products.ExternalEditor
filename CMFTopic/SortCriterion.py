@@ -14,16 +14,14 @@
 
 $Id$
 """
-
-from Products.CMFTopic.AbstractCriterion import AbstractCriterion
-from Products.CMFTopic.Topic import Topic
-from Products.CMFTopic.interfaces import Criterion
-from Products.CMFTopic import TopicPermissions
-
-from Products.CMFCore.CMFCorePermissions import View
-
 from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
+
+from permissions import View
+from permissions import ChangeTopics
+from AbstractCriterion import AbstractCriterion
+from Topic import Topic
+from interfaces import Criterion
 
 class SortCriterion( AbstractCriterion ):
     """
@@ -52,7 +50,7 @@ class SortCriterion( AbstractCriterion ):
         """
         return self.index
 
-    security.declareProtected( TopicPermissions.ChangeTopics, 'getEditForm' )
+    security.declareProtected( ChangeTopics, 'getEditForm' )
     def getEditForm( self ):
         """
             Return the name of skin method which renders the form
@@ -60,7 +58,7 @@ class SortCriterion( AbstractCriterion ):
         """
         return 'sort_edit'
     
-    security.declareProtected( TopicPermissions.ChangeTopics, 'edit' )
+    security.declareProtected( ChangeTopics, 'edit' )
     def edit( self, reversed ):
         """
             Update the value we are to match up against.

@@ -27,15 +27,15 @@ from OFS.SimpleItem import SimpleItem
 
 from Products.CMFCore.ActionInformation import ActionInformation
 from Products.CMFCore.ActionProviderBase import ActionProviderBase
-from Products.CMFCore.CMFCorePermissions import AccessContentsInformation
-from Products.CMFCore.CMFCorePermissions import ManagePortal
-from Products.CMFCore.CMFCorePermissions import ManageProperties
 from Products.CMFCore.Expression import Expression
 from Products.CMFCore.PortalFolder import PortalFolder
 from Products.CMFCore.utils import _checkPermission
 from Products.CMFCore.utils import UniqueObject
 
 from SyndicationInfo import SyndicationInformation
+from permissions import AccessContentsInformation
+from permissions import ManagePortal
+from permissions import ManageProperties
 from utils import _dtmldir
 
 

@@ -23,8 +23,8 @@ from Globals import InitializeClass
 from OFS.SimpleItem import SimpleItem
 
 from ActionProviderBase import ActionProviderBase
-from CMFCorePermissions import ManagePortal
-from CMFCorePermissions import View
+from permissions import ManagePortal
+from permissions import View
 from utils import _dtmldir
 from utils import UniqueObject
 

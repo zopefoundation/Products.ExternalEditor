@@ -25,9 +25,9 @@ from BTrees.OOBTree import OOBTree
 from ZPublisher.Converters import type_converters
 from Acquisition import aq_inner, aq_parent, aq_base
 from AccessControl import ClassSecurityInfo
-from CMFCorePermissions import ViewManagementScreens
-from CMFCorePermissions import ManagePortal
-from CMFCorePermissions import SetOwnProperties
+from permissions import ViewManagementScreens
+from permissions import ManagePortal
+from permissions import SetOwnProperties
 from ActionProviderBase import ActionProviderBase
 
 from interfaces.portal_memberdata import portal_memberdata as IMemberDataTool

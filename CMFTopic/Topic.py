@@ -19,14 +19,14 @@ from AccessControl import ClassSecurityInfo
 from Acquisition import aq_parent, aq_inner, aq_base
 from Globals import InitializeClass
 
-from Products.CMFCore.CMFCorePermissions import ListFolderContents
-from Products.CMFCore.CMFCorePermissions import View
 from Products.CMFCore.PortalFolder import PortalFolder
 from Products.CMFCore.utils import _getViewFor
 from Products.CMFCore.utils import getToolByName
 
-from Products.CMFTopic.TopicPermissions import AddTopics
-from Products.CMFTopic.TopicPermissions import ChangeTopics
+from permissions import ListFolderContents
+from permissions import View
+from permissions import AddTopics
+from permissions import ChangeTopics
 
 
 # Factory type information -- makes Topic objects play nicely

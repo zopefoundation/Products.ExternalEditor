@@ -25,9 +25,9 @@ from OFS.SimpleItem import Item
 from DateTime import DateTime
 from Products.PythonScripts.standard import html_quote
 
-from CMFCorePermissions import ManagePortal
-from CMFCorePermissions import View
-from CMFCorePermissions import ViewManagementScreens
+from permissions import ManagePortal
+from permissions import View
+from permissions import ViewManagementScreens
 from utils import expandpath
 from utils import getToolByName
 

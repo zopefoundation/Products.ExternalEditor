@@ -20,7 +20,7 @@ from AccessControl import ClassSecurityInfo
 from Globals import DTMLFile, InitializeClass, PersistentMapping
 from ZPublisher.mapply import mapply
 
-from CMFCorePermissions import ManagePortal
+from permissions import ManagePortal
 from utils import _dtmldir, getToolByName
 
 import re, os, urllib

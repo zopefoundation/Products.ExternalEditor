@@ -10,18 +10,15 @@
 # FOR A PARTICULAR PURPOSE
 #
 ##############################################################################
-""" TopicPermissions: Permissions used throughout CMFTopic.
+""" Backward-compatibility module for CMFTopic product permissions.
 
 $Id$
 """
 
-from Products.CMFCore.CMFCorePermissions import setDefaultRoles
+from permissions import *
 
-# Gathering Topic Related Permissions into one place
-AddTopics = 'Add portal topics'
-ChangeTopics = 'Change portal topics'
+from warnings import warn
 
-# Set up default roles for permissions
-setDefaultRoles(AddTopics, ('Manager',))
-setDefaultRoles(ChangeTopics, ('Manager', 'Owner',))
-
+warn( "The module, 'Products.CMFTopic.TopicPermissions' is a deprecated "
+      "compatiblity alias for 'Products.CMFTopic.permissions';  please use "
+      "the new module instead.", DeprecationWarning)

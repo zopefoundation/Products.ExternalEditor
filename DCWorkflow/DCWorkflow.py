@@ -18,16 +18,16 @@ $Id$
 # Zope
 from AccessControl import ClassSecurityInfo
 from AccessControl import getSecurityManager
-from Acquisition import aq_inner, aq_parent
+from AccessControl import Unauthorized
+from Acquisition import aq_inner
+from Acquisition import aq_parent
 from App.Undo import UndoSupport
 from DocumentTemplate.DT_Util import TemplateDict
 from Globals import InitializeClass
 from OFS.Folder import Folder
 from OFS.ObjectManager import bad_id
-from AccessControl import Unauthorized
 
 # CMFCore
-from Products.CMFCore.CMFCorePermissions import ManagePortal
 from Products.CMFCore.interfaces.portal_workflow \
         import WorkflowDefinition as IWorkflowDefinition
 from Products.CMFCore.utils import getToolByName
@@ -37,11 +37,16 @@ from Products.CMFCore.WorkflowCore import WorkflowException
 from Products.CMFCore.WorkflowTool import addWorkflowFactory
 
 # DCWorkflow
-from utils import _dtmldir, modifyRolesForPermission, modifyRolesForGroup
+from permissions import ManagePortal
+from utils import _dtmldir
+from utils import modifyRolesForPermission
+from utils import modifyRolesForGroup
 from WorkflowUIMixin import WorkflowUIMixin
-from Transitions import TRIGGER_AUTOMATIC, TRIGGER_USER_ACTION, \
-     TRIGGER_WORKFLOW_METHOD
-from Expression import StateChangeInfo, createExprContext
+from Transitions import TRIGGER_AUTOMATIC
+from Transitions import TRIGGER_USER_ACTION
+from Transitions import TRIGGER_WORKFLOW_METHOD
+from Expression import StateChangeInfo
+from Expression import createExprContext
 
 
 def checkId(id):

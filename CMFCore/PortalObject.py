@@ -19,13 +19,13 @@ from Globals import InitializeClass
 
 from PortalFolder import PortalFolder
 from Skinnable import SkinnableObjectManager
-from CMFCorePermissions import AddPortalMember
-from CMFCorePermissions import SetOwnPassword
-from CMFCorePermissions import SetOwnProperties
-from CMFCorePermissions import MailForgottenPassword
-from CMFCorePermissions import RequestReview
-from CMFCorePermissions import ReviewPortalContent
-from CMFCorePermissions import AccessFuturePortalContent
+from permissions import AddPortalMember
+from permissions import SetOwnPassword
+from permissions import SetOwnProperties
+from permissions import MailForgottenPassword
+from permissions import RequestReview
+from permissions import ReviewPortalContent
+from permissions import AccessFuturePortalContent
 
 PORTAL_SKINS_TOOL_ID = 'portal_skins'
 

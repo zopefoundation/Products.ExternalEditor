@@ -14,10 +14,8 @@
 
 $Id$
 """
-
 from types import StringType
-from utils import UniqueObject, _getAuthenticatedUser, _checkPermission
-from utils import getToolByName, _dtmldir
+
 from OFS.Folder import Folder
 from Acquisition import aq_base
 from Acquisition import aq_inner
@@ -31,14 +29,19 @@ from Globals import PersistentMapping
 from ZODB.POSException import ConflictError
 
 from ActionProviderBase import ActionProviderBase
-from CMFCoreExceptions import AccessControl_Unauthorized
-from CMFCorePermissions import AccessContentsInformation
-from CMFCorePermissions import ChangeLocalRoles
-from CMFCorePermissions import ListPortalMembers
-from CMFCorePermissions import ManagePortal
-from CMFCorePermissions import ManageUsers
-from CMFCorePermissions import SetOwnPassword
-from CMFCorePermissions import View
+from exceptions import AccessControl_Unauthorized
+from permissions import AccessContentsInformation
+from permissions import ChangeLocalRoles
+from permissions import ListPortalMembers
+from permissions import ManagePortal
+from permissions import ManageUsers
+from permissions import SetOwnPassword
+from permissions import View
+from utils import UniqueObject
+from utils import _getAuthenticatedUser
+from utils import _checkPermission
+from utils import getToolByName
+from utils import _dtmldir
 
 from interfaces.portal_membership \
         import portal_membership as IMembershipTool

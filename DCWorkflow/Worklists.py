@@ -18,15 +18,16 @@ $Id$
 from types import TupleType
 
 from OFS.SimpleItem import SimpleItem
-from Globals import DTMLFile, PersistentMapping
-from Acquisition import aq_inner, aq_parent
-import Globals
+from Globals import DTMLFile
+from Globals import InitializeClass
+from Globals import PersistentMapping
+from Acquisition import aq_inner
+from Acquisition import aq_parent
 from AccessControl import ClassSecurityInfo
-
-from Products.CMFCore.CMFCorePermissions import ManagePortal
 
 from ContainerTab import ContainerTab
 from Guard import Guard
+from permissions import ManagePortal
 from utils import _dtmldir
 
 
@@ -138,7 +139,7 @@ class WorklistDefinition (SimpleItem):
         if REQUEST is not None:
             return self.manage_properties(REQUEST, 'Properties changed.')
 
-Globals.InitializeClass(WorklistDefinition)
+InitializeClass(WorklistDefinition)
 
 
 class Worklists (ContainerTab):
@@ -180,4 +181,4 @@ class Worklists (ContainerTab):
         if REQUEST is not None:
             return self.manage_main(REQUEST, 'Worklist(s) removed.')
 
-Globals.InitializeClass(Worklists)
+InitializeClass(Worklists)

@@ -21,9 +21,9 @@ from ExtensionClass import Base
 from Globals import DTMLFile
 from Globals import InitializeClass
 
-from CMFCorePermissions import AccessContentsInformation
-from CMFCorePermissions import ManagePortal
-from CMFCorePermissions import ModifyPortalContent
+from permissions import AccessContentsInformation
+from permissions import ManagePortal
+from permissions import ModifyPortalContent
 from utils import _dtmldir
 from utils import getToolByName
 

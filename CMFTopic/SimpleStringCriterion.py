@@ -14,16 +14,14 @@
 
 $Id$
 """
-
-from Products.CMFTopic import TopicPermissions
-from Products.CMFTopic.AbstractCriterion import AbstractCriterion
-from Products.CMFTopic.Topic import Topic
-from Products.CMFTopic.interfaces import Criterion
-
-from Products.CMFCore.CMFCorePermissions import View
-
 from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
+
+from permissions import View
+from permissions import ChangeTopics
+from AbstractCriterion import AbstractCriterion
+from Topic import Topic
+from interfaces import Criterion
 
 class SimpleStringCriterion( AbstractCriterion ):
     """
@@ -42,14 +40,14 @@ class SimpleStringCriterion( AbstractCriterion ):
         self.field = field
         self.value = ''
         
-    security.declareProtected( TopicPermissions.ChangeTopics, 'getEditForm' )
+    security.declareProtected( ChangeTopics, 'getEditForm' )
     def getEditForm( self ):
         """
             Return the skinned name of the edit form.
         """
         return 'ssc_edit'
     
-    security.declareProtected( TopicPermissions.ChangeTopics, 'edit' )
+    security.declareProtected( ChangeTopics, 'edit' )
     def edit( self, value ):
         """
             Update the value we are to match up against.

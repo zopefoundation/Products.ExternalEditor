@@ -15,13 +15,14 @@
 $Id$
 """
 
-from Products.CMFCore.CMFCorePermissions import AccessContentsInformation
-from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
-from Products.CMFCore.CMFCorePermissions import RequestReview
-from Products.CMFCore.CMFCorePermissions import ReviewPortalContent
-from Products.CMFCore.CMFCorePermissions import View
 from Products.CMFCore.WorkflowTool import addWorkflowFactory
-from Products.DCWorkflow.DCWorkflow import DCWorkflowDefinition
+
+from DCWorkflow import DCWorkflowDefinition
+from permissions import AccessContentsInformation
+from permissions import ModifyPortalContent
+from permissions import RequestReview
+from permissions import ReviewPortalContent
+from permissions import View
 
 p_access = AccessContentsInformation
 p_modify = ModifyPortalContent

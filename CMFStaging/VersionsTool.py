@@ -23,14 +23,15 @@ import os
 from Acquisition import aq_acquire
 from Globals import InitializeClass, DTMLFile
 from AccessControl import ClassSecurityInfo
-from Products.CMFCore.utils import UniqueObject, SimpleItemWithProperties
-from Products.CMFCore.CMFCorePermissions import ManagePortal
 
-from staging_utils import getPortal, verifyPermission, unproxied
+from Products.CMFCore.utils import UniqueObject
+from Products.CMFCore.utils import SimpleItemWithProperties
 
-
-# Permission name
-UseVersionControl = 'Use version control'
+from permissions import ManagePortal
+from permissions import UseVersionControl
+from staging_utils import getPortal
+from staging_utils import verifyPermission
+from staging_utils import unproxied
 
 _wwwdir = os.path.join(os.path.dirname(__file__), 'www')
 

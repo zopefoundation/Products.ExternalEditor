@@ -29,12 +29,12 @@ from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.ActionProviderBase import ActionProviderBase
 from Products.CMFCore.ActionsTool import ActionInformation as AI
 from Products.CMFCore.Expression import Expression
-from Products.CMFCore.CMFCorePermissions import ListPortalMembers
-from Products.CMFCore.CMFCorePermissions import ManagePortal
-from Products.CMFCore.CMFCorePermissions import ManageUsers
-from Products.CMFCore.CMFCorePermissions import View
 
 from Document import addDocument
+from permissions import ListPortalMembers
+from permissions import ManagePortal
+from permissions import ManageUsers
+from permissions import View
 from utils import _dtmldir
 
 from interfaces.portal_membership \

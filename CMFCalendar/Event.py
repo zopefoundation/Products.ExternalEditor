@@ -20,15 +20,20 @@ from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
 from webdav.Lockable import ResourceLockedError
 
-from Products.CMFDefault.DublinCore import DefaultDublinCoreImpl
 from Products.CMFCore.PortalContent import PortalContent
 from Products.CMFCore.WorkflowCore import WorkflowAction
-from Products.CMFCore.CMFCorePermissions import View, ModifyPortalContent
-from Products.CMFDefault.utils import formatRFC822Headers, html_headcheck
-from Products.CMFDefault.utils import SimpleHTMLParser, bodyfinder, parseHeadersBody
 from Products.CMFCore.utils import keywordsplitter
 
-import EventPermissions
+from Products.CMFDefault.DublinCore import DefaultDublinCoreImpl
+from Products.CMFDefault.utils import formatRFC822Headers
+from Products.CMFDefault.utils import html_headcheck
+from Products.CMFDefault.utils import SimpleHTMLParser
+from Products.CMFDefault.utils import bodyfinder
+from Products.CMFDefault.utils import parseHeadersBody
+
+from permissions import View
+from permissions import ModifyPortalContent
+from permissions import ChangeEvents
 
 # Factory type information -- makes Events objects play nicely
 # with the Types Tool (portal_types)
@@ -48,7 +53,7 @@ factory_type_information = (
                  {'id': 'edit',
                   'name': 'Edit',
                   'action': 'string:${object_url}/event_edit_form',
-                  'permissions': (EventPermissions.ChangeEvents,)},
+                  'permissions': (ChangeEvents,)},
                  ),                     # End Actions
      },
     )
@@ -172,7 +177,7 @@ class Event(PortalContent, DefaultDublinCoreImpl):
         """
         return _dateStrings(self.start())
 
-    security.declareProtected(EventPermissions.ChangeEvents, 'edit')
+    security.declareProtected(ChangeEvents, 'edit')
     def edit(self
              , title=None
              , description=None
@@ -276,14 +281,14 @@ class Event(PortalContent, DefaultDublinCoreImpl):
             result.append(str(year))
         return result
 
-    security.declareProtected(EventPermissions.ChangeEvents, 'setStartDate')
+    security.declareProtected(ChangeEvents, 'setStartDate')
     def setStartDate(self, start):
         """
         Setting the event start date, when the event is scheduled to begin.
         """
         self.start_date = self._datify(start)
 
-    security.declareProtected(EventPermissions.ChangeEvents, 'setEndDate')
+    security.declareProtected(ChangeEvents, 'setEndDate')
     def setEndDate(self, end):
         """
         Setting the event end date, when the event ends.

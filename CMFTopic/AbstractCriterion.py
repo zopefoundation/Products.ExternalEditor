@@ -14,16 +14,14 @@
 
 $Id$
 """
-
-from Products.CMFTopic.TopicPermissions import ChangeTopics
-
-from Products.CMFCore.CMFCorePermissions import AccessContentsInformation
-
 from Acquisition import Implicit
 from AccessControl import ClassSecurityInfo
 from Persistence import Persistent
 from Globals import InitializeClass
 from OFS.SimpleItem import Item
+
+from permissions import AccessContentsInformation
+from permissions import ChangeTopics
 
 
 class AbstractCriterion( Persistent, Item, Implicit ):

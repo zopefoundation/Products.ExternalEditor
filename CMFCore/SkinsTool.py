@@ -31,9 +31,9 @@ from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
 from Products.PythonScripts.PythonScript import PythonScript
 
 from ActionProviderBase import ActionProviderBase
-from CMFCorePermissions import AccessContentsInformation
-from CMFCorePermissions import ManagePortal
-from CMFCorePermissions import View
+from permissions import AccessContentsInformation
+from permissions import ManagePortal
+from permissions import View
 from interfaces.portal_skins import portal_skins as ISkinsTool
 from SkinsContainer import SkinsContainer
 from utils import _dtmldir

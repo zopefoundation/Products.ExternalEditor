@@ -29,9 +29,9 @@ from utils import _mergedLocalRoles
 from utils import getToolByName
 from utils import UniqueObject
 from ActionProviderBase import ActionProviderBase
-from CMFCorePermissions import AccessInactivePortalContent
-from CMFCorePermissions import ManagePortal
-from CMFCorePermissions import View
+from permissions import AccessInactivePortalContent
+from permissions import ManagePortal
+from permissions import View
 
 from interfaces.portal_catalog \
         import IndexableObjectWrapper as IIndexableObjectWrapper

@@ -28,8 +28,8 @@ from OFS.SimpleItem import SimpleItem
 from ActionInformation import ActionInformation
 from ActionInformation import getOAI
 from ActionProviderBase import ActionProviderBase
-from CMFCorePermissions import ListFolderContents
-from CMFCorePermissions import ManagePortal
+from permissions import ListFolderContents
+from permissions import ManagePortal
 from Expression import Expression
 from Expression import getExprContext
 from interfaces.portal_actions import portal_actions as IActionsTool

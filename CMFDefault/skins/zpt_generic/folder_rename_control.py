@@ -8,9 +8,10 @@
 ##title=
 ##
 from ZTUtils import make_query
-from Products.CMFCore.CMFCoreExceptions import CopyError
 from Products.CMFCore.utils import getToolByName
+from Products.CMFDefault.exceptions import CopyError
 from Products.CMFDefault.utils import html_marshal
+
 utool = getToolByName(script, 'portal_url')
 portal_url = utool()
 target_action = 'object/folderContents'

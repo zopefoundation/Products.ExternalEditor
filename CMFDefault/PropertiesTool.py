@@ -15,21 +15,20 @@
 $Id$
 """
 
-from Products.CMFCore.utils import UniqueObject
 from OFS.SimpleItem import SimpleItem
 from Acquisition import aq_inner, aq_parent
-
 from Globals import InitializeClass, DTMLFile
 from AccessControl import ClassSecurityInfo
+
+from Products.CMFCore.utils import UniqueObject
 from Products.CMFCore.ActionProviderBase import ActionProviderBase
 from Products.CMFCore.ActionInformation import ActionInformation
 from Products.CMFCore.Expression import Expression
-from Products.CMFCore.CMFCorePermissions import ManagePortal
-from utils import _dtmldir
-
 from Products.CMFCore.interfaces.portal_properties \
         import portal_properties as IPropertiesTool
 
+from permissions import ManagePortal
+from utils import _dtmldir
 
 class PropertiesTool(UniqueObject, SimpleItem, ActionProviderBase):
 

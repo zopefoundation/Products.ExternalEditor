@@ -15,16 +15,13 @@
 $Id$
 """
 
-from Acquisition import aq_base, aq_inner, aq_parent
+from Acquisition import aq_base
+from Acquisition import aq_inner
+from Acquisition import aq_parent
 from AccessControl import ClassSecurityInfo
 from DateTime import DateTime
 from Globals import InitializeClass
 
-from Products.CMFCore.CMFCoreExceptions import AccessControl_Unauthorized
-from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
-from Products.CMFCore.CMFCorePermissions import RequestReview
-from Products.CMFCore.CMFCorePermissions import ReviewPortalContent
-from Products.CMFCore.CMFCorePermissions import View
 from Products.CMFCore.interfaces.portal_workflow \
         import WorkflowDefinition as IWorkflowDefinition
 from Products.CMFCore.utils import _checkPermission
@@ -32,6 +29,12 @@ from Products.CMFCore.utils import _modifyPermissionMappings
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.utils import SimpleItemWithProperties
 from Products.CMFCore.WorkflowTool import addWorkflowClass
+
+from exceptions import AccessControl_Unauthorized
+from permissions import ModifyPortalContent
+from permissions import RequestReview
+from permissions import ReviewPortalContent
+from permissions import View
 
 
 class DefaultWorkflowDefinition (SimpleItemWithProperties):

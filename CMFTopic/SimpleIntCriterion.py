@@ -18,12 +18,11 @@ $Id$
 from AccessControl import ClassSecurityInfo
 from Globals import InitializeClass
 
-from Products.CMFCore.CMFCorePermissions import View
-
-from Products.CMFTopic import TopicPermissions
-from Products.CMFTopic.AbstractCriterion import AbstractCriterion
-from Products.CMFTopic.interfaces import Criterion
-from Products.CMFTopic.Topic import Topic
+from permissions import View
+from permissions import ChangeTopics
+from AbstractCriterion import AbstractCriterion
+from interfaces import Criterion
+from Topic import Topic
 
 
 class SimpleIntCriterion( AbstractCriterion ):
@@ -47,7 +46,7 @@ class SimpleIntCriterion( AbstractCriterion ):
         self.field = field
         self.value = self.direction = None
 
-    security.declareProtected( TopicPermissions.ChangeTopics, 'getEditForm' )
+    security.declareProtected( ChangeTopics, 'getEditForm' )
     def getEditForm( self ):
         """
             Return the name of skin method which renders the form
@@ -55,7 +54,7 @@ class SimpleIntCriterion( AbstractCriterion ):
         """
         return 'sic_edit'
 
-    security.declareProtected( TopicPermissions.ChangeTopics, 'getValueString' )
+    security.declareProtected( ChangeTopics, 'getValueString' )
     def getValueString( self ):
         """
             Return a string representation of the value for which this
@@ -75,7 +74,7 @@ class SimpleIntCriterion( AbstractCriterion ):
 
         return str( self.value )
 
-    security.declareProtected( TopicPermissions.ChangeTopics, 'edit' )
+    security.declareProtected( ChangeTopics, 'edit' )
     def edit( self, value, direction=None ):
         """
             Update the value to be filtered, and the "direction" qualifier.

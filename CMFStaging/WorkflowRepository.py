@@ -18,12 +18,15 @@ $Id$
 
 import os
 
-import Globals
+from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
-from Products.CMFCore.utils import getToolByName, SimpleItemWithProperties
-from Products.CMFCore.CMFCorePermissions import ManagePortal
-from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from BTrees.OOBTree import OOBTree
+from Products.PageTemplates.PageTemplateFile import PageTemplateFile
+
+from Products.CMFCore.utils import getToolByName
+from Products.CMFCore.utils import SimpleItemWithProperties
+
+from permissions import ManagePortal
 
 _www = os.path.join(os.path.dirname(__file__), 'www')
 
@@ -59,7 +62,7 @@ class WorkflowRepository (SimpleItemWithProperties):
     def countHistories(self):
         return len(self._histories)
 
-Globals.InitializeClass(WorkflowRepository)
+InitializeClass(WorkflowRepository)
 
 
 manage_addWorkflowRepositoryForm = PageTemplateFile(

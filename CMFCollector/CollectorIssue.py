@@ -14,27 +14,33 @@
 """Implement the Collector Issue content type - a bundle containing the
 collector transcript and various parts."""
 
-import os, urllib, string, re
+import os
+import urllib
+import string
+import re
 import smtplib
 
 from DateTime import DateTime
 from Globals import InitializeClass
-from AccessControl import ClassSecurityInfo, getSecurityManager
+from AccessControl import ClassSecurityInfo
+from AccessControl import getSecurityManager
 from Acquisition import aq_base
 
-import util                             # Collector utilities.
-
-from Products.CMFDefault.DublinCore import DefaultDublinCoreImpl
 from Products.CMFCore.WorkflowCore import WorkflowAction
 from Products.CMFCore.utils import getToolByName
-
+from Products.CMFDefault.DublinCore import DefaultDublinCoreImpl
 from Products.CMFDefault.SkinnedFolder import SkinnedFolder
+
 from WebTextDocument import addWebTextDocument
 
 # Import permission names
-from Products.CMFCore.CMFCorePermissions import View
-from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
-from CollectorPermissions import *
+from permissions import View
+from permissions import ModifyPortalContent
+from permissions import ViewCollector
+from permissions import EditCollectorIssue
+from permissions import AddCollectorIssueFollowup
+
+import util                             # Collector utilities.
 
 RULE = '_' * 40
 

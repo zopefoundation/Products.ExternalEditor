@@ -24,17 +24,20 @@
 
 $Id$
 """
-
 import os
 from urllib import quote
 
-from Acquisition import aq_inner, aq_parent
-from Globals import InitializeClass, DTMLFile
-from Products.PageTemplates.PageTemplateFile import PageTemplateFile
+from Acquisition import aq_inner
+from Acquisition import aq_parent
+from Globals import InitializeClass
+from Globals import DTMLFile
 from OFS.SimpleItem import SimpleItem
 from AccessControl import ClassSecurityInfo
+from Products.PageTemplates.PageTemplateFile import PageTemplateFile
+
 from Products.CMFCore.utils import UniqueObject, getToolByName
-from Products.CMFCore.CMFCorePermissions import ManagePortal
+
+from permissions import ManagePortal
 
 _wwwdir = os.path.join(os.path.dirname(__file__), 'www') 
 

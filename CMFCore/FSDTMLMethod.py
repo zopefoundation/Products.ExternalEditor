@@ -23,9 +23,9 @@ from AccessControl.Role import RoleManager
 from OFS.Cache import Cacheable
 
 from utils import _dtmldir, _setCacheHeaders
-from CMFCorePermissions import FTPAccess
-from CMFCorePermissions import View
-from CMFCorePermissions import ViewManagementScreens
+from permissions import FTPAccess
+from permissions import View
+from permissions import ViewManagementScreens
 from DirectoryView import registerFileExtension, registerMetaType, expandpath
 from FSObject import FSObject
 

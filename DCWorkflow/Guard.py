@@ -17,15 +17,19 @@ $Id$
 
 from cgi import escape
 
-import Globals
-from Globals import DTMLFile, Persistent
+from Globals import DTMLFile
+from Globals import InitializeClass
+from Globals import Persistent
 from AccessControl import ClassSecurityInfo
-from Acquisition import Explicit, aq_base
+from Acquisition import Explicit
+from Acquisition import aq_base
 
-from Products.CMFCore.CMFCorePermissions import ManagePortal
 from Products.CMFCore.utils import _checkPermission
 
-from Expression import Expression, StateChangeInfo, createExprContext
+from Expression import Expression
+from Expression import StateChangeInfo
+from Expression import createExprContext
+from permissions import ManagePortal
 from utils import _dtmldir
 
 
@@ -163,7 +167,7 @@ class Guard (Persistent, Explicit):
             return ''
         return str(self.expr.text)
 
-Globals.InitializeClass(Guard)
+InitializeClass(Guard)
 
 
 def formatNameUnion(names):

@@ -15,16 +15,13 @@
 $Id$
 """
 
-from Globals import InitializeClass, DTMLFile
+from Globals import InitializeClass
+from Globals import DTMLFile
 from AccessControl import ClassSecurityInfo
 from OFS.SimpleItem import SimpleItem
 
 from Products.CMFCore.ActionInformation import ActionInformation
 from Products.CMFCore.ActionProviderBase import ActionProviderBase
-from Products.CMFCore.CMFCoreExceptions import AccessControl_Unauthorized
-from Products.CMFCore.CMFCorePermissions import ManagePortal
-from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
-from Products.CMFCore.CMFCorePermissions import ReplyToItem
 from Products.CMFCore.Expression import Expression
 from Products.CMFCore.interfaces.portal_discussion \
         import portal_discussion as IDiscussionTool
@@ -33,6 +30,10 @@ from Products.CMFCore.utils import UniqueObject
 
 from DiscussionItem import DiscussionItemContainer
 from utils import _dtmldir
+from exceptions import AccessControl_Unauthorized
+from permissions import ManagePortal
+from permissions import ModifyPortalContent
+from permissions import ReplyToItem
 
 
 class DiscussionNotAllowed( Exception ):

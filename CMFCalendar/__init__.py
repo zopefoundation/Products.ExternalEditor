@@ -10,16 +10,16 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##############################################################################
-from Products.CMFDefault import Portal
-import Event
-import Products.CMFCore
-
-from Products.CMFCore import utils, CMFCorePermissions
-from Products.CMFCore.DirectoryView import registerDirectory
-import EventPermissions
-import CalendarTool
-
 import sys
+
+from Products.CMFCore import utils
+from Products.CMFCore.DirectoryView import registerDirectory
+from Products.CMFDefault import Portal
+
+import Event
+import CalendarTool
+from permissions import AddPortalContent
+
 this_module = sys.modules[ __name__ ]
 
 contentConstructors = (Event.addEvent,)
@@ -47,7 +47,7 @@ def initialize( context ):
     context.registerHelp(directory='help')
     utils.ContentInit( 'CMF Event'
                      , content_types = contentClasses
-                     , permission = CMFCorePermissions.AddPortalContent 
+                     , permission = AddPortalContent 
                      , extra_constructors = contentConstructors
                      , fti = Event.factory_type_information
                      ).initialize( context ) 

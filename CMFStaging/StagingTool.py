@@ -22,20 +22,23 @@ import os
 
 from Acquisition import aq_base, aq_inner, aq_parent, aq_acquire
 from Acquisition import ImplicitAcquisitionWrapper
-from Globals import InitializeClass, DTMLFile
+from Globals import InitializeClass
+from Globals import DTMLFile
 from AccessControl import ClassSecurityInfo
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
-from Products.CMFCore.utils \
-     import UniqueObject, getToolByName, SimpleItemWithProperties
-from Products.CMFCore.CMFCorePermissions import ManagePortal
+from Products.CMFCore.utils import UniqueObject
+from Products.CMFCore.utils import getToolByName
+from Products.CMFCore.utils import SimpleItemWithProperties
 
-from staging_utils import getPortal, verifyPermission, unproxied
-from staging_utils import getProxyReference, cloneByPickle
+from permissions import ManagePortal
+from permissions import StageObjects
+from staging_utils import getPortal
+from staging_utils import verifyPermission
+from staging_utils import unproxied
+from staging_utils import getProxyReference
+from staging_utils import cloneByPickle
 
-
-# Permission name
-StageObjects = 'Use version control'
 
 _wwwdir = os.path.join(os.path.dirname(__file__), 'www')
 

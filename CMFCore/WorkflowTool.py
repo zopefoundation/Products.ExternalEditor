@@ -23,12 +23,14 @@ from AccessControl import ClassSecurityInfo
 from Acquisition import aq_base, aq_inner, aq_parent
 
 from ActionProviderBase import OldstyleActionProviderBase
-from CMFCorePermissions import ManagePortal
+from permissions import ManagePortal
 from interfaces.portal_workflow import portal_workflow as IWorkflowTool
 from utils import _dtmldir
 from utils import getToolByName
 from utils import UniqueObject
-from WorkflowCore import WorkflowException, ObjectDeleted, ObjectMoved
+from WorkflowCore import WorkflowException
+from WorkflowCore import ObjectDeleted
+from WorkflowCore import ObjectMoved
 
 AUTO_MIGRATE_WORKFLOW_TOOLS = 0  # Set to 1 to auto-migrate
 

@@ -2,11 +2,11 @@
 ##parameters=text_format, text, file='', SafetyBelt='', change_and_view=''
 ##title=Edit a document
 ##
-from Products.CMFCore.CMFCoreExceptions import EditingConflict
-from Products.CMFCore.CMFCoreExceptions import IllegalHTML
-from Products.CMFCore.CMFCoreExceptions import ResourceLockedError
-from Products.CMFDefault.utils import scrubHTML
 from Products.PythonScripts.standard import urlencode
+from Products.CMFDefault.exceptions import EditingConflict
+from Products.CMFDefault.exceptions import IllegalHTML
+from Products.CMFDefault.exceptions import ResourceLockedError
+from Products.CMFDefault.utils import scrubHTML
 
 try:
     text = scrubHTML( text ) # Strip Javascript, etc.

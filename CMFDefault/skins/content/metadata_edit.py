@@ -2,9 +2,10 @@
 ##parameters=allowDiscussion=None, title=None, subject=None, description=None, contributors=None, effective_date=None, expiration_date=None, format=None, language=None, rights=None, change_and_edit='', change_and_view=''
 ##title=Update Content Metadata
 ##
-from Products.CMFCore.CMFCoreExceptions import ResourceLockedError
-from Products.CMFCore.utils import getToolByName
 from Products.PythonScripts.standard import urlencode
+from Products.CMFCore.utils import getToolByName
+from Products.CMFDefault.exceptions import ResourceLockedError
+
 dtool = getToolByName(script, 'portal_discussion')
 
 def tuplify( value ):

@@ -14,19 +14,19 @@
 
 $Id$
 """
+
+from ZClasses import createZClassForBase
+
+from Products.CMFCore.utils import ContentInit
+from Products.CMFCore.DirectoryView import registerDirectory
  
-import TopicPermissions
 import Topic
 import SimpleStringCriterion
 import SimpleIntCriterion
 import ListCriterion
 import DateCriteria
 import SortCriterion
-
-from Products.CMFCore.utils import ContentInit
-from Products.CMFCore.DirectoryView import registerDirectory
-
-from ZClasses import createZClassForBase
+from permissions import AddTopics
 
 bases = ( Topic.Topic, )
 
@@ -52,7 +52,7 @@ def initialize( context ):
     # CMF Initializers
     ContentInit( 'CMF Topic Objects'
                , content_types = (Topic.Topic,)
-               , permission = TopicPermissions.AddTopics
+               , permission = AddTopics
                , extra_constructors = (Topic.addTopic,)
                , fti = Topic.factory_type_information
                ).initialize( context )

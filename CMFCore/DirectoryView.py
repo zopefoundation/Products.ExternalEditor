@@ -33,8 +33,8 @@ from OFS.Folder import Folder
 from OFS.ObjectManager import bad_id
 from zLOG import LOG, ERROR
 
-from CMFCorePermissions import AccessContentsInformation
-from CMFCorePermissions import ManagePortal
+from permissions import AccessContentsInformation
+from permissions import ManagePortal
 from FSMetadata import FSMetadata
 from FSObject import BadFile
 from utils import _dtmldir

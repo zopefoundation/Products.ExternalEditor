@@ -18,7 +18,8 @@ $Id$
 import os
 from os import path as os_path
 import re
-from types import StringType, UnicodeType
+from types import StringType
+from types import UnicodeType
 from warnings import warn
 
 from AccessControl import ClassSecurityInfo
@@ -27,7 +28,10 @@ from AccessControl import ModuleSecurityInfo
 from AccessControl.Permission import Permission
 from AccessControl.PermissionRole import rolesForPermissionOn
 from AccessControl.Role import gather_permissions
-from Acquisition import aq_base, aq_get, aq_inner, aq_parent
+from Acquisition import aq_base
+from Acquisition import aq_get
+from Acquisition import aq_inner
+from Acquisition import aq_parent
 from ExtensionClass import Base
 from Globals import HTMLFile
 from Globals import ImageFile
@@ -43,7 +47,7 @@ from OFS.SimpleItem import SimpleItem
 from Products.PageTemplates.Expressions import getEngine
 from Products.PageTemplates.Expressions import SecureModuleImporter
 
-from CMFCoreExceptions import AccessControl_Unauthorized
+from exceptions import AccessControl_Unauthorized
 
 
 security = ModuleSecurityInfo( 'Products.CMFCore.utils' )

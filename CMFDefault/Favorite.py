@@ -21,8 +21,9 @@ from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
 
 from Products.CMFCore.utils import getToolByName
-from Products.CMFCore.CMFCorePermissions import View, ModifyPortalContent
 
+from permissions import View
+from permissions import ModifyPortalContent
 from DublinCore import DefaultDublinCoreImpl
 from Link import Link
 

@@ -31,7 +31,7 @@ import ContentTypeRegistry
 import CachingPolicyManager
 import utils
 
-from CMFCorePermissions import AddPortalFolders
+from permissions import AddPortalFolders
 
 
 # Old name that some third-party packages may need.

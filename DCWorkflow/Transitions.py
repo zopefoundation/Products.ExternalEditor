@@ -16,15 +16,16 @@ $Id$
 """
 
 from OFS.SimpleItem import SimpleItem
-from Globals import DTMLFile, PersistentMapping
-from Acquisition import aq_inner, aq_parent
-import Globals
+from Globals import DTMLFile
+from Globals import PersistentMapping
+from Globals import InitializeClass
+from Acquisition import aq_inner
+from Acquisition import aq_parent
 from AccessControl import ClassSecurityInfo
-
-from Products.CMFCore.CMFCorePermissions import ManagePortal
 
 from ContainerTab import ContainerTab
 from Guard import Guard
+from permissions import ManagePortal
 from utils import _dtmldir
 from Expression import Expression
 
@@ -214,7 +215,7 @@ class TransitionDefinition (SimpleItem):
 
             return self.manage_variables(REQUEST, 'Variables changed.')
 
-Globals.InitializeClass(TransitionDefinition)
+InitializeClass(TransitionDefinition)
 
 
 class Transitions (ContainerTab):
@@ -256,4 +257,4 @@ class Transitions (ContainerTab):
         if REQUEST is not None:
             return self.manage_main(REQUEST, 'Transition(s) removed.')
 
-Globals.InitializeClass(Transitions)
+InitializeClass(Transitions)

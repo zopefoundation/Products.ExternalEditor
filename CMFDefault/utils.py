@@ -15,17 +15,20 @@
 $Id$
 """
 
+import os
+import re
 from cgi import escape
 from sgmllib import SGMLParser
-from types import ListType, StringType, TupleType, UnicodeType
-import re
-import os
+from types import ListType
+from types import StringType
+from types import TupleType
+from types import UnicodeType
 
 from Globals import package_home
 from AccessControl import ModuleSecurityInfo
 from ZTUtils.Zope import complex_marshal
 
-from Products.CMFCore.CMFCoreExceptions import IllegalHTML
+from exceptions import IllegalHTML
 
 security = ModuleSecurityInfo( 'Products.CMFDefault.utils' )
 

@@ -18,11 +18,9 @@ $Id$
 from AccessControl import ClassSecurityInfo
 from Globals import InitializeClass
 
-from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
-from Products.CMFCore.CMFCorePermissions import View
-
 from Document import Document
-
+from permissions import ModifyPortalContent
+from permissions import View
 
 factory_type_information = (
   { 'id'             : 'News Item'

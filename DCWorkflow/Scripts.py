@@ -16,12 +16,11 @@ $Id$
 """
 
 from OFS.Folder import Folder
-import Globals
+from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
 
-from Products.CMFCore.CMFCorePermissions import ManagePortal
-
 from ContainerTab import ContainerTab
+from permissions import ManagePortal
 
 
 class Scripts (ContainerTab):
@@ -38,4 +37,4 @@ class Scripts (ContainerTab):
         kw['management_view'] = 'Scripts'
         return apply(Folder.manage_main, (self, client, REQUEST), kw)
 
-Globals.InitializeClass(Scripts)
+InitializeClass(Scripts)

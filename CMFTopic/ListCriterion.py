@@ -14,16 +14,15 @@
 
 $Id$
 """
-
-from Products.CMFTopic.AbstractCriterion import AbstractCriterion
-from Products.CMFTopic.interfaces import Criterion
-from Products.CMFTopic.Topic import Topic
-from Products.CMFTopic import TopicPermissions
-
-from Products.CMFCore.CMFCorePermissions import View
-
 from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
+
+
+from permissions import View
+from permissions import ChangeTopics
+from AbstractCriterion import AbstractCriterion
+from interfaces import Criterion
+from Topic import Topic
 
 
 class ListCriterion( AbstractCriterion ):
@@ -54,7 +53,7 @@ class ListCriterion( AbstractCriterion ):
         self.value = ( '', )    # *Not* '()', which won't do at all!
         self.operator = None
 
-    security.declareProtected( TopicPermissions.ChangeTopics, 'getEditForm' )
+    security.declareProtected( ChangeTopics, 'getEditForm' )
     def getEditForm( self ):
         """
             Return the name of skin method which renders the form
@@ -62,7 +61,7 @@ class ListCriterion( AbstractCriterion ):
         """
         return "listc_edit"
 
-    security.declareProtected( TopicPermissions.ChangeTopics, 'edit' )
+    security.declareProtected( ChangeTopics, 'edit' )
     def edit( self, value=None, operator=None ):
         """
             Update the value we match against.

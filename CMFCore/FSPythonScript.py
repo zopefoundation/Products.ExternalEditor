@@ -25,9 +25,9 @@ from Products.PythonScripts.PythonScript import PythonScript
 from Shared.DC.Scripts.Script import Script
 from ComputedAttribute import ComputedAttribute
 
-from CMFCorePermissions import FTPAccess
-from CMFCorePermissions import View
-from CMFCorePermissions import ViewManagementScreens
+from permissions import FTPAccess
+from permissions import View
+from permissions import ViewManagementScreens
 from DirectoryView import registerFileExtension
 from DirectoryView import registerMetaType
 from FSObject import FSObject

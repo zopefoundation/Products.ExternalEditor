@@ -16,20 +16,22 @@ $Id$
 """
 
 from OFS.SimpleItem import SimpleItem
-from Products.CMFCore.utils import UniqueObject
 from Globals import PersistentMapping
 
-from Globals import InitializeClass, DTMLFile
-from AccessControl import ClassSecurityInfo, getSecurityManager
-from Products.CMFCore.CMFCorePermissions import View
-from Products.CMFCore.CMFCorePermissions import ManagePortal
-from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
-from Products.CMFCore.ActionProviderBase import ActionProviderBase
-from utils import _dtmldir
+from Globals import InitializeClass
+from Globals import DTMLFile
+from AccessControl import ClassSecurityInfo
+from AccessControl import getSecurityManager
 
+from Products.CMFCore.utils import UniqueObject
+from Products.CMFCore.ActionProviderBase import ActionProviderBase
 from Products.CMFCore.interfaces.portal_metadata \
         import portal_metadata as IMetadataTool
 
+from permissions import View
+from permissions import ManagePortal
+from permissions import ModifyPortalContent
+from utils import _dtmldir
 
 class MetadataElementPolicy( SimpleItem ):
     """

@@ -19,7 +19,7 @@ from Acquisition import aq_base
 from AccessControl import ClassSecurityInfo
 from Globals import InitializeClass
 
-from CMFCorePermissions import AccessContentsInformation
+from permissions import AccessContentsInformation
 from interfaces.portal_skins import SkinsContainer as ISkinsContainer
 
 

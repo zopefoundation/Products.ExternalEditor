@@ -10,17 +10,15 @@
 # FOR A PARTICULAR PURPOSE
 #
 ##############################################################################
-""" EventPermissions: Permissions used in the CMF Events class
+""" Backward compatibility;  see Products.CMFCalendar.permissions
 
 $Id$
 """
 
-from Products.CMFCore.CMFCorePermissions import setDefaultRoles
+from permissions import *
 
-# Gathering Event Related Permissions into one place
-AddEvents = 'Add portal events'
-ChangeEvents = 'Change portal events'
+from warnings import warn
 
-# Set up default roles for permissions
-setDefaultRoles(AddEvents, ('Manager', 'Owner', 'Member'))
-setDefaultRoles(ChangeEvents, ('Manager', 'Owner',))
+warn( "The module, 'Products.CMFCalendar.EventPermissions' is a deprecated "
+      "compatiblity alias for 'Products.CMFalendar.permissions';  please use "
+      "the new module instead.", DeprecationWarning)
