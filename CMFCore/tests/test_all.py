@@ -39,6 +39,7 @@ def test_suite():
         'test_TypesTool',
         'test_UndoTool',
         'test_URLTool',
+        'test_utils',
         'test_WorkflowTool',
         ])
 

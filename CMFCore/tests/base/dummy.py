@@ -229,6 +229,9 @@ class DummyUser(Implicit):
     def getRolesInContext(self, object):
         return ('Authenticated', 'Dummy', 'Member')
 
+    def _check_context(self, object):
+        return 1
+
 
 class DummyUserFolder(Implicit):
     """ A dummy User Folder with 2 dummy Users.
