@@ -6,46 +6,46 @@
  <permission>Access contents information</permission>
  <permission>Modify portal content</permission>
  <permission>View</permission>
- <state state_id="private"
-        title="Non-visible and editable only by owner">
-  <exit-transition transition_id="submit"/>
-  <exit-transition transition_id="publish"/>
-  <permission-map name="Modify portal content"
-                  acquired="False">
-   <permission-role>Manager</permission-role>
-   <permission-role>Owner</permission-role>
-  </permission-map>
-  <permission-map name="Access contents information"
-                  acquired="False">
-   <permission-role>Manager</permission-role>
-   <permission-role>Owner</permission-role>
-  </permission-map>
-  <permission-map name="View" acquired="False">
-   <permission-role>Manager</permission-role>
-   <permission-role>Owner</permission-role>
-  </permission-map>
-
-
- </state>
  <state state_id="pending" title="Waiting for reviewer">
   <exit-transition transition_id="publish"/>
   <exit-transition transition_id="reject"/>
   <exit-transition transition_id="retract"/>
-  <permission-map name="Modify portal content"
-                  acquired="False">
-   <permission-role>Manager</permission-role>
-   <permission-role>Reviewer</permission-role>
-  </permission-map>
   <permission-map name="Access contents information"
                   acquired="False">
    <permission-role>Manager</permission-role>
    <permission-role>Owner</permission-role>
    <permission-role>Reviewer</permission-role>
   </permission-map>
+  <permission-map name="Modify portal content"
+                  acquired="False">
+   <permission-role>Manager</permission-role>
+   <permission-role>Reviewer</permission-role>
+  </permission-map>
   <permission-map name="View" acquired="False">
    <permission-role>Manager</permission-role>
    <permission-role>Owner</permission-role>
    <permission-role>Reviewer</permission-role>
+  </permission-map>
+
+
+ </state>
+ <state state_id="private"
+        title="Non-visible and editable only by owner">
+  <exit-transition transition_id="submit"/>
+  <exit-transition transition_id="publish"/>
+  <permission-map name="Access contents information"
+                  acquired="False">
+   <permission-role>Manager</permission-role>
+   <permission-role>Owner</permission-role>
+  </permission-map>
+  <permission-map name="Modify portal content"
+                  acquired="False">
+   <permission-role>Manager</permission-role>
+   <permission-role>Owner</permission-role>
+  </permission-map>
+  <permission-map name="View" acquired="False">
+   <permission-role>Manager</permission-role>
+   <permission-role>Owner</permission-role>
   </permission-map>
 
 
@@ -53,13 +53,13 @@
  <state state_id="published" title="Public">
   <exit-transition transition_id="reject"/>
   <exit-transition transition_id="retract"/>
-  <permission-map name="Modify portal content"
-                  acquired="False">
-   <permission-role>Manager</permission-role>
-  </permission-map>
   <permission-map name="Access contents information"
                   acquired="True">
    <permission-role>Anonymous</permission-role>
+   <permission-role>Manager</permission-role>
+  </permission-map>
+  <permission-map name="Modify portal content"
+                  acquired="False">
    <permission-role>Manager</permission-role>
   </permission-map>
   <permission-map name="View" acquired="True">
@@ -69,17 +69,6 @@
 
 
  </state>
- <transition transition_id="retract"
-             title="Member retracts submission"
-             new_state="private" trigger="USER"
-             before_script="" after_script="">
-  <action url="%(content_url)s/content_retract_form"
-          category="workflow">Retract</action>
-  <guard>
-   <guard-permission>Request review</guard-permission>
-  </guard>
-
- </transition>
  <transition transition_id="publish"
              title="Reviewer publishes content"
              new_state="published" trigger="USER"
@@ -91,17 +80,6 @@
   </guard>
 
  </transition>
- <transition transition_id="submit"
-             title="Member requests publishing"
-             new_state="pending" trigger="USER"
-             before_script="" after_script="">
-  <action url="%(content_url)s/content_submit_form"
-          category="workflow">Submit</action>
-  <guard>
-   <guard-permission>Request review</guard-permission>
-  </guard>
-
- </transition>
  <transition transition_id="reject"
              title="Reviewer rejects submission"
              new_state="private" trigger="USER"
@@ -110,6 +88,28 @@
           category="workflow">Reject</action>
   <guard>
    <guard-permission>Review portal content</guard-permission>
+  </guard>
+
+ </transition>
+ <transition transition_id="retract"
+             title="Member retracts submission"
+             new_state="private" trigger="USER"
+             before_script="" after_script="">
+  <action url="%(content_url)s/content_retract_form"
+          category="workflow">Retract</action>
+  <guard>
+   <guard-permission>Request review</guard-permission>
+  </guard>
+
+ </transition>
+ <transition transition_id="submit"
+             title="Member requests publishing"
+             new_state="pending" trigger="USER"
+             before_script="" after_script="">
+  <action url="%(content_url)s/content_submit_form"
+          category="workflow">Submit</action>
+  <guard>
+   <guard-permission>Request review</guard-permission>
   </guard>
 
  </transition>
@@ -132,18 +132,6 @@
   <guard>
   </guard>
  </variable>
- <variable variable_id="review_history" for_catalog="False"
-           for_status="False" update_always="False">
-  <description>Provides access to workflow history</description>
-  <default>
-   
-   <expression>state_change/getHistory</expression>
-  </default>
-  <guard>
-   <guard-permission>Request review</guard-permission>
-   <guard-permission>Review portal content</guard-permission>
-  </guard>
- </variable>
  <variable variable_id="actor" for_catalog="False"
            for_status="True" update_always="True">
   <description>The ID of the user who performed the last transition</description>
@@ -162,6 +150,18 @@
    <expression>python:state_change.kwargs.get('comment', '')</expression>
   </default>
   <guard>
+  </guard>
+ </variable>
+ <variable variable_id="review_history" for_catalog="False"
+           for_status="False" update_always="False">
+  <description>Provides access to workflow history</description>
+  <default>
+   
+   <expression>state_change/getHistory</expression>
+  </default>
+  <guard>
+   <guard-permission>Request review</guard-permission>
+   <guard-permission>Review portal content</guard-permission>
   </guard>
  </variable>
  <variable variable_id="time" for_catalog="False"

@@ -1,7 +1,20 @@
+##############################################################################
+#
+# Copyright (c) 2004 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE
+#
+##############################################################################
 """ Classes:  WorkflowConfigurator
 
 $Id$
 """
+
 import re
 from xml.sax import parseString
 from xml.dom.minidom import parseString as domParseString
@@ -49,7 +62,7 @@ def importWorkflowTool( context ):
                            )
 
     o Register via XML:
- 
+
       <setup-step id="importWorkflowTool"
                   version="20040602-01"
                   handler="Products.CMFSetup.workflow.importWorkflowTool"
@@ -118,7 +131,7 @@ def importWorkflowTool( context ):
                 pass # TODO: handle non-DCWorkflows
 
         for type_id, workflow_ids in bindings.items():
- 
+
             chain = ','.join( workflow_ids )
             if type_id is None:
                 tool.setDefaultChain( chain )
@@ -145,7 +158,7 @@ def exportWorkflowTool( context ):
                            )
 
     o Register via XML:
- 
+
       <export-script id="exportWorkflowTool"
                      version="20040518-01"
                      handler="Products.CMFSetup.workflow.exportWorkflowTool"
@@ -179,9 +192,9 @@ class WorkflowToolConfigurator( Implicit ):
 
     """ Synthesize XML description of site's workflows.
     """
-    security = ClassSecurityInfo()   
+    security = ClassSecurityInfo()
     security.setDefaultAccess( 'allow' )
-    
+
     def __init__( self, site ):
         self._site = site
 
@@ -349,7 +362,7 @@ class WorkflowToolConfigurator( Implicit ):
             by the workflow
 
           'state_variable' -- the name of the workflow's "main"
-            state variable 
+            state variable
 
           'initial_state' -- the name of the state in the workflow
             in which objects start their lifecycle.
@@ -386,7 +399,7 @@ class WorkflowToolConfigurator( Implicit ):
         """ Return a sequence of mappings describing DCWorkflow variables.
 
         o Keys for each mapping will include:
-        
+
           'id' -- the variable's ID
 
           'description' -- a textual description of the variable
@@ -414,7 +427,10 @@ class WorkflowToolConfigurator( Implicit ):
         """
         result = []
 
-        for k, v in workflow.variables.objectItems():
+        items = workflow.variables.objectItems()
+        items.sort()
+
+        for k, v in items:
 
             guard = v.getInfoGuard()
 
@@ -483,7 +499,10 @@ class WorkflowToolConfigurator( Implicit ):
         """
         result = []
 
-        for k, v in workflow.states.objectItems():
+        items = workflow.states.objectItems()
+        items.sort()
+
+        for k, v in items:
 
             groups = v.group_roles and list( v.group_roles.items() ) or []
             groups = [ x for x in groups if x[1] ]
@@ -516,7 +535,7 @@ class WorkflowToolConfigurator( Implicit ):
     security.declarePrivate( '_extractStatePermissions' )
     def _extractStatePermissions( self, state ):
 
-        """ Return a sequence of mappings for the permssions in a state.
+        """ Return a sequence of mappings for the permissions in a state.
 
         o Each mapping has the keys:
 
@@ -528,7 +547,10 @@ class WorkflowToolConfigurator( Implicit ):
         """
         result = []
 
-        for k, v in state.permission_roles.items():
+        items = state.permission_roles.items()
+        items.sort()
+
+        for k, v in items:
 
             result.append( { 'name' : k
                            , 'roles' : v
@@ -594,7 +616,10 @@ class WorkflowToolConfigurator( Implicit ):
         """
         result = []
 
-        for k, v in workflow.transitions.objectItems():
+        items = workflow.transitions.objectItems()
+        items.sort()
+
+        for k, v in items:
 
             guard = v.getGuard()
 
@@ -660,7 +685,10 @@ class WorkflowToolConfigurator( Implicit ):
         """
         result = []
 
-        for k, v in workflow.worklists.objectItems():
+        items = workflow.worklists.objectItems()
+        items.sort()
+
+        for k, v in items:
 
             guard = v.getGuard()
 
@@ -721,6 +749,7 @@ class WorkflowToolConfigurator( Implicit ):
 
 InitializeClass( WorkflowToolConfigurator )
 
+
 class _WorkflowToolParser( HandlerBase ):
 
     security = ClassSecurityInfo()
@@ -746,7 +775,7 @@ class _WorkflowToolParser( HandlerBase ):
             if meta_type == DCWorkflowDefinition.meta_type:
 
                 filename = self._extract( attrs, 'filename', workflow_id )
-            
+
                 if filename == workflow_id:
                     filename = _getWorkflowFilename( filename )
 
@@ -1212,7 +1241,7 @@ def _initDCWorkflowStates( workflow, states ):
             gmap[ group_id ] = roles
 
         vmap = s.var_values = PersistentMapping()
-        
+
         for name, v_info in s_info[ 'variables' ].items():
 
             value = _convertVariableValue( v_info[ 'value' ]

@@ -1,11 +1,26 @@
+##############################################################################
+#
+# Copyright (c) 2004 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE
+#
+##############################################################################
 """ Unit tests for export / import of DCWorkflows and bindings.
 
 $Id$
 """
+
 import unittest
+import Testing
+import Zope
+Zope.startup()
 
 from OFS.Folder import Folder
-
 from Products.PythonScripts.PythonScript import PythonScript
 
 from Products.DCWorkflow.DCWorkflow import DCWorkflowDefinition
@@ -15,6 +30,7 @@ from Products.DCWorkflow.Transitions import TRIGGER_AUTOMATIC
 from common import BaseRegistryTests
 from common import DummyExportContext
 from common import DummyImportContext
+
 
 class DummyWorkflowTool( Folder ):
 
@@ -121,7 +137,7 @@ class _WorkflowSetup( BaseRegistryTests ):
                                   )
 
     def _initStates( self, dcworkflow ):
-        
+
         dcworkflow.groups = _WF_GROUPS
 
         for k, v in _WF_STATES.items():
@@ -153,7 +169,7 @@ class _WorkflowSetup( BaseRegistryTests ):
                 state.addVariable( k, v )
 
     def _initTransitions( self, dcworkflow ):
-        
+
         for k, v in _WF_TRANSITIONS.items():
 
             dcworkflow.transitions.addTransition( k )
@@ -899,7 +915,7 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
         , worklists
         , permissions
         , scripts
-        ) = configurator.parseWorkflowXML( 
+        ) = configurator.parseWorkflowXML(
                           _NORMAL_WORKFLOW_EXPORT
                           % { 'workflow_id' : WF_ID
                             , 'title' : WF_TITLE
@@ -962,7 +978,7 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
         , worklists
         , permissions
         , scripts
-        ) = configurator.parseWorkflowXML( 
+        ) = configurator.parseWorkflowXML(
                           _NORMAL_WORKFLOW_EXPORT
                           % { 'workflow_id' : WF_ID
                             , 'title' : WF_TITLE
@@ -1029,7 +1045,7 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
         , worklists
         , permissions
         , scripts
-        ) = configurator.parseWorkflowXML( 
+        ) = configurator.parseWorkflowXML(
                           _NORMAL_WORKFLOW_EXPORT
                           % { 'workflow_id' : WF_ID
                             , 'title' : WF_TITLE
@@ -1106,7 +1122,7 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
         , worklists
         , permissions
         , scripts
-        ) = configurator.parseWorkflowXML( 
+        ) = configurator.parseWorkflowXML(
                           _NORMAL_WORKFLOW_EXPORT
                           % { 'workflow_id' : WF_ID
                             , 'title' : WF_TITLE
@@ -1167,7 +1183,7 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
         , worklists
         , permissions
         , scripts
-        ) = configurator.parseWorkflowXML( 
+        ) = configurator.parseWorkflowXML(
                           _NORMAL_WORKFLOW_EXPORT
                           % { 'workflow_id' : WF_ID
                             , 'title' : WF_TITLE
@@ -1203,7 +1219,7 @@ class WorkflowToolConfiguratorTests( _WorkflowSetup
         , worklists
         , permissions
         , scripts
-        ) = configurator.parseWorkflowXML( 
+        ) = configurator.parseWorkflowXML(
                           _NORMAL_WORKFLOW_EXPORT
                           % { 'workflow_id' : WF_ID
                             , 'title' : WF_TITLE
@@ -1550,7 +1566,7 @@ _EMPTY_WORKFLOW_EXPORT = """\
 <dc-workflow
     workflow_id="%s"
     title="%s"
-    state_variable="state" 
+    state_variable="state"
     initial_state="%s">
 </dc-workflow>
 """
@@ -1560,12 +1576,33 @@ _NORMAL_WORKFLOW_EXPORT = """\
 <dc-workflow
     workflow_id="%(workflow_id)s"
     title="%(title)s"
-    state_variable="state" 
+    state_variable="state"
     initial_state="%(initial_state)s">
  <permission>Open content for modifications</permission>
  <permission>Modify content</permission>
  <permission>Query history</permission>
  <permission>Restore expired content</permission>
+ <state
+    state_id="closed"
+    title="Closed">
+  <description>Closed for modifications</description>
+  <exit-transition
+    transition_id="open"/>
+  <exit-transition
+    transition_id="kill"/>
+  <exit-transition
+    transition_id="expire"/>
+  <permission-map
+    acquired="False"
+    name="Modify content">
+  </permission-map>
+  <assignment
+    name="is_closed"
+    type="bool">True</assignment>
+  <assignment
+    name="is_opened"
+    type="bool">False</assignment>
+ </state>
  <state
     state_id="expired"
     title="Expired">
@@ -1584,6 +1621,11 @@ _NORMAL_WORKFLOW_EXPORT = """\
   <assignment
     name="is_opened"
     type="bool">False</assignment>
+ </state>
+ <state
+    state_id="killed"
+    title="Killed">
+  <description>Permanently unavailable</description>
  </state>
  <state
     state_id="opened"
@@ -1610,32 +1652,6 @@ _NORMAL_WORKFLOW_EXPORT = """\
   <assignment
     name="is_opened"
     type="bool">True</assignment>
- </state>
- <state
-    state_id="closed"
-    title="Closed">
-  <description>Closed for modifications</description>
-  <exit-transition
-    transition_id="open"/>
-  <exit-transition
-    transition_id="kill"/>
-  <exit-transition
-    transition_id="expire"/>
-  <permission-map
-    acquired="False"
-    name="Modify content">
-  </permission-map>
-  <assignment
-    name="is_closed"
-    type="bool">True</assignment>
-  <assignment
-    name="is_opened"
-    type="bool">False</assignment>
- </state>
- <state
-    state_id="killed"
-    title="Killed">
-  <description>Permanently unavailable</description>
  </state>
  <transition
     transition_id="close"
@@ -1668,23 +1684,6 @@ _NORMAL_WORKFLOW_EXPORT = """\
     name="when_expired">object/ZopeTime</assignment>
  </transition>
  <transition
-    transition_id="open"
-    title="Open"
-    trigger="USER"
-    new_state="opened"
-    before_script="before_open"
-    after_script="">
-  <description>Open the object for modifications</description>
-  <action
-    category="workflow"
-    url="string:${object_url}/open_for_modifications">Open</action>
-  <guard>
-   <guard-permission>Open content for modifications</guard-permission>
-  </guard>
-  <assignment
-    name="when_opened">object/ZopeTime</assignment>
- </transition>
- <transition
     transition_id="kill"
     title="Kill"
     trigger="USER"
@@ -1700,6 +1699,23 @@ _NORMAL_WORKFLOW_EXPORT = """\
   </guard>
   <assignment
     name="killed_by">string:${user/getId}</assignment>
+ </transition>
+ <transition
+    transition_id="open"
+    title="Open"
+    trigger="USER"
+    new_state="opened"
+    before_script="before_open"
+    after_script="">
+  <description>Open the object for modifications</description>
+  <action
+    category="workflow"
+    url="string:${object_url}/open_for_modifications">Open</action>
+  <guard>
+   <guard-permission>Open content for modifications</guard-permission>
+  </guard>
+  <assignment
+    name="when_opened">object/ZopeTime</assignment>
  </transition>
  <worklist
     worklist_id="alive_list"
@@ -1916,7 +1932,7 @@ class Test_importWorkflow( _WorkflowSetup
                               }
                           )
 
-        context._files[ 'workflows/%s/after_close.py' % workflow_filename 
+        context._files[ 'workflows/%s/after_close.py' % workflow_filename
                       ] = _AFTER_CLOSE_SCRIPT
 
         context._files[ 'workflows/%s/after_kill.py' % workflow_filename
