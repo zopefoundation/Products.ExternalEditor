@@ -45,7 +45,7 @@ from Products.CMFCore.utils import _dtmldir
 import time
 
 
-def createCPContext( content, view_method, keywords ):
+def createCPContext( content, view_method, keywords, time=None ):
     """
         Construct an expression context for TALES expressions,
         for use by CachingPolicy objects.
@@ -56,6 +56,9 @@ def createCPContext( content, view_method, keywords ):
     else:
         member = pm.getAuthenticatedMember()
 
+    if time is None:
+        time = DateTime()
+
     data = { 'content'  : content
            , 'view'     : view_method
            , 'keywords' : keywords
@@ -63,6 +66,7 @@ def createCPContext( content, view_method, keywords ):
            , 'member'   : member
            , 'modules'  : SecureModuleImporter
            , 'nothing'  : None
+           , 'time'     : time
            }
 
     return getEngine().getContext( data )
@@ -192,7 +196,8 @@ class CachingPolicy:
             control = []
 
             if self._max_age_secs is not None:
-                exp_time_str = rfc1123_date(time.time() + self._max_age_secs)
+                now = expr_context.vars[ 'time' ]
+                exp_time_str = rfc1123_date(now.timeTime() + self._max_age_secs)
                 headers.append( ( 'Expires', exp_time_str ) )
                 control.append( 'max-age=%d' % self._max_age_secs )
 

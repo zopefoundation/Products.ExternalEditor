@@ -23,7 +23,7 @@ class DummyContent:
 class CachingPolicyTests( unittest.TestCase ):
 
     def setUp(self):
-        self.EPOCH = DateTime()
+        self.EPOCH = DateTime( '1970/01/01' )
 
     def _makePolicy( self, policy_id, **kw ):
 
@@ -34,7 +34,8 @@ class CachingPolicyTests( unittest.TestCase ):
 
         from Products.CMFCore.CachingPolicyManager import createCPContext
         from Products.CMFCore.CachingPolicyManager import createCPContext
-        return createCPContext( DummyContent(self.EPOCH), 'foo_view', kw )
+        return createCPContext( DummyContent(self.EPOCH)
+                              , 'foo_view', kw, self.EPOCH )
         
     def test_interface( self ):
         from Products.CMFCore.interfaces.CachingPolicyManager \
@@ -155,9 +156,11 @@ class CachingPolicyTests( unittest.TestCase ):
 
         self.assertEqual( len( headers ), 3 )
         self.assertEqual( headers[0][0].lower() , 'last-modified' )
-        self.assertEqual( headers[0][1] , rfc1123_date(self.EPOCH.timeTime()) )
+        self.assertEqual( headers[0][1]
+                        , rfc1123_date(self.EPOCH.timeTime()) )
         self.assertEqual( headers[1][0].lower() , 'expires' )
-        self.assertEqual( headers[1][1] , rfc1123_date((self.EPOCH+1).timeTime()) )
+        self.assertEqual( headers[1][1]
+                        , rfc1123_date((self.EPOCH+1).timeTime()) )
         self.assertEqual( headers[2][0].lower() , 'cache-control' )
         self.assertEqual( headers[2][1] , 'max-age=86400' )
         
