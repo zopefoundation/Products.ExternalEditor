@@ -30,6 +30,9 @@ from OFS.ObjectManager import REPLACEABLE
 from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
 from Products.PythonScripts.PythonScript import PythonScript
 
+from DirectoryView import base_ignore
+from DirectoryView import ignore
+from DirectoryView import ignore_re
 from ActionProviderBase import ActionProviderBase
 from permissions import AccessContentsInformation
 from permissions import ManagePortal
@@ -349,6 +352,18 @@ class SkinsTool(UniqueObject, SkinsContainer, Folder, ActionProviderBase):
         '''
         sels = self._getSelections()
         skinpath = str(skinpath)
+
+        # Basic precaution to make sure the stuff we want to ignore in
+        # DirectoryViews gets prevented from ending up in a skin path
+        path_elems = [x.strip() for x in skinpath.split(',')]
+        ignored = base_ignore + ignore
+
+        for elem in path_elems[:]:
+            if elem in ignored or ignore_re.match(elem):
+                path_elems.remove(elem)
+
+        skinpath = ','.join(path_elems)
+        
         if test:
             self.testSkinPath(skinpath)
         sels[str(skinname)] = skinpath

@@ -31,6 +31,25 @@ class SkinsToolTests(TestCase):
         verifyClass(ISkinsContainer, SkinsTool)
         verifyClass(IActionProvider, SkinsTool)
 
+    def test_add_invalid_path(self):
+        tool = SkinsTool()
+
+        # We start out with no wkin selections
+        self.assertEquals(len(tool.getSkinSelections()), 0)
+        
+        # Add a skin selection with an invalid path element
+        paths = 'foo, bar, .svn'
+        tool.addSkinSelection('fooskin', paths)
+
+        # Make sure the skin selection exists
+        paths = tool.getSkinPath('fooskin')
+        self.failIf(paths is None)
+        
+        # Test for the contents
+        self.failIf(paths.find('foo') == -1)
+        self.failIf(paths.find('bar') == -1)
+        self.failUnless(paths.find('.svn') == -1)
+
 
 def test_suite():
     return TestSuite((
