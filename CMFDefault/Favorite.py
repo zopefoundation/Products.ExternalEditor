@@ -21,8 +21,9 @@ from Products.CMFCore.PortalContent import PortalContent
 from Products.CMFCore.utils import getToolByName
 from DublinCore import DefaultDublinCoreImpl
 from Link import Link
-
 from Products.CMFCore import CMFCorePermissions
+from Products.CMFCore.WorkflowCore import WorkflowAction
+import string, urlparse
 
 factory_type_information = ( { 'id'             : 'Favorite'
                              , 'meta_type'      : 'Favorite'
@@ -115,6 +116,29 @@ class Favorite( Link ):
         linking to
         """
         return self.restrictedTraverse(self.getRemoteUrl())
+
+    def edit( self, remote_url ):
+        """
+        Edit the Favorite. Unlike Links, Favorites have URLs that are
+        relative to the root of the site.
+        """
+        # strip off scheme and machine from URL if present
+        tokens = urlparse.urlparse( remote_url, 'http' )
+        if tokens[0] or tokens[1]:
+            t=('', '') + tokens[2:]
+            remote_url=urlparse.urlunparse(t)
+        # if URL begins with site URL, remove site URL
+        portal_url = getToolByName(self, 'portal_url').getPortalPath()
+        i=string.find(remote_url, portal_url)
+        if i==0:
+            remote_url=remote_url[len(portal_url):]
+        # if site is still absolute, make it relative
+        if remote_url[0]=='/':
+            remote_url=remote_url[1:]
+        self.remote_url=remote_url
+
+    edit=WorkflowAction(edit)
+
 
 Globals.default__class_init__(Link)
 
