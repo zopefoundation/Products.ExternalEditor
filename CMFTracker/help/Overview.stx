@@ -2,15 +2,31 @@ CMFTracker Overview
 
   Goals
 
-    - Allow site members to view, search, and create content related
-      to issues using the same tools and techniques used to with
-      other CMF content.
+    Submitter
 
-    - Provide a migration target for existing "Collector",
-         http://classic.zope.org:8080/Collector
-      and "Tracker",
-         http://www.zope.org/Members/klm/Tracker
-      issues.
+      - Build descriptions of issues such that the teams
+        responsible for them can understand, evaluate, and resolve
+        them expeditiously.
+
+      - Get a quick resolution for such issues.
+
+    Supporter
+
+      - Minimize the time any issue remains "on the supporter's
+        plate."
+
+      - Capture all data relevant to the resolution of an issue
+        in a form which eases future handling of similar issues.
+
+    Administrator
+
+      - Provide a migration target for existing "Collector",
+           http://classic.zope.org:8080/Collector
+        and "Tracker",
+           http://www.zope.org/Members/klm/Tracker
+        issues.
+
+      - Ensure that issues receive appropriate and timely resolution.
 
 
   Use Cases
@@ -29,6 +45,11 @@ CMFTracker Overview
     - "Correspondent Adds Note to Issue":../CorrespondentAddsNote.stx
 
     - "Supporter Closes Issue":../SupporterClosesIssue.stx
+
+    - "Administrator Migrates Issues":../AdministratorMigratesIssues.stx
+
+    - "Administrator Reviews Issue
+      History":../AdministratorReviewsHistory.stx
 
 
   Design Notes
