@@ -295,7 +295,24 @@ class Topic( PortalFolder ):
                 '%s/topic_criteria?portal_status_message=%s' % (
                 self.absolute_url(), message)
                 )
-        
+
+    security.declareProtected(TopicPermissions.AddTopics, 'addSubtopic')
+    def addSubtopic(self, id, REQUEST=None):
+        """ Add a new subtopic """
+        types = utils.getToolByName(self, 'portal_types')
+        topictype = types.getTypeInfo('Topic')
+
+        topictype.constructInstance(self, id)
+
+        if REQUEST is not None:
+            action = topictype.getActionById('subtopics')
+            url = '%s/%s?portal_status_message=%s' % (
+                self.absolute_url(), action,
+                "Subtopic '%s' added" % id )
+            REQUEST['RESPONSE'].redirect(url)
+        else:
+            return self._getOb(id)
+
 
 # Intialize the Topic class, setting up security.
 InitializeClass(Topic)

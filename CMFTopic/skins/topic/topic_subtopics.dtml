@@ -13,7 +13,16 @@
 
  <tr valign="top">
   <td> <input type="checkbox" name="ids:list" value="&dtml-id;"> </td>
-  <td> <a href="&dtml-id;"> <dtml-var id> </a>
+  <td> 
+   <a href="&dtml-getId;">&dtml-getId;</a>
+   <dtml-with buildQuery>
+    <dtml-in items>
+     <dtml-if sequence-start>(</dtml-if>
+     <dtml-var sequence-key> : <dtml-var sequence-item>
+     <dtml-unless sequence-end>,</dtml-unless>
+     <dtml-if sequence-end>)</dtml-if>
+    </dtml-in>
+   </dtml-with>
   </td>
  </tr>
 
@@ -33,14 +42,12 @@
 </table>
 </form>
 
-<h2> Add: </h2>
-
-<ul>
-
- <li> <a href="manage_addProduct/PTKTopic/manage_addPortalTopicForm"
-    > Subtopic </a> </p>
-
-</ul>
+<form action="addSubtopic" method="get">
+<h2> Add subtopic: </h2>
+<p><strong>Id: </strong>
+<input type="text" name="id" size="30" /><br />
+<input type="submit" value=" Add " /></p>
+</form>
 
 </div>
 
