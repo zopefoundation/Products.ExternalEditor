@@ -32,16 +32,17 @@ Title: My Document
 Description: A document by me
 Contributors: foo@bar.com baz@bam.net no@yes.maybe
 
-This is the header
+This is the header and it supercedes the title
 
   Body body body body body
   body body body.
+
+   o What does this do
+   
+   o if it happens to you?
 '''
 
-class TestCase(unittest.TestCase):
-
-    def setUp(self): pass
-    def tearDown(self): pass
+class DocumentTests(unittest.TestCase):
 
     def test_Empty(self):
         d = Document('foo')
@@ -117,7 +118,7 @@ class TestCase(unittest.TestCase):
 
 
 def test_suite():
-    return unittest.makeSuite(TestCase)
+    return unittest.makeSuite(DocumentTests)
 
 def main():
     unittest.TextTestRunner().run(test_suite())

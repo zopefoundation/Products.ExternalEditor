@@ -1,5 +1,7 @@
 import unittest
-from Products.CMFDefault.tests import test_Document, test_utils
+from Products.CMFDefault.tests import test_Document
+from Products.CMFDefault.tests import test_MetadataTool
+from Products.CMFDefault.tests import test_utils
 
 def main():
     """\
@@ -8,6 +10,7 @@ def main():
     """
     suite = unittest.TestSuite((
         test_Document.test_suite(),
+        test_MetadataTool.test_suite(),
         test_utils.test_suite(),
         ))
     unittest.TextTestRunner().run(suite)
