@@ -52,8 +52,9 @@ class SkinnableObjectManager (ObjectManager):
     def __getattr__(self, name):
         '''
         Looks for the name in an object with wrappers that only reach
-        up to the root skins folder.  This should be fast, flexible,
-        and predictable.
+        up to the root skins folder.  
+        
+        This should be fast, flexible, and predictable.
         '''
         if not name.startswith('_') and not name.startswith('aq_'):
             sd = self._v_skindata
@@ -93,7 +94,7 @@ class SkinnableObjectManager (ObjectManager):
 
     security.declarePublic('getSkinNameFromRequest')
     def getSkinNameFromRequest(self, REQUEST=None):
-        ''' returns the skin name from the Request'''
+        '''Returns the skin name from the Request.'''
         sfn = self.getSkinsFolderName()
         if sfn is not None:
             sf = getattr(self, sfn, None)
@@ -151,9 +152,10 @@ class SkinnableObjectManager (ObjectManager):
 
     def _checkId(self, id, allow_dup=0):
         '''
-        Override of ObjectManager._checkId().  Allows the user
-        to create objects with IDs that match the ID of a skin
-        object.
+        Override of ObjectManager._checkId().  
+        
+        Allows the user to create objects with IDs that match the ID of 
+        a skin object.
         '''
         superCheckId = SkinnableObjectManager.inheritedAttribute('_checkId')
         if not allow_dup:
