@@ -18,6 +18,8 @@ __version__='$Revision$'[11:-2]
 
 from Interface import Attribute, Base
 
+_marker = []
+
 class portal_workflow(Base):
     '''This tool accesses and changes the workflow state of content.
     '''
@@ -60,7 +62,7 @@ class portal_workflow(Base):
         '''
 
     # security.declarePublic('getInfoFor')
-    def getInfoFor(ob, name, default, wf_id=None, *args, **kw):
+    def getInfoFor(ob, name, default=_marker, wf_id=None, *args, **kw):
         '''
         Invoked by user interface code.  Allows the user to request
         information provided by the workflow.  The workflow object
