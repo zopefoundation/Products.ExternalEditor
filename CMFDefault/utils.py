@@ -164,7 +164,7 @@ class SimpleHTMLParser(SGMLParser):
         self.setliteral()
     
 
-_bodyre = re.compile(r'<body.*?>', re.DOTALL|re.I)
+_bodyre = re.compile(r'^\s*<html.*<body.*?>', re.DOTALL|re.I)
 _endbodyre = re.compile(r'</body', re.DOTALL|re.I)
 
 def bodyfinder(text):
