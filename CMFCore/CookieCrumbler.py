@@ -153,7 +153,8 @@ class CookieCrumbler (SimpleItemWithProperties):
         if attempt == ATTEMPT_DISABLED:
             return
         if not req.get('disable_cookie_login__', 0):
-            if attempt == ATTEMPT_LOGIN or attempt == ATTEMPT_NONE:
+            if attempt == ATTEMPT_LOGIN or attempt == ATTEMPT_NONE \
+                   or attempt == ATTEMPT_RESUME:
                 # Modify the "unauthorized" response.
                 req._hold(ResponseCleanup(resp))
                 resp.unauthorized = self.unauthorized
