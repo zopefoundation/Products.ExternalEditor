@@ -3,22 +3,162 @@
 
 from OFS.SimpleItem import SimpleItem, Item
 from AccessControl import ClassSecurityInfo
-from Globals import DTMLFile, InitializeClass
+from Globals import DTMLFile, InitializeClass, PersistentMapping
 from ZPublisher.mapply import mapply
 
 from CMFCorePermissions import ManagePortal
 from utils import _dtmldir
 
-import re, os, urllib
+import re, os, string, urllib
 
-class MimeTypePredicate( SimpleItem ):
+class MajorMinorPredicate( SimpleItem ):
+    """
+        Predicate matching on 'major/minor' content types.
+        Empty major or minor implies wildcard (all match).
+    """
+    major = minor = None
+    PREDICATE_TYPE  = 'major_minor'
+
+    security = ClassSecurityInfo()
+
+    def __init__( self, id ):
+        self.id = id
+
+    security.declareProtected( ManagePortal, 'getMajorType' )
+    def getMajorType( self, join=string.join ):
+        """
+        """
+        if self.major is None:
+            return 'None'
+        return join( self.major )
+
+    security.declareProtected( ManagePortal, 'getMinorType' )
+    def getMinorType( self, join=string.join ):
+        """
+        """
+        if self.minor is None:
+            return 'None'
+        return join( self.minor )
+
+    security.declareProtected( ManagePortal, 'edit' )
+    def edit( self, major, minor, COMMA_SPLIT=re.compile( r'[, ]' ) ):
+
+        if major == 'None':
+            major = None
+        if type( major ) is type( '' ):
+            major = filter( None, COMMA_SPLIT.split( major ) )
+
+        if minor == 'None':
+            minor = None
+        if type( minor ) is type( '' ):
+            minor = filter( None, COMMA_SPLIT.split( minor ) )
+
+        self.major = major
+        self.minor = minor
+
+    #
+    #   ContentTypeRegistryPredicate interface
+    #
+    security.declareObjectPublic()
+    def __call__( self, name, typ, body, SLASH_SPLIT=re.compile( '/' ) ):
+        """
+            Return true if the rule matches, else false.
+        """
+        if self.major is None:
+            return 0
+
+        if self.minor is None:
+            return 0
+
+        major, minor = SLASH_SPLIT.split( typ )
+
+        if self.major and not major in self.major:
+            return 0
+
+        if self.minor and not minor in self.minor:
+            return 0
+
+        return 1
+
+    security.declareProtected( ManagePortal, 'getTypeLabel' )
+    def getTypeLabel( self ):
+        """
+            Return a human-readable label for the predicate type.
+        """
+        return self.PREDICATE_TYPE
+
+    security.declareProtected( ManagePortal, 'predicateWidget' )
+    predicateWidget = DTMLFile( 'majorMinorWidget', _dtmldir )
+
+InitializeClass( MajorMinorPredicate )
+
+class ExtensionPredicate( SimpleItem ):
+    """
+        Predicate matching on filename extensions.
+    """
+    extensions = None
+    PREDICATE_TYPE  = 'extension'
+
+    security = ClassSecurityInfo()
+
+    def __init__( self, id ):
+        self.id = id
+
+    security.declareProtected( ManagePortal, 'getExtensions' )
+    def getExtensions( self, join=string.join ):
+        """
+        """
+        if self.extensions is None:
+            return 'None'
+        return join( self.extensions )
+
+    security.declareProtected( ManagePortal, 'edit' )
+    def edit( self, extensions, COMMA_SPLIT=re.compile( r'[, ]' ) ):
+
+        if extensions == 'None':
+            extensions = None
+        if type( extensions ) is type( '' ):
+            extensions = filter( None, COMMA_SPLIT.split( extensions ) )
+
+        self.extensions = extensions
+
+    #
+    #   ContentTypeRegistryPredicate interface
+    #
+    security.declareObjectPublic()
+    def __call__( self, name, typ, body ):
+        """
+            Return true if the rule matches, else false.
+        """
+        if self.extensions is None:
+            return 0
+
+        base, ext = os.path.splitext( name )
+        if ext and ext[ 0 ] == '.':
+            ext = ext[ 1: ]
+
+        return ext in self.extensions
+
+    security.declareProtected( ManagePortal, 'getTypeLabel' )
+    def getTypeLabel( self ):
+        """
+            Return a human-readable label for the predicate type.
+        """
+        return self.PREDICATE_TYPE
+
+    security.declareProtected( ManagePortal, 'predicateWidget' )
+    predicateWidget = DTMLFile( 'extensionWidget', _dtmldir )
+
+InitializeClass( ExtensionPredicate )
+
+class MimeTypeRegexPredicate( SimpleItem ):
     """
         Predicate matching only on 'typ', using regex matching for
         string patterns (other objects conforming to 'match' can
         also be passed).
     """
     pattern         = None
-    PREDICATE_TYPE  = 'mimetype'
+    PREDICATE_TYPE  = 'mimetype_regex'
 
     security = ClassSecurityInfo()
 
@@ -30,9 +170,6 @@ class MimeTypePredicate( SimpleItem ):
         if self.pattern is None:
             return 'None'
         return self.pattern.pattern
-
-    security.declareProtected( ManagePortal, 'manage_editForm' )
-    manage_editForm = DTMLFile( 'mimetypePredEdit', _dtmldir )
 
     security.declareProtected( ManagePortal, 'edit' )
     def edit( self, pattern ):
@@ -55,6 +192,7 @@ class MimeTypePredicate( SimpleItem ):
 
         return self.pattern.match( typ )
 
+    security.declareProtected( ManagePortal, 'getTypeLabel' )
     def getTypeLabel( self ):
         """
             Return a human-readable label for the predicate type.
@@ -64,16 +202,16 @@ class MimeTypePredicate( SimpleItem ):
     security.declareProtected( ManagePortal, 'predicateWidget' )
     predicateWidget = DTMLFile( 'patternWidget', _dtmldir )
 
-InitializeClass( MimeTypePredicate )
+InitializeClass( MimeTypeRegexPredicate )
 
-class NamePredicate( SimpleItem ):
+class NameRegexPredicate( SimpleItem ):
     """
         Predicate matching only on 'name', using regex matching
         for string patterns (other objects conforming to 'match'
         and 'pattern' can also be passed).
     """
     pattern         = None
-    PREDICATE_TYPE  = 'name'
+    PREDICATE_TYPE  = 'name_regex'
 
     security = ClassSecurityInfo()
 
@@ -88,9 +226,6 @@ class NamePredicate( SimpleItem ):
         if self.pattern is None:
             return 'None'
         return self.pattern.pattern
-
-    security.declareProtected( ManagePortal, 'manage_editForm' )
-    manage_editForm = DTMLFile( 'namePredEdit', _dtmldir )
 
     security.declareProtected( ManagePortal, 'edit' )
     def edit( self, pattern ):
@@ -113,6 +248,7 @@ class NamePredicate( SimpleItem ):
         
         return self.pattern.match( name )
 
+    security.declareProtected( ManagePortal, 'getTypeLabel' )
     def getTypeLabel( self ):
         """
             Return a human-readable label for the predicate type.
@@ -122,18 +258,23 @@ class NamePredicate( SimpleItem ):
     security.declareProtected( ManagePortal, 'predicateWidget' )
     predicateWidget = DTMLFile( 'patternWidget', _dtmldir )
 
-InitializeClass( NamePredicate )
+InitializeClass( NameRegexPredicate )
 
 
-_predicate_types = { MimeTypePredicate.PREDICATE_TYPE : MimeTypePredicate
-                   , NamePredicate.PREDICATE_TYPE     : NamePredicate
-                   }
+_predicate_types = []
 
 def registerPredicateType( typeID, klass ):
     """
         Add a new predicate type.
     """
-    _predicate_types[ typeID ] = klass
+    _predicate_types.append( ( typeID, klass ) )
+
+for klass in ( MajorMinorPredicate
+             , ExtensionPredicate
+             , MimeTypeRegexPredicate
+             , NameRegexPredicate
+             ):
+    registerPredicateType( klass.PREDICATE_TYPE, klass )
 
 
 class ContentTypeRegistry( SimpleItem ):
@@ -155,7 +296,7 @@ class ContentTypeRegistry( SimpleItem ):
 
     def __init__( self ):
         self.predicate_ids  = ()
-        self.predicates     = {}
+        self.predicates     = PersistentMapping()
 
     #
     #   ZMI
@@ -164,7 +305,7 @@ class ContentTypeRegistry( SimpleItem ):
     def listPredicateTypes( self ):
         """
         """
-        return _predicate_types.keys()
+        return map( lambda x: x[0], _predicate_types )
     
     security.declareProtected( ManagePortal, 'manage_predicates' )
     manage_predicates = DTMLFile( 'registryPredList', _dtmldir )
@@ -192,6 +333,38 @@ class ContentTypeRegistry( SimpleItem ):
         REQUEST[ 'RESPONSE' ].redirect( self.absolute_url()
                               + '/manage_predicates'
                               + '?manage_tabs_message=Predicate+updated.'
+                              )
+
+    security.declareProtected( ManagePortal, 'doMovePredicateUp' )
+    def doMovePredicateUp( self, predicate_id, REQUEST ):
+        """
+        """
+        predicate_ids = list( self.predicate_ids )
+        ndx = predicate_ids.index( predicate_id )
+        if ndx == 0:
+            msg = "Predicate+already+first."
+        else:
+            self.reorderPredicate( predicate_id, ndx - 1 )
+            msg = "Predicate+moved."
+        REQUEST[ 'RESPONSE' ].redirect( self.absolute_url()
+                              + '/manage_predicates'
+                              + '?manage_tabs_message=%s' % msg
+                              )
+
+    security.declareProtected( ManagePortal, 'doMovePredicateDown' )
+    def doMovePredicateDown( self, predicate_id, REQUEST ):
+        """
+        """
+        predicate_ids = list( self.predicate_ids )
+        ndx = predicate_ids.index( predicate_id )
+        if ndx == len( predicate_ids ) - 1:
+            msg = "Predicate+already+last."
+        else:
+            self.reorderPredicate( predicate_id, ndx + 1 )
+            msg = "Predicate+moved."
+        REQUEST[ 'RESPONSE' ].redirect( self.absolute_url()
+                              + '/manage_predicates'
+                              + '?manage_tabs_message=%s' % msg
                               )
 
     security.declareProtected( ManagePortal, 'doRemovePredicate' )
@@ -259,7 +432,14 @@ class ContentTypeRegistry( SimpleItem ):
         if predicate_id in self.predicate_ids:
             raise ValueError, "Existing predicate: %s" % predicate_id
 
-        klass = _predicate_types[ predicate_type ]
+        klass = None
+        for key, value in _predicate_types:
+            if key == predicate_type:
+                klass = value
+
+        if klass is None:
+            raise ValueError, "Unknown predicate type: %s" % predicate_type
+
         self.predicates[ predicate_id ] = ( klass( predicate_id ), None )
         self.predicate_ids = self.predicate_ids + ( predicate_id, )
 

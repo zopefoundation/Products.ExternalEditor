@@ -3,9 +3,11 @@
    provides input elements for a predicate which is based on regular
    expressions.
 </dtml-comment>
+<strong> Pattern: </strong
 <input type="hidden"
        name="predicate.id:record"
        value="&dtml-getId;">
 <input type="text"
        name="predicate.pattern:record"
        value="&dtml-getPatternStr;">
+<em> Enter a regular expression. </em>

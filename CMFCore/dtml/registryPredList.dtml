@@ -8,15 +8,19 @@
  <dtml-let item=sequence-item
            pred="item[0]"
            typName="item[1]"
+           predType="pred.getTypeLabel()"
  >
   <tr valign="top">
-   <th align="right"> &dtml-sequence-key;: <th>
+   <th align="left"> &dtml-sequence-key;
+                <br> [&dtml-predType;]:
+   <th>
    <td align="left">
     <form action="&dtml-absolute_url;">
      <dtml-with expr="pred">
       <dtml-var predicateWidget>
       <input type="hidden" name="predicate_id" value="&dtml-getId;">
      </dtml-with>
+   <br>
      <dtml-with portal_types>
      <select name="typeObjectName">
       <dtml-in listContentTypes>
@@ -30,6 +34,8 @@
      </dtml-with>
      <input type="submit" name="doUpdatePredicate:method" value=" Change ">
      <input type="submit" name="doRemovePredicate:method" value=" Delete ">
+     <input type="submit" name="doMovePredicateUp:method" value=" Up ">
+     <input type="submit" name="doMovePredicateDown:method" value=" Down ">
     </form>
    </td>
    <td> <br> </td>
