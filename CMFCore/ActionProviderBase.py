@@ -388,7 +388,7 @@ class OldstyleActionProviderBase:
         return self._actions or ()
 
     security.declarePrivate('getActionObject')
-    getActionObject = ActionProviderBase.getActionObject
+    getActionObject = ActionProviderBase.getActionObject.im_func
 
     security.declarePublic('listActionInfos')
     def listActionInfos(self, action_chain=None, object=None,
