@@ -9,19 +9,19 @@ Function: become_member_setup
 [HomePage]
 HTTP_Verb: GET
 HTTP_Version: HTTP/1.0
-URL: %(portal_url)s/%(site_path)s
+URL: %(site_host)s/%(site_path)s
 Expected_Result: 200
 
 [JoinForm]
 HTTP_Verb: GET
 HTTP_Version: HTTP/1.0
-URL: %(portal_url)s/%(site_path)s/join_form
+URL: %(site_host)s/%(site_path)s/join_form
 Expected_Result: 200
 
 [Join]
 HTTP_Verb: POST
 HTTP_Version: HTTP/1.0
-URL: %(portal_url)s/%(site_path)s/register
+URL: %(site_host)s/%(site_path)s/register
 Field_1: last_visit:date=2001/11/12 17:21:03.25675 US/Eastern
 Field_2: prev_visit:date=2001/11/12 17:21:03.25737 US/Eastern
 Field_3: username=test_user
