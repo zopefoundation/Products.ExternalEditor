@@ -8,7 +8,7 @@ script_path = join(skin_path_name,'test1.py')
 
 class FSPythonScriptTests( TestCase ):
 
-    def test_registerDirectory( self ):
+    def test_GetSize( self ):
         """ Test get_size returns correct value """
         script = FSPythonScript('test1', script_path)
         self.assertEqual(len(script.read()),script.get_size())
