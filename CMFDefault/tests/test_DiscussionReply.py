@@ -48,7 +48,7 @@ class DiscussionReplyTest(RequestTest):
 
     def testDiscussionReply(self):
         self.discussion.getDiscussionFor(self.portal.doc)
-        self.portal.doc.talkback.discussion_reply('Title', 'Text')
+        self.portal.doc.talkback.createReply('Title', 'Text')
         reply = self.portal.doc.talkback.objectValues()[0]
         self.assertEqual(reply.Title(), 'Title')
         self.assertEqual(reply.EditableBody(), 'Text')
