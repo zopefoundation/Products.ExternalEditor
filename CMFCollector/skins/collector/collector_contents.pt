@@ -233,14 +233,13 @@
               <select name="status:list:ignore_empty" multiple size="SIZE"
                     tal:define="values here/collector_issue_trim_states"
                     tal:attributes="size python: min(max(len(values), 3), 5)">
-                <span tal:repeat="status values">
-                  <option value=""
-                          tal:attributes="value status;
-                                          selected python: status
-                                                 in request.get('status', [])"
-                          tal:content="status">
-                  </option>
-                </span>
+                <option value=""
+                        tal:repeat="status values"
+                        tal:attributes="value status;
+                                        selected python: status
+                                               in request.get('status', [])"
+                        tal:content="status">
+                </option>
              </select>
             </td>
             <td align="center">
@@ -248,15 +247,14 @@
                       tal:define="values python: uniquevals('Creator')"
                       tal:attributes="size python: min(max(len(values), 3), 
                                                        5)">
-                <span tal:repeat="creator values">
-                  <option value=""
-                          tal:attributes="
-                              value creator;
-                              selected python: creator
-                                               in request.get('Creator', [])"
-                          tal:content="creator">
-                  </option>
-                </span>
+                <option value=""
+                        tal:repeat="creator values"
+                        tal:attributes="
+                            value creator;
+                            selected python: creator
+                                             in request.get('Creator', [])"
+                        tal:content="creator">
+                </option>
               </select>
             </td>
             <td align="center">
@@ -266,15 +264,14 @@
                                                  here.supporters)"
                       tal:attributes="size python: min(max(len(values), 3),
                                                        5)">
-                <span tal:repeat="supporter values">
-                  <option value=""
-                          tal:attributes="
-                              value supporter;
-                              selected python: supporter 
-                                       in request.get('supporters', [])"
-                          tal:content="supporter">
-                  </option>
-                </span>
+                <option value=""
+                        tal:repeat="supporter values"
+                        tal:attributes="
+                            value supporter;
+                            selected python: supporter 
+                                     in request.get('supporters', [])"
+                        tal:content="supporter">
+                </option>
               </select>
             </td>
             <td align="center">
@@ -302,15 +299,14 @@
                     tal:define="values python: ordered(uniquevals('topic'),
                                                        here.topics)"
                     tal:attributes="size python: min(max(len(values), 3), 5)">
-                <span tal:repeat="topic values">
-                  <option value=""
-                          tal:attributes="
-                              value topic;
-                              selected python: topic
-                                               in request.get('topics', [])"
-                          tal:content="topic">
-                  </option>
-                </span>
+                <option value=""
+                        tal:repeat="topic values"
+                        tal:attributes="
+                            value topic;
+                            selected python: topic
+                                             in request.get('topics', [])"
+                        tal:content="topic">
+                </option>
              </select>
             </td>
             <td align="center">
@@ -320,16 +316,15 @@
                                                  here.classifications)"
                       tal:attributes="size python: min(max(len(values), 3),
                                                        5)">
-                <span tal:repeat="classification values">
-                  <option value=""
-                          tal:attributes="
-                             value classification;
-                             selected python: classification
-                                              in request.get('classifications',
-                                                             [])"
-                          tal:content="classification">
-                  </option>
-                </span>
+                <option value=""
+                        tal:repeat="classification values"
+                        tal:attributes="
+                           value classification;
+                           selected python: classification
+                                            in request.get('classifications',
+                                                           [])"
+                        tal:content="classification">
+                </option>
               </select>
             </td>
             <td align="center">
@@ -339,16 +334,15 @@
                                                  here.importances)"
                       tal:attributes="size python: min(max(len(values), 3), 
                                                        5)">
-                <span tal:repeat="importance values">
-                  <option value=""
-                          tal:attributes="
-                              value importance;
-                              selected python: importance
-                                               in request.get('importances',
-                                                              [])"
-                          tal:content="importance">
-                  </option>
-                </span>
+                <option value=""
+                        tal:repeat="importance values"
+                        tal:attributes="
+                            value importance;
+                            selected python: importance
+                                             in request.get('importances',
+                                                            [])"
+                        tal:content="importance">
+                </option>
              </select>
           </td>
 

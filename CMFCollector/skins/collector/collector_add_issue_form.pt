@@ -160,11 +160,10 @@
            <select name="assignees:list" MULTIPLE size="5"
                    tal:attributes="size python:
                                         min(max(len(supporters), 3), 8)">
-             <span tal:repeat="supporter supporters">
-               <option tal:content="supporter">
-                 SUPPORTER
-               </option>
-             </span>
+             <option tal:repeat="supporter supporters"
+                      tal:content="supporter">
+               SUPPORTER
+             </option>
            </select>
          </td>
               
