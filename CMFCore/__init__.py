@@ -15,6 +15,8 @@
 $Id$
 """
 
+from sys import modules
+
 from AccessControl import allow_module
 
 import PortalObject, PortalContent, PortalFolder
@@ -24,6 +26,7 @@ import MemberDataTool, TypesTool
 import URLTool
 import DirectoryView, FSImage, FSFile, FSPropertiesObject
 import FSDTMLMethod, FSPythonScript, FSSTXMethod
+import FSPageTemplate
 import FSZSQLMethod
 import CookieCrumbler
 import ContentTypeRegistry
@@ -35,16 +38,9 @@ from CMFCorePermissions import AddPortalFolders
 
 allow_module('Products.CMFCore.CMFCoreExceptions')
 
-try:
-    import FSPageTemplate
-except ImportError:
-    HAS_PAGE_TEMPLATES = 0
-else:
-    HAS_PAGE_TEMPLATES = 1
-
-
 # Old name that some third-party packages may need.
 ADD_FOLDERS_PERMISSION = AddPortalFolders
+HAS_PAGE_TEMPLATES = 1
 
 bases = (
     PortalObject.PortalObjectBase,
@@ -66,9 +62,7 @@ tools = (
     URLTool.URLTool,
     )
 
-
-import sys
-this_module = sys.modules[ __name__ ]
+this_module = modules[ __name__ ]
 
 z_bases = utils.initializeBasesPhase1(bases, this_module)
 z_tool_bases = utils.initializeBasesPhase1(tools, this_module)
@@ -113,9 +107,6 @@ def initialize(context):
         icon = 'images/registry.gif'
         )
 
-    if HAS_PAGE_TEMPLATES:
-        utils.registerIcon(FSPageTemplate.FSPageTemplate,
-                        'images/fspt.gif', globals())
     utils.registerIcon(FSDTMLMethod.FSDTMLMethod,
                        'images/fsdtml.gif', globals())
     utils.registerIcon(FSPythonScript.FSPythonScript,
@@ -124,6 +115,8 @@ def initialize(context):
                        'images/fsimage.gif', globals())
     utils.registerIcon(FSFile.FSFile,
                        'images/fsfile.gif', globals())
+    utils.registerIcon(FSPageTemplate.FSPageTemplate,
+                       'images/fspt.gif', globals())
     utils.registerIcon(FSPropertiesObject.FSPropertiesObject,
                        'images/fsprops.gif', globals())
     utils.registerIcon(FSZSQLMethod.FSZSQLMethod,
@@ -133,11 +126,8 @@ def initialize(context):
     utils.registerIcon(TypesTool.ScriptableTypeInformation,
                        'images/typeinfo.gif', globals())
 
-    try:
-        context.registerHelpTitle( 'CMF Core Help' )
-        context.registerHelp(directory='interfaces')
-    except: # AARGH!!
-        pass
+    context.registerHelpTitle('CMF Core Help')
+    context.registerHelp(directory='interfaces')
 
     utils.ToolInit( 'CMF Core Tool'
                   , tools=tools

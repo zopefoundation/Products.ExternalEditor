@@ -18,7 +18,9 @@ $Id$
 import Globals
 from AccessControl import ClassSecurityInfo, getSecurityManager
 from OFS.DTMLMethod import DTMLMethod, decapitate, guess_content_type
+from AccessControl.DTML import RestrictedDTML
 from AccessControl.Role import RoleManager
+from OFS.Cache import Cacheable
 
 from utils import _dtmldir
 from CMFCorePermissions import FTPAccess
@@ -27,15 +29,9 @@ from CMFCorePermissions import ViewManagementScreens
 from DirectoryView import registerFileExtension, registerMetaType, expandpath
 from FSObject import FSObject
 
-try:
-    # Zope 2.4.x
-    from AccessControl.DTML import RestrictedDTML
-except ImportError:
-    class RestrictedDTML: pass
-
-from OFS.Cache import Cacheable
 
 _marker = []  # Create a new marker object.
+
 
 class FSDTMLMethod(RestrictedDTML, RoleManager, FSObject, Globals.HTML):
     """FSDTMLMethods act like DTML methods but are not directly
@@ -128,14 +124,14 @@ class FSDTMLMethod(RestrictedDTML, RoleManager, FSObject, Globals.HTML):
         
             if client is None:
                 # Called as subtemplate, so don't need error propagation!
-                r=apply(Globals.HTML.__call__, (self, client, REQUEST), kw)
+                r = Globals.HTML.__call__(self, client, REQUEST, **kw)
                 if RESPONSE is None: result = r
                 else: result = decapitate(r, RESPONSE)
                 if not self._cache_namespace_keys:
                     self.ZCacheable_set(result)
                 return result
 
-            r=apply(Globals.HTML.__call__, (self, client, REQUEST), kw)
+            r = Globals.HTML.__call__(self, client, REQUEST, **kw)
             if type(r) is not type('') or RESPONSE is None:
                 if not self._cache_namespace_keys:
                     self.ZCacheable_set(r)

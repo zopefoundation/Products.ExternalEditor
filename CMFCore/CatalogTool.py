@@ -20,6 +20,7 @@ from Globals import InitializeClass, package_home, DTMLFile
 from DateTime import DateTime
 from AccessControl.PermissionRole import rolesForPermissionOn
 from AccessControl import ClassSecurityInfo
+
 from utils import _checkPermission
 from utils import _dtmldir
 from utils import _getAuthenticatedUser
@@ -154,30 +155,17 @@ class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
                )
 
     def _initIndexes(self):
-        base = aq_base(self)
-        if hasattr(base, 'addIndex'):
-            # Zope 2.4
-            addIndex = self.addIndex
-        else:
-            # Zope 2.3 and below
-            addIndex = self._catalog.addIndex
-        if hasattr(base, 'addColumn'):
-            # Zope 2.4
-            addColumn = self.addColumn
-        else:
-            # Zope 2.3 and below
-            addColumn = self._catalog.addColumn
 
         # Content indexes
         self._catalog.indexes.clear()
         for index_name, index_type in self.enumerateIndexes():
-            addIndex( index_name, index_type )
+            self.addIndex(index_name, index_type)
 
         # Cached metadata
         self._catalog.names = ()
         self._catalog.schema.clear()
         for column_name in self.enumerateColumns():
-            addColumn( column_name )
+            self.addColumn(column_name)
 
     #
     #   ZMI methods
@@ -205,17 +193,11 @@ class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
         kw[ 'allowedRolesAndUsers' ] = self._listAllowedRolesAndUsers( user )
 
         if not _checkPermission( AccessInactivePortalContent, self ):
-            base = aq_base( self )
             now = DateTime()
-            if hasattr( base, 'addIndex' ):   # Zope 2.4 and above
-                kw[ 'effective' ] = { 'query' : now, 'range' : 'max' }
-                kw[ 'expires'   ] = { 'query' : now, 'range' : 'min' }
-            else:                             # Zope 2.3
-                kw[ 'effective'      ] = kw[ 'expires' ] = now
-                kw[ 'effective_usage'] = 'range:max'
-                kw[ 'expires_usage'  ] = 'range:min'
+            kw['effective'] = {'query': now, 'range': 'max'}
+            kw['expires'] = {'query': now, 'range': 'min'}
 
-        return apply(ZCatalog.searchResults, (self, REQUEST), kw)
+        return ZCatalog.searchResults(self, REQUEST, **kw)
 
     __call__ = searchResults
 
