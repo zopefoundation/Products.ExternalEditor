@@ -73,7 +73,7 @@ def importToolset( context ):
     setup_tool = getToolByName( site, 'portal_setup' )
     toolset = setup_tool.getToolsetRegistry()
 
-    toolset.parseXML( text )
+    toolset.parseXML(text, encoding)
 
     existing_ids = site.objectIds()
     existing_values = site.objectValues()

@@ -62,10 +62,10 @@ def importTypesTool( context ):
     configurator = TypeInfoConfigurator( site )
     text = context.readDataFile( _TOOL_FILENAME )
 
-    for type_id, type_filename in configurator.parseToolXML( text ):
+    for type_id, type_filename in configurator.parseToolXML(text, encoding):
 
         text = context.readDataFile( type_filename )
-        info_list = configurator.parseTypeXML( text )
+        info_list = configurator.parseTypeXML(text, encoding)
 
         for info in info_list:
 

@@ -106,7 +106,7 @@ def importWorkflowTool( context ):
                 , worklists
                 , permissions
                 , scripts
-                ) = wtc.parseWorkflowXML( wf_text )
+                ) = wtc.parseWorkflowXML(wf_text, encoding)
 
                 workflow_id = str( workflow_id ) # No unicode!
 

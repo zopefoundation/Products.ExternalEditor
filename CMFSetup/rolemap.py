@@ -61,6 +61,7 @@ def importRolemap( context ):
 
     """
     site = context.getSite()
+    encoding = context.getEncoding()
 
     if context.shouldPurge():
 
@@ -79,7 +80,7 @@ def importRolemap( context ):
     if text is not None:
 
         rc = RolemapConfigurator( site ).__of__( site )
-        roles, permissions = rc.parseXML( text )
+        roles, permissions = rc.parseXML(text, encoding)
 
         immediate_roles = list( getattr( site, '__ac_roles__', [] ) )[:]
         already = {}
