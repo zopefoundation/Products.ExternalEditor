@@ -31,6 +31,9 @@ from Products.CMFCore.tests.base.dummy import DummySite
 from Products.CMFCore.CatalogTool import CatalogTool
 
 from Products.CMFUid.interfaces import IUniqueIdHandler
+from Products.CMFUid.interfaces import IUniqueIdBrainQuery
+from Products.CMFUid.interfaces import IUniqueIdUnrestrictedQuery
+
 from Products.CMFUid.UniqueIdGeneratorTool import UniqueIdGeneratorTool
 from Products.CMFUid.UniqueIdAnnotationTool import UniqueIdAnnotationTool
 from Products.CMFUid.UniqueIdHandlerTool import UniqueIdHandlerTool
@@ -56,6 +59,8 @@ class UniqueIdHandlerTests(SecurityTest):
     def test_interface(self):
         handler = self.root.portal_uidhandler
         verifyObject(IUniqueIdHandler, handler)
+        verifyObject(IUniqueIdBrainQuery, handler)
+        verifyObject(IUniqueIdUnrestrictedQuery, handler)
     
     def test_getUidOfNotYetRegisteredObject(self):
         handler = self.root.portal_uidhandler
@@ -72,10 +77,14 @@ class UniqueIdHandlerTests(SecurityTest):
         
         self.assertEqual(handler.queryObject(100, None), None)
         self.assertRaises(UniqueIdError, handler.getObject, 100)
+        self.assertEqual(handler.unrestrictedQueryObject(100, None), None)
+        self.assertRaises(UniqueIdError, handler.unrestrictedGetObject, 100)
     
         uid = handler.register(dummy)
         self.assertEqual(handler.queryObject(uid+1, None), None)
         self.assertRaises(UniqueIdError, handler.getObject, uid+1)
+        self.assertEqual(handler.unrestrictedQueryObject(uid+1, None), None)
+        self.assertRaises(UniqueIdError, handler.unrestrictedGetObject, uid+1)
     
     def test_getUidOfRegisteredObject(self):
         handler = self.root.portal_uidhandler
@@ -90,6 +99,7 @@ class UniqueIdHandlerTests(SecurityTest):
         
         uid = handler.register(dummy)
         self.assertEqual(handler.getObject(uid), dummy)
+        self.assertEqual(handler.unrestrictedGetObject(uid), dummy)
     
     def test_getUnregisteredObject(self):
         handler = self.root.portal_uidhandler
@@ -100,6 +110,8 @@ class UniqueIdHandlerTests(SecurityTest):
         handler.unregister(dummy)
         self.assertEqual(handler.queryObject(uid, None), None)
         self.assertRaises(UniqueIdError, handler.getObject, uid)
+        self.assertEqual(handler.unrestrictedQueryObject(uid, None), None)
+        self.assertRaises(UniqueIdError, handler.unrestrictedGetObject, uid)
 
     def test_getUidOfUnregisteredObject(self):
         handler = self.root.portal_uidhandler
