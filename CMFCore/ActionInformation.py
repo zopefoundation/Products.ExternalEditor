@@ -201,7 +201,7 @@ def getOAI(context, object=None):
         cache = request.get('_oai_cache', None)
         if cache is None:
             request['_oai_cache'] = cache = {}
-        info = cache.get( str(object), None )
+        info = cache.get( id(object), None )
     else:
         info = None
     if info is None:
@@ -219,7 +219,7 @@ def getOAI(context, object=None):
                     folder = aq_parent(aq_inner(folder))
         info = oai(context, folder, object)
         if request:
-            cache[ str(object) ] = info
+            cache[ id(object) ] = info
     return info
 
 
