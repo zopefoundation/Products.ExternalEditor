@@ -302,6 +302,7 @@ class DiscussionItemContainer( Persistent, Implicit, Traversable ):
         item.__of__(self).indexObject()
 
         item.setReplyTo( self._getDiscussable() )
+        item.__of__(self).notifyWorkflowCreated()
 
         self._container[ id ] = item
 
