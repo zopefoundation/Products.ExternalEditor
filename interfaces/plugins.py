@@ -82,7 +82,9 @@ class IAuthenticationPlugin( Interface ):
         o 'credentials' will be a mapping, as returned by IExtractionPlugin.
 
         o Return a  tuple consisting of user ID (which may be different 
-          from the login name) and login or None
+          from the login name) and login
+
+        o If the credentials cannot be authenticated, return None.
         """
 
 class IChallengePlugin( Interface ):
