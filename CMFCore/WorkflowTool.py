@@ -94,7 +94,7 @@ from utils import UniqueObject, _checkPermission, getToolByName, _dtmldir
 from OFS.Folder import Folder
 from Globals import InitializeClass, PersistentMapping, DTMLFile
 from AccessControl import ClassSecurityInfo
-from Acquisition import aq_base
+from Acquisition import aq_base, aq_inner, aq_parent
 from WorkflowCore import WorkflowException
 import CMFCorePermissions
 from string import join, split, replace, strip
@@ -157,21 +157,19 @@ class WorkflowTool (UniqueObject, Folder):
         Form for adding workflows.
         '''
         wft = []
-        for mt, klass in _workflow_classes.items():
-            wft.append((mt, '%s (%s)' % (klass.id, klass.title)))
+        for key in _workflow_factories.keys():
+            wft.append(key)
         wft.sort()
         return self._manage_addWorkflowForm(REQUEST, workflow_types=wft)
 
     security.declareProtected( CMFCorePermissions.ManagePortal
                              , 'manage_addWorkflow')
-    def manage_addWorkflow(self, workflow_type, id='', RESPONSE=None):
+    def manage_addWorkflow(self, workflow_type, id, RESPONSE=None):
         '''
         Adds a workflow from the registered types.
         '''
-        klass = _workflow_classes[workflow_type]
-        if not id:
-            id = klass.id
-        ob = klass(id)
+        factory = _workflow_factories[workflow_type]
+        ob = factory(id)
         self._setObject(id, ob)
         if RESPONSE is not None:
             RESPONSE.redirect(self.absolute_url() +
@@ -179,9 +177,10 @@ class WorkflowTool (UniqueObject, Folder):
 
     def all_meta_types(self):
         mt = WorkflowTool.inheritedAttribute('all_meta_types')(self)
-        return mt + ({'name': 'Workflow',
-                      'action': 'manage_addWorkflowForm',
-                      'permission': CMFCorePermissions.ManagePortal },)
+        return tuple(mt) + (
+            {'name': 'Workflow',
+             'action': 'manage_addWorkflowForm',
+             'permission': CMFCorePermissions.ManagePortal },)
 
     def _listTypeInfo(self):
         pt = getToolByName(self, 'portal_types', None)
@@ -264,6 +263,48 @@ class WorkflowTool (UniqueObject, Folder):
         if REQUEST is not None:
             return self.manage_selectWorkflows(REQUEST, manage_tabs_message=
                                                'Changed.')
+
+    security.declareProtected(CMFCorePermissions.ManagePortal,
+                              'updateRoleMappings')
+    def updateRoleMappings(self, REQUEST=None):
+        '''
+        '''
+        wfs = {}
+        for id in self.objectIds():
+            wf = self.getWorkflowById(id)
+            if hasattr(aq_base(wf), 'updateRoleMappingsFor'):
+                wfs[id] = wf
+        portal = aq_parent(aq_inner(self))
+        count = self._recursiveUpdateRoleMappings(portal, wfs)
+        if REQUEST is not None:
+            return self.manage_selectWorkflows(REQUEST, manage_tabs_message=
+                                               '%d object(s) updated.' % count)
+        else:
+            return count
+
+    def _recursiveUpdateRoleMappings(self, ob, wfs):
+        # Returns a count of updated objects.
+        count = 0
+        wf_ids = self.getChainFor(ob)
+        if wf_ids:
+            changed = 0
+            for wf_id in wf_ids:
+                wf = wfs.get(wf_id, None)
+                if wf is not None:
+                    did = wf.updateRoleMappingsFor(ob)
+                    if did: changed = 1
+            if changed:
+                count = count + 1
+        if hasattr(aq_base(ob), 'objectItems'):
+            obs = ob.objectItems()
+            if obs:
+                for k, v in obs:
+                    changed = getattr(v, '_p_changed', 0)
+                    count = count + self._recursiveUpdateRoleMappings(v, wfs)
+                    if changed is None:
+                        # Re-ghostify.
+                        v._p_deactivate()
+        return count
 
     security.declarePrivate('getWorkflowById')
     def getWorkflowById(self, wf_id):
@@ -576,10 +617,18 @@ class WorkflowTool (UniqueObject, Folder):
 InitializeClass(WorkflowTool)
 
 
-_workflow_classes = {}
+_workflow_factories = {}
 
-def addWorkflowClass(klass):
-    # klass is expected to have id, title, and meta_type attributes.
-    # Its constructor should take one argument, id.
-    id = getattr(klass, 'id', None) or klass.meta_type
-    _workflow_classes[id] = klass
+def addWorkflowFactory(factory, id=None, title=None):
+    # The factory should take one argument, id.
+    if id is None:
+        id = getattr(factory, 'id', '') or getattr(factory, 'meta_type', '')
+    if title is None:
+        title = getattr(factory, 'title', '')
+    key = id
+    if title:
+        key = key + ' (%s)' % title
+    _workflow_factories[key] = factory
+
+addWorkflowClass = addWorkflowFactory  # bw compat.
+
