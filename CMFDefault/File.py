@@ -234,7 +234,7 @@ class File( OFS.Image.File
     def edit(self, precondition='', file=''):
         """ Perform changes for user """
         if precondition: self.precondition = precondition
-        elif precondition: del self.precondition
+        elif self.precondition: del self.precondition
 
         if self._isNotEmpty(file):
             self.manage_upload(file)
