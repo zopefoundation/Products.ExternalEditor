@@ -48,7 +48,7 @@ Installing CMFCollector
     steps it took to register and install the CMF Events into the CMF
     Site instance.
 
-  - Finally, install the workflow:
+  - Install the workflow:
 
      1. Put collector_issue_workflow.zexp in your site's import/
         directory.
@@ -67,4 +67,9 @@ Installing CMFCollector
 
         ... and hit the "Change" button.
 
-   Then the workflow will be associated with any new issues you create.
+    Then the workflow will be associated with any new issues you create.
+
+  - Add a Collector to your site:
+
+    Go to your site's interface, and add a Collector as you would any
+    other piece of content.
