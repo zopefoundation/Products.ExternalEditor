@@ -1,217 +1,85 @@
-<tal:x define="dummy here/filterCookie;"/>
-<html xmlns:tal="http://xml.zope.org/namespaces/tal"
-      xmlns:metal="http://xml.zope.org/namespaces/metal"
-      metal:use-macro="here/main_template/macros/master"
->
+<tal:page
+   xmlns:tal="http://xml.zope.org/namespaces/tal"
+   xmlns:metal="http://xml.zope.org/namespaces/metal"
+   xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+   tal:define="control python: here.folder_contents_control(**request.form)"
+   tal:condition="control"
+><html metal:use-macro="here/main_template/macros/master">
 <body>
-<div metal:fill-slot="main"
-     tal:define="m_tool here/portal_membership;
-                 checkPerm nocall: m_tool/checkPermission;
-                 list_here python:checkPerm('List folder contents', here);
-                 list_parent python:checkPerm( 'List folder contents', here
-                                             , 'aq_parent' );
-                "
-     i18n:domain="cmf_default"
->
-<div tal:condition="not: list_here"
-      tal:define="response request/RESPONSE;
-                  url here/absolute_url;
-                 "
- >
-  <span tal:define="redirect python: response.redirect( url )"></span>
-</div>
 
-<!-- This is the desktop area -->
+<metal:block metal:fill-slot="main" i18n:domain="cmf_default"
+   tal:define="batch control/batch;
+               form control/form;
+               up control/up">
 <div class="Desktop">
 
 <h1 i18n:translate="">Desktop</h1>
 
-<form action="" method="post"
-      tal:attributes="action here/absolute_url">
- <table class="FormLayout">
+<tal:case tal:condition="up"
+><tal:case tal:condition="up/url"
+ ><a href="" tal:attributes="href up/url"
+  ><img src="" alt="[Link]" border="0" tal:attributes="src up/icon"
+      i18n:attributes="alt" /></a>
+  <tal:span i18n:translate="">Up to</tal:span>
+  <a href="" tal:attributes="href up/url" tal:content="up/id">ID</a></tal:case
+><tal:case tal:condition="not: up/url"
+ ><span class="mild" i18n:translate="">Root</span></tal:case></tal:case>
+
+<form action="folder_contents" method="post"
+   tal:attributes="action control/form/action">
+ <table class="ContentsList" tal:condition="batch/listItemInfos1">
   <tr>
-   <td valign="top">
-    <table class="ContentsList">
-     <!-- Navigate to parent -->
-     <tbody tal:condition="list_parent">
-      <tr valign="top"
-          tal:define="upNav python: hasattr(here.aq_parent, 'portal_url');
-                      upID python: here.aq_parent.getId()">
-        <td colspan="3" align="left">
-         <span tal:condition="upNav | nothing">
-          <a href="../folder_contents"
-          ><img src="" alt="[Link]" border="0"
-                tal:attributes="src string:${here/portal_url}/UpFolder_icon.gif"
-          /></a>
-         </span>&nbsp;&nbsp;
-         <span tal:condition="upNav">
-          <span tal:omit-tag="" i18n:translate="">Up to</span>
-          <a href="../folder_contents"
-                   tal:content="upID">Up ID</a>
-         </span>
-         <span tal:condition="python: not(upNav)">
-           <span class="mild" i18n:translate="">Root</span>
-         </span>
-        </td>
-      </tr>
-     </tbody>
-     <!-- This row holds the "two column list" -->
-     <tr tal:define="global b_start string:0;
-                     b_start request/b_start | b_start;
-                     filterString python: request.get('folderfilter', '');
-                     filter python: here.decodeFolderFilter(filterString);
-                     items python: here.listFolderContents(
-                                                contentFilter=filter);
-                     Batch nocall: modules/ZTUtils/Batch;
-                     global batch1 python:Batch( items, 20, int(b_start)
-                                              , orphan=0);
-                     global batch2 batch1/next;
-                    "
-     >
-      <!-- First column, first half batch in 'batch1'. -->
-      <td colspan="1" align="left" width="49%">
-       <table>
-        <tr valign="top" tal:repeat="item batch1">
-         <td width="5"
-             tal:define="folderish item/isPrincipiaFolderish;
-                         portalish item/isPortalContent | nothing;
-                         global methodID python:( folderish
-                                              and 'folder_contents'
-                                               or (portalish and 'view' or '')
-                                                );
-                         global icon item/getIcon | item/icon | nothing
-                        ">
-            <input type="checkbox" name="ids:list" value="" id=""
-                   tal:attributes="value item/getId;
-                                   id python: 'cb_' + item.getId()" />
-         </td>
-         <td>
-          <span tal:condition="icon">
-           <a href=""
-              tal:attributes="href string:${item/getId}/${methodID};
-                             "
-           ><img src="" alt="" border="0"
-                 tal:attributes="src string:${here/portal_url}/${icon};
-                                 alt item/Type|nothing;"
-                 i18n:attributes="alt" /></a>
-          </span>
-         </td>
-         <td>
-          <a href=""
-             tal:attributes="href string:${item/getId}/${methodID};
-                            "
-          ><span tal:replace="item/getId">ID</span>
-           <span tal:condition="item/Title"
-                 tal:replace="string:(${item/Title})">(Title)</span></a>
-         </td>
-        </tr>
-       </table>
-      </td>
-      <!-- Spacer column. -->
-      <td width="2%">&nbsp;</td>
-      <!-- Second column, second half batch in 'batch2'. -->
-      <td colspan="1" width="49%">
-       <table>
-        <tr valign="top" tal:repeat="item batch2">
-         <td width="5"
-             tal:define="folderish item/isPrincipiaFolderish;
-                         portalish item/isPortalContent | nothing;
-                         global methodID python:( folderish
-                                              and 'folder_contents'
-                                               or (portalish and 'view' or '')
-                                                );
-                         global icon item/getIcon | item/icon | nothing
-                        ">
-            <input type="checkbox" name="ids:list" value="" id=""
-                   tal:attributes="value item/getId;
-                                   id python: 'cb_' + item.getId()" />
-         </td>
-         <td>
-          <span tal:condition="icon">
-           <a href=""
-              tal:attributes="href string:${item/getId}/${methodID};
-                             "
-           ><img src="" alt="" border="0"
-                 tal:attributes="src string:${here/portal_url}/${icon};
-                                 alt item/Type|nothing;"
-                 i18n:attributes="alt" /></a>
-          </span>
-         </td>
-         <td>
-          <a href=""
-             tal:attributes="href string:${item/getId}/${methodID};
-                            "
-          ><span tal:replace="item/getId">ID</span>
-           <span tal:condition="item/Title"
-                 tal:replace="string:(${item/Title})">(Title)</span></a>
-         </td>
-        </tr>
-       </table>
-      </td>
-
-     </tr>
-
-     <tr>
-      <td align="left">
-       <span tal:define="p batch1/previous" tal:condition="p">
-        <a href=""
-           tal:attributes="
-                href string:folder_contents?b_start=${p/previous/first}"
-           i18n:translate=""
-        >Previous Items</a>
-       </span>
-      </td>
-      <td>&nbsp;</td>
-      <td align="right">
-       <span tal:define="n batch2/next | nothing" tal:condition="n">
-        <a href=""
-           tal:attributes="
-                href string:folder_contents?b_start=${batch2/end}"
-           i18n:translate=""
-        >Next Items</a>
-       </span>
-      </td>
-     </tr>
-    <!-- end contentList -->
-    </table>
-
-    <table border="0" cellspacing="0" cellpadding="2">
-     <tr>
-      <td align="left" valign="top" width="16"></td>
-      <td align="left" valign="top">
-      <span tal:condition="python: checkPerm('Add portal content', here)
-                                   and here.allowedContentTypes()">
-        <input type="submit" name="folder_factories:method" value="New..."
-               i18n:attributes="value" />
-      </span>
-      <span tal:condition="python: checkPerm('View management screens', here)">
-        <input type="submit" name="folder_rename_form:method" value="Rename"
-               i18n:attributes="value" />
-        <input type="submit" name="folder_cut:method" value="Cut"
-               i18n:attributes="value" />
-        <input type="submit" name="folder_copy:method" value="Copy"
-               i18n:attributes="value" />
-        <span tal:condition="here/cb_dataValid">
-        <input type="submit" name="folder_paste:method" value="Paste"
-               i18n:attributes="value" />
-        </span>
-      </span>
-      <span tal:condition="python: checkPerm('Delete objects', here)">
-        <input type="submit" name="folder_delete:method" value="Delete"
-               i18n:attributes="value" />
-      </span>
-      </td>
+   <td width="49%">
+    <table>
+     <tr tal:repeat="item batch/listItemInfos1">
+      <td width="5"
+      ><input type="checkbox" name="ids:tuple" value="" id=""
+          tal:attributes="value item/id; id item/checkbox"
+          tal:condition="item/checkbox" /></td>
+      <td
+      ><a href="" tal:attributes="href item/url" tal:condition="item/icon"
+       ><img src="" alt="" border="0"
+           tal:attributes="src item/icon; alt item/type"
+           i18n:attributes="alt" /></a></td>
+      <td
+      ><a href="" tal:attributes="href item/url"
+       ><tal:span tal:content="item/id">ID</tal:span>
+        <tal:case tal:condition="item/title"
+           tal:content="string:(${item/title})">(Title)</tal:case></a></td>
      </tr>
     </table>
-
+   </td>
+   <td width="2%">&nbsp;</td>
+   <td width="49%" tal:condition="batch/listItemInfos2">
+    <table>
+     <tr tal:repeat="item batch/listItemInfos2">
+      <td width="5"
+      ><input type="checkbox" name="ids:tuple" value="" id=""
+          tal:attributes="value item/id; id item/checkbox"
+          tal:condition="item/checkbox" /></td>
+      <td
+      ><a href="" tal:attributes="href item/url" tal:condition="item/icon"
+       ><img src="" alt="" border="0"
+           tal:attributes="src item/icon; alt item/type"
+           i18n:attributes="alt" /></a></td>
+      <td
+      ><a href="" tal:attributes="href item/url"
+       ><tal:span tal:content="item/id">ID</tal:span>
+        <tal:case tal:condition="item/title"
+           tal:content="string:(${item/title})">(Title)</tal:case></a></td>
+     </tr>
+    </table>
    </td>
   </tr>
  </table>
+ <metal:block metal:use-macro="here/batch_widgets/macros/navigation" />
+ <metal:block metal:use-macro="here/form_widgets/macros/buttons" />
 </form>
 
 <div tal:replace="structure here/folder_filter_form">Filter Form Here</div>
 
 </div>
-</div>
+</metal:block>
+
 </body>
-</html>
+</html></tal:page>
