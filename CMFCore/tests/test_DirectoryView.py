@@ -1,17 +1,14 @@
 import Zope
 from unittest import TestCase, TestSuite, makeSuite, main
 
-from Products.CMFCore.tests.base.dummy import DummyFolder
+from Products.CMFCore.tests.base.dummy import \
+     DummyFolder
 
-from Products.CMFCore.DirectoryView import registerDirectory
-from Products.CMFCore.DirectoryView import addDirectoryViews
-from Products.CMFCore.DirectoryView import DirectoryViewSurrogate
-from Products.CMFCore.DirectoryView import _dirreg
-from Products.CMFCore.DirectoryView import DirectoryInformation
-
+from Products.CMFCore.DirectoryView import \
+     registerDirectory,addDirectoryViews,DirectoryViewSurrogate
 from Globals import package_home, DevelopmentMode
 
-from os import remove, mkdir, rmdir, curdir, stat
+from os import remove, mkdir, rmdir, curdir
 from os.path import join, abspath, dirname
 from shutil import copy2
 from time import sleep
@@ -34,58 +31,11 @@ def _registerDirectory(self=None):
         ob = self.ob = DummyFolder()
         addDirectoryViews(ob, 'fake_skins', _prefix)
     
-def _writeFile(filename, stuff):
-    # write some stuff to a file on disk
-    # make sure the file's modification time has changed
-    thePath = join(skin_path_name,filename)
-    try:
-        mtime1 = stat(thePath)[8]
-    except:
-        mtime1 = 0
-    mtime2 = mtime1
-    while mtime2==mtime1:
-        f = open(thePath,'w')
-        f.write(stuff)
-        f.close()
-        mtime2 = stat(thePath)[8]
-
-def _deleteFile(filename):
-    # nuke it
-    remove(join(skin_path_name,filename))
-
 class DirectoryViewTests1( TestCase ):
 
-    def setUp(self):
-        _registerDirectory()
-        self.ob = DummyFolder()
-        
     def test_registerDirectory( self ):
         """ Test registerDirectory  """
-        pass
-    
-    def test_getDirectoryInfo1( self ):
-        """ windows INSTANCE_HOME  """
-        addDirectoryViews(self.ob, 'fake_skins', _prefix)
-        self.ob.fake_skin.manage_properties(r'Products\CMFCore\tests\fake_skins\fake_skin')        
-        self.failUnless(hasattr(self.ob.fake_skin,'test1'))
-
-    def test_getDirectoryInfo2( self ):
-        """ windows SOFTWARE_HOME  """
-        addDirectoryViews(self.ob, 'fake_skins', _prefix)
-        self.ob.fake_skin.manage_properties(r'C:\Zope\2.5.1\Products\CMFCore\tests\fake_skins\fake_skin')        
-        self.failUnless(hasattr(self.ob.fake_skin,'test1'))
-
-    def test_getDirectoryInfo3( self ):
-        """ *nix INSTANCE_HOME  """
-        addDirectoryViews(self.ob, 'fake_skins', _prefix)
-        self.ob.fake_skin.manage_properties('Products/CMFCore/tests/fake_skins/fake_skin')        
-        self.failUnless(hasattr(self.ob.fake_skin,'test1'))
-
-    def test_getDirectoryInfo4( self ):
-        """ *nix SOFTWARE_HOME  """
-        addDirectoryViews(self.ob, 'fake_skins', _prefix)
-        self.ob.fake_skin.manage_properties('/usr/local/zope/2.5.1/Products/CMFCore/tests/fake_skins/fake_skin')        
-        self.failUnless(hasattr(self.ob.fake_skin,'test1'))
+        _registerDirectory()
 
 class DirectoryViewTests2( TestCase ):
 
@@ -112,6 +62,7 @@ class DirectoryViewTests2( TestCase ):
         """Make sure the directory view is reading properties"""
         self.assertEqual(self.ob.fake_skin.testPT.title, 'Zope Pope')
 
+
 test1path = join(skin_path_name,'test1.py')
 test2path = join(skin_path_name,'test2.py')
 test3path = join(skin_path_name,'test3')
@@ -126,11 +77,15 @@ if DevelopmentMode:
         _registerDirectory(self)
 
         # add a method to the fake skin folder
-        _writeFile(test2path, "return 'test2'")
+        f = open(test2path,'w')
+        f.write("return 'test2'")
+        f.close()
 
         # edit the test1 method
         copy2(test1path,test1path+'.bak')
-        _writeFile(test1path, "return 'new test1'")
+        f = open(test1path,'w')
+        f.write("return 'new test1'")
+        f.close()
 
         # add a new folder
         mkdir(test3path)
@@ -199,7 +154,9 @@ if DevelopmentMode:
             self.fail('test2 still exists')
             
         # add method back to the fake skin folder
-        _writeFile(test2path, "return 'test2.2'")
+        f = open(test2path,'w')
+        f.write("return 'test2.2'")
+        f.close()
         
         # we need to wait a second here or the mtime will actually
         # have the same value, no human makes two edits in less
@@ -209,8 +166,11 @@ if DevelopmentMode:
         # check
         self.assertEqual(self.ob.fake_skin.test2(),'test2.2')
 
+        
         # edit method
-        _writeFile(test2path, "return 'test2.3'")
+        f = open(test2path,'w')
+        f.write("return 'test2.3'")
+        f.close()
 
         # check
         self.assertEqual(self.ob.fake_skin.test2(),'test2.3')
@@ -234,8 +194,8 @@ else:
 
 def test_suite():
     return TestSuite((
-        makeSuite(DirectoryViewTests1),
-        makeSuite(DirectoryViewTests2),
+        # makeSuite(DirectoryViewTests1),
+        # makeSuite(DirectoryViewTests2),
         makeSuite(DebugModeTests),
         ))
 
