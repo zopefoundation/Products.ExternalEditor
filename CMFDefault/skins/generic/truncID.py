@@ -1,12 +1,12 @@
-## Script (Python) "unauthRedirect.py $Revision$"
+## Script (Python) "truncID.py $Revision$"
 ##bind context=context
 ##bind namespace=
 ##bind script=script
 ##bind subpath=traverse_subpath
-##parameters=objID
+##parameters=objID, size 
 ##title=return truncated objID
 ##
-if len(objID) > 15:
-    return objID[:15] + '...'
+if len(objID) > size:
+    return objID[:size] + '...'
 else:
    return objID
