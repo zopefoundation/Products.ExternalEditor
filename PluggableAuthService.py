@@ -1098,7 +1098,6 @@ class PluggableAuthService( Folder ):
         resp = req['RESPONSE']
         resp.exception = self.exception
         resp._unauthorized = self._unauthorized
-        return
 
     #
     # Response overrides
