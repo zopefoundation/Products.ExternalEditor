@@ -422,4 +422,4 @@ And [these words] should be linked, too.
 
     grandparent = FakeParent( None, WikiName = 0 )
 #    print translate_WMML( FakeParent( grandparent, id = 'parent' ), testString )
-    print translate_WMML( testString )
+#    print translate_WMML( testString )
