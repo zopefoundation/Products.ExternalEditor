@@ -8,7 +8,7 @@
                   new_id="'fav_' + _.str(_.int(ZopeTime()))"
                  favPath="favorite[_.len(SERVER_URL):]"
                   favObj="restrictedTraverse(favPath)">
-    <dtml-call expr="targetFolder.addFavorite(id=new_id, title=favObj.title, remote_url=favPath)">
+    <dtml-call expr="targetFolder.invokeFactory('Favorite', id=new_id, title=favObj.title, remote_url=favPath)">
 
   </dtml-let>
 
