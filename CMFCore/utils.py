@@ -607,7 +607,7 @@ def keywordsplitter( headers
 #
 security.declarePublic('normalize')
 def normalize(p):
-    return os_path.abspath(os_path.normcase(os_path.normpath(p.replace('\\','/'))))
+    return os_path.normcase(os_path.normpath(p.replace('\\','/')))
 
 normINSTANCE_HOME = normalize(INSTANCE_HOME)
 normSOFTWARE_HOME = normalize(SOFTWARE_HOME)
