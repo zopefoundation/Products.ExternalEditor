@@ -275,7 +275,7 @@ class ExternalEditor:
                                'Enter the command to launch the default editor')
             if not editor: 
                 sys.exit(0)
-            self.config.set('general', 'editor', path)
+            self.config.set('general', 'editor', editor)
             self.config.save()
 
         if editor is not None:            
