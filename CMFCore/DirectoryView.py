@@ -286,7 +286,9 @@ class DirectoryRegistry:
         return self._directories.get(filepath, None)
 
     def listDirectories(self):
-        return self._directories.keys()
+        dirs = self._directories.keys()
+        dirs.sort()
+        return dirs
         
 
 _dirreg = DirectoryRegistry()
