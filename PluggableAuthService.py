@@ -169,14 +169,6 @@ class PluggableAuthService( Folder ):
 
     maxlistusers = -1   # Don't allow local role form to try to list us!
 
-    #
-    #   ZMI
-    #
-    arrow_right_gif = ImageFile( 'www/arrow-right.gif', globals() )
-    arrow_left_gif = ImageFile( 'www/arrow-left.gif', globals() )
-    arrow_up_gif = ImageFile( 'www/arrow-up.gif', globals() )
-    arrow_down_gif = ImageFile( 'www/arrow-down.gif', globals() )
-
     def getId( self ):
 
         return self._id
@@ -558,6 +550,11 @@ class PluggableAuthService( Folder ):
     #
     # ZMI stuff
     #
+    arrow_right_gif = ImageFile( 'www/arrow-right.gif', globals() )
+    arrow_left_gif = ImageFile( 'www/arrow-left.gif', globals() )
+    arrow_up_gif = ImageFile( 'www/arrow-up.gif', globals() )
+    arrow_down_gif = ImageFile( 'www/arrow-down.gif', globals() )
+
     security.declareProtected(ManageUsers, 'manage_search')
     manage_search = PageTemplateFile('www/pasSearch', globals())
 
