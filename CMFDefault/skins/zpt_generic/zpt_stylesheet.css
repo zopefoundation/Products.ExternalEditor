@@ -316,6 +316,12 @@ td.NewsListing {
     font-weight: bold;
 }
 
+a.NewsListing{
+    background-color: #336699;
+    color:  #FFFFFF;
+    font-weight: bold;
+}
+
 td.NewsByLine {
     background-color:  #CCCCCC;
     color:  #336699;

@@ -19,7 +19,7 @@
 		tal:condition="newsitems">
  <tr>
   <td class="NewsListing" align="left" valign="top">
-      <a href=""
+      <a href="" class="NewsListing"
 	     tal:attributes="href newsitems/getURL"
 		 tal:content="newsitems/title">Title</a>
   </td>
