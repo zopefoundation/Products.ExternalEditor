@@ -97,16 +97,14 @@ class StateDefinition (SimpleItem):
     _properties_form = DTMLFile('state_properties', _dtmldir)
 
     def manage_properties(self, REQUEST, manage_tabs_message=None):
-        '''
-        '''
+        """Show state properties ZMI form."""
         return self._properties_form(REQUEST,
                                      management_view='Properties',
                                      manage_tabs_message=manage_tabs_message,
                                      )
 
     def setProperties(self, title='', transitions=(), REQUEST=None, description=''):
-        '''
-        '''
+        """Set the properties for this State."""
         self.title = str(title)
         self.description = str(description)
         self.transitions = tuple(map(str, transitions))
@@ -117,16 +115,14 @@ class StateDefinition (SimpleItem):
     _variables_form = DTMLFile('state_variables', _dtmldir)
 
     def manage_variables(self, REQUEST, manage_tabs_message=None):
-        '''
-        '''
+        """Show State variables ZMI form."""
         return self._variables_form(REQUEST,
                                      management_view='Variables',
                                      manage_tabs_message=manage_tabs_message,
                                      )
 
     def getVariableValues(self):
-        ''' get VariableValues for management UI
-        '''
+        """Get VariableValues for management UI."""
         vv = self.var_values
         if vv is None:
             return []
@@ -134,12 +130,12 @@ class StateDefinition (SimpleItem):
             return vv.items()
     
     def getWorkflowVariables(self):
-        ''' get all variables that are available form
-            workflow and not handled yet.
-        '''
+        """Get all variables that are available from the workflow and
+        not handled yet.
+        """
         wf_vars = self.getAvailableVarIds()
         if self.var_values is None:
-                return wf_vars
+            return wf_vars
         ret = []
         for vid in wf_vars:
             if not self.var_values.has_key(vid):
@@ -147,8 +143,7 @@ class StateDefinition (SimpleItem):
         return ret
 
     def addVariable(self,id,value,REQUEST=None):
-        ''' add a WorkflowVariable to State
-        '''
+        """Add a WorkflowVariable to State."""
         if self.var_values is None:
             self.var_values = PersistentMapping()
         
@@ -158,8 +153,7 @@ class StateDefinition (SimpleItem):
             return self.manage_variables(REQUEST, 'Variable added.')
     
     def deleteVariables(self,ids=[],REQUEST=None):
-        ''' delete a WorkflowVariable from State
-        '''
+        """Delete a WorkflowVariable from State."""
         vv = self.var_values
         for id in ids:
             if vv.has_key(id):
@@ -169,8 +163,7 @@ class StateDefinition (SimpleItem):
             return self.manage_variables(REQUEST, 'Variables deleted.')
 
     def setVariables(self, ids=[], REQUEST=None):
-        ''' set values for Variables set by this state
-        '''
+        """Set values for Variables set by this State."""
         if self.var_values is None:
             self.var_values = PersistentMapping()
  
@@ -187,17 +180,14 @@ class StateDefinition (SimpleItem):
     _permissions_form = DTMLFile('state_permissions', _dtmldir)
 
     def manage_permissions(self, REQUEST, manage_tabs_message=None):
-        '''
-        '''
-        
+        """Present TTW UI for managing this State's permissions."""
         return self._permissions_form(REQUEST,
                                      management_view='Permissions',
                                      manage_tabs_message=manage_tabs_message,
                                      )
 
     def setPermissions(self, REQUEST):
-        '''
-        '''
+        """Set the permissions in REQUEST for this State."""
         pr = self.permission_roles
         if pr is None:
             self.permission_roles = pr = PersistentMapping()
@@ -214,8 +204,7 @@ class StateDefinition (SimpleItem):
         return self.manage_permissions(REQUEST, 'Permissions changed.')
 
     def setPermission(self, permission, acquired, roles):
-        '''
-        '''
+        """Set a permission for this State."""
         pr = self.permission_roles
         if pr is None:
             self.permission_roles = pr = PersistentMapping()
