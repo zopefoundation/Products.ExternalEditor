@@ -9,26 +9,49 @@ CMF Collector Update Notes
   the collector version as indicated by the VERSION.text file in the
   same directory.
 
-  Version 0.9, Oct 25, 2001
+  Version 0.9a, Oct 25, 2001
 
-    - With this version owners of previously existing collectors will
-      have to sneak a visit to the configure page for previously
-      existing collectors before anyone can browse and search them.
+    - This version requires two installation changes.
 
-      To do so, after putting the new Product code in place (and
-      restarting your site, if you don't have auto-refresh going)
-      collector owners should go to the URL produced by appending
-      "/collector_edit_form" to the URL of the collectors - eg::
+      - The first is simple - replace (or adjust) the workflow.  You can
+        either:
 
-        http://new.zope.org/Members/klm/ColDev/collector_edit_form
+        - install the new collector issue workflow, by first
+          deleting the existing one (in the portal_workflow tool
+          'contents' tab) and installing the new one, according to the
+          instructions in INSTALL.txt, or
 
-      for the example collector at http://new.zope.org/Members/klm/ColDev.
+        - adjust the existing one, by adding the 'request' transition to
+          the 'Pending' and 'Pending_confidential' states.  (Visit the
+          collector_issue_workflow within the portal_workflow tool, go
+          to states, enabling the 'request' transition in each.)
 
-      Check the box by "Reinstate internal catalog?", to the right of
-      the submit and reset buttons at the bottom of the form, and then
-      submit them.  This will establish a new, internal catalog as
-      well as indexing all the items against it and the site catalog
-      (using changed schemas).
+      - Until the collector owner does the second, noone will be able to
+        browse your collector.  The owners have to go directly to the
+        configure form for their collectors and pick an option that
+        instates the new, collector-internal catalog and recatalogs all
+        the issues.
 
-      These changes solve the issue discussed at
-      http://new.zope.org/Members/klm/ColDev/25 - see there for details.
+        To do so, after putting the new Product code in place (and
+        restarting your site, if you don't have auto-refresh going)
+        collector owners should go to the URL produced by appending
+        "/collector_edit_form" to the URL of the collectors - eg::
+
+          http://new.zope.org/Members/klm/ColDev/collector_edit_form
+
+        for the example collector at http://new.zope.org/Members/klm/ColDev.
+
+        Check the box by "Reinstate internal catalog?", to the right of
+        the submit and reset buttons at the bottom of the form, and then
+        submit them.  This will establish a new, internal catalog as
+        well as indexing all the items against it and the site catalog
+        (using changed schemas).
+
+        These changes solve the issue discussed at
+        http://new.zope.org/Members/klm/ColDev/25 - see there for details.
+
+        This version also entails a change to the collector issue
+        workflow.  You can either delete the old workflow and import the
+        new one (see the INSTALL.txt file for instructions), or just go
+        to the portal workflow tool and enable the 'request' transition
+        on the 
