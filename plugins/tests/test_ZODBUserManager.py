@@ -324,5 +324,39 @@ class ZODBUserManagerTests( unittest.TestCase
             self.failUnless( info[ 'id' ] in SUBSET_IDS )
             self.failUnless( info[ 'login' ] in SUBSET_LOGINS )
 
+    def test_authenticateWithOldPasswords( self ):
+
+        import sha
+
+        zum = self._makeOne()
+
+        # synthesize an older account
+
+        old_password = sha.sha( 'old_password' ).hexdigest()
+        zum._user_passwords[ 'old_user' ] = old_password
+        zum._login_to_userid[ 'old_user@example.com' ] = 'old_user'
+        zum._userid_to_login[ 'old_user' ] = 'old_user@example.com'
+
+        # create a new user
+
+        zum.addUser( 'new_user', 'new_user@example.com', 'new_password' )
+
+        user_id, login = zum.authenticateCredentials(
+                                { 'login' : 'old_user@example.com'
+                                , 'password' : 'old_password'
+                                } )
+
+        self.assertEqual( user_id, 'old_user' )
+        self.assertEqual( login, 'old_user@example.com' )
+
+        user_id, login = zum.authenticateCredentials(
+                                { 'login' : 'new_user@example.com'
+                                , 'password' : 'new_password'
+                                } )
+
+        self.assertEqual( user_id, 'new_user' )
+        self.assertEqual( login, 'new_user@example.com' )
+
+
 if __name__ == "__main__":
     unittest.main()
