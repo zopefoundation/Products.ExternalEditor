@@ -46,6 +46,11 @@ New Features
 
 Bugs Fixed
 
+  - Made workflow Expressions use the correct ModuleImporter
+    so that they operate correctly in their restricted 
+    environment. Thanks to Dieter Maurer for the patch.
+    (Tracker 463)
+
   - Fixed incorrent permissions in "pending" state of default 
     DCWorkflows. Thanks for Lynn Walton for the report and 
     Florent Guillaume for the patch. (Tracker #464)

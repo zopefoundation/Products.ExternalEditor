@@ -23,35 +23,10 @@ from AccessControl import getSecurityManager, ClassSecurityInfo
 from DateTime import DateTime
 
 from Products.CMFCore.WorkflowCore import ObjectDeleted, ObjectMoved
+from Products.CMFCore.Expression import Expression
 from Products.PageTemplates.Expressions import getEngine
 from Products.PageTemplates.TALES import SafeMapping
-from Products.PageTemplates.PageTemplate import ModuleImporter
-
-
-class Expression (Persistent):
-    text = ''
-    _v_compiled = None
-
-    security = ClassSecurityInfo()
-
-    def __init__(self, text):
-        self.text = text
-        self._v_compiled = getEngine().compile(text)
-
-    def __call__(self, econtext):
-        compiled = self._v_compiled
-        if compiled is None:
-            compiled = self._v_compiled = getEngine().compile(self.text)
-        # ?? Maybe expressions should manipulate the security
-        # context stack.
-        res = compiled(econtext)
-        if isinstance(res, Exception):
-            raise res
-        #print 'returning %s from %s' % (`res`, self.text)
-        return res
-
-Globals.InitializeClass(Expression)
-
+from Products.PageTemplates.Expressions import SecureModuleImporter
 
 class StateChangeInfo:
     '''
@@ -130,7 +105,7 @@ def createExprContext(sci):
         'nothing':      None,
         'root':         wf.getPhysicalRoot(),
         'request':      getattr( ob, 'REQUEST', None ),
-        'modules':      ModuleImporter,
+        'modules':      SecrueModuleImporter,
         'user':         getSecurityManager().getUser(),
         'state_change': sci,
         'transition':   sci.transition,

@@ -24,8 +24,7 @@ from AccessControl import getSecurityManager, ClassSecurityInfo
 from utils import getToolByName
 from Products.PageTemplates.Expressions import getEngine
 from Products.PageTemplates.TALES import SafeMapping
-from Products.PageTemplates.PageTemplate import ModuleImporter
-
+from Products.PageTemplates.Expressions import SecureModuleImporter
 
 class Expression (Persistent):
     text = ''
@@ -74,7 +73,7 @@ def createExprContext(folder, portal, object):
         'portal':       portal,
         'nothing':      None,
         'request':      getattr( object, 'REQUEST', None ),
-        'modules':      ModuleImporter,
+        'modules':      SecureModuleImporter,
         'member':       member,
         }
     return getEngine().getContext(data)
