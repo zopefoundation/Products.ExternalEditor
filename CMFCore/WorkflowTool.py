@@ -61,10 +61,10 @@ class WorkflowTool (UniqueObject, Folder):
 
     security = ClassSecurityInfo()
 
-    manage_options = ( { 'label' : 'Overview', 'action' : 'manage_overview' }
-                     , { 'label' : 'Workflows'
+    manage_options = ( { 'label' : 'Workflows'
                        , 'action' : 'manage_selectWorkflows'
                        }
+                     , { 'label' : 'Overview', 'action' : 'manage_overview' }
                      ) + Folder.manage_options
 
     #

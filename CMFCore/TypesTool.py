@@ -25,6 +25,9 @@ import string
 from AccessControl import getSecurityManager, ClassSecurityInfo
 from Acquisition import aq_base
 import Products, CMFCorePermissions
+from ActionProviderBase import ActionProviderBase
+from ActionInformation import ActionInformation
+from Expression import Expression
 
 from CMFCorePermissions import View, ManagePortal, AccessContentsInformation
 
@@ -501,18 +504,21 @@ allowedTypes = ( 'Script (Python)'
                , ScriptableTypeInformation.meta_type
                )
 
-class TypesTool( UniqueObject, OFS.Folder.Folder ):
+class TypesTool( UniqueObject, OFS.Folder.Folder, ActionProviderBase ):
     """
         Provides a configurable registry of portal content types.
     """
     id = 'portal_types'
     meta_type = 'CMF Types Tool'
+    _actions = []
 
     security = ClassSecurityInfo()
 
-    manage_options = ( { 'label' : 'Overview', 'action' : 'manage_overview' }
+    manage_options = ( OFS.Folder.Folder.manage_options +
+                      ActionProviderBase.manage_options +
+                      ({ 'label' : 'Overview', 'action' : 'manage_overview' }
                      , 
-                     ) + OFS.Folder.Folder.manage_options
+                     ))
 
     #
     #   ZMI methods
@@ -520,6 +526,14 @@ class TypesTool( UniqueObject, OFS.Folder.Folder ):
     security.declareProtected( CMFCorePermissions.ManagePortal
                              , 'manage_overview' )
     manage_overview = DTMLFile( 'explainTypesTool', _dtmldir )
+
+    security.declarePrivate('listActions')
+    def listActions(self, info=None):
+        """
+        Return a list of action information instances
+        for actions provided via tool
+        """
+        return self._actions
 
     def all_meta_types(self):
         all = TypesTool.inheritedAttribute('all_meta_types')(self)

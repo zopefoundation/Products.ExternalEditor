@@ -27,9 +27,10 @@ from CMFCorePermissions import AddPortalMember, MailForgottenPassword, \
      SetOwnPassword, SetOwnProperties
 import CMFCorePermissions
 import string, random
+from ActionProviderBase import ActionProviderBase
 
 
-class RegistrationTool (UniqueObject, SimpleItem):
+class RegistrationTool (UniqueObject, SimpleItem, ActionProviderBase):
     # This tool creates and modifies users by making calls
     # to portal_membership.
     id = 'portal_registration'
@@ -37,9 +38,10 @@ class RegistrationTool (UniqueObject, SimpleItem):
 
     security = ClassSecurityInfo()
 
-    manage_options = ( { 'label' : 'Overview', 'action' : 'manage_overview' }
+    manage_options = (ActionProviderBase.manage_options +
+                     ({ 'label' : 'Overview', 'action' : 'manage_overview' }
                      , 
-                     ) + SimpleItem.manage_options
+                     ) + SimpleItem.manage_options)
 
     #
     #   ZMI methods
@@ -51,9 +53,6 @@ class RegistrationTool (UniqueObject, SimpleItem):
     #
     #   'portal_registration' interface methods
     #
-    security.declarePrivate('listActions')
-    def listActions(self, info):
-        return none
 
     security.declarePublic('isRegistrationAllowed')
     def isRegistrationAllowed(self, REQUEST):

@@ -26,6 +26,7 @@ from AccessControl.User import nobody
 from AccessControl import ClassSecurityInfo
 from CMFCorePermissions import ManagePortal
 import CMFCorePermissions
+from ActionProviderBase import ActionProviderBase
 import Acquisition
 
 default_member_content = '''Default page for %s
@@ -37,22 +38,23 @@ default_member_content = '''Default page for %s
   in the Tool Box on the left.
 '''
 
-class MembershipTool (UniqueObject, SimpleItem):
+class MembershipTool (UniqueObject, SimpleItem, ActionProviderBase):
     # This tool accesses member data through an acl_users object.
     # It can be replaced with something that accesses member data in
     # a different way.
     id = 'portal_membership'
     meta_type = 'CMF Membership Tool'
-
+    _actions = []
     security = ClassSecurityInfo()
 
-    manage_options=( { 'label' : 'Overview'
-                     , 'action' : 'manage_overview'
-                     }
-                   , { 'label' : 'Configuration'
+    manage_options=( ({ 'label' : 'Configuration'
                      , 'action' : 'manage_mapRoles'
-                     }
-                   ) + SimpleItem.manage_options
+                     },) +
+                     ActionProviderBase.manage_options + 
+                   ( { 'label' : 'Overview'
+                     , 'action' : 'manage_overview'
+                     },
+                   ) + SimpleItem.manage_options)
 
     #
     #   ZMI methods
@@ -387,7 +389,7 @@ class MembershipTool (UniqueObject, SimpleItem):
 
 
     security.declarePrivate('listActions')
-    def listActions(self, info):
+    def listActions(self):
         return None
 
     security.declarePublic('getHomeFolder')

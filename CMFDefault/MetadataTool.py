@@ -24,6 +24,7 @@ from Globals import InitializeClass, DTMLFile
 from Persistence import Persistent
 from AccessControl import ClassSecurityInfo, getSecurityManager
 from Products.CMFCore import CMFCorePermissions
+from Products.CMFCore.ActionProviderBase import ActionProviderBase
 from utils import _dtmldir
 
 class MetadataElementPolicy( Persistent ):
@@ -190,10 +191,12 @@ InitializeClass( ElementSpec )
 class MetadataError( Exception ):
     pass
 
-class MetadataTool( UniqueObject, SimpleItem ):
+class MetadataTool( UniqueObject, SimpleItem, ActionProviderBase ):
 
     id              = 'portal_metadata'
     meta_type       = 'Default Metadata Tool'
+
+    _actions = []
 
     security = ClassSecurityInfo()
 
@@ -225,7 +228,8 @@ class MetadataTool( UniqueObject, SimpleItem ):
     #
     #   ZMI methods
     #
-    manage_options = ( ( { 'label'      : 'Overview'
+    manage_options = ( ActionProviderBase.manage_options + 
+                     ( { 'label'      : 'Overview'
                          , 'action'     : 'manage_overview'
                          }
                        , { 'label'      : 'Properties'
@@ -248,6 +252,13 @@ class MetadataTool( UniqueObject, SimpleItem ):
     security.declareProtected( CMFCorePermissions.ManagePortal
                              , 'propertiesForm' )
     propertiesForm = DTMLFile( 'metadataProperties', _dtmldir )
+
+    security.declarePrivate('listActions')
+    def listActions(self, info=None):
+        """
+        Return actions provided via tool.
+        """
+        return self._actions
 
     security.declareProtected( CMFCorePermissions.ManagePortal
                              , 'editProperties' )

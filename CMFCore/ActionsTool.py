@@ -18,8 +18,9 @@ $Id$
 __version__='$Revision$'[11:-2]
 
 
-from utils import UniqueObject, _getAuthenticatedUser, _checkPermission
-from utils import getToolByName, _dtmldir
+import OFS
+from utils import UniqueObject, SimpleItemWithProperties, _getAuthenticatedUser, _checkPermission
+from utils import getToolByName, _dtmldir, cookString
 import CMFCorePermissions
 from OFS.SimpleItem import SimpleItem
 from Globals import InitializeClass, DTMLFile, package_home
@@ -27,60 +28,57 @@ from urllib import quote
 from Acquisition import aq_base, aq_inner, aq_parent
 from AccessControl import ClassSecurityInfo
 from string import join
-
-class ActionInformation:
-    # Provides information that may be needed when constructing the list of
-    # available actions.
-    __allow_access_to_unprotected_subobjects__ = 1
-
-    def __init__(self, tool, folder, object=None):
-        self.portal = portal = aq_parent(aq_inner(tool))
-        membership = getToolByName(tool, 'portal_membership')
-        self.isAnonymous = membership.isAnonymousUser()
-        self.portal_url = portal.absolute_url()
-        if folder is not None:
-            self.folder_url = folder.absolute_url()
-            self.folder = folder
-        else:
-            self.folder_url = self.portal_url
-            self.folder = portal
-        self.content = object
-        if object is not None:
-            self.content_url = object.absolute_url()
-        else:
-            self.content_url = None
-
-    def __getitem__(self, name):
-        # Mapping interface for easy string formatting.
-        if name[:1] == '_':
-            raise KeyError, name
-        if hasattr(self, name):
-            return getattr(self, name)
-        raise KeyError, name
+from Expression import Expression, createExprContext
+from ActionInformation import ActionInformation, oai
+from ActionProviderBase import ActionProviderBase
 
 
-class ActionsTool (UniqueObject, SimpleItem):
+class ActionsTool(UniqueObject, OFS.Folder.Folder, ActionProviderBase):
     """
         Weave together the various sources of "actions" which are apropos
         to the current user and context.
     """
     id = 'portal_actions'
+    _actions = [ActionInformation(id='folderContents'
+                                , title='Folder contents'
+                                , action=Expression(
+               text='string: ${folder_url}/folder_contents')
+                                , condition=Expression(
+               text='python: folder is not object') 
+                                , permissions=('List folder contents',)
+                                , category='object'
+                                , visible=1
+                                 )
+              , ActionInformation(id='folderContents'
+                                , title='Folder contents'
+                                , action=Expression(
+               text='string: ${folder_url}/folder_contents')
+                                , condition=Expression(
+               text='python: folder is object')
+                                , permissions=('List folder contents',)
+                                , category='folder'
+                                , visible=1
+                                 )]
+
     meta_type = 'CMF Actions Tool'
 
-    action_providers = ( 'portal_actions'
-                       , 'portal_memberdata'
-                       , 'portal_registration'
-                       , 'portal_discussion'
-                       , 'portal_membership'
-                       , 'portal_workflow'
-                       , 'portal_undo'
-                       )
+    action_providers = ('portal_membership'
+                      , 'portal_actions'
+                      , 'portal_registration'
+                      , 'portal_discussion'
+                      , 'portal_undo'
+                      , 'portal_syndication'
+                      , 'portal_workflow'
+                      , 'portal_properties')
 
     security = ClassSecurityInfo()
 
-    manage_options = ( { 'label' : 'Overview', 'action' : 'manage_overview' }
-                     , 
-                     ) + SimpleItem.manage_options
+    manage_options = ( ActionProviderBase.manage_options +
+                      ({'label' : 'Action Providers', 'action' : 'manage_actionProviders'}
+                     ,   { 'label' : 'Overview', 'action' : 'manage_overview' }
+                     ,
+                     ) + OFS.Folder.Folder.manage_options
+                     ) 
 
     #
     #   ZMI methods
@@ -88,18 +86,54 @@ class ActionsTool (UniqueObject, SimpleItem):
     security.declareProtected( CMFCorePermissions.ManagePortal
                              , 'manage_overview' )
     manage_overview = DTMLFile( 'explainActionsTool', _dtmldir )
+    manage_actionProviders = DTMLFile('manageActionProviders', _dtmldir)
 
 
     #
     # Programmatically manipulate the list of action providers
     #
 
+    security.declarePrivate('listActions')
+    def listActions(self, info=None):
+        """
+        Lists actions available through the tool.
+        """
+        return self._actions
+
     security.declareProtected( CMFCorePermissions.ManagePortal
                              , 'listActionProviders'
                              )
-    def listActionProviders( self ):
+    def listActionProviders(self):
        """ returns a sequence of action providers known by this tool """
        return self.action_providers
+
+    security.declareProtected(CMFCorePermissions.ManagePortal
+                            , 'manage_aproviders')
+    def manage_aproviders(self
+                        , apname=''
+                        , chosen=()
+                        , add_provider=0
+                        , del_provider=0
+                        , REQUEST=None):
+        """
+        Manage TTW Action Providers
+        """
+        providers = list(self.listActionProviders())
+        new_providers = []
+        if add_provider:
+            providers.append(apname)
+        elif del_provider:
+            for item in providers:
+                if item not in chosen:
+                    new_providers.append(item)
+            providers = new_providers
+        self.action_providers = providers
+        if REQUEST is not None:
+            return self.manage_actionProviders(self
+                                             , REQUEST
+                                             , manage_tabs_message='Properties changed.')
+        
+
 
     security.declareProtected( CMFCorePermissions.ManagePortal
                              , 'addActionProvider'
@@ -110,26 +144,6 @@ class ActionsTool (UniqueObject, SimpleItem):
             p_old = self.action_providers
             p_new = p_old + ( provider_name, )
             self.action_providers = p_new
-
-    security.declarePrivate('listActions')
-    def listActions(self, info):
-        """
-        List actions available from this tool
-        """
-        if info.isAnonymous:
-            return None
-        else:
-            actions = []
-            folder_url = info.folder_url   
-            content_url = info.content_url   
-            if folder_url is not None: 
-                actions.append(
-                    { 'name'          : 'Folder contents'
-                    , 'url'        : folder_url + '/folder_contents'
-                    , 'permissions'   : ['List folder contents']
-                    , 'category'      : 'folder'
-                   })
-            return actions
 
     security.declareProtected( CMFCorePermissions.ManagePortal
                              , 'deleteActionProvider'
@@ -162,16 +176,24 @@ class ActionsTool (UniqueObject, SimpleItem):
                     break
                 else:
                     folder = aq_parent(aq_inner(folder))
-
-        info = ActionInformation(self, folder, object)
-
+        ec = createExprContext(folder, portal, object)
+        ai_objs = []
         actions = []
+        info = oai(self, folder, object)
         # Include actions from specific tools.
         for provider_name in self.listActionProviders():
             provider = getattr(self, provider_name)
             a = provider.listActions(info)
-            if a:
-                actions.extend(list(a))
+            if a and type(a[0]) is not type({}):
+                ai_objs.extend(list(a))
+            else:
+                for i in a: 
+                    actions.append(i)
+
+        if ai_objs:
+            for ai in ai_objs:
+                if ai.testCondition(ec):
+                    actions.append(ai.getAction(ec))
 
         # Include actions from object.
         if object is not None:
@@ -181,7 +203,7 @@ class ActionsTool (UniqueObject, SimpleItem):
             if ti is not None:
                 defs = ti.getActions()
                 if defs:
-                    c_url = info.content_url
+                    c_url = object.absolute_url()
                     for d in defs:
                         a = d['action']
                         if a:
@@ -197,7 +219,7 @@ class ActionsTool (UniqueObject, SimpleItem):
                             'visible': d.get('visible', 1),
                             })
             if hasattr(base, 'listActions'):
-                a = object.listActions(info)
+                a = object.listActions()
                 if a:
                     actions.extend(list(a))
 

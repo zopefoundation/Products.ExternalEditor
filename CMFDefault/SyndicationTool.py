@@ -26,15 +26,29 @@ from AccessControl import ClassSecurityInfo, SecurityManagement
 from Products.CMFCore.CMFCorePermissions import ManagePortal
 from Products.CMFCore.CMFCorePermissions import ManageProperties
 from Products.CMFCore.CMFCorePermissions import AccessContentsInformation
+from Products.CMFCore.ActionProviderBase import ActionProviderBase
+from Products.CMFCore.ActionInformation import ActionInformation
+from Products.CMFCore.Expression import Expression
 import Products.CMFCore.CMFCorePermissions
 from Products.CMFCore.PortalFolder import PortalFolder
 from SyndicationInfo import SyndicationInformation
 
 _dtmldir = os.path.join( package_home( globals() ), 'dtml' )
 
-class SyndicationTool (UniqueObject, SimpleItem):
+class SyndicationTool (UniqueObject, SimpleItem, ActionProviderBase):
     id = 'portal_syndication'
     meta_type = 'Default Syndication Tool'
+
+    _actions = [ActionInformation(id='syndication'
+                                , title='Syndication'
+                                , action=Expression(
+               text='string: ${folder_url}/synPropertiesForm')
+                                , condition=Expression(
+               text='python: folder is object') 
+                                , permissions=(ManageProperties,)
+                                , category='folder'
+                                , visible=1
+                                 )]
 
     security = ClassSecurityInfo()
     
@@ -46,7 +60,8 @@ class SyndicationTool (UniqueObject, SimpleItem):
     max_items = 15
 
     #ZMI Methods
-    manage_options = (({'label'     :  'Overview'
+    manage_options = (ActionProviderBase.manage_options + 
+                        ({'label'     :  'Overview'
                         ,'action'   :  'overview'
                         , 'help'    :  ('CMFDefault', 'Syndication-Tool_Overview.stx') }
                         ,{'label'   :  'Properties'
@@ -69,6 +84,13 @@ class SyndicationTool (UniqueObject, SimpleItem):
     security.declareProtected(ManagePortal, 'reportForm')
     reportForm = HTMLFile('synReports', _dtmldir)
    
+    security.declarePrivate('listActions')
+    def listActions(self, info=None):
+        """
+        Return actions provided by tool
+        """
+        return self._actions
+
     security.declareProtected(ManagePortal, 'editProperties')
     def editProperties(self
                        , updatePeriod=None

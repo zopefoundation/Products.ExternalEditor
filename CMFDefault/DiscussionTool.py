@@ -26,20 +26,35 @@ from Products.CMFCore import CMFCorePermissions
 
 from utils import _dtmldir
 from DiscussionItem import DiscussionItemContainer
+from Products.CMFCore.ActionInformation import ActionInformation
+from Products.CMFCore.ActionProviderBase import ActionProviderBase
+from Products.CMFCore.Expression import Expression
 
 class DiscussionNotAllowed( Exception ):
     pass
 
-class DiscussionTool( UniqueObject, SimpleItem ):
+class DiscussionTool( UniqueObject, SimpleItem, ActionProviderBase ):
 
     id = 'portal_discussion'
     meta_type = 'Default Discussion Tool'
+    _actions = [ActionInformation(id='reply'
+                                , title='Reply'
+                                , action=Expression(
+                text='string: ${object_url}/discussion_reply_form')
+                                , condition=Expression(
+                text='python: object is not None and ' +
+                'portal.portal_discussion.isDiscussionAllowedFor(object)')
+                                , permissions=('Reply to item',)
+                                , category='object'
+                                , visible=1
+                                 )]
 
     security = ClassSecurityInfo()
 
-    manage_options = ( { 'label' : 'Overview', 'action' : 'manage_overview' }
+    manage_options = (ActionProviderBase.manage_options +
+                     ({ 'label' : 'Overview', 'action' : 'manage_overview' }
                      , 
-                     ) + SimpleItem.manage_options
+                     ) + SimpleItem.manage_options)
 
     #
     #   ZMI methods
@@ -51,6 +66,13 @@ class DiscussionTool( UniqueObject, SimpleItem ):
     #
     #   'portal_discussion' interface methods
     #
+
+    security.declarePrivate('listActions')
+    def listActions(self, info=None):
+        """
+        Return available actions via tool.
+        """
+        return self._actions
 
     security.declarePublic( 'overrideDiscussionFor' )
     def overrideDiscussionFor(self, content, allowDiscussion):
@@ -96,29 +118,6 @@ class DiscussionTool( UniqueObject, SimpleItem ):
         if typeInfo:
             return typeInfo.allowDiscussion()
         return 0
-
-    #
-    #   ActionProvider interface
-    #
-    security.declarePrivate( 'listActions' )
-    def listActions(self, info):
-        # Return actions for reply and show replies
-        content = info.content
-        if content is None or not self.isDiscussionAllowedFor(content):
-            return None
-
-        discussion = self.getDiscussionFor(content)
-        discussion_url = info.content_url
-
-        actions = (
-            {'name': 'Reply',
-             'url': discussion_url + '/discussion_reply_form',
-             'permissions': ['Reply to item'],
-             'category': 'object'
-             },
-            )
-
-        return actions
 
     #
     #   Utility methods

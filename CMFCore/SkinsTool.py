@@ -27,6 +27,9 @@ from Acquisition import aq_base
 from DateTime import DateTime
 from AccessControl import ClassSecurityInfo
 from CMFCorePermissions import ManagePortal, AccessContentsInformation
+from ActionProviderBase import ActionProviderBase
+from ActionInformation import ActionInformation
+from Expression import Expression
 
 from OFS.Image import Image
 from OFS.DTMLMethod import DTMLMethod
@@ -53,20 +56,23 @@ def modifiedOptions():
                   'action':'manage_propertiesForm'}]
     return tuple(rval)
 
-class SkinsTool(UniqueObject, SkinsContainer, PortalFolder):
+class SkinsTool(UniqueObject, SkinsContainer, PortalFolder, ActionProviderBase):
     '''
     This tool is used to supply skins to a portal.
     '''
 
     id = 'portal_skins'
     meta_type = 'CMF Skins Tool'
+    _actions = []
     cookie_persistence = 0
 
     security = ClassSecurityInfo()
 
-    manage_options = ( { 'label' : 'Overview', 'action' : 'manage_overview' }
+    manage_options = ( modifiedOptions() +
+                      ({ 'label' : 'Overview', 'action' : 'manage_overview' }
                      , 
-                     ) + modifiedOptions()
+                     ) + ActionProviderBase.manage_options
+                     )
 
     def __init__(self):
         self.selections = PersistentMapping()
@@ -89,6 +95,14 @@ class SkinsTool(UniqueObject, SkinsContainer, PortalFolder):
     request_varname = 'portal_skin'
     allow_any = 0
     selections = None
+
+    security.declarePrivate('listActions')
+    def listActions(self, info=None):
+        """
+        Return a list of actions information instances
+        provided by the tool.
+        """
+        return self._actions
 
     security.declareProtected(ManagePortal, 'manage_propertiesForm')
     manage_propertiesForm = DTMLFile('dtml/skinProps', globals())

@@ -25,19 +25,25 @@ from Acquisition import aq_inner, aq_parent
 
 from Globals import InitializeClass, DTMLFile
 from AccessControl import ClassSecurityInfo
+from Products.CMFCore.ActionProviderBase import ActionProviderBase
+from Products.CMFCore.ActionInformation import ActionInformation
+from Products.CMFCore.Expression import Expression
 from Products.CMFCore import CMFCorePermissions
 from utils import _dtmldir
 
 
-class URLTool (UniqueObject, SimpleItem):
+class URLTool (UniqueObject, SimpleItem, ActionProviderBase):
     id = 'portal_url'
     meta_type = 'Default URL Tool'
+    _actions = []
 
     security = ClassSecurityInfo()
 
-    manage_options = ( { 'label' : 'Overview', 'action' : 'manage_overview' }
+    manage_options = ( ActionProviderBase.manage_options +
+                      ({ 'label' : 'Overview', 'action' : 'manage_overview' } 
                      , 
                      ) + SimpleItem.manage_options
+                     )
 
     #
     #   ZMI methods
@@ -55,6 +61,13 @@ class URLTool (UniqueObject, SimpleItem):
         Returns the absolute URL of the portal.
         '''
         return aq_parent(aq_inner(self)).absolute_url(relative=relative)
+
+    security.declarePrivate('listActions')
+    def listActions(self, info=None):
+        """
+        Return a list of actions provided via the tool
+        """
+        return self._actions
 
     security.declarePublic( 'getPortalObject' )
     def getPortalObject( self ):

@@ -28,6 +28,9 @@ from string import join
 from AccessControl.PermissionRole import rolesForPermissionOn
 from AccessControl import ClassSecurityInfo
 from utils import mergedLocalRoles
+from ActionProviderBase import ActionProviderBase
+from ActionInformation import ActionInformation
+from Expression import Expression
 import os
 import CMFCorePermissions
 from Acquisition import aq_base
@@ -64,16 +67,19 @@ class IndexableObjectWrapper:
         return list(allowed.keys())
 
 
-class CatalogTool (UniqueObject, ZCatalog):
+class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
     '''This is a ZCatalog that filters catalog queries.
     '''
     id = 'portal_catalog'
     meta_type = 'CMF Catalog'
     security = ClassSecurityInfo()
+    _actions = []
 
-    manage_options = ( { 'label' : 'Overview', 'action' : 'manage_overview' }
+    manage_options = ( ZCatalog.manage_options +
+                      ActionProviderBase.manage_options +
+                      ({ 'label' : 'Overview', 'action' : 'manage_overview' }
                      , 
-                     ) + ZCatalog.manage_options
+                     ))
 
     def __init__(self):
         ZCatalog.__init__(self, self.getId())
@@ -82,6 +88,14 @@ class CatalogTool (UniqueObject, ZCatalog):
     #
     #   Subclass extension interface
     #
+    security.declarePrivate('listActions')
+    def listActions(self, info=None):
+        """
+        Return a list of action information instances 
+        provided via tool
+        """
+        return self._actions
+
     security.declarePublic( 'enumerateIndexes' ) # Subclass can call
     def enumerateIndexes( self ):
         #   Return a list of ( index_name, type ) pairs for the initial

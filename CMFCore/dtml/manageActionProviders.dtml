@@ -1,0 +1,36 @@
+<html><head><title>manage action providers</title></head>
+<body bgcolor="#ffffff">
+<dtml-var manage_tabs>
+<h2>Action Providers</h2>
+<form action="manage_aproviders" method="POST">
+<table>
+  <tr>
+    <th>Name</th>
+  </tr>
+  <dtml-in listActionProviders>
+    <tr>
+      <td>
+        <input type="checkbox" name="chosen:list"
+               value="&dtml-sequence-item;">
+             &dtml-sequence-item;
+      </td>
+     </tr>
+         </dtml-in>
+
+         <tr>
+           <td>
+             <input type="text" name="apname" value="" size="20">
+           </td>
+         </tr>
+
+         <tr>
+           <td>
+             <input type="submit" name="add_provider" value=" Add ">
+             <input type="submit" name="del_provider" value=" Delete ">
+           </td>
+         </tr>
+
+       </table>
+</form>
+</body>
+</html>

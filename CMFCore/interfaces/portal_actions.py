@@ -71,7 +71,8 @@ class ActionProvider(Base):
 
     # listActions__roles__ = ()  # No permission.
     def listActions(info):
-        '''Returns a list of mappings describing actions.  Each action
+        '''Support for the old list of mappings is currently supported:
+        Returns a list of mappings describing actions.  Each action
         should contain the keys "name", "url", "permissions", and
         "category", conforming to the specs outlined in
         portal_actions.listFilteredActionsFor().  The info argument
@@ -85,5 +86,6 @@ class ActionProvider(Base):
           folder_url
           content
           content_url
+          The new way of doing this is....
         '''
 

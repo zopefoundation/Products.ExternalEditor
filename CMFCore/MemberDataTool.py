@@ -30,21 +30,24 @@ from Acquisition import aq_inner, aq_parent, aq_base
 from AccessControl import ClassSecurityInfo
 from CMFCorePermissions import ViewManagementScreens
 import CMFCorePermissions
+from ActionProviderBase import ActionProviderBase
 
 _marker = []  # Create a new marker object.
 
 
-class MemberDataTool (UniqueObject, SimpleItem, PropertyManager):
+class MemberDataTool (UniqueObject, SimpleItem, PropertyManager, ActionProviderBase):
     '''This tool wraps user objects, making them act as Member objects.
     '''
     id = 'portal_memberdata'
     meta_type = 'CMF Member Data Tool'
+    _actions = []
     _v_temps = None
     _properties = ()
 
     security = ClassSecurityInfo()
 
-    manage_options=( ( { 'label' : 'Overview'
+    manage_options=( ActionProviderBase.manage_options +
+                     ({ 'label' : 'Overview'
                        , 'action' : 'manage_overview'
                        }
                      , { 'label' : 'Contents'
@@ -83,8 +86,11 @@ class MemberDataTool (UniqueObject, SimpleItem, PropertyManager):
     #   'portal_memberdata' interface methods
     #
     security.declarePrivate('listActions')
-    def listActions(self, info):
-        return None
+    def listActions(self, info=None):
+        """
+        Return actions provided via tool.
+        """
+        return self._actions
 
     security.declarePrivate('getMemberDataContents')
     def getMemberDataContents(self):

@@ -20,12 +20,14 @@ __version__='$Revision$'[11:-2]
 
 from Products.CMFCore.utils import _getAuthenticatedUser, _checkPermission
 from Products.CMFCore.utils import getToolByName
+from Products.CMFCore.ActionsTool import ActionInformation
 import Products.CMFCore.MembershipTool
 from Products.CMFCore.PortalFolder import manage_addPortalFolder
 import Document
 
 from Globals import InitializeClass, DTMLFile
 from AccessControl import ClassSecurityInfo
+from Products.CMFCore.Expression import Expression
 from Products.CMFCore.CMFCorePermissions import View, AccessContentsInformation
 from Products.CMFCore.CMFCorePermissions import ListPortalMembers, AddPortalMember
 from Products.CMFCore.CMFCorePermissions import ManagePortal
@@ -40,10 +42,73 @@ default_member_content = '''Default page for %s
   in the Tool Box on the left.
 '''
 
-
 class MembershipTool ( Products.CMFCore.MembershipTool.MembershipTool ):
     """
     """
+    _actions =[ActionInformation(id='login'
+                            , title='Login'
+                            , description='Click here to Login'
+                            , action=Expression(
+            text='string: ${portal_url}/login_form')
+                            , permissions=(View,)
+                            , category='user'
+                            , condition=Expression(text='not: member')
+                            , visible=1
+                             ) 
+          , ActionInformation(id='preferences'
+                            , title='Preferences'
+                            , description='Change your user preferences'
+                            , action=Expression(
+            text='string: ${portal_url}/personalize_form')
+                            , permissions=(View,)
+                            , category='user'
+                            , condition=Expression(text='member')
+                            , visible=1
+                             )
+          , ActionInformation(id='logout'
+                            , title='Log out'
+                            , description='Click here to logout'
+                            , action=Expression(
+            text='string: ${portal_url}/logout')
+                            , permissions=(View,)
+                            , category='user'
+                            , condition=Expression(text='member')
+                            , visible=1
+                             )
+          , ActionInformation(id='addFavorite'
+                            , title='Add to favorites'
+                            , description='Add this item to your favorites'
+                            , action=Expression(
+            text='string: ${portal_url}/addtoFavorites')
+                            , permissions=(View,)
+                            , category='user'
+                            , condition=Expression(
+            text='python: portal.portal_membership.getHomeFolder()')
+                            , visible=1
+                             )
+          , ActionInformation(id='mystuff'
+                            , title='my stuff'
+                            , description='Goto your home folder'
+                            , action=Expression(
+          text='python: portal.portal_membership.getHomeUrl()')
+                            , permissions=(View,)
+                            , category='user'
+                            , condition=Expression(
+           text='python: member and portal.portal_membership.getHomeFolder()')
+                            , visible=1
+                             )
+          , ActionInformation(id='favorites'
+                            , title='My favorites'
+                            , description='Browser your favorites'
+                            , action=Expression(
+           text='python: portal.portal_membership.getHomeUrl() + \'/Favorites/folder_contents\'')
+                            , permissions=(View,)
+                            , category='user'
+                            , condition=Expression(
+           text='python: member and hasattr(portal.portal_membership.getHomeFolder(), \'Favorites\')')
+                            , visible=1
+                             )
+                           ]
 
     meta_type = 'Default Membership Tool'
 
@@ -151,63 +216,8 @@ class MembershipTool ( Products.CMFCore.MembershipTool.MembershipTool ):
             return None
 
     security.declarePrivate( 'listActions' )
-    def listActions(self, info):
-        '''Lists actions available to the user.'''
-        user_actions = None
-        portal_url = info.portal_url
-        if info.isAnonymous:
-            user_actions = (
-                {'name': 'Log in',
-                 'url': portal_url + '/login_form',
-                 'permissions': [],
-                 'category': 'user'},
-                {'name': 'Join',
-                 'url': portal_url + '/join_form',
-                 'permissions': [AddPortalMember],
-                 'category': 'user'},
-                )
-
-        if not info.isAnonymous:
-            home_folder = self.getHomeFolder()
-            homeUrl = self.getHomeUrl()
-            user_actions = (
-                {'name': 'Preferences',
-                 'url': portal_url + '/personalize_form',
-                 'permissions': [],
-                 'category': 'user'},
-                {'name': 'Log out',
-                 'url': portal_url + '/logout',
-                 'permissions' : [],
-                 'category': 'user'},
-                {'name': 'Reconfigure portal',
-                 'url': portal_url + '/reconfig_form',
-                 'permissions': ['Manage portal'],
-                 'category': 'global'},
-                )
-
-            if homeUrl is not None:
-                content_url = info.content_url
-                actions = (
-                    {'name': 'Add to Favorites',
-                     'url': ( content_url + '/addtoFavorites' ),
-                     'permissions' : [],
-                     'category': 'user'},
-                    {'name': 'My Stuff',
-                     'url': homeUrl + '/folder_contents',
-                     'permissions': [],
-                     'category': 'user'},
-                    )
-                user_actions = user_actions + actions
-
-                if hasattr( home_folder, 'Favorites' ):
-                    added_actions = (
-                      {'name': 'My Favorites',
-                       'url' : homeUrl + '/Favorites/folder_contents',
-                       'permissions': [],
-                       'category': 'user'},) 
-                    user_actions = user_actions + added_actions
-                    
-        return user_actions
-
+    def listActions(self, info=None):
+        '''Lists actions available through the tool.'''
+        return self._actions
 
 InitializeClass(MembershipTool)

@@ -60,12 +60,6 @@ Use folders to put content in categories."""
                                   , 'permissions'   : (ManageProperties,)
                                   , 'category'      : 'folder'
                                   }
-                                , { 'id'            : 'syndication'
-                                  , 'name'          : 'Syndication'
-                                  , 'action'        : 'synPropertiesForm'
-                                  , 'permissions'   : (ManageProperties,)
-                                  , 'category'      : 'folder'
-                                  }
                                 )
                              }
                            ,

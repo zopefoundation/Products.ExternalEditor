@@ -23,21 +23,34 @@ from OFS.SimpleItem import SimpleItem
 from Globals import InitializeClass, DTMLFile
 from string import split
 from AccessControl import ClassSecurityInfo
-
+from Expression import Expression
+from ActionInformation import ActionInformation
+from ActionProviderBase import ActionProviderBase
 from CMFCorePermissions import ManagePortal, UndoChanges, ListUndoableChanges
 
-class UndoTool (UniqueObject, SimpleItem):
+class UndoTool (UniqueObject, SimpleItem, ActionProviderBase):
     id = 'portal_undo'
     meta_type = 'CMF Undo Tool'
     # This tool is used to undo changes.
+    _actions = [ActionInformation(id='undo'
+                                , title='Undo'
+                                , action=Expression(
+               text='string: ${portal_url}/undo_form')
+                                , condition=Expression(
+               text='member') 
+                                , permissions=(ListUndoableChanges,)
+                                , category='global'
+                                , visible=1
+                                 )]
 
 
     security = ClassSecurityInfo()
 
-    manage_options = ( { 'label' : 'Overview', 'action' : 'manage_overview' }
+    manage_options = ( ActionProviderBase.manage_options +
+                       SimpleItem.manage_options +
+                       ({ 'label' : 'Overview', 'action' : 'manage_overview' }
                      , 
-                     ) + SimpleItem.manage_options
-
+                     ))
     #
     #   ZMI methods
     #
@@ -46,14 +59,11 @@ class UndoTool (UniqueObject, SimpleItem):
     manage_overview = DTMLFile( 'explainUndoTool', _dtmldir )
 
     security.declarePrivate('listActions')
-    def listActions( self, info ):
-        if info.isAnonymous:
-            return []
-        return [ { 'name': 'Undo'
-                 , 'url': 'undo_form'
-                 , 'permissions': [ ListUndoableChanges ]
-                 , 'category': 'global'
-                 } ]
+    def listActions(self, info=None):
+        """
+        List actions available through tool
+        """
+        return self._actions
 
     #
     #   'portal_undo' interface methods
