@@ -130,6 +130,13 @@ class SkinnableObjectManager(ObjectManager):
             if REQUEST is not None:
                 REQUEST._hold(SkinDataCleanup(tid))
 
+    security.declarePublic('clearCurrentSkin')
+    def clearCurrentSkin(self):
+        """Clear the current skin."""
+        tid = get_ident()
+        if SKINDATA.has_key(tid):
+            del SKINDATA[tid]
+
     security.declarePublic('setupCurrentSkin')
     def setupCurrentSkin(self, REQUEST=None):
         '''
