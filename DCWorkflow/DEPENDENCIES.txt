@@ -1,3 +1,2 @@
 Zope >= 2.6.4
 CMFCore
-CMFDefault
