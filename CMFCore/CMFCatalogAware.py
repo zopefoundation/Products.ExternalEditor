@@ -51,7 +51,7 @@ class CMFCatalogAware:
 
     def manage_afterAdd(self, item, container):
         """
-            Add self to the workflow and catalog.
+            Add self to the catalog.
         """
         #
         #   Are we being added (or moved)?
@@ -70,12 +70,7 @@ class CMFCatalogAware:
         """
             Add self to workflow, as we have just been cloned.
         """
-        wf = getToolByName(self, 'portal_workflow', None)
-        if wf is not None:
-            wf.notifyCreated(self)
-            # After a clone, the workflow may have reset
-            # its variables so the object has to be reindexed.
-            self.reindexObject()
+        self.notifyWorkflowCreated()
         #
         #   Now let our "aspects" know we have been cloned.
         #   For instance, talkbacks.
@@ -83,7 +78,6 @@ class CMFCatalogAware:
         for item_id, subitem in self.objectItems():
             if hasattr(aq_base(subitem), 'manage_afterClone'):
                 subitem.manage_afterClone(item)
-
 
     def manage_beforeDelete(self, item, container):
         """
@@ -103,6 +97,15 @@ class CMFCatalogAware:
                 # name "manage_beforeDelete"
                 if hasattr(aq_base(subitem), 'manage_beforeDelete'):
                     subitem.manage_beforeDelete(item, container)
+
+    security.declarePrivate('notifyWorkflowCreated')
+    def notifyWorkflowCreated(self):
+        """
+            Notify the workflow that self was just created.
+        """
+        wftool = getToolByName(self, 'portal_workflow', None)
+        if wftool is not None:
+            wftool.notifyCreated(self)
 
 
 Globals.InitializeClass(CMFCatalogAware)
