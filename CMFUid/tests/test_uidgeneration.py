@@ -46,6 +46,13 @@ class UniqueIdGeneratorTests(SecurityTest):
         uid2 = generator()
         self.failIfEqual(uid1, uid2)
         self.failIfEqual(uid1, None)
+        
+    def test_converter(self):
+        generator = self.root.portal_uidgenerator
+        uid = generator()
+        str_uid = str(uid)
+        result = generator.convert(str_uid)
+        self.assertEqual(result, uid)
 
 def test_suite():
     return TestSuite((

@@ -136,6 +136,10 @@ class UniqueIdHandlerTool(UniqueObject, SimpleItem, ActionProviderBase):
         if uid is None:
             return default
         
+        # convert the uid to the right format
+        generator = getToolByName(self, 'portal_uidgenerator')
+        uid = generator.convert(uid)
+        
         catalog = getToolByName(self, 'portal_catalog')
         searchMethod = getattr(catalog, searchMethodName)
         result = searchMethod({self.UID_ATTRIBUTE_NAME: uid})

@@ -35,6 +35,13 @@ class IUniqueIdGenerator(Interface):
         """Return a unique id value.
         """
 
+    def convert(uid):
+        """Converts the unique id from string type to the appropriate
+           uid type.
+           
+        The resulting type has to be the same as the one '__call__'
+        returns.
+        """
 
 class IUniqueIdAnnotationManagement(Interface):
     """Manage unique id annotations.

@@ -65,5 +65,10 @@ class UniqueIdGeneratorTool(UniqueObject, SimpleItem, ActionProviderBase):
         """
         self._uid_counter.change(+1)
         return self._uid_counter()
+        
+    def convert(self, uid):
+        """See IUniqueIdGenerator.
+        """
+        return int(uid)
 
 InitializeClass(UniqueIdGeneratorTool)
