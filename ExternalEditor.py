@@ -21,6 +21,7 @@ import re
 import urllib
 import Acquisition
 from Globals import InitializeClass
+from App.Common import rfc1123_date
 from AccessControl.SecurityManagement import getSecurityManager
 from AccessControl.SecurityInfo import ClassSecurityInfo
 from OFS import Image
@@ -107,7 +108,10 @@ class ExternalEditor(Acquisition.Implicit):
               
         r.append('')
         
-        RESPONSE.setHeader('Pragma', 'no-cache')
+        # Using RESPONSE.setHeader('Pragma', 'no-cache') would be better, but
+        # this chokes crappy most MSIE versions when downloads happen on SSL.
+        # cf. http://support.microsoft.com/support/kb/articles/q316/4/31.asp
+        RESPONSE.setHeader('Last-Modified', rfc1123_date())
         
         if hasattr(Acquisition.aq_base(ob), 'data') \
            and hasattr(ob.data, '__class__') \

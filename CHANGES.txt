@@ -4,6 +4,9 @@ External Editor Change Log
   
     - Fix bug detecting basic auth info from older versions of CookieCrumber.
       Thanks to David D. Smith and Federico Sevilla III.
+    
+    - Workaround IE browser error when running over SSL. Thanks to 
+      Marc-Aurèle Darche.
   
     - Add ".zem" file extension support for MacOS X (especially Mac IE),
       to ease helper app integration where MIME support is lacking. Thanks
