@@ -71,6 +71,8 @@ class IUniqueIdSet(Interface):
         
         If the object is already registered, its unique id is returned 
         anyway.
+        
+        UniqueIdError is raised if object can not be registered a unique id.
         """
 
     def unregister(obj):
