@@ -265,7 +265,7 @@ class Collector(SkinnedFolder):
                   and (userid not in x)):
                 changes.append("Managers cannot de-enlist themselves")
                 x.append(userid)
-            if util.sorted(self.managers) != util.sorted(x):
+            if self.managers != x:
                 changes.append("Managers")
                 self.managers = x
                 staff_changed = 1
@@ -273,7 +273,7 @@ class Collector(SkinnedFolder):
         if supporters is not None:
             # XXX Vette supporters - they must exist, etc.
             x = filter(None, supporters)
-            if util.sorted(self.supporters) != util.sorted(x):
+            if self.supporters != x:
                 changes.append("Supporters")
                 self.supporters = x
                 staff_changed = 1
