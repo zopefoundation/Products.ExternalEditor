@@ -116,9 +116,11 @@ class SetupStepRegistry( Implicit ):
 
         """ Return a sequence of mappings describing registered steps.
 
-        o Mappings will be ordered topologically (most-dependent last).
+        o Mappings will be ordered alphabetically.
         """
-        return [ self.getStepMetadata( x ) for x in self.sortSteps() ]
+        step_ids = self.listSteps()
+        step_ids.sort()
+        return [ self.getStepMetadata( x ) for x in step_ids ]
 
     security.declareProtected( ManagePortal, 'exportAsXML' )
     def exportAsXML( self ):
@@ -409,9 +411,20 @@ class ExportScriptRegistry( Implicit ):
 
         """ Return a sequence of mappings describing registered scripts.
 
-        o Order is not significant.
+        o Scripts will be alphabetical by ID.
         """
-        return [ self.getStepMetadata( x ) for x in self.listScripts() ]
+        script_ids = self.listScripts()
+        script_ids.sort()
+        return [ self.getScriptMetadata( x ) for x in script_ids ]
+
+    security.declareProtected( ManagePortal, 'exportAsXML' )
+    def exportAsXML( self ):
+
+        """ Return a round-trippable XML representation of the registry.
+
+        o 'callable' values are serialized using their dotted names.
+        """
+        return self._exportTemplate()
 
     security.declarePrivate( 'getScript' )
     def getScript( self, key, default=None ):
@@ -465,4 +478,93 @@ class ExportScriptRegistry( Implicit ):
 
         self._registered[ id ] = info
 
+    security.declarePrivate( 'importFromXML' )
+    def importFromXML( self, text ):
+
+        """ Parse 'text' into a clean registry.
+        """
+        self._clear()
+
+        reader = getattr( text, 'read', None )
+
+        if reader is not None:
+            text = reader()
+
+        parseString( text, _ExportScriptRegistryParser( self ) )
+
+    #
+    #   Helper methods
+    #
+    security.declarePrivate( '_clear' )
+    def _clear( self ):
+
+        self._registered = {}
+
+    security.declarePrivate( '_exportTemplate' )
+    _exportTemplate = PageTemplateFile( 'esrExport.xml', _xmldir )
+
 InitializeClass( ExportScriptRegistry )
+
+class _ExportScriptRegistryParser( ContentHandler ):
+
+    security = ClassSecurityInfo()
+    security.declareObjectPrivate()
+    security.setDefaultAccess( 'deny' )
+
+    def __init__( self, registry, encoding='latin-1' ):
+
+        self._registry = registry
+        self._encoding = encoding
+        self._started = False
+        self._pending = None
+
+    def startElement( self, name, attrs ):
+
+        if name == 'export-scripts':
+
+            if self._started:
+                raise ValueError, 'Duplicated export-scripts element: %s' % name
+
+            self._started = True
+
+        elif name == 'export-script':
+
+            if self._pending is not None:
+                raise ValueError, 'Cannot nest export-script elements'
+
+            self._pending = dict( [ ( k, v.encode( self._encoding ) )
+                                    for k, v in attrs.items() ] )
+
+        else:
+            raise ValueError, 'Unknown element %s' % name
+
+    def characters( self, content ):
+
+        if self._pending is not None:
+            content = content.encode( self._encoding )
+            self._pending.setdefault( 'description', [] ).append( content )
+
+    def endElement(self, name):
+
+        if name == 'export-scripts':
+            pass
+
+        elif name == 'export-script':
+
+            if self._pending is None:
+                raise ValueError, 'No pending script!'
+
+            id = self._pending[ 'id' ]
+            callable = _resolveDottedName( self._pending[ 'callable' ] )
+
+            title = self._pending.get( 'title', id )
+            description = ''.join( self._pending.get( 'description', [] ) )
+
+            self._registry.registerScript( id=id
+                                         , callable=callable
+                                         , title=title
+                                         , description=description
+                                         )
+            self._pending = None
+
+InitializeClass( _ExportScriptRegistryParser )

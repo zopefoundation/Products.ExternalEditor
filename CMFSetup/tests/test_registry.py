@@ -21,18 +21,11 @@ THREE_FUNC_NAME = '%s.%s' % ( __name__, THREE_FUNC.__name__ )
 FOUR_FUNC_NAME = '%s.%s' % ( __name__, FOUR_FUNC.__name__ )
 
 
-#==============================================================================
-#   SSR tests
-#==============================================================================
-class SetupStepRegistryTests( SecurityRequestTest ):
-
-    def _getTargetClass( self ):
-
-        from Products.CMFSetup.registry import SetupStepRegistry
-        return SetupStepRegistry
+class BaseRegistryTests( SecurityRequestTest ):
 
     def _makeOne( self, *args, **kw ):
 
+        # Derived classes must implement _getTargetClass
         return self._getTargetClass()( *args, **kw )
 
     def _compareDOM( self, found_text, expected_text ):
@@ -41,6 +34,17 @@ class SetupStepRegistryTests( SecurityRequestTest ):
         found = parseString( found_text )
         expected = parseString( expected_text )
         self.assertEqual( found.toxml(), expected.toxml() )
+
+
+#==============================================================================
+#   SSR tests
+#==============================================================================
+class SetupStepRegistryTests( BaseRegistryTests ):
+
+    def _getTargetClass( self ):
+
+        from Products.CMFSetup.registry import SetupStepRegistry
+        return SetupStepRegistry
 
     def test_empty( self ):
 
@@ -454,7 +458,7 @@ class SetupStepRegistryTests( SecurityRequestTest ):
                              , description='One small step'
                              )
 
-        self._compareDOM( registry.exportAsXML(), _SINGLE_STEPS_EXPORT )
+        self._compareDOM( registry.exportAsXML(), _SINGLE_STEP_EXPORT )
 
     def test_export_ordered( self ):
 
@@ -515,7 +519,7 @@ class SetupStepRegistryTests( SecurityRequestTest ):
                              , description='Texas two step'
                              )
 
-        registry.importFromXML( _SINGLE_STEPS_EXPORT )
+        registry.importFromXML( _SINGLE_STEP_EXPORT )
 
         self.assertEqual( len( registry.listSteps() ), 1 )
         self.failUnless( 'one' in registry.listSteps() )
@@ -523,6 +527,7 @@ class SetupStepRegistryTests( SecurityRequestTest ):
         info = registry.getStepMetadata( 'one' )
         self.assertEqual( info[ 'id' ], 'one' )
         self.assertEqual( info[ 'version' ], '1' )
+        self.assertEqual( info[ 'callable' ], ONE_FUNC_NAME )
         self.assertEqual( info[ 'dependencies' ], () )
         self.assertEqual( info[ 'title' ], 'One Step' )
         self.failUnless( 'One small step' in info[ 'description' ] )
@@ -553,7 +558,7 @@ _EMPTY_STEPS_EXPORT = """\
 </setup-steps>
 """
 
-_SINGLE_STEPS_EXPORT = """\
+_SINGLE_STEP_EXPORT = """\
 <?xml version="1.0"?>
 <setup-steps>
  <setup-step id="one"
@@ -568,6 +573,13 @@ _SINGLE_STEPS_EXPORT = """\
 _ORDERED_STEPS_EXPORT = """\
 <?xml version="1.0"?>
 <setup-steps>
+ <setup-step id="one"
+             version="1"
+             callable="%s"
+             title="One Step">
+  <dependency step="two" />
+  One small step
+ </setup-step>
  <setup-step id="three"
              version="3"
              callable="%s"
@@ -581,21 +593,14 @@ _ORDERED_STEPS_EXPORT = """\
   <dependency step="three" />
   Texas two step
  </setup-step>
- <setup-step id="one"
-             version="1"
-             callable="%s"
-             title="One Step">
-  <dependency step="two" />
-  One small step
- </setup-step>
 </setup-steps>
-""" % ( THREE_FUNC_NAME, TWO_FUNC_NAME, ONE_FUNC_NAME )
+""" % ( ONE_FUNC_NAME, THREE_FUNC_NAME, TWO_FUNC_NAME )
 
 
 #==============================================================================
 #   ESR tests
 #==============================================================================
-class ExportScriptRegistryTests( unittest.TestCase ):
+class ExportScriptRegistryTests( BaseRegistryTests ):
 
     def _getTargetClass( self ):
 
@@ -686,6 +691,135 @@ class ExportScriptRegistryTests( unittest.TestCase ):
         registry = self._makeOne()
         registry.registerScript( 'one', ONE_FUNC )
         self.assertRaises( KeyError, registry.registerScript, 'one', TWO_FUNC )
+
+    def test_export_empty( self ):
+
+        registry = self._makeOne().__of__( self.root )
+
+        xml = registry.exportAsXML()
+
+        self._compareDOM( registry.exportAsXML(), _EMPTY_SCRIPTS_EXPORT )
+
+    def test_export_single( self ):
+
+        registry = self._makeOne().__of__( self.root )
+
+        registry.registerScript( id='one'
+                               , callable=ONE_FUNC
+                               , title='One Step'
+                               , description='One small step'
+                               )
+
+        self._compareDOM( registry.exportAsXML(), _SINGLE_SCRIPT_EXPORT )
+
+    def test_export_ordered( self ):
+
+        registry = self._makeOne().__of__( self.root )
+
+        registry.registerScript( id='one'
+                               , callable=ONE_FUNC
+                               , title='One Step'
+                               , description='One small step'
+                               )
+
+        registry.registerScript( id='two'
+                               , callable=TWO_FUNC
+                               , title='Two Steps'
+                               , description='Texas two step'
+                               )
+
+        registry.registerScript( id='three'
+                               , callable=THREE_FUNC
+                               , title='Three Steps'
+                               , description='Gimme three steps'
+                               )
+
+        self._compareDOM( registry.exportAsXML(), _ORDERED_SCRIPTS_EXPORT )
+
+    def test_import_empty( self ):
+
+        registry = self._makeOne().__of__( self.root )
+
+        registry.registerScript( id='one'
+                               , callable=ONE_FUNC
+                               , description='One small step'
+                               )
+
+        registry.importFromXML( _EMPTY_SCRIPTS_EXPORT )
+
+        self.assertEqual( len( registry.listScripts() ), 0 )
+        self.assertEqual( len( registry.listScriptMetadata() ), 0 )
+
+    def test_import_single( self ):
+
+        registry = self._makeOne().__of__( self.root )
+
+        registry.registerScript( id='two'
+                               , callable=TWO_FUNC
+                               , title='Two Steps'
+                               , description='Texas two step'
+                               )
+
+        registry.importFromXML( _SINGLE_SCRIPT_EXPORT )
+
+        self.assertEqual( len( registry.listScripts() ), 1 )
+        self.failUnless( 'one' in registry.listScripts() )
+
+        info = registry.getScriptMetadata( 'one' )
+        self.assertEqual( info[ 'id' ], 'one' )
+        self.assertEqual( info[ 'callable' ], ONE_FUNC_NAME )
+        self.assertEqual( info[ 'title' ], 'One Step' )
+        self.failUnless( 'One small step' in info[ 'description' ] )
+
+    def test_import_ordered( self ):
+
+        registry = self._makeOne().__of__( self.root )
+
+        registry.importFromXML( _ORDERED_SCRIPTS_EXPORT )
+
+        self.assertEqual( len( registry.listScripts() ), 3 )
+        self.failUnless( 'one' in registry.listScripts() )
+        self.failUnless( 'two' in registry.listScripts() )
+        self.failUnless( 'three' in registry.listScripts() )
+
+
+_EMPTY_SCRIPTS_EXPORT = """\
+<?xml version="1.0"?>
+<export-scripts>
+</export-scripts>
+"""
+
+_SINGLE_SCRIPT_EXPORT = """\
+<?xml version="1.0"?>
+<export-scripts>
+ <export-script id="one"
+                callable="%s"
+                title="One Step">
+  One small step
+ </export-script>
+</export-scripts>
+""" % ( ONE_FUNC_NAME, )
+
+_ORDERED_SCRIPTS_EXPORT = """\
+<?xml version="1.0"?>
+<export-scripts>
+ <export-script id="one"
+                callable="%s"
+                title="One Step">
+  One small step
+ </export-script>
+ <export-script id="three"
+                callable="%s"
+                title="Three Steps">
+  Gimme three steps
+ </export-script>
+ <export-script id="two"
+                callable="%s"
+                title="Two Steps">
+  Texas two step
+ </export-script>
+</export-scripts>
+""" % ( ONE_FUNC_NAME, THREE_FUNC_NAME, TWO_FUNC_NAME )
 
 
 def test_suite():
