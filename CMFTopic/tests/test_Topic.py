@@ -1,6 +1,15 @@
-import unittest
+from unittest import TestCase, TestSuite, makeSuite, main
 
-class TestTopic(unittest.TestCase):
+import Testing
+import Zope
+try:
+    Zope.startup()
+except AttributeError:
+    # for Zope versions before 2.6.1
+    pass
+
+
+class TestTopic(TestCase):
     """
         Test all the general Topic cases
     """
@@ -12,7 +21,7 @@ class TestTopic(unittest.TestCase):
 
         query = topic.buildQuery()
         self.assertEqual( len( query ), 0 )
-    
+
     def test_Simple( self ):
 
         from Products.CMFTopic.Topic import Topic
@@ -31,7 +40,7 @@ class TestTopic(unittest.TestCase):
         self.assertEqual( len( query ), 2 )
         self.assertEqual( query[ 'foo' ], 'bar' )
         self.assertEqual( query[ 'baz' ], 43 )
-    
+
     def test_Nested( self ):
 
         from Products.CMFTopic.Topic import Topic
@@ -56,8 +65,11 @@ class TestTopic(unittest.TestCase):
         self.assertEqual( len( query ), 1 )
         self.assertEqual( query['baz'], 'bam' )
 
+
 def test_suite():
-    return unittest.makeSuite(TestTopic)
+    return TestSuite((
+        makeSuite(TestTopic),
+        ))
 
 if __name__ == '__main__':
-    unittest.TextTestRunner().run(test_suite())
+    main(defaultTest='test_suite')

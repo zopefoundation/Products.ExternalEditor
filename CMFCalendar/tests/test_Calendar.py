@@ -1,23 +1,30 @@
 import unittest
+
+import Testing
 import Zope
+try:
+    Zope.startup()
+except AttributeError:
+    # for Zope versions before 2.6.1
+    pass
+
 from Testing.makerequest import makerequest
-from Products.CMFCalendar import CalendarTool
 from DateTime import DateTime
 from AccessControl.SecurityManagement import newSecurityManager
 from AccessControl.User import UnrestrictedUser
 from Products.ExternalMethod.ExternalMethod import manage_addExternalMethod
 
+from Products.CMFCalendar import CalendarTool
+
+
 class TestCalendar(unittest.TestCase):
 
     def setUp(self):
         get_transaction().begin()
-        
+
         self.app = makerequest(Zope.app())
         # Log in as a god :-)
-        newSecurityManager(None, UnrestrictedUser('god',
-                                                  'god',
-                                                  [],
-                                                  ''))
+        newSecurityManager( None, UnrestrictedUser('god', 'god', [], '') )
         app = self.app
 
         app.REQUEST.set('URL1','http://foo/sorcerertest/test')
@@ -25,7 +32,7 @@ class TestCalendar(unittest.TestCase):
         try: app._delObject('CalendarTest')
         except AttributeError: pass
         app.manage_addProduct['CMFDefault'].manage_addCMFSite('CalendarTest')
-        
+
         self.Site = app.CalendarTest
 
         manage_addExternalMethod(app.CalendarTest,
@@ -33,10 +40,10 @@ class TestCalendar(unittest.TestCase):
                                  title="Install Events",
                                  module="CMFCalendar.Install",
                                  function="install")
-        
+
         ExMethod = app.restrictedTraverse('/CalendarTest/install_events')
         ExMethod()
-        
+
         self.Tool = app.restrictedTraverse('/CalendarTest/portal_calendar')
 
         # sessioning bodge until we find out how to do this properly
@@ -45,32 +52,31 @@ class TestCalendar(unittest.TestCase):
         if self.have_session:
             app.REQUEST.set_lazy( 'SESSION'
                                 , app.session_data_manager.getSessionData )
-        
+
         # bodge us a URL1
-        
+
     def _testURL(self,url,params=None):
         Site = self.Site
         obj = Site.restrictedTraverse(url)
         if params is None:
             params=(obj, Site.REQUEST)
         apply(obj,params)
-        
+
     def tearDown(self):
         get_transaction().abort()
         self.app._p_jar.close()
-        
-        
+
     def test_new(self):
         tool = CalendarTool.CalendarTool()
         self.assertEqual(tool.getId(),'portal_calendar')
-    
+
     def test_types(self):
         self.assertEqual(self.Tool.getCalendarTypes(),['Event'])
 
         self.Tool.edit_configuration(show_types=['Event','Party']
                                     , use_session="")
         self.assertEqual(self.Tool.getCalendarTypes(),['Event', 'Party'])
-        
+
     def test_Days(self):
         assert self.Tool.getDays() == ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
 
@@ -80,16 +86,16 @@ class TestCalendar(unittest.TestCase):
             return
 
         self.Tool.edit_configuration(show_types=['Event'], use_session="True")
-        
+
         self._testURL('/CalendarTest/calendarBox', ())
-        
+
         self.failUnless(self.app.REQUEST.SESSION.get('calendar_year',None))
 
     def XXX_test_noSessions(self):
         self.Tool.edit_configuration(show_types=['Event'], use_session="")
-        
+
         self._testURL('/CalendarTest/calendarBox', ())
-        
+
         if self.have_session:
             self.failIf(self.app.REQUEST.SESSION.get('calendar_year',None))
 
@@ -139,12 +145,12 @@ class TestCalendar(unittest.TestCase):
                  {'day':31, 'event': 0, 'eventslist':[]},
                  {'day': 0, 'event': 0, 'eventslist':[]},
                  {'day': 0, 'event': 0, 'eventslist':[]}
-                 ]                
+                 ]
                 ]
         assert self.Tool.getEventsForCalendar(month='1', year='2002') == data, self.Tool.getEventsForCalendar(month='1', year='2002')
-        
+
     def test_singleEventCalendarRendering(self):
-        
+
         self.Site.Members.folder_factories.invokeFactory(type_name="Event",id='Event1')
         event = self.app.restrictedTraverse('/CalendarTest/Members/Event1')
         event.edit( title='title'
@@ -164,8 +170,8 @@ class TestCalendar(unittest.TestCase):
         self.Site.portal_workflow.doActionFor(
                                               event,
                                               'publish',
-                                              comment='testing')        
-        
+                                              comment='testing')
+
         data = [
                 [
                  {'day': 0, 'event': 0, 'eventslist':[]},
@@ -211,12 +217,12 @@ class TestCalendar(unittest.TestCase):
                  {'day':31, 'event': 0, 'eventslist':[]},
                  {'day': 0, 'event': 0, 'eventslist':[]},
                  {'day': 0, 'event': 0, 'eventslist':[]}
-                 ]                
+                 ]
                 ]
         assert self.Tool.getEventsForCalendar(month='1', year='2002') == data, self.Tool.getEventsForCalendar(month='1', year='2002')
 
     def test_spanningEventCalendarRendering(self):
-        
+
         self.Site.Members.folder_factories.invokeFactory(type_name="Event",id='Event1')
         event = self.app.restrictedTraverse('/CalendarTest/Members/Event1')
         event.edit( title='title'
@@ -236,8 +242,8 @@ class TestCalendar(unittest.TestCase):
         self.Site.portal_workflow.doActionFor(
                                               event,
                                               'publish',
-                                              comment='testing')        
-        
+                                              comment='testing')
+
         data = [
                 [
                  {'day': 0, 'event': 0, 'eventslist':[]},
@@ -283,14 +289,14 @@ class TestCalendar(unittest.TestCase):
                  {'day':31, 'event': 1, 'eventslist':[{'title': 'title', 'end': '23:59:00', 'start': None}]},
                  {'day': 0, 'event': 0, 'eventslist':[]},
                  {'day': 0, 'event': 0, 'eventslist':[]}
-                 ]                
+                 ]
                 ]
         assert self.Tool.getEventsForCalendar(month='1', year='2002') == data, self.Tool.getEventsForCalendar(month='1', year='2002')
 
     def test_getPreviousMonth(self):
         assert self.Tool.getPreviousMonth(2,2002) == DateTime('1/1/2002')
         assert self.Tool.getPreviousMonth(1,2002) == DateTime('12/1/2001')
-       
+
     def test_getNextMonth(self):
         assert self.Tool.getNextMonth(12,2001) == DateTime('1/1/2002')
         assert self.Tool.getNextMonth(1,2002) == DateTime('2/1/2002')
@@ -299,7 +305,7 @@ class TestCalendar(unittest.TestCase):
         assert self.Tool.getBeginAndEndTimes(1,12,2001) == (DateTime('12/1/2001 12:00:00AM'),DateTime('12/1/2001 11:59:59PM'))
 
     def test_singleDayRendering(self):
-        
+
         self.Site.Members.folder_factories.invokeFactory(type_name="Event",id='Event1')
         event = self.app.restrictedTraverse('/CalendarTest/Members/Event1')
         event.edit( title='title'
@@ -319,8 +325,8 @@ class TestCalendar(unittest.TestCase):
         self.Site.portal_workflow.doActionFor(
                                               event,
                                               'publish',
-                                              comment='testing')        
-        
+                                              comment='testing')
+
         assert len(self.Site.portal_calendar.getEventsForThisDay(thisDay=DateTime('1/1/2002'))) == 1
 
         self.Site.Members.folder_factories.invokeFactory(type_name="Event",id='Event2')
@@ -342,10 +348,10 @@ class TestCalendar(unittest.TestCase):
         self.Site.portal_workflow.doActionFor(
                                               event,
                                               'publish',
-                                              comment='testing')        
+                                              comment='testing')
 
         assert len(self.Site.portal_calendar.getEventsForThisDay(thisDay=DateTime('1/1/2002'))) == 2
-        
+
         self.Site.Members.folder_factories.invokeFactory(type_name="Event",id='Event3')
         event = self.app.restrictedTraverse('/CalendarTest/Members/Event3')
         event.edit( title='title'
@@ -365,7 +371,7 @@ class TestCalendar(unittest.TestCase):
         self.Site.portal_workflow.doActionFor(
                                               event,
                                               'publish',
-                                              comment='testing')        
+                                              comment='testing')
 
         assert len(self.Site.portal_calendar.getEventsForThisDay(thisDay=DateTime('1/1/2002'))) == 3
 
@@ -388,7 +394,7 @@ class TestCalendar(unittest.TestCase):
         self.Site.portal_workflow.doActionFor(
                                               event,
                                               'publish',
-                                              comment='testing')        
+                                              comment='testing')
 
         assert len(self.Site.portal_calendar.getEventsForThisDay(thisDay=DateTime('1/1/2002'))) == 4
 
@@ -411,7 +417,7 @@ class TestCalendar(unittest.TestCase):
         self.Site.portal_workflow.doActionFor(
                                               event,
                                               'publish',
-                                              comment='testing')        
+                                              comment='testing')
 
         assert len(self.Site.portal_calendar.getEventsForThisDay(thisDay=DateTime('1/1/2002'))) == 4
 

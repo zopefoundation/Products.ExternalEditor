@@ -1,30 +1,39 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """ Unit tests for SortCriterion module.
 
 $Id$
 """
 
-import unittest
+from unittest import TestCase, TestSuite, makeSuite, main
 
-class SortCriterionTests( unittest.TestCase ):
+import Testing
+import Zope
+try:
+    Zope.startup()
+except AttributeError:
+    # for Zope versions before 2.6.1
+    pass
+
+
+class SortCriterionTests(TestCase):
 
     def test_Interface( self ):
         from Products.CMFTopic.interfaces import Criterion
         from Products.CMFTopic.SortCriterion import SortCriterion
         self.failUnless(
             Criterion.isImplementedByInstancesOf( SortCriterion ) )
-    
+
     def test_Empty( self ):
 
         from Products.CMFTopic.SortCriterion import SortCriterion
@@ -40,7 +49,7 @@ class SortCriterionTests( unittest.TestCase ):
         self.assertEqual( len( items ), 1 )
         self.assertEqual( items[0][0], 'sort_on' )
         self.assertEqual( items[0][1], 'foofield' )
-    
+
     def test_Nonempty( self ):
 
         from Products.CMFTopic.SortCriterion import SortCriterion
@@ -61,12 +70,11 @@ class SortCriterionTests( unittest.TestCase ):
         self.assertEqual( items[1][0], 'sort_order' )
         self.assertEqual( items[1][1], 'reverse' )
 
-def test_suite():
-    return unittest.makeSuite( SortCriterionTests )
 
-def main():
-    unittest.TextTestRunner().run( test_suite() )
+def test_suite():
+    return TestSuite((
+        makeSuite(SortCriterionTests),
+        ))
 
 if __name__ == '__main__':
-    main()
-    
+    main(defaultTest='test_suite')

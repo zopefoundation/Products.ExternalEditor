@@ -1,23 +1,32 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """ Unit tests for SimpleIntCriterion module.
 
 $Id$
 """
 
-import unittest
+from unittest import TestCase, TestSuite, makeSuite, main
 
-class SimpleIntCriterionTests( unittest.TestCase ):
+import Testing
+import Zope
+try:
+    Zope.startup()
+except AttributeError:
+    # for Zope versions before 2.6.1
+    pass
+
+
+class SimpleIntCriterionTests(TestCase):
 
     def test_Interface( self ):
         from Products.CMFTopic.interfaces import Criterion
@@ -35,7 +44,7 @@ class SimpleIntCriterionTests( unittest.TestCase ):
         self.assertEqual( sic.value, None )
         self.assertEqual( sic.getValueString(), '' )
         self.assertEqual( len(sic.getCriteriaItems() ), 0 )
-    
+
     def test_EditWithString( self ):
 
         from Products.CMFTopic.SimpleIntCriterion import SimpleIntCriterion
@@ -50,7 +59,7 @@ class SimpleIntCriterionTests( unittest.TestCase ):
         self.assertEqual( len( items[0] ), 2 )
         self.assertEqual( items[0][0], 'foofield' )
         self.assertEqual( items[0][1], 0 )
-    
+
     def test_EditWithInt( self ):
 
         from Products.CMFTopic.SimpleIntCriterion import SimpleIntCriterion
@@ -179,11 +188,11 @@ class SimpleIntCriterionTests( unittest.TestCase ):
         self.assertEqual( items[1][0], 'foofield_usage' )
         self.assertEqual( items[1][1], 'range:min:max' )
 
-def test_suite():
-    return unittest.makeSuite( SimpleIntCriterionTests )
 
-def main():
-    unittest.TextTestRunner().run( test_suite() )
+def test_suite():
+    return TestSuite((
+        makeSuite(SimpleIntCriterionTests),
+        ))
 
 if __name__ == '__main__':
-    main()
+    main(defaultTest='test_suite')

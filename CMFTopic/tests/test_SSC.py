@@ -1,23 +1,32 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """ Unit tests for SimpleStringCriterion module.
 
 $Id$
 """
 
-import unittest
+from unittest import TestCase, TestSuite, makeSuite, main
 
-class SimpleStringCriterionTests( unittest.TestCase ):
+import Testing
+import Zope
+try:
+    Zope.startup()
+except AttributeError:
+    # for Zope versions before 2.6.1
+    pass
+
+
+class SimpleStringCriterionTests(TestCase):
 
     def test_Interface( self ):
         from Products.CMFTopic.interfaces import Criterion
@@ -25,7 +34,7 @@ class SimpleStringCriterionTests( unittest.TestCase ):
             import SimpleStringCriterion
         self.failUnless(
             Criterion.isImplementedByInstancesOf( SimpleStringCriterion ) )
-    
+
     def test_Empty( self ):
 
         from Products.CMFTopic.SimpleStringCriterion \
@@ -37,7 +46,7 @@ class SimpleStringCriterionTests( unittest.TestCase ):
         self.assertEqual( ssc.field, 'foofield' )
         self.assertEqual( ssc.value, '' )
         self.assertEqual( len( ssc.getCriteriaItems() ), 0 )
-    
+
     def test_Nonempty( self ):
 
         from Products.CMFTopic.SimpleStringCriterion \
@@ -57,12 +66,11 @@ class SimpleStringCriterionTests( unittest.TestCase ):
         self.assertEqual( items[0][0], 'foofield' )
         self.assertEqual( items[0][1], 'bar' )
 
-def test_suite():
-    return unittest.makeSuite( SimpleStringCriterionTests )
 
-def main():
-    unittest.TextTestRunner().run( test_suite() )
+def test_suite():
+    return TestSuite((
+        makeSuite(SimpleStringCriterionTests),
+        ))
 
 if __name__ == '__main__':
-    main()
-    
+    main(defaultTest='test_suite')

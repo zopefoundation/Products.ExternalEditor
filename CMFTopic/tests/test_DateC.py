@@ -1,24 +1,34 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """ Unit tests for DateCriterion module.
 
 $Id$
 """
 
-import unittest
+from unittest import TestCase, TestSuite, makeSuite, main
+
+import Testing
+import Zope
+try:
+    Zope.startup()
+except AttributeError:
+    # for Zope versions before 2.6.1
+    pass
+
 from DateTime.DateTime import DateTime
 
-class FriendlyDateCriterionTests( unittest.TestCase ):
+
+class FriendlyDateCriterionTests(TestCase):
 
     lessThanFiveDaysOld = { 'value': 4
                           , 'operation': 'min'
@@ -76,7 +86,7 @@ class FriendlyDateCriterionTests( unittest.TestCase ):
 
         from Products.CMFTopic.DateCriteria import FriendlyDateCriterion
         friendly = FriendlyDateCriterion( 'foo', 'foofield' )
-        
+
         friendly.apply( self.lessThanFiveDaysOld )
         self.assertEqual( friendly.value, 4 )
         self.assertEqual( friendly.operation, 'min' )
@@ -119,7 +129,7 @@ class FriendlyDateCriterionTests( unittest.TestCase ):
         self.assertEqual( friendly.daterange, 'ahead' )
 
         now = DateTime()
-        
+
         result = friendly.getCriteriaItems()
         self.assertEqual( len( result ), 2 )
         self.assertEqual( result[0][0], 'foofield' )
@@ -135,7 +145,7 @@ class FriendlyDateCriterionTests( unittest.TestCase ):
 
         friendly.apply( self.lessThanFiveDaysOld )
         self.assertEqual( friendly.daterange, 'old' )
-        
+
         result = friendly.getCriteriaItems()
         self.assertEqual( len( result ), 2 )
         self.assertEqual( result[0][0], 'foofield' )
@@ -155,11 +165,11 @@ class FriendlyDateCriterionTests( unittest.TestCase ):
         self.assertEqual( result[0][1].Date(), ( DateTime() + 30 ).Date() )
         self.assertEqual( result[1][1], 'range:max' )
 
-def test_suite():
-    return unittest.makeSuite( FriendlyDateCriterionTests )
 
-def main():
-    unittest.TextTestRunner().run( test_suite() )
-    
+def test_suite():
+    return TestSuite((
+        makeSuite(FriendlyDateCriterionTests),
+        ))
+
 if __name__ == '__main__':
-    main()
+    main(defaultTest='test_suite')
