@@ -101,6 +101,7 @@ from CMFCorePermissions import View, ManagePortal, AccessContentsInformation
 
 _dtmldir = os.path.join( package_home( globals() ), 'dtml' )
 
+_marker = []  # Create a new marker.
 
 class TypeInformation (SimpleItemWithProperties):
     """
@@ -165,7 +166,17 @@ class TypeInformation (SimpleItemWithProperties):
                 kw['content_meta_type'] = kw['meta_type']
             apply(self.manage_changeProperties, (), kw)
             if kw.has_key('actions'):
-                self._actions = kw['actions']
+                aa = kw['actions']
+                actions = []
+                for action in aa:
+                    action = action.copy()
+                    # Some backward compatibility stuff.
+                    if not action.has_key('id'):
+                        action['id'] = string.lower(action['name'])
+                    if not action.has_key('category'):
+                        action['category'] = 'object'
+                    actions.append(action)
+                self._actions = tuple(actions)
 
     #
     #   Accessors
@@ -226,18 +237,26 @@ class TypeInformation (SimpleItemWithProperties):
         """
         Returns the customizable user actions.
         """
+        # Private because this returns the actual structure.
         return self._actions
 
-    security.declarePublic('actionByName')
-    def actionByName( self, action_name ):
+    security.declarePublic('getActionById')
+    def getActionById( self, id, default=_marker ):
         """
-            Return the URL of the action whose 'Name' is 'action_name'.
+            Return the URL of the action whose ID is id.
         """
         for action in self.getActions():
-            if action[ 'name' ] == action_name:
-                return action[ 'action' ]
-        raise TypeError, 'No action named "%s" for type "%s"' % ( action_name
-                                                                , self.id )
+            if action.has_key('id'):
+                if action['id'] == id:
+                    return action['action']
+            else:
+                # Temporary backward compatibility.
+                if string.lower(action['name']) == id:
+                    return action['action']
+        if default is _marker:
+            raise TypeError, 'No action "%s" for type "%s"' % ( id, self.id )
+        else:
+            return default
 
     #
     #  Action editing interface
@@ -259,6 +278,8 @@ class TypeInformation (SimpleItemWithProperties):
                 a['permission'] = ''
             if not a.has_key('category'):
                 a['category'] = 'object'
+            if not a.has_key('id'):
+                a['id'] = string.lower(a['name'])
             actions.append(a)
         # possible_permissions is in AccessControl.Role.RoleManager.
         pp = self.possible_permissions()
@@ -269,14 +290,15 @@ class TypeInformation (SimpleItemWithProperties):
                                   manage_tabs_message=manage_tabs_message)
 
     security.declareProtected(ManagePortal, 'addAction')
-    def addAction(self, name, action, permission, category, REQUEST=None):
+    def addAction(self, id, name, action, permission, category, REQUEST=None):
         """
         Adds an action to the list.
         """
         if not name:
             raise ValueError('A name is required.')
         self._actions = self._actions + (
-            {'name': str(name),
+            {'id': str(id),
+             'name': str(name),
              'action': str(action),
              'permissions': (str(permission),),
              'category': str(category),
@@ -295,12 +317,14 @@ class TypeInformation (SimpleItemWithProperties):
         actions = []
         for idx in range(len(self._actions)):
             s_idx = str(idx)
-            action = {'name': str(properties.get('name_' + s_idx, '')),
-                      'action': str(properties.get('action_' + s_idx, '')),
-                      'permissions':
-                      (properties.get('permission_' + s_idx, ()),),
-                      'category': str(properties.get('category_' + s_idx, '')),
-                      }
+            action = {
+                'id': str(properties.get('id_' + s_idx, '')),
+                'name': str(properties.get('name_' + s_idx, '')),
+                'action': str(properties.get('action_' + s_idx, '')),
+                'permissions':
+                (properties.get('permission_' + s_idx, ()),),
+                'category': str(properties.get('category_' + s_idx, '')),
+                }
             if not action['name']:
                 raise ValueError('A name is required.')
             actions.append(action)

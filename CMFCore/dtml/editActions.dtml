@@ -42,6 +42,20 @@
 <td></td>
 <td>
   <div class="form-label">
+  Id
+  </div>
+</td>
+<td>
+  <div class="form-element">
+  <input type="text" name="id_&dtml-index;" value="&dtml-id;" />
+  </div>
+</td>
+</tr>
+
+<tr>
+<td></td>
+<td>
+  <div class="form-label">
   Action
   </div>
 </td>
@@ -91,6 +105,11 @@
 </tr>
 
 </dtml-let>
+
+<tr><td colspan="3">
+<hr />
+</td></tr>
+
 </dtml-in>
 </table>
 
@@ -105,7 +124,6 @@
 </table>
 </div>
 
-<hr />
 </dtml-if>
 
 <h3 class="form-help">
@@ -123,6 +141,20 @@ Add an action
 <td>
   <div class="form-element">
   <input type="text" name="name" value="" />
+  </div>
+</td>
+</tr>
+
+<tr>
+<td></td>
+<td>
+  <div class="form-label">
+  Id
+  </div>
+</td>
+<td>
+  <div class="form-element">
+  <input type="text" name="id" value="" />
   </div>
 </td>
 </tr>
@@ -159,7 +191,6 @@ Add an action
   </div>
 </td>
 </tr>
-</table>
 
 <tr>
 <td></td>
@@ -174,6 +205,8 @@ Add an action
   </div>
 </td>
 </tr>
+
+</table>
 
 <div class="form-element">
 <input type="submit" name="addAction:method" value="Add" />
