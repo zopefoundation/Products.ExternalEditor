@@ -5,8 +5,7 @@
 form_vars = {}
 select_vars = ( 'review_state'
               , 'Subject'
-              , 'created'   
-              , 'Type'
+              , 'portal_type'
               )
 
 for k, v in REQUEST.form.items():
