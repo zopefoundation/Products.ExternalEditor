@@ -79,7 +79,7 @@ def _migrateObject(id, s_ob, dst_folder, conversions, skip, res):
     else:
         descend_ok = 0
         res.warnings.append('Could not copy %s' % pathname)
-    if descend_ok:
+    if descend_ok and hasattr(dst_folder, '_getOb'):
         if hasattr(base_ob, 'objectItems'):
             _migrateObjectManager(s_ob, dst_folder._getOb(id),
                                   conversions, skip, res)
