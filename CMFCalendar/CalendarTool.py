@@ -50,7 +50,7 @@ class CalendarTool (UniqueObject, SimpleItem):
     
     def __init__(self):
         self.calendar_types = ['Event']
-        self.use_session = "True"
+        self.use_session = ""
 
     security.declareProtected( CMFCorePermissions.ManagePortal
                              , 'edit_configuration' )
