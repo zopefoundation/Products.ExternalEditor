@@ -130,7 +130,7 @@ def process_comment(comment, strip=string.strip):
                     got.append(' <pre>')
                     inpre = 1
         got.append(' ' + i)
-    return string.join(got, '\n')
+    return string.strip(string.join(got, '\n'))
 
 def add_local_role(object, userid, roleid):
     """Add object roleid for userid if not already there."""
@@ -144,15 +144,15 @@ def get_email_fullname(self, userid):
     mbrtool = getToolByName(self, 'portal_membership')
     user = mbrtool.getMemberById(userid)
     if user is not None:
+        if not user.hasProperty('email'):
+            return (None, None)         # Not worth bothering.
         email = None
         name = userid
-        try: 
-            email = user.email
-            name = email.full_name
-        except AttributeError:
-            pass
-        if email:
-            if '.' in name or ',' in name:
-                name = '"%s"' % name
-            return (name or userid, email)
+        email = user.getProperty('email')
+        name = ((user.hasProperty('full_name') 
+                 and user.getProperty('full_name'))
+                or str(user))
+        if '.' in name or ',' in name:
+            name = '"%s"' % name
+        return (name, email)
     return (None, None)
