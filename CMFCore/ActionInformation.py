@@ -199,6 +199,7 @@ class oai:
         self.portal = portal = aq_parent(aq_inner(tool))
         membership = getToolByName(tool, 'portal_membership')
         self.isAnonymous = membership.isAnonymousUser()
+        self.user_id = membership.getAuthenticatedMember().getUserName()
         self.portal_url = portal.absolute_url()
         if folder is not None:
             self.folder_url = folder.absolute_url()

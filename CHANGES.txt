@@ -25,6 +25,9 @@ CMF 1.3 beta2 (2002/06/30)
 
   New Features
 
+    - Made the id of the current user available to old action providers
+      (DCWorkflow being a prime example) as 'user_id' (Tracker #495).
+
     - Modified the 'standard_error_message' page template to show the
       'error_log_url', if passed in (Zope 2.6 will pass this argument
       if an error log is installed).

@@ -74,7 +74,7 @@ CMF TODO's
         (x) Tracker #481:  Reduntant syndication action on Skinned
                            Folder
 
-        ( ) Tracker #495:  Make logged-in userid available to actions
+        (x) Tracker #495:  Make logged-in userid available to actions
                            providers
 
         ( ) Tracker #496:  Allow string: expressions in DCWorkflow
