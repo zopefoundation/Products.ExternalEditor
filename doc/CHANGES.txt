@@ -2,6 +2,11 @@ PluggableAuthService changelog
 
   After PluggableAuthService 1.0.3
 
+    Features Added
+
+      - Group and user plugins can now specify their own title for a
+        principal entry (PAS will not compute one if they do).
+
     Bugs Fixed
 
       - Clarified interface of IAuthenticationPlugin, which should return
