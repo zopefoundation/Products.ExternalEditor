@@ -88,6 +88,7 @@
 ADD_CONTENT_PERMISSION = 'Add portal content'
 
 import Globals, StructuredText, string
+from StructuredText.HTMLWithImages import HTMLWithImages
 from Globals import DTMLFile, InitializeClass
 from AccessControl import ClassSecurityInfo
 from Products.CMFCore.PortalContent import PortalContent
@@ -104,6 +105,18 @@ def addDocument(self, id, title='', description='', text_format='',
     self._setObject(id,o)
     afterCreate(self.this()._getOb(id))
     
+class CMFHtmlWithImages(HTMLWithImages):
+    """ Special subclass of HTMLWithImages, overriding document() """
+    def document(self, doc, level, output):
+        """\
+        HTMLWithImages.document renders full HTML (head, title, body).  For
+        CMF Purposes, we don't want that.  We just want those nice juicy
+        body parts perfectly rendered.
+        """
+        for c in doc.getChildNodes():
+           getattr(self, self.element_types[c.getNodeName()])(c, level, output)
+
+CMFHtmlWithImages = CMFHtmlWithImages()
 
 class Document(PortalContent, DefaultDublinCoreImpl):
     """ A Document - Handles both StructuredText and HTML """
@@ -207,7 +220,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
             return ""                   # return now or have errors!
 
         doc = StructuredText.DocumentWithImages(st)
-        html = StructuredText.HTMLWithImages(doc)
+        html = CMFHtmlWithImages(doc, level)
         return html
 
     security.declareProtected(CMFCorePermissions.View, 'SearchableText')
