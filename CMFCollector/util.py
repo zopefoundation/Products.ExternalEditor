@@ -20,6 +20,58 @@ citedexp = re.compile(r'^\s*>')
 # Match group 1 is citation prefix, group 2 is leading whitespace:
 cite_prefixexp = re.compile('([\s>]*>)?([\s]*)')
 
+def users_for_local_role(object, userids, role):
+    """Give only designated userids specified local role.
+
+    Return 1 iff any role changes happened."""
+    already = []
+    changed = 0
+    for u in object.users_with_local_role(role):
+        if u in userids:
+            already.append(u)
+        else:
+            changed = 1
+            remove_local_role(object, u, role)
+    for u in userids:
+        if u not in already:
+            changed = 1
+            add_local_role(object, u, role)
+    return changed
+
+def add_local_role(object, userid, role):
+    """Add object role for userid if not already there."""
+    roles = list(object.get_local_roles_for_userid(userid))
+    if role not in roles:
+        roles.append(role)
+        object.manage_setLocalRoles(userid, roles)
+
+def remove_local_role(object, userid, role):
+    """Add object role for userid if not already there."""
+    roles = list(object.get_local_roles_for_userid(userid))
+    roles.remove(role)
+    if roles:
+        object.manage_setLocalRoles(userid, roles)
+    else:
+        object.manage_delLocalRoles([userid])
+
+def get_email_fullname(self, userid):
+    """Get full_name or userid, and email, from membership tool."""
+    mbrtool = getToolByName(self, 'portal_membership')
+    user = mbrtool.getMemberById(userid)
+    if user is not None:
+        if not user.hasProperty('email'):
+            return (None, None)         # Not worth bothering.
+        email = None
+        name = userid
+        email = user.getProperty('email')
+        name = ((user.hasProperty('full_name') 
+                 and user.getProperty('full_name'))
+                or str(user))
+        if '.' in name or ',' in name:
+            name = '"%s"' % name
+        return (name, email)
+    return (None, None)
+
 def cited_text(text, rfind=string.rfind, strip=string.strip):
     """Quote text for use in literal citations.
 
@@ -132,27 +184,7 @@ def process_comment(comment, strip=string.strip):
         got.append(' ' + i)
     return string.strip(string.join(got, '\n'))
 
-def add_local_role(object, userid, roleid):
-    """Add object roleid for userid if not already there."""
-    roles = list(object.get_local_roles_for_userid(userid))
-    if roleid not in roles:
-        roles.append(roleid)
-        object.manage_setLocalRoles(userid, roles)
-
-def get_email_fullname(self, userid):
-    """Get full_name or userid, and email, from membership tool."""
-    mbrtool = getToolByName(self, 'portal_membership')
-    user = mbrtool.getMemberById(userid)
-    if user is not None:
-        if not user.hasProperty('email'):
-            return (None, None)         # Not worth bothering.
-        email = None
-        name = userid
-        email = user.getProperty('email')
-        name = ((user.hasProperty('full_name') 
-                 and user.getProperty('full_name'))
-                or str(user))
-        if '.' in name or ',' in name:
-            name = '"%s"' % name
-        return (name, email)
-    return (None, None)
+def sorted(l):
+    x = l[:]
+    x.sort()
+    return x
