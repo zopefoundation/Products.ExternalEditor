@@ -116,7 +116,8 @@
   <input type="hidden" name="visible_&dtml-index;:int:default"
          value="0" />
   <dtml-let chk="visible and 'checked' or ''">
-  <input type="checkbox" name="visible_&dtml-index;:boolean" &dtml-chk; />
+  <input type="checkbox" name="visible_&dtml-index;:boolean"
+         &dtml-chk; value="1" />
   </dtml-let>
   </div>
 </td>
@@ -235,7 +236,7 @@ Add an action
   <div class="form-element">
   <input type="hidden" name="visible:int:default"
          value="0" />
-  <input type="checkbox" name="visible:boolean" checked />
+  <input type="checkbox" name="visible:boolean" checked value="1"/>
   </div>
 </td>
 </tr>
