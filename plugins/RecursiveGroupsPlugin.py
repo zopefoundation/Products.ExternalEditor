@@ -56,6 +56,9 @@ class SimpleGroup:
     def getGroups( self ):
         return ()
 
+    def _addGroups( self, groups ):
+        pass
+
 class RecursiveGroupsPlugin( BasePlugin ):
 
     """ PAS plugin for recursively flattening a collection of groups
