@@ -25,6 +25,7 @@ from Acquisition import aq_get
 from Globals import DTMLFile
 from Globals import InitializeClass
 from OFS.Folder import Folder
+from OFS.ObjectManager import IFAwareObjectManager
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from zLOG import LOG, ERROR
 import Products
@@ -43,6 +44,7 @@ from utils import _dtmldir
 from utils import _wwwdir
 from utils import cookString
 from utils import getActionContext
+from utils import getToolByName
 from utils import SimpleItemWithProperties
 from utils import UniqueObject
 
@@ -536,6 +538,15 @@ class FactoryTypeInformation (TypeInformation):
 
 InitializeClass( FactoryTypeInformation )
 
+def manage_addFactoryTIForm(self, REQUEST):
+    """ Get the add form for factory-based type infos.
+    """
+    addTIForm = DTMLFile('addTypeInfo', _dtmldir).__of__(self)
+    ttool = getToolByName(self, 'portal_types')
+    return addTIForm( self, REQUEST,
+                      add_meta_type=FactoryTypeInformation.meta_type,
+                      types=ttool.listDefaultTypeInformation() )
+
 
 class ScriptableTypeInformation( TypeInformation ):
     """
@@ -592,23 +603,19 @@ class ScriptableTypeInformation( TypeInformation ):
 
 InitializeClass( ScriptableTypeInformation )
 
+def manage_addScriptableTIForm(self, REQUEST):
+    """ Get the add form for scriptable type infos.
+    """
+    addTIForm = DTMLFile('addTypeInfo', _dtmldir).__of__(self)
+    ttool = getToolByName(self, 'portal_types')
+    return addTIForm( self, REQUEST,
+                      add_meta_type=ScriptableTypeInformation.meta_type,
+                      types=ttool.listDefaultTypeInformation() )
+
 
 # Provide aliases for backward compatibility.
 ContentFactoryMetadata = FactoryTypeInformation
 ContentTypeInformation = ScriptableTypeInformation
-
-
-typeClasses = [
-    {'class':FactoryTypeInformation,
-     'name':FactoryTypeInformation.meta_type,
-     'action':'manage_addFactoryTIForm',
-     'permission':ManagePortal},
-    {'class':ScriptableTypeInformation,
-     'name':ScriptableTypeInformation.meta_type,
-     'action':'manage_addScriptableTIForm',
-     'permission':ManagePortal},
-    ]
-
 
 allowedTypes = [
     'Script (Python)',
@@ -618,7 +625,8 @@ allowedTypes = [
     ]
 
 
-class TypesTool(UniqueObject, Folder, ActionProviderBase):
+class TypesTool(UniqueObject, IFAwareObjectManager, Folder,
+                ActionProviderBase):
     """
         Provides a configurable registry of portal content types.
     """
@@ -627,6 +635,7 @@ class TypesTool(UniqueObject, Folder, ActionProviderBase):
 
     id = 'portal_types'
     meta_type = 'CMF Types Tool'
+    _product_interfaces = (ITypeInformation,)
 
     security = ClassSecurityInfo()
 
@@ -652,20 +661,12 @@ class TypesTool(UniqueObject, Folder, ActionProviderBase):
     #   ObjectManager methods
     #
     def all_meta_types(self):
-        """Adds TypesTool-specific meta types."""
+        # this is a workaround and should be removed again if allowedTypes
+        # have an interface we can use in _product_interfaces
         all = TypesTool.inheritedAttribute('all_meta_types')(self)
-        return tuple(typeClasses) + tuple(all)
-
-    def filtered_meta_types(self, user=None):
-        # Filters the list of available meta types.
-        allowed = {}
-        for tc in typeClasses:
-            allowed[tc['name']] = 1
-        for name in allowedTypes:
-            allowed[name] = 1
-
-        all = TypesTool.inheritedAttribute('filtered_meta_types')(self)
-        return tuple( [ mt for mt in all if mt['name'] in allowed ] )
+        others = [ mt for mt in Products.meta_types
+                   if mt['name'] in allowedTypes ]
+        return tuple(all) + tuple(others)
 
     #
     #   other methods
@@ -700,24 +701,6 @@ class TypesTool(UniqueObject, Folder, ActionProviderBase):
 
         return res
 
-    _addTIForm = DTMLFile( 'addTypeInfo', _dtmldir )
-
-    security.declareProtected(ManagePortal, 'manage_addFactoryTIForm')
-    def manage_addFactoryTIForm(self, REQUEST):
-        ' '
-        return self._addTIForm(
-            self, REQUEST,
-            add_meta_type=FactoryTypeInformation.meta_type,
-            types=self.listDefaultTypeInformation())
-
-    security.declareProtected(ManagePortal, 'manage_addScriptableTIForm')
-    def manage_addScriptableTIForm(self, REQUEST):
-        ' '
-        return self._addTIForm(
-            self, REQUEST,
-            add_meta_type=ScriptableTypeInformation.meta_type,
-            types=self.listDefaultTypeInformation())
-
     security.declareProtected(ManagePortal, 'manage_addTypeInformation')
     def manage_addTypeInformation(self, add_meta_type, id=None,
                                   typeinfo_name=None, RESPONSE=None):
@@ -737,9 +720,9 @@ class TypesTool(UniqueObject, Folder, ActionProviderBase):
                 id = fti.get('id', None)
         if not id:
             raise BadRequest('An id is required.')
-        for mt in typeClasses:
+        for mt in Products.meta_types:
             if mt['name'] == add_meta_type:
-                klass = mt['class']
+                klass = mt['instance']
                 break
         else:
             raise ValueError, (

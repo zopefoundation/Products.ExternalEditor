@@ -18,6 +18,7 @@ $Id$
 from xml.dom.minidom import parseString as domParseString
 from xml.sax import parseString
 
+import Products
 from AccessControl import ClassSecurityInfo
 from Acquisition import Implicit
 from Globals import InitializeClass
@@ -25,7 +26,6 @@ from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
 from Products.CMFCore.TypesTool import FactoryTypeInformation
 from Products.CMFCore.TypesTool import ScriptableTypeInformation
-from Products.CMFCore.TypesTool import typeClasses
 from Products.CMFCore.utils import getToolByName
 
 from actions import _extractActionNodes
@@ -69,10 +69,12 @@ def importTypesTool( context ):
 
         for info in info_list:
 
-            klass_info = [ x for x in typeClasses
-                              if x[ 'name' ] == info[ 'kind' ] ][ 0 ]
-
-            type_info = klass_info[ 'class' ]( **info )
+            for mt_info in Products.meta_types:
+                if mt_info['name'] == info['kind']:
+                    type_info = mt_info['instance'](**info)
+                    break
+            else:
+                raise ValueError('unknown kind \'%s\'' % info['kind'])
 
             types_tool._setObject( str( info[ 'id' ] ), type_info )
 

@@ -2,7 +2,9 @@ HEAD only (unreleased)
 
   New Features
 
-    - 
+    - TypesTool: TypeInformation classes are now pluggable.
+      Any class that implements the TypeInformation interface and is
+      a registered meta type can now be used in the TypesTool.
 
   Bug Fixes
 

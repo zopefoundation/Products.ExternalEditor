@@ -32,6 +32,7 @@ import CachingPolicyManager
 import utils
 
 from permissions import AddPortalFolders
+from permissions import ManagePortal
 
 
 bases = (
@@ -99,6 +100,20 @@ def initialize(context):
         icon = 'images/registry.gif'
         )
 
+    context.registerClass(
+        TypesTool.FactoryTypeInformation,
+        permission=ManagePortal,
+        constructors=( TypesTool.manage_addFactoryTIForm, ),
+        icon='images/typeinfo.gif',
+        visibility=None)
+
+    context.registerClass(
+        TypesTool.ScriptableTypeInformation,
+        permission=ManagePortal,
+        constructors=( TypesTool.manage_addScriptableTIForm, ),
+        icon='images/typeinfo.gif',
+        visibility=None)
+
     utils.registerIcon(FSDTMLMethod.FSDTMLMethod,
                        'images/fsdtml.gif', globals())
     utils.registerIcon(FSPythonScript.FSPythonScript,
@@ -113,10 +128,6 @@ def initialize(context):
                        'images/fsprops.gif', globals())
     utils.registerIcon(FSZSQLMethod.FSZSQLMethod,
                        'images/fssqlmethod.gif', globals())
-    utils.registerIcon(TypesTool.FactoryTypeInformation,
-                       'images/typeinfo.gif', globals())
-    utils.registerIcon(TypesTool.ScriptableTypeInformation,
-                       'images/typeinfo.gif', globals())
 
     context.registerHelpTitle('CMF Core Help')
     context.registerHelp(directory='interfaces')
