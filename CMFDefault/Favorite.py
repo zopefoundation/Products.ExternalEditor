@@ -19,6 +19,7 @@ import urlparse
 
 from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
+from Acquisition import aq_base
 
 from Products.CMFCore.utils import getToolByName
 
@@ -93,17 +94,65 @@ class Favorite( Link ):
         self.title=title
         self.remote_url=remote_url
         self.description = description
+        
+        # save unique id of favorite
+        self.remote_uid = self._getUidByUrl()
+        
+    def _getUidByUrl(self):
+        """Registers and returns the uid of the remote object if
+        the unique id handler tool is available.
+        """
+        # check for unique id handler tool
+        handler = getToolByName(self, 'portal_uidhandler', None)
+        if handler is None or not hasattr(handler, 'register'):
+            return
+        
+        portal = getToolByName(self, 'portal_url').getPortalObject()
+        obj = portal.restrictedTraverse(self.remote_url)
+        return handler.register(obj)
+
+    def _getObjectByUid(self):
+        """Registers and returns the uid of the remote object if
+        the unique id handler tool is available.
+        """
+        # check for unique id handler tool
+        handler = getToolByName(self, 'portal_uidhandler', None)
+        if handler is None or not hasattr(handler, 'queryObject'):
+            return
+        
+        # check for remote uid info on object
+        uid = getattr(aq_base(self), 'remote_uid', None)
+        if uid is None:
+            return
+        
+        return handler.queryObject(uid, None)
 
     security.declareProtected(View, 'getRemoteUrl')
     def getRemoteUrl(self):
         """
             returns the remote URL of the Link
         """
+        # try getting the remote object by unique id
+        remote_url = self._getRemoteUrlTheOldWay()
+        remote_obj = self._getObjectByUid()
+        if remote_obj:
+            url = remote_obj.absolute_url()
+            # update the url when changed (avoid unnecessary ZODB writes)
+            if url != remote_url:
+                self.edit(url)
+            return url
+        
+        return remote_url
+
+    def _getRemoteUrlTheOldWay(self):
+        """Build the url without having taking the uid into account
+        """
         portal_url = getToolByName(self, 'portal_url')
         if self.remote_url:
             return portal_url() + '/' + self.remote_url
         else:
             return portal_url()
+
 
     security.declareProtected(View, 'getIcon')
     def getIcon(self, relative_to_portal=0):
@@ -122,6 +171,11 @@ class Favorite( Link ):
         Return the actual object that the Favorite is 
         linking to
         """
+        # try getting the remote object by unique id
+        remote_obj = self._getObjectByUid()
+        if remote_obj is not None:
+            return remote_obj
+
         portal_url = getToolByName(self, 'portal_url')
         return portal_url.getPortalObject().restrictedTraverse(self.remote_url)
 
@@ -146,6 +200,9 @@ class Favorite( Link ):
         if remote_url[:1]=='/':
             remote_url=remote_url[1:]
         self.remote_url=remote_url
+
+        # save unique id of favorite
+        self.remote_uid = self._getUidByUrl()
 
 
 InitializeClass(Favorite)
