@@ -21,7 +21,7 @@ __version__ = "$Revision$"
 import Missing
 
 import zLOG
-from Globals import InitializeClass, Persistent
+from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
 from Acquisition import Implicit, aq_base
 
@@ -76,7 +76,7 @@ class UniqueIdHandlerTool(UniqueObject, SimpleItem, ActionProviderBase):
         # If 'obj' is a content object the 'uid' attribute is usually a
         # callable object. If 'obj' is a catalog brain the uid attribute 
         # is non callable and possibly equals the 'Missing.MV' value.
-        if uid is Missing.MV:
+        if uid is Missing.MV or uid is None:
             return default
         if callable(uid):
             return uid()
