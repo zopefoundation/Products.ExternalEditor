@@ -72,6 +72,41 @@ class SkinnableObjectManager (ObjectManager):
             raise AttributeError, name
         return superGetAttr(self, name)
 
+    security.declarePrivate('getSkin')
+    def getSkin(self, name=None):
+        """Returns the requested skin.
+        """
+        skinob = None
+        skinstool = None
+        sfn = self.getSkinsFolderName()
+
+        if sfn is not None:
+            sf = getattr(self, sfn, None)
+            if sf is not None:
+               if name is not None:
+                   skinob = sf.getSkinByName(name)
+               if skinob is None:
+                   skinob = sf.getSkinByName(sf.getDefaultSkin())
+                   if skinob is None:
+                       skinob = sf.getSkinByPath('')
+        return skinob
+
+    security.declarePublic('getSkinNameFromRequest')
+    def getSkinNameFromRequest(self, REQUEST=None):
+        ''' returns the skin name from the Request'''
+        sfn = self.getSkinsFolderName()
+        if sfn is not None:
+            sf = getattr(self, sfn, None)
+            if sf is not None:
+                return REQUEST.get(sf.getRequestVarname(), None)
+
+    security.declarePublic('changeSkin')
+    def changeSkin(self, skinname):
+        self._v_skindata = None
+        skinobj = self.getSkin(skinname)
+        if skinobj is not None:
+            self._v_skindata = (self.REQUEST, skinobj, {})
+
     security.declarePublic('setupCurrentSkin')
     def setupCurrentSkin(self, REQUEST=None):
         '''
@@ -82,31 +117,14 @@ class SkinnableObjectManager (ObjectManager):
         if REQUEST is None:
             REQUEST = getattr(self, 'REQUEST', None)
         if REQUEST is None:
-            # We are traversing without a REQUEST at the root.
-            # Don't change the skin right now. (Otherwise
-            # [un]restrictedTraverse messes up the skin data.)
+            # self is not fully wrapped at the moment.  Don't
+            # change anything.
             return
         if self._v_skindata is not None and self._v_skindata[0] is REQUEST:
             # Already set up for this request.
             return
-        self._v_skindata = None
-        sfn = self.getSkinsFolderName()
-        if sfn is not None:
-            # Note that our custom __getattr__ won't get confused
-            # by skins at the moment because _v_skindata is None.
-            sf = getattr(self, sfn, None)
-            if sf is not None:
-                try:
-                    sd = sf.getSkin(REQUEST)
-                except:
-                    import sys
-                    from zLOG import LOG, ERROR
-                    LOG('CMFCore', ERROR, 'Unable to get skin',
-                        error=sys.exc_info())
-                else:
-                    if sd is not None:
-                        # Hide from acquisition.
-                        self._v_skindata = (REQUEST, sd, {})
+        skinname = self.getSkinNameFromRequest(REQUEST)
+        self.changeSkin(skinname)
 
     def __of__(self, parent):
         '''
@@ -114,7 +132,15 @@ class SkinnableObjectManager (ObjectManager):
         that Acquisition.Implicit.__of__() would return.
         '''
         w_self = ImplicitAcquisitionWrapper(aq_base(self), parent)
-        w_self.setupCurrentSkin()
+        try:
+            w_self.setupCurrentSkin()
+        except:
+            # This shouldn't happen, even if the requested skin
+            # does not exist.
+            import sys
+            from zLOG import LOG, ERROR
+            LOG('CMFCore', ERROR, 'Unable to setupCurrentSkin()',
+                error=sys.exc_info())
         return w_self
 
     def _checkId(self, id, allow_dup=0):

@@ -92,21 +92,4 @@ class SkinsContainer:
             return None
         return self.getSkinByPath(path)
 
-    security.declarePrivate('getSkin')
-    def getSkin(self, request):
-        '''
-        Returns the requested skin.
-        '''
-        varname = self.getRequestVarname()
-        name = request.get(varname, None)
-        skinob = None
-        if name is not None:
-            skinob = self.getSkinByName(name)
-        if skinob is None:
-            skinob = self.getSkinByName(self.getDefaultSkin())
-            if skinob is None:
-                skinob = self.getSkinByPath('')
-        return skinob
-
-
 InitializeClass( SkinsContainer )

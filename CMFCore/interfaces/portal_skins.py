@@ -22,17 +22,38 @@ class portal_skins(Base):
     '''
     id = Attribute('id', 'Must be set to "portal_skins"')
 
-    # getSkin__roles__ = ()  # Private
-    def getSkin(request):
-        '''
-        Returns the requested skin object as a tuple:
-        (skinob, skinpath).  Note that self will not normally
-        be wrapped in acquisition, but the request variable is
-        provided so it is possible to access the REQUEST object.
-        '''
+    # Private
+    def getSkinPath(name):
+        """Converts a skin name to a skin path.
+        """
 
-    # getSkinSelections__roles__ = None  # Public
+    # Public
+    def getDefaultSkin():
+        """Returns the default skin name.
+        """
+
+    # Public
+    def getRequestVarname():
+        """Returns the variable name to look for in the REQUEST.
+        """
+
+    # Private
+    def getSkinByPath(path, raise_exc=0):
+        """Returns a skin at the given path.
+
+        A skin path is of the format:
+        'some/path, some/other/path, ...'  The first part has precedence.
+
+        A skin is a specially wrapped object that looks through the layers
+        in the correct order.
+        """
+
+    # Private
+    def getSkinByName(name):
+        """Returns the named skin.
+        """
+
+    # Public
     def getSkinSelections():
-        '''
-        Returns the sorted list of available skin names.
-        '''
+        """Returns the sorted list of available skin names.
+        """
