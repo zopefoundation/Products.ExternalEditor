@@ -298,11 +298,8 @@ class DiscussionItemContainer( Persistent, Implicit, Traversable ):
 
         item = DiscussionItem( id, title=title, description=title )
         item._edit( text_format=text_format, text=text )
-
-        if Creator:
-            item.__of__(self).addCreator(Creator)
-
-        item.__of__( self ).indexObject()
+        item.__of__(self).addCreator(Creator)
+        item.__of__(self).indexObject()
 
         item.setReplyTo( self._getDiscussable() )
 

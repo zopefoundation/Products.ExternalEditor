@@ -120,8 +120,9 @@ class DiscussionTests( SecurityTest ):
 
         reply1 = talkback.getReplies()[0]
         items = talkback._container.items()
-        assert items[0][0] == reply1.getId()
-        assert reply1.inReplyTo() == test
+        self.assertEqual( reply1.getId(), items[0][0] )
+        self.assertEqual( reply1.inReplyTo(), test )
+        self.assertEqual( reply1.listCreators(), ('dummy',) )
 
         parents = reply1.parentsInThread()
         assert len( parents ) == 1
