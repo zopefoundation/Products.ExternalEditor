@@ -1,4 +1,6 @@
+<dtml-let relative_to_content="1">
 <dtml-var standard_html_header>
+</dtml-let>
 
 <div class="Desktop">
 

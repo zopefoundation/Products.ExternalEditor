@@ -9,6 +9,9 @@
   <title><dtml-with portal_properties>&dtml-title;</dtml-with
   ><dtml-if name="Title">: &dtml-Title;</dtml-if></title>
   <dtml-var css_inline_or_link>
+  <dtml-if relative_to_content>
+   <base href="&dtml-absolute_url;" />
+  </dtml-if>
  </head>
 <body>
 
