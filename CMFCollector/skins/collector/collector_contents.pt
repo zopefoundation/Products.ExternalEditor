@@ -202,7 +202,9 @@
           <tr>
             <td COLSPAN="4">
               <strong>Any text:</strong>
-              <input type="text" name="SearchableText" size="40">
+              <input type="text" name="SearchableText" size="40"
+                     value="TEXT"
+                     tal:attributes="value request/SearchableText|nothing">
             </td>
             <td align="center">
               Security Related:
