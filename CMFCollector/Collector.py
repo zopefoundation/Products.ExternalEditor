@@ -424,6 +424,9 @@ def addCollector(self, id, title='', description='', abbrev='',
     it.manage_permission(CMFCorePermissions.AccessInactivePortalContent,
                          roles=['Anonymous', 'Reviewer', 'Manager', 'Owner'],
                          acquire=1)
+    it.manage_permission(CMFCorePermissions.AccessFuturePortalContent,
+                         roles=['Anonymous', 'Reviewer', 'Manager', 'Owner'],
+                         acquire=1)
     if REQUEST is not None:
         try:    url=self.DestinationURL()
         except: url=REQUEST['URL1']

@@ -2,14 +2,18 @@ CMFCollector Known Problems
 
   Oct 27, 2001 Catalog search "active" content culling disabled --
     The CMF catalog search is supposed to automatically cull out items
-    with expired expirration_date or unreached effective_date, unless
-    the visitor has AccessInactivePortalContent permission.  This
-    culling is not working correctly for the collector's internal
-    catalog, at least in some versions, culling out *all* results.
+    with expired expiration_date and/or unreached effective_date,
+    unless the visitor has AccessFuturePortalContent and/or
+    AccessInactivePortalContent permissions.  This culling is not
+    working correctly for the collector's internal catalog, at least
+    in some versions, culling out *all* results.
 
     This looks like a CMF and/or ZCatalog bug, and i haven't been able
     to track where the proper behavior is supposed to be implemented.
     Hence, i've punted on this, and am setting collectors to grant
-    Anonymous AccessInactivePortalContent (in Collector.py
-    addCollectorIssue()), meaning that the active-status culling will
-    not be happening for anyone.
+    Anonymous AccessInactivePortalContent and
+    AccessFuturePortalContent (in Collector.py addCollectorIssue()),
+    meaning that the active-status culling will not happen - even when
+    you want it to - within the collector.  I'll be revisiting this
+    workaround when i know more about how to solve the actual problem.
+    
