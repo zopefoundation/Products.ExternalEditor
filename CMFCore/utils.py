@@ -1,20 +1,23 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
+""" Utility functions.
+
+$Id$
+"""
 
 import os
 from os import path as os_path
 import re
-import operator
 from types import StringType
 
 from Globals import package_home
@@ -22,26 +25,25 @@ from Globals import HTMLFile
 from Globals import ImageFile
 from Globals import InitializeClass
 from Globals import MessageDialog
-
-from ExtensionClass import Base
-from Acquisition import aq_get, aq_inner, aq_parent
+try:
+    from Globals import UNIQUE
+except ImportError:
+    # for Zope versions before 2.5.0
+    from OFS.ObjectManager import UNIQUE
 
 from AccessControl import ClassSecurityInfo
-from AccessControl import ModuleSecurityInfo
 from AccessControl import getSecurityManager
+from AccessControl import ModuleSecurityInfo
 from AccessControl.Permission import Permission
 from AccessControl.PermissionRole import rolesForPermissionOn
 from AccessControl.Role import gather_permissions
-
-from OFS.PropertyManager import PropertyManager
-from OFS.SimpleItem import SimpleItem
-from OFS.PropertySheets import PropertySheets
+from Acquisition import aq_get, aq_inner, aq_parent
+from ExtensionClass import Base
 from OFS.misc_ import misc_ as misc_images
 from OFS.misc_ import Misc_ as MiscImage
-try:
-    from OFS.ObjectManager import UNIQUE
-except ImportError:
-    UNIQUE = 2
+from OFS.PropertyManager import PropertyManager
+from OFS.PropertySheets import PropertySheets
+from OFS.SimpleItem import SimpleItem
 from Products.PageTemplates.Expressions import getEngine
 from Products.PageTemplates.Expressions import SecureModuleImporter
 
@@ -49,7 +51,7 @@ from Products.PageTemplates.Expressions import SecureModuleImporter
 security = ModuleSecurityInfo( 'Products.CMFCore.utils' )
 
 _dtmldir = os_path.join( package_home( globals() ), 'dtml' )
-_wwwdir = os.path.join( package_home( globals() ), 'www' )
+_wwwdir = os_path.join( package_home( globals() ), 'www' )
 
 #
 #   Simple utility functions, callable from restricted code.
@@ -112,13 +114,8 @@ def _getAuthenticatedUser( self ):
     return getSecurityManager().getUser()
 
 security.declarePrivate('_checkPermission')
-def _checkPermission(permission, obj, StringType = type('')):
-    roles = rolesForPermissionOn(permission, obj)
-    if type(roles) is StringType:
-        roles=[roles]
-    if _getAuthenticatedUser( obj ).allowed( obj, roles ):
-        return 1
-    return 0
+def _checkPermission(permission, obj):
+    return getSecurityManager().checkPermission(permission, obj)
 
 security.declarePrivate('_verifyActionPermissions')
 def _verifyActionPermissions(obj, action):
@@ -540,9 +537,9 @@ def initializeBasesPhase1(base_classes, module):
 def initializeBasesPhase2(zclasses, context):
 
     """ Finishes ZClass base initialization.
-    
+
     o 'zclasses' is the list returned by initializeBasesPhase1().
-    
+
     o 'context' is a ProductContext object.
     """
     for zclass in zclasses:
@@ -622,7 +619,7 @@ def keywordsplitter( headers
     for head in names:
         keylist = splitter(headers.get(head, ''))
         keylist = map(lambda x: x.strip(), keylist)
-        out.extend(filter(operator.truth, keylist))
+        out.extend( [key for key in keylist if key] )
     return out
 
 #
@@ -650,11 +647,11 @@ def expandpath(p):
     # However, that's an acceptable risk as people don't seem
     # to re-use product names ever (it would create ZODB persistence
     # problems too ;-)
-    
+
     p = os_path.normpath(p)
     if os_path.isabs(p):
         return p
-    
+
     for ppath in ProductsPath:
         abs = os_path.join(ppath, p)
         if os_path.exists(abs):
@@ -674,6 +671,6 @@ def minimalpath(p):
     if index == -1:
         index = p.rfind('products')
         if index == -1:
-            # couldn't normalise            
+            # couldn't normalise
             return p
     return p[index+len('products/'):]

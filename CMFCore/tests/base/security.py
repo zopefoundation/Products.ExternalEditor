@@ -1,4 +1,8 @@
+from types import StringType, UnicodeType
+
+from AccessControl.PermissionRole import rolesForPermissionOn
 from Acquisition import Implicit
+
 
 class PermissiveSecurityPolicy:
     """
@@ -18,10 +22,14 @@ class PermissiveSecurityPolicy:
                 , **kw):
         return 1
     
-    def checkPermission( self, permission, object, context) :
+    def checkPermission(self, permission, object, context):
         if permission == 'forbidden permission':
             return 0
-        return 1
+        roles = rolesForPermissionOn(permission, object)
+        if type(roles) in (StringType, UnicodeType):
+            roles=[roles]
+        return context.user.allowed(object, roles)
+
 
 class OmnipotentUser( Implicit ):
     """

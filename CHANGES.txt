@@ -82,6 +82,8 @@ CMF 1.5alpha (unreleased)
 
   Bug Fixes
 
+    - CMFCore utils: Reverted obsolete workaround in _checkPermission.
+
     - Skin scripts: Made except statements safer by being more specific. Hope
       this still catches all relevant errors.
 
