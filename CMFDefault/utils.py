@@ -259,6 +259,7 @@ VALID_TAGS = { 'a'          : 1
              , 'title'      : 1
              , 'tr'         : 1
              , 'tt'         : 1
+             , 'u'          : 1
              , 'ul'         : 1
              }
 
