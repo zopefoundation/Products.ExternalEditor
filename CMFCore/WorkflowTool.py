@@ -138,7 +138,6 @@ class WorkflowTool (UniqueObject, Folder):
 
         """ Show a management screen for changing type to workflow connections.
         """
-        cbt = self._chains_by_type
         ti = self._listTypeInfo()
         types_info = []
         for t in ti:
@@ -146,10 +145,7 @@ class WorkflowTool (UniqueObject, Folder):
             title = t.Title()
             if title == id:
                 title = None
-            if cbt is not None and cbt.has_key(id):
-                chain = join(cbt[id], ', ')
-            else:
-                chain = '(Default)'
+            chain = self.getChainForPortalType(id)
             types_info.append({'id': id,
                                'title': title,
                                'chain': chain})
@@ -459,6 +455,19 @@ class WorkflowTool (UniqueObject, Folder):
                 ids.append(wf_id)
 
         self._default_chain = tuple(ids)
+
+    security.declarePublic('getChainForPortalType')
+    def getChainForPortalType(self, pt_name):
+
+        """Get the chain for a specific portal type.
+        """
+        cbt = self._chains_by_type
+        if cbt is not None and cbt.has_key(pt_name):
+            chain = join(cbt[pt_name], ', ')
+        else:
+            chain = '(Default)'
+
+        return chain
 
     security.declareProtected( ManagePortal, 'setChainForPortalTypes')
     def setChainForPortalTypes(self, pt_names, chain):
