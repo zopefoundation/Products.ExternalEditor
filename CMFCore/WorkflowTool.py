@@ -91,29 +91,169 @@ __version__='$Revision$'[11:-2]
 
 import sys
 from utils import UniqueObject, _checkPermission, getToolByName
-from OFS.SimpleItem import SimpleItem
-from Globals import InitializeClass, PersistentMapping
+from OFS.Folder import Folder
+from Globals import InitializeClass, PersistentMapping, DTMLFile, package_home
 from AccessControl import ClassSecurityInfo
 from Acquisition import aq_base
-from DefaultWorkflow import DefaultWorkflowDefinition
 from WorkflowCore import WorkflowException
+from CMFCorePermissions import ManagePortal
+import os
+from string import join, split, replace, strip
 
+AUTO_MIGRATE_WORKFLOW_TOOLS = 1  # This will later be set to 0.
+
+
+_dtmldir = os.path.join( package_home( globals() ), 'dtml' )
 
 _marker = []  # Create a new marker object.
 
 
-class WorkflowTool (UniqueObject, SimpleItem):
+class WorkflowTool (UniqueObject, Folder):
     '''
     This tool accesses and changes the workflow state of content.
     '''
     id = 'portal_workflow'
     meta_type = 'CMF Workflow Tool'
 
+    security = ClassSecurityInfo()
+
     _chains_by_type = None  # PersistentMapping
     _default_chain = ('default_workflow',)
-    default_workflow = DefaultWorkflowDefinition()
 
-    security = ClassSecurityInfo()
+    manage_options = (
+        ({'label':'Workflows', 'action':'manage_selectWorkflows'},) +
+        Folder.manage_options)
+
+    if AUTO_MIGRATE_WORKFLOW_TOOLS:
+        def __setstate__(self, state):
+            # Adds default_workflow to persistent WorkflowTool instances.
+            # This is temporary!
+            WorkflowTool.inheritedAttribute('__setstate__')(self, state)
+            if not self.__dict__.has_key('default_workflow'):
+                try:
+                    from Products.CMFDefault import DefaultWorkflow
+                except ImportError:
+                    pass
+                else:
+                    self.default_workflow = (
+                        DefaultWorkflow.DefaultWorkflowDefinition(
+                        'default_workflow'))
+                    self._objects = self._objects + (
+                        {'id': 'default_workflow',
+                         'meta_type': self.default_workflow.meta_type},)
+
+    _manage_addWorkflowForm = DTMLFile('addWorkflow', _dtmldir)
+
+    security.declareProtected(ManagePortal, 'manage_addWorkflowForm')
+    def manage_addWorkflowForm(self, REQUEST):
+        '''
+        Form for adding workflows.
+        '''
+        wft = []
+        for mt, klass in _workflow_classes.items():
+            wft.append((mt, '%s (%s)' % (klass.id, klass.title)))
+        wft.sort()
+        return self._manage_addWorkflowForm(REQUEST, workflow_types=wft)
+
+    security.declareProtected(ManagePortal, 'manage_addWorkflow')
+    def manage_addWorkflow(self, workflow_type, id='', RESPONSE=None):
+        '''
+        Adds a workflow from the registered types.
+        '''
+        klass = _workflow_classes[workflow_type]
+        if not id:
+            id = klass.id
+        ob = klass(id)
+        self._setObject(id, ob)
+        if RESPONSE is not None:
+            RESPONSE.redirect(self.absolute_url() +
+                              '/manage_main?management_view=Contents')
+
+    def all_meta_types(self):
+        mt = WorkflowTool.inheritedAttribute('all_meta_types')(self)
+        return mt + ({'name': 'Workflow',
+                      'action': 'manage_addWorkflowForm',
+                      'permission': ManagePortal},)
+
+    def _listTypeInfo(self):
+        pt = getToolByName(self, 'portal_types', None)
+        if pt is None:
+            return ()
+        else:
+            return pt.listTypeInfo()
+
+    _manage_selectWorkflows = DTMLFile('selectWorkflows', _dtmldir)
+
+    security.declareProtected(ManagePortal, 'manage_selectWorkflows')
+    def manage_selectWorkflows(self, REQUEST, manage_tabs_message=None):
+        '''
+        Shows a management screen for changing type to workflow connections.
+        '''
+        cbt = self._chains_by_type
+        ti = self._listTypeInfo()
+        types_info = []
+        for t in ti:
+            id = t.getId()
+            title = t.Type()
+            if title == id:
+                title = None
+            if cbt is not None and cbt.has_key(id):
+                chain = join(cbt[id], ', ')
+            else:
+                chain = '(Default)'
+            types_info.append({'id': id,
+                               'title': title,
+                               'chain': chain})
+        return self._manage_selectWorkflows(
+            REQUEST,
+            default_chain=join(self._default_chain, ', '),
+            types_info=types_info,
+            management_view='Workflows',
+            manage_tabs_message=manage_tabs_message)
+
+    security.declareProtected(ManagePortal, 'manage_changeWorkflows')
+    def manage_changeWorkflows(self, default_chain, props=None, REQUEST=None):
+        '''
+        Changes which workflows apply to objects of which type.
+        '''
+        if props is None:
+            props = REQUEST
+        cbt = self._chains_by_type
+        if cbt is None:
+            self._chains_by_type = cbt = PersistentMapping()
+        ti = self._listTypeInfo()
+        # Set up the chains by type.
+        for t in ti:
+            id = t.getId()
+            field_name = 'chain_%s' % id
+            chain = strip(props.get(field_name, '(Default)'))
+            if chain == '(Default)':
+                # Remove from cbt.
+                if cbt.has_key(id):
+                    del cbt[id]
+            else:
+                chain = replace(chain, ',', ' ')
+                ids = []
+                for wf_id in split(chain, ' '):
+                    if wf_id:
+                        if not self.getWorkflowById(wf_id):
+                            raise ValueError, (
+                                '"%s" is not a workflow ID.' % wf_id)
+                        ids.append(wf_id)
+                cbt[id] = tuple(ids)
+        # Set up the default chain.
+        default_chain = replace(default_chain, ',', ' ')
+        ids = []
+        for wf_id in split(default_chain, ' '):
+            if wf_id:
+                if not self.getWorkflowById(wf_id):
+                    raise ValueError, (
+                        '"%s" is not a workflow ID.' % wf_id)
+                ids.append(wf_id)
+        self._default_chain = tuple(ids)
+        if REQUEST is not None:
+            return self.manage_selectWorkflows(REQUEST, manage_tabs_message=
+                                               'Changed.')
 
     security.declarePrivate('getWorkflowById')
     def getWorkflowById(self, wf_id):
@@ -142,6 +282,8 @@ class WorkflowTool (UniqueObject, SimpleItem):
         chain = None
         if cbt is not None:
             chain = cbt.get(pt, None)
+            # Note that if chain is not in cbt or has a value of
+            # None, we use a default chain.
         if chain is None:
             chain = self.getDefaultChainFor(ob)
             if chain is None:
@@ -372,3 +514,11 @@ class WorkflowTool (UniqueObject, SimpleItem):
         ob.workflow_history[wf_id] = tuple(wfh)
 
 InitializeClass(WorkflowTool)
+
+
+_workflow_classes = {}
+
+def addWorkflowClass(klass):
+    # klass is expected to have id, title, and meta_type attributes.
+    # Its constructor should take one argument, id.
+    _workflow_classes[klass.meta_type] = klass
