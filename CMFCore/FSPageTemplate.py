@@ -86,8 +86,12 @@ class FSPageTemplate(FSObject, Script, PageTemplate):
 
         if reparse:
             # If we already have a content_type set it must come from a
-            # .metadata file and we should always honor that
-            if getattr(self, 'content_type', None) is None:
+            # .metadata file and we should always honor that. The content
+            # type is initialized as text/html by default, so we only
+            # attempt further detection if the default is encountered.
+            # One previous misbehavior remains: It is not possible to
+            # force a text./html type if parsing detects it as XML.
+            if getattr(self, 'content_type', 'text/html') == 'text/html':
                 xml_info = xml_detect_re.match(data)
                 if xml_info:
                     # Smells like xml
