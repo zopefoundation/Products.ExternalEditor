@@ -126,11 +126,22 @@ class CMFSite ( PortalObjectBase
                        , ( 'View',  ( 'isEffective', ) )
                        )
 
+    def __init__( self, id, title='' ):
+        PortalObjectBase.__init__( self, id, title )
+        DefaultDublinCoreImpl.__init__( self )
+
     def isEffective( self, date ):
         """
             Override DefaultDublinCoreImpl's test, since we are always viewable.
         """
         return 1
+
+    def reindexObject( self ):
+        """
+            Override DefaultDublinCoreImpl's method (so that we can play
+            in 'edtiMetadata').
+        """
+        pass
 
     #
     #   The following two methods allow conversion of portal content from
