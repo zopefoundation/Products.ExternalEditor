@@ -16,6 +16,8 @@ CMF Collector Update Notes
 
     Bug fixes
 
+      - Removed imports of WorkflowMethod which broke the product
+
       - Created a working test_all.py script so that the unit tests
         actually run when invoking test_all
 
