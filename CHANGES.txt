@@ -1,10 +1,12 @@
 External Editor Change Log
 
+  6/16/02 - 0.3 Release
+
     - Improved behavior when saving after lock attempts fail.
 
     - Now works on Windows (applause) using Pythonwin. Much overall
-      refactoring to abstract process control. Thanks to Oliver Deckmyn and 
-      Gabriel Genellina for testing, patches and suggestions.
+      refactoring to abstract process control. Thanks to Oliver Deckmyn,
+      Gabriel Genellina and Arno Gross for testing, patches and suggestions.
 
     - Added "temp_dir" configuration option for specifying a different
       temp file directory then the OS default. Also further improved 
