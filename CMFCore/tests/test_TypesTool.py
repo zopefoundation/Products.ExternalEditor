@@ -19,8 +19,15 @@ class UnitTestSecurityPolicy:
     #
     #   Standard SecurityPolicy interface
     #
-    def validate(self, accessed, container, name, value, context, roles,
-                 *args, **kw):
+    def validate( self
+                , accessed=None
+                , container=None
+                , name=None
+                , value=None
+                , context=None
+                , roles=None
+                , *args
+                , **kw):
         return 1
     
     def checkPermission( self, permission, object, context) :
