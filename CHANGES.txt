@@ -1,5 +1,9 @@
 External Editor Change Log
 
+    - Fixed https detection bug. External editor is now tested and working with
+      https. Many thanks to Hans-Dieter Stich and Martin Grönemeyer for their 
+      assistance and ideas.
+
     - Made it possible to edit objects that are methods of ZClasses. Thanks to
       Jim Washington
 

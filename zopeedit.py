@@ -1,4 +1,4 @@
-#!/usr/local/bin/python
+#!/usr/bin/env python
 ##############################################################################
 #
 # Copyright (c) 2001, 2002 Zope Corporation and Contributors.
@@ -21,6 +21,7 @@ import sys, os, stat
 from time import sleep
 from ConfigParser import ConfigParser
 from httplib import HTTPConnection, HTTPSConnection
+from urlparse import urlparse
 
 class Configuration:
     
@@ -91,9 +92,13 @@ class ExternalEditor:
 
             self.options = self.config.getAllOptions(metadata['meta_type'],
                                metadata.get('content_type',''))
+                               
+            # parse the incoming url
+            scheme, self.host, self.path = urlparse(metadata['url'])[:3]
+            self.ssl = scheme == 'https'
 
             # Write the body of the input file to a separate file
-            body_file = self.metadata['url'][7:].replace('/',',')
+            body_file = (self.host + self.path).replace('/', ',')
             body_file = '%s-%s' % (os.tmpnam(), body_file)
             ext = self.options.get('extension')
             if ext and not body_file.endswith(ext):
@@ -112,17 +117,6 @@ class ExternalEditor:
             if getattr(self, 'clean_up', 1):
                 os.remove(input_file)
             raise
-        
-        # Get the host and path from the URL
-        self.ssl = self.metadata['url'].startswith('https:')
-        url = self.metadata['url'][7:]
-        path_start = url.find('/')
-        if path_start == -1:
-            self.host = url
-            self.path = '/'
-        else:
-            self.host = url[:path_start]
-            self.path = url[path_start:]
         
     def __del__(self):
         # for security we always delete the files by default
