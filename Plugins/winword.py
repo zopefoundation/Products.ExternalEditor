@@ -19,6 +19,7 @@ $Id$
 import os
 from time import sleep
 import win32com
+import pythoncom
 from win32com import client # Initialize Client module
 
 class EditorProcess:
@@ -50,6 +51,16 @@ class EditorProcess:
         """Returns true if the editor process is still alive"""
        	try:
             self.wordapp.Documents(self.file)
+        except pythoncom.com_error, why:
+            # COM will reject the call to access the doc if the user is
+            # doing anything interactive at the time the call is made.  The
+            # symptom is a COM error numbered -2147418111 named "Call rejected
+            # by callee".  This is most critically seen when the user has
+            # modified the document but chooses "exit" without first saving.
+            # Without this check in place, the document is not saved back to
+            # Zope, but no error is raised.
+            if why[0] == -2147418111:
+                return 1
         except:
             return 0
         else:
