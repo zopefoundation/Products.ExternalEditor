@@ -21,6 +21,7 @@ $Id$
 import os
 
 from Acquisition import aq_base, aq_inner, aq_parent, aq_acquire
+from Acquisition import ImplicitAcquisitionWrapper
 from Globals import InitializeClass, DTMLFile
 from AccessControl import ClassSecurityInfo
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
@@ -30,7 +31,7 @@ from Products.CMFCore.utils \
 from Products.CMFCore.CMFCorePermissions import ManagePortal
 
 from staging_utils import getPortal, verifyPermission, unproxied
-from staging_utils import getProxyTarget, getProxyReference, cloneByPickle
+from staging_utils import getProxyReference, cloneByPickle
 
 
 # Permission name
@@ -224,20 +225,30 @@ class StagingTool(UniqueObject, SimpleItemWithProperties):
             raise StagingError("Invalid to_stages parameter")
 
         if aq_base(unproxied(obj)) is not aq_base(obj):
-            # obj is a proxy.  Find the wrapped target and update that
-            # instead of the reference.  Note that the reference will
-            # be updated with the container.
-            proxy = obj
-            obj = getProxyTarget(proxy)
-            # Decide whether the reference should be staged at the
-            # same time.  If the reference is contained in a
-            # non-versioned container, the reference should be staged.
-            # OTOH, if the reference is in a versioned container,
-            # staging the container will create the reference, so the
-            # reference should not be staged by this operation.
-            repo = self._getVersionRepository()
-            if repo.isUnderVersionControl(aq_parent(aq_inner(proxy))):
+
+            ref = obj.__dict__.get("_Proxy__reference")
+
+            if ref is None:
+                # Carefully wrap an *un*proxied version of obj in the same
+                # context:
+                IAW = ImplicitAcquisitionWrapper
+                obj = IAW(unproxied(obj), aq_parent(aq_inner(obj)))
                 proxy = None
+            else:
+                # obj is a proxy.  Find the wrapped target and update that
+                # instead of the reference.  Note that the reference will
+                # be updated with the container.
+                proxy = obj
+                obj = ref.getTarget(obj)
+                # Decide whether the reference should be staged at the
+                # same time.  If the reference is contained in a
+                # non-versioned container, the reference should be staged.
+                # OTOH, if the reference is in a versioned container,
+                # staging the container will create the reference, so the
+                # reference should not be staged by this operation.
+                repo = self._getVersionRepository()
+                if repo.isUnderVersionControl(aq_parent(aq_inner(proxy))):
+                    proxy = None
         else:
             proxy = None
 
