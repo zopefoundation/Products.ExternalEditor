@@ -55,7 +55,7 @@
  <tr>
   <th class="TextField"> Edit </th>
   <td class="TextField">
-   <textarea name="text:text" rows="20" cols="80"
+   <textarea name="text:text" rows="20" cols="80" wrap="soft"
                     tal:content="here/EditableBody"></textarea>
   </td>
  </tr>

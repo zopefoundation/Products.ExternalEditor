@@ -50,7 +50,7 @@
   <th align="right"> Description </th>
   <td colspan="3">
    <textarea name="description:text" rows="5"
-             cols="65"
+             cols="65" wrap="soft"
 			 tal:content="here/Description"></textarea>
   </td>
 
@@ -60,7 +60,7 @@
        <th align="right"> Subject </th>
   <td tal:define="subj_lines python: modules['string'].join(
                                          here.subjectsList(), '\n' )">
-     <textarea name="subject:lines" rows="3" cols="20"
+     <textarea name="subject:lines" rows="3" cols="20" wrap="soft"
 	           tal:content="subj_lines"></textarea>
  <br> 
    <select name="subject:list" multiple>

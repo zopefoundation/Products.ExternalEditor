@@ -83,7 +83,7 @@
   <td><br></td>
   <td colspan="4">
    <strong> Comment: </strong> <br>
-   <textarea name="comment:text" rows="3" cols="65"></textarea>
+   <textarea name="comment:text" rows="3" cols="65" wrap="soft"></textarea>
   </td>
  </tr>
  <tr>

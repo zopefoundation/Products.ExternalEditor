@@ -37,7 +37,7 @@
   </th>
   <td colspan="3">
    <textarea name="description:text" rows="5"
-             cols="65"
+             cols="65" wrap="soft"
 			 tal:content="here/Description"></textarea>
   </td>
  </tr>
@@ -46,7 +46,7 @@
   <th align="right"> Subject </th>
   <td>
    <textarea name="subject:lines" rows="3"
-               cols="20"
+               cols="20" wrap="soft"
 			   tal:define="lines here/subjectsList"><span tal:repeat="line lines" tal:replace="line"></span></textarea>
  <br> 
    <select name="subject:list" multiple>
@@ -61,7 +61,7 @@
   <th align="right"> Contributors </th>
   <td>
    <textarea name="contributors:lines" rows="5"
-             cols="30"
+             cols="30" wrap="soft"
 			 tal:define="items here/Contributors"
 			 tal:repeat="item items"
 			 tal:content="item"></textarea>

@@ -50,7 +50,7 @@
   </th>
   <td colspan="3">
    <textarea name="description:text" rows="5"
-             cols="65"
+             cols="65" wrap="soft"
 			 tal:content="here/Description">Description</textarea>
   </td>
  </tr>
@@ -61,7 +61,7 @@
   </th>
   <td>
   <textarea name="subject:lines" rows="5"
-               cols="30"
+               cols="30" wrap="soft"
 			   tal:define="lines here/Subject"><span tal:repeat="line lines" tal:replace="line"></span></textarea>
   </td>
  </tr>
