@@ -31,6 +31,7 @@ from Products.CMFCore.Expression import Expression
 from Products.CMFCore import CMFCorePermissions
 from utils import _dtmldir
 
+import pdb; pdb.set_trace()
 
 class URLTool (UniqueObject, SimpleItem, ActionProviderBase):
     id = 'portal_url'
@@ -38,6 +39,7 @@ class URLTool (UniqueObject, SimpleItem, ActionProviderBase):
     _actions = []
 
     security = ClassSecurityInfo()
+    security.declareObjectProtected( CMFCorePermissions.View )
 
     manage_options = ( ActionProviderBase.manage_options +
                       ({ 'label' : 'Overview', 'action' : 'manage_overview' } 

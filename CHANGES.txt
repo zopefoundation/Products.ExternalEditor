@@ -44,6 +44,9 @@ New Features
 
 Bugs Fixed
 
+  - Gave URL tool explicit __roles__, to enable use in 'nocall:'
+    expressions.
+
   - Turned off auto-expansion of customized FSPageTemplates
     (Tracker #477).
     
