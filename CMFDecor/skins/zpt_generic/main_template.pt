@@ -26,7 +26,7 @@
    <span tal:condition="python: object_title != portal_title"
          tal:replace="string:${portal_title}: ${object_title}">The title</span>
  </title>
-  
+ <metal:block define-slot="base" /> 
  <link rel="stylesheet" href="zpt_stylesheet.css" type="text/css"
        tal:attributes="href here/zpt_stylesheet/absolute_url">
 
