@@ -71,7 +71,7 @@
 
    <span tal:condition="python: not mover">
         You can not rename or delete this page.
-        <span tal:replace="python: here.whichWho[ here.opCategory( 'move' ) ]">
+        <span tal:replace="python: here.whichWho('move')">
         movers </span> do so.
    </span>
 

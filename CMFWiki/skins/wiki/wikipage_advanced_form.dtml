@@ -45,7 +45,7 @@
        </font>
      <dtml-elif "not isAllowed('move')">
         You can not rename or delete this page.
-        <dtml-var "whichWho[opCategory('move')]"> do so.
+        <dtml-var "whichWho('move')"> do so.
      <dtml-else>
       <table width="100%" cellspacing=7>
         <tr>
