@@ -7,6 +7,7 @@ from Products.CMFCore.tests.base.testcase import RequestTest
 from Products.CMFCore.tests.base.content import DOCTYPE
 from Products.CMFCore.tests.base.content import HTML_TEMPLATE
 from Products.CMFCore.tests.base.content import BASIC_HTML
+from Products.CMFCore.tests.base.content import FAUX_HTML_LEADING_TEXT
 from Products.CMFCore.tests.base.content import ENTITY_IN_TITLE
 from Products.CMFCore.tests.base.content import BASIC_STRUCTUREDTEXT
 from Products.CMFCore.tests.base.content import STX_WITH_HTML
@@ -84,6 +85,24 @@ class DocumentTests(RequestTest):
         d.PUT(self.REQUEST, self.RESPONSE)
         self.assertEqual( d.Format(), 'text/html' )
         self.assertEqual( d.Description(), 'Describe me' )
+
+    def test_EditStripHTMLToBody(self):
+        # bodyfind should strip away everything but the contents of the body
+        # tag.
+        self.REQUEST['BODY'] = BASIC_HTML
+        d = self.d
+        d.PUT(self.REQUEST, self.RESPONSE)
+        self.failUnless( hasattr(d, 'cooked_text') )
+        self.assertEqual( d.Format(), 'text/html' )
+        self.assertEquals(d.cooked_text, '\n  <h1>Not a lot here</h1>\n ')
+
+    def test_EditPlainDocumentWithEmbeddedHTML(self):
+        d = self.d
+        d.edit('structured-text', FAUX_HTML_LEADING_TEXT)
+        fully_edited = d.cooked_text
+        d._edit(FAUX_HTML_LEADING_TEXT, 'structured-text')
+        partly_edited = d.cooked_text
+        self.assertEquals(fully_edited, partly_edited)
 
     def test_BigHtml(self):
         d = self.d
