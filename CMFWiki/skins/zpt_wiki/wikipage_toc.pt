@@ -25,11 +25,11 @@
 <h3> <em tal:content="here/getId">PageID</em> Contents</h3>
 
     <em>To see a report with the text of all the offspring of this page, visit
+    the
       <a href="TOPIC REPORT PAGE"
          tal:attributes="href
                          string:${here/absolute_url}/wikipage_topic_report">
-        this page's topic report
-      </a>
+        <span tal:replace="here/getId">THIS PAGE'S</span> topic report</a>.
     </em>
 
     <span tal:condition="nothing">
