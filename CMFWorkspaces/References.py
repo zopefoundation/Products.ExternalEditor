@@ -20,11 +20,11 @@ References also are used for content which consists of multiple parts.
 $Id$
 """
 
+import time
 
 from ExtensionClass import Base
 from Acquisition import aq_inner, aq_parent
 from ZODB import Persistent
-
 import Globals
 from AccessControl import ClassSecurityInfo
 from Products.CMFCore.utils import getToolByName
@@ -48,6 +48,7 @@ class RelativeReference (Base):
                 '/'.join(o_path), '/'.join(b_path)))
         self._path = o_path[len(b_path):]
         self.id = object.getId()
+        self.creation_time = time.time()
 
     def _getBaseObject(self, context):
         # Meant to be overridden.
@@ -81,12 +82,12 @@ class RelativeReference (Base):
         return '<%s, path=%s>' % (self.__class__.__name__, self._path)
 
     def __cmp__(self, other):
-        """Returns 0 if the reference we are comparing with points to the
-        same object."""
+        """Compares this object with another.
+
+        References that point to the same object are equivalent."""
         if isinstance(other, self.__class__):
-            if self.id == other.id and self._path == other._path:
-                return 0
-        return 1
+            return cmp(self._path, other._path)
+        return -1
 
 Globals.InitializeClass(RelativeReference)
 
