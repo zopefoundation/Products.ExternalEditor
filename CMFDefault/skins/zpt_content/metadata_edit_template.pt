@@ -16,18 +16,17 @@
  <tr>
   <th i18n:translate="">Enable Discussion?</th>
   <td>
-    <select name="allowDiscussion"
-            tal:define="val context/isDiscussable">
-        <option value="None"
-                tal:attributes="selected python: val == None"
-                i18n:translate="">Default</option>
-        <option value="0"
-                tal:attributes="selected python: val == 0"
-                i18n:translate="">Off</option>
-        <option value="1"
-                tal:attributes="selected python: val == 1"
-                i18n:translate="">On</option>
-     </select>
+   <select name="allow_discussion">
+    <option value="default"
+       tal:attributes="selected python: form['allow_discussion'] is None"
+       i18n:translate="">Default</option>
+    <option value="off"
+       tal:attributes="selected python: form['allow_discussion'] is False"
+       i18n:translate="">Off</option>
+    <option value="on"
+       tal:attributes="selected python: form['allow_discussion'] is True"
+       i18n:translate="">On</option>
+   </select>
   </td>
   <td colspan="2" align="right">
    <a href="full_metadata_edit_form"
@@ -61,8 +60,7 @@
  </tr>
  <tr valign="top">
   <th align="right" i18n:translate="">Subject</th>
-  <td tal:define="subj_lines python: modules['string'].join(
-                                         context.subjectsList(), '\n' )">
+  <td tal:define="subj_lines python: '\n'.join( context.subjectsList() )">
    <textarea name="subject:lines" rows="3" cols="20"
              tal:content="subj_lines"></textarea>
    <br />

@@ -1,4 +1,4 @@
-##parameters=allowDiscussion=None, title=None, subject=None, description=None, contributors=None, effective_date=None, expiration_date=None, format=None, language=None, rights=None, **kw
+##parameters=allow_discussion, title=None, subject=None, description=None, contributors=None, effective_date=None, expiration_date=None, format=None, language=None, rights=None, **kw
 ##
 from Products.CMFCore.utils import getToolByName
 from Products.CMFDefault.exceptions import ResourceLockedError
@@ -44,7 +44,13 @@ if language is None:
 if rights is None:
     rights = context.Rights()
 
-dtool.overrideDiscussionFor(context, allowDiscussion)
+if allow_discussion == 'default':
+    allow_discussion = None
+elif allow_discussion == 'off':
+    allow_discussion = False
+elif allow_discussion == 'on':
+    allow_discussion = True
+dtool.overrideDiscussionFor(context, allow_discussion)
 
 try:
     context.editMetadata( title=title
