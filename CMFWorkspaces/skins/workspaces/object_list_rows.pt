@@ -38,15 +38,16 @@
                     tal:attributes="value python: it[0]"/>
         </td>
 
-        <td> <img src="document_icon.gif"
-                  tal:attributes="src item/getIcon"
-                  tal:on-error="string:" />
-            <a href="#"
-               tal:attributes="href string:${item/absolute_url}/view"
-               tal:content="item/Title"
-               tal:omit-tag="no_item_links|nothing"
-               tal:on-error="string:(broken)">
-              TITLE or ID </a>
+        <td>
+         <a href="#"
+            tal:attributes="href string:${item/absolute_url}/view"
+            tal:omit-tag="no_item_links|nothing"
+            tal:on-error="string:(broken)">
+         <img src="document_icon.gif" border="0"
+              tal:attributes="src item/getIcon"
+              tal:on-error="string:" />
+         <span tal:content="item/Title">TITLE or ID</span>
+         </a>
         </td>
 
         <td tal:content="item/Type" nowrap="nowrap"

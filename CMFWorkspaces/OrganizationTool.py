@@ -26,6 +26,7 @@ $Id$
 """
 
 import os
+from urllib import quote
 
 from Acquisition import aq_inner, aq_parent
 from Globals import InitializeClass, DTMLFile
@@ -70,16 +71,31 @@ class OrganizationTool(UniqueObject, SimpleItem):
 
 
     security.declarePublic('getAddFormURL')
-    def getAddFormURL(self, type_name):
+    def getAddFormURL(self, type_name, workspace=None):
         """Returns the URL to visit to add an object of the given type.
         """
-        base = aq_parent(aq_inner(self)).absolute_url()
         location, skin_name = self._types[str(type_name)]
         if not location.startswith('/'):
             location = '/' + location
-        if not location.endswith('/'):
-            location = location + '/'
-        return base + location + skin_name
+        base = aq_parent(aq_inner(self)).absolute_url()
+        base_url = base + location
+        if not base_url.endswith('/'):
+            base_url = base_url + '/'
+        ws = ''
+        if workspace is not None:
+            ws = '&workspace=%s' % quote(
+                '/'.join(workspace.getPhysicalPath()))
+        return '%s%s?type=%s%s' % (base_url, skin_name, quote(type_name), ws)
+
+
+    security.declarePublic('getTypeContainer')
+    def getTypeContainer(self, type_name):
+        """Returns the container for a given type."""
+        portal = aq_parent(aq_inner(self))
+        location, skin_name = self._types[str(type_name)]
+        if location.startswith('/'):
+            location = location[1:]
+        return portal.restrictedTraverse(location)
 
 
     security.declareProtected(ManagePortal, 'getLocationInfo')
