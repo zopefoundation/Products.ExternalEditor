@@ -40,7 +40,7 @@
                                                            , 'File'
                                                            , 'News Item'
                                                            ) } );
-                   items python: auth_filter( raw_items );
+                   items python: auth_filter( raw_items, skip='' );
                   ">
   <div tal:condition="items">
 
@@ -71,7 +71,7 @@
                                                            , 'Favorite'
                                                            , 'Topic'
                                                            ) } );
-                   items python: auth_filter( raw_items );
+                   items python: auth_filter( raw_items, skip='' );
                   ">
   <div tal:condition="items">
   <h4> Related Resources </h4>
