@@ -64,13 +64,13 @@ def exportTypesTool( context ):
     configurator = TypeInfoConfigurator( site ).__of__( site )
 
     tool_xml = configurator.generateToolXML()
-    context.writeDataFile( _TOOL_FILENAME, tool_xml )
+    context.writeDataFile( _TOOL_FILENAME, tool_xml, 'text/xml' )
 
     for type_id in types_tool.listContentTypes():
 
         type_filename = _getTypeFilename( type_id )
         type_xml = configurator.generateTypeXML( type_id )
-        context.writeDataFile( type_filename, type_xml )
+        context.writeDataFile( type_filename, type_xml, 'text/xml' )
 
     # XXX: YAGNI?
     # exportScriptsFromContainer(types_tool, ('typestool_scripts',))
@@ -199,7 +199,7 @@ class TypeInfoConfigurator( Implicit ):
 
         if ' ' in ti.getId():
 
-            result[ 'filename' ]    = ti.getId().replace( ' ', '_' )
+            result[ 'filename' ]    = _getTypeFilename( ti.getId() )
 
         if isinstance( ti, FactoryTypeInformation ):
 
@@ -254,7 +254,9 @@ class _TypesToolParser( HandlerBase ):
 
             id = self._extract( attrs, 'id' )
             filename = self._extract( attrs, 'filename', id )
-            filename = _getTypeFilename( filename )
+            
+            if filename == id:
+                filename = _getTypeFilename( filename )
 
             self._types.append( ( id, filename ) )
 
@@ -379,7 +381,7 @@ def _getTypeFilename( type_id ):
 
     """ Return the name of the file which holds info for a given type.
     """
-    return 'types/%s.xml' % type_id
+    return 'types/%s.xml' % type_id.replace( ' ', '_' )
 
 def _cleanDescription( desc ):
 

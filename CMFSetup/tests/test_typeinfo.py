@@ -46,12 +46,7 @@ class DummyTypesTool( Folder ):
 
         self._objects.append( ( id, ob ) )
 
-class TypeInfoConfiguratorTests( BaseRegistryTests ):
-
-    def _getTargetClass( self ):
-
-        from Products.CMFSetup.typeinfo import TypeInfoConfigurator
-        return TypeInfoConfigurator
+class _TypeInfoSetup( BaseRegistryTests ):
 
     def _initSite( self, type_infos=() ):
 
@@ -60,6 +55,13 @@ class TypeInfoConfiguratorTests( BaseRegistryTests ):
         self.root.site.portal_types = DummyTypesTool( type_infos )
 
         return self.root.site
+
+class TypeInfoConfiguratorTests( _TypeInfoSetup ):
+
+    def _getTargetClass( self ):
+
+        from Products.CMFSetup.typeinfo import TypeInfoConfigurator
+        return TypeInfoConfigurator
 
     def test_getTypeInfo_nonesuch( self ):
 
@@ -199,7 +201,8 @@ class TypeInfoConfiguratorTests( BaseRegistryTests ):
             expected = _TI_LIST_WITH_FILENAME[ i ]
             self.assertEqual( found[ 'id' ], expected[ 'id' ] )
             self.assertEqual( found[ 'filename' ]
-                            , expected[ 'id' ].replace( ' ', '_' )
+                            , 'types/%s.xml' 
+                                % expected[ 'id' ].replace( ' ', '_' )
                             )
 
     def test_generateToolXML_empty( self ):
@@ -224,13 +227,15 @@ class TypeInfoConfiguratorTests( BaseRegistryTests ):
 
         site = self._initSite( _TI_LIST )
         configurator = self._makeOne( site ).__of__( site )
-        self._compareDOM( configurator.generateTypeXML( 'foo' ), _FOO_EXPORT )
+        self._compareDOM( configurator.generateTypeXML( 'foo' )
+                        , _FOO_EXPORT % 'foo' )
 
     def test_generateTypeXML_STI( self ):
 
         site = self._initSite( _TI_LIST )
         configurator = self._makeOne( site ).__of__( site )
-        self._compareDOM( configurator.generateTypeXML( 'bar' ), _BAR_EXPORT )
+        self._compareDOM( configurator.generateTypeXML( 'bar' )
+                        , _BAR_EXPORT % 'bar' )
 
     def test_parseToolXML_empty( self ):
 
@@ -273,7 +278,7 @@ class TypeInfoConfiguratorTests( BaseRegistryTests ):
         configurator = self._makeOne( site ).__of__( site )
         self.assertEqual( len( tool._objects ), 0 )
 
-        configurator.parseTypeXML( _FOO_EXPORT )
+        configurator.parseTypeXML( _FOO_EXPORT % 'foo' )
         self.assertEqual( len( tool._objects ), 1 )
 
         type_id = tool._objects[ 0 ][ 0 ]
@@ -290,7 +295,7 @@ class TypeInfoConfiguratorTests( BaseRegistryTests ):
         configurator = self._makeOne( site ).__of__( site )
         self.assertEqual( len( tool._objects ), 0 )
 
-        configurator.parseTypeXML( _BAR_EXPORT )
+        configurator.parseTypeXML( _BAR_EXPORT % 'bar' )
         self.assertEqual( len( tool._objects ), 1 )
 
         type_id = tool._objects[ 0 ][ 0 ]
@@ -398,14 +403,14 @@ _NORMAL_EXPORT = """\
 _FILENAME_EXPORT = """\
 <?xml version="1.0"?>
 <types-tool>
- <type id="foo object" filename="foo_object" />
- <type id="bar object" filename="bar_object" />
+ <type id="foo object" filename="types/foo_object.xml" />
+ <type id="bar object" filename="types/bar_object.xml" />
 </types-tool>
 """
 
 _FOO_EXPORT = """\
 <type-info
-   id="foo"
+   id="%s"
    kind="Factory-based Type Information"
    title="Foo"
    meta_type="Foo Thing"
@@ -454,7 +459,7 @@ _FOO_EXPORT = """\
 
 _BAR_EXPORT = """\
 <type-info
-   id="bar"
+   id="%s"
    kind="Scriptable Type Information"
    title="Bar"
    meta_type="Bar Thing"
@@ -510,12 +515,78 @@ _BAR_EXPORT = """\
 </type-info>
 """
 
+class Test_exportTypesTool( _TypeInfoSetup ):
+
+    def test_empty( self ):
+
+        site = self._initSite()
+        context = DummyExportContext( site )
+
+        from Products.CMFSetup.typeinfo import exportTypesTool
+        exportTypesTool( context )
+
+        self.assertEqual( len( context._wrote ), 1 )
+        filename, text, content_type = context._wrote[ 0 ]
+        self.assertEqual( filename, 'typestool.xml' )
+        self._compareDOM( text, _EMPTY_EXPORT )
+        self.assertEqual( content_type, 'text/xml' )
+
+    def test_normal( self ):
+
+        site = self._initSite( _TI_LIST )
+        context = DummyExportContext( site )
+
+        from Products.CMFSetup.typeinfo import exportTypesTool
+        exportTypesTool( context )
+
+        self.assertEqual( len( context._wrote ), 3 )
+
+        filename, text, content_type = context._wrote[ 0 ]
+        self.assertEqual( filename, 'typestool.xml' )
+        self._compareDOM( text, _NORMAL_EXPORT )
+        self.assertEqual( content_type, 'text/xml' )
+
+        filename, text, content_type = context._wrote[ 1 ]
+        self.assertEqual( filename, 'types/foo.xml' )
+        self._compareDOM( text, _FOO_EXPORT % 'foo' )
+        self.assertEqual( content_type, 'text/xml' )
+
+        filename, text, content_type = context._wrote[ 2 ]
+        self.assertEqual( filename, 'types/bar.xml' )
+        self._compareDOM( text, _BAR_EXPORT % 'bar' )
+        self.assertEqual( content_type, 'text/xml' )
+
+    def test_with_filenames( self ):
+
+        site = self._initSite( _TI_LIST_WITH_FILENAME )
+        context = DummyExportContext( site )
+
+        from Products.CMFSetup.typeinfo import exportTypesTool
+        exportTypesTool( context )
+
+        self.assertEqual( len( context._wrote ), 3 )
+
+        filename, text, content_type = context._wrote[ 0 ]
+        self.assertEqual( filename, 'typestool.xml' )
+        self._compareDOM( text, _FILENAME_EXPORT )
+        self.assertEqual( content_type, 'text/xml' )
+
+        filename, text, content_type = context._wrote[ 1 ]
+        self.assertEqual( filename, 'types/foo_object.xml' )
+        self._compareDOM( text, _FOO_EXPORT % 'foo object' )
+        self.assertEqual( content_type, 'text/xml' )
+
+        filename, text, content_type = context._wrote[ 2 ]
+        self.assertEqual( filename, 'types/bar_object.xml' )
+        self._compareDOM( text, _BAR_EXPORT % 'bar object' )
+        self.assertEqual( content_type, 'text/xml' )
+
 
 def test_suite():
     return unittest.TestSuite((
         unittest.makeSuite( TypeInfoConfiguratorTests ),
-        #unittest.makeSuite( Test_exportRolemap ),
-        #unittest.makeSuite( Test_importRolemap ),
+        unittest.makeSuite( Test_exportTypesTool ),
+        #unittest.makeSuite( Test_importTypesTool ),
         ))
 
 if __name__ == '__main__':
