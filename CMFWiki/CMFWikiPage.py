@@ -1834,6 +1834,8 @@ default_perms = {
 
 class CMFWikiFolder( SkinnedFolder ):
 
+    meta_type="CMF Wiki"
+
     def PUT_factory(self, name, typ, body):
         if find(typ, 'text') != -1:
             return makeCMFWikiPage(name, '', body)
