@@ -27,6 +27,16 @@ from httplib import HTTPConnection, HTTPSConnection
 from urlparse import urlparse
 import urllib
 
+try:
+    # See if ssl is available on this system
+    from socket import ssl, sslerror
+except ImportError:
+    ssl_available = 0
+    sslerror = None # Used for catching sslserver protocol violations
+else:
+    ssl_available = 1
+    del ssl 
+
 win32 = sys.platform == 'win32'
 
 class Configuration:
@@ -86,6 +96,7 @@ class Configuration:
 class ExternalEditor:
     
     saved = 1
+    did_lock = 0
     
     def __init__(self, input_file):
         try:
@@ -155,14 +166,10 @@ class ExternalEditor:
                 except OSError:
                     pass # Sometimes we aren't allowed to delete it
             
-            if self.ssl:
-                # See if our Python build supports ssl
-                try:
-                    from socket import ssl
-                except ImportError:
-                    fatalError('SSL support is not available on this system. '
-                               'Make sure openssl is installed '
-                               'and reinstall Python.')
+            if self.ssl and not ssl_available:
+                fatalError('SSL support is not available on this system. '
+                           'Make sure openssl is installed '
+                           'and reinstall Python.')
         except:
             # for security, always delete the input file even if
             # a fatal error occurs, unless explicitly stated otherwise
@@ -181,7 +188,7 @@ class ExternalEditor:
             # for security we always delete the files by default
             os.remove(self.content_file)
 
-        if hasattr(self, 'lock_token'):
+        if self.did_lock and hasattr(self, 'lock_token'):
             # Try not to leave dangling locks on the server
             self.unlock(interactive=0)
             
@@ -303,7 +310,7 @@ class ExternalEditor:
         editor = EditorProcess(command)
         
         if use_locks:
-            self.lock()
+            self.did_lock = self.lock()
             
         while 1:
             editor.wait(save_interval or 2)
@@ -326,8 +333,8 @@ class ExternalEditor:
                        'to editor process.\n'
                        '(%s)' % command)
         
-        if use_locks:
-            self.unlock()
+        if use_locks and self.did_lock:
+            self.did_lock = not self.unlock()
         
         if not self.saved \
            and askYesNo('File not saved to Zope.\nReopen local copy?'):
@@ -369,6 +376,18 @@ class ExternalEditor:
     def lock(self):
         """Apply a webdav lock to the object in Zope"""
         
+        # Check and see if we already have a lock token
+        # that came down with the data
+        if self.metadata.get('lock-token'):
+            if self.options.get('always_borrow_locks') \
+               or askYesNo('This object is already locked by you in another'
+                           ' session.\n Do you want to borrow this lock?'):
+                self.lock_token = 'opaquelocktoken:%s' \
+                                  % self.metadata['lock-token']
+                return 0
+            else:
+                sys.exit()            
+        
         headers = {'Content-Type':'text/xml; charset="utf-8"',
                    'Timeout':'infinite',
                    'Depth':'infinity',
@@ -392,7 +411,7 @@ class ExternalEditor:
             token_start = reply.find('>opaquelocktoken:')
             token_end = reply.find('<', token_start)
             if token_start > 0 and token_end > 0:
-               self.lock_token = reply[token_start+1:token_end]
+                self.lock_token = reply[token_start+1:token_end]
         else:
             # We can't lock her sir!
             if response.status == 423:

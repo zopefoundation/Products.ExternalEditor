@@ -20,6 +20,7 @@ from string import join # For Zope 2.3 compatibility
 import Acquisition
 from AccessControl.SecurityManagement import getSecurityManager
 from webdav.common import rfc1123_date
+from webdav import Lockable
 
 class ExternalEditor(Acquisition.Implicit):
     """Create a response that encapsulates the data needed by the
@@ -64,7 +65,21 @@ class ExternalEditor(Acquisition.Implicit):
                 
             r.append('auth:%s' % auth)
             
-        r.append('cookie:%s' % REQUEST.environ.get('HTTP_COOKIE',''))            
+        r.append('cookie:%s' % REQUEST.environ.get('HTTP_COOKIE',''))
+        
+        if Lockable.wl_isLocked(ob):
+            # Object is locked, send down the lock token 
+            # owned by this user (if any)
+            user_id = security.getUser().getId()
+            for lock in ob.wl_lockValues():
+                if not lock.isValid():
+                    continue # Skip invalid/expired locks
+                creator = lock.getCreator()
+                if creator and creator[1] == user_id:
+                    # Found a lock for this user, so send it
+                    r.append('lock-token:%s' % lock.getLockToken())
+                    break       
+              
         r.append('')
         
         if hasattr(ob, 'manage_FTPget'):

@@ -142,6 +142,12 @@ Zope External Editor
       application checks the edited file for changes.
 
       use_locks -- (1 or 0) Whether to use WebDAV locking.
+      
+      always_borrow_locks -- (1 or 0) When use_locks is enabled this features
+      suppresses warnings when trying to edit an object you have already locked.
+      When enabled, external editor will always "borrow" the existing lock token
+      instead of doing the locking itself. This is useful when using CMFStaging
+      for instance. If omitted, this option defaults to 0. (new in 0.5)
 
       cleanup_files -- (1 or 0) Whether to delete the temp files created.
       WARNING the temp file coming from the browser contains authentication
@@ -154,7 +160,7 @@ Zope External Editor
       better handling of images and can improve syntax highlighting.
 
       temp_dir -- (path) Path to store local copies of object data being
-      edited. Defaults to operating system temp directory (new in 0.3).
+      edited. Defaults to operating system temp directory.
 
     Sections
     
