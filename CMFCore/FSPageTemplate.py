@@ -17,7 +17,7 @@ $Id$
 
 from string import split, replace
 from os import stat
-import re
+import re, sys
 
 import Globals, Acquisition
 from DateTime import DateTime
@@ -143,8 +143,10 @@ class FSPageTemplate(FSObject, Script, PageTemplate):
         except RuntimeError:
             if Globals.DevelopmentMode:
                 err = FSPageTemplate.inheritedAttribute( 'pt_errors' )( self )
+                if not err:
+                    err = sys.exc_info()
                 err_type = err[0]
-                err_msg = '<pre>%s</pre>' % replace( err[1], "\'", "'" )
+                err_msg = '<pre>%s</pre>' % replace( str(err[1]), "\'", "'" )
                 msg = 'FS Page Template %s has errors: %s.<br>%s' % (
                     self.id, err_type, html_quote(err_msg) )
                 raise RuntimeError, msg
