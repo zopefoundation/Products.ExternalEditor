@@ -33,7 +33,7 @@
              &dtml-sequence-key;
            </td>
            <td class="form-element">
-             <textarea cols="30" rows="8" name="skinpath_&dtml-sequence-key;:lines"><dtml-var expr="'\n'.join(_['sequence-item'].split(','))"></textarea>
+             <textarea cols="30" rows="8" name="skinpath_&dtml-sequence-key;:lines"><dtml-var expr="'\n'.join([s.strip() for s in _['sequence-item'].split(',')])"></textarea>
            </td>
          </tr>
          </dtml-in>
