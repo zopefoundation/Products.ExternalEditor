@@ -4,10 +4,10 @@
 ##bind namespace=
 ##bind script=script
 ##bind subpath=traverse_subpath
-##parameters=REQUEST, RESPONSE, field, criteria_type
+##parameters=REQUEST, RESPONSE, field, criterion_type
 ##title=
 ##
 
-context.addCriteria(field=field, criteria_type=criteria_type)
+context.addCriterion(field=field, criterion_type=criterion_type)
 
 RESPONSE.redirect('%s/topic_criteria_form' % context.absolute_url())

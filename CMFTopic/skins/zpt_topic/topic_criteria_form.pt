@@ -38,7 +38,7 @@
 <tr valign="top">
     <th align="left"> Criteria type: </th>
     <td>
-        <select name="criteria_type" tal:define="types here/listCriteriaTypes">
+        <select name="criterion_type" tal:define="types here/listCriteriaTypes">
             <option value="" tal:repeat="type types" tal:attributes="value type/name" tal:content="type/name">Type</option>
         </select>
     </td>

@@ -30,8 +30,8 @@
   </select></td>
  </tr>
  <tr valign="top">
-  <th align="left"> Criteria type: </th>
-  <td><select name="criteria_type">
+  <th align="left"> Criterion type: </th>
+  <td><select name="criterion_type">
     <dtml-in name="listCriteriaTypes" mapping>
     <option value="&dtml-name;">&dtml-name;</option>
     </dtml-in>
