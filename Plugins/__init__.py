@@ -10,3 +10,4 @@ def importAll():
     import excel
     import powerpoint, powerpnt
     import msohtmed
+    import dreamweaver
