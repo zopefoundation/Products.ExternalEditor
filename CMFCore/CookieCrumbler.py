@@ -231,7 +231,7 @@ class CookieCrumbler (SimpleItemWithProperties):
                 came_from = req.get('came_from', None)
                 if came_from is None:
                     came_from = req['URL']
-                url = '%s?came_from=%s&retry=%s' % (
+                url = '%s?came_from=%s&retry=%s&disable_cookie_login__=1' % (
                     page.absolute_url(), quote(came_from), retry)
                 return url
         return None
