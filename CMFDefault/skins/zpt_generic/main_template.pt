@@ -4,6 +4,7 @@
                   mtool here/portal_membership;
                   atool here/portal_actions;
                   wtool here/portal_workflow;
+                  uidtool here/portal_uidhandler | nothing;
                   portal_object utool/getPortalObject;
                   portal_title portal_object/Title;
                   object_title here/Title;
@@ -299,6 +300,16 @@
 
  <!-- end main slot -->
  </div>
+
+ <p tal:define="isFolderish here/isPrincipiaFolderish | nothing"
+    tal:condition="python: uidtool and not isFolderish">Permalink: 
+  <a href=""
+     tal:define="uid python:uidtool.register(here);
+                 url string:${portal_url}/permalink/${uid};"
+     tal:content="url"
+     tal:attributes="href url">
+  the unique id</a>
+ </p>
 
  <!-- end Desktop -->
  </div>
