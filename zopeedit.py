@@ -92,7 +92,7 @@ class ExternalEditor:
         try:
             # Read the configuration file
             if win32:
-                config_path = path.expanduser('~\ZopeExternalEdit.ini')
+                config_path = path.expanduser('~\ZopeEdit.ini')
             else:
                 config_path = path.expanduser('~/.zope-external-edit')
                 
@@ -176,15 +176,15 @@ class ExternalEditor:
     def getEditorCommand(self):
         """Return the editor command"""
         editor = self.options.get('editor')
-        """
-        if not editor and has_tk():
+
+        if not editor and not win32 and has_tk():
             from tkSimpleDialog import askstring
             editor = askstring('Zope External Editor', 
                                'Enter the command to launch the default editor')
             if not editor: sys.exit(0)
             self.config.set('general', 'editor', path)
             self.config.save()
-        """ 
+
         if editor is not None:            
             return editor
         else:
@@ -391,6 +391,7 @@ if win32:
 
     def errorDialog(message):
         MessageBox(message, title, 16)
+        sys.stderr.write(message + '\n')
 
     def askRetryCancel(message):
         return MessageBox(message, title, 53) == 4
@@ -443,7 +444,7 @@ else: # Posix platform
                 showerror(title, message)
                 has_tk()
         finally:
-            sys.stderr.write(message)
+            sys.stderr.write(message + '\n')
 
     def askRetryCancel(message):
         if has_tk():
@@ -481,6 +482,7 @@ else: # Posix platform
 def fatalError(message, exit=1):
     """Show error message and exit"""
     errorDialog('FATAL ERROR: %s' % message)
+    traceback.print_exc(file=sys.stderr)
     if exit: 
         sys.exit(0)
 
@@ -567,11 +569,15 @@ extension=.png"""
 
 if __name__ == '__main__':
     try:
-        ExternalEditor(sys.argv[1]).launch()
+        input_file = sys.argv[1]
+    except IndexError:
+        fatalError('Input file name missing.\n'
+                   'Usage: zopeedit.py inputfile')
+    try:
+        ExternalEditor(input_file).launch()
     except KeyboardInterrupt:
         pass
     except SystemExit:
         pass
     except:
-        fatalError(sys.exc_info()[1],0)
-        raise
+        fatalError(sys.exc_info()[1])
