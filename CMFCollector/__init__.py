@@ -12,7 +12,7 @@
 ##############################################################################
 
 from Products.CMFDefault import Portal
-import Collector, CollectorIssue, WebTextDocument
+import Collector, CollectorIssue, WebTextDocument, CollectorSubset
 import Products.CMFCore
 
 from Products.CMFCore import utils, CMFCorePermissions
@@ -26,6 +26,7 @@ factory_type_information = (
     (Collector.factory_type_information
      + CollectorIssue.factory_type_information
      + Collector.catalog_factory_type_information
+     + CollectorSubset.factory_type_information
 
      + ({'id': 'Collector Issue Transcript',
          #     'content_icon': 'event_icon.gif',
@@ -57,9 +58,10 @@ factory_type_information = (
     )
 
 contentClasses = (Collector.Collector, CollectorIssue.CollectorIssue,
-                  Collector.CollectorCatalog)
+                  Collector.CollectorCatalog, CollectorSubset.CollectorSubset)
 contentConstructors = (Collector.addCollector,
-                       CollectorIssue.addCollectorIssue)
+                       CollectorIssue.addCollectorIssue,
+                       CollectorSubset.addCollectorSubset)
 z_bases = utils.initializeBasesPhase1(contentClasses, this_module)
 # This is used by a script (external method) that can be run
 # to set up collector in an existing CMF Site instance.
@@ -81,3 +83,7 @@ def initialize(context):
     context.registerClass(CollectorIssue.CollectorIssue,
                           constructors = (CollectorIssue.addCollectorIssue,),
                           permission = CollectorPermissions.AddCollectorIssue)
+
+    context.registerClass(CollectorSubset.CollectorSubset,
+                          constructors = (CollectorSubset.addCollectorSubset,),
+                          permission = CMFCorePermissions.AddPortalContent)

@@ -44,33 +44,10 @@ def install(self):
     metadata_tool = getToolByName(self, 'portal_metadata')
     catalog = getToolByName(self, 'portal_catalog')
 
-    # Due to differences in the APIs for adding indexes between
-    # Zope 2.3 and 2.4, we have to catch them here before we can add
-    # our new ones.
-    base = aq_base(catalog)
-    if hasattr(base, 'addIndex'):
-        # Zope 2.4
-        addIndex = catalog.addIndex
-    else:
-        # Zope 2.3 and below
-        addIndex = catalog._catalog.addIndex
-    if hasattr(base, 'addColumn'):
-        # Zope 2.4
-        addColumn = catalog.addColumn
-    else:
-        # Zope 2.3 and below
-        addColumn = catalog._catalog.addColumn
-    # *** Example demonstrating catalog field additions.
-##    addIndex('start', 'FieldIndex')
-##    addIndex('end', 'FieldIndex')
-##    addColumn('start')
-##    addColumn('end')
-##    out.write('Added "start" and "end" field indexes and columns to '
-##              'the portal_catalog\n')
-
     # Borrowed from CMFDefault.Portal.PortalGenerator.setupTypes()
     # We loop through anything defined in the factory type information
     # and configure it in the types tool if it doesn't already exist
+    import pdb; pdb.set_trace()
     for t in CMFCollector.factory_type_information:
         if t['id'] not in types_tool.objectIds():
             cfm = apply(ContentFactoryMetadata, (), t)
@@ -78,23 +55,6 @@ def install(self):
             out.write('Registered %s with the types tool\n' % t['id'])
         else:
             out.write('Skipping "%s" - already in types tool\n' % t['id'])
-
-    # Setup a Metadata_tool Element Policy for Events
-    # XXX Just trying this, doesn't mean submitter_name is actually required.
-##    metadata_tool.addElementPolicy(
-##        element='submitter_name',
-##        content_type='CollectorIssue',
-##        is_required=1,
-##        supply_default=0,
-##        default_value='',
-##        enforce_vocabulary=0,
-##        allowed_vocabulary=('Appointment', 'Convention', 'Meeting',
-##                            'Social Event', 'Work'),
-##        REQUEST=None,
-##        )
-##    out.write('CollectorIssue added to Metdata element Policies\n')
-    
-    
 
     # Setup the skins
     # This is borrowed from CMFDefault/scripts/addImagesToSkinPaths.pys
