@@ -1,20 +1,24 @@
 ??
 
-  - (__future__) Exposed role management for manager users on
-    the default roster:  managers can now "promote" members
-    without going to the ZMI.
+  New Features
 
-  - (__future__) Added "custom schema" mechanism for content
-    objetcts:  site managers can now define additional
-    propertysheets for a content type, which will then be
-    reflected in instances created from the type.
+    - (__future__) Exposed role management for manager users on
+      the default roster:  managers can now "promote" members
+      without going to the ZMI.
 
-  - (__future__) Added simple link extraction / checking for
-    textual content.  Link checking also works for Link objects.
+    - (__future__) Added "custom schema" mechanism for content
+      objetcts:  site managers can now define additional
+      propertysheets for a content type, which will then be
+      reflected in instances created from the type.
 
-  - (__future__) Added "composite content" types (see the
-    "dogbowl proposal",
-    (http://cmf.zope.org/rqmts/proposals/compounds/compoundproposal.txt).
+    - (__future__) Added simple link extraction / checking for
+      textual content.  Link checking also works for Link objects.
 
-  - (__future__) Added DCWorkflow (through-the-web configurable
-    workflows) to the core set of CMF products.
+    - (__future__) Added "composite content" types (see the
+      "dogbowl proposal",
+      (http://cmf.zope.org/rqmts/proposals/compounds/compoundproposal.txt).
+
+    - (__future__) Added DCWorkflow (through-the-web configurable
+      workflows) to the core set of CMF products.
+
+  Bug Fixes
