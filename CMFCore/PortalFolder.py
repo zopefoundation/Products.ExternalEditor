@@ -176,7 +176,8 @@ class PortalFolder( Folder, DynamicType ):
         """
         result = []
         portal_types = getToolByName(self, 'portal_types')
-        myType = portal_types.getTypeInfo(self.Type())
+        pt = self._getPortalTypeName()
+        myType = portal_types.getTypeInfo(pt)
 
         if myType is not None:
             for contentType in portal_types.listTypeInfo():
