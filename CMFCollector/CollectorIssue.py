@@ -214,7 +214,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
 
         transcript = self.get_transcript()
         self.comment_number = self.comment_number + 1
-        entry_leader = "\n\n" + self._entry_header(action, username) + "\n\n"
+        entry_leader = "\n" + self._entry_header(action, username) + "\n"
         transcript._edit('stx',
                          transcript.EditableBody()
                          + entry_leader
@@ -225,6 +225,12 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         """Return the current supporters list, according to workflow."""
         wftool = getToolByName(self, 'portal_workflow')
         return wftool.getInfoFor(self, 'assigned_to', [])
+
+    security.declareProtected(CMFCorePermissions.View, 'is_assigned')
+    def is_assigned(self):
+        """True iff the current user is among .assigned_to()."""
+        username = str(getSecurityManager().getUser())
+        return username in self.assigned_to()
 
     security.declareProtected(CMFCorePermissions.View, 'status')
     def status(self):
@@ -243,7 +249,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         user = getSecurityManager().getUser()
         entry_leader = ("\n\n"
                         + self._entry_header("New Artifact '%s'" % id, user)
-                        + "\n\n")
+                        + "\n")
         transcript._edit('stx',
                          transcript.EditableBody()
                          + entry_leader
