@@ -190,7 +190,8 @@ class ActionsTool (UniqueObject, SimpleItem):
         filtered_actions={'user':[],
                           'folder':[],
                           'object':[],
-                          'global':[]
+                          'global':[],
+                          'workflow':[],
                           }
         for action in actions:
             category = action['category']
