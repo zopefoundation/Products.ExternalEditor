@@ -132,7 +132,7 @@ class Document(PortalContent, DefaultDublinCoreImpl):
         self.description=description
         self.text=text
         self.text_format=text_format
-        self._parse()
+        self.edit(text_format, text)
 
     def edit(self, text_format, text, file=''):
         """
