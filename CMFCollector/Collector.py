@@ -431,7 +431,7 @@ class Collector(SkinnedFolder):
         right place, but it is an expedient one."""
 
         _filter = { 'portal_type': ('Collector Issue',) }
-        for i in self.objectValues(filter=_filter):
+        for i in self.contentValues(filter=_filter):
 
             # Ensure the issue acquires AddCollectorIssueFollowup
             # and AddPortalContent permissions.
