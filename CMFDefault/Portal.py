@@ -209,6 +209,7 @@ class PortalGenerator:
         except AttributeError:
             pass
         else:
+            addCMFUidTool('Unique Id Annotation Tool', None)
             addCMFUidTool('Unique Id Generator Tool', None)
             addCMFUidTool('Unique Id Handler Tool', None)
         
