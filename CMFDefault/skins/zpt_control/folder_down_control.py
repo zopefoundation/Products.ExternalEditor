@@ -1,16 +1,14 @@
-## Script (Python) "folder_bottom"
-##parameters=ids, **kw
-##title=
+##parameters=ids, delta, **kw
 ##
 subset_ids = [ obj.getId() for obj in context.listFolderContents() ]
 try:
     try:
-        attempt = context.moveObjectsToBottom(ids, subset_ids=subset_ids)
+        attempt = context.moveObjectsDown(ids, delta, subset_ids=subset_ids)
     except TypeError:
         # Zope 2.7.0
-        attempt = context.moveObjectsToBottom(ids)
+        attempt = context.moveObjectsDown(ids, delta)
     if attempt:
-        return context.setStatus( True, '%d item%s moved to bottom.' %
+        return context.setStatus( True, '%d item%s moved down.' %
                                     ( attempt, (attempt != 1 and 's' or '') ) )
     else:
         return context.setStatus(False, 'Nothing to change.')

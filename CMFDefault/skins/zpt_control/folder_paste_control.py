@@ -1,4 +1,3 @@
-## Script (Python) "folder_paste"
 ##parameters=**kw
 ##title=Paste objects to a folder from the clipboard
 ##

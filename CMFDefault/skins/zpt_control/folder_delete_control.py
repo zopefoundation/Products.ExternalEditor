@@ -1,4 +1,3 @@
-## Script (Python) "folder_delete"
 ##parameters=ids, **kw
 ##title=Delete objects from a folder
 ##

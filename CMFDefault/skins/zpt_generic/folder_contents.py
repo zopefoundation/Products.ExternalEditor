@@ -1,6 +1,4 @@
-## Script (Python) "folder_contents_control"
-##parameters=ids=(), delta=1, items_copy='', items_cut='', items_delete='', items_new='', items_paste='', items_rename='', items_up='', items_down='', items_top='', items_bottom='', items_sort='', **kw
-##title=
+##parameters=b_start=0, key='', reverse=0, ids=(), delta=1, items_copy='', items_cut='', items_delete='', items_new='', items_paste='', items_rename='', items_up='', items_down='', items_top='', items_bottom='', items_sort=''
 ##
 from ZTUtils import Batch
 from ZTUtils import make_query
@@ -19,59 +17,61 @@ portal_url = utool()
 
 form = context.REQUEST.form
 default_target = 'object/folderContents'
+default_kw = {'b_start': b_start, 'key': key, 'reverse': reverse}
 if items_copy and \
         context.validateItemIds(**form) and \
-        context.folder_copy(**form) and \
-        context.setRedirect(context, default_target, **kw):
+        context.folder_copy_control(**form) and \
+        context.setRedirect(context, default_target, **default_kw):
     return
 elif items_cut and \
         context.validateItemIds(**form) and \
-        context.folder_cut(**form) and \
-        context.setRedirect(context, default_target, **kw):
+        context.folder_cut_control(**form) and \
+        context.setRedirect(context, default_target, **default_kw):
     return
 elif items_delete and \
         context.validateItemIds(**form) and \
-        context.folder_delete(**form) and \
-        context.setRedirect(context, default_target, **kw):
+        context.folder_delete_control(**form) and \
+        context.setRedirect(context, default_target, **default_kw):
     return
 elif items_new and \
         context.setRedirect(context, 'object/new'):
     return
 elif items_paste and \
-        context.folder_paste(**form) and \
-        context.setRedirect(context, default_target, **kw):
+        context.folder_paste_control(**form) and \
+        context.setRedirect(context, default_target, **default_kw):
     return
 elif items_rename and \
         context.validateItemIds(**form) and \
-        context.setRedirect(context, 'object/rename_items', ids=ids, **kw):
+        context.setRedirect(context, 'object/rename_items', ids=ids,
+                            **default_kw):
     return
 elif items_sort and \
-        context.folder_sort(**form) and \
-        context.setRedirect(context, default_target, **kw):
+        context.folder_sort_control(**form) and \
+        context.setRedirect(context, default_target, b_start=b_start):
     return
 elif items_up and \
         context.validateItemIds(**form) and \
-        context.folder_up(**form) and \
-        context.setRedirect(context, default_target, **kw):
+        context.folder_up_control(**form) and \
+        context.setRedirect(context, default_target, **default_kw):
     return
 elif items_down and \
         context.validateItemIds(**form) and \
-        context.folder_down(**form) and \
-        context.setRedirect(context, default_target, **kw):
+        context.folder_down_control(**form) and \
+        context.setRedirect(context, default_target, **default_kw):
     return
 elif items_top and \
         context.validateItemIds(**form) and \
-        context.folder_top(**form) and \
-        context.setRedirect(context, default_target, **kw):
+        context.folder_top_control(**form) and \
+        context.setRedirect(context, default_target, **default_kw):
     return
 elif items_bottom and \
         context.validateItemIds(**form) and \
-        context.folder_bottom(**form) and \
-        context.setRedirect(context, default_target, **kw):
+        context.folder_bottom_control(**form) and \
+        context.setRedirect(context, default_target, **default_kw):
     return
 
 
-control = {}
+options = {}
 
 items_manage_allowed = mtool.checkPermission(ViewManagementScreens, context)
 items_delete_allowed = mtool.checkPermission(DeleteObjects, context)
@@ -92,25 +92,17 @@ if upitems_list_allowed:
         up_info = { 'icon': '',
                     'id': 'Root',
                     'url': '' }
-control['up_info'] = up_info
+options['up_info'] = up_info
 
-target = context.getActionInfo('object/folderContents')['url']
+target = context.getActionInfo(default_target)['url']
 
-key = kw.pop('key', '')
-reverse = kw.pop('reverse', 0)
 if not key:
     (key, reverse) = context.getDefaultSorting()
     is_default = 1
 elif (key, reverse) == context.getDefaultSorting():
     is_default = 1
 else:
-    kw['key'] = key
-    if reverse:
-        kw['reverse'] = reverse
     is_default = 0
-b_start = kw.pop('b_start', 0)
-if b_start:
-    kw['b_start'] = b_start
 
 columns = ( {'key': 'Type',
              'title': 'Type',
@@ -161,13 +153,13 @@ for item in batch_obj:
                     'title': item.Title(),
                     'type': item.Type() or None,
                     'url': item_url } )
-navigation = context.getBatchNavigation(batch_obj, target, **kw)
-control['batch'] = { 'listColumnInfos': tuple(columns),
+navigation = context.getBatchNavigation(batch_obj, target, **default_kw)
+options['batch'] = { 'listColumnInfos': tuple(columns),
                      'listItemInfos': tuple(items),
                      'navigation': navigation }
 
 hidden_vars = []
-for name, value in html_marshal(**kw):
+for name, value in html_marshal(**default_kw):
     hidden_vars.append( {'name': name, 'value': value} )
 buttons = []
 if items_manage_allowed:
@@ -186,11 +178,11 @@ length = batch_obj.sequence_length
 is_orderable = items_move_allowed and (key == 'position') and length > 1
 is_sortable = items_move_allowed and not is_default
 deltas = range( 1, min(5, length) ) + range(5, length, 5)
-control['form'] = { 'action': target,
+options['form'] = { 'action': target,
                     'listHiddenVarInfos': tuple(hidden_vars),
                     'listButtonInfos': tuple(buttons),
                     'listDeltas': tuple(deltas),
                     'is_orderable': is_orderable,
                     'is_sortable': is_sortable }
 
-return control
+return context.folder_contents_template(**options)

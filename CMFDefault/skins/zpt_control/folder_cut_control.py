@@ -1,4 +1,3 @@
-## Script (Python) "folder_cut"
 ##parameters=ids, **kw
 ##title=Cut objects from a folder and copy to the clipboard
 ##

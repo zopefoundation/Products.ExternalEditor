@@ -1,4 +1,3 @@
-## Script (Python) "folder_copy"
 ##parameters=ids, **kw
 ##title=Copy objects from a folder to the clipboard
 ##

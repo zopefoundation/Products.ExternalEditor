@@ -1,4 +1,3 @@
-## Script (Python) "folder_rename"
 ##parameters=ids, new_ids, **kw
 ##title=Rename objects in a folder
 ##
