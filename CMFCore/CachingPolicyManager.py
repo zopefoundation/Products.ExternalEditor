@@ -320,7 +320,7 @@ class CachingPolicyManager( SimpleItem ):
         if ndx == 0:
             msg = "Policy+already+first."
         else:
-            self._reorderPolicy( predicate_id, ndx - 1 )
+            self._reorderPolicy( policy_id, ndx - 1 )
             msg = "Policy+moved."
         REQUEST[ 'RESPONSE' ].redirect( self.absolute_url()
                               + '/manage_cachingPolicies'
