@@ -1,0 +1,2 @@
+<dtml-call expr="addCMFWikiPage(REQUEST['id'])">
+<dtml-return "view_wiki_page(_.None, _, portal_status_message='Page added')">>

@@ -1,0 +1,8 @@
+<!-- start of standard_wiki_footer -->
+
+<dtml-if standard_html_footer>
+  <dtml-var standard_html_footer>
+<dtml-else>
+  </BODY>
+  </HTML>
+</dtml-if>

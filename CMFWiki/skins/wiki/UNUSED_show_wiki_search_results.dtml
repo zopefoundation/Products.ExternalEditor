@@ -1,0 +1,27 @@
+<!--#var standard_html_header-->
+
+<form action="report" method="get">
+<h2><!--#var document_title--></h2>
+Enter query parameters:<br><table>
+
+<tr><th>Title</th>
+    <td><input name="title"
+               width=30 value=""></td></tr>
+<tr><th>Id</th>
+    <td><input name="id"
+               width=30 value=""></td></tr>
+<tr><th>Meta type</th>
+    <td><input name="meta_type"
+               width=30 value=""></td></tr>
+<tr><th>PrincipiaSearchSource</th>
+    <td><input name="PrincipiaSearchSource"
+               width=30 value=""></td></tr>
+<tr><th>Bobobase modification time</th>
+    <td><input name="bobobase_modification_time"
+               width=30 value=""></td></tr>
+<tr><td colspan=2 align=center>
+<input type="SUBMIT" name="SUBMIT" value="Submit Query">
+</td></tr>
+</table>
+</form>
+<!--#var standard_html_footer-->

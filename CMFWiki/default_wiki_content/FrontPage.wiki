@@ -1,0 +1,10 @@
+Welcome to !CMFWiki, this is a !CMFWikiWeb.
+
+  For general Wiki help instructions, see the <a href="view_wiki_help">Help
+  </a>.
+
+  To see the table of contents or recent changes, or to search this
+  !CMFWikiWeb, use the <a href="folder_contents">folder contents</a> view
+  and look for the appropriate actions in the action box.
+
+  To experiment, use the SandBox page.

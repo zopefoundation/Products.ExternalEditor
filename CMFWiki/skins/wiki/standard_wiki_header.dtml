@@ -1,0 +1,37 @@
+<dtml-if standard_html_header>
+  <dtml-var standard_html_header>
+<dtml-else>
+  <HTML>
+  <HEAD>
+  <TITLE><dtml-var titleprefix missing> <dtml-var id> of 
+         <dtml-with aq_parent><dtml-var id></dtml-with>
+         <dtml-var id></TITLE>
+  </HEAD>
+  <BODY BGCOLOR="#FFFFFF">
+</dtml-if>
+<table width="100%" border="0" cellspacing="0" cellpadding="5">
+  <tr>
+    <td> <small>
+      <dtml-var id size=25> page of <dtml-with aq_parent><dtml-var id size=20>
+      CMFWikiWeb</dtml-with>
+      (<a href="&dtml-wiki_base_url;/recent_wiki_changes">Recent Changes</a>)
+         </small>
+    </td>
+    <td align="right">
+        <small>
+          Last 
+          <a href="&dtml-wiki_page_url;/view_wiki_history">edited</a>
+            <dtml-if last_editor> by <b><dtml-var last_editor></b> </dtml-if>
+            on <dtml-var bobobase_modification_time fmt=aCommon> </small>
+    </td>
+  <tr>
+</table>
+<table width="100%" border="0" cellspacing="0" cellpadding="5">
+  <tr align="left" bgcolor="#eeeeee">
+    <td>
+      <dtml-var "context(REQUEST, with_siblings=0)">
+    </td>
+  </tr>
+</table>
+<!-- end of standard_wiki_header -->
+
