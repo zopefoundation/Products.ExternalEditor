@@ -20,12 +20,102 @@ import Testing
 import Zope
 Zope.startup()
 
+from Acquisition import Implicit
+
 from Products.CMFCore.tests.base.dummy import DummySite
 from Products.CMFCore.tests.base.testcase import SecurityTest
 from Products.CMFCore.TypesTool import FactoryTypeInformation as FTI
 from Products.CMFCore.TypesTool import TypesTool
 from Products.CMFTopic.Topic import factory_type_information as FTIDATA_TOPIC
 from Products.CMFTopic.Topic import Topic
+
+class FauxBrain( Implicit ):
+
+    def __init__( self, object ):
+
+        self._object = object
+
+    def getObject( self ):
+
+        return self._object
+
+class DummyDocument( Implicit ):
+
+    def __init__( self, id ):
+
+        self._id = id
+
+    def getId( self ):
+
+        return self._id
+
+
+class DummyCatalog( Implicit ):
+
+    def __init__( self, index_ids=() ):
+
+        self._objects = []
+        self._index_ids = index_ids
+        self._indexes = {}
+
+        for index_id in index_ids:
+            self._indexes[ index_id ] = {}
+
+    def _index( self, obj ):
+
+        marker = object()
+        self._objects.append( obj )
+
+        rid = len( self._objects ) - 1
+
+        for index_id in self._index_ids:
+
+            value = getattr( obj, index_id, marker )
+
+            if value is not marker:
+                for word in value.split():
+                    bucket = self._indexes[ index_id ].setdefault( word, [] )
+                    bucket.append( rid )
+
+    def searchResults( self, REQUEST=None, **kw ):
+
+        from sets import Set
+        limit = None
+
+        criteria = kw.copy()
+
+        if REQUEST is not None:
+            for k, v in REQUEST:
+                criteria[ k ] = v
+
+        results = Set( range( len( self._objects ) ) )
+
+        for k, v in criteria.items():
+
+            if k == 'sort_limit':
+                limit = v
+
+            else:
+                results &= Set( self._indexes[ k ].get( v, [] ) )
+
+
+        results = [ x for x in results ]
+
+        if limit is not None:
+            results = results[ :limit ]
+
+        return [ FauxBrain( self._objects[ rid ] ) for rid in results ]
+
+
+class DummySyndicationTool( Implicit ):
+
+    def __init__( self, max_items ):
+
+        self._max_items = max_items
+
+    def getMaxItems( self, object ):
+
+        return self._max_items
 
 
 class TestTopic(SecurityTest):
@@ -39,6 +129,21 @@ class TestTopic(SecurityTest):
 
     def _makeOne(self, id, *args, **kw):
         return self.site._setObject( id, Topic(id, *args, **kw) )
+
+    def _initSite( self, max_items=15, index_ids=() ):
+
+        self.site.portal_catalog = DummyCatalog( index_ids )
+        self.site.portal_syndication = DummySyndicationTool( max_items )
+
+    def _initDocuments( self, **kw ):
+
+        for k, v in kw.items():
+
+            document = DummyDocument( k )
+            document.description = v
+
+            self.site._setObject( k, v )
+            self.site.portal_catalog._index( document )
 
     def test_Empty( self ):
         topic = self._makeOne('top')
@@ -89,6 +194,89 @@ class TestTopic(SecurityTest):
         self.assertEqual( len( query ), 1 )
         self.assertEqual( query['baz'], 'bam' )
 
+    def test_queryCatalog_noop( self ):
+
+        self._initSite()
+        self._initDocuments( **_DOCUMENTS )
+        topic = self._makeOne('top')
+
+        brains = topic.queryCatalog()
+
+        self.assertEqual( len( brains ), len( _DOCUMENTS ) )
+
+        objects = [ brain.getObject() for brain in brains ]
+
+        for object in objects:
+            self.failUnless( object.getId() in _DOCUMENTS.keys() )
+            self.failUnless( object.description in _DOCUMENTS.values() )
+
+    def test_queryCatalog_simple( self ):
+
+        WORD = 'something'
+
+        self._initSite( index_ids=( 'description', ) )
+        self._initDocuments( **_DOCUMENTS )
+        topic = self._makeOne('top')
+
+        topic.addCriterion( 'description', 'String Criterion' )
+        topic.getCriterion( 'description' ).edit( WORD )
+
+        brains = topic.queryCatalog()
+
+        self.assertEqual( len( brains )
+                        , len( [ x for x in _DOCUMENTS.values()
+                                  if WORD in x ] ) )
+
+        objects = [ brain.getObject() for brain in brains ]
+
+        for object in objects:
+            self.failUnless( object.getId() in _DOCUMENTS.keys() )
+            self.failUnless( object.description in _DOCUMENTS.values() )
+
+    def test_synContentValues_simple( self ):
+
+        self._initSite()
+        self._initDocuments( **_DOCUMENTS )
+        topic = self._makeOne('top')
+
+        brains = topic.synContentValues()
+
+        self.assertEqual( len( brains ), len( _DOCUMENTS ) )
+
+        objects = [ brain.getObject() for brain in brains ]
+
+        for object in objects:
+            self.failUnless( object.getId() in _DOCUMENTS.keys() )
+            self.failUnless( object.description in _DOCUMENTS.values() )
+
+    def test_synContentValues_limit( self ):
+
+        LIMIT = 3
+
+        self._initSite( max_items=LIMIT )
+        self._initDocuments( **_DOCUMENTS )
+        topic = self._makeOne('top')
+
+        brains = topic.synContentValues()
+
+        self.assertEqual( len( brains ), LIMIT )
+
+        objects = [ brain.getObject() for brain in brains ]
+
+        for object in objects:
+            self.failUnless( object.getId() in _DOCUMENTS.keys() )
+            self.failUnless( object.description in _DOCUMENTS.values() )
+
+
+_DOCUMENTS = \
+{ 'one'     : "something in the way she moves"
+, 'two'     : "I don't know much about history"
+, 'three'   : "something about Mary"
+, 'four'    : "something tells me I'm in love"
+, 'five'    : "there's a certain wonderful something"
+, 'six'     : "gonna wash that man right out of my hair"
+, 'seven'   : "I'm so much in love"
+}
 
 def test_suite():
     return TestSuite((

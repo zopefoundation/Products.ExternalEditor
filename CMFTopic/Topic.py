@@ -219,6 +219,19 @@ class Topic( PortalFolder ):
         portal_catalog = getToolByName( self, 'portal_catalog' )
         return portal_catalog.searchResults(REQUEST, **kw)
 
+    security.declareProtected(View, 'synContentValues')
+    def synContentValues( self ):
+
+        """ Return a limited subset of the brains for our query.
+        
+        o Return no more brain objects than the limit set by the
+          syndication tool.
+        """
+        syn_tool = getToolByName( self, 'portal_syndication' )
+        limit = syn_tool.getMaxItems( self )
+        brains = self.queryCatalog( sort_limit=limit )[ :limit ]
+        return [ brain.getObject() for brain in brains ] 
+
     ### Criteria adding/editing/deleting
     security.declareProtected(ChangeTopics, 'addCriterion')
     def addCriterion( self, field, criterion_type ):
