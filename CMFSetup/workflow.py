@@ -110,6 +110,7 @@ def importWorkflowTool( context ):
                                , worklists
                                , permissions
                                , scripts
+                               , context
                                )
             else:
                 pass # TODO: handle non-DCWorkflows
@@ -1053,11 +1054,11 @@ def _guessVariableType( value ):
     if isinstance( value, bool ):
         return 'bool'
 
-    if isinstance( value, float ):
-        return 'float'
-
     if isinstance( value, int ):
         return 'int'
+
+    if isinstance( value, float ):
+        return 'float'
 
     if isinstance( value, basestring ):
         return 'string'
@@ -1121,6 +1122,7 @@ def _initDCWorkflow( workflow
                    , worklists
                    , permissions
                    , scripts
+                   , context
                    ):
     """ Initialize a DC Workflow using values parsed from XML.
     """
@@ -1136,6 +1138,7 @@ def _initDCWorkflow( workflow
     _initDCWorkflowStates( workflow, states )
     _initDCWorkflowTransitions( workflow, transitions )
     _initDCWorkflowWorklists( workflow, worklists )
+    _initDCWorkflowScripts( workflow, scripts, context )
 
 
 def _initDCWorkflowVariables( workflow, variables ):
@@ -1280,3 +1283,27 @@ def _initDCWorkflowWorklists( workflow, worklists ):
                        )
 
         w.var_matches = PersistentMapping( w_info[ 'match' ].items() )
+
+def _initDCWorkflowScripts( workflow, scripts, context ):
+
+    """ Initialize DCWorkflow scripts
+    """
+    for s_info in scripts:
+
+        id = str( s_info[ 'script_id' ] ) # no unicode!
+        meta_type = s_info[ 'meta_type' ]
+        filename = s_info[ 'filename' ]
+
+        file = context.readDataFile( filename )
+
+        if meta_type == PythonScript.meta_type:
+            script = PythonScript( id )
+            script.write( file )
+
+        #elif meta_type == ExternalMethod.meta_type:
+        #    script = ExternalMethod( id, title, module, function )
+
+        elif meta_type == DTMLMethod.meta_type:
+            script = DTMLMethod( file, __name__=id )
+
+        workflow.scripts._setObject( id, script )

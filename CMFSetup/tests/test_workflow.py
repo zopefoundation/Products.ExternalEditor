@@ -1511,6 +1511,25 @@ _NORMAL_TOOL_EXPORT = """\
 </workflow-tool>
 """
 
+_NORMAL_TOOL_EXPORT_WITH_FILENAME = """\
+<?xml version="1.0"?>
+<workflow-tool>
+ <workflow
+    workflow_id="non_dcworkflow"
+    meta_type="Dummy Workflow"
+    />
+ <workflow
+    workflow_id="dcworkflow"
+    filename="workflows/%s/definition.xml"
+    meta_type="Workflow"
+    />
+ <bindings>
+  <default>
+  </default>
+ </bindings>
+</workflow-tool>
+"""
+
 _FILENAME_TOOL_EXPORT = """\
 <?xml version="1.0"?>
 <workflow-tool>
@@ -1878,20 +1897,33 @@ class Test_importWorkflow( _WorkflowSetup
                          , _GuardChecker
                          ):
 
-    def _importNormalWorkflow( self, WF_ID, WF_TITLE, WF_INITIAL_STATE ):
+    def _importNormalWorkflow( self, wf_id, wf_title, wf_initial_state ):
 
         site = self._initSite()
         wf_tool = site.portal_workflow
+        workflow_filename = wf_id.replace(' ', '_')
 
         context = DummyImportContext( site )
-        context._files[ 'workflows.xml' ] = _NORMAL_TOOL_EXPORT
-        context._files[ 'workflows/dcworkflow/definition.xml'
+        context._files[ 'workflows.xml'
+                      ] = _NORMAL_TOOL_EXPORT_WITH_FILENAME % workflow_filename
+
+        context._files[ 'workflows/%s/definition.xml' % wf_id
                       ] = ( _NORMAL_WORKFLOW_EXPORT
-                            % { 'workflow_id' : WF_ID
-                              , 'title' : WF_TITLE
-                              , 'initial_state' : WF_INITIAL_STATE
-                              , 'workflow_filename' : WF_ID.replace(' ', '_')
-                              } )
+                            % { 'workflow_id' : wf_id
+                              , 'title' : wf_title
+                              , 'initial_state' : wf_initial_state
+                              , 'workflow_filename' : workflow_filename
+                              }
+                          )
+
+        context._files[ 'workflows/%s/after_close.py' % workflow_filename 
+                      ] = _AFTER_CLOSE_SCRIPT
+
+        context._files[ 'workflows/%s/after_kill.py' % workflow_filename
+                      ] = _AFTER_KILL_SCRIPT
+
+        context._files[ 'workflows/%s/before_open.py' % workflow_filename
+                      ] = _BEFORE_OPEN_SCRIPT
 
         from Products.CMFSetup.workflow import importWorkflowTool
         importWorkflowTool( context )
@@ -2231,6 +2263,28 @@ class Test_importWorkflow( _WorkflowSetup
             self.assertEqual( guard.roles, expected[ 7 ] )
             self.assertEqual( guard.groups, expected[ 8 ] )
             self.assertEqual( guard.getExprText(), expected[ 9 ] )
+
+    def test_from_empty_dcworkflow_workflow_scripts( self ):
+
+        WF_ID = 'dcworkflow_scripts'
+        WF_TITLE = 'DC Workflow testing scripts'
+        WF_INITIAL_STATE = 'closed'
+
+        tool = self._importNormalWorkflow( WF_ID, WF_TITLE, WF_INITIAL_STATE )
+
+        workflow = tool.objectValues()[ 0 ]
+
+        scripts = workflow.scripts
+
+        self.assertEqual( len( scripts.objectItems() )
+                        , len( _WF_SCRIPTS ) )
+
+        for script_id, script in scripts.objectItems():
+
+            expected = _WF_SCRIPTS[ script_id ]
+
+            self.assertEqual( script.meta_type, expected[ 0 ] )
+            self.assertEqual( script.manage_FTPget(), expected[ 1 ] )
 
 def test_suite():
     return unittest.TestSuite((
