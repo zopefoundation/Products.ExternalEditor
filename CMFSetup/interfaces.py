@@ -478,17 +478,14 @@ class ISetupTool( Interface ):
         o 'snapshot_id' is the ID of the new folder.
         """
 
-    def compareConfigurations( lhs_id
-                             , rhs_id
+    def compareConfigurations( lhs_context
+                             , rhs_context
                              , missing_as_empty=False
                              , ignore_whitespace=False
                              ):
         """ Compare two configurations.
 
-        o 'lhs_id' and 'rhs_id', if None, refer to the "default" filesystem
-          configuration.
-
-        o Otherwise, 'lhs_id' and 'rhs_id' refer to snapshots.
+        o 'lhs_context' and 'rhs_context' must implement IImportContext.
 
         o If 'missing_as_empty', then compare files not present as though
           they were zero-length;  otherwise, omit such files.

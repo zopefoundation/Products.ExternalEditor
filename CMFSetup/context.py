@@ -1,4 +1,4 @@
-""" Classes:  ImportContext, ExportContext
+""" Various context implementations for export / import of configurations.
 
 Wrappers representing the state of an import / export operation.
 
@@ -26,7 +26,7 @@ from permissions import ManagePortal
 from interfaces import IImportContext
 from interfaces import IExportContext
 
-class ImportContext( Implicit ):
+class DirectoryImportContext( Implicit ):
 
     __implements__ = ( IImportContext, )
 
@@ -106,6 +106,9 @@ class ImportContext( Implicit ):
 
         """ See IImportContext.
         """
+        if path is None:
+            path = ''
+            
         full_path = os.path.join( self._profile_path, path )
 
         if not os.path.exists( full_path ) or not os.path.isdir( full_path ):
@@ -122,9 +125,9 @@ class ImportContext( Implicit ):
         """
         return self._should_purge
 
-InitializeClass( ImportContext )
+InitializeClass( DirectoryImportContext )
 
-class ExportContext( Implicit ):
+class DirectoryExportContext( Implicit ):
 
     __implements__ = ( IExportContext, )
 
@@ -163,7 +166,7 @@ class ExportContext( Implicit ):
         file.write( text )
         file.close()
 
-InitializeClass( ExportContext )
+InitializeClass( DirectoryExportContext )
 
 class TarballExportContext( Implicit ):
 
@@ -366,7 +369,8 @@ class SnapshotImportContext( Implicit ):
         except ( AttributeError, KeyError ):
             return None
         else:
-            return object.manage_FTPget()
+            # XXX:  this API may not be general enough for all objects.
+            return object.read()
 
     security.declareProtected( ManagePortal, 'getLastModified' )
     def getLastModified( self, path ):

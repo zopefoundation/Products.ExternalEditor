@@ -31,17 +31,17 @@ class DummyTool( Folder ):
 
     pass
 
-class ImportContextTests( FilesystemTestBase
-                        , ConformsToISetupContext
-                        , ConformsToIImportContext
-                        ):
+class DirectoryImportContextTests( FilesystemTestBase
+                                 , ConformsToISetupContext
+                                 , ConformsToIImportContext
+                                 ):
 
     _PROFILE_PATH = '/tmp/ICTTexts'
 
     def _getTargetClass( self ):
 
-        from Products.CMFSetup.context import ImportContext
-        return ImportContext
+        from Products.CMFSetup.context import DirectoryImportContext
+        return DirectoryImportContext
 
     def test_readDataFile_nonesuch( self ):
 
@@ -183,6 +183,19 @@ class ImportContextTests( FilesystemTestBase
 
         self.assertEqual( ctx.listDirectory( FILENAME ), None )
 
+    def test_listDirectory_root( self ):
+
+        from string import printable
+
+        site = DummySite( 'site' ).__of__( self.root )
+        ctx = self._makeOne( site, self._PROFILE_PATH )
+
+        FILENAME = 'simple.txt'
+        self._makeFile( FILENAME, printable )
+
+        self.assertEqual( len( ctx.listDirectory( None ) ), 1 )
+        self.failUnless( FILENAME in ctx.listDirectory( None ) )
+
     def test_listDirectory_simple( self ):
 
         from string import printable
@@ -276,17 +289,17 @@ class ImportContextTests( FilesystemTestBase
         self.failUnless( 'CVS' in names )
 
 
-class ExportContextTests( FilesystemTestBase
-                        , ConformsToISetupContext
-                        , ConformsToIExportContext
-                        ):
+class DirectoryExportContextTests( FilesystemTestBase
+                                 , ConformsToISetupContext
+                                 , ConformsToIExportContext
+                                 ):
 
     _PROFILE_PATH = '/tmp/ECTTexts'
 
     def _getTargetClass( self ):
 
-        from Products.CMFSetup.context import ExportContext
-        return ExportContext
+        from Products.CMFSetup.context import DirectoryExportContext
+        return DirectoryExportContext
 
     def test_writeDataFile_simple( self ):
 
@@ -841,6 +854,19 @@ class SnapshotImportContextTests( SecurityRequestTest
 
         self.assertEqual( ctx.listDirectory( SUBDIR ), None )
 
+    def test_listDirectory_root( self ):
+
+        from string import printable
+
+        SNAPSHOT_ID = 'listDirectory_root'
+        FILENAME = 'simple.txt'
+
+        site, tool, ctx = self._makeOne( SNAPSHOT_ID )
+        file = self._makeFile( tool, SNAPSHOT_ID, FILENAME, printable )
+
+        self.assertEqual( len( ctx.listDirectory( None ) ), 1 )
+        self.failUnless( FILENAME in ctx.listDirectory( None ) )
+
     def test_listDirectory_simple( self ):
 
         from string import printable
@@ -927,8 +953,8 @@ class SnapshotImportContextTests( SecurityRequestTest
 
 def test_suite():
     return unittest.TestSuite((
-        unittest.makeSuite( ImportContextTests ),
-        unittest.makeSuite( ExportContextTests ),
+        unittest.makeSuite( DirectoryImportContextTests ),
+        unittest.makeSuite( DirectoryExportContextTests ),
         unittest.makeSuite( TarballExportContextTests ),
         unittest.makeSuite( SnapshotExportContextTests ),
         unittest.makeSuite( SnapshotImportContextTests ),

@@ -4,6 +4,7 @@ $Id$
 """
 import os
 import time
+from cgi import escape
 
 from AccessControl import ClassSecurityInfo
 from Acquisition import aq_base
@@ -16,12 +17,15 @@ from Products.CMFCore.utils import getToolByName
 
 from interfaces import ISetupTool
 from permissions import ManagePortal
-from context import ImportContext
+from context import DirectoryImportContext
+from context import SnapshotImportContext
 from context import TarballExportContext
 from context import SnapshotExportContext
+from differ import ConfigDiff
 from registry import ImportStepRegistry
 from registry import ExportStepRegistry
 from registry import ToolsetRegistry
+from registry import _profile_registry
 
 from utils import _resolveDottedName
 from utils import _wwwdir
@@ -149,13 +153,8 @@ class SetupTool( UniqueObject, Folder ):
         """ See ISetupTool.
         """
         if product_name is not None:
-            try:
-                product = __import__( 'Products.%s' % product_name
-                                    , globals(), {}, ['initialize' ] )
-            except ImportError:
-                raise ValueError, 'Not a valid product name: %s' % product_name
 
-            root = self._root_directory = product.__path__[0]
+            root = self._root_directory = self._getProductPath( product_name )
 
             if not os.path.exists( os.path.join( root, path ) ):
                 raise ValueError, 'Invalid path: %s' % path
@@ -200,7 +199,7 @@ class SetupTool( UniqueObject, Folder ):
         """ See ISetupTool.
         """
         profile_path = self._getFullyQualifiedProfileDirectory()
-        context = ImportContext( self, profile_path, purge_old )
+        context = DirectoryImportContext( self, profile_path, purge_old )
 
         info = self._import_registry.getStepMetadata( step_id )
 
@@ -231,7 +230,7 @@ class SetupTool( UniqueObject, Folder ):
         """ See ISetupTool.
         """
         profile_path = self._getFullyQualifiedProfileDirectory()
-        context = ImportContext( self, profile_path, purge_old )
+        context = DirectoryImportContext( self, profile_path, purge_old )
 
         steps = self._import_registry.sortSteps()
         messages = {}
@@ -283,21 +282,70 @@ class SetupTool( UniqueObject, Folder ):
 
     security.declareProtected(ManagePortal, 'compareConfigurations')
     def compareConfigurations( self   
-                             , source1
-                             , source2
+                             , lhs_context
+                             , rhs_context
                              , missing_as_empty=False
-                             , ignore_whitespace=False
+                             , ignore_blanks=False
+                             , skip=( 'CVS', '.svn' )
                              ):
         """ See ISetupTool.
         """
-        raise NotImplementedError
+        differ = ConfigDiff( lhs_context
+                           , rhs_context
+                           , missing_as_empty
+                           , ignore_blanks
+                           , skip
+                           )
+
+        return differ.compare()
 
     security.declareProtected( ManagePortal, 'markupComparison')
     def markupComparison(self, lines):
 
         """ See ISetupTool.
         """
-        raise NotImplementedError
+        result = []
+
+        for line in lines.splitlines():
+
+            if line.startswith('** '):
+
+                if line.find('File') > -1:
+                    if line.find('replaced') > -1:
+                        result.append( ( 'file-to-dir', line ) )
+                    elif line.find('added') > -1:
+                        result.append( ( 'file-added', line ) )
+                    else:
+                        result.append( ( 'file-removed', line ) )
+                else:
+                    if line.find('replaced') > -1:
+                        result.append( ( 'dir-to-file', line ) )
+                    elif line.find('added') > -1:
+                        result.append( ( 'dir-added', line ) )
+                    else:
+                        result.append( ( 'dir-removed', line ) )
+
+            elif line.startswith('@@'):
+                result.append( ( 'diff-range', line ) )
+
+            elif line.startswith(' '):
+                result.append( ( 'diff-context', line ) )
+
+            elif line.startswith('+'):
+                result.append( ( 'diff-added', line ) )
+
+            elif line.startswith('-'):
+                result.append( ( 'diff-removed', line ) )
+
+            elif line == '\ No newline at end of file':
+                result.append( ( 'diff-context', line ) )
+
+            else:
+                result.append( ( 'diff-header', line ) )
+
+        return '<pre>\n%s\n</pre>' % (
+            '\n'.join( [ ( '<span class="%s">%s</span>' % ( cl, escape( l ) ) )
+                                  for cl, l in result] ) )
 
     #
     #   ZMI
@@ -314,6 +362,9 @@ class SetupTool( UniqueObject, Folder ):
                          }
                        , { 'label' : 'Snapshots'
                          , 'action' : 'manage_snapshots'
+                         }
+                       , { 'label' : 'Comparison'
+                         , 'action' : 'manage_showDiff'
                          }
                        )
                      + Folder.manage_options[ 3: ] # skip "View", "Properties"
@@ -436,8 +487,6 @@ class SetupTool( UniqueObject, Folder ):
           'title' -- snapshot title or ID
 
           'url' -- URL of the snapshot folder
-
-        o ZMI support.
         """
         result = []
         snapshots = self._getOb( 'snapshots', None )
@@ -451,6 +500,25 @@ class SetupTool( UniqueObject, Folder ):
                                , 'url' : folder.absolute_url()
                                } )
         return result
+
+    security.declareProtected( ManagePortal, 'listProfileInfo' )
+    def listProfileInfo( self ):
+
+        """ Return a list of mappings describing registered profiles.
+        
+        o Keys include:
+
+          'id' -- profile ID
+
+          'title' -- profile title or ID
+
+          'description' -- description of the profile
+
+          'path' -- path to the profile within its product
+
+          'product' -- name of the registering product
+        """
+        return _profile_registry.listProfileInfo()
 
     security.declareProtected( ManagePortal, 'manage_createSnapshot' )
     def manage_createSnapshot( self, RESPONSE, snapshot_id=None ):
@@ -468,10 +536,85 @@ class SetupTool( UniqueObject, Folder ):
         RESPONSE.redirect( '%s/manage_snapshots?manage_tabs_message=%s'
                          % ( self.absolute_url(), 'Snapshot+created.' ) )
 
+    security.declareProtected( ManagePortal, 'manage_showDiff' )
+    manage_showDiff = PageTemplateFile( 'sutCompare', _wwwdir )
+
+    def manage_downloadDiff( self
+                           , lhs
+                           , rhs
+                           , missing_as_empty
+                           , ignore_blanks
+                           , RESPONSE
+                           ):
+        """ Crack request vars and call compareConfigurations.
+
+        o Return the result as a 'text/plain' stream, suitable for framing.
+        """
+        comparison = self.manage_compareConfigurations( lhs
+                                                      , rhs
+                                                      , missing_as_empty
+                                                      , ignore_blanks
+                                                      )
+        RESPONSE.setHeader( 'Content-Type', 'text/plain' )
+        return _PLAINTEXT_DIFF_HEADER % ( lhs, rhs, comparison )
+
+    security.declareProtected( ManagePortal, 'manage_compareConfigurations' )
+    def manage_compareConfigurations( self
+                                    , lhs
+                                    , rhs
+                                    , missing_as_empty
+                                    , ignore_blanks
+                                    ):
+        """ Crack request vars and call compareConfigurations.
+        """
+        lhs_context = self._getImportContext( lhs )
+        rhs_context = self._getImportContext( rhs )
+
+        return self.compareConfigurations( lhs_context
+                                         , rhs_context
+                                         , missing_as_empty
+                                         , ignore_blanks
+                                         )
+
 
     #
     #   Helper methods
     #
+    security.declarePrivate( '_getProductPath' )
+    def _getProductPath( self, product_name ):
+
+        """ Return the absolute path of the product's directory.
+        """
+        try:
+            product = __import__( 'Products.%s' % product_name
+                                , globals(), {}, ['initialize' ] )
+        except ImportError:
+            raise ValueError, 'Not a valid product name: %s' % product_name
+
+        return product.__path__[0]
+
+    security.declarePrivate( '_getImportContext' )
+    def _getImportContext( self, context_id ):
+
+        """ Crack ID and generate appropriate import context.
+        """
+        if context_id.startswith( 'profile-' ):
+
+            context_id = context_id[ len( 'profile-' ): ]
+            info = _profile_registry.getProfileInfo( context_id )
+
+            if info.get( 'product' ):
+                path = os.path.join( self._getProductPath( info[ 'product' ] )
+                                   , info[ 'path' ] )
+            else:
+                path = info[ 'path' ]
+
+            return DirectoryImportContext( self, path )
+        
+        # else snapshot
+        context_id = context_id[ len( 'snapshot-' ): ]
+        return SnapshotImportContext( self, context_id )
+
     security.declarePrivate( '_getFullyQualifiedProfileDirectory' )
     def _getFullyQualifiedProfileDirectory( self ):
 
@@ -591,3 +734,8 @@ class SetupTool( UniqueObject, Folder ):
                }
 
 InitializeClass( SetupTool )
+
+_PLAINTEXT_DIFF_HEADER ="""\
+Comparing configurations: '%s' and '%s'
+
+%s"""
