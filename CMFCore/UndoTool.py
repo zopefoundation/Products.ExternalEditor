@@ -82,6 +82,9 @@ class UndoTool (UniqueObject, SimpleItem, ActionProviderBase):
             first_transaction=first_transaction,
             last_transaction=last_transaction,
             PrincipiaUndoBatchSize=PrincipiaUndoBatchSize)
+        for t in transactions:
+            # Ensure transaction ids don't have embeded LF
+            t['id'] = t['id'].replace('\n', '')
         if not _checkPermission('Manage portal', portal):
             # Filter out transactions done by other members of the portal.
             user_name = _getAuthenticatedUser(self).getUserName()
