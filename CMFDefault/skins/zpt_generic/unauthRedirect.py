@@ -1,7 +1,5 @@
-## Script (Python) "unauthRedirect.py $Revision$"
 ##parameters=
-##title=clear browser cookie
 ##
+# this script is deprecated
 REQUEST=context.REQUEST
 REQUEST.RESPONSE.redirect( context.absolute_url())
-
