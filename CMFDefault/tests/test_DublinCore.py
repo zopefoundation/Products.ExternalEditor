@@ -2,20 +2,17 @@ from unittest import TestSuite, makeSuite, main
 import Testing
 import Zope
 Zope.startup()
+
+from Acquisition import Implicit
 from Interface.Verify import verifyClass
 
 from AccessControl.SecurityManagement import newSecurityManager
 
-from Products.CMFCore.PortalContent import PortalContent
 from Products.CMFCore.tests.base.dummy import DummySite
 from Products.CMFCore.tests.base.dummy import DummyUserFolder
 from Products.CMFCore.tests.base.testcase import SecurityTest
-from Products.CMFDefault.DublinCore import DefaultDublinCoreImpl
 from Products.CMFDefault.MembershipTool import MembershipTool
 
-
-class DummyContent(PortalContent, DefaultDublinCoreImpl):
-    pass
 
 
 def _DateIndexConvert(value):
@@ -34,21 +31,48 @@ def _DateIndexConvert(value):
 
     return t_val
 
+class DummyMetadataTool(Implicit):
+
+    def __init__(self, publisher):
+        self._publisher = publisher
+
+    def getPublisher(self):
+        return self._publisher
 
 class DublinCoreTests(SecurityTest):
 
-    def setUp(self):
+    def xxx_setUp(self):
         SecurityTest.setUp(self)
-        self.site = DummySite('site').__of__(self.root)
-        self.site._setObject( 'portal_membership', MembershipTool() )
+
+    def test_interface(self):
+        from Products.CMFCore.interfaces.DublinCore \
+                import DublinCore as IDublinCore
+        from Products.CMFCore.interfaces.DublinCore \
+                import CatalogableDublinCore as ICatalogableDublinCore
+        from Products.CMFCore.interfaces.DublinCore \
+                import MutableDublinCore as IMutableDublinCore
+        from Products.CMFDefault.DublinCore import DefaultDublinCoreImpl
+
+        verifyClass(IDublinCore, DefaultDublinCoreImpl)
+        verifyClass(ICatalogableDublinCore, DefaultDublinCoreImpl)
+        verifyClass(IMutableDublinCore, DefaultDublinCoreImpl)
 
     def _makeDummyContent(self, id, *args, **kw):
-        return self.site._setObject( id, DummyContent(id, *args, **kw) )
+
+        from Products.CMFCore.PortalContent import PortalContent
+        from Products.CMFDefault.DublinCore import DefaultDublinCoreImpl
+
+        class DummyContent(PortalContent, DefaultDublinCoreImpl):
+            pass
+
+        return DummyContent(id, *args, **kw)
 
     def test_notifyModified(self):
-        acl_users = self.site._setObject( 'acl_users', DummyUserFolder() )
+        site = DummySite('site').__of__(self.root)
+        acl_users = site._setObject( 'acl_users', DummyUserFolder() )
+        site._setObject( 'portal_membership', MembershipTool() )
         newSecurityManager(None, acl_users.user_foo)
-        item = self._makeDummyContent('item')
+        item = self._makeDummyContent('item').__of__(site)
         self.assertEqual( item.listCreators(), () )
         item.setModificationDate(0)
         initial_date = item.ModificationDate()
@@ -58,9 +82,11 @@ class DublinCoreTests(SecurityTest):
         self.assertNotEqual( item.ModificationDate(), initial_date )
 
     def test_creators_methods(self):
-        acl_users = self.site._setObject( 'acl_users', DummyUserFolder() )
+        site = DummySite('site').__of__(self.root)
+        acl_users = site._setObject( 'acl_users', DummyUserFolder() )
+        site._setObject( 'portal_membership', MembershipTool() )
         newSecurityManager(None, acl_users.user_foo)
-        item = self._makeDummyContent('item')
+        item = self._makeDummyContent('item').__of__(site)
         self.assertEqual( item.listCreators(), () )
 
         item.addCreator()
@@ -76,24 +102,22 @@ class DublinCoreTests(SecurityTest):
 
     def test_ceiling_parsable(self):
         # Test that a None ceiling date will be parsable by a DateIndex
-        acl_users = self.site._setObject( 'acl_users', DummyUserFolder() )
-        newSecurityManager(None, acl_users.user_foo)
-        item = self._makeDummyContent('item')
+        site = DummySite('site').__of__(self.root)
+        item = self._makeDummyContent('item').__of__(site)
         self.assertEqual(item.expiration_date, None)
         self.assert_(_DateIndexConvert(item.expires()))
 
-    def test_interface(self):
-        from Products.CMFCore.interfaces.DublinCore \
-                import DublinCore as IDublinCore
-        from Products.CMFCore.interfaces.DublinCore \
-                import CatalogableDublinCore as ICatalogableDublinCore
-        from Products.CMFCore.interfaces.DublinCore \
-                import MutableDublinCore as IMutableDublinCore
+    def test_publisher_no_metadata_tool(self):
+        site = DummySite('site').__of__(self.root)
+        item = self._makeDummyContent('item').__of__(site)
+        self.assertEqual(item.Publisher(), 'No publisher')
 
-        verifyClass(IDublinCore, DefaultDublinCoreImpl)
-        verifyClass(ICatalogableDublinCore, DefaultDublinCoreImpl)
-        verifyClass(IMutableDublinCore, DefaultDublinCoreImpl)
-
+    def test_publisher_with_metadata_tool(self):
+        PUBLISHER = 'Some Publisher'
+        site = DummySite('site').__of__(self.root)
+        site.portal_metadata = DummyMetadataTool(publisher=PUBLISHER)
+        item = self._makeDummyContent('item').__of__(site)
+        self.assertEqual(item.Publisher(), PUBLISHER)
 
 def test_suite():
     return TestSuite((

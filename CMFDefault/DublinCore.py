@@ -154,7 +154,11 @@ class DefaultDublinCoreImpl( PropertyManager ):
     def Publisher( self ):
         """ Dublin Core Publisher element - resource publisher.
         """
-        # XXX: fixme using 'portal_metadata'
+        tool = getToolByName(self, 'portal_metadata', None)
+
+        if tool is not None:
+            return tool.getPublisher()
+
         return 'No publisher'
 
     security.declareProtected(View, 'listContributors')
