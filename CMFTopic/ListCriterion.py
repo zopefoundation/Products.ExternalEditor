@@ -36,6 +36,8 @@ class ListCriterion( AbstractCriterion ):
     __implements__ = ( Criterion, )
 
     meta_type = 'List Criterion'
+    operator = None
+    value = ( '', )
 
     security = ClassSecurityInfo()
 
