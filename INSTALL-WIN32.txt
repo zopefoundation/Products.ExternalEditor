@@ -11,10 +11,28 @@ Zope External Editor Installation
     Download the archive and extract it into your Zope products directory. Then
     restart Zope. If you succeeded, you'll notice pencil icons next to the
     external editable objects in the Zope management screens.
+    
+  Helper Application Installation (Binary)
 
-  Helper Application Installation
+    The binary distribution for Windows includes everything you need to
+    to install the helper application. It is precompiled to a native Windows
+    executable using Python 2.2.2, Pythonwin build 148 and Py2exe 0.3.3. 
+    Everything is included for you in one package.
+
+    Just run the setup executable to install and configure the helper app
+    for use with Internet Explorer. You can also register it (zopeedit.exe) 
+    with other browsers directly.
+
+    You can download the binary installer from Zope.org at::
+
+      http://www.zope.org/Members/Caseman/ExternalEditor
+
+  Helper Application Installation (Source)
 
     Dependancies: Python 2.2, Pythonwin extensions
+
+    *Note: This configuration is for Windows 98, for easier setup on XP and
+    Windows 2000, use the binary distribution*
     
     Download the helper app archive and extract into the directory where you 
     want to install it (it contains one executable Python module file).
@@ -45,12 +63,12 @@ Zope External Editor Installation
     - For Action enter: Open
 
     - For application used, enter or browse to the path to pythonw.exe
-      (wherever you installed python2.2, such as C:\Program Files\Python22).
+      (wherever you installed python2.2, such as C:\Python22).
       Use quotes around the path if it includes spaces. Following the path to
       Python, enter the path to the helper application file, in quotes if
-      needed.  Follow it with: "%1" (in quotes). On my system it looks like:
+      needed.  Follow it with: "%1" (in quotes). On my system it looks like::
 
-      '"C:\Program Files\Python22\pythonw.exe" C:\Casey\ExternalEditor\zopeedit.py "%1"
+        '"C:\Python22\pythonw.exe" C:\Casey\ExternalEditor\zopeedit.py "%1"
 
     - Click OK.
 
