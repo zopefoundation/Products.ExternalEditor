@@ -1,14 +1,14 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """ Cookie Crumbler: Enable cookies for non-cookie user folders.
 
@@ -19,24 +19,23 @@ from base64 import encodestring, decodestring
 from urllib import quote, unquote
 from Acquisition import aq_inner, aq_parent
 from DateTime import DateTime
-from utils import SimpleItemWithProperties
-from AccessControl import ClassSecurityInfo, Permissions
+from AccessControl import ClassSecurityInfo
 from ZPublisher import BeforeTraverse
 import Globals
 from Globals import HTMLFile
 from zLOG import LOG, ERROR
 import sys
-
 from ZPublisher.HTTPRequest import HTTPRequest
+
+from CMFCorePermissions import ModifyCookieCrumblers
+from CMFCorePermissions import ViewManagementScreens
+from utils import SimpleItemWithProperties
 
 
 # Constants.
 ATTEMPT_NONE = 0       # No attempt at authentication
 ATTEMPT_LOGIN = 1      # Attempt to log in
 ATTEMPT_RESUME = 2     # Attempt to resume session
-
-ModifyCookieCrumblers = 'Modify Cookie Crumblers'
-ViewManagementScreens = Permissions.view_management_screens
 
 
 class CookieCrumblerDisabled (Exception):

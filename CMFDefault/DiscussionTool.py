@@ -22,6 +22,7 @@ from OFS.SimpleItem import SimpleItem
 from Products.CMFCore.utils import UniqueObject, getToolByName
 from Products.CMFCore.CMFCorePermissions import ManagePortal
 from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
+from Products.CMFCore.CMFCorePermissions import ReplyToItem
 
 from utils import _dtmldir
 from DiscussionItem import DiscussionItemContainer
@@ -49,7 +50,7 @@ class DiscussionTool( UniqueObject, SimpleItem, ActionProviderBase ):
                                 , condition=Expression(
                 text='python: object is not None and ' +
                 'portal.portal_discussion.isDiscussionAllowedFor(object)')
-                                , permissions=('Reply to item',)
+                                , permissions=(ReplyToItem,)
                                 , category='object'
                                 , visible=1
                                  )

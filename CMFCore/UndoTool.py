@@ -26,8 +26,8 @@ from utils import UniqueObject
 from Expression import Expression
 from ActionInformation import ActionInformation
 from ActionProviderBase import ActionProviderBase
-from CMFCorePermissions import ManagePortal
 from CMFCorePermissions import ListUndoableChanges
+from CMFCorePermissions import ManagePortal
 
 from interfaces.portal_undo import portal_undo as IUndoTool
 
@@ -85,7 +85,7 @@ class UndoTool (UniqueObject, SimpleItem, ActionProviderBase):
         for t in transactions:
             # Ensure transaction ids don't have embedded LF.
             t['id'] = t['id'].replace('\n', '')
-        if not _checkPermission('Manage portal', portal):
+        if not _checkPermission(ManagePortal, portal):
             # Filter out transactions done by other members of the portal.
             user_id = _getAuthenticatedUser(self).getId()
             transactions = filter(

@@ -25,13 +25,9 @@ from string import uppercase
 from string import digits
 
 from ActionProviderBase import ActionProviderBase
-
 from CMFCorePermissions import AddPortalMember
 from CMFCorePermissions import MailForgottenPassword
-from CMFCorePermissions import SetOwnPassword
-from CMFCorePermissions import SetOwnProperties
 from CMFCorePermissions import ManagePortal
-
 from utils import UniqueObject
 from utils import _checkPermission
 from utils import _limitGrantedRoles

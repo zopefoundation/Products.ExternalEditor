@@ -154,7 +154,7 @@ class MembershipTool( BaseTool ):
         If Manager, return a list of all usernames.  The mapping
         contains the id and listed variables.
         """
-        isManager = _checkPermission('Manage portal', self)
+        isManager = _checkPermission(ManagePortal, self)
         roster = []
         for member in self.listMembers():
             if isManager or member.listed:
@@ -255,7 +255,7 @@ class MembershipTool( BaseTool ):
         if members:
             try:
                 folder = members[id]
-                if verifyPermission and not _checkPermission('View', folder):
+                if verifyPermission and not _checkPermission(View, folder):
                     # Don't return the folder if the user can't get to it.
                     return None
                 return folder

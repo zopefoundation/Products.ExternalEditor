@@ -22,7 +22,6 @@ from OFS.SimpleItem import SimpleItem
 
 from Expression import Expression
 from CMFCorePermissions import View
-from CMFCorePermissions import ManagePortal
 from utils import getToolByName
 from types import StringType
 

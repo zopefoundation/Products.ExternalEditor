@@ -76,7 +76,7 @@ class RegistrationTool(BaseTool):
         o If the password is valid, return None.
         o If not, return a string explaining why.
         """
-        if len(password) < 5 and not _checkPermission('Manage portal', self):
+        if len(password) < 5 and not _checkPermission(ManagePortal, self):
             return 'Your password must contain at least 5 characters.'
 
         if confirm is not None and confirm != password:

@@ -20,13 +20,16 @@ from AccessControl import ClassSecurityInfo
 from DateTime import DateTime
 from Globals import InitializeClass
 
+from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
+from Products.CMFCore.CMFCorePermissions import RequestReview
+from Products.CMFCore.CMFCorePermissions import ReviewPortalContent
+from Products.CMFCore.CMFCorePermissions import View
 from Products.CMFCore.utils import _modifyPermissionMappings
 from Products.CMFCore.utils import _checkPermission
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.utils import SimpleItemWithProperties
 from Products.CMFCore.WorkflowCore import WorkflowException
 from Products.CMFCore.WorkflowTool import addWorkflowClass
-from Products.CMFCore.CMFCorePermissions import ReviewPortalContent
 
 from Products.CMFCore.interfaces.portal_workflow \
         import WorkflowDefinition as IWorkflowDefinition
@@ -94,8 +97,8 @@ class DefaultWorkflowDefinition (SimpleItemWithProperties):
         review_state = self.getReviewStateOf(content)
         actions = []
 
-        allow_review = _checkPermission('Review portal content', content)
-        allow_request = _checkPermission('Request review', content)
+        allow_review = _checkPermission(ReviewPortalContent, content)
+        allow_request = _checkPermission(RequestReview, content)
 
         append_action = (lambda name, p, url=content_url, a=actions.append:
                          a({'name': name,
@@ -173,8 +176,8 @@ class DefaultWorkflowDefinition (SimpleItemWithProperties):
         Allows the user to request a workflow action.  This method
         must perform its own security checks.
         '''
-        allow_review = _checkPermission('Review portal content', ob)
-        allow_request = _checkPermission('Request review', ob)
+        allow_review = _checkPermission(ReviewPortalContent, ob)
+        allow_request = _checkPermission(RequestReview, ob)
         review_state = self.getReviewStateOf(ob)
         tool = aq_parent(aq_inner(self))
 
@@ -224,8 +227,8 @@ class DefaultWorkflowDefinition (SimpleItemWithProperties):
         if name == 'review_state':
             return self.getReviewStateOf(ob)
 
-        allow_review = _checkPermission('Review portal content', ob)
-        allow_request = _checkPermission('Request review', ob)
+        allow_review = _checkPermission(ReviewPortalContent, ob)
+        allow_request = _checkPermission(RequestReview, ob)
         if not allow_review and not allow_request:
             return default
 
@@ -309,11 +312,10 @@ class DefaultWorkflowDefinition (SimpleItemWithProperties):
 
         # Modify role to permission mappings directly.
 
-        new_map = { 'View': { 'Anonymous': anon_view
-                            , 'Reviewer': reviewer_view
-                            , 'Owner': 1
-                            }
-                  , 'Modify portal content': {'Owner': owner_modify}
+        new_map = { View: {'Anonymous': anon_view,
+                           'Reviewer': reviewer_view,
+                           'Owner': 1}
+                  , ModifyPortalContent: {'Owner': owner_modify}
                   }
         return _modifyPermissionMappings(ob, new_map)
 

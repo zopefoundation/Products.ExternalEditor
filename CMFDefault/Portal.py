@@ -18,6 +18,22 @@ $Id$
 from Globals import HTMLFile
 from Globals import InitializeClass
 
+from Products.CMFCore.CMFCorePermissions import AccessFuturePortalContent
+from Products.CMFCore.CMFCorePermissions import AddPortalContent
+from Products.CMFCore.CMFCorePermissions import AddPortalFolders
+from Products.CMFCore.CMFCorePermissions import DeleteObjects
+from Products.CMFCore.CMFCorePermissions import FTPAccess
+from Products.CMFCore.CMFCorePermissions import ListPortalMembers
+from Products.CMFCore.CMFCorePermissions import ListUndoableChanges
+from Products.CMFCore.CMFCorePermissions import ManagePortal
+from Products.CMFCore.CMFCorePermissions import ManageProperties
+from Products.CMFCore.CMFCorePermissions import ReplyToItem
+from Products.CMFCore.CMFCorePermissions import ReviewPortalContent
+from Products.CMFCore.CMFCorePermissions import SetOwnPassword
+from Products.CMFCore.CMFCorePermissions import SetOwnProperties
+from Products.CMFCore.CMFCorePermissions import UndoChanges
+from Products.CMFCore.CMFCorePermissions import View
+from Products.CMFCore.CMFCorePermissions import ViewManagementScreens
 from Products.CMFCore.PortalObject import PortalObjectBase
 from Products.CMFCore import PortalFolder
 from Products.CMFCore.TypesTool import ContentFactoryMetadata
@@ -55,12 +71,12 @@ class CMFSite ( PortalObjectBase
     title = ''
     description = ''
 
-    __ac_permissions__=( ( 'Manage portal', ('manage_migrate_content',) )
-                       , ( 'Add portal content', () )
-                       , ( 'Add portal folders', () )
-                       , ( 'List portal members', () )
-                       , ( 'Reply to item', () )
-                       , ( 'View',  ( 'isEffective', ) )
+    __ac_permissions__=( ( ManagePortal, ('manage_migrate_content',) )
+                       , ( AddPortalContent, () )
+                       , ( AddPortalFolders, () )
+                       , ( ListPortalMembers, () )
+                       , ( ReplyToItem, () )
+                       , ( View, ('isEffective',) )
                        )
 
     def __init__( self, id, title='' ):
@@ -203,23 +219,22 @@ class PortalGenerator:
         # Set up some suggested role to permission mappings.
         mp = p.manage_permission
 
-        mp('Set own password',        ['Member','Manager',],    1)
-        mp('Set own properties',      ['Member','Manager',],    1)
-        mp('List undoable changes',   ['Member','Manager',],    1)
-        mp('Add portal content',      ['Owner','Manager',],     1)
-        mp('Add portal folders',      ['Owner','Manager',],     1)
-        mp('Review portal content',   ['Reviewer','Manager',],  1)
-        mp('Access future portal content',
-                                      ['Reviewer','Manager',],  1)
-        mp('List portal members',     ['Member','Manager',],    1)
-        mp('Reply to item',           ['Member','Manager',],    1)
+        mp(AccessFuturePortalContent, ['Reviewer','Manager',], 1)
+        mp(AddPortalContent,          ['Owner','Manager',],    1)
+        mp(AddPortalFolders,          ['Owner','Manager',],    1)
+        mp(ListPortalMembers,         ['Member','Manager',],   1)
+        mp(ListUndoableChanges,       ['Member','Manager',],   1)
+        mp(ReplyToItem,               ['Member','Manager',],   1)
+        mp(ReviewPortalContent,       ['Reviewer','Manager',], 1)
+        mp(SetOwnPassword,            ['Member','Manager',],   1)
+        mp(SetOwnProperties,          ['Member','Manager',],   1)
 
         # Add some other permissions mappings that may be helpful.
-        mp('Delete objects',          ['Owner','Manager',],     1)
-        mp('FTP access',              ['Owner','Manager',],     1)
-        mp('Manage properties',       ['Owner','Manager',],     1)
-        mp('Undo changes',            ['Owner','Manager',],     1)
-        mp('View management screens', ['Owner','Manager',],     1)
+        mp(DeleteObjects,             ['Owner','Manager',],    1)
+        mp(FTPAccess,                 ['Owner','Manager',],    1)
+        mp(ManageProperties,          ['Owner','Manager',],    1)
+        mp(UndoChanges,               ['Owner','Manager',],    1)
+        mp(ViewManagementScreens,     ['Owner','Manager',],    1)
 
     def setupDefaultSkins(self, p):
         from Products.CMFCore.DirectoryView import addDirectoryViews

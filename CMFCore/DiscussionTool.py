@@ -18,10 +18,10 @@ $Id$
 from utils import _dtmldir
 from utils import getToolByName
 from utils import UniqueObject
-from CMFCorePermissions import ReplyToItem
-from CMFCorePermissions import View
 from CMFCorePermissions import AccessContentsInformation
 from CMFCorePermissions import ManagePortal
+from CMFCorePermissions import ReplyToItem
+from CMFCorePermissions import View
 from OFS.SimpleItem import SimpleItem
 from Globals import InitializeClass, DTMLFile
 from Acquisition import Implicit
@@ -170,7 +170,7 @@ class DiscussionTool (UniqueObject, SimpleItem):
         actions = (
             {'name': 'Reply',
              'url': discussion_url + '/discussion_reply_form',
-             'permissions': ['Reply to item'],
+             'permissions': [ReplyToItem],
              'category': 'object'
              },
             )

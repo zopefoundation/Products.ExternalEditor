@@ -1,32 +1,29 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """ Customizable DTML methods that come from the filesystem.
 
 $Id$
 """
 
-from string import split
-from os import path, stat
-
 import Globals
-from AccessControl import ClassSecurityInfo, getSecurityManager, Permissions
+from AccessControl import ClassSecurityInfo, getSecurityManager
 from OFS.DTMLMethod import DTMLMethod, decapitate, guess_content_type
 from AccessControl.Role import RoleManager
 
 from utils import _dtmldir
+from CMFCorePermissions import FTPAccess
 from CMFCorePermissions import View
 from CMFCorePermissions import ViewManagementScreens
-from CMFCorePermissions import FTPAccess
 from DirectoryView import registerFileExtension, registerMetaType, expandpath
 from FSObject import FSObject
 

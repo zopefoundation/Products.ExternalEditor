@@ -25,6 +25,7 @@ from Expression import Expression, createExprContext
 from ActionInformation import ActionInformation, oai
 from ActionProviderBase import ActionProviderBase
 from TypesTool import TypeInformation
+from CMFCorePermissions import ListFolderContents
 from CMFCorePermissions import ManagePortal
 from utils import _checkPermission
 from utils import _dtmldir
@@ -51,7 +52,7 @@ class ActionsTool(UniqueObject, Folder, ActionProviderBase):
                text='string: ${folder_url}/folder_contents')
                                 , condition=Expression(
                text='python: folder is not object') 
-                                , permissions=('List folder contents',)
+                                , permissions=(ListFolderContents,)
                                 , category='object'
                                 , visible=1
                                  )
@@ -61,7 +62,7 @@ class ActionsTool(UniqueObject, Folder, ActionProviderBase):
                text='string: ${folder_url}/folder_contents')
                                 , condition=Expression(
                text='python: folder is object')
-                                , permissions=('List folder contents',)
+                                , permissions=(ListFolderContents,)
                                 , category='folder'
                                 , visible=1
                                  )

@@ -28,8 +28,9 @@ from utils import UniqueObject
 from ActionProviderBase import ActionProviderBase
 from ActionInformation import ActionInformation
 from Expression import Expression
-from CMFCorePermissions import ManagePortal
 from CMFCorePermissions import AccessInactivePortalContent
+from CMFCorePermissions import ManagePortal
+from CMFCorePermissions import View
 from Acquisition import aq_base
 
 from interfaces.portal_catalog \
@@ -58,7 +59,7 @@ class IndexableObjectWrapper:
         """
         ob = self.__ob
         allowed = {}
-        for r in rolesForPermissionOn('View', ob):
+        for r in rolesForPermissionOn(View, ob):
             allowed[r] = 1
         localroles = _mergedLocalRoles(ob)
         for user, roles in localroles.items():

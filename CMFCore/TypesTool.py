@@ -14,6 +14,7 @@
 
 $Id$
 """
+
 import sys
 
 from Globals import DTMLFile
@@ -32,11 +33,9 @@ from interfaces.portal_types import ContentTypeInformation as ITypeInformation
 from interfaces.portal_types import portal_types as ITypesTool
 
 from ActionProviderBase import ActionProviderBase
-
-from CMFCorePermissions import View
-from CMFCorePermissions import ManagePortal
 from CMFCorePermissions import AccessContentsInformation
-
+from CMFCorePermissions import ManagePortal
+from CMFCorePermissions import View
 from utils import UniqueObject
 from utils import SimpleItemWithProperties
 from utils import _dtmldir
@@ -621,11 +620,11 @@ typeClasses = [
     {'class':FactoryTypeInformation,
      'name':FactoryTypeInformation.meta_type,
      'action':'manage_addFactoryTIForm',
-     'permission':'Manage portal'},
+     'permission':ManagePortal},
     {'class':ScriptableTypeInformation,
      'name':ScriptableTypeInformation.meta_type,
      'action':'manage_addScriptableTIForm',
-     'permission':'Manage portal'},
+     'permission':ManagePortal},
     ]
 
 

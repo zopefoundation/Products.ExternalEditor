@@ -1,32 +1,33 @@
 ##############################################################################
 #
 # Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
 """ Programmatically creates a workflow.
 
 $Id$
 """
 
-from Products.CMFCore.CMFCorePermissions import RequestReview, \
-                                                ModifyPortalContent, \
-                                                ReviewPortalContent
+from Products.CMFCore.CMFCorePermissions import AccessContentsInformation
+from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
+from Products.CMFCore.CMFCorePermissions import RequestReview
+from Products.CMFCore.CMFCorePermissions import ReviewPortalContent
+from Products.CMFCore.CMFCorePermissions import View
 from Products.CMFCore.WorkflowTool import addWorkflowFactory
 from Products.DCWorkflow.DCWorkflow import DCWorkflowDefinition
-from AccessControl.Permissions import view, access_contents_information
 
-p_access = access_contents_information
+p_access = AccessContentsInformation
 p_modify = ModifyPortalContent
-p_view = view
-p_review = ReviewPortalContent
 p_request = RequestReview
+p_review = ReviewPortalContent
+p_view = View
 
 r_anon = 'Anonymous'
 r_manager = 'Manager'

@@ -33,7 +33,7 @@ class portal_properties(Interface):
     def editProperties(props):
         """ Change portal settings.
 
-        Permission -- ManagePortal
+        Permission -- Manage portal
         """
 
     def title():
