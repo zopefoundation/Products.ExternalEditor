@@ -1,14 +1,5 @@
 <?xml version="1.0"?>
 <import-steps>
- <import-step id="actions" version="20040523-01"
-              handler="Products.CMFSetup.actions.importActionProviders"
-              title="Action Providers">
-  
-  
-  Import actions tool's action providers and their actions.
- 
- 
- </import-step>
  <import-step id="rolemap" version="20040523-01"
               handler="Products.CMFSetup.rolemap.importRolemap"
               title="Role / Permission Map">
@@ -18,7 +9,26 @@
  
  
  </import-step>
- <import-step id="skins" version="20040523-01"
+ <import-step id="toolset" version="20040630-01"
+              handler="Products.CMFSetup.tool.importToolset"
+              title="Required tools">
+  
+  
+  Create required tools, replacing any of the wrong class, and remove
+  forbidden ones.
+ 
+ </import-step>
+ <import-step id="actions" version="20040630-01"
+              handler="Products.CMFSetup.actions.importActionProviders"
+              title="Action Providers">
+  
+  
+  Import actions tool's action providers and their actions.
+ 
+ 
+  <dependency step="toolset" />
+ </import-step>
+ <import-step id="skins" version="20040630-01"
               handler="Products.CMFSetup.skins.importSkinsTool"
               title="Skins Tool">
   
@@ -26,8 +36,9 @@
   Import skins tool's filesystem directory views and skin path definitions.
  
  
+  <dependency step="toolset" />
  </import-step>
- <import-step id="typeinfo" version="20040523-01"
+ <import-step id="typeinfo" version="20040630-01"
               handler="Products.CMFSetup.typeinfo.importTypesTool"
               title="Types Tool">
   
@@ -35,8 +46,9 @@
   Import types tool's type information objects.
  
  
+  <dependency step="toolset" />
  </import-step>
- <import-step id="typeinfo" version="20040624-01"
+ <import-step id="typeinfo" version="20040630-01"
               handler="Products.CMFSetup.workflow.importWorkflowTool"
               title="Workflow Tool">
   
@@ -44,5 +56,6 @@
   Import workflow tool's workflow definitions and supporting scripts.
  
  
+  <dependency step="toolset" />
  </import-step>
 </import-steps>

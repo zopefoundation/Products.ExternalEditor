@@ -256,6 +256,60 @@ class IExportStepRegistry( IStepRegistry ):
           the step is used, or default to ''.
         """
 
+class IToolsetRegistry( Interface ):
+
+    """ API for toolset registry.
+    """
+    def listForbiddenTools():
+
+        """ Return a list of IDs of tools which must be removed, if present.
+        """
+
+    def addForbiddenTool(tool_id ):
+
+        """ Add 'tool_id' to the list of forbidden tools.
+
+        o Raise KeyError if 'tool_id' is already in the list.
+
+        o Raise ValueError if 'tool_id' is in the "required" list.
+        """
+
+    def listRequiredTools():
+
+        """ Return a list of IDs of tools which must be present.
+        """
+
+    def getRequiredToolInfo( tool_id ):
+
+        """ Return a mapping describing a partiuclar required tool.
+
+        o Keys include:
+
+          'id' -- the ID of the tool
+
+          'class' -- a dotted path to its class
+
+        o Raise KeyError if 'tool_id' id not a known tool.
+        """
+
+    def listRequiredToolInfo():
+
+        """ Return a list of IDs of tools which must be present.
+        """
+
+    def addRequiredTool( tool_id, dotted_name ):
+
+        """ Add a tool to our "required" list.
+
+        o 'tool_id' is the tool's ID.
+
+        o 'dotted_name' is a dotted (importable) name of the tool's class.
+
+        o Raise KeyError if we have already registered a class for 'tool_id'.
+
+        o Raise ValueError if 'tool_id' is in the "forbidden" list.
+        """
+
 class ISetupTool( Interface ):
 
     """ API for SetupTool.
@@ -294,6 +348,11 @@ class ISetupTool( Interface ):
     def getExportStepRegistry():
 
         """ Return the IExportStepRegistry for the tool.
+        """
+
+    def getToolsetRegistry():
+
+        """ Return the IToolsetRegistry for the tool.
         """
 
     def runImportStep( step_id, purge_old=True, run_dependencies=True ):

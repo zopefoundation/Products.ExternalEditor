@@ -6,6 +6,7 @@ import os
 import time
 
 from AccessControl import ClassSecurityInfo
+from Acquisition import aq_base
 from Globals import InitializeClass
 from OFS.Folder import Folder
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
@@ -20,10 +21,14 @@ from context import TarballExportContext
 from context import SnapshotExportContext
 from registry import ImportStepRegistry
 from registry import ExportStepRegistry
+from registry import ToolsetRegistry
 
 from utils import _resolveDottedName
 from utils import _wwwdir
 
+IMPORT_STEPS_XML = 'import_steps.xml'
+EXPORT_STEPS_XML = 'export_steps.xml'
+TOOLSET_XML = 'toolset.xml'
 
 def exportStepRegistries( context ):
 
@@ -40,6 +45,57 @@ def exportStepRegistries( context ):
 
     return 'Step registries exported'
 
+def importToolset( context ):
+
+    """ Import required / forbidden tools from XML file.
+    """
+    site = context.getSite()
+    encoding = context.getEncoding()
+    text = context.readDataFile( TOOLSET_XML )
+
+    setup_tool = getToolByName( site, 'portal_setup' )
+    toolset = setup_tool.getToolsetRegistry()
+
+    toolset.parseXML( text )
+
+    existing_ids = site.objectIds()
+    existing_values = site.objectValues()
+
+    for tool_id in toolset.listForbiddenTools():
+
+        if tool_id in existing_ids:
+            site._delObject( tool_id )
+
+    for info in toolset.listRequiredToolInfo():
+
+        tool_id = str( info[ 'id' ] )
+        tool_class = _resolveDottedName( info[ 'class' ] )
+
+        existing = getToolByName( site, tool_id, None )
+
+        if existing is None:
+            site._setObject( tool_id, tool_class() )
+
+        else:
+            unwrapped = aq_base( existing )
+            if not isinstance( unwrapped, tool_class ):
+                site._delObject( tool_id )
+                site._setObject( tool_id, tool_class() )
+
+    return 'Toolset imported'
+
+def exportToolset( context ):
+
+    """ Export required / forbidden tools to XML file.
+    """
+    site = context.getSite()
+    toolset = ToolsetRegistry().__of__( site )
+
+    xml = toolset.generateXML()
+    context.writeDataFile( TOOLSET_XML, xml, 'text/xml' )
+
+    return 'Toolset exported'
+
 
 class SetupTool( UniqueObject, Folder ):
 
@@ -49,9 +105,6 @@ class SetupTool( UniqueObject, Folder ):
 
     id = 'portal_setup'
     meta_type = 'Portal Setup Tool'
-
-    IMPORT_STEPS_XML = 'import_steps.xml'
-    EXPORT_STEPS_XML = 'export_steps.xml'
 
     _product_name = None
     _profile_directory = None
@@ -67,6 +120,7 @@ class SetupTool( UniqueObject, Folder ):
                                           , exportStepRegistries
                                           , 'Export import / export steps.'
                                           )
+        self._toolset_registry = ToolsetRegistry()
 
     #
     #   ISetupTool API
@@ -116,6 +170,7 @@ class SetupTool( UniqueObject, Folder ):
 
         self._updateImportStepsRegistry( encoding )
         self._updateExportStepsRegistry( encoding )
+        self._updateToolsetRegistry( encoding )
     
     security.declareProtected( ManagePortal, 'getImportStepRegistry' )
     def getImportStepRegistry( self ):
@@ -130,6 +185,13 @@ class SetupTool( UniqueObject, Folder ):
         """ See ISetupTool.
         """
         return self._export_registry
+    
+    security.declareProtected( ManagePortal, 'getToolsetRegistry' )
+    def getToolsetRegistry( self ):
+
+        """ See ISetupTool.
+        """
+        return self._toolset_registry
 
     security.declareProtected( ManagePortal, 'executeStep' )
     def runImportStep( self, step_id, run_dependencies=True, purge_old=True ):
@@ -427,7 +489,7 @@ class SetupTool( UniqueObject, Folder ):
         """
         fq = self._getFullyQualifiedProfileDirectory()
 
-        f = open( os.path.join( fq, self.IMPORT_STEPS_XML ), 'r' )
+        f = open( os.path.join( fq, IMPORT_STEPS_XML ), 'r' )
         xml = f.read()
         f.close()
 
@@ -458,7 +520,7 @@ class SetupTool( UniqueObject, Folder ):
         """
         fq = self._getFullyQualifiedProfileDirectory()
 
-        f = open( os.path.join( fq, self.EXPORT_STEPS_XML ), 'r' )
+        f = open( os.path.join( fq, EXPORT_STEPS_XML ), 'r' )
         xml = f.read()
         f.close()
 
@@ -477,6 +539,19 @@ class SetupTool( UniqueObject, Folder ):
                                               , title=title
                                               , description=description
                                               )
+
+    security.declarePrivate( '_updateToolsetRegistry' )
+    def _updateToolsetRegistry( self, encoding ):
+
+        """ Update our toolset registry from our profile.
+        """
+        fq = self._getFullyQualifiedProfileDirectory()
+
+        f = open( os.path.join( fq, TOOLSET_XML ), 'r' )
+        xml = f.read()
+        f.close()
+
+        self._toolset_registry.parseXML( xml, encoding )
 
     security.declarePrivate( '_doRunImportStep' )
     def _doRunImportStep( self, step_id, context ):

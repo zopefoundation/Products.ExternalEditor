@@ -1,20 +1,29 @@
 <?xml version="1.0"?>
 <export-steps>
- <export-step id="actions"
-              handler="Products.CMFSetup.actions.exportActionProviders"
-              title="Action Providers">
-  
-  
-  Export actions tool's action providers and their actions.
- 
- 
- </export-step>
  <export-step id="rolemap"
               handler="Products.CMFSetup.rolemap.exportRolemap"
               title="Role / Permission Map">
   
   
   Export custom roles and non-default role-permission mappings.
+ 
+ 
+ </export-step>
+ <export-step id="toolset"
+              handler="Products.CMFSetup.tool.exportToolset"
+              title="Required Tools">
+  
+  
+  Export required / forbidden tools.
+ 
+ 
+ </export-step>
+ <export-step id="actions"
+              handler="Products.CMFSetup.actions.exportActionProviders"
+              title="Action Providers">
+  
+  
+  Export actions tool's action providers and their actions.
  
  
  </export-step>

@@ -60,6 +60,15 @@ class ConformsToIExportStepRegistry:
 
         verifyClass( IExportStepRegistry, self._getTargetClass() )
 
+class ConformsToIToolsetRegistry:
+
+    def test_IToolsetRegistry_conformance( self ):
+
+        from Products.CMFSetup.interfaces import IToolsetRegistry
+        from Interface.Verify import verifyClass
+
+        verifyClass( IToolsetRegistry, self._getTargetClass() )
+
 class ConformsToISetupTool:
 
     def test_ISetupTool_conformance( self ):

@@ -5,11 +5,13 @@ $Id$
 import unittest
 import os
 
+from OFS.Folder import Folder
 from Products.CMFSetup.tests.common import BaseRegistryTests
 
 from conformance import ConformsToIStepRegistry
 from conformance import ConformsToIImportStepRegistry
 from conformance import ConformsToIExportStepRegistry
+from conformance import ConformsToIToolsetRegistry
 
 #==============================================================================
 #   Dummy handlers
@@ -801,11 +803,211 @@ _ORDERED_EXPORT_XML = """\
 </export-steps>
 """ % ( ONE_FUNC_NAME, THREE_FUNC_NAME, TWO_FUNC_NAME )
 
+#==============================================================================
+#   ToolsetRegistry tests
+#==============================================================================
+class ToolsetRegistryTests( BaseRegistryTests
+                          , ConformsToIToolsetRegistry
+                          ):
+
+    def _getTargetClass( self ):
+
+        from Products.CMFSetup.registry import ToolsetRegistry
+        return ToolsetRegistry
+
+    def _initSite( self ):
+
+        self.root.site = Folder( id='site' )
+        site = self.root.site
+
+        return site
+
+    def test_empty( self ):
+
+        site = self._initSite()
+        configurator = self._makeOne().__of__( site )
+
+        self.assertEqual( len( configurator.listForbiddenTools() ), 0 )
+        self.assertEqual( len( configurator.listRequiredTools() ), 0 )
+        self.assertEqual( len( configurator.listRequiredToolInfo() ), 0 )
+
+        self.assertRaises( KeyError
+                         , configurator.getRequiredToolInfo, 'nonesuch' )
+
+    def test_addForbiddenTool_multiple( self ):
+
+        VERBOTTEN = ( 'foo', 'bar', 'bam' )
+
+        site = self._initSite()
+        configurator = self._makeOne().__of__( site )
+
+        for verbotten in VERBOTTEN:
+            configurator.addForbiddenTool( verbotten )
+
+        self.assertEqual( len( configurator.listForbiddenTools() )
+                        , len( VERBOTTEN ) )
+
+        for verbotten in configurator.listForbiddenTools():
+            self.failUnless( verbotten in VERBOTTEN )
+
+    def test_addForbiddenTool_duplicate( self ):
+
+        site = self._initSite()
+        configurator = self._makeOne().__of__( site )
+
+        configurator.addForbiddenTool( 'once' )
+
+        self.assertRaises( KeyError, configurator.addForbiddenTool, 'once' )
+
+    def test_addForbiddenTool_but_required( self ):
+
+        site = self._initSite()
+        configurator = self._makeOne().__of__( site )
+
+        configurator.addRequiredTool( 'required', 'some.dotted.name' )
+
+        self.assertRaises( ValueError
+                         , configurator.addForbiddenTool, 'required' )
+
+    def test_addRequiredTool_multiple( self ):
+
+        REQUIRED = ( ( 'one', 'path.to.one' )
+                   , ( 'two', 'path.to.two' )
+                   , ( 'three', 'path.to.three' )
+                   )
+
+        site = self._initSite()
+        configurator = self._makeOne().__of__( site )
+
+        for tool_id, dotted_name in REQUIRED:
+            configurator.addRequiredTool( tool_id, dotted_name )
+
+        self.assertEqual( len( configurator.listRequiredTools() )
+                        , len( REQUIRED ) )
+
+        for id in [ x[0] for x in REQUIRED ]:
+            self.failUnless( id in configurator.listRequiredTools() )
+
+        self.assertEqual( len( configurator.listRequiredToolInfo() )
+                        , len( REQUIRED ) )
+
+        for tool_id, dotted_name in REQUIRED:
+            info = configurator.getRequiredToolInfo( tool_id )
+            self.assertEqual( info[ 'id' ], tool_id )
+            self.assertEqual( info[ 'class' ], dotted_name )
+
+    def test_addRequiredTool_duplicate( self ):
+
+        site = self._initSite()
+        configurator = self._makeOne().__of__( site )
+
+        configurator.addRequiredTool( 'required', 'some.dotted.name' )
+
+        self.assertRaises( KeyError
+                         , configurator.addRequiredTool
+                         , 'required'
+                         , 'another.name'
+                         )
+
+    def test_addRequiredTool_but_forbidden( self ):
+
+        site = self._initSite()
+        configurator = self._makeOne().__of__( site )
+
+        configurator.addForbiddenTool( 'forbidden' )
+
+        self.assertRaises( ValueError
+                         , configurator.addRequiredTool
+                         , 'forbidden'
+                         , 'a.name'
+                         )
+
+    def test_generateXML_empty( self ):
+
+        site = self._initSite()
+        configurator = self._makeOne().__of__( site )
+
+        self._compareDOM( configurator.generateXML(), _EMPTY_TOOLSET_XML )
+
+    def test_generateXML_normal( self ):
+
+        site = self._initSite()
+        configurator = self._makeOne().__of__( site )
+
+        configurator.addForbiddenTool( 'doomed' )
+        configurator.addRequiredTool( 'mandatory', 'path.to.one' )
+        configurator.addRequiredTool( 'obligatory', 'path.to.another' )
+
+        configurator.parseXML( _NORMAL_TOOLSET_XML )
+
+    def test_parseXML_empty( self ):
+
+        site = self._initSite()
+        configurator = self._makeOne().__of__( site )
+
+        configurator.parseXML( _EMPTY_TOOLSET_XML )
+
+        self.assertEqual( len( configurator.listForbiddenTools() ), 0 )
+        self.assertEqual( len( configurator.listRequiredTools() ), 0 )
+
+    def test_parseXML_normal( self ):
+
+        site = self._initSite()
+        configurator = self._makeOne().__of__( site )
+
+        configurator.parseXML( _NORMAL_TOOLSET_XML )
+
+        self.assertEqual( len( configurator.listForbiddenTools() ), 1 )
+        self.failUnless( 'doomed' in configurator.listForbiddenTools() )
+
+        self.assertEqual( len( configurator.listRequiredTools() ), 2 )
+
+        self.failUnless( 'mandatory' in configurator.listRequiredTools() )
+        info = configurator.getRequiredToolInfo( 'mandatory' )
+        self.assertEqual( info[ 'class' ], 'path.to.one' )
+
+        self.failUnless( 'obligatory' in configurator.listRequiredTools() )
+        info = configurator.getRequiredToolInfo( 'obligatory' )
+        self.assertEqual( info[ 'class' ], 'path.to.another' )
+
+    def test_parseXML_confused( self ):
+
+        site = self._initSite()
+        configurator = self._makeOne().__of__( site )
+
+        self.assertRaises( ValueError
+                         , configurator.parseXML, _CONFUSED_TOOLSET_XML )
+
+
+_EMPTY_TOOLSET_XML = """\
+<?xml version="1.0"?>
+<tool-setup>
+</tool-setup>
+"""
+
+_NORMAL_TOOLSET_XML = """\
+<?xml version="1.0"?>
+<tool-setup>
+ <forbidden tool_id="doomed" />
+ <required tool_id="mandatory" class="path.to.one" />
+ <required tool_id="obligatory" class="path.to.another" />
+</tool-setup>
+"""
+
+_CONFUSED_TOOLSET_XML = """\
+<?xml version="1.0"?>
+<tool-setup>
+ <forbidden tool_id="confused" />
+ <required tool_id="confused" class="path.to.one" />
+</tool-setup>
+"""
+
 
 def test_suite():
     return unittest.TestSuite((
         unittest.makeSuite( ImportStepRegistryTests ),
         unittest.makeSuite( ExportStepRegistryTests ),
+        unittest.makeSuite( ToolsetRegistryTests ),
         ))
 
 if __name__ == '__main__':
