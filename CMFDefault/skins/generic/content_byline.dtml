@@ -8,5 +8,7 @@
    &dtml-creator;.
   </dtml-if>
  </dtml-let>
- Last modified on <dtml-var bobobase_modification_time fmt="Date">
+ <dtml-if ModificationDate>
+ Last modified on <dtml-var ModificationDate>
+ </dtml-if>
 </p>
