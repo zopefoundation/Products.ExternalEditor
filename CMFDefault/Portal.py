@@ -155,6 +155,7 @@ factory_type_information = (
     {'id': 'Folder', 'meta_type': 'Portal Folder', 'description':
      'Use folders to put content in categories.', 'icon': 'folder_icon.gif',
      'product':'CMFCore', 'factory':'manage_addPortalFolder',
+     'filter_content_types': 0,
      'immediate_view':'folder_contents', 'actions':
      ({'name': 'View',
        'action': '',
