@@ -32,7 +32,12 @@ def addConfiguredSiteForm( dispatcher ):
 
     return wrapped( profiles=profile_registry.listProfileInfo() )
 
-def addConfiguredSite( dispatcher, site_id, profile_id, RESPONSE=None ):
+def addConfiguredSite( dispatcher
+                     , site_id
+                     , profile_id
+                     , snapshot=True
+                     , RESPONSE=None 
+                     ):
 
     """ Add a CMFSite to 'dispatcher', configured according to 'profile_id'.
     """
@@ -46,7 +51,9 @@ def addConfiguredSite( dispatcher, site_id, profile_id, RESPONSE=None ):
 
     setup_tool.setImportContext( 'profile-%s' % profile_id )
     setup_tool.runAllImportSteps()
-    setup_tool.createSnapshot( 'initial_configuration' )
+
+    if snapshot is True:
+        setup_tool.createSnapshot( 'initial_configuration' )
 
     if RESPONSE is not None:
         RESPONSE.redirect( '%s/manage_main?update_menu=1'

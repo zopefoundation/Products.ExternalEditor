@@ -102,9 +102,12 @@ def importSkinsTool( context ):
 
     #
     #   Purge and rebuild the skin path, now that we have added our stuff.
+    #   Don't bother if no REQUEST is present, e.g. when running unit tests
     #
-    site._v_skindata = None
-    skins_tool.setupCurrentSkin( site.REQUEST )
+    request = getattr(site, 'REQUEST', None)
+    if request is not None:
+        site._v_skindata = None
+        skins_tool.setupCurrentSkin(request)
 
     return 'Skins tool imported'
 
