@@ -14,6 +14,7 @@ id = context.add_issue(submitter=submitter,
                        severity=severity,
                        reported_version=reported_version,
                        other_version_info=other_version_info,
+                       assignees=REQUEST.get('assignees'),
                        file=REQUEST.get('file'),
                        fileid=REQUEST.get('fileid', ''),
                        filetype=REQUEST.get('filetype', 'file'))
