@@ -205,7 +205,7 @@ class ActionsTool(UniqueObject, OFS.Folder.Folder, ActionProviderBase):
             # case).  This prevents us from needing to check the condition.
             ti = types_tool.getTypeInfo( object ) or TypeInformation('Dummy')
             defs = ti.getActions()
-            object_url = object.absolute_url()
+            url = object_url = object.absolute_url()
             for d in defs:
                 # we can't modify or expose the original actionsd... this
                 # stems from the fact that getActions returns a ref to the
