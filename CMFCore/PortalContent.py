@@ -204,8 +204,7 @@ class PortalContent(SimpleItem, DynamicType):
     security.declareProtected(CMFCorePermissions.View, 'asHTML')
     def asHTML(self):
         '''
-        This is for when this object is used as an index_html
-        for a folder.
+        Called when this object is the index_html for a folder.
         '''
         view = self.view
         if getattr(aq_base(view), 'isDocTemp', 0):
@@ -229,6 +228,5 @@ class PortalContent(SimpleItem, DynamicType):
             return ((talkback.id, talkback),)
         else:
             return []
-
 
 Globals.InitializeClass(PortalContent)
