@@ -462,7 +462,7 @@ class MetadataTool( UniqueObject, SimpleItem ):
 
     security.declareProtected( CMFCorePermissions.ManagePortal
                              , 'addElementSpec' )
-    def addElementSpec( self, element, is_multi_valued ):
+    def addElementSpec( self, element, is_multi_valued, REQUEST=None ):
         """
             Add 'element' to our list of managed elements.
         """
@@ -472,13 +472,25 @@ class MetadataTool( UniqueObject, SimpleItem ):
 
         self.element_specs[ element ] = ElementSpec( is_multi_valued )
 
+        if REQUEST is not None:
+            REQUEST[ 'RESPONSE' ].redirect( self.absolute_url()
+               + '/propertiesForm'
+               + '?manage_tabs_message=Element+' + element + '+added.'
+               )
+
     security.declareProtected( CMFCorePermissions.ManagePortal
                              , 'removeElementSpec' )
-    def removeElementSpec( self, element ):
+    def removeElementSpec( self, element, REQUEST=None ):
         """
             Remove 'element' from our list of managed elements.
         """
         del self.element_specs[ element ]
+
+        if REQUEST is not None:
+            REQUEST[ 'RESPONSE' ].redirect( self.absolute_url()
+               + '/propertiesForm'
+               + '?manage_tabs_message=Element+' + element + '+removed.'
+               )
 
     security.declareProtected( CMFCorePermissions.ManagePortal, 'listPolicies' )
     def listPolicies( self, typ=None ):
@@ -513,8 +525,8 @@ class MetadataTool( UniqueObject, SimpleItem ):
         """
         return self.publisher
 
-    security.declarePrivate( '_listAllowedVocabulary' )
-    def _listAllowedVocabulary( self, element, content=None ):
+    security.declarePublic( 'listAllowedVocabulary' )
+    def listAllowedVocabulary( self, element, content=None ):
         """
             List allowed keywords for a given meta_type, or all
             possible keywords if none supplied.
@@ -529,7 +541,7 @@ class MetadataTool( UniqueObject, SimpleItem ):
             List allowed keywords for a given meta_type, or all
             possible keywords if none supplied.
         """
-        return self._listAllowedVocabulary( 'Subject', content )
+        return self.listAllowedVocabulary( 'Subject', content )
 
     security.declarePublic( 'listAllowedFormats' )
     def listAllowedFormats( self, content=None ):
@@ -537,14 +549,14 @@ class MetadataTool( UniqueObject, SimpleItem ):
             List the allowed 'Content-type' values for a particular
             meta_type, or all possible formats if none supplied.
         """
-        return self._listAllowedVocabulary( 'Format', content )
+        return self.listAllowedVocabulary( 'Format', content )
 
     security.declarePublic( 'listAllowedLanguages' )
     def listAllowedLanguages( self, content=None ):
         """
             List the allowed language values.
         """
-        return self._listAllowedVocabulary( 'Language', content )
+        return self.listAllowedVocabulary( 'Language', content )
 
     security.declarePublic( 'listAllowedRights' )
     def listAllowedRights( self, content=None ):
@@ -553,7 +565,7 @@ class MetadataTool( UniqueObject, SimpleItem ):
             selection list;  this gets especially important where
             syndication is involved.
         """
-        return self._listAllowedVocabulary( 'Rights', content )
+        return self.listAllowedVocabulary( 'Rights', content )
 
     security.declarePrivate( 'setInitialMetadata' )
     def setInitialMetadata( self, content ):

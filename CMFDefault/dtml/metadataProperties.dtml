@@ -4,17 +4,68 @@
 <h3> Update Metadata Tool Properties </h3>
 
 <form action="editProperties" method="POST">
-<table class="FormLayout">
+<table>
 
- <tr>
-  <th> Publisher: </th>
+ <tr valign="middle">
+  <th width="100" align="right"> Publisher: </th>
   <td> <input type="text" name="publisher"
               value="&dtml-getPublisher;" size="40"> </td>
  </tr>
 
- <tr>
+ <tr valign="middle">
   <td> <br> </td>
   <td> <input type="submit" value=" Change "> </td>
+ </tr>
+
+</table>
+</form>
+
+<h3> Add Metadata Element </h3>
+
+<form action="&dtml-absolute_url;/addElementSpec" method="POST">
+<input type="hidden" name="is_multi_valued:int:default" value="0">
+<table>
+
+ <tr valign="middle">
+  <th width="100" align="right"> Element: </th>
+  <td> <input type="text" name="element" size="20"> </td>
+ </tr>
+
+ <tr valign="middle">
+  <th width="100" align="right"> Multi-valued? </th>
+  <td> <input type="checkbox" name="is_multi_valued:boolean"> </td>
+ </tr>
+
+ <tr valign="middle">
+  <td> <br> </td>
+  <td> <input type="submit" value=" Add "> </td>
+ </tr>
+
+</table>
+</form>
+
+<h3> Remove Metadata Element </h3>
+
+<form action="&dtml-absolute_url;/removeElementSpec" method="POST">
+<table>
+
+ <tr valign="middle">
+  <th width="100" align="right"> Element: </th>
+  <td> <dtml-in listElementSpecs>
+       <dtml-if sequence-start>
+       <select name="element">
+       </dtml-if>
+       <option value="&dtml-sequence-key;"> &dtml-sequence-key; </option>
+       <dtml-if sequence-end>
+       </select>
+       </dtml-if>
+       </dtml-in>
+  </td>
+ </tr>
+
+ <tr valign="middle">
+  <td> <br> </td>
+  <td> <input type="submit" value=" Remove "> </td>
  </tr>
 
 </table>
