@@ -386,11 +386,11 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
 
     def _send_update_notice(self, action, actor,
                             orig_status=None, additions=None, removals=None,
-                            file=None, fileid=None):
+                            file=None, fileid=None, lower=string.lower):
         """Send email notification about issue event to relevant parties."""
 
         action = string.capitalize(string.split(action, '_')[0])
-        new_status = string.split(self.status(), '_')[0]
+        new_status = self.status()
 
         recipients = []
 
@@ -406,16 +406,24 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         # - Person taking action always
         # - Supporters assigned to the issue always
         # - Managers or managers + all supporters (according to dispatching):
-        #   - When an issue is any state besides accepted
-        #   - When an issue is being accepted
-        #   - When an issue is accepted and moving to another state
+        #   - When in any state besides accepted (or accepted_confidential)
+        #   - When being accepted (or accepted_confidential)
+        #   - When is accepted (or accepted_confidential) and moving to
+        #     another state 
         # - Any supporters being removed from the issue by the current action
+        # - In addition, any destinations for the resulting state registered
+        #   in state_email are included.
         #
-        # We're liberal about duplicates - they'll be filtered before send.
+        # We're liberal about allowing duplicates in the collection phase -
+        # all duplicate addresses will be filtered out before actual send.
 
         candidates = [self.submitter_id, actor] + list(self.assigned_to())
-        if orig_status and not ('accepted' == string.lower(new_status) == 
-                                string.lower(orig_status)):
+        continuing_accepted = (lower(orig_status) in ['accepted',
+                                                      'accepted_confidential']
+                               and
+                               lower(new_status) in ['accepted',
+                                                     'accepted_confidential'])
+        if orig_status and not continuing_accepted:
             candidates.extend(self.aq_parent.managers)
             if not self.aq_parent.dispatching:
                 candidates.extend(self.aq_parent.supporters)
