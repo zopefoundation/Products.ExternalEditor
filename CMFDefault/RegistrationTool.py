@@ -54,20 +54,6 @@ class RegistrationTool(BaseTool):
     security = ClassSecurityInfo()
 
     #
-    #   ZMI methods
-    #
-    security.declareProtected( ManagePortal, 'manage_overview' )
-
-    manage_options = ( ActionProviderBase.manage_options
-                     + ( { 'label' : 'Overview'
-                         , 'action' : 'manage_overview'
-                         }
-                       ,
-                       )
-                     )
-    manage_overview = DTMLFile( 'explainRegistrationTool', _dtmldir )
-
-    #
     #   'portal_registration' interface
     #
     security.declarePublic( 'testPasswordValidity' )
