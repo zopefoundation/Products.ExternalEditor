@@ -1,19 +1,13 @@
 from unittest import TestCase, makeSuite, main
-
 import Testing
 import Zope
-try:
-    Zope.startup()
-except AttributeError:
-    # for Zope versions before 2.6.1
-    pass
+Zope.startup()
 
 from Products.CMFCore.tests.base.content import FAUX_HTML_LEADING_TEXT
 from Products.CMFCore.tests.base.content import SIMPLE_HTML
 from Products.CMFCore.tests.base.content import SIMPLE_STRUCTUREDTEXT
 from Products.CMFCore.tests.base.content import SIMPLE_XHTML
 from Products.CMFCore.tests.base.content import STX_WITH_HTML
-
 from Products.CMFDefault.utils import bodyfinder
 from Products.CMFDefault.utils import comma_split
 from Products.CMFDefault.utils import html_headcheck
@@ -56,7 +50,7 @@ Header: value
         desc_len = len( headers[ 'Description' ].split('\n') )
         assert( desc_len == 2, '%d!' % desc_len )
         assert( len( body ) == 0, '%d!' % len( body ) )
-    
+
     def test_Body( self ):
         headers, body = parseHeadersBody( '%s\n\n%s'
                                         % ( self.COMMON_HEADERS
@@ -65,7 +59,7 @@ Header: value
                                         )
         assert( len( headers ) == 2, '%d!' % len( headers ) )
         assert( body == self.TEST_BODY )
-    
+
     def test_Preload( self ):
         preloaded = { 'Author' : 'xxx', 'text_format' : 'structured_text' }
         headers, body = parseHeadersBody( '%s\n%s\n\n%s'

@@ -1,12 +1,7 @@
 from unittest import TestSuite, makeSuite, main
-
 import Testing
 import Zope
-try:
-    Zope.startup()
-except AttributeError:
-    # for Zope versions before 2.6.1
-    pass
+Zope.startup()
 
 from AccessControl import getSecurityManager
 from AccessControl.Owned import Owned

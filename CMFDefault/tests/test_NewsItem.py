@@ -1,17 +1,12 @@
 from unittest import TestSuite, makeSuite, main
-
 import Testing
 import Zope
-try:
-    Zope.startup()
-except AttributeError:
-    # for Zope versions before 2.6.1
-    pass
+Zope.startup()
 
-from Products.CMFCore.tests.base.content import DOCTYPE
 from Products.CMFCore.tests.base.content import BASIC_HTML
-from Products.CMFCore.tests.base.content import ENTITY_IN_TITLE
 from Products.CMFCore.tests.base.content import BASIC_STRUCTUREDTEXT
+from Products.CMFCore.tests.base.content import DOCTYPE
+from Products.CMFCore.tests.base.content import ENTITY_IN_TITLE
 from Products.CMFCore.tests.base.dummy import DummySite
 from Products.CMFCore.tests.base.dummy import DummyTool
 from Products.CMFCore.tests.base.testcase import RequestTest

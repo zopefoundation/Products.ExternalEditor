@@ -1,12 +1,7 @@
 import unittest
-
 import Testing
 import Zope
-try:
-    Zope.startup()
-except AttributeError:
-    # for Zope versions before 2.6.1
-    pass
+Zope.startup()
 
 from os.path import join as path_join
 
@@ -69,9 +64,7 @@ class FSImageTests( RequestTest, FSDVTest):
         self.assertEqual( len( data ), len( ref ) )
         self.assertEqual( data, ref )
         # ICK!  'HTTPResponse.getHeader' doesn't case-flatten the key!
-        # for Zope versions before 2.6.1: Content-Length has to be stringified
-        self.assertEqual( str( self.RESPONSE.getHeader(
-                                  'Content-Length'.lower() ) )
+        self.assertEqual( self.RESPONSE.getHeader( 'Content-Length'.lower() )
                         , str(len(ref)) )
         self.assertEqual( self.RESPONSE.getHeader( 'Content-Type'.lower() )
                         , 'image/gif' )

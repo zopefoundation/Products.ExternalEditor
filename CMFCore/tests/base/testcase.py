@@ -1,23 +1,22 @@
-import Zope
-try:
-    Zope.startup()
-except AttributeError:
-    # for Zope versions before 2.6.1
-    pass
 from unittest import TestCase
+import Zope
+Zope.startup()
+
+from os import curdir, mkdir, stat, remove
+from os.path import join, abspath, dirname
+from shutil import copytree, rmtree
+from tempfile import mktemp
+import sys
+import time
+
 from AccessControl.SecurityManagement import newSecurityManager
 from AccessControl.SecurityManagement import noSecurityManager
 from AccessControl.SecurityManager import setSecurityPolicy
-from Testing.makerequest import makerequest
 from security import PermissiveSecurityPolicy, AnonymousUser
+from Testing.makerequest import makerequest
+
 from dummy import DummyFolder
-from os.path import join, abspath, dirname
-from os import curdir, mkdir, stat, remove
-from shutil import copytree,rmtree
-from tempfile import mktemp
-import os
-import sys
-import time
+
 
 class TransactionalTest( TestCase ):
 
@@ -27,18 +26,20 @@ class TransactionalTest( TestCase ):
         get_transaction().begin()
         self.connection = Zope.DB.open()
         self.root =  self.connection.root()[ 'Application' ]
-    
+
     def tearDown( self ):
         get_transaction().abort()
         self.connection.close()
 
+
 class RequestTest( TransactionalTest ):
-    
+
     def setUp(self):
         TransactionalTest.setUp(self)
         root = self.root = makerequest(self.root)
         self.REQUEST  = root.REQUEST
         self.RESPONSE = root.REQUEST.RESPONSE
+
 
 class SecurityTest( TestCase ):
 
@@ -56,8 +57,9 @@ class SecurityTest( TestCase ):
         noSecurityManager()
         setSecurityPolicy(self._oldPolicy)
 
+
 class SecurityRequestTest( SecurityTest ):
-    
+
     def setUp(self):
         SecurityTest.setUp(self)
         self.root = makerequest(self.root)
@@ -72,6 +74,7 @@ else:
     _prefix = abspath(dirname(__file__))
 
 _prefix = abspath(join(_prefix,'..'))
+
 
 class FSDVTest( TestCase ):
     # Base class for FSDV test, creates a fake skin
@@ -88,7 +91,7 @@ class FSDVTest( TestCase ):
         if object is not None:
             ob = self.ob = DummyFolder()
             addDirectoryViews(ob, self._skinname, self.tempname)
-    
+
     def _writeFile(self, filename, stuff):
         # write some stuff to a file on disk
         # make sure the file's modification time has changed
@@ -142,7 +145,7 @@ class FSDVTest( TestCase ):
             f = open(fn, 'w')
             f.write('Temporary file')
             f.close()
-            os.remove(fn)
+            remove(fn)
             new_mtime = stat(self.skin_path_name)[8]
 
     def setUp(self):
@@ -161,4 +164,3 @@ class FSDVTest( TestCase ):
     def tearDown(self):
         # kill the copy
         rmtree(self.tempname)
-

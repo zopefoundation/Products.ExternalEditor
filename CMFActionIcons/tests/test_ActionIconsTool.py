@@ -1,25 +1,32 @@
 ##############################################################################
 #
 # Copyright (c) 2003 Zope Corporation and Contributors. All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE
-# 
+#
 ##############################################################################
-import unittest
+""" Unit tests for ActionIconsTool module.
 
+$Id$
+"""
+
+import unittest
+import Testing
 import Zope
+Zope.startup()
+
 
 class ActionIconToolTests( unittest.TestCase ):
 
     def _makeOne( self, *args, **kw ):
 
         from Products.CMFActionIcons.ActionIconsTool import ActionIconsTool
-        
+
         return ActionIconsTool( *args, **kw )
 
     def test_empty( self ):
@@ -217,4 +224,3 @@ def test_suite():
 
 if __name__ == '__main__':
     unittest.main(defaultTest='test_suite')
-

@@ -1,14 +1,10 @@
 from unittest import TestCase, TestSuite, makeSuite, main
-
 import Testing
 import Zope
-try:
-    Zope.startup()
-except AttributeError:
-    # for Zope versions before 2.6.1
-    pass
+Zope.startup()
 
-import os, cStringIO
+from os.path import join as path_join
+from cStringIO import StringIO
 
 from Products.CMFCore.tests.base.dummy import DummySite
 from Products.CMFCore.tests.base.dummy import DummyTool
@@ -16,7 +12,7 @@ from Products.CMFDefault import tests
 from Products.CMFDefault.Image import Image
 
 TESTS_HOME = tests.__path__[0]
-TEST_JPG = os.path.join(TESTS_HOME, 'TestImage.jpg')
+TEST_JPG = path_join(TESTS_HOME, 'TestImage.jpg')
 
 
 class TestImageElement(TestCase):
@@ -37,7 +33,7 @@ class TestImageElement(TestCase):
 
         assert image.get_size() == testfilesize
 
-        emptyfile = cStringIO.StringIO()
+        emptyfile = StringIO()
         image.edit(file=emptyfile)
 
         assert image.get_size() > 0

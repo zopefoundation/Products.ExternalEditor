@@ -1,18 +1,29 @@
-from unittest import TestSuite, makeSuite, main
+##############################################################################
+#
+# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE
+#
+##############################################################################
+""" Unit tests for Topic module.
 
+$Id$
+"""
+
+from unittest import TestSuite, makeSuite, main
 import Testing
 import Zope
-try:
-    Zope.startup()
-except AttributeError:
-    # for Zope versions before 2.6.1
-    pass
+Zope.startup()
 
 from Products.CMFCore.tests.base.dummy import DummySite
 from Products.CMFCore.tests.base.testcase import SecurityTest
 from Products.CMFCore.TypesTool import FactoryTypeInformation as FTI
 from Products.CMFCore.TypesTool import TypesTool
-
 from Products.CMFTopic.Topic import factory_type_information as FTIDATA_TOPIC
 from Products.CMFTopic.Topic import Topic
 

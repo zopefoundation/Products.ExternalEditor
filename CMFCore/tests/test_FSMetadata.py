@@ -1,12 +1,7 @@
 from unittest import TestSuite, makeSuite, main
-
 import Testing
 import Zope
-try:
-    Zope.startup()
-except AttributeError:
-    # for Zope versions before 2.6.1
-    pass
+Zope.startup()
 
 from types import ListType
 from os import remove

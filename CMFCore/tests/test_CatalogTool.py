@@ -1,17 +1,8 @@
 from unittest import TestCase, TestSuite, makeSuite, main
-
 import Testing
 import Zope
-try:
-    Zope.startup()
-except AttributeError:
-    # for Zope versions before 2.6.1
-    pass
-try:
-    from Interface.Verify import verifyClass
-except ImportError:
-    # for Zope versions before 2.6.0
-    from Interface import verify_class_implementation as verifyClass
+Zope.startup()
+from Interface.Verify import verifyClass
 
 from Products.CMFCore.CatalogTool import CatalogTool
 from Products.CMFCore.CatalogTool import IndexableObjectWrapper
@@ -45,16 +36,12 @@ class CatalogToolTests( TestCase ):
                 import portal_catalog as ICatalogTool
         from Products.CMFCore.interfaces.portal_actions \
                 import ActionProvider as IActionProvider
+        from Products.ZCatalog.IZCatalog import IZCatalog
 
         verifyClass(ICatalogTool, CatalogTool)
         verifyClass(IActionProvider, CatalogTool)
+        verifyClass(IZCatalog, CatalogTool)
 
-        try:
-            from Products.ZCatalog.IZCatalog import IZCatalog
-            verifyClass(IZCatalog, CatalogTool)
-        except ImportError:
-            # for Zope versions before 2.6.0
-            pass
 
 
 def test_suite():

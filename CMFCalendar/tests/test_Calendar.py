@@ -1,12 +1,24 @@
-import unittest
+##############################################################################
+#
+# Copyright (c) 2002 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE.
+#
+##############################################################################
+""" Unit tests for CalendarTool module.
 
+$Id$
+"""
+
+import unittest
 import Testing
 import Zope
-try:
-    Zope.startup()
-except AttributeError:
-    # for Zope versions before 2.6.1
-    pass
+Zope.startup()
 
 from AccessControl.SecurityManagement import newSecurityManager
 from AccessControl.User import UnrestrictedUser
@@ -425,6 +437,7 @@ class TestCalendar(unittest.TestCase):
                                               comment='testing')
 
         assert len(self.Site.portal_calendar.getEventsForThisDay(thisDay=DateTime('1/1/2002'))) == 4
+
 
 def test_suite():
     return unittest.TestSuite((

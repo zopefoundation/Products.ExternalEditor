@@ -1,16 +1,13 @@
 from unittest import TestCase, TestSuite, makeSuite, main
-
 import Testing
 import Zope
-try:
-    Zope.startup()
-except AttributeError:
-    # for Zope versions before 2.6.1
-    pass
+Zope.startup()
 
 from DateTime import DateTime
+from webdav.WriteLockInterface import WriteLockInterface
 
 from Products.CMFCore.CatalogTool import CatalogTool
+from Products.CMFCore.interfaces.Dynamic import DynamicType as IDynamicType
 from Products.CMFCore.PortalFolder import ContentFilter
 from Products.CMFCore.PortalFolder import PortalFolder
 from Products.CMFCore.tests.base.dummy import DummyContent
@@ -22,8 +19,7 @@ from Products.CMFCore.tests.base.tidata import FTIDATA_DUMMY
 from Products.CMFCore.tests.base.utils import has_path
 from Products.CMFCore.TypesTool import FactoryTypeInformation as FTI
 from Products.CMFCore.TypesTool import TypesTool
-from Products.CMFCore.interfaces.Dynamic import DynamicType as IDynamicType
-from webdav.WriteLockInterface import WriteLockInterface
+
 
 def extra_meta_types():
     return [  { 'name' : 'Dummy', 'action' : 'manage_addFolder' } ]
