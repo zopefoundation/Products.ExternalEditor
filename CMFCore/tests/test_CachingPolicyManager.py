@@ -41,10 +41,12 @@ class CachingPolicyTests( unittest.TestCase ):
         from Products.CMFCore.interfaces.CachingPolicyManager \
             import CachingPolicyManager as ICachingPolicyManager
         from Products.CMFCore.CachingPolicyManager import CachingPolicyManager
-        from Interface import verify_class_implementation
+        try:
+            from Interface import verify_class_implementation as verifyClass
+        except ImportError:
+            from Interface.Verify import verifyClass
 
-        verify_class_implementation( ICachingPolicyManager
-                                   , CachingPolicyManager )
+        verifyClass(ICachingPolicyManager, CachingPolicyManager)
 
     def test_empty( self ):
 
@@ -240,10 +242,12 @@ class CachingPolicyManagerTests( unittest.TestCase ):
         from Products.CMFCore.interfaces.CachingPolicyManager \
                 import CachingPolicyManager as ICachingPolicyManager
 
-        from Interface import verify_class_implementation
+        try:
+            from Interface import verify_class_implementation as verifyClass
+        except ImportError:
+            from Interface.Verify import verifyClass
 
-        verify_class_implementation( ICachingPolicyManager
-                                   , CachingPolicyManager )
+        verifyClass(ICachingPolicyManager, CachingPolicyManager)
 
     def test_empty( self ):
 

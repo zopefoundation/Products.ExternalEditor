@@ -133,10 +133,12 @@ class WorkflowToolTests( unittest.TestCase ):
     def test_interface( self ):
         from Products.CMFCore.WorkflowTool import WorkflowTool
         from Products.CMFCore.interfaces.portal_workflow import portal_workflow
-        from Interface import verify_class_implementation
+        try:
+            from Interface import verify_class_implementation as verifyClass
+        except ImportError:
+            from Interface.Verify import verifyClass
 
-        # XXX:  need better verify!
-        verify_class_implementation( portal_workflow, WorkflowTool )
+        verifyClass(portal_workflow, WorkflowTool)
 
     def test_empty( self ):
 
