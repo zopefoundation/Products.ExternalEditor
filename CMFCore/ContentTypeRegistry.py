@@ -70,6 +70,9 @@ class MajorMinorPredicate( SimpleItem ):
         if self.minor is None:
             return 0
 
+        typ = typ or '/'
+        if not '/' in typ:
+            typ = typ + '/'
         major, minor = SLASH_SPLIT.split( typ )
 
         if self.major and not major in self.major:

@@ -18,6 +18,8 @@ class MajorMinorPredicateTests( unittest.TestCase ):
         assert pred.getMinorType() == 'plain'
         assert pred( 'foo', 'text/plain', 'asdfljksadf' )
         assert not pred( 'foo', 'text/html', 'asdfljksadf' )
+        assert not pred( '', '', '' )
+        assert not pred( '', 'asdf', '' )
 
     def test_wildcard( self ):
         pred = MajorMinorPredicate( 'alltext' )
@@ -131,12 +133,16 @@ class ContentTypeRegistryTests( unittest.TestCase ):
 
     def test_lookup( self ):
         reg = ContentTypeRegistry()
+        reg.addPredicate( 'image', 'major_minor' )
+        reg.getPredicate( 'image' ).edit( 'image', '' )
         reg.addPredicate( 'onlyfoo', 'name_regex' )
         reg.getPredicate( 'onlyfoo' ).edit( 'foo' )
         reg.assignTypeName( 'onlyfoo', 'Foo' )
         assert reg.findTypeName( 'foo', 'text/plain', 'asdfljksadf' ) == 'Foo'
         assert not reg.findTypeName( 'fargo', 'text/plain', 'asdfljksadf' )
         assert not reg.findTypeName( 'bar', 'text/plain', 'asdfljksadf' )
+        assert reg.findTypeName( 'foo', '', '' ) == 'Foo'
+        assert reg.findTypeName( 'foo', None, None ) == 'Foo'
 
 def test_suite():
     suite = unittest.TestSuite()
