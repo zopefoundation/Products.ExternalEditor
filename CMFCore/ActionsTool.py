@@ -219,7 +219,7 @@ class ActionsTool(UniqueObject, OFS.Folder.Folder, ActionProviderBase):
                             'visible': d.get('visible', 1),
                             })
             if hasattr(base, 'listActions'):
-                a = object.listActions()
+                a = object.listActions(info)
                 if a:
                     actions.extend(list(a))
 
