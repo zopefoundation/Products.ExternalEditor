@@ -42,16 +42,41 @@
              cols="65">&dtml-Description;</textarea>
   </td>
  </tr>
+
  <tr valign="top">
-  <th align="right"> Subject
-  </th>
+  <th align="right"> Subject </th>
   <td>
-   <textarea name="subject:lines" rows="5"
-             cols="30"><dtml-in Subject><dtml-var sequence-item>
-</dtml-in></textarea>
+   <dtml-let contentSubject=Subject
+             allowedSubjects="portal_metadata.listAllowedSubjects( this() )"
+   >
+   <dtml-comment>
+       Comment out / delete this to enforce that Subject is drawn from
+       a controlled vocabulary.
+   </dtml-comment>
+     <textarea name="subject:lines" rows="3"
+               cols="20"><dtml-in Subject
+                ><dtml-let item=sequence-item
+                ><dtml-unless expr="item in allowedSubjects"
+                ><dtml-var sequence-item>
+                </dtml-unless></dtml-let></dtml-in></textarea>
+   <dtml-comment>
+       Comment out / delete this to ignore controlled vocabulary 
+       for Subject.
+   </dtml-comment>
+   <br>
+    <select name="subject:list" multiple>
+     <dtml-in allowedSubjects>
+     <dtml-let item=sequence-item
+               sel="item in contentSubject and 'selected' or ''"
+     >
+      <option value="&dtml-sequence-item;"
+              &dtml-sel;> &dtml-sequence-item; </option>
+     </dtml-let>
+     </dtml-in>
+    </select>
+   </dtml-let>
   </td>
-  <th align="right"> Contributors
-  </th>
+  <th align="right"> Contributors </th>
   <td>
    <textarea name="contributors:lines" rows="5"
              cols="30"><dtml-in Contributors><dtml-var sequence-item>

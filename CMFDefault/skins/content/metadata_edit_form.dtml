@@ -13,50 +13,86 @@
 
 <form action="metadata_edit" method="post">
 <table class="FormLayout">
+
  <tr valign="top">
-  <th align="right"> Identifier
-  </th>
-  <td>
-   <dtml-var Identifier>
-  </td>
+
+  <th align="right"> Identifier </th>
+  <td> <dtml-var Identifier> </td>
+
   <td colspan="2" align="right">
    <a href="full_metadata_edit_form"> Edit all metadata </a>
   </td>
+
  </tr>
+
  <tr valign="top">
-  <th align="right"> Title
-  </th>
+
+  <th align="right"> Title </th>
   <td colspan="3">
    <input type="text"
           name="title"
           value="&dtml-Title;"
           size="65">
   </td>
+
  </tr>
+
  <tr valign="top">
-  <th align="right"> Description
-  </th>
+
+  <th align="right"> Description </th>
   <td colspan="3">
    <textarea name="description:text" rows="5"
              cols="65">&dtml-Description;</textarea>
   </td>
+
  </tr>
+
  <tr valign="top">
-  <th align="right"> Subject
-  </th>
+
+  <th align="right"> Subject </th>
   <td>
-   <textarea name="subject:lines" rows="5"
-             cols="30"><dtml-in Subject><dtml-var sequence-item>
-</dtml-in></textarea>
+   <dtml-let contentSubject=Subject
+             allowedSubjects="portal_metadata.listAllowedSubjects( this() )"
+   >
+   <dtml-comment>
+       Comment out / delete this to enforce that Subject is drawn from
+       a controlled vocabulary.
+   </dtml-comment>
+     <textarea name="subject:lines" rows="3"
+               cols="20"><dtml-in Subject
+                ><dtml-let item=sequence-item
+                ><dtml-unless expr="item in allowedSubjects"
+                ><dtml-var sequence-item>
+                </dtml-unless></dtml-let></dtml-in></textarea>
+   <dtml-comment>
+       Comment out / delete this to ignore controlled vocabulary 
+       for Subject.
+   </dtml-comment>
+   <br>
+    <select name="subject:list" multiple>
+     <dtml-in allowedSubjects>
+     <dtml-let item=sequence-item
+               sel="item in contentSubject and 'selected' or ''"
+     >
+      <option value="&dtml-sequence-item;"
+              &dtml-sel;> &dtml-sequence-item; </option>
+     </dtml-let>
+     </dtml-in>
+    </select>
+   </dtml-let>
   </td>
-  <th align="right"> Format
-  </th>
+
+  <th align="right"> Format </th>
   <td> <input type="text" name="format" value="&dtml-Format;">
+  <br> <input type="submit" name="change" value=" Change ">
   <br> <input type="submit" name="change_and_edit" value=" Change & Edit ">
   <br> <input type="submit" name="change_and_view" value=" Change & View ">
   </td>
+
  </tr>
+
 </table>
+
 </form>
 
 </div>
