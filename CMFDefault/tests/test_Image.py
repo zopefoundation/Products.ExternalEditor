@@ -17,11 +17,24 @@ $Id$
 
 from unittest import TestCase, TestSuite, makeSuite, main
 import Testing
-import Zope
-Zope.startup()
+try:
+    import Zope2
+except ImportError:
+    # BBB: for Zope 2.7
+    import Zope as Zope2
+Zope2.startup()
 
 from os.path import join as path_join
 from cStringIO import StringIO
+
+from AccessControl.SecurityManagement import newSecurityManager
+from AccessControl.SecurityManagement import noSecurityManager
+from AccessControl.User import UnrestrictedUser
+try:
+    import transaction
+except ImportError:
+    # BBB: for Zope 2.7
+    from Products.CMFCore.utils import transaction
 
 from Products.CMFCore.tests.base.dummy import DummySite
 from Products.CMFCore.tests.base.dummy import DummyTool
@@ -29,9 +42,6 @@ from Products.CMFCore.tests.base.testcase import RequestTest
 from Products.CMFDefault import tests
 from Products.CMFDefault.File import File
 from Products.CMFDefault.Image import Image
-from AccessControl.SecurityManagement import newSecurityManager
-from AccessControl.SecurityManagement import noSecurityManager
-from AccessControl.User import UnrestrictedUser
 
 TESTS_HOME = tests.__path__[0]
 TEST_JPG = path_join(TESTS_HOME, 'TestImage.jpg')
@@ -99,7 +109,7 @@ class TestImageCopyPaste(RequestTest):
             self.site.invokeFactory('Folder', id='subfolder')
             self.subfolder = self.site.subfolder
             self.workflow = self.site.portal_workflow
-            get_transaction().commit(1) # Make sure we have _p_jars
+            transaction.commit(1) # Make sure we have _p_jars
         except:
             self.tearDown()
             raise

@@ -17,8 +17,12 @@ $Id$
 
 import unittest
 import Testing
-import Zope
-Zope.startup()
+try:
+    import Zope2
+except ImportError:
+    # BBB: for Zope 2.7
+    import Zope as Zope2
+Zope2.startup()
 
 import locale
 
@@ -29,6 +33,11 @@ from DateTime import DateTime
 from Products.TemporaryFolder.TemporaryFolder import MountedTemporaryFolder
 from Products.Transience.Transience import TransientObjectContainer
 from Testing.makerequest import makerequest
+try:
+    import transaction
+except ImportError:
+    # BBB: for Zope 2.7
+    from Products.CMFCore.utils import transaction
 
 
 class CalendarTests(unittest.TestCase):
@@ -74,9 +83,9 @@ class CalendarTests(unittest.TestCase):
 class CalendarRequestTests(unittest.TestCase):
 
     def setUp(self):
-        get_transaction().begin()
+        transaction.begin()
 
-        app = self.app = makerequest(Zope.app())
+        app = self.app = makerequest(Zope2.app())
         # Log in as a god :-)
         newSecurityManager( None, UnrestrictedUser('god', 'god', ['Manager'], '') )
 
@@ -98,7 +107,7 @@ class CalendarRequestTests(unittest.TestCase):
 
     def tearDown(self):
         noSecurityManager()
-        get_transaction().abort()
+        transaction.abort()
         self.app._p_jar.close()
 
     def _testURL(self,url,params=None):

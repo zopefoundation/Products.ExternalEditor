@@ -15,29 +15,34 @@
 $Id$
 """
 
-from Globals import DTMLFile
-from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
 from AccessControl import getSecurityManager
 from Acquisition import aq_base
 from DocumentTemplate.DT_Util import html_quote
+from Globals import DTMLFile
+from Globals import InitializeClass
 from StructuredText.StructuredText import HTML
+try:
+    import transaction
+except ImportError:
+    # BBB: for Zope 2.7
+    from Products.CMFCore.utils import transaction
 
 from Products.CMFCore.PortalContent import PortalContent
-from Products.CMFCore.utils import keywordsplitter
 from Products.CMFCore.utils import contributorsplitter
+from Products.CMFCore.utils import keywordsplitter
 
 from DublinCore import DefaultDublinCoreImpl
 from exceptions import EditingConflict
 from exceptions import ResourceLockedError
-from permissions import View
 from permissions import ModifyPortalContent
-from utils import parseHeadersBody
-from utils import formatRFC822Headers
-from utils import SimpleHTMLParser
-from utils import bodyfinder
+from permissions import View
 from utils import _dtmldir
+from utils import bodyfinder
+from utils import formatRFC822Headers
 from utils import html_headcheck
+from utils import parseHeadersBody
+from utils import SimpleHTMLParser
 
 factory_type_information = (
   { 'id'             : 'Document'
@@ -370,11 +375,11 @@ class Document(PortalContent, DefaultDublinCoreImpl):
             # XXX Can we get an error msg through?  Should we be raising an
             #     exception, to be handled in the FTP mechanism?  Inquiring
             #     minds...
-            get_transaction().abort()
+            transaction.abort()
             RESPONSE.setStatus(450)
             return RESPONSE
         except ResourceLockedError, msg:
-            get_transaction().abort()
+            transaction.abort()
             RESPONSE.setStatus(423)
             return RESPONSE
 

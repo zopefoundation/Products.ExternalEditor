@@ -1,15 +1,42 @@
+##############################################################################
+#
+# Copyright (c) 2002 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE.
+#
+##############################################################################
+""" Unit tests for PortalContent module.
+
+$Id$
+"""
+
 from unittest import TestCase, TestSuite, makeSuite, main
 import Testing
-import Zope
-Zope.startup()
+try:
+    import Zope2
+except ImportError:
+    # BBB: for Zope 2.7
+    import Zope as Zope2
+Zope2.startup()
 from Interface.Verify import verifyClass
 
-from Acquisition import aq_base
-from Products.CMFCore.tests.base.testcase import RequestTest
 from AccessControl.SecurityManagement import newSecurityManager
 from AccessControl.SecurityManagement import noSecurityManager
 from AccessControl.User import UnrestrictedUser
+from Acquisition import aq_base
+try:
+    import transaction
+except ImportError:
+    # BBB: for Zope 2.7
+    from Products.CMFCore.utils import transaction
+
 from Products.CMFCore.PortalContent import PortalContent
+from Products.CMFCore.tests.base.testcase import RequestTest
 from Products.CMFDefault.Portal import PortalGenerator
 
 
@@ -36,7 +63,7 @@ class TestContentCopyPaste(RequestTest):
             site_generator = PortalGenerator()
             site_generator.create(self.root, 'cmf', 1)
             self.site = self.root.cmf
-            get_transaction().commit(1) # Make sure we have _p_jars
+            transaction.commit(1) # Make sure we have _p_jars
         except:
             self.tearDown()
             raise
@@ -80,8 +107,8 @@ class TestContentCopyPaste(RequestTest):
 
 def test_suite():
     return TestSuite((
-        makeSuite( PortalContentTests ),
-        makeSuite( TestContentCopyPaste),
+        makeSuite(PortalContentTests),
+        makeSuite(TestContentCopyPaste),
         ))
 
 if __name__ == '__main__':

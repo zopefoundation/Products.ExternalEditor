@@ -15,25 +15,30 @@
 $Id$
 """
 
+from AccessControl import ClassSecurityInfo
 from DateTime import DateTime
 from Globals import InitializeClass
-from AccessControl import ClassSecurityInfo
+try:
+    import transaction
+except ImportError:
+    # BBB: for Zope 2.7
+    from Products.CMFCore.utils import transaction
 from webdav.Lockable import ResourceLockedError
 
 from Products.CMFCore.PortalContent import PortalContent
-from Products.CMFCore.utils import keywordsplitter
 from Products.CMFCore.utils import contributorsplitter
+from Products.CMFCore.utils import keywordsplitter
 
 from Products.CMFDefault.DublinCore import DefaultDublinCoreImpl
+from Products.CMFDefault.utils import bodyfinder
 from Products.CMFDefault.utils import formatRFC822Headers
 from Products.CMFDefault.utils import html_headcheck
-from Products.CMFDefault.utils import SimpleHTMLParser
-from Products.CMFDefault.utils import bodyfinder
 from Products.CMFDefault.utils import parseHeadersBody
+from Products.CMFDefault.utils import SimpleHTMLParser
 
-from permissions import View
-from permissions import ModifyPortalContent
 from permissions import ChangeEvents
+from permissions import ModifyPortalContent
+from permissions import View
 
 # Factory type information -- makes Events objects play nicely
 # with the Types Tool (portal_types)
@@ -405,7 +410,7 @@ class Event(PortalContent, DefaultDublinCoreImpl):
              )
 
         except ResourceLockedError, msg:
-            get_transaction().abort()
+            transaction.abort()
             RESPONSE.setStatus(423)
             return RESPONSE
 

@@ -19,10 +19,9 @@ from AccessControl.SecurityManager import setSecurityPolicy
 from Testing.makerequest import makerequest
 try:
     import transaction
-    has_transaction = True
 except ImportError:
     # BBB: for Zope 2.7
-    has_transaction = False
+    from Products.CMFCore.utils import transaction
 
 from dummy import DummyFolder
 from security import AnonymousUser
@@ -32,20 +31,12 @@ from security import PermissiveSecurityPolicy
 class TransactionalTest( TestCase ):
 
     def setUp( self ):
-        if has_transaction:
-            transaction.begin()
-        else:
-            # BBB: for Zope 2.7
-            get_transaction().begin()
+        transaction.begin()
         self.connection = Zope2.DB.open()
         self.root =  self.connection.root()[ 'Application' ]
 
     def tearDown( self ):
-        if has_transaction:
-            transaction.abort()
-        else:
-            # BBB: for Zope 2.7
-            get_transaction().abort()
+        transaction.abort()
         self.connection.close()
 
 
@@ -61,11 +52,7 @@ class RequestTest( TransactionalTest ):
 class SecurityTest( TestCase ):
 
     def setUp(self):
-        if has_transaction:
-            transaction.begin()
-        else:
-            # BBB: for Zope 2.7
-            get_transaction().begin()
+        transaction.begin()
         self._policy = PermissiveSecurityPolicy()
         self._oldPolicy = setSecurityPolicy(self._policy)
         self.connection = Zope2.DB.open()
@@ -73,11 +60,7 @@ class SecurityTest( TestCase ):
         newSecurityManager( None, AnonymousUser().__of__( self.root ) )
 
     def tearDown( self ):
-        if has_transaction:
-            transaction.abort()
-        else:
-            # BBB: for Zope 2.7
-            get_transaction().abort()
+        transaction.abort()
         self.connection.close()
         noSecurityManager()
         setSecurityPolicy(self._oldPolicy)

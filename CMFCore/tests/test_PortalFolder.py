@@ -17,8 +17,12 @@ $Id$
 
 from unittest import TestCase, TestSuite, makeSuite, main
 import Testing
-import Zope
-Zope.startup()
+try:
+    import Zope2
+except ImportError:
+    # BBB: for Zope 2.7
+    import Zope as Zope2
+Zope2.startup()
 from Interface.Verify import verifyClass
 
 import cStringIO
@@ -32,6 +36,11 @@ from OFS.Application import Application
 from OFS.Image import manage_addFile
 from OFS.tests.testCopySupport import makeConnection
 from Testing.makerequest import makerequest
+try:
+    import transaction
+except ImportError:
+    # BBB: for Zope 2.7
+    from Products.CMFCore.utils import transaction
 
 from Products.CMFCore.CatalogTool import CatalogTool
 from Products.CMFCore.exceptions import BadRequest
@@ -409,7 +418,7 @@ class PortalFolderMoveTests(SecurityTest):
         self.failUnless( has_path(ctool._catalog,
                                   '/bar/site/folder/sub/foo') )
 
-        get_transaction().commit(1)
+        transaction.commit(1)
         folder.manage_renameObject(id='sub', new_id='new_sub')
         self.assertEqual( len(ctool), 1 )
         self.failUnless( 'foo' in ctool.uniqueValuesFor('getId') )
@@ -428,7 +437,7 @@ class PortalFolderMoveTests(SecurityTest):
         sub2.all_meta_types.extend( sub2.all_meta_types )
         sub2.all_meta_types.extend( extra_meta_types() )
 
-        get_transaction().commit(1)
+        transaction.commit(1)
         cookie = folder.manage_cutObjects(ids=['bar'])
         sub2.manage_pasteObjects(cookie)
 
@@ -478,7 +487,7 @@ class PortalFolderMoveTests(SecurityTest):
         self.failUnless( has_path(ctool._catalog, '/bar/site/sub2/dummy') )
         self.failIf( has_path(ctool._catalog, '/bar/site/sub3/dummy') )
 
-        get_transaction().commit(1)
+        transaction.commit(1)
         cookie = sub1.manage_cutObjects( ids = ('dummy',) )
         # Waaa! force sub2 to allow paste of Dummy object.
         sub3.all_meta_types = []
@@ -833,18 +842,16 @@ class PortalFolderCopySupportTests( TestCase ):
             # Hack, we need a _p_mtime for the file, so we make sure that it
             # has one. We use a subtransaction, which means we can rollback
             # later and pretend we didn't touch the ZODB.
-            get_transaction().commit()
+            transaction.commit(1)
         except:
             self.connection.close()
             raise
-        get_transaction().begin()
 
         return self.app._getOb( 'folder1' ), self.app._getOb( 'folder2' )
 
     def _cleanApp( self ):
 
-        get_transaction().abort()
-        self.app._p_jar.sync()
+        transaction.abort()
         self.connection.close()
         del self.app
         del self.responseOut
@@ -1061,7 +1068,7 @@ class PortalFolderCopySupportTests( TestCase ):
         folder1.manage_permission( DeleteObjects, roles=(), acquire=0 )
 
         folder1._setObject( 'sub', PortalFolder( 'sub' ) )
-        get_transaction().commit() # get a _p_jar for 'sub'
+        transaction.commit(1) # get a _p_jar for 'sub'
 
         FOLDER_CTOR = 'manage_addProducts/CMFCore/manage_addPortalFolder'
         folder2.all_meta_types = ( { 'name'        : 'CMF Core Content'

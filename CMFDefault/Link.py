@@ -17,20 +17,26 @@ $Id$
 
 import urlparse
 
-from Globals import InitializeClass, DTMLFile
 from AccessControl import ClassSecurityInfo
+from Globals import DTMLFile
+from Globals import InitializeClass
+try:
+    import transaction
+except ImportError:
+    # BBB: for Zope 2.7
+    from Products.CMFCore.utils import transaction
 from webdav.Lockable import ResourceLockedError
 
 from Products.CMFCore.PortalContent import PortalContent
-from Products.CMFCore.utils import keywordsplitter
 from Products.CMFCore.utils import contributorsplitter
+from Products.CMFCore.utils import keywordsplitter
 
 from DublinCore import DefaultDublinCoreImpl
-from permissions import View
 from permissions import ModifyPortalContent
+from permissions import View
+from utils import _dtmldir
 from utils import formatRFC822Headers
 from utils import parseHeadersBody
-from utils import _dtmldir
 
 factory_type_information = (
   { 'id'             : 'Link'
@@ -206,7 +212,7 @@ class Link( PortalContent
             RESPONSE.setStatus(204)
             return RESPONSE
         except ResourceLockedError, msg:
-            get_transaction().abort()
+            transaction.abort()
             RESPONSE.setStatus(423)
             return RESPONSE
 
@@ -223,10 +229,8 @@ class Link( PortalContent
 
     security.declareProtected(View, 'get_size')
     def get_size( self ):
-        """
-            Used for FTP and apparently the ZMI now too 
+        """ Used for FTP and apparently the ZMI now too.
         """
         return len(self.manage_FTPget())
 
 InitializeClass( Link )
-

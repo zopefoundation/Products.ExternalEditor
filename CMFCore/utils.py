@@ -25,11 +25,11 @@ from AccessControl import ModuleSecurityInfo
 from AccessControl.Permission import Permission
 from AccessControl.PermissionRole import rolesForPermissionOn
 from AccessControl.Role import gather_permissions
-from Acquisition import Implicit
 from Acquisition import aq_base
 from Acquisition import aq_get
 from Acquisition import aq_inner
 from Acquisition import aq_parent
+from Acquisition import Implicit
 from ExtensionClass import Base
 from Globals import HTMLFile
 from Globals import ImageFile
@@ -380,10 +380,10 @@ class ToolInit:
             )
 
         if self.icon:
-            icon = os_path.split(self.icon)[1]            
+            icon = os_path.split(self.icon)[1]
         else:
             icon = None
-        
+
         for tool in self.tools:
             tool.__factory_meta_type__ = self.meta_type
             tool.icon = 'misc_/%s/%s' % (self.product_name, icon)
@@ -637,9 +637,24 @@ def minimalpath(p):
             break
     return p.replace('\\','/')
 
+
 class SimpleRecord:
     """ record-like class """
 
     def __init__(self, **kw):
         self.__dict__.update(kw)
 
+
+# BBB: for Zope 2.7
+class BBBTransaction:
+
+    def begin(self):
+        get_transaction().begin()
+
+    def commit(self, sub=False):
+        get_transaction().commit(sub)
+
+    def abort(self, sub=False):
+        get_transaction().abort(sub)
+
+transaction = BBBTransaction()
