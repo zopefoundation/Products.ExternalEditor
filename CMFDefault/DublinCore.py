@@ -25,6 +25,7 @@ from Globals import InitializeClass, DTMLFile
 from AccessControl import ClassSecurityInfo
 from Products.CMFCore.CMFCorePermissions import ModifyPortalContent
 
+_marker=[]
 
 class DefaultDublinCoreImpl( PropertyManager ):
     """
@@ -370,28 +371,37 @@ class DefaultDublinCoreImpl( PropertyManager ):
 
     security.declarePrivate( '_editMetadata' )
     def _editMetadata( self
-                     , title=''
-                     , subject=()
-                     , description=''
-                     , contributors=()
-                     , effective_date=None
-                     , expiration_date=None
-                     , format='text/html'
-                     , language='en-US'
-                     , rights=''
+                     , title=_marker
+                     , subject=_marker
+                     , description=_marker
+                     , contributors=_marker
+                     , effective_date=_marker
+                     , expiration_date=_marker
+                     , format=_marker
+                     , language=_marker
+                     , rights=_marker
                      ):
         """
             Update the editable metadata for this resource.
         """
-        self.setTitle( title )
-        self.setSubject( subject )
-        self.setDescription( description )
-        self.setContributors( contributors )
-        self.setEffectiveDate( effective_date )
-        self.setExpirationDate( expiration_date )
-        self.setFormat( format )
-        self.setLanguage( language )
-        self.setRights( rights )
+        if title is not _marker:
+            self.setTitle( title )
+        if subject is not _marker:
+            self.setSubject( subject )
+        if description is not _marker:
+            self.setDescription( description )
+        if contributors is not _marker:
+            self.setContributors( contributors )
+        if effective_date is not _marker:
+            self.setEffectiveDate( effective_date )
+        if expiration_date is not _marker:
+            self.setExpirationDate( expiration_date )
+        if format is not _marker:
+            self.setFormat( format )
+        if language is not _marker:
+            self.setLanguage( language )
+        if rights is not _marker:
+            self.setRights( rights )
 
     security.declareProtected(ModifyPortalContent, 'manage_metadata')
     manage_metadata = DTMLFile( 'zmi_metadata', _dtmldir )
