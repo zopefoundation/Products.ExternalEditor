@@ -221,10 +221,10 @@ def migrate(self, src_path='', dest_path=''):
     if not src_path or not dest_path:
         return '''
         <html><body><form action="%s" method="POST">
-        <p>Migrate PTK content to CMF site</p>
-        <p>Path (not including "http://") to PTK instance (source):
+        <h2>Migrate PTK content to CMF site</h2>
+        <p>Path (not including server URL) to PTK instance (source):
         <input type="text" name="src_path"></p>
-        <p>Path (not including "http://") to CMF site (destination):
+        <p>Path (not including server URL) to CMF site (destination):
         <input type="text" name="dest_path"></p>
         <input type="submit" name="submit" value="Migrate">
         </form></body></html>
