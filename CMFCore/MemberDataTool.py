@@ -188,7 +188,11 @@ class CleanupTemp:
     def __init__(self, tool):
         self._tool = tool
     def __del__(self):
-        del self._tool._v_temps
+        try:
+            del self._tool._v_temps
+        except AttributeError:
+            # The object has already been deactivated.
+            pass
 
 
 class MemberData (SimpleItem):
