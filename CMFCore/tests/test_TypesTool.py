@@ -97,18 +97,18 @@ class TypesToolTests(SecurityTest):
                       'Unauthorized raised' )
 
     def test_CMFCollector_49(self):
-        """http://www.zope.org/Collectors/CMF/49
+        #http://www.zope.org/Collectors/CMF/49
 
-        If you have two FTIs on the file system, both with the same meta_type
-        but with different id values, the way listDefaultTypeInformation 
-        listed them in the dropdown list made it impossible to distinguish
-        the two because the identifier string only contained the CMF package
-        name and the meta_type
-        """
-        import copy
+        #If you have two FTIs on the file system, both with the same meta_type
+        #but with different id values, the way listDefaultTypeInformation 
+        #listed them in the dropdown list made it impossible to distinguish
+        #the two because the identifier string only contained the CMF package
+        #name and the meta_type
+
         # Extreme nastiness: Fake out a /Control_Panel/Products registry
         # inside the fake site by putting dummy objects with a
         # factory_type_information attribute on them...
+        import copy
         fti1 = copy.deepcopy(FTIDATA_DUMMY)
         fti2 = copy.deepcopy(FTIDATA_DUMMY)
         fti2[0]['id'] = 'Other Content'
