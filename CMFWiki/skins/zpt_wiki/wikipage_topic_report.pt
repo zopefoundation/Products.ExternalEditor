@@ -1,0 +1,106 @@
+<html xmlns:tal="http://xml.zope.org/namespaces/tal"
+       xmlns:metal="http://xml.zope.org/namespaces/metal"
+       metal:use-macro="here/main_template/macros/master">
+<body>
+<div metal:fill-slot="header"
+     tal:define="global wiki_header_present python:1">
+  <div tal:replace="structure here/wikipage_header">
+  </div>
+</div>
+
+<div metal:fill-slot="main">
+
+  <div class="Desktop"
+       tal:define="nesting python: here.offspring(raw=1)">
+
+    <div tal:condition="not: wiki_header_present|nothing">
+      <span tal:condition="nothing">
+        In case master has no "header" macro. </span>
+      <div tal:replace="structure here/wikipage_header"> </div>
+    </div>
+
+    <table border="3">
+      <tr>
+        <td>
+          <p>
+            This page presents a consolidated view of the current page and
+            all its offspring.  You can get here from the
+            <a href="TOC PAGE"
+               tal:attributes="href string:${here/absolute_url}/wikipage_toc">
+              Wiki-Wide Table-of-Contents View
+            </a>.
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td NOWRAP>
+          <span tal:repeat="entry nesting">
+            <span tal:replace="structure python: entry[1] * '&nbsp;' * 4">
+              SPACING
+            </span>
+            <a href="REPORT ANCHOR LINK"
+               name="TOC ANCHOR"
+               tal:attributes="href python: '#%s_entry' % entry[0];
+                               name python: '%s_toc' % entry[0]"
+               tal:content="python: entry[0]">
+              ENTRY NAME
+            </a>
+            <span tal:condition="python: entry[2]"> ... </span>
+            <br>
+          </span>
+        </td>
+      </tr>
+      
+      <tr tal:repeat="entry nesting">
+        <td tal:define="thepage python: here.aq_parent[entry[0]]">
+
+          <table border="0" width="100%">
+
+            <tr>
+              <td bgcolor="#ccffcc">
+                <table width="100%">
+                  <tr>
+                    <th align="left">
+                      <font size="+1">
+                        <a href="ACTUAL PAGE URL"
+                           name="ANCHOR NAME"
+                           tal:attributes="href thepage/absolute_url;
+                                           name python: '%s_entry' % entry[0]"
+                           tal:content="python: entry[0]">
+                          THE PAGE
+                        </a>
+                      </font>
+                    </th>
+                    <td align="right">
+                      <a href="TABLE OF CONTENTS ENTRY"
+                         tal:attributes="href python: '#%s_toc' % entry[0]">
+                        Return to Report Table-of-Contents
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+
+                <span tal:replace="structure python:
+                                             thepage.render()">
+                  THE PAGE
+                </span>
+              </td>
+            </tr>
+
+          </table>
+
+        </td>
+      </tr>
+
+    </table>
+
+  </div> <!-- Desktop -->
+
+</div> <!-- main -->
+
+</html>
