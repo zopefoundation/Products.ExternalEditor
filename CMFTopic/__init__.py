@@ -103,8 +103,6 @@ this_module = sys.modules[ __name__ ]
 for base in bases:
     createZClassForBase( base, this_module )
 
-TOPIC_CTOR_FORM = ( 'manage_addPortalTopicForm', Topic.addTopicForm )
-
 
 # Make the skins available as DirectoryViews
 registerDirectory('skins/topic', globals())
