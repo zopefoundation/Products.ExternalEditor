@@ -1,5 +1,5 @@
 <dtml-var standard_html_header>
-<dtml-let callresults="FrontPage.map()"
+<dtml-let callresults="map()"
           nesting="callresults[0]"
           singletons="callresults[1]">
 <h3><i>&dtml-getId;</i> Contents</h3>

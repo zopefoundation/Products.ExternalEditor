@@ -13,8 +13,8 @@
   <tr>
     <td> <small>
       <dtml-var id size=25> page of <dtml-with aq_parent><dtml-var id size=20>
-      CMFWikiWeb</dtml-with>
-      (<a href="&dtml-wiki_base_url;/get_wiki_toc#&dtml-id;">Table of Contents</a>)
+      </dtml-with>
+      (<a href="&dtml-wiki_page_url;/get_wiki_toc#&dtml-id;">Table of Contents</a>)
          </small>
     </td>
     <td align="right">

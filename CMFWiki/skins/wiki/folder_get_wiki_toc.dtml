@@ -1,0 +1,2 @@
+<dtml-var "RESPONSE.redirect(this().absolute_url() +
+                             '/FrontPage/get_wiki_toc')">
