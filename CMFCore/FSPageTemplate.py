@@ -10,8 +10,10 @@
 # FOR A PARTICULAR PURPOSE
 # 
 ##########################################################################
-"""Customizable page templates that come from the filesystem."""
-__version__='$Revision$'[11:-2]
+"""Customizable page templates that come from the filesystem.
+
+$Id$
+"""
 
 from string import split, replace
 from os import stat
@@ -147,47 +149,22 @@ class FSPageTemplate(FSObject, Script, PageTemplate):
             else:
                 raise
                 
+    security.declarePrivate( '_ZPT_exec' )
+    _ZPT_exec = ZopePageTemplate._exec
+
+    security.declarePrivate( '_exec' )
     def _exec(self, bound_names, args, kw):
         """Call a FSPageTemplate"""
-        if not kw.has_key('args'):
-            kw['args'] = args
-        bound_names['options'] = kw
-
         try:
             response = self.REQUEST.RESPONSE
         except AttributeError:
             response = None
-
-        security=getSecurityManager()
-        bound_names['user'] = security.getUser()
-
-        # Retrieve the value from the cache.
-        keyset = None
-        if self.ZCacheable_isCachingEnabled():
-            # Prepare a cache key.
-            keyset = {'here': self._getContext(),
-                      'bound_names': bound_names}
-            result = self.ZCacheable_get(keywords=keyset)
-            if result is not None:
-                # Got a cached value.
-                if response is not None:
-                    response.setHeader('content-type',self.content_type)
-                return result
-                
-        # Execute the template in a new security context.
-        security.addContext(self)
-        try:
-            result = self.pt_render(extra_context=bound_names)
-            if response is not None:
-                # content_type may not have been cooked until now
-                response.setHeader('content-type',self.content_type)
-            if keyset is not None:
-                # Store the result in the cache.
-                self.ZCacheable_set(result, keywords=keyset)
-            return result
-        finally:
-            security.removeContext(self)
-                        
+        # call "inherited"
+        result = self._ZPT_exec( bound_names, args, kw )
+        if response is not None:
+            response.setHeader( 'content-type', self.content_type )
+        return result
+ 
     # Copy over more methods
     security.declareProtected(FTPAccess, 'manage_FTPget')
     security.declareProtected(View, 'get_size')
