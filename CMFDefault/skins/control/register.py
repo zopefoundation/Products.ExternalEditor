@@ -5,7 +5,6 @@
 REQUEST=context.REQUEST
 portal_properties = context.portal_properties
 portal_registration = context.portal_registration
-join_form=context.join_form
 
 if not portal_properties.validate_email:
   failMessage = portal_registration.testPasswordValidity(password, confirm)
@@ -19,4 +18,4 @@ else:
     portal_registration.addMember(REQUEST['username'], password, properties=REQUEST)
     if portal_properties.validate_email or REQUEST.get('mail_me', 0):
         portal_registration.registeredNotify(REQUEST['username'])
-    return REQUEST.RESPONSE.redirect(context.absolute_url() + '/registered')
+    return context.registered(context,REQUEST)
