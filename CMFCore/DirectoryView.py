@@ -179,10 +179,15 @@ class DirectoryInformation:
                     registry.registerDirectoryByPath(entry_filepath)
                     info = registry.getDirectoryInfo(entry_minimal_fp)
                 if info is not None:
-                    mt = types.get(entry)
-                    t = None
-                    if mt is not None:
-                        t = registry.getTypeByMetaType(mt)
+                    # Folders on the file system have no extension or 
+                    # meta_type, as a crutch to enable customizing what gets
+                    # created to represent a filesystem folder in a 
+                    # DirectoryView we use a fake type "FOLDER". That way
+                    # other implementations can register for that type and
+                    # circumvent the hardcoded assumption that all filesystem
+                    # directories will turn into DirectoryViews.
+                    mt = types.get(entry) or 'FOLDER'
+                    t = registry.getTypeByMetaType(mt)
                     if t is None:
                         t = DirectoryView
                     ob = t(entry, entry_minimal_fp)

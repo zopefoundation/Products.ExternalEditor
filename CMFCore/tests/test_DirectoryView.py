@@ -13,6 +13,16 @@ from Products.CMFCore.tests.base.dummy import DummyFolder
 from Products.CMFCore.tests.base.testcase import _prefix
 from Products.CMFCore.tests.base.testcase import FSDVTest
 
+from Products.CMFCore.DirectoryView import DirectoryView
+
+
+class DummyDirectoryView(DirectoryView):
+    def __of__(self, parent):
+        return DummyDirectoryViewSurrogate()
+
+class DummyDirectoryViewSurrogate:
+    pass
+
 
 class DirectoryViewPathTests( TestCase ):
     """
@@ -148,6 +158,43 @@ class DirectoryViewTests( FSDVTest ):
         # Test that the .test1.py is ignored
         assert('#test1' not in self.ob.fake_skin.objectIds())
 
+
+class DirectoryViewFolderTests(FSDVTest):
+
+    def setUp(self):
+        FSDVTest.setUp(self)
+        self._registerDirectory(self)
+
+    def tearDown(self):
+        from Products.CMFCore import DirectoryView
+        # This is nasty, but there is no way to unregister anything
+        # right now...
+        metatype_registry = DirectoryView._dirreg._meta_types
+        if 'FOLDER' in metatype_registry.keys():
+            del metatype_registry['FOLDER']
+        FSDVTest.tearDown(self)
+
+    def test_DirectoryViewFolderDefault(self):
+        # Test that a folder inside the fake skin really is of type
+        # DirectoryViewSurrogate
+        from Products.CMFCore.DirectoryView import DirectoryViewSurrogate
+        testfolder = self.ob.fake_skin.test_directory
+        self.failUnless(isinstance(testfolder, DirectoryViewSurrogate))
+
+    def test_DirectoryViewFolderCustom(self):
+        # Now we register a different class under the fake meta_type
+        # "FOLDER" and test again...
+        from Products.CMFCore.DirectoryView import registerMetaType
+        registerMetaType('FOLDER', DummyDirectoryView)
+
+        # In order to regenerate the FSDV data we need to remove and
+        # register again, that way the newly registered meta_type is used
+        self.ob._delObject('fake_skin')
+        self._registerDirectory(self)
+        testfolder = self.ob.fake_skin.test_directory
+        self.failUnless(isinstance(testfolder, DummyDirectoryViewSurrogate))
+
+
 if DevelopmentMode:
 
   class DebugModeTests( FSDVTest ):
@@ -223,6 +270,7 @@ def test_suite():
     return TestSuite((
         makeSuite(DirectoryViewPathTests),
         makeSuite(DirectoryViewTests),
+        makeSuite(DirectoryViewFolderTests),
         makeSuite(DebugModeTests),
         ))
 
