@@ -1,17 +1,25 @@
+<dtml-var standard_html_header>
+
 <dtml-let homeFolder="portal_membership.getHomeFolder()">
 
   <dtml-if expr="not _.hasattr(homeFolder, 'Favorites')">
-    <dtml-call expr="homeFolder.manage_addPortalFolder(id='Favorites', title='Favorites')">
+    <dtml-call expr="homeFolder.manage_addPortalFolder( id='Favorites'
+                                                      , title='Favorites')">
   </dtml-if>
 
-  <dtml-let targetFolder="_.getattr(homeFolder, 'Favorites')"
-                  new_id="'fav_' + _.str(_.int(ZopeTime()))"
-                 favPath="favorite[_.len(SERVER_URL):]"
-                  favObj="restrictedTraverse(favPath)">
-    <dtml-call expr="targetFolder.invokeFactory('Favorite', id=new_id, title=favObj.title, remote_url=favPath)">
+  <dtml-let targetFolder="_.getattr( homeFolder, 'Favorites' )"
+            new_id="'fav_' + _.str( _.int( ZopeTime() ) )"
+            myPath="portal_url.getRelativeUrl( this() )"
+  >
+    <dtml-call expr="targetFolder.invokeFactory( 'Favorite'
+                                               , id=new_id
+                                               , title=Title()
+                                               , remote_url=myPath
+                                               )">
 
   </dtml-let>
 
-  <dtml-call expr="RESPONSE.redirect(favorite + '/view')">
+  <dtml-call expr="RESPONSE.redirect( absolute_url() + '/view')">
 </dtml-let>
 
+<dtml-var standard_html_footer>

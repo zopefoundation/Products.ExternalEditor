@@ -277,8 +277,7 @@ class ActionsTool (UniqueObject, SimpleItem):
                 home_url = pm.getHomeUrl()
                 actions.append({
                     'name': 'Add to Favorites',
-                    'url': (home_url + '/addtoFavorites?favorite=' +
-                            quote(content_url)),
+                    'url': ( content_url + '/addtoFavorites' ),
                     'permissions' : [],
                     'category': 'user',
                     })

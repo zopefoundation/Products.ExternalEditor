@@ -151,10 +151,14 @@ class DiscussionItem( Document
         content_item = container.aq_inner.aq_parent
         parent_rel_url = portal_url.getRelativeUrl(content_item)
 
+        fmt_string = '%s/%s/talkback/%s'
+
         if relative:
-            return parent_rel_url + '/talkback/' + str(self.id)
+            prefix = portal_url.getPortalPath()
         else:
-            return portal_url() + '/' + parent_rel_url + '/talkback/' + str(self.id)
+            prefix = portal_url()
+
+        return fmt_string % ( prefix, parent_rel_url, str( self.id ) )
 
     def getPhysicalPath(self):
         """
