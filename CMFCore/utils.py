@@ -85,21 +85,31 @@
 
 from ExtensionClass import Base
 from AccessControl import ClassSecurityInfo
-import Globals, Acquisition
+from AccessControl.Permission import Permission
+from AccessControl.Role import gather_permissions
+import Globals
+from Acquisition import aq_get
 try: from OFS.ObjectManager import UNIQUE
-except: UNIQUE = 2
+except ImportError: UNIQUE = 2
 
 # Tool for getting at Tools, meant to be modified as policies or Tool
 # implementations change without having to affect the consumer.
-_marker = 0
+
+_marker = []  # Create a new marker object.
+
 def getToolByName(obj, name, default=_marker):
     " Get the tool, 'toolname', by acquiring it. "
-    if default == _marker:
-        try: tool = getattr(obj, name)
-        except: raise AttributeError, name
+    try:
+        tool = aq_get(obj, name, default, 1)
+    except AttributeError:
+        if default is _marker:
+            raise
+        return default
     else:
-        tool = getattr(obj, name, default)
-    return tool
+        if tool is _marker:
+            raise AttributeError, name
+        return tool
+
 
 class ImmutableId (Base):
     def _setId(self, id):
@@ -156,7 +166,6 @@ def limitGrantedRoles(roles, context, special_roles=()):
         if role not in special_roles and role not in user_roles:
             raise 'Unauthorized', 'Too many roles specified.'
 
-
 def mergedLocalRoles(object):
     """Returns a merging of object and its ancestors'
     __ac_local_roles__."""
@@ -182,6 +191,43 @@ def mergedLocalRoles(object):
             continue
         break
     return merged
+
+def ac_inherited_permissions(ob, all=0):
+    # Get all permissions not defined in ourself that are inherited
+    # This will be a sequence of tuples with a name as the first item and
+    # an empty tuple as the second.
+    d = {}
+    perms = getattr(ob, '__ac_permissions__', ())
+    for p in perms: d[p[0]] = None
+    r = gather_permissions(ob.__class__, [], d)
+    if all:
+       if hasattr(ob, '_subobject_permissions'):
+           for p in ob._subobject_permissions():
+               pname=p[0]
+               if not d.has_key(pname):
+                   d[pname]=1
+                   r.append(p)
+       r = list(perms) + r
+    return r
+
+def modifyPermissionMappings(ob, map):
+    '''
+    Modifies multiple role to permission mappings.
+    '''
+    # This mimics what AccessControl/Role.py does.
+    # Needless to say, it's crude. :-(
+    map = map.copy()  # Safety.
+    for perm in ac_inherited_permissions(ob, 1):
+        name, value = perm[:2]
+        if map.has_key(name):
+            for (role, allow) in map[name].items():
+                p = Permission(name, value, ob)
+                p.setRole(role, allow)  # Will only modify if it should.
+            del map[name]
+    if map:
+        for name, (role, allow) in map.items():
+            p = Permission(name, (), ob)
+            p.setRole(role, allow)
 
 
 from Globals import HTMLFile
