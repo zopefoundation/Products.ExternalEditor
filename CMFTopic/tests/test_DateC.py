@@ -59,7 +59,9 @@ class FriendlyDateCriterionTests( unittest.TestCase ):
         friendly = FriendlyDateCriterion( 'foo', 'foofield' )
 
         d = friendly.defaultDateOptions()
-        self.assertEqual( d[1][0], 2 )
+        self.assertEqual( d[0][0], 0 )
+        self.assertEqual( d[1][0], 1 )
+        self.assertEqual( d[2][0], 2 )
 
     def test_Clear( self ):
 
