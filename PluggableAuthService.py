@@ -297,7 +297,8 @@ class PluggableAuthService( Folder ):
 
     security.declareProtected( SearchPrincipals, 'searchUsers')
     def searchUsers(self, **kw):
-        """ Search for users """
+        """ Search for users
+        """
         exact_match = kw.get( 'exact_match', False )
         search_id = kw.get( 'id', None )
         search_name = kw.get( 'name', None )
@@ -378,7 +379,8 @@ class PluggableAuthService( Folder ):
 
     security.declareProtected( SearchPrincipals, 'searchGroups')
     def searchGroups(self, **kw):
-        """ Search for groups """
+        """ Search for groups
+        """
         exact_match = kw.get( 'exact_match', False )
         search_id = kw.get( 'id', None )
         search_name = kw.get( 'name', None )
@@ -458,7 +460,8 @@ class PluggableAuthService( Folder ):
 
     security.declareProtected( SearchPrincipals, 'searchPrincipals')
     def searchPrincipals(self, groups_first=False, **kw):
-        """ Search for principals (users, groups, or both) """
+        """ Search for principals (users, groups, or both)
+        """
         exact_match = kw.get( 'exact_match', False )
         max_results = kw.get( 'max_results', '' )
 
@@ -568,7 +571,8 @@ class PluggableAuthService( Folder ):
 
     security.declareProtected(ManageUsers, 'resultsBatch')
     def resultsBatch(self, results, REQUEST, size=20, orphan=2, overlap=0):
-        """ ZMI helper for getting batching for displaying search results """
+        """ ZMI helper for getting batching for displaying search results
+        """
         try:
             start_val = REQUEST.get('batch_start', '0')
             start = int(start_val)
@@ -606,7 +610,8 @@ class PluggableAuthService( Folder ):
 
     security.declarePrivate('_getBatchLink')
     def _getBatchLink(self, qs, old_start, new_start):
-        """ Internal helper to generate correct query strings """
+        """ Internal helper to generate correct query strings
+        """
         if new_start is not None:
             if not qs:
                 qs = 'batch_start=%d' % new_start
@@ -1060,7 +1065,8 @@ class PluggableAuthService( Folder ):
 
     security.declarePublic('all_meta_types')
     def all_meta_types(self):
-        """ What objects can be put in here? """
+        """ What objects can be put in here?
+        """
         allowed_types = tuple(MultiPlugins)
 
         return [x for x in Products.meta_types if x['name'] in allowed_types]
@@ -1087,7 +1093,8 @@ class PluggableAuthService( Folder ):
             BeforeTraverse.registerBeforeTraverse(container, nc, handle)
 
     def __call__(self, container, req):
-        """ The __before_publishing_traverse__ hook. """
+        """ The __before_publishing_traverse__ hook. 
+        """
         resp = req['RESPONSE']
         resp.exception = self.exception
         resp._unauthorized = self._unauthorized
