@@ -1,37 +1,15 @@
 
-# A first attempt at getting all of the Permissions used in the CMFCore
-# into a single defined place.
+import Globals, AccessControl, Products
+from AccessControl import Permissions
 
 # General Zope permissions
-View = 'View'
-AccessContentsInformation = 'Access contents information'
-UndoChanges = 'Undo changes'
-ChangePermissions = 'Change permissions'
-ViewManagementScreens = 'View management screens'
-ManageProperties = 'Manage properties'
+View = Permissions.view
+AccessContentsInformation = Permissions.access_contents_information
+UndoChanges = Permissions.undo_changes
+ChangePermissions = Permissions.change_permissions
+ViewManagementScreens = Permissions.view_management_screens
+ManageProperties = Permissions.manage_properties
 
-# CMF Base Permissions
-AccessInactivePortalContent = 'Access inactive portal content'
-ModifyCookieCrumblers = 'Modify Cookie Crumblers'
-ReplyToItem = 'Reply to item'
-ManagePortal = 'Manage portal'
-ReviewPortalContent = 'Review portal content'
-ModifyPortalContent = 'Modify portal content'
-AddPortalFolders = 'Add portal folders'
-AddPortalContent = 'Add portal content'
-AddPortalMember = 'Add portal member'
-SetOwnPassword = 'Set own password'
-SetOwnProperties = 'Set own properties'
-MailForgottenPassword = 'Mail forgotten password'
-
-
-# Workflow Permissions
-RequestReview = 'Request review'
-ReviewPortalContent = 'Review portal content'
-AccessFuturePortalContent = 'Access future portal content'
-
-
-import Globals, AccessControl, Products
 
 def setDefaultRoles(permission, roles):
     '''
@@ -46,6 +24,58 @@ def setDefaultRoles(permission, roles):
         mangled = AccessControl.Permission.pname(permission)
         setattr(Globals.ApplicationDefaultPermissions, mangled, roles)
 
+# Note that we can only use the default Zope roles in calls to
+# setDefaultRoles().  The default Zope roles are:
+# Anonymous, Manager, and Owner.
 
+#
+# CMF Base Permissions
+#
+
+AccessInactivePortalContent = 'Access inactive portal content'
+setDefaultRoles(AccessInactivePortalContent, ('Manager',))
+
+ModifyCookieCrumblers = 'Modify Cookie Crumblers'
+setDefaultRoles(ModifyCookieCrumblers, ('Manager',))
+
+ReplyToItem = 'Reply to item'
+setDefaultRoles(ReplyToItem, ('Manager',))  # + Member
+
+ManagePortal = 'Manage portal'
 setDefaultRoles(ManagePortal, ('Manager',))
+
+ModifyPortalContent = 'Modify portal content'
 setDefaultRoles(ModifyPortalContent, ('Manager',))
+
+AddPortalFolders = 'Add portal folders'
+setDefaultRoles(AddPortalFolders, ('Owner','Manager'))  # + Member
+
+AddPortalContent = 'Add portal content'
+setDefaultRoles(AddPortalContent, ('Owner','Manager',))  # + Member
+
+AddPortalMember = 'Add portal member'
+setDefaultRoles(AddPortalMember, ('Anonymous', 'Manager',))
+
+SetOwnPassword = 'Set own password'
+setDefaultRoles(SetOwnPassword, ('Manager',))  # + Member
+
+SetOwnProperties = 'Set own properties'
+setDefaultRoles(SetOwnProperties, ('Manager',))  # + Member
+
+MailForgottenPassword = 'Mail forgotten password'
+setDefaultRoles(MailForgottenPassword, ('Anonymous', 'Manager',))
+
+
+#
+# Workflow Permissions
+#
+
+RequestReview = 'Request review'
+setDefaultRoles(RequestReview, ('Owner', 'Manager',))
+
+ReviewPortalContent = 'Review portal content'
+setDefaultRoles(ReviewPortalContent, ('Manager',))  # + Reviewer
+
+AccessFuturePortalContent = 'Access future portal content'
+setDefaultRoles(AccessFuturePortalContent, ('Manager',))  # + Reviewer
+
