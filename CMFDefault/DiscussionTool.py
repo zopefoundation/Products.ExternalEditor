@@ -100,14 +100,11 @@ class DiscussionTool( UniqueObject, SimpleItem, ActionProviderBase ):
         if not self.isDiscussionAllowedFor( content ):
             raise DiscussionNotAllowed
 
-        if IDiscussionResponse.isImplementedBy(content):
+        if not IDiscussionResponse.isImplementedBy(content) and \
+                getattr( aq_base(content), 'talkback', None ) is None:
             # Discussion Items use the DiscussionItemContainer object of the
-            # related content item, so talkback needs to be acquired
-            talkback = getattr(content, 'talkback')
-        else:
-            talkback = getattr( aq_base(content), 'talkback', None )
-            if talkback is None:
-                talkback = self._createDiscussionFor( content )
+            # related content item, so only create one for other content items
+            self._createDiscussionFor(content)
 
         return content.talkback # Return wrapped talkback
 
