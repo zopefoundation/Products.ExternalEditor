@@ -31,6 +31,23 @@ AUTO_MIGRATE_WORKFLOW_TOOLS = 1  # This will later be set to 0.
 
 _marker = []  # Create a new marker object.
 
+class WorkflowInformation:
+    """
+        Shim implementation of ActionInformation, to enable
+        querying actions without mediation of the 'portal_actions' tool.
+    """
+    def __init__(self, object):
+        self.content = object
+        self.content_url = object.absolute_url()
+        self.portal_url = self.folder_url = ''
+
+    def __getitem__(self, name):
+        if name[:1] == '_':
+            raise KeyError, name
+        if hasattr(self, name):
+            return getattr(self, name)
+        raise KeyError, name
+
 
 class WorkflowTool (UniqueObject, Folder):
     '''
@@ -345,6 +362,14 @@ class WorkflowTool (UniqueObject, Folder):
             if v is not None:
                 vars.update(v)
         return vars
+
+    security.declarePublic('getActionsFor')
+    def getActionsFor(self, ob):
+        '''
+        Return a list of action dictionaries for 'ob', just as though
+        queried via 'ActionsTool.listFilteredActionsFor'.
+        '''
+        return self.listActions( WorkflowInformation( ob ) )
 
     security.declarePrivate('listActions')
     def listActions(self, info):

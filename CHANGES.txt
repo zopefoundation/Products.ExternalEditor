@@ -21,6 +21,9 @@
     - (__future__) Added DCWorkflow (through-the-web configurable
       workflows) to the core set of CMF products.
 
+    - Enabled querying actions from workflow tool in absence
+      of actions tool (Tracker #401).
+
   Bug Fixes
 
     - Made links emitted by 'topic_view' play nice with virtual hosting
