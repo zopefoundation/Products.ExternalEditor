@@ -284,3 +284,10 @@ class WorkflowDefinition (Base):
         Invoked by the portal_workflow tool.
         Notifies this workflow that an action failed.
         '''
+
+    #security.declarePrivate('updateRoleMappingsFor')
+    def updateRoleMappingsFor(self, ob):
+        '''
+        Updates the object permissions according to the current
+        workflow state.
+        '''
