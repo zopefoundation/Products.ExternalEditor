@@ -52,6 +52,9 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
     comment_number = 0
     _st_data = None
     security = ClassSecurityInfo()
+    _subowner = 'both'
+    SUBOWNER_TYPES = ['creator', 'original_owner', 'both']
+
     ZWIKI_PAGE_TYPES = ['structuredtext', 'plaintext', 'html',
                         'structuredtextdtml', 'htmldtml',
                         'classicwiki']
@@ -92,6 +95,9 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
                  {'id':'dtml_allowed', 'type': 'boolean', 'mode': 'w'},
                  {'id':'last_editor', 'type': 'string', 'mode': 'w'},
                  {'id':'last_log', 'type': 'string', 'mode': 'w'},
+                 {'id':'comment_number', 'type': 'int', 'mode': 'w'},
+                 {'id':'_subowner', 'mode': 'w', 'type': 'selection',
+                  'select_variable': 'SUBOWNER_TYPES'},
                  )
     # permission defaults
     set = security.setPermissionDefault
@@ -103,11 +109,10 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
     set(CMFWikiPermissions.Comment, ('Owner', 'Manager', 'Authenticated'))
     set = None
 
-    def __init__(self, file=None, __name__='', source_string='', mapping=None):
-        DTMLDocument.__init__(self, file=file,
+    def __init__(self, __name__='', source_string='', mapping=None):
+        DTMLDocument.__init__(self, source_string=source_string,
                               mapping=mapping,
-                              __name__=__name__,
-                              source_string=source_string)
+                              __name__=__name__)
         DefaultDublinCoreImpl.__init__(self)
 
     security.declarePublic('getId')
@@ -1813,7 +1818,7 @@ class CMFWikiFolder(PortalFolder):
             return makeCMFWikiPage(name, '', body)
 
 def makeCMFWikiPage(id, title, file):
-    ob = CMFWikiPage(file, __name__=id)
+    ob = CMFWikiPage(source_string=file, __name__=id)
     ob.title = title
     ob.parents = []
     username = getSecurityManager().getUser().getUserName()
@@ -1849,3 +1854,6 @@ def addCMFWikiFolder(self, id, title=''):
         addCMFWikiPage(ob, fname, title='', file=f.read())
         page = getattr(ob, fname)
         page.indexObject()
+        # Hack - may be ok if we continue to have, like, only two pages:
+        if fname == 'SandBox':
+            page.parents = ['FrontPage']
