@@ -4,26 +4,26 @@
 <body>
 <div metal:fill-slot="main">
 <div class="Desktop">
-
-<div class="Link">
-<div tal:replace="structure here/content_byline">By Me</div>
-
-<p>
-<a tal:attributes="href here/remote_url" href=""><span tal:replace="here/remote_url">www.zope.org</span></a></p>
-<p></p>
-
-<div tal:replace="here/Description">Description</div>
-
-<div class="Discussion">
-
-<span tal:replace="structure here/viewThreadsAtBottom"
-         tal:condition="here/viewThreadsAtBottom|nothing"></span>
-
+<table>
+  <tr>
+    <td><div metal:use-macro="here/content_byline/macros/byline">By Me</div></td>
+  </tr>
+  <tr><td>&nbsp;</td></tr>
+  <tr>
+    <td><a tal:attributes="href here/remote_url" href=""><span tal:replace="here/remote_url">www.zope.org</span></a></td>
+  </tr>
+  <tr>
+    <td><div class="Description" tal:replace="here/Description">Description</div></td>
+  </tr>
+  <tr tal:condition="here/viewThreadsAtBottom">
+    <td><div class="Discussion">
+            <span tal:replace="structure here/viewThreadsAtBottom" />
+        </div>
+    </td>
+  </tr>
+</table>
 </div>
 
-</div>
-
-</div>
 </div>
 </body>
 </html>
