@@ -198,8 +198,6 @@ class Image( OFS.Image.Image
         if self._isNotEmpty(file):
             self.manage_upload(file)
 
-        self.setFormat(self.content_type)
-
     security.declareProtected(ModifyPortalContent, 'edit')
     def edit(self, precondition='', file=''):
         """ Update and reindex. """
@@ -217,6 +215,16 @@ class Image( OFS.Image.Image
         #if REQUEST['PATH_INFO'][-10:] == 'index_html':
         #    return self.view(self, REQUEST)
         return OFS.Image.Image.index_html(self, REQUEST, RESPONSE)
+
+    security.declareProtected(View, 'Format')
+    def Format(self):
+        """ Dublin Core element - resource format """
+        return self.content_type
+
+    security.declareProtected(ModifyPortalContent, 'setFormat')
+    def setFormat(self, format):
+        """ Dublin Core element - resource format """
+        self.manage_changeProperties(content_type=format)
 
     security.declareProtected(ModifyPortalContent, 'PUT')
     def PUT(self, REQUEST, RESPONSE):

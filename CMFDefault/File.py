@@ -206,8 +206,6 @@ class File( OFS.Image.File
         if self._isNotEmpty(file):
             self.manage_upload(file)
 
-        self.setFormat(self.content_type)
-
     security.declareProtected(ModifyPortalContent, 'edit')
     def edit(self, precondition='', file=''):
         """ Update and reindex. """
@@ -233,6 +231,16 @@ class File( OFS.Image.File
         RESPONSE.setHeader('Content-Disposition',
                            'attachment; filename=%s' % self.getId())
         return OFS.Image.File.index_html(self, REQUEST, RESPONSE)
+
+    security.declareProtected(View, 'Format')
+    def Format(self):
+        """ Dublin Core element - resource format """
+        return self.content_type
+
+    security.declareProtected(ModifyPortalContent, 'setFormat')
+    def setFormat(self, format):
+        """ Dublin Core element - resource format """
+        self.manage_changeProperties(content_type=format)
 
     security.declareProtected(ModifyPortalContent, 'PUT')
     def PUT(self, REQUEST, RESPONSE):

@@ -32,6 +32,11 @@ CMF 1.5.0-beta (unreleased)
       
   Bug Fixes
 
+    - CMFDefault.File and CMFDefault.Image: setFormat() failed to update
+      the content_type property causing index_html() to use a stale mimetype
+      when serving the file or image.
+      Also see http://collector.zope.org/CMF/226
+
     - CMFDefault.Document, CMFDefault.Link, and CMFCalendar.Event: 
       WebDAV PUT() caused improper splitting of 'Contributors' metadata header.
 
