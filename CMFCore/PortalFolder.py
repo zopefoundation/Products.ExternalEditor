@@ -297,6 +297,13 @@ class PortalFolder( Folder, DynamicType ):
         ids = self.objectIds( spec )
         return self._filteredItems( ids, filter )
 
+    security.declareProtected(View, 'Title')
+    def Title( self ):
+        """
+             Implement dublin core Title
+        """
+        return self.title
+
     security.declareProtected(View, 'Type')
     def Type( self ):
         """
