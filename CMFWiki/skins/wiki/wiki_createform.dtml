@@ -13,14 +13,8 @@
     <strong> <dtml-var "whichWho('create')">
       create new pages from <dtml-var "this().getId()">.
     </strong>
-  <dtml-elif doalternate>
-    Create this page as a file or an image upload, below.  Use the 
-    <a href="&dtml-wiki_page_url;/wiki_createform?doalternate=&page=&dtml.url_quote-page;&text=&dtml.url_quote-text;">
-    regular edit form</a> to create it as a normal ZWiki page, instead.
   <dtml-else>
-    Fill in the text and hit the <em> Create <dtml-var page> </em> button.
-    Use <a href="&dtml-wiki_page_url;/wiki_createform?doalternate=1&page=&dtml.url_quote-page;&text=&dtml.url_quote-text;">
-    this form</a> to upload the page as a file or image, instead.
+    Fill in the text and hit the <em> Create <dtml-var page> </em> button. 
   </dtml-if noedit>
 
   <FORM METHOD="POST"
@@ -28,31 +22,8 @@
         ENCTYPE="multipart/form-data">
   <input type=hidden name=page value="&dtml-page;">
 
-  <table width="100%" border="0" cellspacing="0" cellpadding="5"
-         <dtml-if doalternate> bgcolor="eeeeee" </dtml-if> >
+  <table width="100%" border="0" cellspacing="0" cellpadding="5">
 
-   <dtml-if doalternate>
-    <tr>
-      <td align="right">
-        <strong> File </strong>
-        <input type="radio" name="filetype" value="file" CHECKED>
-        <br> or <strong> Image </strong>
-        <input type="radio" name="filetype" value="image">
-      </td>
-      <td ALIGN="LEFT" VALIGN="middle" colspan=2>
-        <INPUT TYPE="file" NAME="file" SIZE="25" VALUE="">
-      </td>
-    </tr>
-    <tr>
-      <th ALIGN="right" VALIGN="CENTER"> <EM>Title</EM> </Th>
-      <td ALIGN="LEFT" VALIGN="CENTER">
-      <INPUT TYPE="TEXT" NAME="title" SIZE="40">
-      </td>
-      <td colspan=2 align="right" valign="bottom">
-        <INPUT TYPE="SUBMIT" name="CreateFile" VALUE="Create File or Image">
-      </td>
-    </tr>
-   <dtml-else>
     <!-- Readonly *and* onkeydown for bowser diversity. -->
     <tr bgcolor=<dtml-if noedit>"pink"<dtml-else>"eeeeee"</dtml-if> >
       <td colspan=2 align="center">
@@ -100,7 +71,6 @@
        </td>
      </tr>
     </dtml-if> <dtml-comment> "not noedit" </dtml-comment>
-   </dtml-if> <dtml-comment> doalternate </dtml-comment>
   </table>
  </FORM>
 </dtml-let>
