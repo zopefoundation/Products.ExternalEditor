@@ -44,6 +44,7 @@ import Globals
 from DateTime import DateTime
 from AccessControl import ClassSecurityInfo
 from Products.CMFCore import CMFCorePermissions, PortalContent
+from Products.CMFDefault.DublinCore import DefaultDublinCoreImpl
 
 from References import ReferenceCollection
 
@@ -70,12 +71,18 @@ you navigate efficiently.""",
         'permissions'   : (CMFCorePermissions.View,),
         'category'      : 'object',
         },
+       {'id'            : 'metadata',
+        'name'          : 'Metadata',
+        'action'        : 'metadata_edit_form',
+        'permissions'   : (CMFCorePermissions.View,),
+        'category'      : 'object',
+        },       
        )
       },
     )
 
 
-class Workspace (PortalContent.PortalContent):
+class Workspace (PortalContent.PortalContent, DefaultDublinCoreImpl):
     __doc__ = __doc__                   # Use the module docstring.
 
     meta_type = 'Workspace'
