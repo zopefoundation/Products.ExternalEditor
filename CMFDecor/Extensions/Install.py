@@ -60,9 +60,10 @@ def install(self):
 
         path = skinstool.getSkinPath( skinstool.getDefaultSkin() )
         path = map( string.strip, string.split( path,',' ) )
-        for zptdir in ZPT_SKINS_DIRS:
+        insertion_point = path.index( 'custom' ) + 1
+        for zptdir in ( 'zpt_topic', ) + ZPT_SKINS_DIRS:
             try:
-                path.insert( path.index( 'content' ), zptdir )
+                path.insert( insertion_point, zptdir )
             except ValueError:
                 path.append( zptdir )
                     
