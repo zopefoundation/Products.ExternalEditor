@@ -13,8 +13,9 @@
    <base href="&dtml-absolute_url;" />
   </dtml-if>
  </head>
-<body>
-
+<dtml-with stylesheet_properties>
+<body text="&dtml-base_font_color;">
+</dtml-with>
 <dtml-var standard_top_bar>
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
