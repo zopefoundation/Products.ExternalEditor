@@ -351,13 +351,3 @@ class Topic(PortalFolder):
 
 # Intialize the Topic class, setting up security.
 InitializeClass(Topic)
-
-# Waah.  This seems to be the only way to get the icon in correctly
-##from Products.CMFCore.register import registerPortalContent
-##registerPortalContent(
-##    Topic,
-##    meta_type='Portal Topic',
-##    icon = 'images/topic.gif',
-##    permission = TopicPermissions.AddTopics,
-##    productGlobals = globals(),
-##    )
