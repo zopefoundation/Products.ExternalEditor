@@ -11,34 +11,59 @@
 # 
 ##############################################################################
 
+import os
+from os import path as os_path
+import re
+import operator
 from types import StringType
 
 from ExtensionClass import Base
-from AccessControl import ClassSecurityInfo, getSecurityManager
+from Acquisition import aq_get, aq_inner, aq_parent
+
+from AccessControl import ClassSecurityInfo
+from AccessControl import ModuleSecurityInfo
+from AccessControl import getSecurityManager
 from AccessControl.Permission import Permission
 from AccessControl.PermissionRole import rolesForPermissionOn
 from AccessControl.Role import gather_permissions
-import Globals
-from Acquisition import aq_get, aq_inner, aq_parent
-from string import split
-import os, re
+
 from Globals import package_home
-from string import lower
+from Globals import InitializeClass
+from Globals import HTMLFile
+from Globals import ImageFile
+from Globals import MessageDialog
 
-try: from OFS.ObjectManager import UNIQUE
-except ImportError: UNIQUE = 2
+from OFS.PropertyManager import PropertyManager
+from OFS.SimpleItem import SimpleItem
+from OFS.PropertySheets import PropertySheets
+from OFS.misc_ import misc_ as misc_images
+from OFS.misc_ import Misc_ as MiscImage
+try:
+    from OFS.ObjectManager import UNIQUE
+except ImportError:
+    UNIQUE = 2
+
+import StructuredText
+from StructuredText.HTMLWithImages import HTMLWithImages
+
+_STXDWI = StructuredText.DocumentWithImages.__class__
+
+_dtmldir = os_path.join( package_home( globals() ), 'dtml' )
 
 
-_dtmldir = os.path.join( package_home( globals() ), 'dtml' )
-
-
-# Tool for getting at Tools, meant to be modified as policies or Tool
-# implementations change without having to affect the consumer.
-
+#
+#   Simple utility functions, callable from restricted code.
+#
 _marker = []  # Create a new marker object.
 
 def getToolByName(obj, name, default=_marker):
-    " Get the tool, 'toolname', by acquiring it. "
+
+    """ Get the tool, 'toolname', by acquiring it.
+
+    o Application code should use this method, rather than simply
+      acquiring the tool by name, to ease forward migration (e.g.,
+      to Zope3).
+    """
     try:
         tool = aq_get(obj, name, default, 1)
     except AttributeError:
@@ -50,36 +75,35 @@ def getToolByName(obj, name, default=_marker):
             raise AttributeError, name
         return tool
 
-
-class ImmutableId (Base):
-    def _setId(self, id):
-        if id != self.getId():
-            raise Globals.MessageDialog(
-                title='Invalid Id',
-                message='Cannot change the id of this object',
-                action ='./manage_main',)
-
-
-class UniqueObject (ImmutableId):
-    __replaceable__ = UNIQUE
-
-
 def cookString(text):
-    """
-    Make a single string without spaces from a string possibly
-    containing spaces....and make it lowercase...also makes a zope
-    friendly id.
+
+    """ Make a Zope-friendly ID from 'text'.
+
+    o Remove any spaces
+
+    o Lowercase the ID.
     """
     rgx = re.compile(r'(^_|[^a-zA-Z0-9-_~\,\.])')
-    cooked = string.lower(re.sub(rgx, "",text))
+    cooked = re.sub(rgx, "",text).lower()
     return cooked
 
 def tuplize( valueName, value ):
-    if type(value) == type(()): return value
-    if type(value) == type([]): return tuple( value )
-    if type(value) == type(''): return tuple( split( value ) )
+
+    """ Make a tuple from 'value'.
+
+    o Use 'valueName' to generate appropriate error messages.
+    """
+    if type(value) == type(()):
+        return value
+    if type(value) == type([]):
+        return tuple( value )
+    if type(value) == type(''):
+        return tuple( value.split() )
     raise ValueError, "%s of unsupported type" % valueName
 
+#
+#   Security utilities, callable only from unrestricted code.
+#
 def _getAuthenticatedUser( self ):
     return getSecurityManager().getUser()
 
@@ -114,10 +138,10 @@ def _getViewFor(obj, view='view'):
             if _verifyActionPermissions(obj, action):
                 return obj.restrictedTraverse(action['action'])
         raise 'Unauthorized', ('No accessible views available for %s' %
-                               string.join(obj.getPhysicalPath(), '/'))
+                               '/'.join(obj.getPhysicalPath()))
     else:
         raise 'Not Found', ('Cannot find default view for "%s"' %
-                            string.join(obj.getPhysicalPath(), '/'))
+                            '/'.join(obj.getPhysicalPath()))
 
 
 # If Zope ever provides a call to getRolesInContext() through
@@ -182,9 +206,9 @@ def ac_inherited_permissions(ob, all=0):
     return r
 
 def modifyPermissionMappings(ob, map):
-    '''
+    """
     Modifies multiple role to permission mappings.
-    '''
+    """
     # This mimics what AccessControl/Role.py does.
     # Needless to say, it's crude. :-(
     something_changed = 0
@@ -218,170 +242,35 @@ def modifyPermissionMappings(ob, map):
             something_changed = 1
     return something_changed
 
-
-from Globals import HTMLFile
-
-addInstanceForm = HTMLFile('dtml/addInstance', globals())
-
-
-class ToolInit:
-    '''Utility class that can generate the factories for several tools
-    at once.'''
-    __name__ = 'toolinit'
-
-    security = ClassSecurityInfo()
-    security.declareObjectPrivate()     # equivalent of __roles__ = ()
-
-    def __init__(self, meta_type, tools, product_name, icon):
-        ''
-        self.meta_type = meta_type
-        self.tools = tools
-        self.product_name = product_name
-        self.icon = icon
-
-    def initialize(self, context):
-        # Add only one meta type to the folder add list.
-        context.registerClass(
-            meta_type = self.meta_type,
-            # This is a little sneaky: we add self to the
-            # FactoryDispatcher under the name "toolinit".
-            # manage_addTool() can then grab it.
-            constructors = (manage_addToolForm,
-                            manage_addTool,
-                            self,),
-            icon = self.icon
-            )
-
-        for tool in self.tools:
-            tool.__factory_meta_type__ = self.meta_type
-            tool.icon = 'misc_/%s/%s' % (self.product_name, self.icon)
-
-
-Globals.InitializeClass( ToolInit )
-
-def manage_addToolForm(self, REQUEST):
-    '''
-    Shows the add tool form.
-    '''
-    # self is a FactoryDispatcher.
-    toolinit = self.toolinit
-    tl = []
-    for tool in toolinit.tools:
-        tl.append(tool.meta_type)
-    return addInstanceForm(addInstanceForm, self, REQUEST,
-                           factory_action='manage_addTool',
-                           factory_meta_type=toolinit.meta_type,
-                           factory_product_name=toolinit.product_name,
-                           factory_icon=toolinit.icon,
-                           factory_types_list=tl,
-                           factory_need_id=0)
-
-def manage_addTool(self, type, REQUEST=None):
-    '''Adds the tool specified by name.'''
-    # self is a FactoryDispatcher.
-    toolinit = self.toolinit
-    obj = None
-    for tool in toolinit.tools:
-        if tool.meta_type == type:
-            obj = tool()
-            break
-    if obj is None:
-        raise 'NotFound', type
-    self._setObject(obj.getId(), obj)
-    if REQUEST is not None:
-        return self.manage_main(self, REQUEST)
-
-
 #
-#   Now, do the same for creating content factories.
+#   Base classes for tools
 #
-class ContentInit:
+class ImmutableId(Base):
+
+    """ Base class for objects which cannot be renamed.
     """
-        Utility class that can generate the factories for several
-        content types at once.
+    def _setId(self, id):
+
+        """ Never allow renaming!
+        """
+        if id != self.getId():
+            raise MessageDialog(
+                title='Invalid Id',
+                message='Cannot change the id of this object',
+                action ='./manage_main',)
+
+class UniqueObject (ImmutableId):
+
+    """ Base class for objects which cannot be "overridden" / shadowed.
     """
-    __name__ = 'contentinit'
+    __replaceable__ = UNIQUE
 
-    security = ClassSecurityInfo()
-    security.declareObjectPrivate()
-
-    def __init__( self
-                , meta_type
-                , content_types
-                , permission=None
-                , extra_constructors=()
-                , fti=()
-                ):
-        ''
-        self.meta_type = meta_type
-        self.content_types = content_types
-        self.permission = permission
-        self.extra_constructors = extra_constructors
-        self.fti = fti
-
-    def initialize(self, context):
-        # Add only one meta type to the folder add list.
-        context.registerClass(
-            meta_type = self.meta_type
-            # This is a little sneaky: we add self to the
-            # FactoryDispatcher under the name "contentinit".
-            # manage_addContentType() can then grab it.
-            , constructors = ( manage_addContentForm
-                               , manage_addContent
-                               , self
-                               , ('factory_type_information', self.fti)
-                               ) + self.extra_constructors
-            , permission = self.permission
-            )
-
-        for ct in self.content_types:
-            ct.__factory_meta_type__ = self.meta_type
-
-Globals.InitializeClass( ContentInit )
-
-def manage_addContentForm(self, REQUEST):
-    '''
-    Shows the add content type form.
-    '''
-    # self is a FactoryDispatcher.
-    ci = self.contentinit
-    tl = []
-    for t in ci.content_types:
-        tl.append(t.meta_type)
-    return addInstanceForm(addInstanceForm, self, REQUEST,
-                           factory_action='manage_addContent',
-                           factory_meta_type=ci.meta_type,
-                           factory_icon=None,
-                           factory_types_list=tl,
-                           factory_need_id=1)
-
-def manage_addContent( self, id, type, REQUEST=None ):
-    '''
-        Adds the content type specified by name.
-    '''
-    # self is a FactoryDispatcher.
-    contentinit = self.contentinit
-    obj = None
-    for content_type in contentinit.content_types:
-        if content_type.meta_type == type:
-            obj = content_type( id )
-            break
-    if obj is None:
-        raise 'NotFound', type
-    self._setObject( id, obj )
-    if REQUEST is not None:
-        return self.manage_main(self, REQUEST)
-
-
-
-from OFS.PropertyManager import PropertyManager
-from OFS.SimpleItem import SimpleItem
 
 class SimpleItemWithProperties (PropertyManager, SimpleItem):
-    '''
+    """
     A common base class for objects with configurable
     properties in a fixed schema.
-    '''
+    """
     manage_options = (
         PropertyManager.manage_options
         + SimpleItem.manage_options)
@@ -410,18 +299,167 @@ class SimpleItemWithProperties (PropertyManager, SimpleItem):
                 return p.get('label', id)
         return id
 
+InitializeClass( SimpleItemWithProperties )
 
-Globals.InitializeClass( SimpleItemWithProperties )
+
+#
+#   "Omnibus" factory framework for tools.
+#
+class ToolInit:
+
+    """ Utility class for generating the factories for several tools.
+    """
+    __name__ = 'toolinit'
+
+    security = ClassSecurityInfo()
+    security.declareObjectPrivate()     # equivalent of __roles__ = ()
+
+    def __init__(self, meta_type, tools, product_name, icon):
+        self.meta_type = meta_type
+        self.tools = tools
+        self.product_name = product_name
+        self.icon = icon
+
+    def initialize(self, context):
+        # Add only one meta type to the folder add list.
+        context.registerClass(
+            meta_type = self.meta_type,
+            # This is a little sneaky: we add self to the
+            # FactoryDispatcher under the name "toolinit".
+            # manage_addTool() can then grab it.
+            constructors = (manage_addToolForm,
+                            manage_addTool,
+                            self,),
+            icon = self.icon
+            )
+
+        for tool in self.tools:
+            tool.__factory_meta_type__ = self.meta_type
+            tool.icon = 'misc_/%s/%s' % (self.product_name, self.icon)
+
+InitializeClass( ToolInit )
 
 
-import OFS
-import sys
-from os import path
-from App.Common import package_home
+addInstanceForm = HTMLFile('dtml/addInstance', globals())
+
+def manage_addToolForm(self, REQUEST):
+
+    """ Show the add tool form.
+    """
+    # self is a FactoryDispatcher.
+    toolinit = self.toolinit
+    tl = []
+    for tool in toolinit.tools:
+        tl.append(tool.meta_type)
+    return addInstanceForm(addInstanceForm, self, REQUEST,
+                           factory_action='manage_addTool',
+                           factory_meta_type=toolinit.meta_type,
+                           factory_product_name=toolinit.product_name,
+                           factory_icon=toolinit.icon,
+                           factory_types_list=tl,
+                           factory_need_id=0)
+
+def manage_addTool(self, type, REQUEST=None):
+
+    """ Add the tool specified by name.
+    """
+    # self is a FactoryDispatcher.
+    toolinit = self.toolinit
+    obj = None
+    for tool in toolinit.tools:
+        if tool.meta_type == type:
+            obj = tool()
+            break
+    if obj is None:
+        raise 'NotFound', type
+    self._setObject(obj.getId(), obj)
+    if REQUEST is not None:
+        return self.manage_main(self, REQUEST)
+
+
+#
+#   Now, do the same for creating content factories.
+#
+class ContentInit:
+
+    """ Utility class for generating factories for several content types.
+    """
+    __name__ = 'contentinit'
+
+    security = ClassSecurityInfo()
+    security.declareObjectPrivate()
+
+    def __init__( self
+                , meta_type
+                , content_types
+                , permission=None
+                , extra_constructors=()
+                , fti=()
+                ):
+        self.meta_type = meta_type
+        self.content_types = content_types
+        self.permission = permission
+        self.extra_constructors = extra_constructors
+        self.fti = fti
+
+    def initialize(self, context):
+        # Add only one meta type to the folder add list.
+        context.registerClass(
+            meta_type = self.meta_type
+            # This is a little sneaky: we add self to the
+            # FactoryDispatcher under the name "contentinit".
+            # manage_addContentType() can then grab it.
+            , constructors = ( manage_addContentForm
+                               , manage_addContent
+                               , self
+                               , ('factory_type_information', self.fti)
+                               ) + self.extra_constructors
+            , permission = self.permission
+            )
+
+        for ct in self.content_types:
+            ct.__factory_meta_type__ = self.meta_type
+
+InitializeClass( ContentInit )
+
+def manage_addContentForm(self, REQUEST):
+
+    """ Show the add content type form.
+    """
+    # self is a FactoryDispatcher.
+    ci = self.contentinit
+    tl = []
+    for t in ci.content_types:
+        tl.append(t.meta_type)
+    return addInstanceForm(addInstanceForm, self, REQUEST,
+                           factory_action='manage_addContent',
+                           factory_meta_type=ci.meta_type,
+                           factory_icon=None,
+                           factory_types_list=tl,
+                           factory_need_id=1)
+
+def manage_addContent( self, id, type, REQUEST=None ):
+
+    """ Add the content type specified by name.
+    """
+    # self is a FactoryDispatcher.
+    contentinit = self.contentinit
+    obj = None
+    for content_type in contentinit.content_types:
+        if content_type.meta_type == type:
+            obj = content_type( id )
+            break
+    if obj is None:
+        raise 'NotFound', type
+    self._setObject( id, obj )
+    if REQUEST is not None:
+        return self.manage_main(self, REQUEST)
+
 
 def initializeBasesPhase1(base_classes, module):
-    """
-    Executes the first part of initialization of ZClass base classes.
+
+    """ Execute the first part of initialization of ZClass base classes.
+
     Stuffs a _ZClass_for_x class in the module for each base.
     """
     rval = []
@@ -430,7 +468,7 @@ def initializeBasesPhase1(base_classes, module):
         zclass_name = '_ZClass_for_%s' % base_class.__name__
         exec 'class %s: pass' % zclass_name in d
         Z = d[ zclass_name ]
-        Z.propertysheets = OFS.PropertySheets.PropertySheets()
+        Z.propertysheets = PropertySheets()
         Z._zclass_ = base_class
         Z.manage_options = ()
         Z.__module__ = module.__name__
@@ -439,31 +477,40 @@ def initializeBasesPhase1(base_classes, module):
     return rval
 
 def initializeBasesPhase2(zclasses, context):
-    """
-    Finishes ZClass base initialization.  zclasses is the list returned
-    by initializeBasesPhase1().  context is a ProductContext object.
+
+    """ Finishes ZClass base initialization.
+    
+    o 'zclasses' is the list returned by initializeBasesPhase1().
+    
+    o 'context' is a ProductContext object.
     """
     for zclass in zclasses:
         context.registerZClass(zclass)
 
 def registerIcon(klass, iconspec, _prefix=None):
+
+    """ Make an icon available for a given class.
+
+    o 'klass' is the class being decorated.
+
+    o 'iconspec' is the path within the product where the icon lives.
+    """
     modname = klass.__module__
-    pid = split(modname, '.')[1]
-    name = path.split(iconspec)[1]
+    pid = modname.split('.')[1]
+    name = os_path.split(iconspec)[1]
     klass.icon = 'misc_/%s/%s' % (pid, name)
-    icon = Globals.ImageFile(iconspec, _prefix)
+    icon = ImageFile(iconspec, _prefix)
     icon.__roles__=None
-    if not hasattr(OFS.misc_.misc_, pid):
-        setattr(OFS.misc_.misc_, pid, OFS.misc_.Misc_(pid, {}))
-    getattr(OFS.misc_.misc_, pid)[name]=icon
+    if not hasattr(misc_images, pid):
+        setattr(misc_images, pid, MiscImage(pid, {}))
+    getattr(misc_images, pid)[name]=icon
 
 #
 #   StructuredText handling.
 #
-import StructuredText
-from StructuredText.HTMLWithImages import HTMLWithImages
-
-_STXDWI = StructuredText.DocumentWithImages.__class__
+#   XXX:    This section is mostly workarounds for things fixed in the
+#           core, and should go away soon.
+#
 
 class CMFDocumentClass( StructuredText.DocumentWithImages.__class__ ):
     """
@@ -518,17 +565,21 @@ def _format_stx( text, level=1 ):
     html = CMFHtmlWithImages( doc, level )
     return html
 
-### Metadata Keyword splitter utilities
-import re, string, operator
+#
+#   Metadata Keyword splitter utilities
+#
 KEYSPLITRE = re.compile(r'[,;]')
-def keywordsplitter(headers,
-                    names=('Subject', 'Keywords',),
-                    splitter=KEYSPLITRE.split):
-    """ Splits keywords out of headers, keyed on names.  Returns list. """
+
+def keywordsplitter( headers
+                   , names=('Subject', 'Keywords',)
+                   , splitter=KEYSPLITRE.split
+                   ):
+    """ Split keywords out of headers, keyed on names.  Returns list.
+    """
     out = []
     for head in names:
         keylist = splitter(headers.get(head, ''))
-        keylist = map(string.strip, keylist)
+        keylist = map(lambda x: x.strip(), keylist)
         out.extend(filter(operator.truth, keylist))
     return out
 
@@ -536,7 +587,7 @@ def keywordsplitter(headers,
 #   Directory-handling utilities
 #
 def normalize(p):
-    return path.abspath(path.normcase(path.normpath(p)))
+    return os_path.abspath(os_path.normcase(os_path.normpath(p)))
 
 normINSTANCE_HOME = normalize(INSTANCE_HOME)
 normSOFTWARE_HOME = normalize(SOFTWARE_HOME)
@@ -545,17 +596,17 @@ separators = (os.sep, os.altsep)
 
 def expandpath(p):
     # Converts a minimal path to an absolute path.
-    p = path.normpath(p)
-    if path.isabs(p):
+    p = os_path.normpath(p)
+    if os_path.isabs(p):
         return p
-    abs = path.join(normINSTANCE_HOME, p)
-    if path.exists(abs):
+    abs = os_path.join(normINSTANCE_HOME, p)
+    if os_path.exists(abs):
         return abs
-    return path.join(normSOFTWARE_HOME, p)
+    return os_path.join(normSOFTWARE_HOME, p)
 
 def minimalpath(p):
     # Trims INSTANCE_HOME or SOFTWARE_HOME from a path.
-    p = path.abspath(p)
+    p = os_path.abspath(p)
     abs = normalize(p)
     l = len(normINSTANCE_HOME)
     if abs[:l] != normINSTANCE_HOME:
@@ -567,75 +618,3 @@ def minimalpath(p):
     while p[:1] in separators:
         p = p[1:]
     return p
-
-if 0:
-    # Hopefully we can use this.
-
-    from Globals import Persistent
-
-    class NotifyOnModify (Persistent):
-        '''
-        This base class allows instances to be notified when there are
-        changes that would affect persistence.
-        '''
-
-        __ready = 0
-
-        def _setNotifyModified(self):
-            self.__ready = 1
-
-        def __doNotify(self):
-            if self.__ready:
-                dict = self.__dict__
-                if not dict.has_key('__notified_on_modify__'):
-                    dict['__notified_on_modify__'] = 1
-                    self.notifyModified()
-
-        def __setattr__(self, name, val):
-            self.__dict__[name] = val
-            self._p_changed = 1
-            self.__doNotify()
-
-        def __delattr__(self, name):
-            del self.__dict__[name]
-            self._p_changed = 1
-            self.__doNotify()
-
-        def notifyModified(self):
-            # To be overridden.
-            pass
-
-
-if 0:
-  # Prototype for a "UniqueId" base ZClass.
-  import OFS
-
-  class UniqueSheet(OFS.PropertySheets.PropertySheet,
-                  OFS.PropertySheets.View):
-    'Manage id of unique objects'
-
-    manage = Globals.HTMLFile('uniqueid', globals())
-
-    def getId(self):
-        return self.getClassAttr('id')
-
-    def manage_edit(self, id, REQUEST=None):
-        self.setClassAttr('id', id)
-        if REQUEST is not None:
-            return self.manage(self, REQUEST)
-
-
-  class ZUniqueObjectPropertySheets(OFS.PropertySheets.PropertySheets):
-
-    unique = UniqueSheet('unique')
-
-  class ZUniqueObject:
-    '''Mix-in for unique zclass instances.'''
-
-    _zclass_ = UniqueObject
-
-    propertysheets = ZUniqueObjectPropertySheets()
-
-    manage_options = (
-        {'label': 'Id', 'action':'propertysheets/unique/manage'},
-        )
