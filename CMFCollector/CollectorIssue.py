@@ -84,7 +84,10 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
 
     comment_delimiter = "<hr solid id=comment_delim>"
 
-    comment_number = 0
+    comment_number = 1
+
+    ACTIONS_ORDER = ['Accept', 'Resign', 'Assign',
+                     'Resolve', 'Reject', 'Defer'] 
 
     def __init__(self, 
                  id, container,
@@ -94,7 +97,6 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
                  topic=None, classification=None,
                  security_related=0,
                  importance=None, severity=None,
-                 assigned_to=None, current_status='pending',
                  resolution=None,
                  reported_version=None, other_version_info=None,
                  creation_date=None, modification_date=None,
@@ -138,8 +140,6 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         self.security_related = security_related
         self.importance = importance
         self.severity = severity
-        self.assigned_to = assigned_to
-        self.current_status = current_status
         self.resolution = resolution
         self.reported_version = reported_version
         self.other_version_info = other_version_info
@@ -194,17 +194,43 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
     security.declareProtected(CMFCorePermissions.View, 'get_transcript')
     def get_transcript(self):
         return self._getOb(TRANSCRIPT_NAME)
-
+    
     security.declareProtected(AddCollectorIssueComment, 'do_action')
-    def do_action(self, action, comment, attachments=None):
+    def do_action(self, action, comment, attachments=None, assignees=None):
         """Execute an action, adding comment to the transcript."""
+
+        username = str(getSecurityManager().getUser())
+
+        if string.lower(action) != 'comment':
+            # Confirm against portal actions tool:
+            if action not in self._valid_actions():
+                raise 'Unauthorized', "Invalid action '%s'" % action
+
+            self.portal_workflow.doActionFor(self,
+                                             action,
+                                             comment=comment,
+                                             username=username,
+                                             assignees=assignees)
+
         transcript = self.get_transcript()
         self.comment_number = self.comment_number + 1
-        entry_leader = "\n\n" + self._entry_header(action) + "\n\n"
+        entry_leader = "\n\n" + self._entry_header(action, username) + "\n\n"
         transcript._edit('stx',
                          transcript.EditableBody()
                          + entry_leader
                          + util.process_comment(comment))
+
+    security.declareProtected(CMFCorePermissions.View, 'assigned_to')
+    def assigned_to(self):
+        """Return the current supporters list, according to workflow."""
+        wftool = getToolByName(self, 'portal_workflow')
+        return wftool.getInfoFor(self, 'assigned_to', [])
+
+    security.declareProtected(CMFCorePermissions.View, 'status')
+    def status(self):
+        """Return the current status according to workflow."""
+        wftool = getToolByName(self, 'portal_workflow')
+        return wftool.getInfoFor(self, 'state', '??')
 
     security.declareProtected(AddCollectorIssueArtifact, 'add_artifact')
     def add_artifact(self, id, type, description, file):
@@ -214,8 +240,9 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         it.description = description
         it.manage_upload(file)
         transcript = self.get_transcript()
+        user = getSecurityManager().getUser()
         entry_leader = ("\n\n"
-                        + self._entry_header("New Artifact '%s'" % id)
+                        + self._entry_header("New Artifact '%s'" % id, user)
                         + "\n\n")
         transcript._edit('stx',
                          transcript.EditableBody()
@@ -226,15 +253,17 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
                            text_format=DEFAULT_TRANSCRIPT_FORMAT):
         """Create events and comments transcript, with initial entry."""
 
+        user = getSecurityManager().getUser()
         addDocument(self, TRANSCRIPT_NAME, description=description)
         it = self.get_transcript()
         it._setPortalTypeName('Collector Issue Transcript')
-        text = "%s\n\n %s " % (self._entry_header('Request', prefix="== "),
-                               description)
+        text = ("%s\n\n %s " %
+                (self._entry_header('Request', user, prefix="== "),
+                 description))
         it._edit(text_format=text_format, text=text)
         it.title = self.title
 
-    def _entry_header(self, type, prefix="<hr> == ", suffix=" =="):
+    def _entry_header(self, type, user, prefix="<hr> == ", suffix=" =="):
         """Return text for the header of a new transcript entry."""
         # Ideally this would be a skin method (probly python script), but i
         # don't know how to call it from the product, sigh.
@@ -244,7 +273,6 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         else:
             lead = t
 
-        user = getSecurityManager().getUser()
         return ("%s%s by %s on %s%s" %
                 (prefix, lead, str(user), DateTime().aCommon(), suffix))
 
@@ -252,6 +280,32 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
     def cited_text(self):
         """Quote text for use in literal citations."""
         return util.cited_text(self.get_transcript().text)
+
+    def _valid_actions(self):
+        """Return actions valid according to workflow and application logic."""
+        pa = getToolByName(self, 'portal_actions', None)
+        return [entry['name']
+                for entry in pa.listFilteredActionsFor(self)['issue_workflow']]
+
+    security.declareProtected(CMFCorePermissions.View, 'valid_actions_pairs')
+    def valid_actions_pairs(self):
+        """Return ordered (prettyname, rawname) valid workflow action names."""
+        # XXX I would do this with a python script method, but i'm hitting
+        #     inability to assign to indexes (eg, 'list[x] = 1' or 
+        #     'dict[x] = 1'), so having to resort to python code, sigh.
+
+        order=self.ACTIONS_ORDER
+        got = [()] * len(order)
+        remainder = []
+
+        for raw in self._valid_actions():
+            pretty = raw.split('_')[0].capitalize()
+            if pretty in order:
+                got[order.index(pretty)] = (raw, pretty)
+            else:
+                remainder.append((raw, pretty))
+        return filter(None, got) + remainder
+
 
     #################################################
     # Dublin Core and search provisions
@@ -309,7 +363,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
                 + self.classification + ' '
                 + self.importance + ' '
                 + self.severity + ' '
-                + self.current_status + ' '
+                + self.status() + ' '
                 + self.resolution + ' '
                 + self.reported_version + ' '
                 + self.other_version_info + ' '
@@ -317,15 +371,15 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
 
     def Subject(self):
         """The structured attrs, combined w/field names for targeted search."""
+        assigned_to = tuple(['assigned_to:' + i for i in self.assigned_to()])
         return ('topic:' + self.topic,
                 'classification:' + self.classification,
                 'security_related:' + ((self.security_related and '1') or '0'),
                 'importance:' + self.importance,
                 'severity:' + self.severity,
-                'assigned_to:' + (self.assigned_to or ''),
-                'current_status:' + (self.current_status or ''),
+                'status:' + (self.status() or ''),
                 'resolution:' + (self.resolution or ''),
-                'reported_version:' + self.reported_version)
+                'reported_version:' + self.reported_version) + assigned_to
 
     def __repr__(self):
         return ("<%s %s \"%s\" at 0x%s>"
@@ -349,7 +403,6 @@ def addCollectorIssue(self,
                       security_related=0,
                       importance=None,
                       severity=None,
-                      assigned_to=None,
                       reported_version=None,
                       other_version_info=None,
                       REQUEST=None):
@@ -370,7 +423,6 @@ def addCollectorIssue(self,
                         security_related=security_related,
                         importance=importance,
                         severity=severity,
-                        assigned_to=assigned_to,
                         reported_version=reported_version,
                         other_version_info=other_version_info)
     it._setPortalTypeName('Collector Issue')
