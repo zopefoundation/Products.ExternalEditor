@@ -62,7 +62,7 @@ class VariableDefinition (SimpleItem):
         if self.info_guard is not None:
             return self.info_guard
         else:
-            return Guard()  # Create a temporary guard.
+            return Guard().__of__(self)  # Create a temporary guard.
 
     def getInfoGuardSummary(self):
         res = None

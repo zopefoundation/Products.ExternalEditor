@@ -21,6 +21,7 @@ from cgi import escape
 import Globals
 from Globals import DTMLFile, Persistent
 from AccessControl import ClassSecurityInfo
+from Acquisition import Explicit
 
 from Products.CMFCore.CMFCorePermissions import ManagePortal
 
@@ -28,7 +29,7 @@ from Expression import Expression, StateChangeInfo, createExprContext
 from utils import _dtmldir
 
 
-class Guard (Persistent):
+class Guard (Persistent, Explicit):
     permissions = ()
     roles = ()
     expr = None
@@ -70,6 +71,7 @@ class Guard (Persistent):
                 return 0
         return 1
 
+    security.declareProtected(ManagePortal, 'getSummary')
     def getSummary(self):
         # Perhaps ought to be in DTML.
         res = []
@@ -125,16 +127,19 @@ class Guard (Persistent):
             self.expr = Expression(s)
         return res
 
+    security.declareProtected(ManagePortal, 'getPermissionsText')
     def getPermissionsText(self):
         if not self.permissions:
             return ''
         return join(self.permissions, '; ')
 
+    security.declareProtected(ManagePortal, 'getRolesText')
     def getRolesText(self):
         if not self.roles:
             return ''
         return join(self.roles, '; ')
 
+    security.declareProtected(ManagePortal, 'getExprText')
     def getExprText(self):
         if not self.expr:
             return ''

@@ -53,7 +53,7 @@ class WorklistDefinition (SimpleItem):
         if self.guard is not None:
             return self.guard
         else:
-            return Guard()  # Create a temporary guard.
+            return Guard().__of__(self)  # Create a temporary guard.
 
     def getGuardSummary(self):
         res = None
