@@ -32,9 +32,10 @@ from Products.CMFCore.tests.base.utils import build_test_suite
 CMF_PACKAGES = [ ( 'CMFCore',        1 )
                , ( 'CMFDefault',     1 )
                , ( 'CMFTopic',       1 )
-               , ( 'CMFCalendar',    0 )
-               , ( 'CMFActionIcons', 0 )
                , ( 'DCWorkflow',     1 )
+               , ( 'CMFActionIcons', 1 )
+               , ( 'CMFSetup',       1 )
+               , ( 'CMFCalendar',    0 )
                ]
 
 PACKAGES_UNDER_TEST = []
