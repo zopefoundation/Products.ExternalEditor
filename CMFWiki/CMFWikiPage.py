@@ -25,8 +25,6 @@ from AccessControl.Permission import Permission
 from Persistence import Persistent
 from DateTime import DateTime
 from struct import pack, unpack
-from ZWikiDefaults import default_wiki_page, default_wiki_header,\
-     default_wiki_footer, default_editform, default_backlinks
 from ZWikiRegexes import urlchars, url, urlexp, bracketedexpr,\
      bracketedexprexp, underlinedexpr, underlinedexprexp, wikiname1,\
      wikiname2, simplewikilinkexp, wikiending, urllinkending, wikilink,\
@@ -35,7 +33,7 @@ from ZWikiRegexes import urlchars, url, urlexp, bracketedexpr,\
      preexp, unpreexp, citedexp, cite_prefixexp, intl_char_entities
 import CMFWikiPermissions
 from Products.CMFCore.PortalContent import PortalContent
-from Products.CMFCore.PortalFolder import PortalFolder
+from Products.CMFDefault.SkinnedFolder import SkinnedFolder
 from Products import CMFDefault
 from Products.CMFDefault.DublinCore import DefaultDublinCoreImpl
 DISABLE_JAVASCRIPT = 1
@@ -57,9 +55,11 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
     _subowner = 'both'
     SUBOWNER_TYPES = ['creator', 'original_owner', 'both']
 
-    ZWIKI_PAGE_TYPES = ['structuredtext', 'plaintext', 'html',
-                        'structuredtextdtml', 'htmldtml',
-                        'classicwiki']
+    ZWIKI_PAGE_TYPES = [ 'structuredtext'
+                       , 'plaintext'
+                       , 'html'
+                       , 'classicwiki'
+                       ]
     # mapping of action category (used by forms) to permission name
     _perms = {
         'move':CMFWikiPermissions.Move,
@@ -94,7 +94,6 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
                   'select_variable': 'ZWIKI_PAGE_TYPES'},
                  {'id':'username', 'type': 'string', 'mode': 'w'},
                  {'id':'parents', 'type': 'lines', 'mode': 'w'},
-                 {'id':'dtml_allowed', 'type': 'boolean', 'mode': 'w'},
                  {'id':'last_editor', 'type': 'string', 'mode': 'w'},
                  {'id':'last_log', 'type': 'string', 'mode': 'w'},
                  {'id':'comment_number', 'type': 'int', 'mode': 'w'},
@@ -128,55 +127,21 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
 
     security.declareProtected(CMFWikiPermissions.View, '__call__')
     def __call__(self, client=None, REQUEST={}, RESPONSE=None, **kw):
-        """Render a zwiki page, with standard header & footer
-        """
-        header = ''
-        footer = ''
-        if REQUEST is not None and not hasattr(REQUEST, 'noheaders'):
-            # prepend wiki header if it's defined
-            if hasattr(self, 'standard_wiki_header'):
-                header = apply(
-                    self.standard_wiki_header, (self, REQUEST, RESPONSE), kw)
-            else:
-                header = default_wiki_header(self, REQUEST)
-            # append wiki footer if it's defined
-            if hasattr(self, 'standard_wiki_footer'):
-                footer = apply(
-                    self.standard_wiki_footer, (self, REQUEST, RESPONSE), kw)
-            else:
-                footer = default_wiki_footer(self, REQUEST)
-        renderer = 'render_' + self.page_type
-        try:
-            renderer = getattr(self, renderer)
-        except AttributeError:
-            renderer = self.render_plaintext
-	if RESPONSE is not None:
-	    RESPONSE.setHeader('Content-Type', 'text/html')
-        # call render_<page_type> to render the body, appending head & foot
-        return header + apply(renderer,(self, REQUEST, RESPONSE), kw) + footer
+        '''
+        Invokes the default view.
+        '''
+        view = self._getDefaultView()
+        if getattr(aq_base(view), 'isDocTemp', 0):
+            return apply(view, (self, REQUEST))
+        else:
+            if REQUEST:
+                kw[ 'REQUEST' ] = REQUEST
+            if RESPONSE:
+                kw[ 'RESPONSE' ] = RESPONSE
 
-    def render_structuredtextdtml(self, client=None, REQUEST={},
-                                  RESPONSE=None, **kw): 
-        # DTML + structured text + wiki links + HTML
-        t = apply(DTMLDocument.__call__,
-                  (self, client, REQUEST, RESPONSE), kw)
-        # XXX problem: dtml decapitates() initial lines that look like
-        #              http headers! 
-        #              BAD DTML!!!
-        # (not-at-all-)quick workaround:keep a comment in front to hide them,
-        # omit it everywhere else; see _set_text, xread
-        t = protected_lineexp.sub(self._protect_line, t)
-	if self._st_data is None:
-            # XXX klm: Shouldn't happen -_st_data should've been set by edit.
-            t = str(html_with_references(t, level=3))
-        t = interwikilinkexp.sub(
-            thunk_substituter(self._interwikilink_replace, t, 1),
-            t)
-        t = wikilinkexp.sub(
-            thunk_substituter(self._wikilink_replace, t,
-                              self.isAllowed('create')),
-            t)
-        return t
+            return apply( view, (self,), kw )
+
+    index_html = None  # This special value informs ZPublisher to use __call__
 
     def render_structuredtext(self, client=None, REQUEST={},
                               RESPONSE=None, **kw):
@@ -215,21 +180,6 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
             t)
         return t
 
-    def render_htmldtml(self, client=None, REQUEST={}, RESPONSE=None, **kw):
-        # DTML + wiki links + HTML
-
-        t = apply(
-            DTMLDocument.__call__,(self, client, REQUEST, RESPONSE), kw)
-
-        t = protected_lineexp.sub(self._protect_line, t)
-        t = interwikilinkexp.sub(
-            thunk_substituter(self._interwikilink_replace, t, 1),
-            t)
-        t = wikilinkexp.sub(
-            thunk_substituter(self._wikilink_replace, t,
-                              self.isAllowed('create')),
-            t)
-        return t
 
     def render_html(self, client=None, REQUEST={}, RESPONSE=None, **kw):
         # wiki links + HTML
@@ -262,6 +212,22 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
         t = "<pre>\n" + html_quote(self.xread()) + "\n</pre>\n"
         return t
 
+    RENDERERS = { 'structuredtext'      : render_structuredtext
+                , 'structuredtextonly'  : render_structuredtextonly
+                , 'html'                : render_html
+                , 'classicwiki'         : render_classicwiki
+                , 'plaintext'           : render_plaintext
+                }
+
+    def render( self, client=None, REQUEST={}, RESPONSE=None, **kw ):
+        """
+            Determine the appropriate renderer, and call it.
+        """
+        renderer = self.RENDERERS[ self.page_type ]
+        if client is None:
+            client = self
+        return apply( renderer, ( self, client, REQUEST, RESPONSE ), kw )
+
     # XXX see render_structuredtextdtml
     def xread(self):
         return antidecapexp.sub('', self.read())
@@ -289,6 +255,23 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
     def _my_folder(self):
         """ Obtain parent folder """
         return aq_parent(aq_inner(self))
+
+    def _makeCreationLink( self, wiki_name, allowed ):
+        # Build the wiki creation link
+        action = self.REQUEST.get( 'WikiCreateAction', None )
+        if action is None:
+            action = self.getTypeInfo().getActionById( 'create' )
+            self.REQUEST.set( 'WikiCreateAction', action )
+        fmt =  ( allowed
+             and '%s<a href="%s/%s?page=%s">?</a>'
+              or '%s<sup><a href="%s/%s?page=%s">x</a></sup>'
+               )
+        return fmt % ( wiki_name
+                     , quote( self.getId() )
+                     , action
+                     , quote( wiki_name )
+                     )
+
 
     def _simplewikilink_replace(self, match, allowed=1, state=None, text=''):
         """replace an occurrence of simplewikilink with a suitable hyperlink
@@ -325,12 +308,8 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
             return '<a href="%s">%s</a>' % (obj.absolute_url(), m)
 
         # otherwise, provide a suitable creation link
-        elif allowed:
-            return ('%s<a href="%s/wiki_createform?page=%s">?</a>' %
-                    (m, quote(self.getId()), quote(m)))
         else:
-            return ('%s<sup><a href="%s/wiki_createform?page=%s">x</a></sup>'
-                    % (m, quote(self.getId()), quote(m)))
+            return self._makeCreationLink( m, allowed )
 
     def _wikilink_replace(self, match, allowed=0, state=None, text=''):
         """Replace occurrence of the wikilink regexp with suitable hyperlink.
@@ -387,14 +366,8 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
             return '<a href="%s">%s</a>' % (obj.absolute_url(), m) + e
 
         # otherwise, provide a suitable creation link
-        elif allowed:
-            return ('%s<a href="%s/wiki_createform?page=%s">?</a>'
-                    % (m, quote(self.getId()), quote(m)))+e
         else:
-            return (
-                '%s<sup><a href="%s/wiki_createform?page=%s">x</a></sup>' %
-                (m, quote(self.getId()), quote(m))
-                )+e
+            return self._makeCreationLink( m, allowed ) + e
 
     def _interwikilink_replace(self, match, allowed=0, state=None, text=''):
         """replace an occurrence of interwikilink with a suitable hyperlink.
@@ -517,14 +490,6 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
         if username == 'Anonymous User': username = ''
         self.last_editor = username
         if type is not None:
-            if (type[-4:] == 'dtml'
-                and not self.dtml_allowed
-                and (not hasattr(self._my_folder(), 'wiki_dtml_allowed')
-                     or not getattr(self._my_folder(), 'wiki_dtml_allowed')
-                     )
-                ):
-                raise 'ValueError', ('You may not set this page for dtml'
-                                     '(%s) processing.' % type)
             self.username = username
             self.page_type = type
         if log and string.strip(log):
@@ -805,14 +770,7 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
         # for DTML page types, execute the DTML to catch problems -
         # zope will magically roll back this whole transaction and the
         # user will get an appropriate error
-        if re.search(r'(?i)dtml',self.page_type):
-
-            # XXX see render_structuredtextdtml
-            t = antidecaptext + t
-
-            self.munge(t)               # In DT_String, sets self.raw.
-        else:
-            self.raw = t
+        self.raw = t
 
     def _text_cleanups(self, t):
         """do some cleanup of a page's new text
@@ -1034,8 +992,6 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
         "Get source for FTP download"
 
         candidates = ['structuredtext', 'plaintext']
-        if self.dtml_allowed:
-            candidates = candidates + ['structuredtextdtml', 'htmldtml']
         types = "%s (alternatives:" % self.page_type
         if self.page_type in candidates:
             candidates.remove(self.page_type)
@@ -1062,8 +1018,6 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
         if type is not None:
             type = string.split(type)[0]
             candidates = ['structuredtext', 'plaintext']
-            if self.dtml_allowed:
-                candidates = candidates + ['structuredtextdtml', 'htmldtml']
             if type not in candidates:
                 # Silently ignore it.
                 type = None
@@ -1233,8 +1187,20 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
             got.append(descend_ancestors(t, ancestors, did, offspring))
         return got or [[self.getId()]]
 
-    security.declarePublic('context')
-    def context(self, REQUEST=None, with_siblings=0):
+    security.declarePrivate('listActions')
+    def listActions( self, info ):
+        return [ { 'name' : 'Help'
+                 , 'url' : "javascript:window.open("
+                         "'WikiHelp',"
+                         "'WikiHelp',"
+                         "'menubar=no,toolbar=yes,scrollbars=yes,resizable=yes'"
+                           ").focus();"
+                 , 'permissions' : []
+                 , 'category' : 'object'
+                 } ]
+        
+    security.declarePublic('wiki_context')
+    def wiki_context(self, REQUEST=None, with_siblings=0):
         """Return HTML showing this page's parents and siblings."""
         myid = self.getId()
         if with_siblings:
@@ -1255,8 +1221,8 @@ class CMFWikiPage(DTMLDocument, PortalContent, DefaultDublinCoreImpl):
         return present_nesting(myid, nesting.get_offspring([myid]),
                                self.wiki_base_url()) # SKWM
 
-    security.declarePublic('map')
-    def map(self, REQUEST=None):
+    security.declarePublic('wiki_map')
+    def wiki_map(self, REQUEST=None):
         """Present the nesting layout of the entire wiki, showing:
         - All the independent nodes, ie those without parents or children,
         - All the branches in the wiki - from the possibly multiple roots."""
@@ -1570,8 +1536,7 @@ def _present_nesting_cur_node(rel, node, no_anchor=0):
     anchorexp = ((not no_anchor) and 'name="%s"' % quote(node)) or ''
     s = ('<font size="+2"><b><a %s href="%s/%s">%s</a></b></font>'
          % ((anchorexp, rel, quote(node), node)))
-    return s + (' / <a href="%s/%s/view_wiki_backlinks">backlinks</a>'
-                % (rel, quote(node)))
+    return s
     
 def present_nesting(myid, nesting, rel, no_anchors=0,
                     did=None, _got=None, indent=""):
@@ -1773,49 +1738,51 @@ def initPageMetadata(page):
 
 factory_type_information = (
     {'id': 'CMF Wiki Page',
-     'content_icon': 'wikipageicon.gif',
+     'content_icon': 'wikipage_icon.gif',
      'meta_type': 'CMF Wiki Page',
      'product': 'CMFWiki',
      'factory': 'addCMFWikiPage',
-     'immediate_view': 'view_wiki_page',
-     'actions': ({'id': 'view', # used for finding immediate view
+     'immediate_view': 'wikipage_view',
+     'actions': ({'id': 'view',
                   'name': 'View',
-                  'action': 'view_wiki_page',
+                  'action': 'wikipage_view',
                   'permissions': (CMFWikiPermissions.View,)},
                  {'id': 'comment',
                   'name': 'Comment',
-                  'action': 'add_wiki_comment',
+                  'action': 'wikipage_comment_form',
                   'permissions': (CMFWikiPermissions.Comment,)},
                  {'id': 'edit',
                   'name': 'Edit',
-                  'action': 'wiki_editform',
+                  'action': 'wikipage_edit_form',
                   'permissions': (CMFWikiPermissions.Edit,)},
                  {'id': 'history',
                   'name': 'History',
-                  'action': 'view_wiki_history',
+                  'action': 'wikipage_history',
                   'permissions': (CMFWikiPermissions.View,)},
                  {'id': 'backlinks',
                   'name': 'Backlinks',
-                  'action': 'view_wiki_backlinks',
+                  'action': 'wikipage_backlinks',
                   'permissions': (CMFWikiPermissions.View,)},
                  {'id': 'advanced',
                   'name': 'Advanced',
-                  'action': 'advanced_wiki_actions',
-                  'permissions': (CMFWikiPermissions.View,)},
-                 {'id': 'wikihelp',
-                  'name': 'WikiHelp',
-                  'action': 'view_wiki_help',
+                  'action': 'wikipage_advanced_form',
                   'permissions': (CMFWikiPermissions.View,)},
                  {'id': 'toc',
                   'name': 'Wiki Contents',
                   'category': 'folder',
-                  'action':'get_wiki_toc',
+                  'action':'wikipage_toc',
                   'permissions': (CMFWikiPermissions.View,)},
                  {'id': 'recent_changes',
                   'name': 'Recent Changes',
                   'category': 'folder',
-                  'action':'page_recent_wiki_changes',
+                  'action':'wikipage_recentchanges',
                   'permissions': (CMFWikiPermissions.View,)},
+                 {'id': 'create',
+                  'name': 'Create',
+                  'category': 'folder',
+                  'action':'wikipage_create_form',
+                  'permissions': (CMFWikiPermissions.Create,),
+                  'visible': 0 },
                  ),
      },
     {'id': 'CMF Wiki',
@@ -1825,31 +1792,31 @@ factory_type_information = (
                      'added to Wikis.'),
      'product': 'CMFWiki',
      'factory': 'addCMFWikiFolder',
-     'immediate_view': 'get_wiki_front_page',
+     'immediate_view': 'FrontPage',
      'actions': ({'id': 'toc',
                   'name': 'Wiki Contents',
                   'category': 'folder',
-                  'action':'folder_get_wiki_toc',
+                  'action':'wiki_toc',
                   'permissions': (CMFWikiPermissions.View,)},
                  {'id': 'view',
                   'name': 'FrontPage',
                   'category': 'folder',
-                  'action':'get_wiki_front_page',
+                  'action':'FrontPage',
                   'permissions': (CMFWikiPermissions.View,)},
                  {'id': 'all',
                   'name': 'All Pages',
                   'category': 'folder',
-                  'action':'all_wiki_pages',
+                  'action':'wiki_allpages',
                   'permissions': (CMFWikiPermissions.View,)},
                  {'id': 'recent_changes',
                   'name': 'Recent Changes',
                   'category': 'folder',
-                  'action':'recent_wiki_changes',
+                  'action':'wiki_recentchanges',
                   'permissions': (CMFWikiPermissions.View,)},
                  {'id': 'wikihelp',
                   'name': 'WikiHelp',
                   'category': 'folder',
-                  'action': 'view_wiki_help',
+                  'action': 'WikiHelp',
                   'permissions': (CMFWikiPermissions.View,)}
                  ),
      },
@@ -1863,19 +1830,11 @@ default_perms = {
     'regulate': 'owners'
     }
 
-class CMFWikiFolder(PortalFolder):
+class CMFWikiFolder( SkinnedFolder ):
+
     def PUT_factory(self, name, typ, body):
         if find(typ, 'text') != -1:
             return makeCMFWikiPage(name, '', body)
-
-    def index_html(self):
-        """Redirects to FrontPage, if any, else does acquired index_html."""
-        if hasattr(self, 'FrontPage'):
-            response = self.REQUEST.RESPONSE
-            return response.redirect(self['FrontPage'].absolute_url())
-        else:
-            return apply(getattr(self.aq_parent, 'index_html'),
-                         (self, self.REQUEST))
 
 def makeCMFWikiPage(id, title, file):
     ob = CMFWikiPage(source_string=file, __name__=id)

@@ -1,0 +1,102 @@
+<html xmlns:tal="http://xml.zope.org/namespaces/tal"
+       xmlns:metal="http://xml.zope.org/namespaces/metal"
+       metal:use-macro="here/main_template/macros/master">
+<body>
+<div metal:fill-slot="main">
+
+<div class="Desktop">
+
+<div tal:replace="structure here/wikipage_header"> </div>
+
+<div
+  tal:define="commentator python:here.isAllowed('comment', REQUEST=request);
+              editor python:here.isAllowed('edit', REQUEST=request);
+              commentcat python:here.opCategory('comment')">
+
+ <h3> Submit a Comment for <em tal:content="here/getId">page</em> </h3>
+
+ <p tal:condition="python:not commentator">
+   <strong> You are not allowed to comment on <span tal:replace="here/getId">
+    this page</span>. </strong>
+   (<span tal:replace="python:here.whichWho( commentcat )" /> may add
+   a comment to this page.)
+ </p>
+
+<div tal:condition="commentator">
+
+  <p> Submit a comment to be appended to the page.  Your comment 
+      will be automatically prefaced with your username and the current
+      time, and be formatted according to the
+      <a href="TextFormattingRules" target="_blank">TextFormattingRules</a>.
+  </p>
+
+  <p> The current page source is provided for cut-and-paste citing.
+      Groups of '&gt;' prefixed citation lines will be bracketed with
+      &lt;pre&gt; ... &lt;/pre&gt;, to prevent unruly flowing.  Please be
+      sparing with cited text!
+  </p>
+
+  <p tal:condition="python:not editor">
+      <em>Note that you can't change your comments, once submitted.
+      See <a href="wikipage_advanced_form">Advanced Actions</a>
+      for page policy. </em> </p>
+
+  <form method="POST"
+        action="wikipage_editcomment_handler"
+        enctype="multipart/form-data">
+  <input type="hidden" name="page" tal:attributes="value here/getId">
+
+  <table width="100%" border="0" cellspacing="0" cellpadding="5">
+    <tr bgcolor="eeeeee">
+      <td colspan=2 align="center">
+        <strong> Comment on <span tal:replace="python: here.getId()[:40]">
+                 page </span>; </strong> <br>
+        <textarea wrap="soft" name="comment"
+                  rows="7" cols="80"
+                  tal:attributes="cols request/zwiki_width missing | default"
+        ></textarea>
+      </td>
+    </tr>
+    <tr bgcolor="eeeeee">
+      <td valign="middle" align="left">
+        See <a href="HowDoIEdit" target="_blank">HowDoIEdit</a>
+        for help. <br> <span tal:replace="here/page_type" />
+      </td>
+      <td valign="middle" align="right">
+        <table> <tr>
+          <td>
+            <input type="checkbox" name="ack_requested" value="ON">
+                   Request Editor Remark? &nbsp;
+          </td>
+          <td>
+            <input type="submit"
+                   name="Comment"
+                   value="Submit Comment">
+          </td> </tr> </table>
+      </td>
+    </tr>
+    <tr>
+      <td colspan=2 align="center">
+        <strong> Citation Source </strong> (For copying - not editable) <br>
+        <!-- Readonly *and* onkeydown for browser diversity: -->
+        <textarea wrap="soft" name="text"
+                  rows="15" cols="80" readonly
+                  onkeydown="this.blur(); return false;"
+                  tal:attributes="rows request/zwiki_height | default;
+                                  cols request/zwiki_width  | default"
+                  tal:content="here/prep_citation"></textarea>
+      </td>
+    </tr>
+  </table>
+ </form>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</body>
+</html>

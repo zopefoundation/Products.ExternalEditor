@@ -1,1 +1,0 @@
-<dtml-call "RESPONSE.redirect(URL1)">

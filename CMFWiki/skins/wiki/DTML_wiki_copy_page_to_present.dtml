@@ -1,5 +1,0 @@
-<dtml-let keys="REQUEST['keys']" url="absolute_url()">
-  <dtml-call "history_copy_page_to_present(keys)">
-  <dtml-call "RESPONSE.redirect('%s' % url)">
-</dtml-let>
-

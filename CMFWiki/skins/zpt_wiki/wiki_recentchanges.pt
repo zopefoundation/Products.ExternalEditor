@@ -1,0 +1,47 @@
+<html xmlns:tal="http://xml.zope.org/namespaces/tal"
+       xmlns:metal="http://xml.zope.org/namespaces/metal"
+       metal:use-macro="here/main_template/macros/master">
+<body>
+<div metal:fill-slot="main">
+
+<div class="Desktop"
+     tal:define="pages python: here.wiki_listpages( sort_order='modified' )"
+>
+
+<p> Most recently changed pages in this CMFWikiWeb.  See also 
+    <a href="wiki_allpages">All Pages</a>.
+</p>
+
+<table border="0">
+
+ <tr>
+  <th align="left">Page</th>
+  <th align="left">Size</th>
+  <th align="left">Last modified</th>
+ </tr>
+
+ <tr tal:repeat="page pages">
+
+  <td>
+   <a href="PageID"
+      tal:attributes="href page/getId"
+      tal:content="page/getId"
+   >PageID</a>
+  </td>
+  <td align="right" tal:content="page/getSize">
+    1234
+  </td>
+  <td tal:content="page/bobobase_modification_time">
+    2001/01/01 08:00:00 CST
+  </td>
+ </tr>
+</table>
+
+<p> (<span tal:content="python: len( pages )">123</span> pages) </p>
+
+
+</div>
+
+</div>
+</body>
+</html>
