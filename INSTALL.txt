@@ -2,7 +2,7 @@ Installing CMF 1.1beta
 
   Requirements
 
-    - Zope v. 2.3.2 or later
+    - Zope v. 2.3.2 or later (*not* 2.4a1)
 
   Assumptions
 
@@ -30,3 +30,55 @@ Installing CMF 1.1beta
 
     4. Create a CMF Site object. join, and begin adding content.
        Enjoy!
+
+    *Note:* --
+          the optional 'CMFDecor' product **requires** that you have
+          "Zope Page Templates", http://www.zope.org/Members/4am/ZPT
+          installed;  if you don't have it, then don't link/copy in
+          'CMFDecor'.
+
+Upgrading from CMF 1.0
+
+
+  Install the New Software.
+
+    0. "Download":CMF-1.1beta.tar.gz the tarball.
+
+    1. Copy your "working" products off to one side (in case
+       you need / choose to revert).
+
+    2. Unpack the tarball into a separate location; copy or
+       link the subdirectories into the 'Products' directory of
+       your INSTANCE_HOME.
+
+    3. Restart Zope.
+
+  Create and Configure New tools
+
+    'portal_metadata' tool
+
+      1. From the ZMI of your CMFSite, select "CMFDefault Tool"
+         from the Add list.  Select "Default Metadata Tool" and
+         click "Add".
+
+      2. Configure the "Elements" tab, particularly the "Subject"
+         element (give it "suggested" subjects, perhaps by
+         looking at the values on the search page).
+
+    'portal_syndication'
+
+      1. From the ZMI of your CMFSite, select "CMFDefault Tool"
+         from the Add list.  Select "Default Syndication Tool"
+         and click "Add".
+
+      2. Use the "Properties" tab to enable syndication for the
+         site (if desired), and then to configure the "sitewide"
+         policies for outbound syndication.  Once enabled, you
+         will be able to toggle syndication and policies for
+         individual folders as well.
+
+  Add New Content Type:  Event
+
+      1. Build and run the installation ExternalMethod as
+         described in CMFCalendar/INSTALL.txt.
+
