@@ -31,7 +31,7 @@ from string import join
 from Expression import Expression, createExprContext
 from ActionInformation import ActionInformation, oai
 from ActionProviderBase import ActionProviderBase
-
+from TypesTool import TypeInformation
 
 class ActionsTool(UniqueObject, OFS.Folder.Folder, ActionProviderBase):
     """
@@ -200,29 +200,28 @@ class ActionsTool(UniqueObject, OFS.Folder.Folder, ActionProviderBase):
         if object is not None:
             base = aq_base(object)
             types_tool = getToolByName( self, 'portal_types' )
-            ti = types_tool.getTypeInfo( object )
-            if ti is not None:
-                defs = ti.getActions()
-                if defs:
-                    c_url = object.absolute_url()
-                    for d in defs:
-                        a = d['action']
-                        if a:
-                            url = c_url + '/' + a
-                        else:
-                            url = c_url
-                        actions.append({
-                            'id': d.get('id', None),
-                            'name': d['name'],
-                            'action': d['action'],
-                            'url': url,
-                            'permissions': d['permissions'],
-                            'category': d.get('category', 'object'),
-                            'visible': d.get('visible', 1),
-                            })                
+            # we might get None back from getTypeInfo.  We construct
+            # a dummy TypeInformation object here in that case (the 'or'
+            # case).  This prevents us from needing to check the condition.
+            ti = types_tool.getTypeInfo( object ) or TypeInformation('Dummy')
+            defs = ti.getActions()
+            url = object.absolute_url()
+            for d in defs:
+                # we can't modify or expose the original actionsd... this
+                # stems from the fact that getActions returns a ref to the
+                # actual dictionary used to store actions instead of a
+                # copy.  We copy it here to prevent it from being modified.
+                d = d.copy()
+                d['id'] = d.get('id', None)
+                if d['action']:
+                    url = '%s/%s' % (url, d['action'])
+                d['url'] = url
+                d['category'] = d.get('category', 'object')
+                d['visible'] = d.get('visible', 1)
+                actions.append(d)
+
             if hasattr(base, 'listActions'):
                 self._listActions(append,object,info,ec)
-                
 
         # Reorganize the actions by category,
         # filtering out disallowed actions.

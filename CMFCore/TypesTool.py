@@ -306,19 +306,20 @@ class TypeInformation (SimpleItemWithProperties):
         actions = []
         for idx in range(len(self._actions)):
             s_idx = str(idx)
-            action = {
-                'id': str(properties.get('id_' + s_idx, '')),
-                'name': str(properties.get('name_' + s_idx, '')),
-                'action': str(properties.get('action_' + s_idx, '')),
-                'permissions':
-                (properties.get('permission_' + s_idx, ()),),
-                'category': str(properties.get('category_' + s_idx, '')),
-                'visible': not not properties.get('visible_' + s_idx, 0),
-                }
+            action = self._actions[idx].copy()
+            action.update( {
+                    'id': str(properties.get('id_' + s_idx, '')),
+                    'name': str(properties.get('name_' + s_idx, '')),
+                    'action': str(properties.get('action_' + s_idx, '')),
+                    'permissions':
+                    (properties.get('permission_' + s_idx, ()),),
+                    'category': str(properties.get('category_' + s_idx, '')),
+                    'visible': not not properties.get('visible_' + s_idx, 0),
+                    } )
             if not action['name']:
                 raise ValueError('A name is required.')
-            actions.append(action)
-        self._actions = tuple(actions)
+            actions.append( action )
+        self._actions = tuple( actions )
         if REQUEST is not None:
             return self.manage_editActionsForm(REQUEST, manage_tabs_message=
                                                'Actions changed.')
@@ -476,6 +477,7 @@ class FactoryTypeInformation (TypeInformation):
         """
         # Get the factory method, performing a security check
         # in the process.
+
         m = self._getFactoryMethod(container, raise_exc=1)
 
         if m is None:
