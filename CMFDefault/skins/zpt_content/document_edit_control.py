@@ -1,56 +1,20 @@
 ## Script (Python) "document_edit_control"
-##bind container=container
-##bind context=context
-##bind namespace=
-##bind script=script
-##bind subpath=traverse_subpath
-##parameters=text_format='', text='', file='', SafetyBelt='', change='', change_and_view=''
+##parameters=text_format='', text='', file='', SafetyBelt='', change='', change_and_view='', **kw
 ##title=
 ##
-from ZTUtils import make_query
-from Products.CMFDefault.exceptions import EditingConflict
-from Products.CMFDefault.exceptions import IllegalHTML
-from Products.CMFDefault.exceptions import ResourceLockedError
-from Products.CMFDefault.utils import scrubHTML
-
-message = ''
-
-
-if change or change_and_view:
-    ok = 1
-    message = 'Nothing to change.'
-
-    try:
-        upload = file.read()
-    except AttributeError:
-        pass
-    else:
-        if upload:
-            text = upload
-
-    try:
-        text = scrubHTML(text)
-    except IllegalHTML, msg:
-        ok = 0
-        message = msg
-
-    if ok and (text_format != context.text_format or text != context.text):
-        try:
-            context.edit(text_format, text, safety_belt=SafetyBelt)
-        except (ResourceLockedError, EditingConflict), msg:
-            ok = 0
-            message = msg
-        else:
-            message = 'Document changed.'
-
-    if ok and change_and_view:
-        target = context.getActionInfo('object/view')['url']
-        query = make_query(portal_status_message=message)
-        context.REQUEST.RESPONSE.redirect( '%s?%s' % (target, query) )
-        return None
-
-if message:
-    context.REQUEST.set('portal_status_message', message)
+form = context.REQUEST.form
+if change and \
+        context.validateTextFile(**form) and \
+        context.validateHTML(**form) and \
+        context.document_edit(**form) and \
+        context.setRedirect(context, 'object/edit'):
+    return
+elif change_and_view and \
+        context.validateTextFile(**form) and \
+        context.validateHTML(**form) and \
+        context.document_edit(**form) and \
+        context.setRedirect(context, 'object/view'):
+    return
 
 
 control = {}
