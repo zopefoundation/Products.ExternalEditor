@@ -84,7 +84,7 @@ class CMFCatalogAware(Base):
         catalog = getToolByName(self, 'portal_catalog', None)
         if catalog is not None:
             path = '/'.join(self.getPhysicalPath())
-            for brain in catalog.searchResults(path=path):
+            for brain in catalog.unrestrictedSearchResults(path=path):
                 ob = brain.getObject()
                 if ob is None:
                     # Ignore old references to deleted objects.
