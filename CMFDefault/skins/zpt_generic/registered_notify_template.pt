@@ -1,5 +1,4 @@
-<tal:page xmlns:tal="http://xml.zope.org/namespaces/tal"
-   tal:define="control python: here.registered_notify_control(**options)"
+<tal:page tal:define="control python: context.registered_notify(**options)"
 ><div tal:omit-tag="" i18n:domain="cmf_default"
 >Subject: <tal:span i18n:translate=""><tal:span i18n:name="portal_title"
                                          tal:content="control/portal_title"
