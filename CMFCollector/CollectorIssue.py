@@ -237,6 +237,1074 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
              text=None):
         """Update the explicitly passed fields."""
 
+<<<<<<< CollectorIssue.py
+<<<<<<< CollectorIssue.py
+    ACTIONS_ORDER = [ 'Accept'
+                    , 'Assign'
+                    , 'Resolve'
+                    , 'Reject'
+                    , 'Defer'
+                    , 'Resign'
+                    ] 
+
+    _action_number = 0
+
+    _submitter_id = _submitter_email = _submitter_name = None
+    _supporters = ()
+    _kibitzers = ()
+    _security_related = 0
+    _topic = _classification = _importance = _resolution = None
+    _version_info = ''
+    _invisible = 0
+
+    def __init__( self
+                , id
+                , title=''
+                , description=''
+                ):
+
+        SkinnedFolder.__init__( self
+                              , id
+                              , title
+                              )
+
+        DefaultDublinCoreImpl.__init__( self
+                                      , title=title
+                                      , description=description
+                                      )
+
+        self._create_transcript( title, description )
+
+    #
+    #   Property management.
+    #
+    security.declareProtected( CMFCorePermissions.View, 'isSecurityRelated' )
+    def isSecurityRelated( self ):
+        """
+            Is this issue related to security (and therefore, should it
+            receive special handling)?
+        """
+        return self._security_related
+
+    security.declareProtected( EditCollectorIssue, 'setSecurityRelated' )
+    def setSecurityRelated( self, security_related ):
+        """
+            Assign the "security related" flag.
+        """
+        self._security_related = not not security_related
+
+    security.declareProtected( CMFCorePermissions.View, 'getTopic' )
+    def getTopic( self ):
+        """
+            What is the "topic" of this issue (typically, the
+            subsystem, package, or component to which it pertains)?
+        """
+        return self._topic
+
+    security.declareProtected( EditCollectorIssue, 'setTopic' )
+    def setTopic( self, topic ):
+        """
+            Assign the "topic" field.
+        """
+        self._topic = topic
+
+    security.declareProtected( CMFCorePermissions.View, 'getClassification' )
+    def getClassification( self ):
+        """
+            What is the "kind" of this issue (typically, bug report,
+            feature request, etc.)?
+        """
+        return self._classification
+
+    security.declareProtected( EditCollectorIssue, 'setClassification' )
+    def setClassification( self, classification ):
+        """
+            Assign the "classification" field.
+        """
+        self._classification = classification
+
+    security.declareProtected( CMFCorePermissions.View, 'getImportance' )
+    def getImportance( self ):
+        """
+            What is the "importance" of this issue (typically, "critical",
+            "high", etc.)?
+        """
+        return self._importance
+
+    security.declareProtected( EditCollectorIssue, 'setImportance' )
+    def setImportance( self, importance ):
+        """
+            Assign the "importance" field.
+        """
+        self._importance = importance
+
+    security.declareProtected( CMFCorePermissions.View, 'getVersionInfo' )
+    def getVersionInfo( self ):
+        """
+            To what "version" of the software does the issue pertain?
+        """
+        return self._version_info
+
+    security.declareProtected( EditCollectorIssue, 'setVersionInfo' )
+    def setVersionInfo( self, version_info ):
+        """
+            Assign the "importance" field.
+        """
+        self._version_info = version_info
+
+    security.declareProtected( CMFCorePermissions.View, 'isInvisible' )
+    def isInvisible( self ):
+        """
+            Is this issue "hidden" from catalog queries?
+        """
+        return self._invisible
+
+    security.declareProtected( EditCollectorIssue, 'setInvisible' )
+    def setInvisible( self, invisible ):
+        """
+            Assign invisibility.
+        """
+        self._invisible = invisible
+
+    security.declareProtected( EditCollectorIssue, 'edit' )
+    def edit( self
+            , title=None
+            , description=None
+            , security_related=None
+            , topic=None
+            , classification=None
+            , importance=None
+            , version_info=None
+            , comment=None
+            , text=None
+            , submitter_id=None
+            , submitter_name=None
+            , submitter_email=None
+            ):
+        """
+            Update the explicitly passed fields.
+        """
+=======
+    ACTIONS_ORDER = [ 'Accept'
+                    , 'Assign'
+                    , 'Resolve'
+                    , 'Reject'
+                    , 'Defer'
+                    , 'Resign'
+                    ] 
+
+    _action_number = 0
+
+    _security_related = 0
+    _topic = _classification = _importance = _resolution = None
+    _version_info = ''
+    _invisible = 0
+    _submitter_id = _submitter_email = _submitter_name = None
+    _supporters = ()
+    _kibitzers = ()
+
+    def __init__( self
+                , id
+                , title=''
+                , description=''
+                , creation_date=None
+                , effective_date=None
+                , expiration_date=None
+                , submitter_id=None
+                , submitter_name=None
+                , submitter_email=None
+                , supporters=None
+                , kibitzers=None
+                , security_related=0
+                , topic=None
+                , classification=None
+                , importance=None
+                , resolution=None
+                , version_info=''
+                , invisible=0
+                ):
+
+        SkinnedFolder.__init__( self
+                              , id
+                              , title
+                              )
+
+        DefaultDublinCoreImpl.__init__( self
+                                      , title=title
+                                      , description=description
+                                      , effective_date=effective_date
+                                      , expiration_date=expiration_date
+                                      )
+        if creation_date is not None:
+            self.creation_date = creation_date
+
+        self._submitter_id = submitter_id
+        self._submitter_name = submitter_name
+        self._submitter_email = submitter_email
+        self._supporters = supporters or ()
+        self._kibitzers = kibitzers or ()
+
+        self.setSecurityRelated( security_related )
+        self._topic = topic
+        self._classification = classification
+        self._importance = importance
+        self._resolution = resolution
+        self._version_info = version_info
+        self._invisible = invisible
+
+        self._create_transcript( description )
+
+    #
+    #   Property management.
+    #
+    security.declareProtected( CMFCorePermissions.View, 'isSecurityRelated' )
+    def isSecurityRelated( self ):
+        """
+            Is this issue related to security (and therefore, should it
+            receive special handling)?
+        """
+        return self._security_related
+
+    security.declareProtected( EditCollectorIssue, 'setSecurityRelated' )
+    def setSecurityRelated( self, security_related ):
+        """
+            Assign the "security related" flag.
+        """
+        self._security_related = not not security_related
+
+    security.declareProtected( CMFCorePermissions.View, 'getTopic' )
+    def getTopic( self ):
+        """
+            What is the "topic" of this issue (typically, the
+            subsystem, package, or component to which it pertains)?
+        """
+        return self._topic
+
+    security.declareProtected( EditCollectorIssue, 'setTopic' )
+    def setTopic( self, topic ):
+        """
+            Assign the "topic" field.
+        """
+        self._topic = topic
+
+    security.declareProtected( CMFCorePermissions.View, 'getClassification' )
+    def getClassification( self ):
+        """
+            What is the "kind" of this issue (typically, bug report,
+            feature request, etc.)?
+        """
+        return self._classification
+
+    security.declareProtected( EditCollectorIssue, 'setClassification' )
+    def setClassification( self, classification ):
+        """
+            Assign the "classification" field.
+        """
+        self._classification = classification
+
+    security.declareProtected( CMFCorePermissions.View, 'getImportance' )
+    def getImportance( self ):
+        """
+            What is the "importance" of this issue (typically, "critical",
+            "high", etc.)?
+        """
+        return self._importance
+
+    security.declareProtected( EditCollectorIssue, 'setImportance' )
+    def setImportance( self, importance ):
+        """
+            Assign the "importance" field.
+        """
+        self._importance = importance
+
+    security.declareProtected( CMFCorePermissions.View, 'getVersionInfo' )
+    def getVersionInfo( self ):
+        """
+            To what "version" of the software does the issue pertain?
+        """
+        return self._version_info
+
+    security.declareProtected( EditCollectorIssue, 'setVersionInfo' )
+    def setVersionInfo( self, version_info ):
+        """
+            Assign the "importance" field.
+        """
+        self._version_info = version_info
+
+    security.declareProtected( EditCollectorIssue, 'edit' )
+    def edit( self
+            , title=None
+            , description=None
+            , security_related=None
+            , topic=None
+            , classification=None
+            , importance=None
+            , version_info=None
+            , comment=None
+            , text=None
+            , submitter_id=None
+            , submitter_name=None
+            , submitter_email=None
+            ):
+        """
+            Update the explicitly passed fields.
+        """
+>>>>>>> 1.38.2.1
+        changes = []
+
+        if self.hasChanged( 'Title', title ):
+            changes.append('revised title')
+            self.setTitle( title )
+
+        if self.hasChanged( 'Description', description ):
+            changes.append('revised description')
+            self.setDescription( description )
+
+        if self.hasChanged( 'isSecurityRelated', security_related ):
+            changes.append('security_related %s'
+                        % (security_related and 'set' or 'unset'))
+            self.setSecurityRelated( security_related )
+
+        if self.hasChanged( 'getTopic', topic ):
+            changes.append('topic (%s => %s)' % (self._topic, topic))
+            self.setTopic( topic )
+
+        if self.hasChanged( 'getClassification', classification ):
+            changes.append('classification (%s => %s)'
+                           % (self.classification, classification))
+            self.setClassification( classification )
+
+        if self.hasChanged( 'getImportance', importance ):
+            changes.append('importance (%s => %s)'
+                           % (self.importance, importance))
+            self.setImportance( importance )
+
+        if self.hasChanged( 'getVersionInfo', version_info ):
+            changes.append('revised version_info')
+            self._version_info = version_info
+
+        if comment:
+            changes.append('new comment')
+
+        transcript = self.get_transcript()
+        text = text.replace('\r', '')
+
+        if self.hasChanged( 'EditableBody', text  ):
+            changes.append('edited transcript')
+            transcript.edit(text_format=self.TRANSCRIPT_FORMAT, text=text)
+
+        changes.extend( self.setSubmitter( submitter_id
+                                         , submitter_name
+                                         , submitter_email
+                                         ) )
+        if not changes:
+            return 'No changes.'
+
+        self._incrementActionNumber()
+
+        username = str(getSecurityManager().getUser())
+
+        if comment:
+            comment = "\n\n" + comment
+        else:
+            comment = ''
+
+        transcript.edit(self.TRANSCRIPT_FORMAT,
+                         self._entry_header('Edit', username)
+                         + "\n\n"
+                         + " Changes: " + ", ".join(changes)
+                         + comment
+                         + ((self.getActionNumber() > 1) and "\n" + RULE + "\n")
+                         + transcript.EditableBody())
+        self.reindexObject()
+        self._send_update_notice('Edit', username)
+        return ", ".join(changes)
+
+<<<<<<< CollectorIssue.py
+    security.declareProtected( EditCollectorIssue, 'hasChanged' )
+    def hasChanged( self, field_name, value ):
+        """
+            True if value is not None and different than self.field_name.
+        """
+        if value is None:
+            return 0
+
+        method = getattr( self, field_name )
+        return method() != value
+    
+    #
+    #   Manage data about the submitter.
+    #
+    security.declareProtected( EditCollectorIssue, 'getSubmitterEmail' )
+    def getSubmitter( self ):
+        """
+            Return the member object for the submitter, or None
+        """
+        member = None
+
+        if self._submitter_id is not None:
+            try:
+                mtool = getToolByName( self, 'portal_membership' )
+            except AttributeError:
+                pass
+            else:
+                member = mtool.getMemberById( self._submitter_id )
+        
+        return member
+
+    security.declareProtected( EditCollectorIssue, 'getSubmitterId' )
+    def getSubmitterId( self ):
+        """
+            Return the id of the submitter (None for anonymous submission).
+        """
+        return self._submitter_id
+
+    security.declareProtected( EditCollectorIssue, 'getSubmitterName' )
+    def getSubmitterName( self ):
+        """
+            Return the name of the submitter (defaults to the ID).
+        """
+        if self._submitter_name is not None:
+            return self._submitter_name
+
+        member = self.getSubmitter()
+
+        if member:
+            return util.safeGetProperty( member, 'full_name', None )
+
+        return self._submitter_id or 'Anonymous'
+
+    security.declareProtected( EditCollectorIssue, 'getSubmitterEmail' )
+    def getSubmitterEmail( self ):
+        """
+            Return the e-mail address of the submitter, if possible.
+        """
+        if self._submitter_email is not None:
+            return self._submitter_email
+
+        member = self.getSubmitter()
+
+        if member:
+            return util.safeGetProperty( member, 'email', None )
+
+        return None
+
+    security.declareProtected( EditCollectorIssue, 'setSubmitter' )
+    def setSubmitter( self
+                    , submitter_id=None
+                    , submitter_name=None
+                    , submitter_email=None
+                    ):
+        """
+            Given an id, set the name and email as warranted.
+
+            Return a list of strings indicating the fields which have
+            been changed.
+        """
+        changes = []
+        member = None
+
+        if submitter_id is not None:
+            try:
+                mtool = getToolByName( self, 'portal_membership' )
+            except AttributeError:
+                pass
+            else:
+                member = mtool.getMemberById( submitter_id )
+
+        if self._submitter_id != submitter_id:
+            changes.append( "submitter id: '%s' => '%s'"
+                          % (self._submitter_id, submitter_id ) )
+            self._submitter_id = submitter_id
+
+        if self._submitter_name != submitter_name:
+            changes.append('submitter name')
+            self._submitter_name = submitter_name
+
+        email_pref = util.safeGetProperty( member, 'email', '' )
+
+        if submitter_email and submitter_email == email_pref:
+            # A bit different than you'd expect: only stash the specified
+            # email if it's different than the member-preference.  Otherwise,
+            # stash None, so the preference is tracked at send time.
+            submitter_email = None
+
+        if self._submitter_email != submitter_email:
+            changes.append("submitter email")
+            self._submitter_email = submitter_email
+
+        return changes
+
+    #
+    #   Manage supporters.
+    #
+    security.declareProtected(CMFCorePermissions.View, 'assigned_to')
+    def assigned_to(self):
+        """
+            Return the current supporters list, according to workflow.
+
+            XXX:  Deprectaed; retained only to allow conversions from 
+                  old-style issues which didn't manage their own supporters.
+        """
+        wftool = getToolByName(self, 'portal_workflow')
+        return wftool.getInfoFor(self, 'assigned_to', ()) or ()
+
+    security.declareProtected(CMFCorePermissions.View, 'is_assigned')
+    def is_assigned(self):
+        """
+            Return boolean indicating whehter the current user is a supporter.
+        """
+        mtool = getToolByName( self, 'portal_membership' )
+        member = mtool.getAuthenticatedMember()
+
+        return member.getUserName() in self.listSupporters()
+
+    security.declarePublic( 'diffUserLists' )
+    def diffUserLists( self, old, new ):
+        """
+            Return (list-of-added-users, list-of-removed-users).
+        """
+        plus, minus = list( new ), []
+
+        for userid in list( old ):
+
+            if userid in plus:
+                plus.remove( userid )
+            else:
+                minus.append( userid )
+
+        return ( plus, minus )
+
+    security.declareProtected( CMFCorePermissions.View, 'listSupporters' )
+    def listSupporters( self ):
+        """
+            Return a list (possibly empty) of user IDs of supporters
+            assigned to this issue.
+        """
+        return self._supporters
+
+    security.declareProtected( EditCollectorIssue, 'addSupporter' )
+    def addSupporter( self, supporter ):
+        """
+            Add 'supporter' to the list of users who are assigned to
+            this issue.
+        """
+        if supporter in self._supporters:
+            raise ValueError, 'Already assigned: %s' % supporter
+
+        supporters = list( self._supporters )
+        supporters.append( supporter )
+        self._supporters = tuple( supporters )
+
+    security.declareProtected( EditCollectorIssue, 'removeSupporter' )
+    def removeSupporter( self, supporter ):
+        """
+            Remove 'supporter' from the list of users who are assigned to
+            this issue.
+        """
+        if supporter not in self._supporters:
+            raise ValueError, 'Not assigned: %s' % supporter
+
+        supporters = list( self._supporters )
+        supporters.remove( supporter )
+        self._supporters = tuple( supporters )
+
+    security.declareProtected( EditCollectorIssue, 'setSupporters' )
+    def setSupporters( self, supporters ):
+        """
+            Update our list of supporters;  return a list of strings
+            indicating the changes (additions, removals).
+        """
+        changes = []
+
+        added, removed = self.diffUserLists( self._supporters, supporters )
+        self._supporters = tuple( supporters )
+
+        if added:
+            changes.append( 'added supporters: %s' % ' '.join( added ) )
+
+        if removed:
+            changes.append( 'removed supporters: %s' % ' '.join( removed ) )
+
+        return changes
+
+    security.declareProtected( EditCollectorIssue, 'clearSupporters' )
+    def clearSupporters( self ):
+        """
+            Remove all supporters from an issue.
+        """
+        del self._supporters
+
+
+    #
+    #   Manage other interested parties.
+    #
+    security.declareProtected( CMFCorePermissions.View, 'listKibitzers' )
+    def listKibitzers( self ):
+        """
+            Return a list (possibly empty) of user IDs of non-supporters
+            who have subscribed to this issue.
+        """
+        return self._kibitzers
+
+    security.declareProtected( EditCollectorIssue, 'addKibitzer' )
+    def addKibitzer( self, kibitzer ):
+        """
+            Add 'kibitzer' to the list of users who are subscribed to
+            this issue.
+        """
+        if kibitzer in self._kibitzers:
+            raise ValueError, 'Already subscribed: %s' % kibitzer
+
+        kibitzers = list( self._kibitzers )
+        kibitzers.append( kibitzer )
+        self._kibitzers = tuple( kibitzers )
+
+    security.declareProtected( EditCollectorIssue, 'removeKibitzer' )
+    def removeKibitzer( self, kibitzer ):
+        """
+            Remove 'kibitzer' from the list of users who are subscribed to
+            this issue.
+        """
+        if kibitzer not in self._kibitzers:
+            raise ValueError, 'Not subscribed: %s' % kibitzer
+
+        kibitzers = list( self._kibitzers )
+        kibitzers.remove( kibitzer )
+        self._kibitzers = tuple( kibitzers )
+
+    security.declareProtected( EditCollectorIssue, 'setKibitzers' )
+    def setKibitzers( self, kibitzers ):
+        """
+            Update our list of kibitzers;  return a list of strings
+            indicating the changes (additions, removals).
+        """
+        changes = []
+
+        added, removed = self.diffUserLists( self._kibitzers, kibitzers )
+        self._kibitzers = tuple( kibitzers )
+
+        if added:
+            changes.append( 'added kibitzers: %s' % ' '.join( added ) )
+
+        if removed:
+            changes.append( 'removed kibitzers: %s' % ' '.join( removed ) )
+
+        return changes
+
+    security.declareProtected( EditCollectorIssue, 'clearKibitzers' )
+    def clearKibitzers( self ):
+        """
+            Remove all kibitzers from an issue.
+        """
+        del self._kibitzers
+
+    #
+    #   Manage the transcript.
+    #
+    security.declarePrivate( '_create_transcript' )
+    def _create_transcript(self, title, description):
+        """
+            Create events and comments transcript, with initial entry.
+        """
+        addWebTextDocument( self
+                          , TRANSCRIPT_NAME
+                          , title=title
+                          , description=description
+                          )
+        it = self.get_transcript()
+        it._setPortalTypeName('Collector Issue Transcript')
+
+    security.declareProtected( CMFCorePermissions.View, 'getTranscript' )
+    def getTranscript( self ):
+        """
+            Return the transcript
+        """
+        return self._getOb( TRANSCRIPT_NAME )
+
+    get_transcript = getTranscript
+
+    security.declareProtected( CMFCorePermissions.View, 'CookedBody' )
+    def CookedBody( self ):
+        """
+            Render the transcript.
+        """
+        body = self.get_transcript().CookedBody()
+        return uploadexp.sub(r'\1 <a href="%s/\2/view">\2</a>\3'
+                             % self.absolute_url(),
+                             body)
+
+    security.declareProtected(CMFCorePermissions.View, 'cited_text')
+    def cited_text(self):
+        """
+            Quote text for use in literal citations.
+        """
+        return util.cited_text( self.get_transcript().EditableBody() )
+        
+    #
+    #   "Audit trail" management.
+    #
+    security.declarePrivate( '_incrementActionNumber')
+    def _incrementActionNumber( self ):
+        """
+            Bump the "action" counter.
+        """
+        self._action_number += 1
+
+    security.declareProtected( CMFCorePermissions.View, 'getActionNumber' )
+    def getActionNumber( self ):
+        """
+            Return the sequence number of the most recent action.
+        """
+        return self._action_number
+=======
+    security.declareProtected( EditCollectorIssue, 'hasChanged' )
+    def hasChanged( self, field_name, value ):
+        """
+            True if value is not None and different than self.field_name.
+        """
+        if value is None:
+            return 0
+
+        method = getattr( self, field_name )
+        return method() != value
+>>>>>>> 1.38.2.1
+    
+<<<<<<< CollectorIssue.py
+    security.declareProtected( AddCollectorIssueFollowup, 'do_action')
+    def do_action(self,
+                  action,
+                  comment,
+                  file=None,
+                  fileid=None,
+                  filetype=None):
+=======
+    #
+    #   Manage data about the submitter.
+    #
+    security.declareProtected( EditCollectorIssue, 'getSubmitterEmail' )
+    def getSubmitter( self ):
+        """
+            Return the member object for the submitter, or None
+        """
+        member = None
+
+        if self._submitter_id is not None:
+            try:
+                mtool = getToolByName( self, 'portal_membership' )
+            except AttributeError:
+                pass
+            else:
+                member = mtool.getMemberById( self._submitter_id )
+        
+        return member
+
+    security.declareProtected( EditCollectorIssue, 'getSubmitterId' )
+    def getSubmitterId( self ):
+        """
+            Return the id of the submitter (None for anonymous submission).
+        """
+        return self._submitter_id
+
+    security.declareProtected( EditCollectorIssue, 'getSubmitterName' )
+    def getSubmitterName( self ):
+        """
+            Return the name of the submitter (defaults to the ID).
+        """
+        if self._submitter_name is not None:
+            return self._submitter_name
+
+        member = self.getSubmitter()
+
+        if member:
+            return util.safeGetProperty( member, 'full_name', None )
+
+        return self._submitter_id or 'Anonymous'
+
+    security.declareProtected( EditCollectorIssue, 'getSubmitterEmail' )
+    def getSubmitterEmail( self ):
+        """
+            Return the e-mail address of the submitter, if possible.
+        """
+        if self._submitter_email is not None:
+            return self._submitter_email
+
+        member = self.getSubmitter()
+
+        if member:
+            return util.safeGetProperty( member, 'email', None )
+
+        return None
+
+    security.declareProtected( EditCollectorIssue, 'setSubmitter' )
+    def setSubmitter( self
+                    , submitter_id=None
+                    , submitter_name=None
+                    , submitter_email=None
+                    ):
+        """
+            Given an id, set the name and email as warranted.
+
+            Return a list of strings indicating the fields which have
+            been changed.
+        """
+        changes = []
+        member = None
+
+        if submitter_id is not None:
+            try:
+                mtool = getToolByName( self, 'portal_membership' )
+            except AttributeError:
+                pass
+            else:
+                member = mtool.getMemberById( submitter_id )
+
+        if self._submitter_id != submitter_id:
+            changes.append( "submitter id: '%s' => '%s'"
+                          % (self._submitter_id, submitter_id ) )
+            self._submitter_id = submitter_id
+
+        if self._submitter_name != submitter_name:
+            changes.append('submitter name')
+            self._submitter_name = submitter_name
+
+        email_pref = util.safeGetProperty( member, 'email', '' )
+
+        if submitter_email and submitter_email == email_pref:
+            # A bit different than you'd expect: only stash the specified
+            # email if it's different than the member-preference.  Otherwise,
+            # stash None, so the preference is tracked at send time.
+            submitter_email = None
+
+        if self._submitter_email != submitter_email:
+            changes.append("submitter email")
+            self._submitter_email = submitter_email
+
+        return changes
+
+    #
+    #   Manage supporters.
+    #
+    security.declareProtected(CMFCorePermissions.View, 'assigned_to')
+    def assigned_to(self):
+        """
+            Return the current supporters list, according to workflow.
+
+            XXX:  Deprectaed; retained only to allow conversions from 
+                  old-style issues which didn't manage their own supporters.
+        """
+        wftool = getToolByName(self, 'portal_workflow')
+        return wftool.getInfoFor(self, 'assigned_to', ()) or ()
+
+    security.declareProtected(CMFCorePermissions.View, 'is_assigned')
+    def is_assigned(self):
+        """
+            Return boolean indicating whehter the current user is a supporter.
+        """
+        mtool = getToolByName( self, 'portal_membership' )
+        member = mtool.getAuthenticatedMember()
+
+        return member.getUserName() in self.listSupporters()
+
+    security.declarePublic( 'diffUserLists' )
+    def diffUserLists( self, old, new ):
+        """
+            Return (list-of-added-users, list-of-removed-users).
+        """
+        plus, minus = list( new ), []
+
+        for userid in list( old ):
+
+            if userid in plus:
+                plus.remove( userid )
+            else:
+                minus.append( userid )
+
+        return ( plus, minus )
+
+    security.declareProtected( CMFCorePermissions.View, 'listSupporters' )
+    def listSupporters( self ):
+        """
+            Return a list (possibly empty) of user IDs of supporters
+            assigned to this issue.
+        """
+        return self._supporters
+
+    security.declareProtected( EditCollectorIssue, 'addSupporter' )
+    def addSupporter( self, supporter ):
+        """
+            Add 'supporter' to the list of users who are assigned to
+            this issue.
+        """
+        if supporter in self._supporters:
+            raise ValueError, 'Already assigned: %s' % supporter
+
+        supporters = list( self._supporters )
+        supporters.append( supporter )
+        self._supporters = tuple( supporters )
+
+    security.declareProtected( EditCollectorIssue, 'removeSupporter' )
+    def removeSupporter( self, supporter ):
+        """
+            Remove 'supporter' from the list of users who are assigned to
+            this issue.
+        """
+        if supporter not in self._supporters:
+            raise ValueError, 'Not assigned: %s' % supporter
+
+        supporters = list( self._supporters )
+        supporters.remove( supporter )
+        self._supporters = tuple( supporters )
+
+    security.declareProtected( EditCollectorIssue, 'setSupporters' )
+    def setSupporters( self, supporters ):
+        """
+            Update our list of supporters;  return a list of strings
+            indicating the changes (additions, removals).
+        """
+        changes = []
+
+        added, removed = self.diffUserLists( self._supporters, supporters )
+        self._supporters = tuple( supporters )
+
+        if added:
+            changes.append( 'added supporters: %s' % ' '.join( added ) )
+
+        if removed:
+            changes.append( 'removed supporters: %s' % ' '.join( removed ) )
+
+        return changes
+
+    security.declareProtected( EditCollectorIssue, 'clearSupporters' )
+    def clearSupporters( self ):
+        """
+            Remove all supporters from an issue.
+        """
+        del self._supporters
+
+
+    #
+    #   Manage other interested parties.
+    #
+    security.declareProtected( CMFCorePermissions.View, 'listKibitzers' )
+    def listKibitzers( self ):
+        """
+            Return a list (possibly empty) of user IDs of non-supporters
+            who have subscribed to this issue.
+        """
+        return self._kibitzers
+
+    security.declareProtected( EditCollectorIssue, 'addKibitzer' )
+    def addKibitzer( self, kibitzer ):
+        """
+            Add 'kibitzer' to the list of users who are subscribed to
+            this issue.
+        """
+        if kibitzer in self._kibitzers:
+            raise ValueError, 'Already subscribed: %s' % kibitzer
+
+        kibitzers = list( self._kibitzers )
+        kibitzers.append( kibitzer )
+        self._kibitzers = tuple( kibitzers )
+
+    security.declareProtected( EditCollectorIssue, 'removeKibitzer' )
+    def removeKibitzer( self, kibitzer ):
+        """
+            Remove 'kibitzer' from the list of users who are subscribed to
+            this issue.
+        """
+        if kibitzer not in self._kibitzers:
+            raise ValueError, 'Not subscribed: %s' % kibitzer
+
+        kibitzers = list( self._kibitzers )
+        kibitzers.remove( kibitzer )
+        self._kibitzers = tuple( kibitzers )
+
+    security.declareProtected( EditCollectorIssue, 'setKibitzers' )
+    def setKibitzers( self, kibitzers ):
+        """
+            Update our list of kibitzers;  return a list of strings
+            indicating the changes (additions, removals).
+        """
+        changes = []
+
+        added, removed = self.diffUserLists( self._kibitzers, kibitzers )
+        self._kibitzers = tuple( kibitzers )
+
+        if added:
+            changes.append( 'added kibitzers: %s' % ' '.join( added ) )
+
+        if removed:
+            changes.append( 'removed kibitzers: %s' % ' '.join( removed ) )
+
+        return changes
+
+    security.declareProtected( EditCollectorIssue, 'clearKibitzers' )
+    def clearKibitzers( self ):
+        """
+            Remove all kibitzers from an issue.
+        """
+        del self._kibitzers
+
+    #
+    #   Manage the transcript.
+    #
+    security.declarePrivate( '_create_transcript' )
+    def _create_transcript(self, description):
+        """
+            Create events and comments transcript, with initial entry.
+        """
+        addWebTextDocument( self
+                          , TRANSCRIPT_NAME
+                          , title=self.Title()
+                          , description=description
+                          )
+        it = self.get_transcript()
+        it._setPortalTypeName('Collector Issue Transcript')
+
+    security.declareProtected( CMFCorePermissions.View, 'getTranscript' )
+    def getTranscript( self ):
+        """
+            Return the transcript
+        """
+        return self._getOb( TRANSCRIPT_NAME )
+
+    get_transcript = getTranscript
+
+    security.declareProtected( CMFCorePermissions.View, 'CookedBody' )
+    def CookedBody( self ):
+        """
+            Render the transcript.
+        """
+        body = self.get_transcript().CookedBody()
+        return uploadexp.sub(r'\1 <a href="%s/\2/view">\2</a>\3'
+                             % self.absolute_url(),
+                             body)
+
+    security.declareProtected(CMFCorePermissions.View, 'cited_text')
+    def cited_text(self):
+        """
+            Quote text for use in literal citations.
+        """
+        return util.cited_text( self.get_transcript().EditableBody() )
+        
+    #
+    #   "Audit trail" management.
+    #
+    security.declarePrivate( '_incrementActionNumber')
+    def _incrementActionNumber( self ):
+        """
+            Bump the "action" counter.
+        """
+        self._action_number += 1
+
+    security.declareProtected( CMFCorePermissions.View, 'getActionNumber' )
+    def getActionNumber( self ):
+        """
+            Return the sequence number of the most recent action.
+        """
+        return self._action_number
+=======
         changes = []
         changed = self._changed
 
@@ -311,16 +1379,17 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
     security.declareProtected(CMFCorePermissions.View, 'get_transcript')
     def get_transcript(self):
         return self._getOb(TRANSCRIPT_NAME)
+>>>>>>> 1.39
     
     security.declareProtected(AddCollectorIssueFollowup, 'do_action')
     def do_action(self, action, comment,
                   assignees=None, file=None, fileid=None, filetype=None):
+>>>>>>> 1.38.2.1
         """Execute an action, adding comment to the transcript."""
 
         action_number = self.action_number = self.action_number + 1
         username = str(getSecurityManager().getUser())
 
-        orig_supporters = self.assigned_to()
         # Strip off '_confidential' from status, if any.
         orig_status = string.split(self.status(), '_')[0]
 
@@ -333,7 +1402,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
                                              action,
                                              comment=comment,
                                              username=username,
-                                             assignees=assignees)
+                                             assignees=self.listSupporters())
 
         new_status = string.split(self.status(), '_')[0]
 
@@ -348,16 +1417,6 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
             and (new_status != orig_status)):
             comment_header.append(" Status: %s => %s"
                                   % (orig_status, new_status))
-
-        additions, removals = self._supporters_diff(orig_supporters)
-        if additions or removals:
-            if additions:
-                reroster = " Supporters added: %s" % ", ".join(additions)
-                if removals:
-                    reroster += "; removed: %s" % ", ".join(removals)
-            elif removals:
-                reroster = " Supporters removed: %s" % ", ".join(removals)
-            comment_header.append(reroster)
 
         (uploadmsg, fileid) = self._process_file(file, fileid,
                                                   filetype, comment)
@@ -379,8 +1438,80 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
                                        file=file, fileid=fileid)
         return got
 
+<<<<<<< CollectorIssue.py
+<<<<<<< CollectorIssue.py
+    #
+    #   File uploads.
+    #
+    def _process_file(self, file, fileid, filetype, comment):
+        """Upload file to issue if it is substantial (has a name).
+
+        Return a message describing the file, for transcript inclusion."""
+        if file and file.filename:
+            if not fileid:
+                fileid = string.split(string.split(file.filename, '/')[-1],
+                                      '\\')[-1]
+            upload = self._add_artifact(fileid, filetype, comment, file)
+            uploadmsg = "%s%s" % (UPLOAD_PREFIX, fileid)
+            return (uploadmsg, fileid)
+        else:
+            return ('', '')
+
+    def _add_artifact(self, id, type, description, file):
+        """Add new artifact, and return object."""
+        self.invokeFactory(type, id)
+        it = self._getOb(id)
+        # Acquire view and access permissions from container
+        it.manage_permission('View', acquire=1)
+        it.manage_permission('Access contents information', acquire=1)
+        it.description = description
+        it.manage_upload(file)
+        return it
+=======
+    #
+    #   File uploads.
+    #
+    def _process_file(self, file, fileid, filetype, comment):
+        """Upload file to issue if it is substantial (has a name).
+>>>>>>> 1.38.2.1
+
+<<<<<<< CollectorIssue.py
+    def upload_number(self):
+        """ """
+        return len(self)
+=======
+        Return a message describing the file, for transcript inclusion."""
+        if file and file.filename:
+            if not fileid:
+                fileid = string.split(string.split(file.filename, '/')[-1],
+                                      '\\')[-1]
+            upload = self._add_artifact(fileid, filetype, comment, file)
+            uploadmsg = "%s%s" % (UPLOAD_PREFIX, fileid)
+            return (uploadmsg, fileid)
+        else:
+            return ('', '')
+>>>>>>> 1.38.2.1
+
+<<<<<<< CollectorIssue.py
+    #
+    #   E-mail notification.  XXX:  This belongs in the workflow!
+    #
+    security.declarePrivate( '_send_update_notice' )
+=======
+    def _add_artifact(self, id, type, description, file):
+        """Add new artifact, and return object."""
+        self.invokeFactory(type, id)
+        it = self._getOb(id)
+        # Acquire view and access permissions from container
+        it.manage_permission('View', acquire=1)
+        it.manage_permission('Access contents information', acquire=1)
+        it.description = description
+        it.manage_upload(file)
+        return it
+=======
     def _supporters_diff(self, orig_supporters):
         """Indicate supporter roster changes, relative to orig_supporters.
+>>>>>>> 1.39
 
         Return (list-of-added-supporters, list-of-removed-supporters)."""
         plus, minus = list(self.assigned_to()), []
@@ -389,6 +1520,14 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
             else: minus.append(supporter)
         return (plus, minus)
 
+<<<<<<< CollectorIssue.py
+    #
+    #   E-mail notification.  XXX:  This belongs in the workflow!
+    #
+    security.declarePrivate( '_send_update_notice' )
+>>>>>>> 1.38.2.1
+=======
+>>>>>>> 1.39
     def _send_update_notice(self, action, actor,
                             orig_status=None, additions=None, removals=None,
                             file=None, fileid=None, lower=string.lower):
@@ -576,15 +1715,22 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
     security.declareProtected(CMFCorePermissions.View, 'review_state')
     review_state = status
 
-    security.declareProtected(CMFCorePermissions.View, 'confidential')
-    def confidential(self):
+    security.declareProtected(CMFCorePermissions.View, 'isConfidential')
+    def isConfidential(self):
         """True if workflow has the issue marked confidential.
 
         (Security_related issues start confidential, and are made
         unconfidential on any completion.)"""
         wftool = getToolByName(self, 'portal_workflow')
+<<<<<<< CollectorIssue.py
+        return wftool and wftool.getInfoFor(self, 'confidential', 0)
+
+=======
         return wftool.getInfoFor(self, 'confidential', 0)
 
+<<<<<<< CollectorIssue.py
+>>>>>>> 1.38.2.1
+=======
     def _create_transcript(self, description):
         """Create events and comments transcript, with initial entry."""
 
@@ -594,6 +1740,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
         it._setPortalTypeName('Collector Issue Transcript')
         it.title = self.title
 
+>>>>>>> 1.39
     def _entry_header(self, type, user, prefix="= ", suffix=""):
         """Return text for the header of a new transcript entry."""
         # Ideally this would be a skin method (probly python script), but i
@@ -649,12 +1796,40 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
     security.declareProtected(CMFCorePermissions.ModifyPortalContent,
                               'indexObject')
     def indexObject(self):
+<<<<<<< CollectorIssue.py
+<<<<<<< CollectorIssue.py
+        """
+            Index the issue into the catalog(s) which are available,
+            including both the "internal" catalog of the collector and
+            the portal_catalog (either of which may not be present).
+
+            'invisible' indicates that the issue should not show up
+            in the catalog.
+        """
+        if not self.isInvisible():
+            for catalog in self._listCatalogs():
+                catalog.indexObject( self )
+=======
+        """
+            Index the issue into the catalog(s) which are available,
+            including both the "internal" catalog of the collector and
+            the portal_catalog (either of which may not be present).
+
+            'invisible' indicates that the issue should not show up
+            in the catalog.
+        """
+        if not self.invisible:
+            for catalog in self._listCatalogs():
+                catalog.indexObject( self )
+>>>>>>> 1.38.2.1
+=======
         if self.invisible:
             return
         for i in (self._get_internal_catalog(),
                   getToolByName(self, 'portal_catalog', None)):
             if i is not None:
                 i.indexObject(self)
+>>>>>>> 1.39
 
     security.declareProtected(CMFCorePermissions.ModifyPortalContent,
                               'unindexObject')
@@ -667,9 +1842,73 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
     security.declareProtected(CMFCorePermissions.ModifyPortalContent,
                               'reindexObject')
     def reindexObject(self, internal_only=0):
+<<<<<<< CollectorIssue.py
+<<<<<<< CollectorIssue.py
+        """
+            Index the issue into the catalog(s) which are available,
+            including both the "internal" catalog of the collector and
+            the portal_catalog (either of which may not be present).
+
+            'invisible' indicates that the issue should not show up
+            in the catalog.
+        """
+        if not self.isInvisible():
+            for catalog in self._listCatalogs( internal_only=internal_only ):
+                catalog.reindexObject( self )
+
+    security.declarePrivate( '_listCatalogs' )
+    def _listCatalogs( self, internal_only=0 ):
+        """
+            Return a list of the catalogs into which the issue is indexed.
+        """
+        result = []
+        parent = getattr( self, 'aq_parent', None )
+
+        if parent is not None:
+
+            try:
+                internal = parent.get_internal_catalog()
+            except AttributeError:
+                pass
+            else:
+                result.append( internal )
+
+=======
+        """
+            Index the issue into the catalog(s) which are available,
+            including both the "internal" catalog of the collector and
+            the portal_catalog (either of which may not be present).
+
+            'invisible' indicates that the issue should not show up
+            in the catalog.
+        """
+        if not self.invisible:
+            for catalog in self._listCatalogs( internal_only=internal_only ):
+                catalog.reindexObject( slef )
+
+    security.declarePrivate( '_listCatalogs' )
+    def _listCatalogs( self, internal_only=0 ):
+        """
+            Return a list of the catalogs into which the issue is indexed.
+        """
+        result = []
+        parent = getattr( self, 'aq_parent', None )
+
+        if parent is not None:
+
+            try:
+                internal = parent.get_internal_catalog()
+            except AttributeError:
+                pass
+            else:
+                result.append( internal )
+
+>>>>>>> 1.38.2.1
+=======
         if self.invisible:
             return
         catalogs = [self._get_internal_catalog()]
+>>>>>>> 1.39
         if not internal_only:
             catalogs.append(getToolByName(self, 'portal_catalog', None))
         for i in catalogs:
@@ -742,6 +1981,10 @@ def addCollectorIssue(self,
                       id,
                       title='',
                       description='',
+<<<<<<< CollectorIssue.py
+                      REQUEST=None
+                     ):
+=======
                       submitter_id=None,
                       submitter_name=None,
                       submitter_email=None,
@@ -751,9 +1994,16 @@ def addCollectorIssue(self,
                       security_related=0,
                       importance=None,
                       version_info=None,
+<<<<<<< CollectorIssue.py
+                      invisible=0,
+                      REQUEST=None
+                     ):
+>>>>>>> 1.38.2.1
+=======
                       assignees=None,
                       file=None, fileid=None, filetype=None,
                       REQUEST=None):
+>>>>>>> 1.39
     """Create a new issue in the collector.
 
     We return a string indicating any errors, or None if there weren't any."""
@@ -761,6 +2011,9 @@ def addCollectorIssue(self,
     it = CollectorIssue(id=id,
                         container=self,
                         title=title,
+<<<<<<< CollectorIssue.py
+                        description=description)
+=======
                         description=description,
                         submitter_id=submitter_id,
                         submitter_name=submitter_name,
@@ -771,10 +2024,15 @@ def addCollectorIssue(self,
                         security_related=security_related,
                         importance=importance,
                         version_info=version_info,
+<<<<<<< CollectorIssue.py
+                        invisible=invisible
+                       )
+>>>>>>> 1.38.2.1
+=======
                         assignees=assignees,
                         file=file, fileid=fileid, filetype=filetype)
+>>>>>>> 1.39
     it = self._getOb(it.id)
-    got = it.do_action('request', description, assignees,
-                       file, fileid, filetype)
+    got = it.do_action('request', description, file, fileid, filetype)
 
     return got
