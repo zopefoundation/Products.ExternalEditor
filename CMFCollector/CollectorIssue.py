@@ -666,7 +666,7 @@ class CollectorIssue(SkinnedFolder, DefaultDublinCoreImpl):
 
     security.declareProtected(CMFCorePermissions.ModifyPortalContent,
                               'reindexObject')
-    def reindexObject(self, internal_only=0):
+    def reindexObject(self, idxs=[], internal_only=0):
         if self.invisible:
             return
         catalogs = [self._get_internal_catalog()]
