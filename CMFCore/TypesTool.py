@@ -16,6 +16,7 @@ $Id$
 """
 
 import sys
+import warnings
 
 from Globals import DTMLFile
 from Globals import InitializeClass
@@ -840,11 +841,17 @@ class TypesTool(UniqueObject, Folder, ActionProviderBase):
     def listContentTypes( self, container=None, by_metatype=0 ):
         """
             Return list of content types.
+
+        o Passing 'by_metatype' is deprecated (type information may not
+          correspond 1:1 to an underlying meta_type).
         """
         typenames = {}
         for t in self.listTypeInfo( container ):
 
             if by_metatype:
+                LOG('CMFCore.TypesTool', WARNING,
+                    'TypeInformation.listContentTypes(by_metatype=1) '
+                   +'is deprecated.')
                 name = t.Metatype()
             else:
                 name = t.getId()

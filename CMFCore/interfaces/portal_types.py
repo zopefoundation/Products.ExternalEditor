@@ -30,6 +30,9 @@ class ContentTypeInformation(Interface):
     def Metatype():
         """
             Return the Zope 'meta_type' for this content object.
+
+        o Deprecated (not all objects of a given type may even share
+          the same meta_type).
         """
     
     def Title():
