@@ -257,7 +257,7 @@ class Topic( PortalFolder ):
             for cid in criterion_id:
                 self._delObject( cid )
 
-    security.declarePublic( CMFCorePermissions.View, 'getCriterion' )
+    security.declareProtected( CMFCorePermissions.View, 'getCriterion' )
     def getCriterion( self, criterion_id ):
         """
             Get the criterion object.
