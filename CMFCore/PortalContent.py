@@ -94,7 +94,8 @@ import CMFCorePermissions
 from interfaces.Contentish import Contentish
 from DynamicType import DynamicType
 from utils import getToolByName, _checkPermission
-from webdav.WriteLockInterface import WriteLockInterface
+try: from webdav.WriteLockInterface import WriteLockInterface
+except ImportError: pass
 from Acquisition import aq_base
 
 
