@@ -115,33 +115,29 @@ def install(self):
     addDirectoryViews( skinstool, 'skins', cmfdecor_globals )
     out.write( "Added CMFDecor directory views to portal_skins\n" )
 
-    # Setup the skins
-    # This is borrowed from CMFDefault/scripts/addImagesToSkinPaths.pys
-    for skin_dir in ( 'zpt_content'
-                    , 'zpt_control'
-                    , 'zpt_generic'
-                    , 'zpt_images'
-                    ):
+    #
+    #   Add a new skin, 'ZPT', copying 'Basic', if it exists, and then
+    #   add our directories only to it.
+    #
+    if skinstool.getSkinPath( 'ZPT' ) is None:
 
-        # Go through the skin configurations and insert each skin directory
-        # into the configurations.  Preferably, this should be right before
-        # where 'content' is placed.  Otherwise, we append it to the end.
-        names = skinstool.getSkinSelections()
-        for name in names:
-            path = skinstool.getSkinPath(name)
-            path = map(string.strip, string.split(path,','))
-            if skin_dir not in path:
-                try: path.insert( path.index('content'), skin_dir )
-                except ValueError:
-                    path.append( skin_dir )
+        path = skinstool.getSkinPath( skinstool.getDefaultSkin() )
+        path = map( string.strip, string.split( path,',' ) )
+        for zptdir in ( 'zpt_content'
+                      , 'zpt_control'
+                      , 'zpt_generic'
+                      , 'zpt_images'
+                      ):
+            try:
+                path.insert( path.index( 'content' ), zptdir )
+            except ValueError:
+                path.append( zptdir )
                     
-                path = string.join(path, ', ')
-                # addSkinSelection will replace exissting skins as well.
-                skinstool.addSkinSelection( name, path )
-                out.write("Added %s to %s skin\n" % ( skin_dir, name ) )
-            else:
-                out.write("Skipping %s skin, %s is already set up\n" % (
-                    name, skin_dir))
+        path = string.join( path, ', ' )
+        skinstool.addSkinSelection( 'ZPT', path )
+        out.write( "Added ZPT skin\n" )
+    
+    else:
+        out.write( "ZPT skin already exists\n" )
 
     return out.getvalue()
-
