@@ -145,9 +145,12 @@ class DynamicType:
                 if relative_to_portal:
                     return icon
                 else:
-                    # Need the full path to the icon.
+                    # Relative to REQUEST['BASEPATH1']
                     portal_url = getToolByName( self, 'portal_url' )
-                    return portal_url() + '/' + icon
+                    res = portal_url(relative=1) + '/' + icon
+                    while res[:1] == '/':
+                        res = res[1:]
+                    return res
         return 'misc_/OFSP/dtmldoc.gif'
 
     security.declarePublic('icon')
