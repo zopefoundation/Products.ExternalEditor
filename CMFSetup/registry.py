@@ -3,6 +3,7 @@
 $Id$
 """
 import re
+from types import StringTypes
 from xml.sax import parseString
 from xml.sax.handler import ContentHandler
 
@@ -102,14 +103,7 @@ class SetupStepRegistry( Implicit ):
         if info is None:
             return default
 
-        for key, value in info.items():
-
-            if key == 'handler':
-                result[ key ] = _getDottedName( value )
-            else:
-                result[ key ] = value
-
-        return result
+        return info.copy()
 
     security.declareProtected( ManagePortal, 'listStepMetadata' )
     def listStepMetadata( self ):
@@ -144,7 +138,7 @@ class SetupStepRegistry( Implicit ):
         if info is marker:
             return default
 
-        return info[ 'handler' ]
+        return _resolveDottedName( info[ 'handler' ] )
     
     security.declarePrivate( 'registerStep' )
     def registerStep( self
@@ -197,9 +191,12 @@ class SetupStepRegistry( Implicit ):
             title = title or t
             description = description or d
 
+        if type( handler ) not in StringTypes:
+            handler = _getDottedName( handler )
+
         info = { 'id'           : id
                , 'version'      : version
-               , 'handler'     : handler
+               , 'handler'      : handler
                , 'dependencies' : dependencies
                , 'title'        : title
                , 'description'  : description
@@ -390,21 +387,12 @@ class ExportScriptRegistry( Implicit ):
 
         o The 'handler' metadata is available via 'getScript'.
         """
-        result = {}
-
         info = self._registered.get( key )
 
         if info is None:
             return default
 
-        for key, value in info.items():
-
-            if key == 'handler':
-                result[ key ] = _getDottedName( value )
-            else:
-                result[ key ] = value
-
-        return result
+        return info.copy()
 
     security.declareProtected( ManagePortal, 'listScriptMetadata' )
     def listScriptMetadata( self ):
@@ -439,7 +427,7 @@ class ExportScriptRegistry( Implicit ):
         if info is marker:
             return default
 
-        return info[ 'handler' ]
+        return _resolveDottedName( info[ 'handler' ] )
 
     security.declarePrivate( 'registerScript' )
     def registerScript( self, id, handler, title=None, description=None ):
@@ -470,8 +458,11 @@ class ExportScriptRegistry( Implicit ):
             title = title or t
             description = description or d
 
+        if type( handler ) not in StringTypes:
+            handler = _getDottedName( handler )
+
         info = { 'id'           : id
-               , 'handler'     : handler
+               , 'handler'      : handler
                , 'title'        : title
                , 'description'  : description
                }

@@ -4,6 +4,7 @@ $Id$
 """
 import os
 from inspect import getdoc
+from types import StringTypes, InstanceType
 
 from Globals import package_home
 
@@ -12,9 +13,15 @@ _wwwdir = os.path.join( _pkgdir, 'www' )
 _datadir = os.path.join( _pkgdir, 'data' )
 _xmldir = os.path.join( _pkgdir, 'xml' )
 
-def _getDottedName( callable ):
+def _getDottedName( named ):
 
-    return '%s.%s' % ( callable.__module__, callable.__name__ )
+    if isinstance( named, StringTypes ):
+        return str( named )
+
+    try:
+        return '%s.%s' % ( named.__module__, named.__name__ )
+    except AttributeError:
+        raise ValueError, 'Cannot compute dotted name: %s' % named
 
 def _resolveDottedName( dotted ):
 
