@@ -200,13 +200,12 @@ class DefaultWorkflowDefinition (SimpleItemWithProperties):
     security.declarePrivate('listGlobalActions')
     def listGlobalActions(self, info):
         '''
-        Allows this workflow to
-        include actions to be displayed in the actions box.
-        Called on every request.
+        Allows this workflow to include actions to be displayed
+        in the actions box.  Called on every request.
+        
         Returns the actions to be displayed to the user.
         '''
-        if (info.isAnonymous or not _checkPermission(
-            'Review portal content', info.portal)):
+        if info.isAnonymous:
             return None
 
         actions = []
