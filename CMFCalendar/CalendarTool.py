@@ -129,27 +129,16 @@ class CalendarTool (UniqueObject, SimpleItem):
         last_day=calendar.monthrange(year, month)[1]
         ## This line was cropping the last day of the month out of the
         ## calendar when doing the query
-	## last_date=DateTime(str(month)+'/'+str(last_day)+'/'+str(year))
-	last_date=first_date + last_day    
+    	## last_date=DateTime(str(month)+'/'+str(last_day)+'/'+str(year))
+    	last_date=first_date + last_day    
         
-	query=self.portal_catalog(portal_type=self.calendar_types,
+    	query=self.portal_catalog(portal_type=self.calendar_types,
                                   review_state='published',	                          
-                                  start=(first_date, last_date),
-                                  start_usage='range:min:max',
+                                  start=last_date,
+                                  start_usage='range:max',
+                                  end=first_date,
+                                  end_usage='range:min',
                                   sort_on='start')
-        # I don't like doing two searches
-        # What i want to do is
-        # start date => 1/1/2002 and start date <= 31/1/2002
-        # or
-        # end date => 1/1/2002 and end date <= 31/1/2002
-        # but I don't know how to do that in one search query :(  - AD
-
-        # if you look at calendar_slot you can see how to do this in 1 query - runyaga
-        query+=self.portal_catalog(portal_type=self.calendar_types,
-                                   review_state='published',
-                                   end=(first_date, last_date),
-                                   end_usage='range:min:max',
-                                   sort_on='end')
         
         # compile a list of the days that have events
         eventDays={}
