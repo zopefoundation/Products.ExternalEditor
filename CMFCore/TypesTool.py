@@ -451,7 +451,6 @@ class FactoryTypeInformation (TypeInformation):
             raise ValueError, ('Product factory for %s was undefined' %
                                self.getId())
         p = container.manage_addProduct[self.product]
-        
         m = getattr(p, self.factory, None)
         if m is None:
             raise ValueError, ('Product factory for %s was invalid' %
@@ -460,17 +459,26 @@ class FactoryTypeInformation (TypeInformation):
             return m
         raise Unauthorized, ('Cannot create %s' % self.getId())
 
-    def _queryFactoryMethod(self, container, m=None):
+    def _queryFactoryMethod(self, container, default=None):
+        if not self.product or not self.factory:
+            return default
         try:
-            if self.product and self.factory:
-                p = container.manage_addProduct[self.product]
-                t = getattr(p, self.factory, None)
-                if getSecurityManager().validate(p, p, self.factory, t):
-                    m = t
+            p = container.manage_addProduct[self.product]
+            m = getattr(p, self.factory, None)
+            if m is None:
+                return default
+            try:
+                # validate() can either raise Unauthorized or return 0 to
+                # mean unauthorized.
+                if getSecurityManager().validate(p, p, self.factory, m):
+                    return m
+            except Unauthorized:
+                pass
+            return default
         except:
             LOG('Types Tool', ERROR, '_queryFactoryMethod raised an exception',
                 error=sys.exc_info())
-        return m
+        return default
 
     security.declarePublic('isConstructionAllowed')
     def isConstructionAllowed ( self, container ):
