@@ -33,7 +33,12 @@ class ExternalEditor(Acquisition.Implicit):
         """Publish the object to the external editor helper app"""
         
         security = getSecurityManager()
-        ob = getattr(self.aq_parent, REQUEST['target'])
+        parent = self.aq_parent
+        try:
+            ob = parent[REQUEST['target']]
+        except AttributeError:
+            # Handle objects that are methods in ZClasses
+            ob = parent.propertysheets.methods[REQUEST['target']]
         
         if not security.checkPermission('View management screen', ob):
             raise 'Unauthorized'

@@ -1,5 +1,12 @@
 External Editor Change Log
 
+    - Made it possible to edit objects that are methods of ZClasses. Thanks to
+      Jim Washington
+
+    - Refactored link generation code in manage_main so that it uses
+      the parent's absolute_url rather than URL1. Thanks to
+      Jim Washington
+
     - Removed implicit save in Configuration class destructor
 
     - Added caching headers to prevent client-side caching of edit data.
