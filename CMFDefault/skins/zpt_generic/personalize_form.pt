@@ -5,17 +5,17 @@
 
 <div metal:fill-slot="main">
 
- <div tal:define="mtool here/portal_membership;
+ <div tal:define="purl here/portal_url;
+                  mtool here/portal_membership;
                   member mtool/getAuthenticatedMember;
                  ">
 
   <div tal:condition="python: not( mtool.checkPermission( 'Set own properties'
-                                                        , here ) )">
-    <span tal:define="purl here/portal_url;
-                      aurl here/absolute_url;
-                      rurl string:${purl}/login_form?came_from=${aurl};
-                      response request/RESPONSE;
-                      redirect python:response.redirect( rurl )" />
+                                                        , here ) )"
+       tal:define="aurl here/absolute_url;
+                   rurl string:${purl}/login_form?came_from=${aurl};
+                   response request/RESPONSE;
+                   redirect python:response.redirect( rurl )" >
 
   </div><!-- not Set own properties -->
 
