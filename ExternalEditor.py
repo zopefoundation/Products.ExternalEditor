@@ -96,6 +96,8 @@ class ExternalEditor(Acquisition.Implicit):
                 if creator and creator[1] == user_id:
                     # Found a lock for this user, so send it
                     r.append('lock-token:%s' % lock.getLockToken())
+                    if REQUEST.get('borrow_lock'):
+                        r.append('borrow_lock:1')
                     break       
               
         r.append('')
@@ -137,7 +139,7 @@ class ExternalEditor(Acquisition.Implicit):
 
 InitializeClass(ExternalEditor)
 
-def EditLink(self, object):
+def EditLink(self, object, borrow_lock=0):
     """Insert the external editor link to an object if appropriate"""
     base = Acquisition.aq_base(object)
     user = getSecurityManager().getUser()
@@ -146,13 +148,15 @@ def EditLink(self, object):
                 or hasattr(base, 'document_src')
                 or hasattr(base, 'read'))
     if editable and user.has_permission(ExternalEditorPermission, object):
-        return ('<a href="%s/externalEdit_/%s" '
+        url = "%s/externalEdit_/%s" % (
+            object.aq_parent.absolute_url(), urllib.quote(object.getId()))
+        if borrow_lock:
+            url += '?borrow_lock=1'
+        return ('<a href="%s" '
                 'title="Edit using external editor">'
                 '<img src="%s/misc_/ExternalEditor/edit_icon" '
                 'align="middle" hspace="2" border="0" alt="External Editor" />'
-                '</a>' % (object.aq_parent.absolute_url(), 
-                          urllib.quote(object.getId()),
-                          object.REQUEST.BASEPATH1)
+                '</a>' % (url, object.REQUEST.BASEPATH1)
                )
     else:
         return ''

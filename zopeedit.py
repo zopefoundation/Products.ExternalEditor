@@ -296,10 +296,11 @@ class ExternalEditor:
         if use_locks and self.metadata.get('lock-token'):
             # A lock token came down with the data, so the object is
             # already locked, see if we can borrow the lock
-            if int(self.options.get('always_borrow_locks', 0)) \
-               or askYesNo('This object is already locked by you in another'
-                           ' session.\n Do you want to borrow this lock'
-                           ' and continue?'):
+            if (int(self.options.get('always_borrow_locks', 0))
+                or self.metadata.get('borrow_lock')
+                or askYesNo('This object is already locked by you in another'
+                            ' session.\n Do you want to borrow this lock'
+                            ' and continue?')):
                 self.lock_token = 'opaquelocktoken:%s' \
                                   % self.metadata['lock-token']
             else:
