@@ -47,7 +47,7 @@ CMF 1.5alpha (unreleased)
     - PortalFolder and SkinnedFolder: Added 'new' and 'rename_items' Actions.
       Used for redirects they are invisible by default.
 
-    - CMFCoreExceptions: Added some Exceptions.
+    - CMFCore exceptions: Added some Exceptions.
       AccessControl.Unauthorized is a subclass of zExceptions.Unauthorized, so
       for best results use 'AccessControl_Unauthorized' to raise Unauthorized
       and 'zExceptions_Unauthorized' to catch them all. 'CopyError' and
@@ -162,9 +162,8 @@ CMF 1.5alpha (unreleased)
       PortalFolder's 'Local Roles' Action and MembershipTool's Local Roles
       methods are now guarded by 'Change local roles' of the object.
 
-    - Added CMFCoreExceptions: Errors defined in this module are available for
-      import by Scripts. In the long run, all Errors defined in CMF should be
-      moved to this module.
+    - Added CMFCore 'exceptions.py': Errors defined in this module are
+      available for import by Scripts.
 
     - CMFCore and CMFDefault MembershipTool: Changed permissions.
       'createMemberarea()' for someone else and 'getRoster()' including hidden
