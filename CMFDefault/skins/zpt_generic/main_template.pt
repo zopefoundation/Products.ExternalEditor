@@ -1,5 +1,6 @@
-<html metal:define-macro="master"
-      tal:define="utool nocall:here/portal_url;
+<metal:macro metal:define-macro="master"
+><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "DTD/xhtml1-transitional.dtd">
+<html tal:define="utool nocall:here/portal_url;
                   mtool here/portal_membership;
                   atool here/portal_actions;
                   wtool here/portal_workflow;
@@ -107,23 +108,16 @@
  <!-- user_menu_bar -->
  <table id="MemberActionsBox"
         width="100%" border="0" cellpadding="0" cellspacing="0">
-
   <tr>
-
-    <td class="ActionTitle" tal:content="uname"> Guest </td>
-
-    <td class="ActionLink" align="right">
-      <span tal:repeat="action user_actions">
-       <a href="" tal:attributes="href action/url"
-                  tal:content="action/name" i18n:translate="">Login</a
-       ><span tal:condition="not: repeat/action/end">&nbsp;|&nbsp;</span>
-      </span>
-      <span tal:condition="nothing"><a href="join_form"
-                                       i18n:translate="">Join</a></span>
-    </td>
-
-   </tr>
-
+   <td class="ActionTitle" tal:content="uname">Guest</td>
+   <td class="ActionLink" align="right">
+    <tal:span tal:repeat="action user_actions"
+    ><a href="" tal:attributes="href action/url"
+                tal:content="action/name" i18n:translate="">Login</a
+    ><tal:span tal:condition="not: repeat/action/end"> |</tal:span></tal:span>
+    <tal:span tal:condition="nothing"
+    ><a href="">Join</a></tal:span> </td>
+  </tr>
  </table>
  <!-- end user_menu_bar -->
 
@@ -316,4 +310,4 @@
 </div>
 
 </body>
-</html>
+</html></metal:macro>
