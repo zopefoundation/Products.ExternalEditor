@@ -6,7 +6,7 @@
 
 <div class="Desktop">
 
-<h1> Search portal </h1>
+<h1>Search <span tal:replace="here/Title" /></h1>
 
 <form action="search">
 
@@ -90,7 +90,7 @@
            tal:define="today python: here.ZopeTime().earliestTime()">
     <option value=""
 	        tal:condition="python:not(here.portal_membership.isAnonymousUser())"
-			tal:define="member python:here.portal_membership.getAuthenticatedMember(); lastLogin member/last_login_time"
+			tal:define="member python:here.portal_membership.getAuthenticatedMember(); lastLogin exists: member/last_login_time"
 			tal:attributes="value lastLogin">Last login</option>
     <option value=""
 	        tal:define="yesterday python:(today-1).Date()"

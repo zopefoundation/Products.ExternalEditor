@@ -4,9 +4,7 @@
 <body>
 <div metal:fill-slot="main">
 <div class="Desktop">
-
-<div class="File">
-<span tal:replace="structure here/content_byline">ByLine</span>
+<div metal:use-macro="here/content_byline/macros/byline">By Me</div>
 <p>
 <b>Filename</b>: <span tal:replace="here/getId">My ID</span>
 <br>
@@ -25,8 +23,7 @@
 
 <div class="Discussion">
 <span tal:replace="here/viewThreadsAtBottom"
-       tal:condition="viewThreadsAtBottom|nothing">Dicussions</span>
-</div>
+       tal:condition="here/viewThreadsAtBottom|nothing">Dicussions</span>
 </div>
 </div>
 </div>

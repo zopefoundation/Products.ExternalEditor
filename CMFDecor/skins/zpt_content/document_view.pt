@@ -15,7 +15,7 @@
         </tr>
 		<tr><td>&nbsp;</td></tr>
   <tr>
-    <td><div tal:replace="structure here/content_byline">By Me</div></td>
+    <td><div metal:use-macro="here/content_byline/macros/byline">By Me</div></td>
   </tr>
   <tr>
     <td><div class="Description" tal:content="here/Description"></div></td>

@@ -1,6 +1,6 @@
 <html metal:define-macro="master">
  <head>
-  <title tal:define="ob_title here/Title; portal_title container/title" tal:content="string:${portal_title}: ${ob_title}">The title</title>
+  <title tal:define="ob_title here/Title; portal_title here/title" tal:content="string:${portal_title}: ${ob_title}">The title</title>
   
 <link rel="stylesheet" href="zpt_stylesheet.css" type="text/css"
       tal:attributes="href here/zpt_stylesheet/absolute_url">
@@ -15,15 +15,15 @@
  <tr class="Masthead">
 
             <form action="search" method="GET"
-       tal:define="portal_url container/portal_url"
+       tal:define="portal_url here/portal_url"
        tal:attributes="action string:${portal_url}/search">
 	          <td class="PortalLogo" align="left" valign="middle" width="7%" height="32"> 
-                <a href="." tal:attributes="href container/portal_url"><img src="../zpt_images/Zope_logo.gif" alt="Zope Logo" border="0" width="87" height="38"
+                <a href="." tal:attributes="href here/portal_url"><img src="../zpt_images/Zope_logo.gif" alt="Zope Logo" border="0" width="87" height="38"
 																																	 tal:attributes="src string:Zope_logo.gif"></a> 
               </td>
 
               <td class="PortalTitle" width="43%" align="left" valign="middle" height="32"> 
-                <span tal:define="portal_title container/title" tal:content="string:${portal_title}">Site 
+                <span tal:define="portal_title here/title" tal:content="string:${portal_title}">Site 
                 Title</span> </td>
 
               <td class="NavBar" align="right" valign="middle" width="50%" wrap="no" height="32" NOWRAP> 
@@ -61,7 +61,7 @@
 </td></tr>
    <tr valign="top">
    <td class="ActionBox" width="15%" align="left" valign="top" tal:condition="python: not isAnon">
-   <span metal:use-macro="container/actions_box/macros/actions">
+   <span metal:use-macro="here/actions_box/macros/actions">
    <!--everything below here is replaced, just here for view of actions_box -->
    <table class="ActionBox" width="100%">
  <tr class="AuthClass">

@@ -253,7 +253,7 @@ div.Desktop {
 }
 
 div.Desktop p {
-    font-size: 80%;
+    font-size: 100%;
     margin-right: 10px;
     font-family: Verdana, Helvetica, sans-serif;
     text-indent: 4px;    
@@ -265,6 +265,18 @@ div.Desktop h1 {
     font-family: Verdana, Helvetica, sans-serif;
 }
 
+div.Desktop h2 {
+    font-size: 115%;
+    margin-right:100pt;
+    font-family: Verdana, Helvetica, sans-serif;
+}
+
+div.Desktop h3 {
+    font-size: 110%;
+    margin-right:100pt;
+    font-family: Verdana, Helvetica, sans-serif;
+}
+
 div.Desktop a:link {
     text-decoration: none;
     color: #336699;
@@ -272,7 +284,7 @@ div.Desktop a:link {
 
 div.Desktop table tr td {
     font-size: 80%;
-    color: #336699;
+    color: #000000;
 }
 
 div.Desktop a:visited {

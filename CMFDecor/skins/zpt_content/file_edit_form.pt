@@ -8,30 +8,28 @@
 <span tal:replace="request/message"
    tal:condition="request/message|nothing"><hr></span>
 
-<div class="File">
-
 <h2>Edit <span tal:replace="here/id">My ID</span></h2>
 
 <form action="file_edit" method="post" enctype="multipart/form-data">
 <table class="FormLayout">
 
  <tr>
-  <th> Title </th>
+  <th>Title</th>
   <td> <span tal:replace="here/Title">My Title</span></td>
  </tr>
 
  <tr>
-  <th> Description </th>
+  <th>Description</th>
   <td> <span tal:replace="here/Description">My Description</span></td>
  </tr>
 
  <tr>
-  <th> Content type </th>
+  <th>Content type</th>
   <td> <span tal:replace="here/Format">html/text</span></td>
  </tr>
 
  <tr>
-  <th> Upload file </th>
+  <th>Upload file</th>
   <td> <input type="file" name="file" size="35"> </td>
  </tr>
 

@@ -4,9 +4,7 @@
 <body>
 <div metal:fill-slot="main">	  
 <div class="Desktop">
-<div class="Document">
-
-<h2>Edit <span tal:replace="here/getId">My ID</span></h2>
+<h2>Edit <span tal:replace="here/getId">ID</span></h2>
 
 <form action="document_edit" method="post" enctype="multipart/form-data">
 
@@ -70,9 +68,6 @@
  </tr>
 </table>
 </form>
-
-</div>
-
 </div>
 </div>
 </body>

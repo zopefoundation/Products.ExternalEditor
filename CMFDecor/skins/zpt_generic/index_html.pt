@@ -1,4 +1,4 @@
-<html metal:use-macro="container/main_template/macros/master">
+<html metal:use-macro="here/main_template/macros/master">
 <body>
  <div metal:fill-slot="main">
 
@@ -6,15 +6,15 @@
  <tr>
  <td valign="top" width="80%">
 
- <h1> Welcome to <span tal:replace="container/title">(portal title)</span> </h1>
+ <h1> Welcome to <span tal:replace="here/title">(portal title)</span> </h1>
 
  <dl>
  <dt> Overview </dt>
- <dd tal:content="container/description"> Description here </dd>
+ <dd tal:content="here/description"> Description here </dd>
  </dl>
 
  </td>
- <td valign="top" width="20%" tal:content="structure container/news_box">
+ <td valign="top" width="20%" tal:content="structure here/news_box">
   News here
  </td>
  </tr>

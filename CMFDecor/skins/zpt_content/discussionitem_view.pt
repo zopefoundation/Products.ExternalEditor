@@ -7,7 +7,7 @@
 
  <div class="Document">
 
-  <div tal:replace="structure here/content_byline">By Me</div>
+  <div metal:use-macro="here/content_byline/macros/byline">By Me</div>
 
   <div class="Discussion">
    <span tal:replace="structure here/aboveInThread"></span>
