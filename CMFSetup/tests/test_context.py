@@ -96,7 +96,9 @@ class DirectoryImportContextTests( FilesystemTestBase
         site = DummySite( 'site' ).__of__( self.root )
         ctx = self._makeOne( site, self._PROFILE_PATH )
 
-        self.assertEqual( ctx.getLastModified( FILENAME ), timestamp )
+        lm = ctx.getLastModified( FILENAME )
+        self.failUnless( isinstance( lm, DateTime ) )
+        self.assertEqual( lm, timestamp )
 
     def test_getLastModified_subdir( self ):
 
@@ -110,7 +112,9 @@ class DirectoryImportContextTests( FilesystemTestBase
         site = DummySite( 'site' ).__of__( self.root )
         ctx = self._makeOne( site, self._PROFILE_PATH )
 
-        self.assertEqual( ctx.getLastModified( FILENAME ), timestamp )
+        lm = ctx.getLastModified( FILENAME )
+        self.failUnless( isinstance( lm, DateTime ) )
+        self.assertEqual( lm, timestamp )
 
     def test_getLastModified_directory( self ):
 
@@ -125,7 +129,9 @@ class DirectoryImportContextTests( FilesystemTestBase
         site = DummySite( 'site' ).__of__( self.root )
         ctx = self._makeOne( site, self._PROFILE_PATH )
 
-        self.assertEqual( ctx.getLastModified( SUBDIR ), timestamp )
+        lm = ctx.getLastModified( SUBDIR )
+        self.failUnless( isinstance( lm, DateTime ) )
+        self.assertEqual( lm, timestamp )
 
     def test_isDirectory_nonesuch( self ):
 

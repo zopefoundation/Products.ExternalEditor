@@ -45,6 +45,8 @@ class IImportContext( ISetupContext ):
 
         """ Return the modification timestamp of the item at 'path'.
 
+        o Result will be a DateTime instance.
+
         o Search profiles in the configuration in order.
 
         o If the context is filesystem based, return the 'stat' timestamp

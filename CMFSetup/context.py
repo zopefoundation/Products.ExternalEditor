@@ -14,6 +14,7 @@ from AccessControl import ClassSecurityInfo
 from Acquisition import Implicit
 from Acquisition import aq_inner
 from Acquisition import aq_parent
+from DateTime.DateTime import DateTime
 from Globals import InitializeClass
 from OFS.DTMLDocument import DTMLDocument
 from OFS.Folder import Folder
@@ -87,7 +88,7 @@ class DirectoryImportContext( Implicit ):
         if not os.path.exists( full_path ):
             return None
 
-        return os.path.getmtime( full_path )
+        return DateTime( os.path.getmtime( full_path ) )
 
     security.declareProtected( ManagePortal, 'isDirectory' )
     def isDirectory( self, path ):
@@ -368,9 +369,11 @@ class SnapshotImportContext( Implicit ):
             object = snapshot._getOb( filename )
         except ( AttributeError, KeyError ):
             return None
-        else:
-            # XXX:  this API may not be general enough for all objects.
+
+        try:
             return object.read()
+        except AttributeError:
+            return object.manage_FTPget()
 
     security.declareProtected( ManagePortal, 'getLastModified' )
     def getLastModified( self, path ):
