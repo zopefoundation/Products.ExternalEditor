@@ -404,13 +404,8 @@ class MembershipTool (UniqueObject, SimpleItem, ActionProviderBase):
             raise "Can't add Member", "No supported UserSources"
 
         if properties is not None:
-            # note that the below seems really silly.  We *are* the
-            # portal_membership tool, aren't we?  Is there a reason
-            # for this?  Acqusition?  How about a comment?  - chrism
-            membership = getToolByName(self, 'portal_membership')
-            member = membership.getMemberById(id)
+            member = self.getMemberById(id)
             member.setMemberProperties(properties)
-
 
     security.declarePrivate('listActions')
     def listActions(self, info=None):
