@@ -16,19 +16,19 @@ $Id$
 """
 
 import Globals
-from DateTime import DateTime
 from AccessControl import ClassSecurityInfo
-from webdav.common import rfc1123_date
+from DateTime import DateTime
 from OFS.Cache import Cacheable
-from OFS.Image import File
 from OFS.content_types import guess_content_type
+from OFS.Image import File
+from webdav.common import rfc1123_date
 
-from permissions import FTPAccess
-from permissions import View
-from permissions import ViewManagementScreens
 from DirectoryView import registerFileExtension
 from DirectoryView import registerMetaType
 from FSObject import FSObject
+from permissions import FTPAccess
+from permissions import View
+from permissions import ViewManagementScreens
 from utils import _dtmldir
 from utils import _setCacheHeaders, _ViewEmulator
 from utils import expandpath
@@ -75,7 +75,8 @@ class FSFile(FSObject):
             # Last resort: Use the (imperfect) content type guessing
             # mechanism from OFS.Image, which ultimately uses the
             # Python mimetypes module.
-            if type(body) is not type(''): body=body.data
+            if not isinstance(body, basestring):
+                body = body.data
             content_type, enc=guess_content_type(
                 getattr(file, 'filename',id), body, content_type)
 

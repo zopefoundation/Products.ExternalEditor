@@ -99,11 +99,11 @@ def tuplize( valueName, value ):
 
     o Use 'valueName' to generate appropriate error messages.
     """
-    if type(value) == type(()):
+    if isinstance(value, tuple):
         return value
-    if type(value) == type([]):
+    if isinstance(value, list):
         return tuple( value )
-    if type(value) == type(''):
+    if isinstance(value, basestring):
         return tuple( value.split() )
     raise ValueError, "%s of unsupported type" % valueName
 

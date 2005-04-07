@@ -15,8 +15,6 @@
 $Id$
 """
 
-from types import StringType
-
 from AccessControl import ClassSecurityInfo
 from AccessControl.User import nobody
 from Acquisition import aq_base
@@ -469,7 +467,7 @@ class MembershipTool(UniqueObject, Folder, ActionProviderBase):
         # Delete members in acl_users.
         acl_users = self.acl_users
         if _checkPermission(ManageUsers, acl_users):
-            if type(member_ids) is StringType:
+            if isinstance(member_ids, basestring):
                 member_ids = (member_ids,)
             member_ids = list(member_ids)
             for member_id in member_ids[:]:

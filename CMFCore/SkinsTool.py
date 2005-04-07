@@ -15,14 +15,12 @@
 $Id$
 """
 
-from types import ListType
-
+from AccessControl import ClassSecurityInfo
+from Acquisition import aq_base
+from DateTime import DateTime
 from Globals import DTMLFile
 from Globals import InitializeClass
 from Globals import PersistentMapping
-from Acquisition import aq_base
-from DateTime import DateTime
-from AccessControl import ClassSecurityInfo
 from OFS.DTMLMethod import DTMLMethod
 from OFS.Folder import Folder
 from OFS.Image import Image
@@ -30,14 +28,14 @@ from OFS.ObjectManager import REPLACEABLE
 from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
 from Products.PythonScripts.PythonScript import PythonScript
 
+from ActionProviderBase import ActionProviderBase
 from DirectoryView import base_ignore
 from DirectoryView import ignore
 from DirectoryView import ignore_re
-from ActionProviderBase import ActionProviderBase
+from interfaces.portal_skins import portal_skins as ISkinsTool
 from permissions import AccessContentsInformation
 from permissions import ManagePortal
 from permissions import View
-from interfaces.portal_skins import portal_skins as ISkinsTool
 from SkinsContainer import SkinsContainer
 from utils import _dtmldir
 from utils import getToolByName
@@ -131,7 +129,7 @@ class SkinsTool(UniqueObject, SkinsContainer, Folder, ActionProviderBase):
                 # if val is a list from the new lines field
                 # then munge it back into a comma delimited list
                 # for hysterical reasons
-                if isinstance(val, ListType):
+                if isinstance(val, list):
                     val = ','.join([layer.strip() for layer in val])
 
                 if sels[key] != val:
@@ -155,7 +153,7 @@ class SkinsTool(UniqueObject, SkinsContainer, Folder, ActionProviderBase):
         skin?
         """
         if skin is None or skin == 'None':
-            skin = self.getDefaultSkin()            
+            skin = self.getDefaultSkin()
         template = self.restrictedTraverse(template_path)
         name = template.getId()
         skin_path = self.getSkinPath(skin)
@@ -363,7 +361,7 @@ class SkinsTool(UniqueObject, SkinsContainer, Folder, ActionProviderBase):
                 path_elems.remove(elem)
 
         skinpath = ','.join(path_elems)
-        
+
         if test:
             self.testSkinPath(skinpath)
         sels[str(skinname)] = skinpath

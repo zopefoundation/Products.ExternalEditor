@@ -15,20 +15,21 @@
 $Id$
 """
 
-from OFS.SimpleItem import SimpleItem
-from Globals import DTMLFile
-from Globals import InitializeClass
+from AccessControl import ClassSecurityInfo
 from Acquisition import aq_inner
 from Acquisition import aq_parent
-from AccessControl import ClassSecurityInfo
+from Globals import DTMLFile
+from Globals import InitializeClass
+from OFS.SimpleItem import SimpleItem
 
 from ContainerTab import ContainerTab
-from Guard import Guard
 from Expression import Expression
+from Guard import Guard
 from permissions import ManagePortal
 from utils import _dtmldir
 
-class VariableDefinition (SimpleItem):
+
+class VariableDefinition(SimpleItem):
     """Variable definition"""
 
     meta_type = 'Workflow Variable'
@@ -98,16 +99,16 @@ class VariableDefinition (SimpleItem):
             self.info_guard = g
         else:
             self.info_guard = None
-        self.for_catalog = not not for_catalog  # Pure boolean value
-        self.for_status = not not for_status
-        self.update_always = not not update_always
+        self.for_catalog = bool(for_catalog)
+        self.for_status = bool(for_status)
+        self.update_always = bool(update_always)
         if REQUEST is not None:
             return self.manage_properties(REQUEST, 'Properties changed.')
 
 InitializeClass(VariableDefinition)
 
 
-class Variables (ContainerTab):
+class Variables(ContainerTab):
     """A container for variable definitions"""
 
     meta_type = 'Workflow Variables'

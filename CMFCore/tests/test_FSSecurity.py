@@ -3,10 +3,7 @@ import Testing
 import Zope
 Zope.startup()
 
-from os import remove
-from os.path import join
 from time import sleep
-from types import ListType
 
 from AccessControl.Permission import Permission
 from Globals import DevelopmentMode
@@ -17,26 +14,27 @@ from Products.CMFCore.tests.base.testcase import RequestTest
 
 class FSSecurityBase( RequestTest, FSDVTest ):
 
-    def _checkSettings(self,object,permissionname,acquire=0,roles=[]):
+    def _checkSettings(self, object, permissionname, acquire=0, roles=[]):
         # check the roles and acquire settings for a permission on an
         # object are as expected
-        happy=0
+        happy = 0
         for pstuff in object.ac_inherited_permissions(1):
-            name,value = pstuff[:2]
-            if name==permissionname:
-                p = Permission(name,value,object)
-                groles=p.getRoles(default=[])
-                acquired=isinstance(groles,ListType)
-                expected={}
+            name, value = pstuff[:2]
+            if name == permissionname:
+                p = Permission(name, value, object)
+                groles = p.getRoles(default=[])
+                acquired = isinstance(groles, list)
+                expected = {}
                 for role in roles:
-                    expected[role]=1
-                got={}
+                    expected[role] = 1
+                got = {}
                 for role in groles:
-                    got[role]=1
-                self.assertEqual((acquire,expected),(acquired,got))
-                happy=1
+                    got[role] = 1
+                self.assertEqual((acquire, expected), (acquired, got))
+                happy = 1
         if not happy:
-            raise ValueError,"'%s' not found in permissions: %s" % (permissionname,all_names)
+            raise ValueError("'%s' not found in permissions: %s"
+                             % (permissionname, all_names))
 
     def setUp( self ):
         # initialise skins

@@ -1,3 +1,15 @@
+##############################################################################
+#
+# Copyright (c) 2003 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE.
+#
+##############################################################################
 """ Handles reading the properties for an object that comes from the filesystem.
 
 $Id$
@@ -182,7 +194,7 @@ class FSMetadata:
                     c1 = line.index(':')+1
                     c2 = line.index(':',c1)
                     permission = line[:c1-1]
-                    acquire = not not line[c1:c2] # get boolean
+                    acquire = bool(line[c1:c2])
                     proles = line[c2+1:].split(',')
                     roles=[]
                     for role in proles:

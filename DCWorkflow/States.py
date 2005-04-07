@@ -15,16 +15,13 @@
 $Id$
 """
 
-from types import TupleType
-
+from AccessControl import ClassSecurityInfo
 from Acquisition import aq_inner
 from Acquisition import aq_parent
 from Globals import DTMLFile
-from Globals import PersistentMapping
 from Globals import InitializeClass
+from Globals import PersistentMapping
 from OFS.SimpleItem import SimpleItem
-from AccessControl import ClassSecurityInfo
-
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
 from ContainerTab import ContainerTab
@@ -32,7 +29,7 @@ from permissions import ManagePortal
 from utils import _dtmldir
 
 
-class StateDefinition (SimpleItem):
+class StateDefinition(SimpleItem):
     """State definition"""
 
     meta_type = 'Workflow State'
@@ -94,7 +91,7 @@ class StateDefinition (SimpleItem):
         if roles is None:
             return {'acquired':1, 'roles':[]}
         else:
-            if type(roles) is TupleType:
+            if isinstance(roles, tuple):
                 acq = 0
             else:
                 acq = 1
@@ -254,7 +251,7 @@ class StateDefinition (SimpleItem):
 InitializeClass(StateDefinition)
 
 
-class States (ContainerTab):
+class States(ContainerTab):
     """A container for state definitions"""
 
     meta_type = 'Workflow States'

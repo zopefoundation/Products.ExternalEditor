@@ -1218,7 +1218,7 @@ def _initDCWorkflowStates( workflow, states ):
                        )
 
         for k, v in s_info[ 'permissions' ].items():
-            s.setPermission( k, type( v ) is type( [] ), v )
+            s.setPermission( k, isinstance(v, list), v )
 
         gmap = s.group_roles = PersistentMapping()
 

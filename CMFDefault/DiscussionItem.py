@@ -15,11 +15,13 @@
 $Id$
 """
 
-from Globals import Persistent, PersistentMapping, InitializeClass
 from AccessControl import ClassSecurityInfo
 from Acquisition import Implicit, aq_base, aq_inner, aq_parent
-from OFS.Traversable import Traversable
 from DateTime import DateTime
+from Globals import InitializeClass
+from Globals import Persistent
+from Globals import PersistentMapping
+from OFS.Traversable import Traversable
 
 from Products.CMFCore.interfaces.Discussions import Discussable
 from Products.CMFCore.interfaces.Discussions import DiscussionResponse
@@ -30,6 +32,7 @@ from permissions import AccessContentsInformation
 from permissions import ManagePortal
 from permissions import ReplyToItem
 from permissions import View
+from utils import scrubHTML
 
 
 factory_type_information = (
@@ -56,8 +59,6 @@ They should *not* be addable through the standard 'folder_factories' interface.
 ,
 )
 
-
-from utils import scrubHTML
 
 def addDiscussionItem(self, id, title, description, text_format, text,
                       reply_to, RESPONSE=None):
@@ -334,9 +335,9 @@ class DiscussionItemContainer( Persistent, Implicit, Traversable ):
         """
         outer = self._getDiscussable( outer=1 )
         if content_obj == outer:
-            return not not len( self._container )
+            return bool( len(self._container) )
         else:
-            return not not len( content_obj.talkback._getReplyResults() )
+            return bool( len( content_obj.talkback._getReplyResults() ) )
 
     security.declareProtected(View, 'replyCount')
     def replyCount( self, content_obj ):
@@ -433,6 +434,5 @@ class DiscussionItemContainer( Persistent, Implicit, Traversable ):
         result.sort( lambda a, b: cmp(a[1].creation_date, b[1].creation_date) )
 
         return [ x[0] for x in result ]
-
 
 InitializeClass( DiscussionItemContainer )

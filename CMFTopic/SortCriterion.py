@@ -63,7 +63,7 @@ class SortCriterion( AbstractCriterion ):
         """
             Update the value we are to match up against.
         """
-        self.reversed = not not reversed
+        self.reversed = bool(reversed)
     
     security.declareProtected(View, 'getCriteriaItems')
     def getCriteriaItems( self ):

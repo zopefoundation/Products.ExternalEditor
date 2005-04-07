@@ -15,15 +15,13 @@
 $Id$
 """
 
-from types import TupleType
-
-from OFS.SimpleItem import SimpleItem
+from AccessControl import ClassSecurityInfo
+from Acquisition import aq_inner
+from Acquisition import aq_parent
 from Globals import DTMLFile
 from Globals import InitializeClass
 from Globals import PersistentMapping
-from Acquisition import aq_inner
-from Acquisition import aq_parent
-from AccessControl import ClassSecurityInfo
+from OFS.SimpleItem import SimpleItem
 
 from ContainerTab import ContainerTab
 from Guard import Guard
@@ -31,7 +29,7 @@ from permissions import ManagePortal
 from utils import _dtmldir
 
 
-class WorklistDefinition (SimpleItem):
+class WorklistDefinition(SimpleItem):
     """Worklist definiton"""
 
     meta_type = 'Worklist'
@@ -86,7 +84,7 @@ class WorklistDefinition (SimpleItem):
     def getVarMatch(self, id):
         if self.var_matches:
             matches = self.var_matches.get(id, ())
-            if not isinstance(matches, TupleType):
+            if not isinstance(matches, tuple):
                 # Old version, convert it.
                 matches = (matches,)
                 self.var_matches[id] = matches
@@ -142,7 +140,7 @@ class WorklistDefinition (SimpleItem):
 InitializeClass(WorklistDefinition)
 
 
-class Worklists (ContainerTab):
+class Worklists(ContainerTab):
     """A container for worklist definitions"""
 
     meta_type = 'Worklists'

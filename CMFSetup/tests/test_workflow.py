@@ -2177,7 +2177,7 @@ class Test_importWorkflow( _WorkflowSetup
                 p_expected = expected[ 3 ].get( permission, [] )
 
                 self.assertEqual( bool( p_info[ 'acquired' ] )
-                                , type( p_expected ) is type( [] ) )
+                                , isinstance(p_expected, list) )
 
                 self.assertEqual( len( p_info[ 'roles' ] ), len( p_expected ) )
 

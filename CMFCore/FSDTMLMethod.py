@@ -134,7 +134,7 @@ class FSDTMLMethod(RestrictedDTML, RoleManager, FSObject, Globals.HTML):
                     self.ZCacheable_set(result)
                 return result
 
-            if type(r) is not type('') or RESPONSE is None:
+            if not isinstance(r, basestring) or RESPONSE is None:
                 if not self._cache_namespace_keys:
                     self.ZCacheable_set(r)
                 return r

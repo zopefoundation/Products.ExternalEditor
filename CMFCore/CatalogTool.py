@@ -15,34 +15,32 @@
 $Id$
 """
 
-from types import TupleType, ListType
 from AccessControl import ClassSecurityInfo
 from AccessControl.PermissionRole import rolesForPermissionOn
 from DateTime import DateTime
 from Globals import DTMLFile
 from Globals import InitializeClass
 from Products.ZCatalog.ZCatalog import ZCatalog
-from Products.ZCTextIndex.Lexicon import Splitter
-from Products.ZCTextIndex.Lexicon import CaseNormalizer
-from Products.ZCTextIndex.Lexicon import StopWordRemover
 from Products.ZCTextIndex.HTMLSplitter import HTMLWordSplitter
+from Products.ZCTextIndex.Lexicon import CaseNormalizer
+from Products.ZCTextIndex.Lexicon import Splitter
+from Products.ZCTextIndex.Lexicon import StopWordRemover
 from Products.ZCTextIndex.ZCTextIndex import PLexicon
 
+from ActionProviderBase import ActionProviderBase
+from interfaces.portal_catalog \
+        import IndexableObjectWrapper as IIndexableObjectWrapper
+from interfaces.portal_catalog import portal_catalog as ICatalogTool
+from permissions import AccessInactivePortalContent
+from permissions import ManagePortal
+from permissions import View
 from utils import _checkPermission
 from utils import _dtmldir
 from utils import _getAuthenticatedUser
 from utils import _mergedLocalRoles
 from utils import getToolByName
-from utils import UniqueObject
 from utils import SimpleRecord
-from ActionProviderBase import ActionProviderBase
-from permissions import AccessInactivePortalContent
-from permissions import ManagePortal
-from permissions import View
-
-from interfaces.portal_catalog \
-        import IndexableObjectWrapper as IIndexableObjectWrapper
-from interfaces.portal_catalog import portal_catalog as ICatalogTool
+from utils import UniqueObject
 
 
 class IndexableObjectWrapper:
@@ -78,7 +76,7 @@ class IndexableObjectWrapper:
         return list(allowed.keys())
 
 
-class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
+class CatalogTool(UniqueObject, ZCatalog, ActionProviderBase):
     """ This is a ZCatalog that filters catalog queries.
     """
 
@@ -155,7 +153,6 @@ class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
                  , StopWordRemover()
                  )
                )
-
 
     security.declarePublic( 'enumerateColumns' )
     def enumerateColumns( self ):
@@ -244,8 +241,8 @@ class CatalogTool (UniqueObject, ZCatalog, ActionProviderBase):
                 if kw.has_key(k):
                     range = kw[k]['range'] or ''
                     query = kw[k]['query']
-                    if (not isinstance(query, TupleType) and
-                        not isinstance(query, ListType)):
+                    if (not isinstance(query, tuple) and
+                        not isinstance(query, list)):
                         query = (query,)
                 else:
                     range = ''

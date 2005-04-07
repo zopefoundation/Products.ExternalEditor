@@ -17,21 +17,24 @@ $Id$
 
 import sys
 
-from OFS.Folder import Folder
-from Globals import InitializeClass, PersistentMapping, DTMLFile
 from AccessControl import ClassSecurityInfo
 from Acquisition import aq_base, aq_inner, aq_parent
+from Globals import DTMLFile
+from Globals import InitializeClass
+from Globals import PersistentMapping
+from OFS.Folder import Folder
 
 from ActionInformation import getOAI
 from ActionProviderBase import ActionProviderBase
-from permissions import ManagePortal
 from interfaces.portal_workflow import portal_workflow as IWorkflowTool
+from permissions import ManagePortal
 from utils import _dtmldir
 from utils import getToolByName
 from utils import UniqueObject
-from WorkflowCore import WorkflowException
 from WorkflowCore import ObjectDeleted
 from WorkflowCore import ObjectMoved
+from WorkflowCore import WorkflowException
+
 
 AUTO_MIGRATE_WORKFLOW_TOOLS = 0  # Set to 1 to auto-migrate
 
@@ -531,7 +534,7 @@ class WorkflowTool(UniqueObject, Folder, ActionProviderBase):
             the portal_type.
         """
         cbt = self._chains_by_type
-        if type(ob) == type(''):
+        if isinstance(ob, basestring):
             pt = ob
         elif hasattr(aq_base(ob), 'getPortalTypeName'):
             pt = ob.getPortalTypeName()
@@ -666,7 +669,7 @@ class WorkflowTool(UniqueObject, Folder, ActionProviderBase):
             the catalog (sometimes not desirable, e.g. when the workflow
             objects do this themselves only at particular points).
         """
-        self._default_cataloging = not not value
+        self._default_cataloging = bool(value)
 
     security.declarePrivate('_reindexWorkflowVariables')
     def _reindexWorkflowVariables(self, ob):

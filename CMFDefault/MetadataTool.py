@@ -49,8 +49,8 @@ class MetadataElementPolicy( SimpleItem ):
     enforce_vocabulary  = 0
     allowed_vocabulary  = ()
 
-    def __init__( self, is_multi_valued=0 ):
-        self.is_multi_valued    = not not is_multi_valued
+    def __init__(self, is_multi_valued=False):
+        self.is_multi_valued = bool(is_multi_valued)
 
     #
     #   Mutator.
@@ -63,11 +63,11 @@ class MetadataElementPolicy( SimpleItem ):
             , enforce_vocabulary
             , allowed_vocabulary
             ):
-        self.is_required        = not not is_required
-        self.supply_default     = not not supply_default
+        self.is_required        = bool(is_required)
+        self.supply_default     = bool(supply_default)
         self.default_value      = default_value
-        self.enforce_vocabulary = not not enforce_vocabulary
-        self.allowed_vocabulary = tuple( allowed_vocabulary )
+        self.enforce_vocabulary = bool(enforce_vocabulary)
+        self.allowed_vocabulary = tuple(allowed_vocabulary)
 
     #
     #   Query interface
