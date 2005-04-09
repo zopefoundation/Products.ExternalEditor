@@ -7,6 +7,7 @@ from Acquisition import Implicit
 from Interface.Verify import verifyClass
 
 from AccessControl.SecurityManagement import newSecurityManager
+from DateTime.DateTime import DateTime
 
 from Products.CMFCore.tests.base.dummy import DummySite
 from Products.CMFCore.tests.base.dummy import DummyUserFolder
@@ -143,6 +144,38 @@ class DublinCoreTests(SecurityTest):
         item = self._makeDummyContent('item').__of__(site)
         self.assertEqual(item.Publisher(), PUBLISHER)
 
+    def test_timezone_metadata(self):
+        # http://www.zope.org/Collectors/CMF/325
+        # If an item's timestamp(s) are stored in another timezone,
+        # e.g. 4 hours further away from UTC, the DC date methods
+        # should still return it in the local timezone so that all
+        # user-visible dates can be compared to each other by eye.
+        site = DummySite('site').__of__(self.root)
+        item = self._makeDummyContent('item').__of__(site)
+        dates_and_methods = (
+            ('modification_date', 'ModificationDate'),
+            ('effective_date', 'EffectiveDate'),
+            ('effective_date', 'Date'),
+            ('expiration_date', 'ExpirationDate'),
+            ('creation_date', 'CreationDate'))
+        offset = 4  # arbitrary, any value should work.
+        for datename, dc_methodname in dates_and_methods:
+            orig = getattr(item, datename)
+            # Some default to None, fix that.
+            if orig is None:
+                orig = DateTime()
+                setattr(item, datename, orig)
+            orig_DC = getattr(item, dc_methodname)()
+            # Change the timezone of the date.
+            local_offset = orig.tzoffset() % (3600*24)
+            other_offset = (local_offset + offset) % 24
+            otherzone = 'GMT+%d' % other_offset
+            setattr(item, datename, orig.toZone(otherzone))
+            # Finally, verify that display has not changed.
+            new_DC = getattr(item, dc_methodname)()
+            self.assertEqual(orig_DC, new_DC)
+        
+        
 def test_suite():
     return TestSuite((
         makeSuite( DublinCoreTests ),

@@ -35,7 +35,10 @@ from utils import semi_split
 
 _marker=[]
 
-
+# For http://www.zope.org/Collectors/CMF/325
+# We only really need this once, at startup.
+_zone = DateTime().timezone()
+    
 class DefaultDublinCoreImpl( PropertyManager ):
     """ Mix-in class which provides Dublin Core methods.
     """
@@ -181,34 +184,37 @@ class DefaultDublinCoreImpl( PropertyManager ):
         date = getattr(self, 'effective_date', None )
         if date is None:
             date = self.modified()
-        return date.ISO()
+        return date.toZone(_zone).ISO()
 
     security.declareProtected(View, 'CreationDate')
     def CreationDate( self ):
         """ Dublin Core Date element - date resource created.
         """
         # return unknown if never set properly
-        return self.creation_date and self.creation_date.ISO() or 'Unknown'
+        if self.creation_date:
+            return self.creation_date.toZone(_zone).ISO()
+        else:
+            return 'Unknown'
 
     security.declareProtected(View, 'EffectiveDate')
     def EffectiveDate( self ):
         """ Dublin Core Date element - date resource becomes effective.
         """
         ed = getattr( self, 'effective_date', None )
-        return ed and ed.ISO() or 'None'
+        return ed and ed.toZone(_zone).ISO() or 'None'
 
     security.declareProtected(View, 'ExpirationDate')
     def ExpirationDate( self ):
         """ Dublin Core Date element - date resource expires.
         """
         ed = getattr( self, 'expiration_date', None )
-        return ed and ed.ISO() or 'None'
+        return ed and ed.toZone(_zone).ISO() or 'None'
 
     security.declareProtected(View, 'ModificationDate')
     def ModificationDate( self ):
         """ Dublin Core Date element - date resource last modified.
         """
-        return self.modified().ISO()
+        return self.modified().toZone(_zone).ISO()
 
     security.declareProtected(View, 'Type')
     def Type( self ):
