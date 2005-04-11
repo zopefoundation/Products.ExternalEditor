@@ -218,6 +218,8 @@ class ConfiguratorBase(Implicit):
           'object':
             { 'name':            {KEY: 'id'},
               'meta_type':       {},
+              'insert-before':   {},
+              'insert-after' :   {},
               'property':        {KEY: 'properties', DEFAULT: ()},
               'object':          {KEY: 'objects', DEFAULT: ()} },
           'property':
@@ -263,7 +265,7 @@ class ConfiguratorBase(Implicit):
     security.declareProtected(ManagePortal, 'initObject')
     def initObject(self, parent, o_info):
 
-        obj_id = o_info['id']
+        obj_id = str(o_info['id'])
         if obj_id not in parent.objectIds():
             meta_type = o_info['meta_type']
             for mt_info in Products.meta_types:
@@ -273,6 +275,25 @@ class ConfiguratorBase(Implicit):
             else:
                 raise ValueError('unknown meta_type \'%s\'' % obj_id)
         obj = parent._getOb(obj_id)
+
+        if 'insert-before' in o_info:
+            if o_info['insert-before'] == '*':
+                parent.moveObjectsToTop(obj_id)
+            else:
+                try:
+                    position = parent.getObjectPosition(o_info['insert-before'])
+                    parent.moveObjectToPosition(obj_id, position)
+                except ValueError:
+                    pass
+        elif 'insert-after' in o_info:
+            if o_info['insert-after'] == '*':
+                parent.moveObjectsToBottom(obj_id)
+            else:
+                try:
+                    position = parent.getObjectPosition(o_info['insert-after'])
+                    parent.moveObjectToPosition(obj_id, position+1)
+                except ValueError:
+                    pass
 
         [ self.initObject(obj, info) for info in o_info['objects'] ]
 

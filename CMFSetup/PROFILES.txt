@@ -1,0 +1,34 @@
+Profiles
+
+  Overview
+
+    There are two different kinds of profiles: Base profiles and extension
+    profiles. Base profiles have no dependencies. Extension profiles are
+    profile fragments used to modify base profiles. They can be shipped with
+    add-on products or used for customization steps. Importing an extension
+    profile adds or overwrites existing settings in a fine-grained way. You
+    can't export extension profiles. Snapshots and exports always represent
+    the merged settings.
+
+  Update Directives
+
+    For some XML elements there are additional attributes and values to
+    specify update directives. They are only useful for extension profiles and
+    you will never see them in snapshots and exports.
+
+    'insert-before' and 'insert-after'
+
+      applies to: object (generic); layer (skins.xml)
+
+      'insert-before' and 'insert-after' specify the position of a new item
+      relative to an existing item. If they are omitted or not valid, items
+      are appended. You can also use '*' as wildcard. This will insert the new
+      item at the top (before all existing items) or the bottom (after all
+      existing items). If an item with the given ID exists already, it is
+      moved to the specified position.
+
+    'id="*"' wildcard
+
+      applies to: skin-path (skins.xml)
+
+      Updates all existing items in the container with the same settings.

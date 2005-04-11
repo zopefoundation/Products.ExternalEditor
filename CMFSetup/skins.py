@@ -135,20 +135,29 @@ def _updatePath(path, layer_infos):
     for layer in layer_infos:
         if layer['name'] in path:
             path.remove(layer['name'])
+
         if 'insert-before' in layer:
-            try:
-                index = path.index(layer['insert-before'])
-                path.insert(index, layer['name'])
+            if layer['insert-before'] == '*':
+                path.insert(0, layer['name'])
                 continue
-            except ValueError:
+            else:
+                try:
+                    index = path.index(layer['insert-before'])
+                    path.insert(index, layer['name'])
+                    continue
+                except ValueError:
+                    pass
+        elif 'insert-after' in layer:
+            if layer['insert-after'] == '*':
                 pass
-        if 'insert-after' in layer:
-            try:
-                index = path.index(layer['insert-after'])
-                path.insert(index+1, layer['name'])
-                continue
-            except ValueError:
-                pass
+            else:
+                try:
+                    index = path.index(layer['insert-after'])
+                    path.insert(index+1, layer['name'])
+                    continue
+                except ValueError:
+                    pass
+
         path.append(layer['name'])
 
     return str( ','.join(path) )

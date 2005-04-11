@@ -281,7 +281,7 @@ _FRAGMENT_IMPORT = """\
 </skins-tool>
 """
 
-_FRAGMENT_IMPORT2 = """\
+_FRAGMENT2_IMPORT = """\
 <?xml version="1.0"?>
 <skins-tool>
  <skin-directory id="four" directory="CMFSetup/tests/four" />
@@ -291,6 +291,17 @@ _FRAGMENT_IMPORT2 = """\
 </skins-tool>
 """
 
+_FRAGMENT3_IMPORT = """\
+<?xml version="1.0"?>
+<skins-tool>
+ <skin-directory id="three" directory="CMFSetup/tests/three" />
+ <skin-directory id="four" directory="CMFSetup/tests/four" />
+ <skin-path id="*">
+  <layer name="three" insert-before="*"/>
+  <layer name="four" insert-after="*"/>
+ </skin-path>
+</skins-tool>
+"""
 
 class Test_exportSkinsTool( _SkinsSetup ):
 
@@ -516,7 +527,7 @@ class Test_importSkinsTool( _SkinsSetup ):
         self.assertEqual( len( skins_tool.objectItems() ), 3 )
 
         self._registerDirectoryView( os.path.join( _TESTS_PATH, 'four' ) )
-        context._files[ 'skins.xml' ] = _FRAGMENT_IMPORT2
+        context._files[ 'skins.xml' ] = _FRAGMENT2_IMPORT
         importSkinsTool( context )
 
         self.assertEqual( skins_tool.default_skin, "default_skin" )
@@ -530,6 +541,44 @@ class Test_importSkinsTool( _SkinsSetup ):
         self.assertEqual( skin_paths[ 0 ], ( 'basic', 'one,three,four' ) )
         self.assertEqual( skin_paths[ 1 ], ( 'fancy', 'three,four,two,one' ) )
         self.assertEqual( len( skins_tool.objectItems() ), 4 )
+
+    def test_fragment3_skip_purge(self):
+
+        _IDS = ( 'one', 'two' )
+        _FSDVS = [ ( id, DummyFSDV( id ) ) for id in _IDS ]
+        _PATHS = { 'basic' : 'one', 'fancy' : 'two,one' }
+
+        site = self._initSite( selections=_PATHS, fsdvs=_FSDVS )
+        self._registerDirectoryView( os.path.join( _TESTS_PATH, 'three' ) )
+        self._registerDirectoryView( os.path.join( _TESTS_PATH, 'four' ) )
+        skins_tool = site.portal_skins
+
+        self.failIf( site._skin_setup_called )
+        skin_paths = skins_tool.getSkinPaths()
+        self.assertEqual( len( skin_paths ), 2 )
+        self.assertEqual( skin_paths[ 0 ], ( 'basic', 'one' ) )
+        self.assertEqual( skin_paths[ 1 ], ( 'fancy', 'two,one' ) )
+        self.assertEqual( len( skins_tool.objectItems() ), 2 )
+
+        context = DummyImportContext( site, False )
+        context._files[ 'skins.xml' ] = _FRAGMENT3_IMPORT
+
+        from Products.CMFSetup.skins import importSkinsTool
+        importSkinsTool( context )
+
+        self.assertEqual( skins_tool.default_skin, "default_skin" )
+        self.assertEqual( skins_tool.request_varname, "request_varname" )
+        self.failIf( skins_tool.allow_any )
+        self.failIf( skins_tool.cookie_persistence )
+
+        self.failUnless( site._skin_setup_called )
+        skin_paths = skins_tool.getSkinPaths()
+        self.assertEqual( len( skin_paths ), 2 )
+        self.assertEqual( skin_paths[ 0 ], ( 'basic', 'three,one,four' ) )
+        self.assertEqual( skin_paths[ 1 ],
+                          ( 'fancy', 'three,two,one,four' ) )
+        self.assertEqual( len( skins_tool.objectItems() ), 4 )
+
 
 def test_suite():
     return unittest.TestSuite((

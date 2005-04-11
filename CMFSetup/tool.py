@@ -69,12 +69,15 @@ def importToolset( context ):
     """
     site = context.getSite()
     encoding = context.getEncoding()
-    text = context.readDataFile( TOOLSET_XML )
+
+    xml = context.readDataFile(TOOLSET_XML)
+    if xml is None:
+        return 'Toolset: Nothing to import.'
 
     setup_tool = getToolByName( site, 'portal_setup' )
     toolset = setup_tool.getToolsetRegistry()
 
-    toolset.parseXML(text, encoding)
+    toolset.parseXML(xml, encoding)
 
     existing_ids = site.objectIds()
     existing_values = site.objectValues()
@@ -100,7 +103,7 @@ def importToolset( context ):
                 site._delObject( tool_id )
                 site._setObject( tool_id, tool_class() )
 
-    return 'Toolset imported'
+    return 'Toolset imported.'
 
 def exportToolset( context ):
 
@@ -113,7 +116,7 @@ def exportToolset( context ):
     xml = toolset.generateXML()
     context.writeDataFile( TOOLSET_XML, xml, 'text/xml' )
 
-    return 'Toolset exported'
+    return 'Toolset exported.'
 
 
 class SetupTool( UniqueObject, Folder ):
