@@ -241,8 +241,7 @@ class CatalogTool(UniqueObject, ZCatalog, ActionProviderBase):
                 if kw.has_key(k):
                     range = kw[k]['range'] or ''
                     query = kw[k]['query']
-                    if (not isinstance(query, tuple) and
-                        not isinstance(query, list)):
+                    if not isinstance(query, (tuple, list)):
                         query = (query,)
                 else:
                     range = ''

@@ -193,16 +193,11 @@ class ActionsTool(UniqueObject, IFAwareObjectManager, OrderedFolder,
                           'global':[],
                           'workflow':[],
                           }
+
         for action in actions:
-            category = action['category']
-            catlist = filtered_actions.get(category, None)
-            if catlist is None:
-                filtered_actions[category] = catlist = []
+            catlist = filtered_actions.setdefault(action['category'], [])
             catlist.append(action)
-            # ...should you need it, here's some code that filters
-            # by equality (use instead of the line above)
-            #if not action in catlist:
-            #    catlist.append(action)
+
         return filtered_actions
 
 InitializeClass(ActionsTool)
