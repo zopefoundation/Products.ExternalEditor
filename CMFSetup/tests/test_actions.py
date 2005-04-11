@@ -265,6 +265,57 @@ _NORMAL_EXPORT = """\
 </actions-tool>
 """
 
+_NEWSYTLE_EXPORT = """\
+<?xml version="1.0"?>
+<actions-tool>
+ <action-provider id="portal_actions">
+ </action-provider>
+ <object name="dummy" meta_type="CMF Action Category">
+  <property name="title"></property>
+ <object name="foo" meta_type="CMF Action">
+  <property name="title">Foo</property>
+  <property name="description"></property>
+  <property name="url_expr">string:${object_url}/foo</property>
+  <property name="icon_expr"></property>
+  <property name="available_expr">python:1</property>
+  <property name="permissions"></property>
+  <property name="visible">True</property>
+ </object>
+ <object name="bar" meta_type="CMF Action">
+  <property name="title">Bar</property>
+  <property name="description"></property>
+  <property name="url_expr">string:${object_url}/bar</property>
+  <property name="icon_expr"></property>
+  <property name="available_expr">python:0</property>
+  <property name="permissions">
+   <element value="Manage portal" /></property>
+  <property name="visible">False</property>
+ </object>
+ </object>
+</actions-tool>
+"""
+
+_FRAGMENT_IMPORT = """\
+<?xml version="1.0"?>
+<actions-tool>
+ <object name="dummy">
+ <object name="spam" meta_type="CMF Action" insert-before="*">
+  <property name="title">Spam</property>
+  <property name="description"></property>
+  <property name="url_expr">string:${object_url}/spam</property>
+  <property name="icon_expr">string:spam_icon.png</property>
+  <property name="available_expr"></property>
+  <property name="permissions">
+   <element value="View" /></property>
+  <property name="visible">True</property>
+ </object>
+ <object name="foo" insert-after="*">
+  <property name="icon_expr">string:foo_icon.png</property>
+ </object>
+ </object>
+</actions-tool>
+"""
+
 
 class Test_exportActionProviders( _ActionSetup ):
 
@@ -391,6 +442,17 @@ class Test_importActionProviders( _ActionSetup ):
         self.failIf( foo.listActions() )
         self.failIf( bar.listActions() )
 
+        # complete the roundtrip
+        context = DummyExportContext( site )
+        from Products.CMFSetup.actions import exportActionProviders
+        exportActionProviders( context )
+
+        self.assertEqual( len( context._wrote ), 1 )
+        filename, text, content_type = context._wrote[ 0 ]
+        self.assertEqual( filename, 'actions.xml' )
+        self._compareDOM( text, _NEWSYTLE_EXPORT )
+        self.assertEqual( content_type, 'text/xml' )
+
     def test_normal_encode_as_ascii( self ):
 
         site = self._initSite( 1, 1 )
@@ -415,6 +477,31 @@ class Test_importActionProviders( _ActionSetup ):
         self.failUnless( 'bar' in atool.dummy.objectIds() )
         self.failIf( foo.listActions() )
         self.failIf( bar.listActions() )
+
+    def test_fragment_skip_purge(self):
+
+        from Products.CMFSetup.actions import importActionProviders
+
+        site = self._initSite(0, 0)
+        atool = site.portal_actions
+
+        context = DummyImportContext(site)
+        context._files['actions.xml'] = _NEWSYTLE_EXPORT
+        importActionProviders(context)
+
+        self.assertEqual( len( atool.listActionProviders() ), 1 )
+        self.assertEqual( atool.objectIds(), ['dummy'] )
+        self.assertEqual( atool.dummy.objectIds(), ['foo', 'bar'] )
+        self.assertEqual( atool.dummy.foo.icon_expr, '' )
+
+        context = DummyImportContext(site, False)
+        context._files['actions.xml'] = _FRAGMENT_IMPORT
+        importActionProviders(context)
+
+        self.assertEqual( len( atool.listActionProviders() ), 1 )
+        self.assertEqual( atool.objectIds(), ['dummy'] )
+        self.assertEqual( atool.dummy.objectIds(), ['spam', 'bar', 'foo'] )
+        self.assertEqual( atool.dummy.foo.icon_expr, 'string:foo_icon.png' )
 
 
 def test_suite():
