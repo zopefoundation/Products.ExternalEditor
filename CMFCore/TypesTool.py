@@ -52,7 +52,7 @@ from utils import UniqueObject
 _marker = []  # Create a new marker.
 
 
-class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
+class TypeInformation(SimpleItemWithProperties, ActionProviderBase):
     """
     Base class for information about a content type.
     """
@@ -432,7 +432,7 @@ class TypeInformation (SimpleItemWithProperties, ActionProviderBase):
 InitializeClass( TypeInformation )
 
 
-class FactoryTypeInformation (TypeInformation):
+class FactoryTypeInformation(TypeInformation):
     """
     Portal content factory.
     """
@@ -731,7 +731,7 @@ class TypesTool(UniqueObject, IFAwareObjectManager, Folder,
                 ti_prod, ti_mt = [x.strip() for x in typeinfo_name.split(':')]
 
                 for name, ft in info:
-                    if ( name.startswith(ti_prod) and 
+                    if ( name.startswith(ti_prod) and
                          name.endswith('(%s)' % ti_mt) ):
                         fti = ft
                         break
@@ -802,13 +802,6 @@ class TypesTool(UniqueObject, IFAwareObjectManager, Folder,
         else:
             return None
 
-    security.declarePrivate('_checkViewType')
-    def _checkViewType(self,t):
-        try:
-            return getSecurityManager().validate(t, t, 'Title', t.Title)
-        except zExceptions_Unauthorized:  # Catch *all* Unauths!
-            return 0
-
     security.declareProtected(AccessContentsInformation, 'listTypeInfo')
     def listTypeInfo( self, container=None ):
         """
@@ -827,8 +820,6 @@ class TypesTool(UniqueObject, IFAwareObjectManager, Folder,
                 # Not ready.
                 continue
             # check we're allowed to access the type object
-            if not self._checkViewType(t):
-                continue
             if container is not None:
                 if not t.isConstructionAllowed(container):
                     continue
@@ -877,10 +868,6 @@ class TypesTool(UniqueObject, IFAwareObjectManager, Folder,
         info = self.getTypeInfo( type_name )
         if info is None:
             raise ValueError('No such content type: %s' % type_name)
-
-        # check we're allowed to access the type object
-        if not self._checkViewType(info):
-            raise AccessControl_Unauthorized(info)
 
         ob = info.constructInstance(container, id, *args, **kw)
 
