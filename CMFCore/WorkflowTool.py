@@ -36,8 +36,6 @@ from WorkflowCore import ObjectMoved
 from WorkflowCore import WorkflowException
 
 
-AUTO_MIGRATE_WORKFLOW_TOOLS = 0  # Set to 1 to auto-migrate
-
 _marker = []  # Create a new marker object.
 
 class WorkflowInformation:
@@ -83,24 +81,6 @@ class WorkflowTool(UniqueObject, Folder, ActionProviderBase):
     #
     security.declareProtected( ManagePortal, 'manage_overview' )
     manage_overview = DTMLFile( 'explainWorkflowTool', _dtmldir )
-
-    if AUTO_MIGRATE_WORKFLOW_TOOLS:
-        def __setstate__(self, state):
-            # Adds default_workflow to persistent WorkflowTool instances.
-            # This is temporary!
-            WorkflowTool.inheritedAttribute('__setstate__')(self, state)
-            if not self.__dict__.has_key('default_workflow'):
-                try:
-                    from Products.CMFDefault import DefaultWorkflow
-                except ImportError:
-                    pass
-                else:
-                    self.default_workflow = (
-                        DefaultWorkflow.DefaultWorkflowDefinition(
-                        'default_workflow'))
-                    self._objects = self._objects + (
-                        {'id': 'default_workflow',
-                         'meta_type': self.default_workflow.meta_type},)
 
     _manage_addWorkflowForm = DTMLFile('addWorkflow', _dtmldir)
 
@@ -568,7 +548,7 @@ class WorkflowTool(UniqueObject, Folder, ActionProviderBase):
 
         return tuple(wf_ids)
 
-    security.declareProtected( ManagePortal, 'getWorkflowsFor')
+    security.declareProtected(ManagePortal, 'getWorkflowsFor')
     def getWorkflowsFor(self, ob):
 
         """ Find the workflows for the type of the given object.
