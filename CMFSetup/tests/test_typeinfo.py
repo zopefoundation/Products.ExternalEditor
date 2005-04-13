@@ -34,11 +34,10 @@ from common import DummyExportContext
 from common import DummyImportContext
 
 
-class DummyTypeInfo( SimpleItem ):
+class DummyTypeInfo(SimpleItem):
 
-    def __init__( self, info ):
+    pass
 
-        self.__dict__.update( info )
 
 class DummyTypesTool( Folder ):
 
@@ -450,6 +449,13 @@ _FILENAME_EXPORT = """\
 </types-tool>
 """
 
+_UPDATE_TOOL_IMPORT = """\
+<?xml version="1.0"?>
+<types-tool>
+ <type id="foo"/>
+</types-tool>
+"""
+
 _FOO_EXPORT = """\
 <type-info
    id="%s"
@@ -555,6 +561,15 @@ _BAR_EXPORT = """\
   </action>
 </type-info>
 """
+
+_UPDATE_FOO_IMPORT = """\
+<type-info id="foo">
+  <aliases>
+   <alias from="spam" to="eggs"/>
+  </aliases>
+</type-info>
+"""
+
 
 class Test_exportTypesTool( _TypeInfoSetup ):
 
@@ -706,6 +721,39 @@ class Test_importTypesTool( _TypeInfoSetup ):
         self.assertEqual( len( tool.objectIds() ), 2 )
         self.failUnless( 'foo object' in tool.objectIds() )
         self.failUnless( 'bar object' in tool.objectIds() )
+
+    def test_fragment_skip_purge_ascii(self):
+
+        from Products.CMFSetup.typeinfo import importTypesTool
+
+        site = self._initSite()
+        tool = site.portal_types
+
+        context = DummyImportContext(site, encoding='ascii')
+        context._files['typestool.xml'] = _NORMAL_TOOL_EXPORT
+        context._files['types/foo.xml'] = _FOO_EXPORT % 'foo'
+        context._files['types/bar.xml'] = _BAR_EXPORT % 'bar'
+        importTypesTool(context)
+
+        self.assertEqual( tool.foo.title, 'Foo' )
+        self.assertEqual( tool.foo.content_meta_type, 'Foo Thing' )
+        self.assertEqual( tool.foo.content_icon, 'foo.png' )
+        self.assertEqual( tool.foo.immediate_view, 'foo_view' )
+        self.assertEqual( tool.foo._aliases,
+                          {'(Default)': 'foo_view', 'view': 'foo_view'} )
+
+        context = DummyImportContext(site, False, encoding='ascii')
+        context._files['typestool.xml'] = _UPDATE_TOOL_IMPORT
+        context._files['types/foo.xml'] = _UPDATE_FOO_IMPORT
+        importTypesTool(context)
+
+        self.assertEqual( tool.foo.title, 'Foo' )
+        self.assertEqual( tool.foo.content_meta_type, 'Foo Thing' )
+        self.assertEqual( tool.foo.content_icon, 'foo.png' )
+        self.assertEqual( tool.foo.immediate_view, 'foo_view' )
+        self.assertEqual( tool.foo._aliases,
+               {'(Default)': 'foo_view', 'view': 'foo_view', 'spam': 'eggs'} )
+
 
 def test_suite():
     return unittest.TestSuite((

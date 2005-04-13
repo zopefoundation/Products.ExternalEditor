@@ -295,7 +295,7 @@ _NEWSYTLE_EXPORT = """\
 </actions-tool>
 """
 
-_FRAGMENT_IMPORT = """\
+_INSERT_IMPORT = """\
 <?xml version="1.0"?>
 <actions-tool>
  <object name="dummy">
@@ -313,6 +313,18 @@ _FRAGMENT_IMPORT = """\
   <property name="icon_expr">string:foo_icon.png</property>
  </object>
  </object>
+</actions-tool>
+"""
+
+_REMOVE_IMPORT = """\
+<?xml version="1.0"?>
+<actions-tool>
+ <action-provider id="portal_actions" remove="">
+ </action-provider>
+ <action-provider id="not_existing" remove="">
+ </action-provider>
+ <action-provider id="portal_bar" remove="">
+ </action-provider>
 </actions-tool>
 """
 
@@ -478,7 +490,7 @@ class Test_importActionProviders( _ActionSetup ):
         self.failIf( foo.listActions() )
         self.failIf( bar.listActions() )
 
-    def test_fragment_skip_purge(self):
+    def test_insert_skip_purge(self):
 
         from Products.CMFSetup.actions import importActionProviders
 
@@ -495,13 +507,29 @@ class Test_importActionProviders( _ActionSetup ):
         self.assertEqual( atool.dummy.foo.icon_expr, '' )
 
         context = DummyImportContext(site, False)
-        context._files['actions.xml'] = _FRAGMENT_IMPORT
+        context._files['actions.xml'] = _INSERT_IMPORT
         importActionProviders(context)
 
         self.assertEqual( len( atool.listActionProviders() ), 1 )
         self.assertEqual( atool.objectIds(), ['dummy'] )
         self.assertEqual( atool.dummy.objectIds(), ['spam', 'bar', 'foo'] )
         self.assertEqual( atool.dummy.foo.icon_expr, 'string:foo_icon.png' )
+
+    def test_remove_skip_purge(self):
+
+        from Products.CMFSetup.actions import importActionProviders
+
+        site = self._initSite(2, 2)
+        atool = site.portal_actions
+
+        self.assertEqual( atool.listActionProviders(),
+                          ['portal_actions', 'portal_foo', 'portal_bar'] )
+
+        context = DummyImportContext(site, False)
+        context._files['actions.xml'] = _REMOVE_IMPORT
+        importActionProviders(context)
+
+        self.assertEqual( atool.listActionProviders(), ['portal_foo'] )
 
 
 def test_suite():

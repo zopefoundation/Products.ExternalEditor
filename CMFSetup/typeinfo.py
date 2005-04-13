@@ -67,18 +67,40 @@ def importTypesTool( context ):
             text = context.readDataFile( filename[sep+1:], filename[:sep] )
         info = tic.parseXML( text )
 
-        for mt_info in Products.meta_types:
-            if mt_info['name'] == info['kind']:
-                type_info = mt_info['instance'](**info)
-                break
+        type_id = str(info['id'])
+        if 'kind' in info:
+            for mt_info in Products.meta_types:
+                if mt_info['name'] == info['kind']:
+                    type_info = mt_info['instance'](type_id)
+                    break
+            else:
+                raise ValueError('unknown kind \'%s\'' % info['kind'])
+
+            if type_id in types_tool.objectIds():
+                types_tool._delObject(type_id)
+
+            types_tool._setObject(type_id, type_info)
+            type_info = types_tool._getOb(type_id)
+            type_info._updateProperty('title', info['id'])
+            type_info._updateProperty('content_meta_type', info['id'])
+            type_info._updateProperty('content_icon', '%s.png' % info['id'])
+            type_info._updateProperty('immediate_view',
+                                      '%s_edit' % info['id'])
         else:
-            raise ValueError('unknown kind \'%s\'' % info['kind'])
+            type_info = types_tool._getOb(type_id)
 
-        if info['id'] in types_tool.objectIds():
-            types_tool._delObject(info['id'])
+        type_info.manage_changeProperties(**info)
 
-        types_tool._setObject( str( info[ 'id' ] ), type_info )
+        if 'actions' in info:
+            type_info._actions = info['actions']
 
+        if 'aliases' in info:
+            if not getattr(type_info, '_aliases', False):
+                aliases = info['aliases']
+            else:
+                aliases = type_info.getMethodAliases()
+                aliases.update(info['aliases'])
+            type_info.setMethodAliases(aliases)
 
     # XXX: YAGNI?
     # importScriptsToContainer(types_tool, ('typestool_scripts',),
@@ -238,18 +260,15 @@ class TypeInfoConfigurator(ConfiguratorBase):
           'type-info':
             { 'id':                   {},
               'kind':                 {},
-              'title':                {DEFAULT: '%(id)s'},
+              'title':                {},
               'description':          {CONVERTER: self._convertToUnique},
-              'meta_type':            {DEFAULT: '%(id)s'},
-              'icon':                 {DEFAULT: '%(id)s.png'},
-              'immediate_view':       {DEFAULT: '%(id)s_edit'},
-              'global_allow':         {DEFAULT: True,
-                                       CONVERTER: self._convertToBoolean},
-              'filter_content_types': {DEFAULT: False,
-                                       CONVERTER: self._convertToBoolean},
+              'meta_type':            {KEY: 'content_meta_type'},
+              'icon':                 {KEY: 'content_icon'},
+              'immediate_view':       {},
+              'global_allow':         {CONVERTER: self._convertToBoolean},
+              'filter_content_types': {CONVERTER: self._convertToBoolean},
               'allowed_content_type': {KEY: 'allowed_content_types'},
-              'allow_discussion':     {DEFAULT: False,
-                                       CONVERTER: self._convertToBoolean},
+              'allow_discussion':     {CONVERTER: self._convertToBoolean},
               'aliases':              {CONVERTER: self._convertAliases},
               'action':               {KEY: 'actions'},
               'product':              {},

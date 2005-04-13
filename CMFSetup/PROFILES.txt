@@ -32,3 +32,9 @@ Profiles
       applies to: skin-path (skins.xml)
 
       Updates all existing items in the container with the same settings.
+
+    'remove'
+
+      applies to: action-provider (actions.xml)
+
+      Removes the specified item if it exists.
