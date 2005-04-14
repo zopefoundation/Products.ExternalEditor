@@ -1,0 +1,151 @@
+##############################################################################
+#
+# Copyright (c) 2005 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE.
+#
+##############################################################################
+"""Unit tests for CMFCatalogAware.
+
+$Id$
+"""
+
+import unittest
+import Testing
+
+try:
+   import Zope2
+except ImportError:
+    # BBB: for Zope 2.7
+    import Zope as Zope2
+Zope2.startup()
+
+from OFS.Folder import Folder
+from OFS.SimpleItem import SimpleItem
+from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
+
+
+def physicalpath(ob):
+    return '/'.join(ob.getPhysicalPath())
+
+
+class SimpleFolder(Folder):
+    def __init__(self, id):
+        self._setId(id)
+
+class DummyRoot(SimpleFolder):
+    def getPhysicalRoot(self):
+        return self
+
+class DummyCatalog(SimpleItem):
+    def __init__(self):
+        self.log = []
+        self.obs = []
+    def indexObject(self, ob):
+        self.log.append('index %s' % physicalpath(ob))
+    def reindexObject(self, ob, idxs=[], update_metadata=0):
+        self.log.append('reindex %s %s' % (physicalpath(ob), idxs))
+    def unindexObject(self, ob):
+        self.log.append('unindex %s' % physicalpath(ob))
+    def setObs(self, obs):
+        self.obs = [(ob, physicalpath(ob)) for ob in obs]
+    def unrestrictedSearchResults(self, path):
+        res = []
+        for ob, obpath in self.obs:
+            if not (obpath+'/').startswith(path+'/'):
+                continue
+            if obpath == path:
+                # Normal PathIndex skips initial value
+                continue
+            res.append(DummyBrain(ob, obpath))
+        return res
+
+class DummyBrain:
+    def __init__(self, ob, path):
+        self.ob = ob
+        self.path = path
+    def getPath(self):
+        return self.path
+    def getObject(self):
+        if self.ob.getId() == 'hop':
+            raise ValueError("security problem for this object")
+        return self.ob
+
+
+class TheClass(CMFCatalogAware, Folder):
+    def __init__(self, id):
+        self._setId(id)
+        self.notified = False
+    def notifyModified(self):
+        self.notified = True
+
+
+class CMFCatalogAwareTests(unittest.TestCase):
+
+    def setUp(self):
+        self.root = DummyRoot('')
+        self.root.site = SimpleFolder('site')
+        self.site = self.root.site
+        self.site._setObject('portal_catalog', DummyCatalog())
+        self.site.foo = TheClass('foo')
+
+    def test_indexObject(self):
+        foo = self.site.foo
+        cat = self.site.portal_catalog
+        foo.indexObject()
+        self.assertEquals(cat.log, ["index /site/foo"])
+
+    def test_unindexObject(self):
+        foo = self.site.foo
+        cat = self.site.portal_catalog
+        foo.unindexObject()
+        self.assertEquals(cat.log, ["unindex /site/foo"])
+
+    def test_reindexObject(self):
+        foo = self.site.foo
+        cat = self.site.portal_catalog
+        foo.reindexObject()
+        self.assertEquals(cat.log, ["reindex /site/foo []"])
+        self.assert_(foo.notified)
+
+    def test_reindexObject_idxs(self):
+        foo = self.site.foo
+        cat = self.site.portal_catalog
+        foo.reindexObject(idxs=['bar'])
+        self.assertEquals(cat.log, ["reindex /site/foo ['bar']"])
+        self.failIf(foo.notified)
+
+    def test_reindexObjectSecurity(self):
+        foo = self.site.foo
+        self.site.foo.bar = TheClass('bar')
+        bar = self.site.foo.bar
+        self.site.foo.hop = TheClass('hop')
+        hop = self.site.foo.hop
+        cat = self.site.portal_catalog
+        cat.setObs([foo, bar, hop])
+        foo.reindexObjectSecurity()
+        l = list(cat.log)
+        l.sort()
+        self.assertEquals(l, [
+            "reindex /site/foo ['allowedRolesAndUsers']",
+            "reindex /site/foo/bar ['allowedRolesAndUsers']",
+            "reindex /site/foo/hop ['allowedRolesAndUsers']",
+            ])
+        self.failIf(foo.notified)
+        self.failIf(bar.notified)
+        self.failIf(hop.notified)
+
+    # FIXME: more tests needed
+
+def test_suite():
+    return unittest.TestSuite((
+        unittest.makeSuite(CMFCatalogAwareTests),
+        ))
+
+if __name__ == '__main__':
+    main(defaultTest='test_suite')
