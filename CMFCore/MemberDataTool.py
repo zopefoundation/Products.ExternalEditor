@@ -366,14 +366,16 @@ class MemberData (SimpleItem):
     def setSecurityProfile(self, password=None, roles=None, domains=None):
         """Set the user's basic security profile"""
         u = self.getUser()
-        # This is really hackish.  The Zope User API needs methods
-        # for performing these functions.
-        if password is not None:
-            u.__ = password
-        if roles is not None:
-            u.roles = roles
-        if domains is not None:
-            u.domains = domains
+
+        # The Zope User API is stupid, it should check for None.
+        if roles is None:
+            roles = list(u.getRoles())
+            if 'Authenticated' in roles:
+                roles.remove('Authenticated')
+        if domains is None:
+            domains = u.getDomains()
+
+        u.userFolderEditUser(u.getUserName(), password, roles, domains)
 
     def __str__(self):
         return self.getMemberId()
