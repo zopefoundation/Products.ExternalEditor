@@ -1,0 +1,133 @@
+<html tal:define="URL context/absolute_url;">
+<head>
+ <meta content="text/html; charset=ISO-8859-1"
+       http-equiv="content-type" />
+ <link rel="stylesheet" type="text/css" href="selenium.css"
+       tal:attributes="href string:${URL}/selenium.css" />
+ <title>Selenium Functional Test Runner</title>
+ <script language="JavaScript" type="text/javascript"
+         src="jsunit/app/jsUnitCore.js"
+         tal:attributes="src string:${URL}/jsUnitCore.js"
+         ></script>
+ <script language="JavaScript" type="text/javascript"
+         src="/html-xpath/html-xpath-patched.js"
+         tal:attributes="src string:${URL}/html-xpath-patched.js"
+         ></script>
+ <script language="JavaScript" type="text/javascript"
+         src="selenium-browserbot.js"
+         tal:attributes="src string:${URL}/selenium-browserbot.js"
+         ></script>
+ <script language="JavaScript" type="text/javascript"
+         src="selenium-api.js"
+         tal:attributes="src string:${URL}/selenium-api.js"
+         ></script>
+ <script language="JavaScript" type="text/javascript"
+         src="selenium-commandhandlers.js"
+         tal:attributes="src string:${URL}/selenium-commandhandlers.js"
+         ></script>
+ <script language="JavaScript" type="text/javascript"
+         src="selenium-executionloop.js"
+         tal:attributes="src string:${URL}/selenium-executionloop.js"
+         ></script>
+ <script language="JavaScript" type="text/javascript"
+         src="selenium-fitrunner.js"
+         tal:attributes="src string:${URL}/selenium-fitrunner.js"
+         ></script>
+ <script language="JavaScript" type="text/javascript"
+         src="htmlutils.js"
+         tal:attributes="src string:${URL}/htmlutils.js"
+         ></script>
+</head>
+
+<body onLoad="javascript:loadSuiteFrame();">
+
+ <iframe name="testSuiteFrame" id="testSuiteFrame"
+         width="220px;" height="20%" border="0"
+         tal:define="dynamic string:${context/absolute_url}/test_suite_html;"
+         tal:attributes="src options/suite_name | dynamic;"
+         ></iframe>
+
+ <div id="seleniumControlPanel">
+
+ <div id="launchPanel">
+
+  <b>Run:</b>
+
+  <button type="button" id="runTest"
+    style="margin-top:10pt; cursor: pointer; cursor: hand"
+    onClick="runSingleTest();"
+  >Selected test</button>
+
+  <button type="button" id="runSuite"
+    style="margin-top:10pt; cursor: pointer; cursor: hand"
+    onClick="startTestSuite();"
+  >All tests</button>
+
+ </div>
+
+ <div id="runSpeedPanel">
+
+  <b>Run mode:</b>
+
+  <label for="runMode">Run</label>
+  <input id="modeRun" type="radio" name="runMode" value="0" checked="checked" />
+
+  <label for="modeWalk">Walk</label>
+  <input id="modeWalk" type="radio" name="runMode" value="500" />
+
+  <label for="modeStep">Step</label>
+  <input id="modeStep" type="radio" name="runMode" value="-1" />
+
+  <button type="button" id="continueTest">Next/Continue</button>
+
+ </div>
+
+<table id="resultsPanel">
+ <tr>
+  <th>Elapsed Time:</th>
+  <td id="elapsedTime">00.00</td>
+ </tr>
+ <tr>
+  <th colspan="2">Test Results</th>
+  <th colspan="2">Command Results</th>
+ </tr>
+ <tr>
+  <td>Total run:</td>
+  <td id="testRuns">0</td>
+  <td>Passes:</td>
+  <td id="commandPasses">0</td>
+ </tr>
+ <tr>
+  <td>Failures:</td>
+  <td id="testFailures">0</td>
+  <td>Failures:</td>
+  <td id="commandFailures">0</td>
+ </tr>
+ <tr>
+  <td colspan="2"/>
+  <td>Errors:</td>
+  <td id="commandErrors">0</td>
+ </tr>
+</table>
+</div>
+
+<iframe
+  name="testFrame"
+  id="testFrame"
+  style="float:left;margin-top: 10px;"
+  height="75%"
+  width="30%"
+  border="0"
+  src="about:blank"></iframe>
+
+<iframe
+  name="myiframe"
+  id="myiframe"
+  style="float:right;margin-top: 10px;"
+  height="75%;"
+  width="68%"
+  border="0"
+  src="about:blank"></iframe>
+
+</body>
+</html>

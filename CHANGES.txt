@@ -1,0 +1,7 @@
+Zelenium Product Changelog
+
+  Zelenium-0.1 (2005/04/15)
+
+    - CVS tag:  'Zelenium-0_1'
+
+    - Initial release
