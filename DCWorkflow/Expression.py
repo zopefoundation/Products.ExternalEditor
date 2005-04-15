@@ -98,9 +98,12 @@ def createExprContext(sci):
     '''
     ob = sci.object
     wf = sci.workflow
+    container = aq_parent(aq_inner(ob))
     data = {
         'here':         ob,
-        'container':    aq_parent(aq_inner(ob)),
+        'object':       ob,
+        'container':    container,
+        'folder':       container,
         'nothing':      None,
         'root':         wf.getPhysicalRoot(),
         'request':      getattr( ob, 'REQUEST', None ),
