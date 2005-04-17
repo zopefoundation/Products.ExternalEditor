@@ -74,7 +74,7 @@ Installation
 
      From the management interface, somewhere in the "main"
      section of your site (*not* the Control_Panel!),
-     select "Portal (New)" from the add list.  Fill out the
+     select "Configured CMF Site" from the add list.  Fill out the
      constructor form, and click the "Add" button.
 
 Refreshing your Checkout
