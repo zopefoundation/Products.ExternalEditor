@@ -7,7 +7,10 @@ RELEASE.txt - notes for creating a CMF release
   www.zope.org.
 
   Before running 'slurp_release.py' the respective branch needs to be cleaned
-  up and tagged properly.
+  up and tagged properly. 
+  
+  **Important note**: Always run all CMF unit tests before even thinking of
+  cutting a new release.
 
 
   **Naming conventions**
@@ -70,7 +73,11 @@ RELEASE.txt - notes for creating a CMF release
 
       - Installation URL '/Products/CMF/CMF-1.8.4beta2/INSTALL.txt'
 
-    Make sure to publish this Software Release.
+    Make sure to publish this Software Release. Due to a problem with the 
+    zope.org site at the time of this writing, you need to specify an
+    effective date on the publishing form if you want the item to show up on
+    the zope.org front page. Just choose the current data using the date
+    picker widget.
 
     With CVS and zope.org preparations done the 'slurp_release.py' script will 
     do the remaining work. You run it with the CVS tag and version ID as 
@@ -78,12 +85,17 @@ RELEASE.txt - notes for creating a CMF release
 
       slurp_release.py [options] release_tag version_id
 
-    Without any options it will complete the whole procedure including upload
-    to the zope.org site. Use 'slurp_release.py --help' to find out more.
+    slurp_release can be run from anywhere, it does not depend on your CVS
+    sandbox because it will create its own. Without any options it will 
+    complete the whole procedure including upload to the zope.org site. 
+    Use 'slurp_release.py --help' to find out more. The release_tag is equal 
+    to the CVS tag in the repository (CMF-1_8_4beta2, to stick with our 
+    example) whereas the version_id is the ID of the software release on 
+    zope.org (CMF-1.8.4beta2).
 
     Once 'slurp_release.py' has completed the upload step you need to visit
     the uploaded files on zope.org and make sure they get published on the 
-    site.
+    site. See the note about specifying an effective date above.
 
 
   **Announcing the release**
