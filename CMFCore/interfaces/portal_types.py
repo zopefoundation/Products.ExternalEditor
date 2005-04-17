@@ -138,5 +138,6 @@ class portal_types(Interface):
         """
             Build an instance of the appropriate content class in
             'container', using 'id'.  If RESPONSE is provided, redirect
-            to the new object's "initial view".
+            to the new object's "initial view", otherwise return the
+            new object's Id string.
         """
