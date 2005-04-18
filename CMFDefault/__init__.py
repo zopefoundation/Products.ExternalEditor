@@ -121,7 +121,6 @@ def initialize( context ):
                                         , Portal.manage_addCMFSite
                                         )
                          , icon='portal.gif'
-                         , visibility=None
                          )
 
     registerIcon( DefaultWorkflow.DefaultWorkflowDefinition

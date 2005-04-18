@@ -46,9 +46,8 @@ HEAD only (unreleased)
       removed. (http://www.zope.org/Collectors/CMF/240)
 
     - CMFDefault: Marked 'manage_addCMFSite' as deprecated.
-      'CMF Site' no longer shows up in the 'Add' list. To add a new CMF site,
-      select 'Configured CMF Site' instead. The 'CMFDefault Site' profile
-      creates a new site like those you know from 'CMF Site'.
+      To add a new CMF site, select 'Configured CMF Site'. The 'CMFDefault
+      Site' profile creates a new site like those you know from 'CMF Site'.
 
     - CMFDefault: Cleaned out some super-ancient code for migrating
       or fixing PTK content so it would work with CMF.
