@@ -1,5 +1,10 @@
 Zelenium Product Changelog
 
+  After Zelenium-0.1
+
+    - Allowed test cases to be PageTemplates, as well as Files, to permit
+      using the properties of the test suite for indirection.
+
   Zelenium-0.1 (2005/04/15)
 
     - CVS tag:  'Zelenium-0_1'

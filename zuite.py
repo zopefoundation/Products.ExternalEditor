@@ -12,7 +12,6 @@ from Globals import InitializeClass
 from OFS.Image import File
 from OFS.OrderedFolder import OrderedFolder
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
-from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
 from permissions import ManageSeleniumTestCases
 from permissions import View
@@ -51,8 +50,8 @@ class Zuite( OrderedFolder ):
     A Zuite instance is an ordered folder, whose 'index_html' provides the
     typical "TestRunner.html" view from Selenium.  It generates the
     "TestSuite.html" view from its 'objectItems' list (which allows the
-    user to control ordering), selecting File objects whose names start
-    with 'test'.
+    user to control ordering), selecting File and PageTemplate objects
+    whose names start with 'test'.
     """
     meta_type = 'Zuite'
 
@@ -75,7 +74,7 @@ class Zuite( OrderedFolder ):
         """ Return a list of our contents which qualify as test cases.
         """
         return [ { 'id' : x[ 0 ], 'title' : x[ 1 ].title_or_id() }
-                 for x in self.objectItems( [ 'File' ] )
+                 for x in self.objectItems( [ 'File', 'Page Template' ] )
                       if x[ 0 ].startswith('test') ]
 
     def __getitem__( self, key, default=_MARKER ):
@@ -158,7 +157,9 @@ class Zuite( OrderedFolder ):
         test_cases = [ { 'id' :  self._getFilename( k )
                        , 'title' : v.title_or_id()
                        , 'data' : v.manage_FTPget()
-                       } for ( k, v ) in self.objectItems( [ 'File' ] ) ]
+                       } for ( k, v ) in self.objectItems( [ 'File'
+                                                           , 'Page Template'
+                                                           ] ) ]
 
         archive.writestr( 'testSuite.html'
                         , self.test_suite_html( test_cases=test_cases ) )
