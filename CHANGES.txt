@@ -1,6 +1,11 @@
 Zelenium Product Changelog
 
-  After Zelenium-0.1
+  Zelenium-0.2 (2005/04/20)
+
+    - CVS tag:  'Zelenium-0_2'
+
+    - Added script, 'generator.py', to create Selenium testcase files
+      from the request / response logfiles created by tcpwatch.
 
     - Allowed test cases to be PageTemplates, as well as Files, to permit
       indirecting through properties of the test suite (e.g., for
