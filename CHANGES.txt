@@ -1,5 +1,12 @@
 Zelenium Product Changelog
 
+  Zelenium-0.2.1 (2005/04/20)
+
+    - CVS tag:  'Zelenium-0_2_1'
+
+    - Punt on handling XML-RPC requests (e.g., Epoz calls back to the
+      server to run Tidy).
+
   Zelenium-0.2 (2005/04/20)
 
     - CVS tag:  'Zelenium-0_2'

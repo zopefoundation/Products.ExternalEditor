@@ -386,6 +386,9 @@ class ScenarioGenerator:
 
         if http_verb == 'POST':
 
+            if content_type == 'text/xml':   # XXX XML-RPC, punt!
+                return
+
             form_data = cgi.FieldStorage( fp=f
                                         , environ=cgi_environ
                                         , keep_blank_values=1
