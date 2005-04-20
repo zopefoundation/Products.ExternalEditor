@@ -316,8 +316,8 @@ class ScenarioGenerator:
         if scheme and parms.get( 'site_host' ) is None:
             parms[ 'site_host' ] = site_host
 
-        if site_host != parms[ 'site_host' ]: # foreign site!
-            return None
+        if site_host != parms[ 'site_host' ]: # XXX foreign site!  Punt!
+            return None, None
 
         if self._site_path and path.startswith( self._site_path ):
             path = path[ len( self._site_path ) : ]
