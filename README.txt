@@ -69,3 +69,34 @@ Zelenium Product README
     On the "Zip" tab, supply a filename and click the "Download" button.
     The Zuite object will construct a zip file with the same contents
     described above, and then save it as a File object in its own contents.
+
+
+  Generating Testcases using tcpwatch
+
+    1. Download the 'tcpwatch' product from Shane Hathaway's site:
+
+       http://hathawaymix.org/Software/TCPWatch
+
+    2. Unpack and run tcpwatch in its "HTTP proxy" mode, with recoring
+       turned on.  E.g., the following command runs the proxy on
+       port 9999, recording the request / response data to the directory
+       '/tmp/recorded_scenario'::
+
+        $ python /path/to/tcpwatch/ tcpwatch.py \
+            -p 9999 -r /tmp/recorded_scenario 
+
+    3. Configure your browser to use an HTTP proxy on localhost, port 9999.
+
+    4. Click through your site, exercising the features you are testing.
+
+    5. Stop the proxy.  Run the 'generator.py' script, pointing to the
+       directory where tcpwatch was recording::
+
+        $ python /path/to/Zelenium/generator.py \
+           --logfile-directory=/tmp/recorded_scenario \
+           --output-file=test_case_name.html
+
+    6. Edit the generated test case, removing / correcting the various
+       steps.
+
+    7. Upload the test case to a Zelenium Zuite and run it.
