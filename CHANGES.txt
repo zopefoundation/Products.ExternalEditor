@@ -1,8 +1,10 @@
 Zelenium Product Changelog
 
-  Zelenium-0.2.1 (2005/04/20)
+  Zelenium-0.2.1 (2005/04/21)
 
     - CVS tag:  'Zelenium-0_2_1'
+
+    - Correct the emitted HTML for input widgets (close the <tr> tag).
 
     - Fix unpack bug in code which punts on requests to "foreign" hosts.
 

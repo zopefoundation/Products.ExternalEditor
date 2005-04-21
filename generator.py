@@ -66,7 +66,7 @@ _INPUT_FIELD_SKELETON = """
    <td>type</td>
    <td>%(FIELD_NAME)s</td>
    <td>%(FIELD_VALUE)s</td>
-  <tr>
+  </tr>
 """
 
 _SELECT_FIELD_SKELETON = """
@@ -74,7 +74,7 @@ _SELECT_FIELD_SKELETON = """
    <td>select</td>
    <td>%(FIELD_NAME)s</td>
    <td>%(FIELD_VALUE)s</td>
-  <tr>
+  </tr>
 """
 
 class ScenarioGenerator:
