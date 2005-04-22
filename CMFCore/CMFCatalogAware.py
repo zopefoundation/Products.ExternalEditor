@@ -120,7 +120,7 @@ class CMFCatalogAware(Base):
             using something that is not an ObjectManager).
         """
         items = []
-        
+
         # Call 'talkback' knowing that it is an opaque item.
         # This will remain here as long as the discussion item does
         # not implement ICallableOpaqueItem (backwards compatibility).
@@ -128,17 +128,17 @@ class CMFCatalogAware(Base):
             talkback = self.talkback
             if talkback is not None:
                 items.append((talkback.id, talkback))
-        
+
         # Other opaque items than 'talkback' may have callable
         # manage_after* and manage_before* hooks.
-        # Loop over all attributes and add those to 'items' 
+        # Loop over all attributes and add those to 'items'
         # implementing 'ICallableOpaqueItem'.
         self_base = aq_base(self)
         for name in self_base.__dict__.keys():
             obj = getattr(self_base, name)
             if ICallableOpaqueItem.isImplementedBy(obj):
                 items.append((obj.getId(), obj))
-        
+
         return tuple(items)
 
     security.declareProtected(AccessContentsInformation, 'opaqueIds')
