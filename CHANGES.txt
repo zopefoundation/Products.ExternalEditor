@@ -76,6 +76,14 @@ HEAD only (unreleased)
 
     - Workflow: Removed deprecated WorkflowMethod machinery.
 
+    - CMFCatalogAware: reindexObjectSecurity() optimizations in case
+      of an indexable container.
+    
+    - reindexObjectSecurity() supports now an optional argument
+      skip_self that prevent the object itself to be reindexed but its
+      descendants only. Optimization issue when you want to reindex
+      all the idxs *and* the security in a single shoot with reindexObject()
+
 CMF 1.5.x
 
   For a complete list see CHANGES.txt of CMF-1_5-branch.
