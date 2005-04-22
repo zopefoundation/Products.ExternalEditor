@@ -76,7 +76,7 @@ class CMFCatalogAware(Base):
             catalog.reindexObject(self, idxs=idxs)
 
     security.declareProtected(ModifyPortalContent, 'reindexObjectSecurity')
-    def reindexObjectSecurity(self):
+    def reindexObjectSecurity(self, skip_self=False):
         """
             Reindex security-related indexes on the object
             (and its descendants).
@@ -98,10 +98,11 @@ class CMFCatalogAware(Base):
                 catalog.reindexObject(ob, idxs=['allowedRolesAndUsers'],
                                       update_metadata=0)
                 if s is None: ob._p_deactivate()
-            # Reindex the object itself, as the PathIndex only gave us
-            # the descendants.
-            catalog.reindexObject(self, idxs=['allowedRolesAndUsers'],
-                                  update_metadata=0)
+            # Reindex the object itself in here if not explicitly
+            # asked to not to
+            if not skip_self:
+                catalog.reindexObject(self, idxs=['allowedRolesAndUsers'],
+                                      update_metadata=0)
 
     # Workflow methods
     # ----------------
