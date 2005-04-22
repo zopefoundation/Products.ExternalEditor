@@ -85,7 +85,12 @@ class CMFCatalogAware(Base):
         if catalog is not None:
             path = '/'.join(self.getPhysicalPath())
             for brain in catalog.unrestrictedSearchResults(path=path):
-                ob = self.unrestrictedTraverse(brain.getPath(), None)
+                brain_path = brain.getPath()
+                # self is treated at the end of the method
+                # Optimization in case of an indexable container
+                if brain_path == path:
+                    continue
+                ob = self.unrestrictedTraverse(brain_path, None)
                 if ob is None:
                     # Ignore old references to deleted objects.
                     continue
