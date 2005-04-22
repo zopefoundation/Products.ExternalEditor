@@ -15,6 +15,7 @@
 $Id$
 """
 
+from zLOG import LOG, PROBLEM
 from AccessControl import ClassSecurityInfo
 from Acquisition import aq_base
 from ExtensionClass import Base
@@ -90,9 +91,16 @@ class CMFCatalogAware(Base):
                 # Optimization in case of an indexable container
                 if brain_path == path:
                     continue
-                ob = self.unrestrictedTraverse(brain_path, None)
+                # Get the object
+                if hasattr(aq_base(brain), '_unrestrictedGetObject'):
+                    ob = brain._unrestrictedGetObject()
+                else:
+                    # BBB older Zope
+                    ob = self.unrestrictedTraverse(brain_path, None)
                 if ob is None:
                     # Ignore old references to deleted objects.
+                    LOG('reindexObjectSecurity', PROBLEM,
+                        "Cannot get %s from catalog" % brain_path)
                     continue
                 s = getattr(ob, '_p_changed', 0)
                 catalog.reindexObject(ob, idxs=['allowedRolesAndUsers'],
