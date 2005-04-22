@@ -124,7 +124,7 @@ class SyndicationTool (UniqueObject, SimpleItem, ActionProviderBase):
         if isAllowed is not None:
             self.isAllowed = isAllowed
 
-        if updatePeriod:
+        if updatePeriod is not None:
             self.syUpdatePeriod = updatePeriod
         else:
             try:
@@ -132,15 +132,15 @@ class SyndicationTool (UniqueObject, SimpleItem, ActionProviderBase):
             except KeyError:
                 pass
 
-        if updateFrequency:
-            self.syUpdateFrequency = updateFrequency
+        if updateFrequency is not None:
+            self.syUpdateFrequency = int(updateFrequency)
         else:
             try:
                 del self.syUpdateFrequency
             except KeyError:
                 pass
 
-        if updateBase:
+        if updateBase is not None:
             if type( updateBase ) is type( '' ):
                 updateBase = DateTime( updateBase )
             self.syUpdateBase = updateBase
@@ -150,8 +150,8 @@ class SyndicationTool (UniqueObject, SimpleItem, ActionProviderBase):
             except KeyError:
                 pass
 
-        if max_items:
-            self.max_items = max_items
+        if max_items is not None:
+            self.max_items = int(max_items)
         else:
             try:
                 del self.max_items
@@ -186,25 +186,25 @@ class SyndicationTool (UniqueObject, SimpleItem, ActionProviderBase):
         if syInfo is None:
             raise 'Syndication is Disabled'
 
-        if updatePeriod:
+        if updatePeriod is not None:
             syInfo.syUpdatePeriod = updatePeriod
         else:
             syInfo.syUpdatePeriod = self.syUpdatePeriod
 
-        if updateFrequency:
-            syInfo.syUpdateFrequency = updateFrequency
+        if updateFrequency is not None:
+            syInfo.syUpdateFrequency = int(updateFrequency)
         else:
             syInfo.syUpdateFrequency = self.syUpdateFrequency
 
-        if updateBase:
+        if updateBase is not None:
             if type( updateBase ) is type( '' ):
                 updateBase = DateTime( updateBase )
             syInfo.syUpdateBase = updateBase
         else:
             syInfo.syUpdateBase = self.syUpdateBase
 
-        if max_items:
-            syInfo.max_items = max_items
+        if max_items is not None:
+            syInfo.max_items = int(max_items)
         else:
             syInfo.max_items = self.max_items
 

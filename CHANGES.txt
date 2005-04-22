@@ -31,6 +31,9 @@ HEAD only (unreleased)
 
   Bug Fixes
 
+    - CMFDefault.SyndicationTool: Coerce property values into correct
+      types. (http://zope.org/Collectors/CMF/344)
+
     - CMFCore.PortalContent: Wrong variable name in __call__ would blow up
       if no default view could be found for a piece of content.
 
