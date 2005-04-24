@@ -42,7 +42,7 @@ RELEASE.txt - notes for creating a CMF release
       - At the top of 'CHANGES.txt', enter the current date as YYYY/MM/DD
         in parentheses next to the CMF version number.
 
-      - Find all 'version.txt' files throughout the CMF pacckage and adjust 
+      - Find all 'version.txt' files throughout the CMF package and adjust 
         the version number, in this case 'CMF-1.8.4beta2'.
 
       - Check these changes into the CVS repository
