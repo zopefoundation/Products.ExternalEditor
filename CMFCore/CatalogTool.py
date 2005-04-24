@@ -171,7 +171,7 @@ class CatalogTool(UniqueObject, ZCatalog, ActionProviderBase):
                , 'modified'
                , 'CreationDate'
                , 'EffectiveDate'
-               , 'ExpiresDate'
+               , 'ExpirationDate'
                , 'ModificationDate'
                , 'getId'
                , 'portal_type'
