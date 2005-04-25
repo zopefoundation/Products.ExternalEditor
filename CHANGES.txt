@@ -23,12 +23,6 @@ HEAD only (unreleased)
       Any class that implements the TypeInformation interface and is
       a registered meta type can now be used in the TypesTool.
 
-    - CMFCatalogAware: reindexObjectSecurity() now supports an optional
-      argument 'skip_self' that prevents the object itself from being
-      reindexed, but its descendants still are. Allows an optimization
-      when you want to reindex all the idxs *and* the security in a
-      single shot with reindexObject().
-
   Bug Fixes
 
     - CMFDefault.SyndicationTool: Coerce property values into correct
