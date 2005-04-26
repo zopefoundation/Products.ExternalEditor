@@ -36,26 +36,46 @@ class DCWorkflowDefinitionTests(TestCase):
         self.site._setObject( 'portal_types', DummyTool() )
         self.site._setObject( 'portal_workflow', WorkflowTool() )
         addWorkflowFactory(DCWorkflowDefinition)
+        self._constructDummyWorkflow()
 
-    def test_doActionFor(self):
+    def test_interface(self):
+        from Products.CMFCore.interfaces.portal_workflow \
+             import WorkflowDefinition as IWorkflowDefinition
+
+        verifyClass(IWorkflowDefinition, DCWorkflowDefinition)
+
+    def _constructDummyWorkflow(self):
+
         wftool = self.site.portal_workflow
         wftool.manage_addWorkflow('Workflow (DC Workflow Definition)', 'wf')
         wftool.setDefaultChain('wf')
-
         wf = wftool.wf
+
         wf.states.addState('private')
         sdef = wf.states['private']
         sdef.setProperties( transitions=('publish',) )
+
         wf.states.addState('published')
         wf.states.setInitialState('private')
+
         wf.transitions.addTransition('publish')
         tdef = wf.transitions['publish']
         tdef.setProperties(title='', new_state_id='published', actbox_name='')
+
         wf.variables.addVariable('comments')
         vdef = wf.variables['comments']
         vdef.setProperties(description='',
                  default_expr="python:state_change.kwargs.get('comment', '')",
                  for_status=1, update_always=1)
+
+    def _getDummyWorkflow(self):
+        wftool = self.site.portal_workflow
+        return wftool.wf
+
+    def test_doActionFor(self):
+
+        wftool = self.site.portal_workflow
+        wf = self._getDummyWorkflow()
 
         dummy = self.site._setObject( 'dummy', DummyContent() )
         wftool.notifyCreated(dummy)
@@ -65,12 +85,37 @@ class DCWorkflowDefinitionTests(TestCase):
         self.assertEqual( wf._getStatusOf(dummy),
                           {'state': 'published', 'comments': 'foo'} )
 
-    def test_interface(self):
-        from Products.CMFCore.interfaces.portal_workflow \
-                import WorkflowDefinition as IWorkflowDefinition
+        # XXX more
 
-        verifyClass(IWorkflowDefinition, DCWorkflowDefinition)
+    def test_checkTransitionGuard(self):
 
+        wftool = self.site.portal_workflow
+        wf = self._getDummyWorkflow()
+        dummy = self.site._setObject( 'dummy', DummyContent() )
+        wftool.notifyCreated(dummy)
+        self.assertEqual( wf._getStatusOf(dummy),
+                          {'state': 'private', 'comments': ''} )
+
+        # Check
+        self.assert_(wf._checkTransitionGuard(wf.transitions['publish'],
+                                              dummy))
+
+        # Check with kwargs propagation
+        self.assert_(wf._checkTransitionGuard(wf.transitions['publish'],
+                                              dummy, arg1=1, arg2=2))
+
+    def test_isActionSupported(self):
+
+        wf = self._getDummyWorkflow()
+        dummy = self.site._setObject( 'dummy', DummyContent() )
+
+        # check publish
+        self.assert_(wf.isActionSupported(dummy, 'publish'))
+
+        # Check with kwargs.
+        self.assert_(wf.isActionSupported(dummy, 'publish', arg1=1, arg2=2))
+
+    # XXX more tests...
 
 def test_suite():
     return TestSuite((
