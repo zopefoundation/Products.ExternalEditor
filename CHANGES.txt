@@ -1,5 +1,12 @@
 Zelenium Product Changelog
 
+  Zelenium-0.3 (2005/04/25)
+
+    - CVS tag:  'Zelenium-0_3'
+
+    - Added 'postResults' handling code to capture results as a sub-
+      folder of the suite.
+
   Zelenium-0.2.1 (2005/04/21)
 
     - CVS tag:  'Zelenium-0_2_1'
