@@ -1,5 +1,10 @@
 Zelenium Product Changelog
 
+  After Zelenium-0.3
+
+    - Captured additional request parameters in 'postResults' (user agent,
+      HTTP host, remote address).
+
   Zelenium-0.3 (2005/04/25)
 
     - CVS tag:  'Zelenium-0_3'

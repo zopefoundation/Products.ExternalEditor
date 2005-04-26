@@ -96,6 +96,25 @@ _RESULT_HTML = """\
   <td align="right" style="color: orange"
       tal:content="context/commands_with_errors">20</td>
  </tr>
+
+ <tr>
+  <td>User agent</td>
+  <td align="right" style="color: black"
+      tal:content="context/user_agent">lynx/2.8</td>
+ </tr>
+
+ <tr>
+  <td>Remote address</td>
+  <td align="right" style="color: black"
+      tal:content="context/remote_addr">127.0.0.1</td>
+ </tr>
+
+ <tr>
+  <td>HTTP Host</td>
+  <td align="right" style="color: black"
+      tal:content="context/http_host">localhost</td>
+ </tr>
+
 </table>
  
 <div style="padding-top: 10px;"
@@ -196,6 +215,7 @@ class Zuite( OrderedFolder ):
         self._setObject( result_id, Folder( 'result_id' ) )
         result = self._getOb( result_id )
         rfg = REQUEST.form.get
+        reg = REQUEST.environ.get
 
         result._setProperty( 'completed'
                            , completed
@@ -235,6 +255,21 @@ class Zuite( OrderedFolder ):
         result._setProperty( 'commands_with_errors'
                            , int( rfg( 'numCommandErrors', 0 ) )
                            , 'int'
+                           )
+
+        result._setProperty( 'user_agent'
+                           , reg( 'HTTP_USER_AGENT', 'unknown' )
+                           , 'string'
+                           )
+
+        result._setProperty( 'remote_addr'
+                           , reg( 'REMOTE_ADDR', 'unknown' )
+                           , 'string'
+                           )
+
+        result._setProperty( 'http_host'
+                           , reg( 'HTTP_HOST', 'unknown' )
+                           , 'string'
                            )
 
         result._setObject( 'index_html'
