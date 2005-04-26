@@ -281,7 +281,7 @@ class WorkflowTool(UniqueObject, Folder, ActionProviderBase):
                 raise WorkflowException('No workflows found.')
             found = 0
             for wf in wfs:
-                if wf.isActionSupported(ob, action):
+                if wf.isActionSupported(ob, action, **kw):
                     found = 1
                     break
             if not found:
