@@ -283,11 +283,8 @@ class PortalFolder(DynamicType, CMFCatalogAware, OrderedFolder):
     def Type( self ):
         """ Dublin Core Type element - resource type.
         """
-        if hasattr(aq_base(self), 'getTypeInfo'):
-            ti = self.getTypeInfo()
-            if ti is not None:
-                return ti.Title()
-        return self.meta_type
+        ti = self.getTypeInfo()
+        return ti is not None and ti.Title() or 'Unknown'
 
     #
     #   other methods

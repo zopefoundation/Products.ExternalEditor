@@ -25,6 +25,9 @@ HEAD only (unreleased)
 
   Bug Fixes
 
+    - DublinCore and PortalFolder: Changed fallback in 'Type' method.
+      The fallback is only necessary if the related type info is missing.
+
     - CMFDefault.SyndicationTool: Coerce property values into correct
       types. (http://zope.org/Collectors/CMF/344)
 
