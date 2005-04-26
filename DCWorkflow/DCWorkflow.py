@@ -247,7 +247,7 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
         return [ result[1] for result in res ]
 
     security.declarePrivate('isActionSupported')
-    def isActionSupported(self, ob, action):
+    def isActionSupported(self, ob, action, **kw):
         '''
         Returns a true value if the given action name
         is possible in the current state.
@@ -259,7 +259,7 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
             tdef = self.transitions.get(action, None)
             if (tdef is not None and
                 tdef.trigger_type == TRIGGER_USER_ACTION and
-                self._checkTransitionGuard(tdef, ob)):
+                self._checkTransitionGuard(tdef, ob, **kw)):
                 return 1
         return 0
 
@@ -279,7 +279,7 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
         if tdef is None or tdef.trigger_type != TRIGGER_USER_ACTION:
             raise WorkflowException, (
                 'Transition %s is not triggered by a user action' % action)
-        if not self._checkTransitionGuard(tdef, ob):
+        if not self._checkTransitionGuard(tdef, ob, **kw):
             raise Unauthorized(action)
         self._changeStateOf(ob, tdef, kw)
 
@@ -393,11 +393,11 @@ class DCWorkflowDefinition (WorkflowUIMixin, Folder):
                     changed = 1
         return changed
 
-    def _checkTransitionGuard(self, t, ob):
+    def _checkTransitionGuard(self, t, ob, **kw):
         guard = t.guard
         if guard is None:
             return 1
-        if guard.check(getSecurityManager(), self, ob):
+        if guard.check(getSecurityManager(), self, ob, **kw):
             return 1
         return 0
 
