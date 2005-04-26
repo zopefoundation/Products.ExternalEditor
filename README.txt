@@ -100,3 +100,27 @@ Zelenium Product README
        steps.
 
     7. Upload the test case to a Zelenium Zuite and run it.
+
+
+  Capturing Results from the Test Run
+
+    Selenium has a feature which allows the testrunner to upload
+    result data from an automated test run to the server.  To enable
+    this feature in Zope, add a PythonScript, 'postResults', in the
+    root of your site, with text similar to::
+
+      context.test_suite.postResuts(context.REQUEST)
+
+    Invoke the test suite from your browser as usual, but append the
+    query string '?auto=1', to the URL, e.g.::
+
+      http://localhost:8080/test_suite?auto=1
+
+    Selenium will run all test cases, and then upload its result data
+    to the '/postResults' URL (your PythonScript).
+
+    Note:  if running Zope behind Apache or another rewriting proxy, 
+    you may be able to skip adding a PythonScript, and instead rewrite
+    '/postResults' directly onto the 'postResults' method of your
+    test suite.
+

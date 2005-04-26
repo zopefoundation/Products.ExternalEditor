@@ -3,14 +3,18 @@
 $Id$
 """
 import os
+from urllib import unquote
 import zipfile
 import StringIO
 
 from AccessControl.SecurityInfo import ClassSecurityInfo
+from DateTime.DateTime import DateTime
 from Globals import package_home
 from Globals import InitializeClass
+from OFS.Folder import Folder
 from OFS.Image import File
 from OFS.OrderedFolder import OrderedFolder
+from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
 from permissions import ManageSeleniumTestCases
@@ -34,6 +38,76 @@ _SUPPORT_FILE_NAMES = [ 'htmlutils.js'
                       , 'selenium-executionloop.js'
                       , 'selenium-fitrunner.js'
                       ]
+
+_RESULT_HTML = """\
+<html>
+<head>
+<title tal:content="context/completed/ISO"
+>Test result: YYYY-MM-DDTHH:MM:SS</title>
+</head>
+<body>
+
+<h1> Test Result: <tal:x replace="context/completed/ISO" /></h1>
+
+<table border="1" cellpadding="2">
+
+ <tr>
+  <td>Status</td>
+  <td>
+    <span style="color: green"
+          tal:condition="context/passed">PASSED</span>
+    <span style="color: red"
+          tal:condition="not: context/passed">FAILED</span>
+  </td>
+ </tr>
+
+ <tr>
+  <td>Elapsed time (sec)</td>
+  <td align="right"
+      tal:content="context/time_secs">20</td>
+ </tr>
+
+ <tr>
+  <td>Tests passed</td>
+  <td align="right" style="color: green"
+      tal:content="context/tests_passed">20</td>
+ </tr>
+
+ <tr>
+  <td>Tests failed</td>
+  <td align="right" style="color: red"
+      tal:content="context/tests_failed">20</td>
+ </tr>
+
+ <tr>
+  <td>Commands passed</td>
+  <td align="right" style="color: green"
+      tal:content="context/commands_passed">20</td>
+ </tr>
+
+ <tr>
+  <td>Commands failed</td>
+  <td align="right" style="color: red"
+      tal:content="context/commands_failed">20</td>
+ </tr>
+
+ <tr>
+  <td>Commands with errors</td>
+  <td align="right" style="color: orange"
+      tal:content="context/commands_with_errors">20</td>
+ </tr>
+</table>
+ 
+<div style="padding-top: 10px;"
+     tal:repeat="item python:context.objectItems(['File'])">
+
+ <div tal:condition="python: item[0].startswith('testTable')"
+      tal:replace="structure python: item[1]" />
+</div>
+
+</body>
+</html>
+"""
 
 def _makeFile(filename):
     path = os.path.join(_SUPPORT_DIR, filename)
@@ -89,6 +163,107 @@ class Zuite( OrderedFolder ):
             return default
 
         raise KeyError, key
+
+    security.declarePublic('postResults')
+    def postResults(self, REQUEST):
+        """ Record the results of a test run.
+
+        o Create a folder with properties representing the summary results,
+          and files containing the suite and the individual test runs.
+
+        o REQUEST will have the following form fields:
+
+          result -- one of "failed" or "passed"
+
+          totalTime -- time in floating point seconds for the run
+
+          numTestPasses -- count of test runs which passed
+
+          numTestFailures -- count of test runs which failed
+
+          numCommandPasses -- count of commands which passed
+
+          numCommandFailures -- count of commands which failed
+
+          numCommandErrors -- count of commands raising non-assert errors
+
+          suite -- Colorized HTML of the suite table
+
+          testTable.<n> -- Colorized HTML of each test run
+        """
+        completed = DateTime()
+        result_id = 'result_%s' % completed.strftime( '%Y%m%d_%H%M%S' )
+        self._setObject( result_id, Folder( 'result_id' ) )
+        result = self._getOb( result_id )
+        rfg = REQUEST.form.get
+
+        result._setProperty( 'completed'
+                           , completed
+                           , 'date'
+                           )
+
+        result._setProperty( 'passed'
+                           , rfg( 'result' ).lower() == 'passed'
+                           , 'boolean'
+                           )
+
+        result._setProperty( 'time_secs'
+                           , float( rfg( 'totalTime', 0 ) )
+                           , 'float'
+                           )
+
+        result._setProperty( 'tests_passed'
+                           , int( rfg( 'numTestPasses', 0 ) )
+                           , 'int'
+                           )
+
+        result._setProperty( 'tests_failed'
+                           , int( rfg( 'numTestFailures', 0 ) )
+                           , 'int'
+                           )
+
+        result._setProperty( 'commands_passed'
+                           , int( rfg( 'numCommandPasses', 0 ) )
+                           , 'int'
+                           )
+
+        result._setProperty( 'commands_failed'
+                           , int( rfg( 'numCommandFailures', 0 ) )
+                           , 'int'
+                           )
+
+        result._setProperty( 'commands_with_errors'
+                           , int( rfg( 'numCommandErrors', 0 ) )
+                           , 'int'
+                           )
+
+        result._setObject( 'index_html'
+                         , ZopePageTemplate('index_html'
+                                           , _RESULT_HTML
+                                           , 'text/html'
+                                           )
+                         )
+
+        result._setObject( 'suite.html'
+                         , File( 'suite.html'
+                               , 'Test Suite'
+                               , unquote( rfg( 'suite' ) )
+                               , 'text/html'
+                               )
+                         )
+
+        test_ids = [ x for x in REQUEST.form.keys()
+                        if x.startswith( 'testTable' ) ]
+        test_ids.sort()
+
+        for test_id in test_ids:
+            result._setObject( test_id
+                             , File( test_id
+                                   , 'Test case: %s' % test_id
+                                   , unquote( rfg( test_id ) )
+                                   , 'text/html'
+                                   )
+                             )
 
     security.declareProtected(ManageSeleniumTestCases, 'manage_zipfile')
     manage_zipfile = PageTemplateFile( 'suiteZipFile', _WWW_DIR )
