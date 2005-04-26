@@ -3,7 +3,7 @@ Zelenium Product README
   Overview
 
     This product allows developers to create TTW Selenium test suites
-    inside their Zope instance, in order to to browser-based functional
+    inside their Zope instance, in order to do browser-based functional
     testing of their site.
 
 
