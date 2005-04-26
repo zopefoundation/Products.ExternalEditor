@@ -109,7 +109,7 @@ Zelenium Product README
     this feature in Zope, add a PythonScript, 'postResults', in the
     root of your site, with text similar to::
 
-      context.test_suite.postResuts(context.REQUEST)
+      context.test_suite.postResults(context.REQUEST)
 
     Invoke the test suite from your browser as usual, but append the
     query string '?auto=1', to the URL, e.g.::
