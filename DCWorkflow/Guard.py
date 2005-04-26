@@ -44,7 +44,7 @@ class Guard (Persistent, Explicit):
 
     guardForm = DTMLFile('guard', _dtmldir)
 
-    def check(self, sm, wf_def, ob):
+    def check(self, sm, wf_def, ob, **kw):
         """Checks conditions in this guard.
         """
         u_roles = None
@@ -85,7 +85,8 @@ class Guard (Persistent, Explicit):
                 return 0
         expr = self.expr
         if expr is not None:
-            econtext = createExprContext(StateChangeInfo(ob, wf_def))
+            econtext = createExprContext(
+                StateChangeInfo(ob, wf_def, kwargs=kw))
             res = expr(econtext)
             if not res:
                 return 0
