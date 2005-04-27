@@ -1,8 +1,13 @@
 Zelenium Product Changelog
 
-  After Zelenium-0.3
+  Zelenium-0.3.1 (2005/04/26)
 
-    - Captured additional request parameters in 'postResults' (user agent,
+    - CVS tag:  'Zelenium-0_3_1'
+
+    - Record server-side data during 'postResults':  Zope version string,
+      product names and versions.
+
+    - Captured additional request parameters in 'postResults':  user agent,
       HTTP host, remote address).
 
   Zelenium-0.3 (2005/04/25)

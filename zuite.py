@@ -49,10 +49,12 @@ _RESULT_HTML = """\
 
 <h1> Test Result: <tal:x replace="context/completed/ISO" /></h1>
 
+<h2> Test Summary </h2>
+
 <table border="1" cellpadding="2">
 
  <tr>
-  <td>Status</td>
+  <th align="left">Status</th>
   <td>
     <span style="color: green"
           tal:condition="context/passed">PASSED</span>
@@ -62,67 +64,94 @@ _RESULT_HTML = """\
  </tr>
 
  <tr>
-  <td>Elapsed time (sec)</td>
+  <th align="left">Elapsed time (sec)</th>
   <td align="right"
       tal:content="context/time_secs">20</td>
  </tr>
 
  <tr>
-  <td>Tests passed</td>
+  <th align="left">Tests passed</th>
   <td align="right" style="color: green"
       tal:content="context/tests_passed">20</td>
  </tr>
 
  <tr>
-  <td>Tests failed</td>
+  <th align="left">Tests failed</th>
   <td align="right" style="color: red"
       tal:content="context/tests_failed">20</td>
  </tr>
 
  <tr>
-  <td>Commands passed</td>
+  <th align="left">Commands passed</th>
   <td align="right" style="color: green"
       tal:content="context/commands_passed">20</td>
  </tr>
 
  <tr>
-  <td>Commands failed</td>
+  <th align="left">Commands failed</th>
   <td align="right" style="color: red"
       tal:content="context/commands_failed">20</td>
  </tr>
 
  <tr>
-  <td>Commands with errors</td>
+  <th align="left">Commands with errors</th>
   <td align="right" style="color: orange"
       tal:content="context/commands_with_errors">20</td>
  </tr>
 
- <tr>
-  <td>User agent</td>
-  <td align="right" style="color: black"
-      tal:content="context/user_agent">lynx/2.8</td>
- </tr>
-
- <tr>
-  <td>Remote address</td>
-  <td align="right" style="color: black"
-      tal:content="context/remote_addr">127.0.0.1</td>
- </tr>
-
- <tr>
-  <td>HTTP Host</td>
-  <td align="right" style="color: black"
-      tal:content="context/http_host">localhost</td>
- </tr>
-
 </table>
  
+<h2> Test Cases </h2>
+
 <div style="padding-top: 10px;"
      tal:repeat="item python:context.objectItems(['File'])">
 
  <div tal:condition="python: item[0].startswith('testTable')"
       tal:replace="structure python: item[1]" />
 </div>
+
+<h2> Remote Client Data </h2>
+
+<table border="1" cellpadding="2">
+
+ <tr>
+  <th align="left">User agent</th>
+  <td tal:content="context/user_agent">lynx/2.8</td>
+ </tr>
+
+ <tr>
+  <th align="left">Remote address</th>
+  <td tal:content="context/remote_addr">127.0.0.1</td>
+ </tr>
+
+ <tr>
+  <th align="left">HTTP Host</th>
+  <td tal:content="context/http_host">localhost</td>
+ </tr>
+
+</table>
+
+<h2> Software Under Test </h2>
+
+<table border="1" cellpadding="2">
+
+ <tr>
+  <th align="left">Server Software</th>
+  <td tal:content="context/server_software">localhost</td>
+ </tr>
+
+ <tbody tal:repeat="product_line context/product_info">
+  <tr tal:define="tokens product_line/split;
+                  product_name python:tokens[0];
+                  product_version python:tokens[1];
+                 ">
+   <th align="left"
+       tal:content="string:Product: ${product_name}">PRODUCT_NAME</th>
+   <td tal:content="product_version">PRODUCT_VERSION</td>
+  </tr>
+ </tbody>
+
+</table>
 
 </body>
 </html>
@@ -272,6 +301,16 @@ class Zuite( OrderedFolder ):
                            , 'string'
                            )
 
+        result._setProperty( 'server_software'
+                           , reg( 'SERVER_SOFTWARE', 'unknown' )
+                           , 'string'
+                           )
+
+        result._setProperty( 'product_info'
+                           , self._listProductInfo()
+                           , 'lines'
+                           )
+
         result._setObject( 'index_html'
                          , ZopePageTemplate('index_html'
                                            , _RESULT_HTML
@@ -300,6 +339,24 @@ class Zuite( OrderedFolder ):
                                    )
                              )
 
+    security.declarePrivate('_listProductInfo')
+    def _listProductInfo( self ):
+        """ Return a list of strings of form '%(name)s %(version)s'.
+
+        o Each line describes one product installed in the Control_Panel.
+        """
+        result = []
+        cp = self.getPhysicalRoot().Control_Panel
+        products = cp.Products.objectItems()
+        products.sort()
+
+        for product_name, product in products:
+            version = product.version or 'unreleased'
+            result.append( '%s %s' % ( product_name, version ) )
+
+        return result
+
+ 
     security.declareProtected(ManageSeleniumTestCases, 'manage_zipfile')
     manage_zipfile = PageTemplateFile( 'suiteZipFile', _WWW_DIR )
 
