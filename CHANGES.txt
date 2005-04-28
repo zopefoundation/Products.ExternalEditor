@@ -1,5 +1,10 @@
 Zelenium Product Changelog
 
+  After Zelenium-0.4
+
+    - Compensate in display of test tables for non-padded integers
+      in the IDs (make them sort properly).
+
   Zelenium-0.4 (2005/04/27)
 
     - CVS tag:  'Zelenium-0_4'

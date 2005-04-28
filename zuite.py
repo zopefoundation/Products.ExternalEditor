@@ -103,14 +103,29 @@ _RESULT_HTML = """\
  </tr>
 
 </table>
- 
-<h2> Test Cases </h2>
 
-<div style="padding-top: 10px;"
-     tal:repeat="item python:context.objectItems(['File'])">
 
- <div tal:condition="python: item[0].startswith('testTable')"
-      tal:replace="structure python: item[1]" />
+<div tal:define="raw_case_ids python: [x for x in context.objectIds(['File'])
+                                         if x.startswith('testTable')];
+                 tokenized python: [x.split('.') for x in raw_case_ids];
+                 normalized python: [(x[0], int(x[1])) for x in tokenized];
+                 ignored normalized/sort;
+                 case_ids python: [('%s.%d' % x) for x in normalized];
+                 test_cases python: [context.restrictedTraverse(case_id)
+                                        for case_id in case_ids];
+                ">
+ <h2> Test Cases </h2>
+
+ <div style="padding-top: 10px;"
+      tal:repeat="test_case test_cases">
+
+  <p><a href="#"
+        tal:attributes="href test_case/absolute_url"
+        tal:content="test_case/getId">TEST_CASE</a></p>
+
+  <div tal:replace="structure python: test_case" />
+ </div>
+
 </div>
 
 <h2> Remote Client Data </h2>
