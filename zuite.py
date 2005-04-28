@@ -1,5 +1,7 @@
 """ Classes:  Zuite
 
+Zuite instances are collections of Zelenium test cases.
+
 $Id$
 """
 import os
@@ -8,6 +10,7 @@ import zipfile
 import StringIO
 
 from AccessControl.SecurityInfo import ClassSecurityInfo
+from App.special_dtml import DTMLFile
 from DateTime.DateTime import DateTime
 from Globals import package_home
 from Globals import InitializeClass
@@ -183,21 +186,26 @@ class Zuite( OrderedFolder ):
                      )
 
     security = ClassSecurityInfo()
-    security.declareObjectProtected(View)
+    security.declareObjectProtected( View )
 
-    security.declareProtected(View, 'index_html')
+    security.declareProtected( ManageSeleniumTestCases, 'manage_main' )
+    manage_main = DTMLFile( 'suiteMain', _WWW_DIR )
+
+    security.declareProtected( View, 'index_html' )
     index_html = PageTemplateFile( 'suiteView', _WWW_DIR )
 
-    security.declareProtected(View, 'test_suite_html')
+    security.declareProtected( View, 'test_suite_html' )
     test_suite_html = PageTemplateFile( 'suiteTests', _WWW_DIR )
 
-    security.declareProtected(View, 'listTestCases')
+
+    security.declareProtected( View, 'listTestCases' )
     def listTestCases( self ):
         """ Return a list of our contents which qualify as test cases.
         """
         return [ { 'id' : x[ 0 ], 'title' : x[ 1 ].title_or_id() }
                  for x in self.objectItems( [ 'File', 'Page Template' ] )
                       if x[ 0 ].startswith('test') ]
+
 
     def __getitem__( self, key, default=_MARKER ):
 
@@ -211,6 +219,7 @@ class Zuite( OrderedFolder ):
             return default
 
         raise KeyError, key
+
 
     security.declarePublic('postResults')
     def postResults(self, REQUEST):
@@ -336,8 +345,8 @@ class Zuite( OrderedFolder ):
                                    , 'Test case: %s' % test_id
                                    , unquote( rfg( test_id ) )
                                    , 'text/html'
-                                   )
-                             )
+                                   ) )
+
 
     security.declarePrivate('_listProductInfo')
     def _listProductInfo( self ):
@@ -368,6 +377,7 @@ class Zuite( OrderedFolder ):
         now_str = now.strftime( '%Y-%m-%d' )
         return '%s-%s.zip' % ( self.getId(), now_str )
 
+
     security.declareProtected(ManageSeleniumTestCases, 'manage_getZipFile')
     def manage_getZipFile(self, archive_name=None, RESPONSE=None):
         """ Export the test suite as a zip file.
@@ -386,6 +396,7 @@ class Zuite( OrderedFolder ):
                             'inline;filename=%s' % archive_name )
         RESPONSE.write(bits)
 
+
     security.declareProtected(ManageSeleniumTestCases, 'manage_createSnapshot')
     def manage_createSnapshot(self, archive_name=None, RESPONSE=None):
         """ Save the test suite as a zip file *in the zuite*.
@@ -402,6 +413,7 @@ class Zuite( OrderedFolder ):
                                 , 'Snapshot+added'
                                 ) )
 
+
     security.declarePrivate('_getFilename')
     def _getFilename(self, name):
         """ Convert 'name' to a suitable filename, if needed.
@@ -410,6 +422,7 @@ class Zuite( OrderedFolder ):
             return '%s.html' % name
 
         return name
+
 
     security.declarePrivate('_getZipFile')
     def _getZipFile(self):
@@ -440,6 +453,7 @@ class Zuite( OrderedFolder ):
 
         archive.close()
         return stream.getvalue()
+
 
 InitializeClass(Zuite)
 
