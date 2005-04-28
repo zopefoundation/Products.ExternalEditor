@@ -185,6 +185,16 @@ class Zuite( OrderedFolder ):
                        )
                      )
 
+    test_case_metatypes = ( 'File'
+                          , 'Page Template'
+                          )
+
+    _properties = ( { 'id' : 'test_case_metatypes'
+                    , 'type' : 'lines'
+                    , 'mode' : 'w'
+                    },
+                  )
+
     security = ClassSecurityInfo()
     security.declareObjectProtected( View )
 
@@ -203,7 +213,7 @@ class Zuite( OrderedFolder ):
         """ Return a list of our contents which qualify as test cases.
         """
         return [ { 'id' : x[ 0 ], 'title' : x[ 1 ].title_or_id() }
-                 for x in self.objectItems( [ 'File', 'Page Template' ] )
+                 for x in self.objectItems( self.test_case_metatypes )
                       if x[ 0 ].startswith('test') ]
 
 

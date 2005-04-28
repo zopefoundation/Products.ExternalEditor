@@ -2,6 +2,9 @@ Zelenium Product Changelog
 
   After Zelenium-0.3.1
  
+    - Allow indiviual zuites to override the list of metatypes which
+      can be test cases, via a new 'testcase_metatypes' property.
+
     - Force Zuite objects to show order support, even in the presence of
       ExternalEditor, whose monkey patching seems to trip it up.  Surface
       the EE icon, if the product is available
