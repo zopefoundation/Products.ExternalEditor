@@ -46,6 +46,22 @@ Zelenium Product README
     on the table structure and the Selenese language.
 
 
+  Using Additional Metatypes as Test Cases
+
+    On the "Properties" tab of your test suite, you can add / modify
+    the list of meta_types which the suite will allow as test cases.
+    Adding "Script (Python)", for instance, allows you to define
+    test cases in PythonScripts.
+
+
+  Nesting Test Suites
+
+    Each test suite automatically includes the test cases of any
+    suite it contains.  You can take advantage of this feature to
+    organize your test cases in a hierarchy, running them in separate
+    segments, or all at once.
+
+
   Exporting an Archive
 
     On the "Zip" tab, supply a filename and click the "Download" button.
