@@ -1,7 +1,13 @@
 Zelenium Product Changelog
 
-  After Zelenium-0.3.1
+  Zelenium-0.4 (2005/04/27)
+
+    - CVS tag:  'Zelenium-0_4'
  
+    - Make Zuite instances recursively include their Zuite children's
+      test cases (to allow easier organization of the test cases in a
+      hierarchy).
+
     - Allow indiviual zuites to override the list of metatypes which
       can be test cases, via a new 'testcase_metatypes' property.
 

@@ -212,9 +212,18 @@ class Zuite( OrderedFolder ):
     def listTestCases( self ):
         """ Return a list of our contents which qualify as test cases.
         """
-        return [ { 'id' : x[ 0 ], 'title' : x[ 1 ].title_or_id() }
-                 for x in self.objectItems( self.test_case_metatypes )
-                      if x[ 0 ].startswith('test') ]
+        result = []
+        types = [ self.meta_type ]
+        types.extend( self.test_case_metatypes )
+        for tcid, testcase in self.objectItems( types ):
+            if isinstance(testcase, self.__class__):
+                result.extend( testcase.listTestCases() )
+            else:
+                result.append( { 'id' : tcid
+                               , 'title' : testcase.title_or_id()
+                               , 'url' : testcase.absolute_url(1)
+                               } )
+        return result
 
 
     def __getitem__( self, key, default=_MARKER ):
