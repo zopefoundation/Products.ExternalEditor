@@ -1,6 +1,10 @@
 Zelenium Product Changelog
 
-  After Zelenium-0.4
+  Zelenium-0.4.1 (2005/04/27)
+
+    - CVS tag:  'Zelenium-0_4_1'
+
+    - Repair breakage of ExternalEditor link in 'manage_main'.
 
     - Compensate in display of test tables for non-padded integers
       in the IDs (make them sort properly).
