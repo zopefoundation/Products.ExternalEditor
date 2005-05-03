@@ -23,6 +23,14 @@ from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from permissions import ManageSeleniumTestCases
 from permissions import View
 
+_NOW = None   # set only for testing
+
+def _getNow():
+    if _NOW is not None:
+        return _NOW
+
+    return DateTime()
+
 _WWW_DIR = os.path.join( package_home( globals() ), 'www' )
 
 #
@@ -407,8 +415,8 @@ class Zuite( OrderedFolder ):
     def getZipFileName(self):
         """ Generate a suitable name for the zip file.
         """
-        now = self.ZopeTime()
-        now_str = now.strftime( '%Y-%m-%d' )
+        now = _getNow()
+        now_str = now.ISO()[:10]
         return '%s-%s.zip' % ( self.getId(), now_str )
 
 
