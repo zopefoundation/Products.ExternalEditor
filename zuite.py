@@ -465,29 +465,47 @@ class Zuite( OrderedFolder ):
         stream = StringIO.StringIO()
         archive = zipfile.ZipFile( stream, 'w' )
 
-        archive.writestr( 'index.html'
-                        , self.index_html( suite_name='testSuite.html' ) )
-
-        test_cases = [ { 'id' :  self._getFilename( k )
-                       , 'title' : v.title_or_id()
-                       , 'data' : v.manage_FTPget()
-                       } for ( k, v ) in self.objectItems( [ 'File'
-                                                           , 'Page Template'
-                                                           ] ) ]
-
-        archive.writestr( 'testSuite.html'
-                        , self.test_suite_html( test_cases=test_cases ) )
+        self._getZipFile_recurse( archive )
 
         for k, v in _SUPPORT_FILES.items():
             archive.writestr( k, v.manage_FTPget() )
 
-        for test_case in test_cases:
-            archive.writestr( test_case[ 'id' ]
-                            , test_case[ 'data' ] )
-
         archive.close()
         return stream.getvalue()
 
+
+    security.declarePrivate('_getZipFile_recurse')
+    def _getZipFile_recurse(self, archive, prefix=''):
+        """ Recursively add files to the archive.
+        """
+        archive.writestr( 'index.html'
+                        , self.index_html( suite_name='testSuite.html' ) )
+
+        test_cases = []
+
+        for ( k, v ) in self.objectItems( self.test_case_metatypes ):
+            id =  self._getFilename( k )
+            path = prefix and '%s/%s' % ( prefix, id ) or id
+
+            test_cases.append( { 'id' :  id
+                               , 'title' : v.title_or_id()
+                               , 'url' : path
+                               , 'path' : path
+                               , 'data' : v.manage_FTPget()
+                               } )
+
+        archive.writestr( 'testSuite.html'
+                        , self.test_suite_html( test_cases=test_cases ) )
+
+        for test_case in test_cases:
+            archive.writestr( test_case[ 'path' ]
+                            , test_case[ 'data' ] )
+
+        for subsuite_id, subsuite in self.objectItems( self.meta_type ):
+            subsuite._getZipFile_recurse( archive
+                                        , prefix='%s/%s' % ( prefix 
+                                                           , subsuite_id )
+                                        )
 
 InitializeClass(Zuite)
 
