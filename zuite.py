@@ -39,15 +39,18 @@ _WWW_DIR = os.path.join( package_home( globals() ), 'www' )
 _SUPPORT_DIR = os.path.join( package_home( globals() ), 'selenium' )
 
 # TODO:  generate this list dynamically from the selenium sources!
-_SUPPORT_FILE_NAMES = [ 'htmlutils.js'
-                      , 'html-xpath-patched.js'
-                      , 'jsUnitCore.js'
-                      , 'selenium.css'
-                      , 'selenium-api.js'
+_SUPPORT_FILE_NAMES = [ 'html-xpath-patched.js'
                       , 'selenium-browserbot.js'
+                      , 'selenium-api.js'
                       , 'selenium-commandhandlers.js'
                       , 'selenium-executionloop.js'
+                      , 'selenium-executioncontext.js'
                       , 'selenium-fitrunner.js'
+                      , 'selenium-logging.js'
+                      , 'htmlutils.js'
+                      , 'selenium-domviewer.js'
+                      , 'selenium.css'
+                      , 'domviewer.html'
                       ]
 
 _RESULT_HTML = """\

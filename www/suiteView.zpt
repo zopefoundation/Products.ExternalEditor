@@ -2,13 +2,7 @@
 <head>
  <meta content="text/html; charset=ISO-8859-1"
        http-equiv="content-type" />
- <link rel="stylesheet" type="text/css" href="selenium.css"
-       tal:attributes="href string:${URL}/selenium.css" />
  <title>Selenium Functional Test Runner</title>
- <script language="JavaScript" type="text/javascript"
-         src="jsunit/app/jsUnitCore.js"
-         tal:attributes="src string:${URL}/jsUnitCore.js"
-         ></script>
  <script language="JavaScript" type="text/javascript"
          src="/html-xpath/html-xpath-patched.js"
          tal:attributes="src string:${URL}/html-xpath-patched.js"
@@ -30,104 +24,185 @@
          tal:attributes="src string:${URL}/selenium-executionloop.js"
          ></script>
  <script language="JavaScript" type="text/javascript"
+         src="selenium-executioncontext.js"
+         tal:attributes="src string:${URL}/selenium-executioncontext.js"
+         ></script>
+ <script language="JavaScript" type="text/javascript"
          src="selenium-fitrunner.js"
          tal:attributes="src string:${URL}/selenium-fitrunner.js"
+         ></script>
+ <script language="JavaScript" type="text/javascript"
+         src="selenium-logging.js"
+         tal:attributes="src string:${URL}/selenium-logging.js"
          ></script>
  <script language="JavaScript" type="text/javascript"
          src="htmlutils.js"
          tal:attributes="src string:${URL}/htmlutils.js"
          ></script>
+ <script language="JavaScript" type="text/javascript"
+         src="selenium-domviewer.js"
+         tal:attributes="src string:${URL}/selenium-domviewer.js"
+         ></script>
+ <link rel="stylesheet" type="text/css" href="selenium.css"
+       tal:attributes="href string:${URL}/selenium.css" />
 </head>
 
-<body onLoad="javascript:loadSuiteFrame();">
+<body onLoad="start();">
 
- <iframe name="testSuiteFrame" id="testSuiteFrame"
-         width="220px;" height="20%" border="0"
-         tal:define="dynamic string:${context/absolute_url}/test_suite_html;"
-         tal:attributes="src options/suite_name | dynamic;"
-         ></iframe>
+ <table class="layout">
+ <form action="">
 
- <div id="seleniumControlPanel">
+  <!-- Suite, Test, Control Panel -->
 
- <div id="launchPanel">
+  <tr class="selenium">
+   <td width="25%" height="30%" rowspan="2">
+    <iframe
+       id="testSuiteFrame"
+       name="testSuiteFrame"
+       src="./tests/TestSuite.html"
+       tal:define="dynamic string:${context/absolute_url}/test_suite_html;"
+       tal:attributes="src options/suite_name | dynamic;"
+       ></iframe>
+   </td>
+   <td width="50%" height="30%" rowspan="2">
+    <iframe
+       id="testFrame"
+       name="testFrame"
+       > </iframe>
+   </td>
+   <th width="25%" height="1" class="header">
+    <h1>
+     <a href="http://selenium.thoughtworks.com"
+        title="The Selenium Project">Selenium</a> TestRunner</h1>
+   </th>
+  </tr>
 
-  <b>Run:</b>
+  <tr class="selenium">
+   <td width="25%" height="30%" id="controlPanel">
 
-  <button type="button" id="runTest"
-    style="margin-top:10pt; cursor: pointer; cursor: hand"
-    onClick="runSingleTest();"
-  >Selected test</button>
+     <table id="controls">
 
-  <button type="button" id="runSuite"
-    style="margin-top:10pt; cursor: pointer; cursor: hand"
-    onClick="startTestSuite();"
-  >All tests</button>
+      <tr>
+       <td>
+        <b>Run:</b>
+        <button
+           type="button"
+           id="runTest"
+           onclick="runSingleTest();"
+           ><em>Selected</em> Test</button>
+        <button
+           type="button"
+           id="runSuite"
+           onclick="startTestSuite();"
+           ><strong>All</strong> Tests</button>
+       </td>
+      </tr>
 
+      <tr>
+       <td>
+        <b>Mode:</b>
+        <label>
+         <input
+            id="modeRun"
+            type="radio"
+            name="runMode"
+            value="0"
+            checked="checked"
+            />Run</label>
+        <label>
+         <input
+            id="modeWalk"
+            type="radio"
+            name="runMode"
+            value="500"
+            />Walk</label>
+        <label>
+         <input
+            id="modeStep"
+            type="radio"
+            name="runMode"
+            value="-1"
+            />Step</label>
+       </td>
+      </tr>
+
+      <tr>
+       <td>
+        <button
+           type="button"
+           id="domViewer1"
+           onclick="newRoot=getIframeDocument(getElementById('myiframe'));window.open('domviewer.html');return false;"
+           >View DOM</button>
+        <button
+           type="button"
+           id="continueTest">Next/Continue</button>
+       </td>
+      </tr>
+
+     </table>
+
+     <table id="stats" align="center">
+
+      <tr>
+       <td colspan="2" align="right">Elapsed:</td>
+       <td id="elapsedTime" colspan="2">00.00</td>
+      </tr>
+
+      <tr>
+       <th colspan="2">Tests</th>
+       <th colspan="2">Commands</th>
+      </tr>
+
+      <tr>
+       <td class="count" id="testRuns">0</td>
+       <td>run</td>
+       <td class="count" id="commandPasses">0</td>
+       <td>passed</td>
+      </tr>
+
+      <tr>
+       <td class="count" id="testFailures">0</td>
+       <td>failed</td>
+       <td class="count" id="commandFailures">0</td>
+       <td>failed</td>
+      </tr>
+
+      <tr>
+       <td colspan="2"></td>
+       <td class="count" id="commandErrors">0</td>
+       <td>incomplete</td>
+      </tr>
+
+     </table>
+
+   </td>
+  </tr>
+
+  <!-- AUT -->
+
+  <tr>
+   <td colspan="3" height="70%">
+    <iframe
+       id="myiframe"
+       name="myiframe"
+       src="about:blank"></iframe>
+   </td>
+  </tr>
+
+ </form>
+ </table>
+
+ <div id="logging-console">
+  <h1>Javascript Log Console
+    (<a id="closeLog" href="javascript:LOG.hide()">Close</a>
+     <a href="javascript:LOG.clear();LOG.hide();">Clear</a>)</h1>
+  <ul id="log-list"/>
  </div>
 
- <div id="runSpeedPanel">
-
-  <b>Run mode:</b>
-
-  <label for="runMode">Run</label>
-  <input id="modeRun" type="radio" name="runMode" value="0" checked="checked" />
-
-  <label for="modeWalk">Walk</label>
-  <input id="modeWalk" type="radio" name="runMode" value="500" />
-
-  <label for="modeStep">Step</label>
-  <input id="modeStep" type="radio" name="runMode" value="-1" />
-
-  <button type="button" id="continueTest">Next/Continue</button>
-
- </div>
-
-<table id="resultsPanel">
- <tr>
-  <th>Elapsed Time:</th>
-  <td id="elapsedTime">00.00</td>
- </tr>
- <tr>
-  <th colspan="2">Test Results</th>
-  <th colspan="2">Command Results</th>
- </tr>
- <tr>
-  <td>Total run:</td>
-  <td id="testRuns">0</td>
-  <td>Passes:</td>
-  <td id="commandPasses">0</td>
- </tr>
- <tr>
-  <td>Failures:</td>
-  <td id="testFailures">0</td>
-  <td>Failures:</td>
-  <td id="commandFailures">0</td>
- </tr>
- <tr>
-  <td colspan="2"/>
-  <td>Errors:</td>
-  <td id="commandErrors">0</td>
- </tr>
-</table>
-</div>
-
-<iframe
-  name="testFrame"
-  id="testFrame"
-  style="float:left;margin-top: 10px;"
-  height="75%"
-  width="30%"
-  border="0"
-  src="about:blank"></iframe>
-
-<iframe
-  name="myiframe"
-  id="myiframe"
-  style="float:right;margin-top: 10px;"
-  height="75%;"
-  width="68%"
-  border="0"
-  src="about:blank"></iframe>
+ <script language="javascript">
+  LOG = new Logger(LEVEL_WARN);
+  LOG.hide();
+ </script>
 
 </body>
 </html>

@@ -2,6 +2,10 @@ Zelenium Product Changelog
 
   After Zelenium-0.4.1
 
+    - Updated to use the "TestRunner core" from Selenium version 0.3.0.
+      See http://selenium.thoughtworks.com/release-notes.html for more
+      information.
+
     - Add unit tests for Zuite class.
 
     - Make ZIPfile generation work with nested suites.
