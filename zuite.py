@@ -51,6 +51,7 @@ _SUPPORT_FILE_NAMES = [ 'html-xpath-patched.js'
                       , 'selenium-domviewer.js'
                       , 'selenium.css'
                       , 'domviewer.html'
+                      , 'selenium-logo.png'
                       ]
 
 _RESULT_HTML = """\
@@ -233,6 +234,8 @@ class Zuite( OrderedFolder ):
     security.declareProtected( View, 'test_suite_html' )
     test_suite_html = PageTemplateFile( 'suiteTests', _WWW_DIR )
 
+    security.declareProtected( View, 'splash_html' )
+    splash_html = PageTemplateFile( 'suiteSplash', _WWW_DIR )
 
     security.declareProtected( View, 'listTestCases' )
     def listTestCases( self ):

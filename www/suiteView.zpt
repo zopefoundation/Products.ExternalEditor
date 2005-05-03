@@ -185,7 +185,7 @@
     <iframe
        id="myiframe"
        name="myiframe"
-       src="about:blank"></iframe>
+       src="splash_html"></iframe>
    </td>
   </tr>
 
