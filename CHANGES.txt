@@ -1,6 +1,6 @@
 Zelenium Product Changelog
 
-  Zelenium-0.4.1 (2005/04/27)
+  Zelenium-0.4.1 (2005/05/02)
 
     - CVS tag:  'Zelenium-0_4_1'
 
