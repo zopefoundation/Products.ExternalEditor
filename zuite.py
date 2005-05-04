@@ -54,139 +54,6 @@ _SUPPORT_FILE_NAMES = [ 'html-xpath-patched.js'
                       , 'selenium-logo.png'
                       ]
 
-_RESULT_HTML = """\
-<html>
-<head>
-<title tal:content="context/completed/ISO"
->Test result: YYYY-MM-DDTHH:MM:SS</title>
-</head>
-<body>
-
-<h1> Test Result: <tal:x replace="context/completed/ISO" /></h1>
-
-<h2> Test Summary </h2>
-
-<table border="1" cellpadding="2">
-
- <tr>
-  <th align="left">Status</th>
-  <td>
-    <span style="color: green"
-          tal:condition="context/passed">PASSED</span>
-    <span style="color: red"
-          tal:condition="not: context/passed">FAILED</span>
-  </td>
- </tr>
-
- <tr>
-  <th align="left">Elapsed time (sec)</th>
-  <td align="right"
-      tal:content="context/time_secs">20</td>
- </tr>
-
- <tr>
-  <th align="left">Tests passed</th>
-  <td align="right" style="color: green"
-      tal:content="context/tests_passed">20</td>
- </tr>
-
- <tr>
-  <th align="left">Tests failed</th>
-  <td align="right" style="color: red"
-      tal:content="context/tests_failed">20</td>
- </tr>
-
- <tr>
-  <th align="left">Commands passed</th>
-  <td align="right" style="color: green"
-      tal:content="context/commands_passed">20</td>
- </tr>
-
- <tr>
-  <th align="left">Commands failed</th>
-  <td align="right" style="color: red"
-      tal:content="context/commands_failed">20</td>
- </tr>
-
- <tr>
-  <th align="left">Commands with errors</th>
-  <td align="right" style="color: orange"
-      tal:content="context/commands_with_errors">20</td>
- </tr>
-
-</table>
-
-
-<div tal:define="raw_case_ids python: [x for x in context.objectIds(['File'])
-                                         if x.startswith('testTable')];
-                 tokenized python: [x.split('.') for x in raw_case_ids];
-                 normalized python: [(x[0], int(x[1])) for x in tokenized];
-                 ignored normalized/sort;
-                 case_ids python: [('%s.%d' % x) for x in normalized];
-                 test_cases python: [context.restrictedTraverse(case_id)
-                                        for case_id in case_ids];
-                ">
- <h2> Test Cases </h2>
-
- <div style="padding-top: 10px;"
-      tal:repeat="test_case test_cases">
-
-  <p><a href="#"
-        tal:attributes="href test_case/absolute_url"
-        tal:content="test_case/getId">TEST_CASE</a></p>
-
-  <div tal:replace="structure python: test_case" />
- </div>
-
-</div>
-
-<h2> Remote Client Data </h2>
-
-<table border="1" cellpadding="2">
-
- <tr>
-  <th align="left">User agent</th>
-  <td tal:content="context/user_agent">lynx/2.8</td>
- </tr>
-
- <tr>
-  <th align="left">Remote address</th>
-  <td tal:content="context/remote_addr">127.0.0.1</td>
- </tr>
-
- <tr>
-  <th align="left">HTTP Host</th>
-  <td tal:content="context/http_host">localhost</td>
- </tr>
-
-</table>
-
-<h2> Software Under Test </h2>
-
-<table border="1" cellpadding="2">
-
- <tr>
-  <th align="left">Server Software</th>
-  <td tal:content="context/server_software">localhost</td>
- </tr>
-
- <tbody tal:repeat="product_line context/product_info">
-  <tr tal:define="tokens product_line/split;
-                  product_name python:tokens[0];
-                  product_version python:tokens[1];
-                 ">
-   <th align="left"
-       tal:content="string:Product: ${product_name}">PRODUCT_NAME</th>
-   <td tal:content="product_version">PRODUCT_VERSION</td>
-  </tr>
- </tbody>
-
-</table>
-
-</body>
-</html>
-"""
-
 def _makeFile(filename):
     path = os.path.join(_SUPPORT_DIR, filename)
     return File(id=filename, title='', file=open(path).read())
@@ -415,82 +282,62 @@ class Zuite( OrderedFolder ):
         """
         completed = DateTime()
         result_id = 'result_%s' % completed.strftime( '%Y%m%d_%H%M%S' )
-        self._setObject( result_id, Folder( 'result_id' ) )
+        self._setObject( result_id, ZuiteResults( result_id ) )
         result = self._getOb( result_id )
         rfg = REQUEST.form.get
         reg = REQUEST.environ.get
 
-        result._setProperty( 'completed'
-                           , completed
-                           , 'date'
-                           )
+        result._updateProperty( 'completed'
+                              , completed
+                              )
 
-        result._setProperty( 'passed'
-                           , rfg( 'result' ).lower() == 'passed'
-                           , 'boolean'
-                           )
+        result._updateProperty( 'passed'
+                              , rfg( 'result' ).lower() == 'passed'
+                              )
 
-        result._setProperty( 'time_secs'
-                           , float( rfg( 'totalTime', 0 ) )
-                           , 'float'
-                           )
+        result._updateProperty( 'time_secs'
+                              , float( rfg( 'totalTime', 0 ) )
+                              )
 
-        result._setProperty( 'tests_passed'
-                           , int( rfg( 'numTestPasses', 0 ) )
-                           , 'int'
-                           )
+        result._updateProperty( 'tests_passed'
+                              , int( rfg( 'numTestPasses', 0 ) )
+                              )
 
-        result._setProperty( 'tests_failed'
-                           , int( rfg( 'numTestFailures', 0 ) )
-                           , 'int'
-                           )
+        result._updateProperty( 'tests_failed'
+                              , int( rfg( 'numTestFailures', 0 ) )
+                              )
 
-        result._setProperty( 'commands_passed'
-                           , int( rfg( 'numCommandPasses', 0 ) )
-                           , 'int'
-                           )
+        result._updateProperty( 'commands_passed'
+                              , int( rfg( 'numCommandPasses', 0 ) )
+                              )
 
-        result._setProperty( 'commands_failed'
-                           , int( rfg( 'numCommandFailures', 0 ) )
-                           , 'int'
-                           )
+        result._updateProperty( 'commands_failed'
+                              , int( rfg( 'numCommandFailures', 0 ) )
+                              )
 
-        result._setProperty( 'commands_with_errors'
-                           , int( rfg( 'numCommandErrors', 0 ) )
-                           , 'int'
-                           )
+        result._updateProperty( 'commands_with_errors'
+                              , int( rfg( 'numCommandErrors', 0 ) )
+                              )
 
-        result._setProperty( 'user_agent'
-                           , reg( 'HTTP_USER_AGENT', 'unknown' )
-                           , 'string'
-                           )
+        result._updateProperty( 'user_agent'
+                              , reg( 'HTTP_USER_AGENT', 'unknown' )
+                              )
 
-        result._setProperty( 'remote_addr'
-                           , reg( 'REMOTE_ADDR', 'unknown' )
-                           , 'string'
-                           )
+        result._updateProperty( 'remote_addr'
+                              , reg( 'REMOTE_ADDR', 'unknown' )
+                              )
 
-        result._setProperty( 'http_host'
-                           , reg( 'HTTP_HOST', 'unknown' )
-                           , 'string'
-                           )
+        result._updateProperty( 'http_host'
+                              , reg( 'HTTP_HOST', 'unknown' )
+                              )
 
-        result._setProperty( 'server_software'
-                           , reg( 'SERVER_SOFTWARE', 'unknown' )
-                           , 'string'
-                           )
+        result._updateProperty( 'server_software'
+                              , reg( 'SERVER_SOFTWARE', 'unknown' )
+                              )
 
-        result._setProperty( 'product_info'
-                           , self._listProductInfo()
-                           , 'lines'
-                           )
-
-        result._setObject( 'index_html'
-                         , ZopePageTemplate('index_html'
-                                           , _RESULT_HTML
-                                           , 'text/html'
-                                           )
-                         )
+        result._updateProperty( 'product_info'
+                              , self._listProductInfo()
+                              )
 
         result._setObject( 'suite.html'
                          , File( 'suite.html'
@@ -512,7 +359,78 @@ class Zuite( OrderedFolder ):
                                    , 'text/html'
                                    ) )
 
-InitializeClass(Zuite)
+InitializeClass( Zuite )
+
+
+class ZuiteResults( Folder ):
+
+    security = ClassSecurityInfo()
+    meta_type = 'Zuite Results'
+
+    _properties = ( { 'id' : 'test_case_metatypes'
+                    , 'type' : 'lines'
+                    , 'mode' : 'w'
+                    },
+                    { 'id' : 'completed'
+                    , 'type' : 'date'
+                    , 'mode' : 'w'
+                    },
+                    { 'id' : 'passed'
+                    , 'type' : 'boolean'
+                    , 'mode' : 'w'
+                    },
+                    { 'id' : 'time_secs'
+                    , 'type' : 'float'
+                    , 'mode' : 'w'
+                    },
+                    { 'id' : 'tests_passed'
+                    , 'type' : 'int'
+                    , 'mode' : 'w'
+                    },
+                    { 'id' : 'tests_failed'
+                    , 'type' : 'int'
+                    , 'mode' : 'w'
+                    },
+                    { 'id' : 'commands_passed'
+                    , 'type' : 'int'
+                    , 'mode' : 'w'
+                    },
+                    { 'id' : 'commands_failed'
+                    , 'type' : 'int'
+                    , 'mode' : 'w'
+                    },
+                    { 'id' : 'commands_with_errors'
+                    , 'type' : 'int'
+                    , 'mode' : 'w'
+                    },
+                    { 'id' : 'user_agent'
+                    , 'type' : 'string'
+                    , 'mode' : 'w'
+                    },
+                    { 'id' : 'remote_addr'
+                    , 'type' : 'string'
+                    , 'mode' : 'w'
+                    },
+                    { 'id' : 'http_host'
+                    , 'type' : 'string'
+                    , 'mode' : 'w'
+                    },
+                    { 'id' : 'server_software'
+                    , 'type' : 'string'
+                    , 'mode' : 'w'
+                    },
+                    { 'id' : 'product_info'
+                    , 'type' : 'lines'
+                    , 'mode' : 'w'
+                    },
+                  )
+
+    security.declareObjectProtected( View )
+
+    security.declarePublic( 'index_html' )
+    index_html = PageTemplateFile( 'resultsView', _WWW_DIR )
+
+InitializeClass( Zuite )
 
 #
 #   Factory methods

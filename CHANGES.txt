@@ -2,6 +2,9 @@ Zelenium Product Changelog
 
   After Zelenium-0.5
 
+    - Make the posted results folder into its own class, derived from
+      Folder (moving the template out to a PageTemplateFile).
+
     - Further repaired recursive ZIPfile generation, including normalizing
       URLs in generated HTML.
 
