@@ -1155,7 +1155,7 @@ def _initDCWorkflow( workflow
 
     permissions = permissions[:]
     permissions.sort()
-    workflow.permissions = permissions
+    workflow.permissions = tuple(permissions)
 
     _initDCWorkflowVariables( workflow, variables )
     _initDCWorkflowStates( workflow, states )
