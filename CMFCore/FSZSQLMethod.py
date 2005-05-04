@@ -66,7 +66,8 @@ class FSZSQLMethod(SQL, FSObject):
                           self.cache_time_,
                           self.class_name_,
                           self.class_file_,
-                          connection_hook=self.connection_hook)
+                          connection_hook=self.connection_hook,
+                          direct=self.allow_simple_one_argument_traversal)
         return s
 
     def _readFile(self, reparse):
@@ -106,6 +107,7 @@ class FSZSQLMethod(SQL, FSObject):
         class_name =      parameters.get('class_name','')
         class_file =      parameters.get('class_file','')
         connection_hook = parameters.get('connection_hook',None)
+        direct = parameters.get('allow_simple_one_argument_traversal', None)
 
         self.manage_edit(title, connection_id, arguments, template=data)
 
@@ -114,7 +116,8 @@ class FSZSQLMethod(SQL, FSObject):
                              cache_time,
                              class_name,
                              class_file,
-                             connection_hook=connection_hook)
+                             connection_hook=connection_hook,
+                             direct=direct)
 
         # do we need to do anything on reparse?
 

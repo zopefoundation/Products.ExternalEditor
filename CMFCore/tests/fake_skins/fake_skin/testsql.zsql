@@ -8,6 +8,7 @@ cache_time : 10
 class_name : MyRecord
 class_file : CMFCore.TestRecord
 connection_hook : MyHook
+allow_simple_one_argument_traversal : 1
 </dtml-comment>
 FROM test_table
 SELECT *
