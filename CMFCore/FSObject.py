@@ -107,9 +107,15 @@ class FSObject(Implicit, Item, RoleManager, Cacheable):
                 # The permission was invalid, never mind
                 pass
 
+        skins_tool_namegetter = getattr(self, 'getSkinsFolderName', None)
+        if skins_tool_namegetter is not None:
+            skins_tool_name = skins_tool_namegetter()
+        else:
+            skins_tool_name = 'portal_skins'
+
         id = obj.getId()
         fpath = tuple( folder_path.split('/') )
-        portal_skins = getToolByName(self,'portal_skins')
+        portal_skins = getToolByName(self, skins_tool_name)
         folder = portal_skins.restrictedTraverse(fpath)
         if id in folder.objectIds():
             # we cant catch the badrequest so
