@@ -238,19 +238,23 @@ class Zuite( OrderedFolder ):
     splash_html = PageTemplateFile( 'suiteSplash', _WWW_DIR )
 
     security.declareProtected( View, 'listTestCases' )
-    def listTestCases( self ):
+    def listTestCases( self, prefix=() ):
         """ Return a list of our contents which qualify as test cases.
         """
         result = []
         types = [ self.meta_type ]
         types.extend( self.test_case_metatypes )
-        for tcid, testcase in self.objectItems( types ):
-            if isinstance(testcase, self.__class__):
-                result.extend( testcase.listTestCases() )
+        for tcid, test_case in self.objectItems( types ):
+            if isinstance(test_case, self.__class__):
+                result.extend( test_case.listTestCases(
+                                        prefix=prefix + ( tcid, ) ) )
             else:
+                path = '/'.join( prefix + ( tcid, ) )
                 result.append( { 'id' : tcid
-                               , 'title' : testcase.title_or_id()
-                               , 'url' : testcase.absolute_url(1)
+                               , 'title' : test_case.title_or_id()
+                               , 'url' : path
+                               , 'path' : path
+                               , 'test_case' : test_case
                                } )
         return result
 
@@ -268,6 +272,119 @@ class Zuite( OrderedFolder ):
 
         raise KeyError, key
 
+
+    security.declarePrivate('_listProductInfo')
+    def _listProductInfo( self ):
+        """ Return a list of strings of form '%(name)s %(version)s'.
+
+        o Each line describes one product installed in the Control_Panel.
+        """
+        result = []
+        cp = self.getPhysicalRoot().Control_Panel
+        products = cp.Products.objectItems()
+        products.sort()
+
+        for product_name, product in products:
+            version = product.version or 'unreleased'
+            result.append( '%s %s' % ( product_name, version ) )
+
+        return result
+
+ 
+    security.declareProtected(ManageSeleniumTestCases, 'manage_zipfile')
+    manage_zipfile = PageTemplateFile( 'suiteZipFile', _WWW_DIR )
+
+    security.declareProtected(ManageSeleniumTestCases, 'getZipFileName')
+    def getZipFileName(self):
+        """ Generate a suitable name for the zip file.
+        """
+        now = _getNow()
+        now_str = now.ISO()[:10]
+        return '%s-%s.zip' % ( self.getId(), now_str )
+
+
+    security.declareProtected(ManageSeleniumTestCases, 'manage_getZipFile')
+    def manage_getZipFile(self, archive_name=None, RESPONSE=None):
+        """ Export the test suite as a zip file.
+        """
+        if archive_name is None or archive_name.strip() == '':
+            archive_name = self.getZipFileName()
+
+        bits = self._getZipFile()
+
+        if RESPONSE is None:
+            return bits
+
+        RESPONSE.setHeader('Content-type', 'application/zip')
+        RESPONSE.setHeader('Content-length', str( len( bits ) ) )
+        RESPONSE.setHeader('Content-disposition',
+                            'inline;filename=%s' % archive_name )
+        RESPONSE.write(bits)
+
+
+    security.declareProtected(ManageSeleniumTestCases, 'manage_createSnapshot')
+    def manage_createSnapshot(self, archive_name=None, RESPONSE=None):
+        """ Save the test suite as a zip file *in the zuite*.
+        """
+        if archive_name is None or archive_name.strip() == '':
+            archive_name = self.getZipFileName()
+
+        archive = File( archive_name, title='', file=self._getZipFile() )
+        self._setObject( archive_name, archive )
+
+        if RESPONSE is not None:
+            RESPONSE.redirect( '%s/manage_main?manage_tabs_message=%s'
+                              % ( self.absolute_url()
+                                , 'Snapshot+added'
+                                ) )
+
+
+    security.declarePrivate('_getFilename')
+    def _getFilename(self, name):
+        """ Convert 'name' to a suitable filename, if needed.
+        """
+        if '.' not in name:
+            return '%s.html' % name
+
+        return name
+
+
+    security.declarePrivate('_getZipFile')
+    def _getZipFile(self):
+        """ Generate a zip file containing both tests and scaffolding.
+        """
+        stream = StringIO.StringIO()
+        archive = zipfile.ZipFile( stream, 'w' )
+
+        archive.writestr( 'index.html'
+                        , self.index_html( suite_name='testSuite.html' ) )
+
+        test_cases = self.listTestCases()
+
+        # ensure suffixes
+        for info in test_cases:
+            info[ 'path' ] = self._getFilename( info[ 'path' ] )
+            info[ 'url' ] = self._getFilename( info[ 'url' ] )
+
+        archive.writestr( 'testSuite.html'
+                        , self.test_suite_html( test_cases=test_cases ) )
+
+        for k, v in _SUPPORT_FILES.items():
+            archive.writestr( k, v.manage_FTPget() )
+
+        for info in test_cases:
+            test_case = info[ 'test_case' ]
+
+            if getattr( test_case, '__call__', None ) is not None:
+                body = test_case()  # XXX: DTML?
+            else:
+                body = test_case.manage_FTPget()
+
+            archive.writestr( info[ 'path' ]
+                            , body
+                            )
+        archive.close()
+        return stream.getvalue()
 
     security.declarePublic('postResults')
     def postResults(self, REQUEST):
@@ -394,132 +511,6 @@ class Zuite( OrderedFolder ):
                                    , unquote( rfg( test_id ) )
                                    , 'text/html'
                                    ) )
-
-
-    security.declarePrivate('_listProductInfo')
-    def _listProductInfo( self ):
-        """ Return a list of strings of form '%(name)s %(version)s'.
-
-        o Each line describes one product installed in the Control_Panel.
-        """
-        result = []
-        cp = self.getPhysicalRoot().Control_Panel
-        products = cp.Products.objectItems()
-        products.sort()
-
-        for product_name, product in products:
-            version = product.version or 'unreleased'
-            result.append( '%s %s' % ( product_name, version ) )
-
-        return result
-
- 
-    security.declareProtected(ManageSeleniumTestCases, 'manage_zipfile')
-    manage_zipfile = PageTemplateFile( 'suiteZipFile', _WWW_DIR )
-
-    security.declareProtected(ManageSeleniumTestCases, 'getZipFileName')
-    def getZipFileName(self):
-        """ Generate a suitable name for the zip file.
-        """
-        now = _getNow()
-        now_str = now.ISO()[:10]
-        return '%s-%s.zip' % ( self.getId(), now_str )
-
-
-    security.declareProtected(ManageSeleniumTestCases, 'manage_getZipFile')
-    def manage_getZipFile(self, archive_name=None, RESPONSE=None):
-        """ Export the test suite as a zip file.
-        """
-        if archive_name is None or archive_name.strip() == '':
-            archive_name = self.getZipFileName()
-
-        bits = self._getZipFile()
-
-        if RESPONSE is None:
-            return bits
-
-        RESPONSE.setHeader('Content-type', 'application/zip')
-        RESPONSE.setHeader('Content-length', str( len( bits ) ) )
-        RESPONSE.setHeader('Content-disposition',
-                            'inline;filename=%s' % archive_name )
-        RESPONSE.write(bits)
-
-
-    security.declareProtected(ManageSeleniumTestCases, 'manage_createSnapshot')
-    def manage_createSnapshot(self, archive_name=None, RESPONSE=None):
-        """ Save the test suite as a zip file *in the zuite*.
-        """
-        if archive_name is None or archive_name.strip() == '':
-            archive_name = self.getZipFileName()
-
-        archive = File( archive_name, title='', file=self._getZipFile() )
-        self._setObject( archive_name, archive )
-
-        if RESPONSE is not None:
-            RESPONSE.redirect( '%s/manage_main?manage_tabs_message=%s'
-                              % ( self.absolute_url()
-                                , 'Snapshot+added'
-                                ) )
-
-
-    security.declarePrivate('_getFilename')
-    def _getFilename(self, name):
-        """ Convert 'name' to a suitable filename, if needed.
-        """
-        if '.' not in name:
-            return '%s.html' % name
-
-        return name
-
-
-    security.declarePrivate('_getZipFile')
-    def _getZipFile(self):
-        """ Generate a zip file containing both tests and scaffolding.
-        """
-        stream = StringIO.StringIO()
-        archive = zipfile.ZipFile( stream, 'w' )
-
-        self._getZipFile_recurse( archive )
-
-        for k, v in _SUPPORT_FILES.items():
-            archive.writestr( k, v.manage_FTPget() )
-
-        archive.close()
-        return stream.getvalue()
-
-
-    security.declarePrivate('_getZipFile_recurse')
-    def _getZipFile_recurse(self, archive, prefix=''):
-        """ Recursively add files to the archive.
-        """
-        archive.writestr( 'index.html'
-                        , self.index_html( suite_name='testSuite.html' ) )
-
-        test_cases = []
-
-        for ( k, v ) in self.objectItems( self.test_case_metatypes ):
-            id =  self._getFilename( k )
-            path = prefix and '%s/%s' % ( prefix, id ) or id
-
-            test_cases.append( { 'id' :  id
-                               , 'title' : v.title_or_id()
-                               , 'url' : path
-                               , 'path' : path
-                               , 'data' : v.manage_FTPget()
-                               } )
-
-        archive.writestr( 'testSuite.html'
-                        , self.test_suite_html( test_cases=test_cases ) )
-
-        for test_case in test_cases:
-            archive.writestr( test_case[ 'path' ]
-                            , test_case[ 'data' ] )
-
-        for subsuite_id, subsuite in self.objectItems( self.meta_type ):
-            subsuite._getZipFile_recurse( archive
-                                        , prefix='%s/%s' % ( prefix 
-                                                           , subsuite_id )
-                                        )
 
 InitializeClass(Zuite)
 

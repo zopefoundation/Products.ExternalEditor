@@ -1,5 +1,13 @@
 Zelenium Product Changelog
 
+  After Zelenium-0.5
+
+    - Further repaired recursive ZIPfile generation, including normalizing
+      URLs in generated HTML.
+
+    - Extended zuite unittests to test 'listTestCases' and
+      'manage_createSnapshot', as well as recursive ZIPfile generation.
+
   Zelenium-0.5 (2005/05/04)
 
     - CVS tag:  'Zelenium-0_5'
