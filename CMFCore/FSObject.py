@@ -20,7 +20,9 @@ from os import path, stat
 import Globals
 from AccessControl import ClassSecurityInfo
 from AccessControl.Role import RoleManager
+from AccessControl.Permission import Permission
 from Acquisition import Implicit
+from Acquisition import aq_base
 from OFS.Cache import Cacheable
 from OFS.SimpleItem import Item
 from DateTime import DateTime
@@ -85,6 +87,25 @@ class FSObject(Implicit, Item, RoleManager, Cacheable):
         if ( cachemgr_id and 
              getattr(obj, 'ZCacheable_setManagerId', None) is not None ):
             obj.ZCacheable_setManagerId(cachemgr_id)
+
+        # If there are proxy roles we preserve them
+        proxy_roles = getattr(aq_base(self), '_proxy_roles', None)
+        if proxy_roles is not None and isinstance(proxy_roles, tuple):
+            obj._proxy_roles = tuple(self._proxy_roles)
+
+        # Also, preserve any permission settings that might have come
+        # from a metadata file or from fiddling in the ZMI
+        old_info = [x[:2] for x in self.ac_inherited_permissions(1)]
+        for old_perm, value in old_info:
+            p = Permission(old_perm, value, self)
+            acquired = int(isinstance(p.getRoles(default=[]), list))
+            rop_info = self.rolesOfPermission(old_perm)
+            roles = [x['name'] for x in rop_info if x['selected'] != '']
+            try:
+                obj.manage_permission(old_perm, roles=roles, acquire=acquired)
+            except ValueError:
+                # The permission was invalid, never mind
+                pass
 
         id = obj.getId()
         fpath = tuple( folder_path.split('/') )
