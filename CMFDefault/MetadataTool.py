@@ -160,7 +160,7 @@ class ElementSpec( SimpleItem ):
         try:
             return self.policies[ typ ].__of__(self)
         except KeyError:
-            return self.policies[ None ]
+            return self.policies[ None ].__of__(self)
 
     security.declareProtected(View , 'listPolicies')
     def listPolicies( self ):
