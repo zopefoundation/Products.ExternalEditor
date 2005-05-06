@@ -2,6 +2,10 @@ Zelenium Product Changelog
 
   After Zelenium-0.5
 
+    - Make passing / failing test cases in results view more obvious in
+      printed representation by adding icons.  N.B.: at the moment, we do
+      this by sniffing the HTML of the test case for the "pink" backgrounds.
+
     - Apply patch from the selenium-devel list to fix regression in
       testcase HTML extraction in 'postTestResults'.
 

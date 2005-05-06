@@ -74,9 +74,17 @@
  <div style="padding-top: 10px;"
       tal:repeat="test_case test_cases">
 
-  <p><a href="#"
+  <p>
+     <img src="check.gif" height="32" width="32"
+          tal:condition="test_case/passed"
+          tal:attributes="src string:${context/absolute_url}/check.gif;"/>
+     <img src="error.gif" height="32" width="32"
+          tal:condition="not: test_case/passed"
+          tal:attributes="src string:${context/absolute_url}/error.gif;"/>
+     <a href="#"
         tal:attributes="href test_case/absolute_url"
-        tal:content="test_case/getId">TEST_CASE</a></p>
+        tal:content="test_case/getId">TEST_CASE</a>
+  </p>
 
   <div tal:replace="structure python: test_case" />
  </div>

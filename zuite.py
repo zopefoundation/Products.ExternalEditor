@@ -5,12 +5,14 @@ Zuite instances are collections of Zelenium test cases.
 $Id$
 """
 import os
+import re
 from urllib import unquote
 import zipfile
 import StringIO
 
 from AccessControl.SecurityInfo import ClassSecurityInfo
 from App.special_dtml import DTMLFile
+from App.ImageFile import ImageFile
 from DateTime.DateTime import DateTime
 from Globals import package_home
 from Globals import InitializeClass
@@ -24,6 +26,8 @@ from permissions import ManageSeleniumTestCases
 from permissions import View
 
 _NOW = None   # set only for testing
+
+_PINK_BACKGROUND = re.compile('bgcolor="#ffcfcf"')
 
 def _getNow():
     if _NOW is not None:
@@ -104,6 +108,20 @@ class Zuite( OrderedFolder ):
     security.declareProtected( View, 'splash_html' )
     splash_html = PageTemplateFile( 'suiteSplash', _WWW_DIR )
 
+
+    def __getitem__( self, key, default=_MARKER ):
+
+        if key in self.objectIds():
+            return self._getOb( key )
+
+        if key in _SUPPORT_FILE_NAMES:
+            return _SUPPORT_FILES[ key ].__of__( self )
+
+        if default is not _MARKER:
+            return default
+
+        raise KeyError, key
+
     security.declareProtected( View, 'listTestCases' )
     def listTestCases( self, prefix=() ):
         """ Return a list of our contents which qualify as test cases.
@@ -124,20 +142,6 @@ class Zuite( OrderedFolder ):
                                , 'test_case' : test_case
                                } )
         return result
-
-
-    def __getitem__( self, key, default=_MARKER ):
-
-        if key in self.objectIds():
-            return self._getOb( key )
-
-        if key in _SUPPORT_FILE_NAMES:
-            return _SUPPORT_FILES[ key ].__of__( self )
-
-        if default is not _MARKER:
-            return default
-
-        raise KeyError, key
 
 
     security.declarePrivate('_listProductInfo')
@@ -352,12 +356,19 @@ class Zuite( OrderedFolder ):
         test_ids.sort()
 
         for test_id in test_ids:
+            body = unquote( rfg( test_id ) )
             result._setObject( test_id
                              , File( test_id
                                    , 'Test case: %s' % test_id
-                                   , unquote( rfg( test_id ) )
+                                   , body
                                    , 'text/html'
                                    ) )
+            testcase = result._getOb( test_id )
+            testcase._setProperty( 'passed'
+                                 , _PINK_BACKGROUND.search( body ) is None
+                                 , 'boolean'
+                                 )
+
 
 InitializeClass( Zuite )
 
@@ -430,7 +441,30 @@ class ZuiteResults( Folder ):
     security.declarePublic( 'index_html' )
     index_html = PageTemplateFile( 'resultsView', _WWW_DIR )
 
-InitializeClass( Zuite )
+    security.declareProtected( View, 'error_icon' )
+    error_icon = ImageFile( 'error.gif', _WWW_DIR )
+
+    security.declareProtected( View, 'check_icon' )
+    check_icon = ImageFile( 'check.gif', _WWW_DIR )
+
+
+    def __getitem__( self, key, default=_MARKER ):
+
+        if key in self.objectIds():
+            return self._getOb( key )
+
+        if key == 'error.gif':
+            return self.error_icon
+
+        if key == 'check.gif':
+            return self.check_icon
+
+        if default is not _MARKER:
+            return default
+
+        raise KeyError, key
+
+InitializeClass( ZuiteResults )
 
 #
 #   Factory methods
