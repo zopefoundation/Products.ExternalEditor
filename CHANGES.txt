@@ -2,6 +2,9 @@ Zelenium Product Changelog
 
   After Zelenium-0.5
 
+    - Apply patch from the selenium-devel list to fix regression in
+      testcase HTML extraction in 'postTestResults'.
+
     - Make the posted results folder into its own class, derived from
       Folder (moving the template out to a PageTemplateFile).
 
