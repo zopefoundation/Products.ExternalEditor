@@ -35,6 +35,6 @@ Profiles
 
     'remove'
 
-      applies to: action-provider (actions.xml)
+      applies to: action-provider, skin layer (actions.xml, skins.xml)
 
       Removes the specified item if it exists.
