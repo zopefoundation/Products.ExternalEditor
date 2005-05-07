@@ -303,6 +303,16 @@ _FRAGMENT3_IMPORT = """\
 </skins-tool>
 """
 
+_FRAGMENT4_IMPORT = """\
+<?xml version="1.0"?>
+<skins-tool>
+ <skin-path id="*">
+  <layer name="three" remove="1"/>
+ </skin-path>
+</skins-tool>
+"""
+
+
 class Test_exportSkinsTool( _SkinsSetup ):
 
     def test_empty( self ):
@@ -577,6 +587,50 @@ class Test_importSkinsTool( _SkinsSetup ):
         self.assertEqual( skin_paths[ 0 ], ( 'basic', 'three,one,four' ) )
         self.assertEqual( skin_paths[ 1 ],
                           ( 'fancy', 'three,two,one,four' ) )
+        self.assertEqual( len( skins_tool.objectItems() ), 4 )
+
+    def test_fragment4_removal(self):
+
+        _IDS = ( 'one', 'two' )
+        _FSDVS = [ ( id, DummyFSDV( id ) ) for id in _IDS ]
+        _PATHS = { 'basic' : 'one', 'fancy' : 'two,one' }
+
+        site = self._initSite( selections=_PATHS, fsdvs=_FSDVS )
+        self._registerDirectoryView( os.path.join( _TESTS_PATH, 'three' ) )
+        self._registerDirectoryView( os.path.join( _TESTS_PATH, 'four' ) )
+        skins_tool = site.portal_skins
+
+        skin_paths = skins_tool.getSkinPaths()
+        self.assertEqual( len( skin_paths ), 2 )
+        self.assertEqual( skin_paths[ 0 ], ( 'basic', 'one' ) )
+        self.assertEqual( skin_paths[ 1 ], ( 'fancy', 'two,one' ) )
+        self.assertEqual( len( skins_tool.objectItems() ), 2 )
+
+        context = DummyImportContext( site, False )
+        context._files[ 'skins.xml' ] = _FRAGMENT3_IMPORT
+
+        from Products.CMFSetup.skins import importSkinsTool
+        importSkinsTool( context )
+
+        self.failUnless( site._skin_setup_called )
+        skin_paths = skins_tool.getSkinPaths()
+        self.assertEqual( len( skin_paths ), 2 )
+        self.assertEqual( skin_paths[ 0 ], ( 'basic', 'three,one,four' ) )
+        self.assertEqual( skin_paths[ 1 ],
+                          ( 'fancy', 'three,two,one,four' ) )
+        self.assertEqual( len( skins_tool.objectItems() ), 4 )
+
+        context = DummyImportContext( site, False )
+        context._files[ 'skins.xml' ] = _FRAGMENT4_IMPORT
+
+        importSkinsTool( context )
+
+        self.failUnless( site._skin_setup_called )
+        skin_paths = skins_tool.getSkinPaths()
+        self.assertEqual( len( skin_paths ), 2 )
+        self.assertEqual( skin_paths[ 0 ], ( 'basic', 'one,four' ) )
+        self.assertEqual( skin_paths[ 1 ],
+                          ( 'fancy', 'two,one,four' ) )
         self.assertEqual( len( skins_tool.objectItems() ), 4 )
 
 

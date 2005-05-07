@@ -219,7 +219,8 @@ class ConfiguratorBase(Implicit):
             { 'name':            {KEY: 'id'},
               'meta_type':       {},
               'insert-before':   {},
-              'insert-after' :   {},
+              'insert-after':    {},
+              'remove':          {},
               'property':        {KEY: 'properties', DEFAULT: ()},
               'object':          {KEY: 'objects', DEFAULT: ()} },
           'property':

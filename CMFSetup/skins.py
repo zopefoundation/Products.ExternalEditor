@@ -158,7 +158,8 @@ def _updatePath(path, layer_infos):
                 except ValueError:
                     pass
 
-        path.append(layer['name'])
+        if not 'remove' in layer:
+            path.append(layer['name'])
 
     return str( ','.join(path) )
 
@@ -282,7 +283,8 @@ class SkinsToolConfigurator(ConfiguratorBase):
               'layer':              {KEY: 'layers', DEFAULT: ()} },
           'layer':
             { 'name':               {},
-              'insert-after' :      {},
-              'insert-before':      {} } }
+              'insert-after':       {},
+              'insert-before':      {},
+              'remove':             {} } }
 
 InitializeClass(SkinsToolConfigurator)
