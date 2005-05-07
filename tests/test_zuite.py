@@ -154,6 +154,43 @@ class ZuiteTests( unittest.TestCase ):
             object = zuite[ name ]
             self.assertEqual( object.meta_type, 'File' )
 
+    def test___getitem___filesystem( self ):
+
+        import os
+        from Globals import package_home
+
+        zuite = self._makeOne()
+        zuite._updateProperty( 'filesystem_path'
+                             , os.path.join( package_home( globals() )
+                                           , 'flat'
+                                           )
+                             )
+
+        for name in ( 'test_simple.html'
+                    ,
+                    ):
+            object = zuite[ name ]
+            self.assertEqual( object.meta_type, 'File' )
+
+    def test___getitem___filesystem_recursive( self ):
+
+        import os
+        from Globals import package_home
+
+        zuite = self._makeOne()
+        zuite._updateProperty( 'filesystem_path'
+                             , os.path.join( package_home( globals() )
+                                           , 'nested'
+                                           )
+                             )
+
+        for subdir, name in ( ( 'one', 'test_one.html' )
+                            , ( 'two', 'test_another.html' )
+                            ):
+            proxy = zuite[ subdir ]
+            object = proxy[ name ]
+            self.assertEqual( object.meta_type, 'File' )
+
     def test_listTestCases_simple( self ):
 
         _TEST_IDS = ( 'test_one'
@@ -223,6 +260,40 @@ class ZuiteTests( unittest.TestCase ):
         self.assertEqual( len( cases ), len( _TEST_IDS ) )
         for case in cases:
             self.failUnless( case[ 'id' ] in _TEST_IDS )
+
+    def test_listTestCases_filesystem( self ):
+
+        import os
+        from Globals import package_home
+
+        zuite = self._makeOne()
+        zuite._updateProperty( 'filesystem_path'
+                             , os.path.join( package_home( globals() )
+                                           , 'flat'
+                                           )
+                             )
+
+        cases = zuite.listTestCases()
+        self.assertEqual( len( cases ), 1 )
+        self.assertEqual( cases[ 0 ][ 'id' ], 'test_simple.html' )
+
+    def test_listTestCases_filesystem_recursive( self ):
+
+        import os
+        from Globals import package_home
+
+        zuite = self._makeOne()
+        zuite._updateProperty( 'filesystem_path'
+                             , os.path.join( package_home( globals() )
+                                           , 'nested'
+                                           )
+                             )
+
+        cases = zuite.listTestCases()
+        self.assertEqual( len( cases ), 2 )
+        case_ids = [ x[ 'id' ] for x in cases ]
+        self.failUnless( 'test_one.html' in case_ids )
+        self.failUnless( 'test_another.html' in case_ids )
 
     def test_getZipFileName( self ):
 

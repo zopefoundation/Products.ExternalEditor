@@ -2,6 +2,19 @@ Zelenium Product Changelog
 
   After Zelenium-0.5.1
 
+    - Add support for returning testcases from a mapped directory path,
+      including recursion through subdirectories of that path.  Currently,
+      the implementation has the following issues:
+
+      o It doesn't provide control over the order in which test cases or
+        subdirectories are returned.
+
+      o It doesn't allow exclusion / filtering of subdirectories or
+        test cases.
+
+      o It only creates OFS.Image.File objects for test cases (no templates,
+        scripts, etc.)
+
     - Add unit tests for Zuite.__getitem__ behavior, including support files.
 
   Zelenium-0.5.1 (2005/05/07)

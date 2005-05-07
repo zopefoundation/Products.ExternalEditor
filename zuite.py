@@ -29,6 +29,8 @@ _NOW = None   # set only for testing
 
 _PINK_BACKGROUND = re.compile('bgcolor="#ffcfcf"')
 
+_EXCLUDE_NAMES = ( 'CVS', '.svn' )
+
 def _getNow():
     if _NOW is not None:
         return _NOW
@@ -86,11 +88,17 @@ class Zuite( OrderedFolder ):
     test_case_metatypes = ( 'File'
                           , 'Page Template'
                           )
+    filesystem_path = ''
+    _v_filesystem_objects = None
 
     _properties = ( { 'id' : 'test_case_metatypes'
                     , 'type' : 'lines'
                     , 'mode' : 'w'
-                    },
+                    }
+                  , { 'id' : 'filesystem_path'
+                    , 'type' : 'string'
+                    , 'mode' : 'w'
+                    }
                   )
 
     security = ClassSecurityInfo()
@@ -107,6 +115,9 @@ class Zuite( OrderedFolder ):
 
     security.declareProtected( View, 'splash_html' )
     splash_html = PageTemplateFile( 'suiteSplash', _WWW_DIR )
+ 
+    security.declareProtected(ManageSeleniumTestCases, 'manage_zipfile')
+    manage_zipfile = PageTemplateFile( 'suiteZipFile', _WWW_DIR )
 
 
     def __getitem__( self, key, default=_MARKER ):
@@ -117,10 +128,16 @@ class Zuite( OrderedFolder ):
         if key in _SUPPORT_FILE_NAMES:
             return _SUPPORT_FILES[ key ].__of__( self )
 
-        if default is not _MARKER:
-            return default
+        proxy = _FilesystemProxy( self._listFilesystemObjects()
+                                ).__of__( self )
+
+        value = proxy.get( key, default )
+
+        if value is not _MARKER:
+            return value
 
         raise KeyError, key
+
 
     security.declareProtected( View, 'listTestCases' )
     def listTestCases( self, prefix=() ):
@@ -129,8 +146,9 @@ class Zuite( OrderedFolder ):
         result = []
         types = [ self.meta_type ]
         types.extend( self.test_case_metatypes )
+
         for tcid, test_case in self.objectItems( types ):
-            if isinstance(test_case, self.__class__):
+            if isinstance( test_case, self.__class__ ):
                 result.extend( test_case.listTestCases(
                                         prefix=prefix + ( tcid, ) ) )
             else:
@@ -141,29 +159,32 @@ class Zuite( OrderedFolder ):
                                , 'path' : path
                                , 'test_case' : test_case
                                } )
-        return result
 
+        fsobjs = self._listFilesystemObjects()
 
-    security.declarePrivate('_listProductInfo')
-    def _listProductInfo( self ):
-        """ Return a list of strings of form '%(name)s %(version)s'.
-
-        o Each line describes one product installed in the Control_Panel.
-        """
-        result = []
-        cp = self.getPhysicalRoot().Control_Panel
-        products = cp.Products.objectItems()
-        products.sort()
-
-        for product_name, product in products:
-            version = product.version or 'unreleased'
-            result.append( '%s %s' % ( product_name, version ) )
+        self._recurseFSTestCases( result, prefix, fsobjs )
 
         return result
 
- 
-    security.declareProtected(ManageSeleniumTestCases, 'manage_zipfile')
-    manage_zipfile = PageTemplateFile( 'suiteZipFile', _WWW_DIR )
+
+    security.declarePrivate( '_recurseFSTestCases' )
+    def _recurseFSTestCases( self, result, prefix, fsobjs ):
+
+        for tcid, test_case in fsobjs.get( 'testcases', {} ).items():
+            path = '/'.join( prefix + ( tcid, ) )
+            result.append( { 'id' : tcid
+                            , 'title' : test_case.title_or_id()
+                            , 'url' : path
+                            , 'path' : path
+                            , 'test_case' : test_case
+                            } )
+
+        for name, info in fsobjs.get( 'subdirs', {} ).items():
+            self._recurseFSTestCases( result
+                                    , prefix + ( name, )
+                                    , info
+                                    )
+
 
     security.declareProtected(ManageSeleniumTestCases, 'getZipFileName')
     def getZipFileName(self):
@@ -209,53 +230,6 @@ class Zuite( OrderedFolder ):
                                 , 'Snapshot+added'
                                 ) )
 
-
-    security.declarePrivate('_getFilename')
-    def _getFilename(self, name):
-        """ Convert 'name' to a suitable filename, if needed.
-        """
-        if '.' not in name:
-            return '%s.html' % name
-
-        return name
-
-
-    security.declarePrivate('_getZipFile')
-    def _getZipFile(self):
-        """ Generate a zip file containing both tests and scaffolding.
-        """
-        stream = StringIO.StringIO()
-        archive = zipfile.ZipFile( stream, 'w' )
-
-        archive.writestr( 'index.html'
-                        , self.index_html( suite_name='testSuite.html' ) )
-
-        test_cases = self.listTestCases()
-
-        # ensure suffixes
-        for info in test_cases:
-            info[ 'path' ] = self._getFilename( info[ 'path' ] )
-            info[ 'url' ] = self._getFilename( info[ 'url' ] )
-
-        archive.writestr( 'testSuite.html'
-                        , self.test_suite_html( test_cases=test_cases ) )
-
-        for k, v in _SUPPORT_FILES.items():
-            archive.writestr( k, v.manage_FTPget() )
-
-        for info in test_cases:
-            test_case = info[ 'test_case' ]
-
-            if getattr( test_case, '__call__', None ) is not None:
-                body = test_case()  # XXX: DTML?
-            else:
-                body = test_case.manage_FTPget()
-
-            archive.writestr( info[ 'path' ]
-                            , body
-                            )
-        archive.close()
-        return stream.getvalue()
 
     security.declarePublic('postResults')
     def postResults(self, REQUEST):
@@ -364,10 +338,117 @@ class Zuite( OrderedFolder ):
                                    , 'text/html'
                                    ) )
             testcase = result._getOb( test_id )
+
+            # XXX:  this is silly, but we have no other metadata.
             testcase._setProperty( 'passed'
                                  , _PINK_BACKGROUND.search( body ) is None
                                  , 'boolean'
                                  )
+
+
+    #
+    #   Helper methods
+    #
+    security.declarePrivate('_listFilesystemObjects')
+    def _listFilesystemObjects( self ):
+        """ Return a mapping of any filesystem objects we "hold".
+        """
+        if self._v_filesystem_objects is not None:
+            return self._v_filesystem_objects
+
+        if not self.filesystem_path:
+            return {}
+
+        path = os.path.abspath( self.filesystem_path )
+
+        self._v_filesystem_objects = self._grubFilesystem( path )
+        return self._v_filesystem_objects
+
+    security.declarePrivate('_grubFilesystem')
+    def _grubFilesystem( self, path ):
+
+        info = { 'testcases' : {}, 'subdirs' : {} }
+
+        for name in os.listdir( path ):
+
+            if name in _EXCLUDE_NAMES:
+                continue
+
+            fqfn = os.path.join( path, name )
+
+            if os.path.isfile( fqfn ):
+                testcase = _makeFile( fqfn )
+                info[ 'testcases' ][ name ] = testcase.__of__( self )
+
+            elif os.path.isdir( fqfn ):
+                info[ 'subdirs' ][ name ] = self._grubFilesystem( fqfn )
+
+        return info
+
+
+    security.declarePrivate('_getFilename')
+    def _getFilename(self, name):
+        """ Convert 'name' to a suitable filename, if needed.
+        """
+        if '.' not in name:
+            return '%s.html' % name
+
+        return name
+
+
+    security.declarePrivate('_getZipFile')
+    def _getZipFile(self):
+        """ Generate a zip file containing both tests and scaffolding.
+        """
+        stream = StringIO.StringIO()
+        archive = zipfile.ZipFile( stream, 'w' )
+
+        archive.writestr( 'index.html'
+                        , self.index_html( suite_name='testSuite.html' ) )
+
+        test_cases = self.listTestCases()
+
+        # ensure suffixes
+        for info in test_cases:
+            info[ 'path' ] = self._getFilename( info[ 'path' ] )
+            info[ 'url' ] = self._getFilename( info[ 'url' ] )
+
+        archive.writestr( 'testSuite.html'
+                        , self.test_suite_html( test_cases=test_cases ) )
+
+        for k, v in _SUPPORT_FILES.items():
+            archive.writestr( k, v.manage_FTPget() )
+
+        for info in test_cases:
+            test_case = info[ 'test_case' ]
+
+            if getattr( test_case, '__call__', None ) is not None:
+                body = test_case()  # XXX: DTML?
+            else:
+                body = test_case.manage_FTPget()
+
+            archive.writestr( info[ 'path' ]
+                            , body
+                            )
+        archive.close()
+        return stream.getvalue()
+
+    security.declarePrivate('_listProductInfo')
+    def _listProductInfo( self ):
+        """ Return a list of strings of form '%(name)s %(version)s'.
+
+        o Each line describes one product installed in the Control_Panel.
+        """
+        result = []
+        cp = self.getPhysicalRoot().Control_Panel
+        products = cp.Products.objectItems()
+        products.sort()
+
+        for product_name, product in products:
+            version = product.version or 'unreleased'
+            result.append( '%s %s' % ( product_name, version ) )
+
+        return result
 
 
 InitializeClass( Zuite )
@@ -465,6 +546,35 @@ class ZuiteResults( Folder ):
         raise KeyError, key
 
 InitializeClass( ZuiteResults )
+
+class _FilesystemProxy( Folder ):
+
+    security = ClassSecurityInfo()
+
+    def __init__( self, fsobjs ):
+
+        self._fsobjs = fsobjs
+
+    security.declareProtected( View, 'get' )
+    def get( self, key, default=_MARKER ):
+
+        if key in self._fsobjs[ 'testcases' ]:
+            return self._fsobjs[ 'testcases' ][ key ].__of__( self )
+
+        if key in self._fsobjs[ 'subdirs' ]:
+            return self.__class__( self._fsobjs[ 'subdirs' ][ key ]
+                                 ).__of__( self )
+
+        if default is not _MARKER:
+            return default
+
+        raise KeyError, key
+
+    def __getitem__( self, key ):
+
+        return self.get( key )
+
+InitializeClass( _FilesystemProxy )
 
 #
 #   Factory methods
