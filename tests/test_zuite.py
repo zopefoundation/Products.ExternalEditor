@@ -3,6 +3,7 @@
 $Id$
 """
 import unittest
+
 try:
     import Zope2
 except ImportError:
@@ -123,6 +124,35 @@ class ZuiteTests( unittest.TestCase ):
         self.failUnless( 'File' in zuite.test_case_metatypes )
         self.failUnless( 'Page Template' in zuite.test_case_metatypes )
         self.assertEqual( len( zuite.listTestCases() ), 0 )
+
+    def test___getitem___normal( self ):
+
+        from Acquisition import aq_base
+
+        _KEY = 'key'
+        zuite = self._makeOne()
+
+        try:
+            object = zuite[ _KEY ]
+        except KeyError:
+            pass
+        else:
+            assert 0, "__getitem__ didn't raise: %s" % _KEY
+
+        zuite._setObject( _KEY, self._makeFile( _KEY ) )
+        object = zuite[ _KEY ]
+        self.failUnless( aq_base( object )
+                      is aq_base( getattr( zuite, _KEY ) ) )
+
+    def test___getitem___support_files( self ):
+
+        from Products.Zelenium.zuite import _SUPPORT_FILE_NAMES
+
+        zuite = self._makeOne()
+
+        for name in _SUPPORT_FILE_NAMES:
+            object = zuite[ name ]
+            self.assertEqual( object.meta_type, 'File' )
 
     def test_listTestCases_simple( self ):
 
