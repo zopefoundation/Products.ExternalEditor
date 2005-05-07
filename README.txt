@@ -61,6 +61,11 @@ Zelenium Product README
     organize your test cases in a hierarchy, running them in separate
     segments, or all at once.
 
+  Including Tests from the Filesystem
+
+    Test suites now have a property, 'filesystem_path';  if set, the
+    suite will recursively load testcases from files in / under the
+    directory pointed to by that path.
 
   Exporting an Archive
 
@@ -121,11 +126,7 @@ Zelenium Product README
   Capturing Results from the Test Run
 
     Selenium has a feature which allows the testrunner to upload
-    result data from an automated test run to the server.  To enable
-    this feature in Zope, add a PythonScript, 'postResults', in the
-    root of your site, with text similar to::
-
-      context.test_suite.postResults(context.REQUEST)
+    result data from an automated test run to the server.
 
     Invoke the test suite from your browser as usual, but append the
     query string '?auto=1', to the URL, e.g.::
@@ -133,10 +134,8 @@ Zelenium Product README
       http://localhost:8080/test_suite?auto=1
 
     Selenium will run all test cases, and then upload its result data
-    to the '/postResults' URL (your PythonScript).
-
-    Note:  if running Zope behind Apache or another rewriting proxy, 
-    you may be able to skip adding a PythonScript, and instead rewrite
-    '/postResults' directly onto the 'postResults' method of your
-    test suite.
+    to the 'postResults' method of your suite. (Note that you no longer
+    need the 'postResults' PythonScript in the root of your site, because
+    the latest version of Selenium posts to that name relative to the
+    test suite).
 
