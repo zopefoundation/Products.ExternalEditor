@@ -1,6 +1,6 @@
 Zelenium Product Changelog
 
-  After Zelenium-0.5
+  Zelenium-0.5.1 (2005/05/07)
 
     - Make passing / failing test cases in results view more obvious in
       printed representation by adding icons.  N.B.: at the moment, we do
