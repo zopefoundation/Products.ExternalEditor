@@ -184,6 +184,9 @@ class ConfiguratorBase(Implicit):
         for child in node.childNodes:
             name = child.nodeName
 
+            if name == '#comment':
+                continue
+
             if not name == '#text':
                 key = node_map[name].get(KEY, str(name) )
                 info[key] = info.setdefault( key, () ) + (
@@ -220,7 +223,6 @@ class ConfiguratorBase(Implicit):
               'meta_type':       {},
               'insert-before':   {},
               'insert-after':    {},
-              'remove':          {},
               'property':        {KEY: 'properties', DEFAULT: ()},
               'object':          {KEY: 'objects', DEFAULT: ()} },
           'property':
@@ -232,7 +234,7 @@ class ConfiguratorBase(Implicit):
           'element':
             { 'value':           {KEY: None} },
           'description':
-            { '#text':           {KEY: None} } }
+            { '#text':           {KEY: None, DEFAULT: ''} } }
 
     def _convertToBoolean(self, val):
 

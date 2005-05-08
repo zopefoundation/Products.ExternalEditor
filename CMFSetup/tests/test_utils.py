@@ -150,6 +150,13 @@ _NORMAL_OBJECT_EXPORT = """\
 </dummy>
 """ % _NORMAL_PROPERTY_NODES
 
+_SPECIAL_IMPORT = """\
+<?xml version="1.0"?>
+<dummy>
+ <!-- ignore comment, allow empty description -->
+ <description></description>
+</dummy>
+"""
 
 def _testFunc( *args, **kw ):
 
@@ -227,7 +234,7 @@ class ConfiguratorBaseTests(BaseRegistryTests):
     def _getTargetClass(self):
 
         from Products.CMFSetup.utils import ConfiguratorBase
-        from Products.CMFSetup.utils import DEFAULT, KEY
+        from Products.CMFSetup.utils import CONVERTER, DEFAULT, KEY
 
         class Configurator(ConfiguratorBase):
 
@@ -235,8 +242,10 @@ class ConfiguratorBaseTests(BaseRegistryTests):
                 return None
 
             def _getImportMapping(self):
-                return { 'dummy': { 'property': {KEY: 'properties',
-                                                 DEFAULT: () } } }
+                return {
+                  'dummy':
+                    { 'property':    {KEY: 'properties', DEFAULT: ()},
+                      'description': {CONVERTER: self._convertToUnique} } }
 
         return Configurator
 
@@ -409,6 +418,20 @@ class ConfiguratorBaseTests(BaseRegistryTests):
         self.assertEqual( info['elements'][1], 'Baz' )
         self.assertEqual( info['type'], 'multiple selection' )
         self.assertEqual( info['select_variable'], 'foobarbaz' )
+
+    def test_parseXML_special(self):
+
+        site = self._initSite()
+        configurator = self._makeOne(site)
+        try:
+            site_info = configurator.parseXML(_SPECIAL_IMPORT)
+        except KeyError:
+            self.fail('CMF Collector issue #352 (comment or empty '
+                      'description bug): KeyError raised')
+
+        self.assertEqual( len(site_info), 2 )
+        self.assertEqual( site_info['description'], '' )
+        self.assertEqual( len(site_info['properties']), 0 )
 
     def test_initProperty_normal(self):
 
