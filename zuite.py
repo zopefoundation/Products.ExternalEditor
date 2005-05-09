@@ -4,6 +4,7 @@ Zuite instances are collections of Zelenium test cases.
 
 $Id$
 """
+import glob
 import os
 import re
 from urllib import unquote
@@ -29,7 +30,7 @@ _NOW = None   # set only for testing
 
 _PINK_BACKGROUND = re.compile('bgcolor="#ffcfcf"')
 
-_EXCLUDE_NAMES = ( 'CVS', '.svn' )
+_EXCLUDE_NAMES = ( 'CVS', '.svn', '.objects' )
 
 def _getNow():
     if _NOW is not None:
@@ -60,11 +61,19 @@ _SUPPORT_FILE_NAMES = [ 'html-xpath-patched.js'
                       , 'selenium-logo.png'
                       ]
 
-def _makeFile(filename):
-    path = os.path.join(_SUPPORT_DIR, filename)
-    return File(id=filename, title='', file=open(path).read())
+def _makeFile(filename, prefix=None, id=None):
 
-_SUPPORT_FILES = dict( [ ( x, _makeFile(x) )
+    if prefix:
+        path = os.path.join( prefix, filename )
+    else:
+        path = filename
+
+    if id is None:
+        id = os.path.split( path )[ 1 ]
+
+    return File( id=id, title='', file=open(path).read() )
+
+_SUPPORT_FILES = dict( [ ( x, _makeFile( x, prefix=_SUPPORT_DIR ) )
                             for x in _SUPPORT_FILE_NAMES ] )
 
 _MARKER = object()
@@ -89,6 +98,7 @@ class Zuite( OrderedFolder ):
                           , 'Page Template'
                           )
     filesystem_path = ''
+    filename_glob = ''
     _v_filesystem_objects = None
 
     _properties = ( { 'id' : 'test_case_metatypes'
@@ -96,6 +106,10 @@ class Zuite( OrderedFolder ):
                     , 'mode' : 'w'
                     }
                   , { 'id' : 'filesystem_path'
+                    , 'type' : 'string'
+                    , 'mode' : 'w'
+                    }
+                  , { 'id' : 'filename_glob'
                     , 'type' : 'string'
                     , 'mode' : 'w'
                     }
@@ -170,20 +184,29 @@ class Zuite( OrderedFolder ):
     security.declarePrivate( '_recurseFSTestCases' )
     def _recurseFSTestCases( self, result, prefix, fsobjs ):
 
-        for tcid, test_case in fsobjs.get( 'testcases', {} ).items():
-            path = '/'.join( prefix + ( tcid, ) )
-            result.append( { 'id' : tcid
-                            , 'title' : test_case.title_or_id()
-                            , 'url' : path
-                            , 'path' : path
-                            , 'test_case' : test_case
-                            } )
+        test_cases = dict( [ ( x.getId(), x )
+                                for x in fsobjs.get( 'testcases', () ) ] )
+        subdirs = fsobjs.get( 'subdirs', {} )
 
-        for name, info in fsobjs.get( 'subdirs', {} ).items():
-            self._recurseFSTestCases( result
-                                    , prefix + ( name, )
-                                    , info
-                                    )
+        for name in fsobjs.get( 'ordered', [] ):
+
+            if name in test_cases:
+                test_case = test_cases[ name ]
+                name = test_case.getId()
+                path = '/'.join( prefix + ( name, ) )
+                result.append( { 'id' : name
+                               , 'title' : test_case.title_or_id()
+                               , 'url' : path
+                               , 'path' : path
+                               , 'test_case' : test_case
+                               } )
+
+            if name in subdirs:
+                info = subdirs[ name ]
+                self._recurseFSTestCases( result
+                                        , prefix + ( name, )
+                                        , info
+                                        )
 
 
     security.declareProtected(ManageSeleniumTestCases, 'getZipFileName')
@@ -367,18 +390,32 @@ class Zuite( OrderedFolder ):
     security.declarePrivate('_grubFilesystem')
     def _grubFilesystem( self, path ):
 
-        info = { 'testcases' : {}, 'subdirs' : {} }
+        info = { 'testcases' : (), 'subdirs' : {} }
 
-        for name in os.listdir( path ):
+        # Look for a '.objects' file with an explicit manifiest
+        manifest = os.path.join( path, '.objects' )
 
-            if name in _EXCLUDE_NAMES:
-                continue
+        if os.path.isfile( manifest ):
+            filenames = [ x.strip() for x in open( manifest ).readlines() ]
+
+        elif self.filename_glob:
+            globbed = glob.glob( os.path.join( path, self.filename_glob ) )
+            filenames = [ os.path.split( x )[ 1 ] for x in globbed ]
+
+        else:   # guess
+            filenames = [ x for x in os.listdir( path )
+                                if x not in _EXCLUDE_NAMES ]
+            filenames.sort()
+
+        info[ 'ordered' ] = filenames
+
+        for name in filenames:
 
             fqfn = os.path.join( path, name )
 
             if os.path.isfile( fqfn ):
                 testcase = _makeFile( fqfn )
-                info[ 'testcases' ][ name ] = testcase.__of__( self )
+                info[ 'testcases' ] += ( testcase, )
 
             elif os.path.isdir( fqfn ):
                 info[ 'subdirs' ][ name ] = self._grubFilesystem( fqfn )
@@ -408,16 +445,44 @@ class Zuite( OrderedFolder ):
 
         test_cases = self.listTestCases()
 
-        # ensure suffixes
+        paths = { '' : [] }
+
+        def _ensurePath( prefix, element ):
+            elements = paths.setdefault( prefix, [] )
+            if element not in elements:
+                elements.append( element )
+
         for info in test_cases:
-            info[ 'path' ] = self._getFilename( info[ 'path' ] )
+            # ensure suffixes
+            path = self._getFilename( info[ 'path' ] )
+            info[ 'path' ] = path
             info[ 'url' ] = self._getFilename( info[ 'url' ] )
+
+        for info in test_cases:
+            #parent, filename = os.path.split( info[ 'path' ] )
+            #paths.setdefault( parent, [] ).append( filename )
+            elements = info[ 'path' ].split( os.path.sep )
+            _ensurePath( '', elements[ 0 ] )
+            for i in range( 1, len( elements ) ):
+                prefix = '/'.join( elements[ : i ] )
+                _ensurePath( prefix, elements[ i ] )
 
         archive.writestr( 'testSuite.html'
                         , self.test_suite_html( test_cases=test_cases ) )
 
         for k, v in _SUPPORT_FILES.items():
             archive.writestr( k, v.manage_FTPget() )
+
+        for pathname, filenames in paths.items():
+
+            if pathname == '':
+                filename = '.objects'
+            else:
+                filename = '%s/.objects' % pathname
+
+            archive.writestr( filename
+                            , '\n'.join( filenames )
+                            )
 
         for info in test_cases:
             test_case = info[ 'test_case' ]
@@ -558,8 +623,9 @@ class _FilesystemProxy( Folder ):
     security.declareProtected( View, 'get' )
     def get( self, key, default=_MARKER ):
 
-        if key in self._fsobjs[ 'testcases' ]:
-            return self._fsobjs[ 'testcases' ][ key ].__of__( self )
+        for tc in self._fsobjs[ 'testcases' ]:
+            if tc.getId() == key:
+                return tc.__of__( self )
 
         if key in self._fsobjs[ 'subdirs' ]:
             return self.__class__( self._fsobjs[ 'subdirs' ][ key ]

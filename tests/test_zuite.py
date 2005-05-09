@@ -83,9 +83,18 @@ class ZuiteTests( unittest.TestCase ):
         import zipfile
         stream = StringIO.StringIO( bits )
         archive = zipfile.ZipFile( stream, 'r' )
-        names = archive.namelist()
 
-        self.assertEqual( len( contents ), len( names ), (contents, names) )
+        names = list( archive.namelist() )
+        names.sort()
+        contents = list( contents )
+        contents.sort()
+
+        self.assertEqual( len( contents ), len( names ),
+                          "\n==========\n%s\n==========\n%s\n==========\n"
+                            % ( '\n'.join( contents )
+                              , '\n'.join( names )
+                              )
+                        )
 
         for name in names:
             if name not in contents:
@@ -94,6 +103,19 @@ class ZuiteTests( unittest.TestCase ):
         for name in contents:
             if name not in names:
                 raise AssertionError, 'Missing name in archive: %s' % name
+
+    def _verifyManifest( self, bits, name, contents ):
+
+        import StringIO
+        import zipfile
+        stream = StringIO.StringIO( bits )
+        archive = zipfile.ZipFile( stream, 'r' )
+
+        manifest = filter( None, archive.read( name ).split( '\n' ) )
+        self.assertEqual( len( manifest ), len( contents ) )
+
+        for lhs, rhs in zip( manifest, contents ):
+            self.assertEqual( lhs, rhs )
 
     def _listDefaultArchiveNames( self ):
 
@@ -137,7 +159,7 @@ class ZuiteTests( unittest.TestCase ):
         except KeyError:
             pass
         else:
-            assert 0, "__getitem__ didn't raise: %s" % _KEY
+            self.fail( "__getitem__ didn't raise: %s" % _KEY )
 
         zuite._setObject( _KEY, self._makeFile( _KEY ) )
         object = zuite[ _KEY ]
@@ -189,6 +211,35 @@ class ZuiteTests( unittest.TestCase ):
                             ):
             proxy = zuite[ subdir ]
             object = proxy[ name ]
+            self.assertEqual( object.meta_type, 'File' )
+
+    def test___getitem___filesystem_filtered( self ):
+
+        import os
+        from Globals import package_home
+
+        zuite = self._makeOne()
+        zuite._updateProperty( 'filesystem_path'
+                             , os.path.join( package_home( globals() )
+                                           , 'filters'
+                                           )
+                             )
+
+        zuite._updateProperty( 'filename_glob'
+                             , 'test_*.html'
+                             )
+
+        try:
+            excluded = zuite[ 'exclude_me.html' ]
+        except KeyError:
+            pass
+        else:
+            self.fail( "Didn't exclude 'exclude_me.html'." )
+
+        for name in ( 'test_one.html'
+                    , 'test_another.html'
+                    ):
+            object = zuite[ name ]
             self.assertEqual( object.meta_type, 'File' )
 
     def test_listTestCases_simple( self ):
@@ -295,6 +346,64 @@ class ZuiteTests( unittest.TestCase ):
         self.failUnless( 'test_one.html' in case_ids )
         self.failUnless( 'test_another.html' in case_ids )
 
+    def test_listTestCases_filesystem_ordered_default( self ):
+
+        # By default, sort alphabetically.
+        import os
+        from Globals import package_home
+
+        zuite = self._makeOne()
+        zuite._updateProperty( 'filesystem_path'
+                             , os.path.join( package_home( globals() )
+                                           , 'ordered'
+                                           , 'default'
+                                           )
+                             )
+        cases = zuite.listTestCases()
+        self.assertEqual( len( cases ), 2 )
+        case_ids = [ x[ 'id' ] for x in cases ]
+        self.assertEqual( case_ids[ 0 ], 'test_alpha.html' )
+        self.assertEqual( case_ids[ 1 ], 'test_beta.html' )
+
+    def test_listTestCases_filesystem_ordered_explicit( self ):
+
+        # Use the ordering specified in '.objects'.
+        import os
+        from Globals import package_home
+
+        zuite = self._makeOne()
+        zuite._updateProperty( 'filesystem_path'
+                             , os.path.join( package_home( globals() )
+                                           , 'ordered'
+                                           , 'explicit'
+                                           )
+                             )
+        cases = zuite.listTestCases()
+        self.assertEqual( len( cases ), 2 )
+        case_ids = [ x[ 'id' ] for x in cases ]
+        self.assertEqual( case_ids[ 0 ], 'test_beta.html' )
+        self.assertEqual( case_ids[ 1 ], 'test_alpha.html' )
+
+    def test_listTestCases_filesystem_recursive_explicit( self ):
+
+        import os
+        from Globals import package_home
+
+        zuite = self._makeOne()
+        zuite._updateProperty( 'filesystem_path'
+                             , os.path.join( package_home( globals() )
+                                           , 'fussy'
+                                           )
+                             )
+        cases = zuite.listTestCases()
+        case_ids = [ x[ 'id' ] for x in cases ]
+        self.assertEqual( len( case_ids ), 5, case_ids )
+        self.assertEqual( case_ids[ 0 ], 'test_niece1.html' )
+        self.assertEqual( case_ids[ 1 ], 'test_niece2.html' )
+        self.assertEqual( case_ids[ 2 ], 'test_uncle.html' )
+        self.assertEqual( case_ids[ 3 ], 'test_nephew2.html' )
+        self.assertEqual( case_ids[ 4 ], 'test_nephew1.html' )
+
     def test_getZipFileName( self ):
 
         _ID = 'gzf'
@@ -322,7 +431,10 @@ class ZuiteTests( unittest.TestCase ):
         self.assertEqual( response._headers[ 'Content-length' ]
                         , str( len( response._body ) ) )
 
-        self._verifyArchive( response._body, self._listDefaultArchiveNames() )
+        expected = self._listDefaultArchiveNames()
+        expected.append( '.objects' )
+        self._verifyArchive( response._body, expected )
+        self._verifyManifest( response._body, '.objects', [] )
 
     def test_manage_getZipFile_default_name( self ):
 
@@ -346,8 +458,11 @@ class ZuiteTests( unittest.TestCase ):
                         , str( len( response._body ) ) )
 
         expected = self._listDefaultArchiveNames()
-        expected.append( '%s.html' % _FILENAME )
+        expected.append( '.objects' )
+        filename = '%s.html' % _FILENAME
+        expected.append( filename )
         self._verifyArchive( response._body, expected )
+        self._verifyManifest( response._body, '.objects', [ filename ] )
 
     def test_manage_getZipFile_recursive( self ):
 
@@ -384,14 +499,26 @@ class ZuiteTests( unittest.TestCase ):
                         , str( len( response._body ) ) )
 
         expected = self._listDefaultArchiveNames()
+        expected.append( '.objects' )
+        expected.append( 'sub/.objects' )
 
+        top_level = []
         for test_id in _TEST_IDS:
-            expected.append( '%s.html' % test_id )
+            filename = '%s.html' % test_id 
+            expected.append( filename )
+            top_level.append( filename )
 
+        top_level.append( 'sub' )
+
+        sub_level = []
         for sub_id in _SUB_IDS:
-            expected.append( 'sub/%s.html' % sub_id )
+            filename = '%s.html' % sub_id
+            expected.append( 'sub/%s' % filename )
+            sub_level.append( filename )
 
         self._verifyArchive( response._body, expected )
+        self._verifyManifest( response._body, '.objects', top_level )
+        self._verifyManifest( response._body, 'sub/.objects', sub_level )
 
     def test_manage_createSnapshot_empty( self ):
 
@@ -405,7 +532,9 @@ class ZuiteTests( unittest.TestCase ):
         self.failUnless( _ARCHIVE_NAME in object_ids )
 
         archive = zuite._getOb( _ARCHIVE_NAME )
-        self._verifyArchive( archive.data, self._listDefaultArchiveNames() )
+        expected = self._listDefaultArchiveNames()
+        expected.append( '.objects' )
+        self._verifyArchive( archive.data, expected )
 
     def test_manage_createSnapshot_default_name( self ):
 
@@ -426,6 +555,7 @@ class ZuiteTests( unittest.TestCase ):
         self.failUnless( expected_id in object_ids )
 
         expected = self._listDefaultArchiveNames()
+        expected.append( '.objects' )
         expected.append( '%s.html' % _FILENAME )
         archive = zuite._getOb( expected_id )
         self._verifyArchive( archive.data, expected )
@@ -461,6 +591,8 @@ class ZuiteTests( unittest.TestCase ):
 
         archive = zuite._getOb( _ARCHIVE_NAME )
         expected = self._listDefaultArchiveNames()
+        expected.append( '.objects' )
+        expected.append( 'sub/.objects' )
 
         for test_id in _TEST_IDS:
             expected.append( '%s.html' % test_id )

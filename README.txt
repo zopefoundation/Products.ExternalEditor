@@ -67,6 +67,24 @@ Zelenium Product README
     suite will recursively load testcases from files in / under the
     directory pointed to by that path.
 
+    The list of files to be included is computed via the following
+    rules:
+
+     - If the directory contains a file, '.objects', it is presumed to
+       contain a list of files to be included, one per line;  only those
+       files / subdirectories (if present) will be included.  In this case,
+       the test cases will be presented in the order indicated in the file,
+       followed by any test cases from subdirectories.
+
+     - Otherwise, if the suite's property, 'filename_glob' is non-empty,
+       it will be expanded (via Python's 'glob.glob') to compute the list
+       of filenames.  The test cases will be presented in alphabetical
+       order, followed by any test cases from subdirectories.
+
+     - Otherwise, any file will be considered a testcase.  The test cases
+       will be presented in alphabetical order, followed by any test cases
+       from subdirectories.
+
   Exporting an Archive
 
     On the "Zip" tab, supply a filename and click the "Download" button.

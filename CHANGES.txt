@@ -6,12 +6,6 @@ Zelenium Product Changelog
       including recursion through subdirectories of that path.  Currently,
       the implementation has the following issues:
 
-      o It doesn't provide control over the order in which test cases or
-        subdirectories are returned.
-
-      o It doesn't allow exclusion / filtering of subdirectories or
-        test cases.
-
       o It only creates OFS.Image.File objects for test cases (no templates,
         scripts, etc.)
 
