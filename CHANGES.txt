@@ -1,6 +1,6 @@
 Zelenium Product Changelog
 
-  After Zelenium-0.5.1
+  Zelenium-0.6 (2005/05/09)
 
     - Add support for returning testcases from a mapped directory path,
       including recursion through subdirectories of that path.  Currently,
