@@ -117,13 +117,16 @@ class ZuiteTests( unittest.TestCase ):
         for lhs, rhs in zip( manifest, contents ):
             self.assertEqual( lhs, rhs )
 
-    def _listDefaultArchiveNames( self ):
+    def _listDefaultArchiveNames( self, include_selenium=True ):
 
         from Products.Zelenium.zuite import _SUPPORT_FILES
 
-        expected_names = _SUPPORT_FILES.keys()
+        expected_names = []
         expected_names.append( 'index.html' )
         expected_names.append( 'testSuite.html' )
+
+        if include_selenium:
+            expected_names.extend( _SUPPORT_FILES.keys() )
 
         return expected_names
 
@@ -436,6 +439,31 @@ class ZuiteTests( unittest.TestCase ):
         self._verifyArchive( response._body, expected )
         self._verifyManifest( response._body, '.objects', [] )
 
+    def test_manage_getZipFile_empty_no_selenium( self ):
+
+        _ID = 'mgzf_empty'
+        _ARCHIVE_NAME = 'empty.zip'
+
+        response = DummyResponse()
+        zuite = self._makeOne( _ID ).__of__( self.root )
+
+        zuite.manage_getZipFile( archive_name=_ARCHIVE_NAME
+                               , include_selenium=False
+                               , RESPONSE=response
+                               )
+
+        self.assertEqual( response._headers[ 'Content-type' ]
+                        , 'application/zip' )
+        self.assertEqual( response._headers[ 'Content-disposition' ]
+                        , 'inline;filename=%s' % _ARCHIVE_NAME )
+        self.assertEqual( response._headers[ 'Content-length' ]
+                        , str( len( response._body ) ) )
+
+        expected = self._listDefaultArchiveNames( include_selenium=False )
+        expected.append( '.objects' )
+        self._verifyArchive( response._body, expected )
+        self._verifyManifest( response._body, '.objects', [] )
+
     def test_manage_getZipFile_default_name( self ):
 
         _ID = 'mgzf'
@@ -533,6 +561,24 @@ class ZuiteTests( unittest.TestCase ):
 
         archive = zuite._getOb( _ARCHIVE_NAME )
         expected = self._listDefaultArchiveNames()
+        expected.append( '.objects' )
+        self._verifyArchive( archive.data, expected )
+
+    def test_manage_createSnapshot_no_selenium( self ):
+
+        _ID = 'mcs_empty'
+        _ARCHIVE_NAME = 'empty.zip'
+        zuite = self._makeOne( _ID ).__of__( self.root )
+
+        zuite.manage_createSnapshot( archive_name=_ARCHIVE_NAME
+                                   , include_selenium=False
+                                   )
+        object_ids = zuite.objectIds()
+        self.assertEqual( len( object_ids ), 1 )
+        self.failUnless( _ARCHIVE_NAME in object_ids )
+
+        archive = zuite._getOb( _ARCHIVE_NAME )
+        expected = self._listDefaultArchiveNames( include_selenium=False )
         expected.append( '.objects' )
         self._verifyArchive( archive.data, expected )
 

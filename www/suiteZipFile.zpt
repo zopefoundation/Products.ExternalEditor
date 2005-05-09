@@ -24,6 +24,18 @@ Export the Selenium test case as a ZIP file, or create a snapshot.
 
   <tr>
     <td align="left" valign="top">
+    <div class="form-label">
+    Include Selenium support?
+    </div>
+    </td>
+    <td align="left" valign="top">
+    <input type="hidden" name="include_selenium:int:default" value="0" />
+    <input type="checkbox" name="include_selenium:boolean" checked="checked" />
+    </td>
+  </tr>
+
+  <tr>
+    <td align="left" valign="top">
     </td>
     <td align="left" valign="top">
     <div class="form-element">

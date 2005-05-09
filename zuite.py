@@ -219,13 +219,17 @@ class Zuite( OrderedFolder ):
 
 
     security.declareProtected(ManageSeleniumTestCases, 'manage_getZipFile')
-    def manage_getZipFile(self, archive_name=None, RESPONSE=None):
+    def manage_getZipFile( self
+                         , archive_name=None
+                         , include_selenium=True
+                         , RESPONSE=None
+                         ):
         """ Export the test suite as a zip file.
         """
         if archive_name is None or archive_name.strip() == '':
             archive_name = self.getZipFileName()
 
-        bits = self._getZipFile()
+        bits = self._getZipFile( include_selenium )
 
         if RESPONSE is None:
             return bits
@@ -238,13 +242,20 @@ class Zuite( OrderedFolder ):
 
 
     security.declareProtected(ManageSeleniumTestCases, 'manage_createSnapshot')
-    def manage_createSnapshot(self, archive_name=None, RESPONSE=None):
+    def manage_createSnapshot( self
+                             , archive_name=None
+                             , include_selenium=True
+                             , RESPONSE=None
+                             ):
         """ Save the test suite as a zip file *in the zuite*.
         """
         if archive_name is None or archive_name.strip() == '':
             archive_name = self.getZipFileName()
 
-        archive = File( archive_name, title='', file=self._getZipFile() )
+        archive = File( archive_name
+                      , title=''
+                      , file=self._getZipFile( include_selenium )
+                      )
         self._setObject( archive_name, archive )
 
         if RESPONSE is not None:
@@ -433,8 +444,8 @@ class Zuite( OrderedFolder ):
         return name
 
 
-    security.declarePrivate('_getZipFile')
-    def _getZipFile(self):
+    security.declarePrivate( '_getZipFile' )
+    def _getZipFile( self, include_selenium=True ):
         """ Generate a zip file containing both tests and scaffolding.
         """
         stream = StringIO.StringIO()
@@ -458,20 +469,15 @@ class Zuite( OrderedFolder ):
             info[ 'path' ] = path
             info[ 'url' ] = self._getFilename( info[ 'url' ] )
 
-        for info in test_cases:
-            #parent, filename = os.path.split( info[ 'path' ] )
-            #paths.setdefault( parent, [] ).append( filename )
-            elements = info[ 'path' ].split( os.path.sep )
+            elements = path.split( os.path.sep )
             _ensurePath( '', elements[ 0 ] )
+
             for i in range( 1, len( elements ) ):
                 prefix = '/'.join( elements[ : i ] )
                 _ensurePath( prefix, elements[ i ] )
 
         archive.writestr( 'testSuite.html'
                         , self.test_suite_html( test_cases=test_cases ) )
-
-        for k, v in _SUPPORT_FILES.items():
-            archive.writestr( k, v.manage_FTPget() )
 
         for pathname, filenames in paths.items():
 
@@ -495,6 +501,12 @@ class Zuite( OrderedFolder ):
             archive.writestr( info[ 'path' ]
                             , body
                             )
+
+        if include_selenium:
+
+            for k, v in _SUPPORT_FILES.items():
+                archive.writestr( k, v.manage_FTPget() )
+
         archive.close()
         return stream.getvalue()
 

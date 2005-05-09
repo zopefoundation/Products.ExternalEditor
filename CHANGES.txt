@@ -4,6 +4,9 @@ Zelenium Product Changelog
 
     - CVS tag:  'Zelenium-0_6'
 
+    - Add ability to suppress inclusion of Selenium support files in
+      snapshot / download.
+
     - Add support for returning testcases from a mapped directory path,
       including recursion through subdirectories of that path.  Currently,
       the implementation has the following issues:
