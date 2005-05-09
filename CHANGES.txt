@@ -2,6 +2,8 @@ Zelenium Product Changelog
 
   Zelenium-0.6 (2005/05/09)
 
+    - CVS tag:  'Zelenium-0_6'
+
     - Add support for returning testcases from a mapped directory path,
       including recursion through subdirectories of that path.  Currently,
       the implementation has the following issues:
