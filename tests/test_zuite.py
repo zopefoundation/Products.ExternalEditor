@@ -11,6 +11,7 @@ except ImportError:
     import Zope as Zope2
 Zope2.startup()
 try:
+    from transaction import begin  # in case we have an older version
     import transaction
 except ImportError:
     # BBB: for Zope 2.7
