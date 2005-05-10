@@ -78,6 +78,33 @@ _SUPPORT_FILES = dict( [ ( x, _makeFile( x, prefix=_SUPPORT_DIR ) )
 
 _MARKER = object()
 
+
+def _recurseFSTestCases( result, prefix, fsobjs ):
+
+    test_cases = dict( [ ( x.getId(), x )
+                            for x in fsobjs.get( 'testcases', () ) ] )
+    subdirs = fsobjs.get( 'subdirs', {} )
+
+    for name in fsobjs.get( 'ordered', [] ):
+
+        if name in test_cases:
+            test_case = test_cases[ name ]
+            name = test_case.getId()
+            path = '/'.join( prefix + ( name, ) )
+            result.append( { 'id' : name
+                            , 'title' : test_case.title_or_id()
+                            , 'url' : path
+                            , 'path' : path
+                            , 'test_case' : test_case
+                            } )
+
+        if name in subdirs:
+            info = subdirs[ name ]
+            _recurseFSTestCases( result
+                               , prefix + ( name, )
+                               , info
+                               )
+
 class Zuite( OrderedFolder ):
     """ TTW-manageable browser test suite
 
@@ -142,7 +169,8 @@ class Zuite( OrderedFolder ):
         if key in _SUPPORT_FILE_NAMES:
             return _SUPPORT_FILES[ key ].__of__( self )
 
-        proxy = _FilesystemProxy( self._listFilesystemObjects()
+        proxy = _FilesystemProxy( key
+                                , self._listFilesystemObjects()
                                 ).__of__( self )
 
         value = proxy.get( key, default )
@@ -176,37 +204,10 @@ class Zuite( OrderedFolder ):
 
         fsobjs = self._listFilesystemObjects()
 
-        self._recurseFSTestCases( result, prefix, fsobjs )
+        _recurseFSTestCases( result, prefix, fsobjs )
 
         return result
 
-
-    security.declarePrivate( '_recurseFSTestCases' )
-    def _recurseFSTestCases( self, result, prefix, fsobjs ):
-
-        test_cases = dict( [ ( x.getId(), x )
-                                for x in fsobjs.get( 'testcases', () ) ] )
-        subdirs = fsobjs.get( 'subdirs', {} )
-
-        for name in fsobjs.get( 'ordered', [] ):
-
-            if name in test_cases:
-                test_case = test_cases[ name ]
-                name = test_case.getId()
-                path = '/'.join( prefix + ( name, ) )
-                result.append( { 'id' : name
-                               , 'title' : test_case.title_or_id()
-                               , 'url' : path
-                               , 'path' : path
-                               , 'test_case' : test_case
-                               } )
-
-            if name in subdirs:
-                info = subdirs[ name ]
-                self._recurseFSTestCases( result
-                                        , prefix + ( name, )
-                                        , info
-                                        )
 
 
     security.declareProtected(ManageSeleniumTestCases, 'getZipFileName')
@@ -628,29 +629,47 @@ class _FilesystemProxy( Folder ):
 
     security = ClassSecurityInfo()
 
-    def __init__( self, fsobjs ):
+    def __init__( self, id, fsobjs ):
 
+        self._setId( id )
         self._fsobjs = fsobjs
+
+    def __getitem__( self, key ):
+
+        return self.get( key )
+
+    security.declareProtected( View, 'index_html' )
+    index_html = PageTemplateFile( 'suiteView', _WWW_DIR )
+
+    security.declareProtected( View, 'test_suite_html' )
+    test_suite_html = PageTemplateFile( 'suiteTests', _WWW_DIR )
 
     security.declareProtected( View, 'get' )
     def get( self, key, default=_MARKER ):
 
         for tc in self._fsobjs[ 'testcases' ]:
             if tc.getId() == key:
-                return tc.__of__( self )
+                return tc.__of__( self.aq_parent )
 
         if key in self._fsobjs[ 'subdirs' ]:
-            return self.__class__( self._fsobjs[ 'subdirs' ][ key ]
-                                 ).__of__( self )
+            return self.__class__( key, self._fsobjs[ 'subdirs' ][ key ]
+                                 ).__of__( self.aq_parent )
+
+        if key in _SUPPORT_FILE_NAMES:
+            return _SUPPORT_FILES[ key ].__of__( self )
 
         if default is not _MARKER:
             return default
 
         raise KeyError, key
 
-    def __getitem__( self, key ):
-
-        return self.get( key )
+    security.declareProtected( View, 'listTestCases' )
+    def listTestCases( self, prefix=() ):
+        """ Return a list of our contents which qualify as test cases.
+        """
+        result = []
+        _recurseFSTestCases( result, prefix, self._fsobjs )
+        return result
 
 InitializeClass( _FilesystemProxy )
 
