@@ -404,17 +404,25 @@ class DirectoryView (Persistent):
         self._properties = properties
 
     def __of__(self, parent):
-        info = _dirreg.getDirectoryInfo(self._dirpath)
+        dirpath = self._dirpath
+        info = _dirreg.getDirectoryInfo(dirpath)
         if info is None:
             # for DirectoryViews created with CMF versions before 1.5
             # this is basically the old minimalpath() code
-            self._dirpath = normalize(self._dirpath)
-            index = self._dirpath.rfind('Products')
+            dirpath = normalize(dirpath)
+            index = dirpath.rfind('Products')
             if index == -1:
-                index = self._dirpath.rfind('products')
+                index = dirpath.rfind('products')
             if index != -1:
-                self._dirpath = self._dirpath[index+len('products/'):]
-            info = _dirreg.getDirectoryInfo(self._dirpath)
+                dirpath = dirpath[index+len('products/'):]
+            info = _dirreg.getDirectoryInfo(dirpath)
+            if info is not None:
+                # update the directory view with a corrected path
+                self._dirpath = dirpath
+            else:
+                from warnings import warn
+                warn('DirectoryView %s refers to a non-existing path %s'
+                     % (self.id, dirpath), UserWarning)
         if info is None:
             data = {}
             objects = ()

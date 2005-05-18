@@ -105,8 +105,14 @@ class DirectoryViewPathTests( TestCase ):
     # Test we do nothing if given a really wacky path
     def test_UnhandleableExpandPath( self ):
         from tempfile import mktemp
-        self.ob.fake_skin.manage_properties(mktemp())
+        file = mktemp()
+        self.ob.fake_skin.manage_properties(file)
         self.assertEqual(self.ob.fake_skin.objectIds(),[])
+        # Check that a warning was raised.
+        from Products.CMFCore import DirectoryView
+        warnings = [t[0] for t in DirectoryView.__warningregistry__]
+        text = 'DirectoryView fake_skin refers to a non-existing path %s' % file
+        self.assert_(text in warnings)
 
     def test_UnhandleableMinimalPath( self ):
         from Products.CMFCore.utils import minimalpath, normalize
