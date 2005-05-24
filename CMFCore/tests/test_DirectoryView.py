@@ -112,6 +112,7 @@ class DirectoryViewPathTests( TestCase ):
         from Products.CMFCore import DirectoryView
         warnings = [t[0] for t in DirectoryView.__warningregistry__]
         text = 'DirectoryView fake_skin refers to a non-existing path %s' % file
+        text = text.replace('\\','/')
         self.assert_(text in warnings)
 
     def test_UnhandleableMinimalPath( self ):
@@ -168,7 +169,7 @@ class DirectoryViewTests( FSDVTest ):
 
     def test_surrogate_writethrough(self):
         # CMF Collector 316: It is possible to cause ZODB writes because
-        # setting attributes on the non-persistent surrogate writes them 
+        # setting attributes on the non-persistent surrogate writes them
         # into the persistent DirectoryView as well. This is bad in situations
         # where you only want to store markers and remove them before the
         # transaction has ended - they never got removed because there was
