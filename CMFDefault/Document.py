@@ -35,6 +35,8 @@ from Products.CMFCore.utils import keywordsplitter
 from DublinCore import DefaultDublinCoreImpl
 from exceptions import EditingConflict
 from exceptions import ResourceLockedError
+from interfaces.Document import IDocument
+from interfaces.Document import IMutableDocument
 from permissions import ModifyPortalContent
 from permissions import View
 from utils import _dtmldir
@@ -88,9 +90,9 @@ def addDocument(self, id, title='', description='', text_format='',
 class Document(PortalContent, DefaultDublinCoreImpl):
     """ A Document - Handles both StructuredText and HTML """
 
-    __implements__ = ( PortalContent.__implements__
-                     , DefaultDublinCoreImpl.__implements__
-                     )
+    __implements__ = (IDocument, IMutableDocument,
+                      PortalContent.__implements__,
+                      DefaultDublinCoreImpl.__implements__)
 
     meta_type = 'Document'
     effective_date = expiration_date = None
@@ -151,14 +153,14 @@ class Document(PortalContent, DefaultDublinCoreImpl):
         else:
             self.cooked_text = HTML(text, level=self._stx_level, header=0)
 
+    #
+    #   IMutableDocument method
+    #
+
     security.declareProtected(ModifyPortalContent, 'edit')
-    def edit( self
-            , text_format
-            , text
-            , file=''
-            , safety_belt=''
-            ):
-        """
+    def edit(self, text_format, text, file='', safety_belt=''):
+        """ Update the document.
+
         To add webDav support, we need to check if the content is locked, and if
         so return ResourceLockedError if not, call _edit.
 
@@ -277,6 +279,11 @@ class Document(PortalContent, DefaultDublinCoreImpl):
         return 1
 
     ### Content accessor methods
+
+    #
+    #   IContentish method
+    #
+
     security.declareProtected(View, 'SearchableText')
     def SearchableText(self):
         """ Used by the catalog for basic full text indexing """
@@ -285,9 +292,14 @@ class Document(PortalContent, DefaultDublinCoreImpl):
                             , self.EditableBody()
                             )
 
+    #
+    #   IDocument methods
+    #
+
     security.declareProtected(View, 'CookedBody')
     def CookedBody(self, stx_level=None, setlevel=0):
-        """\
+        """ Get the "cooked" (ready for presentation) form of the text.
+
         The prepared basic rendering of an object.  For Documents, this
         means pre-rendered structured text, or what was between the
         <BODY> tags of HTML.
@@ -310,11 +322,16 @@ class Document(PortalContent, DefaultDublinCoreImpl):
 
     security.declareProtected(View, 'EditableBody')
     def EditableBody(self):
-        """\
+        """ Get the "raw" (as edited) form of the text.
+
         The editable body of text.  This is the raw structured text, or
         in the case of HTML, what was between the <BODY> tags.
         """
         return self.text
+
+    #
+    #   IDublinCore method
+    #
 
     security.declareProtected(View, 'Format')
     def Format(self):
@@ -324,6 +341,10 @@ class Document(PortalContent, DefaultDublinCoreImpl):
             return 'text/html'
         else:
             return 'text/plain'
+
+    #
+    #   IMutableDublinCore method
+    #
 
     security.declareProtected(ModifyPortalContent, 'setFormat')
     def setFormat(self, format):
@@ -354,7 +375,6 @@ class Document(PortalContent, DefaultDublinCoreImpl):
 
     ## FTP handlers
     security.declareProtected(ModifyPortalContent, 'PUT')
-
     def PUT(self, REQUEST, RESPONSE):
         """ Handle HTTP (and presumably FTP?) PUT requests """
         self.dav__init(REQUEST, RESPONSE)

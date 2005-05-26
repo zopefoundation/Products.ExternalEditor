@@ -19,7 +19,6 @@ from unittest import TestSuite, makeSuite, main
 import Testing
 import Zope
 Zope.startup()
-from Interface.Verify import verifyClass
 
 from os.path import abspath
 from os.path import dirname
@@ -360,7 +359,8 @@ class DocumentTests(RequestTestBase):
         self.assertEqual( d.Format(), 'text/plain' )
         self.assertEqual( d.text_format, 'structured-text' )
 
-    def test_interface(self):
+    def test_z2interfaces(self):
+        from Interface.Verify import verifyClass
         from Products.CMFCore.interfaces.Dynamic \
                 import DynamicType as IDynamicType
         from Products.CMFCore.interfaces.Contentish \
@@ -372,12 +372,16 @@ class DocumentTests(RequestTestBase):
         from Products.CMFCore.interfaces.DublinCore \
                 import MutableDublinCore as IMutableDublinCore
         from Products.CMFDefault.Document import Document
+        from Products.CMFDefault.interfaces.Document import IDocument
+        from Products.CMFDefault.interfaces.Document import IMutableDocument
 
         verifyClass(IDynamicType, Document)
         verifyClass(IContentish, Document)
         verifyClass(IDublinCore, Document)
         verifyClass(ICatalogableDublinCore, Document)
         verifyClass(IMutableDublinCore, Document)
+        verifyClass(IDocument, Document)
+        verifyClass(IMutableDocument, Document)
 
 
 class DocumentFTPGetTests(RequestTestBase):
