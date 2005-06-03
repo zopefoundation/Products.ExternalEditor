@@ -76,6 +76,8 @@ class CMFCatalogAware(Base):
         if catalog is not None:
             catalog.reindexObject(self, idxs=idxs)
 
+    _cmf_security_indexes = ('allowedRolesAndUsers',)
+
     security.declareProtected(ModifyPortalContent, 'reindexObjectSecurity')
     def reindexObjectSecurity(self, skip_self=False):
         """
@@ -103,13 +105,13 @@ class CMFCatalogAware(Base):
                         "Cannot get %s from catalog" % brain_path)
                     continue
                 s = getattr(ob, '_p_changed', 0)
-                catalog.reindexObject(ob, idxs=['allowedRolesAndUsers'],
+                catalog.reindexObject(ob, idxs=self._cmf_security_indexes,
                                       update_metadata=0)
                 if s is None: ob._p_deactivate()
             # Reindex the object itself in here if not explicitly
             # asked to not to
             if not skip_self:
-                catalog.reindexObject(self, idxs=['allowedRolesAndUsers'],
+                catalog.reindexObject(self, idxs=self._cmf_security_indexes,
                                       update_metadata=0)
 
     # Workflow methods

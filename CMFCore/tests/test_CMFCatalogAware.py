@@ -147,9 +147,9 @@ class CMFCatalogAwareTests(unittest.TestCase):
         l = list(cat.log)
         l.sort()
         self.assertEquals(l, [
-            "reindex /site/foo ['allowedRolesAndUsers']",
-            "reindex /site/foo/bar ['allowedRolesAndUsers']",
-            "reindex /site/foo/hop ['allowedRolesAndUsers']",
+            "reindex /site/foo ('allowedRolesAndUsers',)",
+            "reindex /site/foo/bar ('allowedRolesAndUsers',)",
+            "reindex /site/foo/hop ('allowedRolesAndUsers',)",
             ])
         self.failIf(foo.notified)
         self.failIf(bar.notified)
@@ -168,9 +168,9 @@ class CMFCatalogAwareTests(unittest.TestCase):
         l = list(cat.log)
         l.sort()
         self.assertEquals(l, [
-            "reindex /site/foo ['allowedRolesAndUsers']",
-            "reindex /site/foo/bar ['allowedRolesAndUsers']",
-            "reindex /site/foo/hop ['allowedRolesAndUsers']",
+            "reindex /site/foo ('allowedRolesAndUsers',)",
+            "reindex /site/foo/bar ('allowedRolesAndUsers',)",
+            "reindex /site/foo/hop ('allowedRolesAndUsers',)",
             ])
         self.failIf(foo.notified)
         self.failIf(bar.notified)
@@ -194,7 +194,7 @@ class CMFCatalogAwareTests(unittest.TestCase):
         cat.setObs([foo, missing])
         foo.reindexObjectSecurity()
         self.assertEquals(cat.log,
-                          ["reindex /site/foo ['allowedRolesAndUsers']"])
+                          ["reindex /site/foo ('allowedRolesAndUsers',)"])
         self.failIf(foo.notified)
         self.failIf(missing.notified)
 
@@ -208,7 +208,7 @@ class CMFCatalogAwareTests(unittest.TestCase):
         cat.setObs([foo, missing])
         foo.reindexObjectSecurity()
         self.assertEquals(cat.log,
-                          ["reindex /site/foo ['allowedRolesAndUsers']"])
+                          ["reindex /site/foo ('allowedRolesAndUsers',)"])
         self.failIf(foo.notified)
         self.failIf(missing.notified)
 
