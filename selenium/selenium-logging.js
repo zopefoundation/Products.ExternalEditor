@@ -72,3 +72,17 @@ Logger.prototype.log = function(message, className) {
     this.logList.appendChild(loggingNode);
     this.show();
 };
+
+function noop() {};
+
+function DummyLogger() {
+};
+
+DummyLogger.prototype.show = noop;
+DummyLogger.prototype.hide = noop;
+DummyLogger.prototype.clear = noop;
+DummyLogger.prototype.log = noop;
+DummyLogger.prototype.debug = noop;
+DummyLogger.prototype.info = noop;
+DummyLogger.prototype.warn = noop;
+DummyLogger.prototype.error = noop;

@@ -43,6 +43,14 @@
          src="selenium-domviewer.js"
          tal:attributes="src string:${URL}/selenium-domviewer.js"
          ></script>
+ <script language="JavaScript" type="text/javascript"
+         src="xpath.js"
+         tal:attributes="src string:${URL}/xpath.js"
+         ></script>
+ <script language="JavaScript" type="text/javascript"
+         src="user-extensions.js"
+         tal:attributes="src string:${URL}/user-extensions.js"
+         ></script>
  <link rel="stylesheet" type="text/css" href="selenium.css"
        tal:attributes="href string:${URL}/selenium.css" />
 </head>

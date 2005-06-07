@@ -1,5 +1,15 @@
 Zelenium Product Changelog
 
+  After Zelenium-0.6 (2005/05/09)
+
+    - Upgrade to use the Selenium "core application" from Selenium 0.4.0.
+      See http://selenium.thoughtworks.com/release-notes.html for a summary
+      of changes.
+
+      o **N.B.**:  the semantics of 'click' have changed;  that command
+        no longer waits by default, and the 'nowait' modifier is no longer
+        meaningful.  Use 'clickAndWait' to get the desired semantics.
+
   Zelenium-0.6 (2005/05/09)
 
     - CVS tag:  'Zelenium-0_6'
