@@ -24,10 +24,6 @@
          tal:attributes="src string:${URL}/selenium-executionloop.js"
          ></script>
  <script language="JavaScript" type="text/javascript"
-         src="selenium-executioncontext.js"
-         tal:attributes="src string:${URL}/selenium-executioncontext.js"
-         ></script>
- <script language="JavaScript" type="text/javascript"
          src="selenium-fitrunner.js"
          tal:attributes="src string:${URL}/selenium-fitrunner.js"
          ></script>
@@ -58,7 +54,7 @@
 <body onLoad="start();">
 
  <table class="layout">
- <form action="">
+ <form action="" name="controlPanel">
 
   <!-- Suite, Test, Control Panel -->
 
@@ -86,7 +82,7 @@
   </tr>
 
   <tr class="selenium">
-   <td width="25%" height="30%" id="controlPanel">
+   <td width="15%" height="30%" id="controlPanel">
 
      <table id="controls">
 
