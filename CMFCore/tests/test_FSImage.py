@@ -124,6 +124,35 @@ class FSImageTests( RequestTest, FSDVTest):
         self.assertEqual(headers['test_path'], '/test_image')
 
 
+    def test_index_html_with_304_and_caching( self ):
+
+        # See collector #355
+        self.root.caching_policy_manager = DummyCachingManager()
+        original_len = len(self.RESPONSE.headers)
+        path, ref = self._extractFile()
+
+        import os
+        from webdav.common import rfc1123_date
+
+        mod_time = os.stat( path )[ 8 ]
+
+        image = self._makeOne( 'test_image', 'test_image.gif' )
+        image = image.__of__( self.root )
+
+        self.REQUEST.environ[ 'IF_MODIFIED_SINCE'
+                            ] = '%s;' % rfc1123_date( mod_time+3600 )
+
+        data = image.index_html( self.REQUEST, self.RESPONSE )
+
+        self.assertEqual( data, '' )
+        self.assertEqual( self.RESPONSE.getStatus(), 304 )
+
+        headers = self.RESPONSE.headers
+        self.failUnless(len(headers) >= original_len + 3)
+        self.failUnless('foo' in headers.keys())
+        self.failUnless('bar' in headers.keys())
+        self.assertEqual(headers['test_path'], '/test_image')
+
 def test_suite():
     return unittest.TestSuite((
         unittest.makeSuite(FSImageTests),

@@ -25,6 +25,9 @@ HEAD only (unreleased)
 
   Bug Fixes
 
+    - Set cache headers in 304 responses from FSImage / FSFile
+      (http://zope.org/Collectors/355)
+
     - DublinCore and PortalFolder: Changed fallback in 'Type' method.
       The fallback is only necessary if the related type info is missing.
 
