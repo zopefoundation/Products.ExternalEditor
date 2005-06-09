@@ -2,6 +2,9 @@ HEAD only (unreleased)
 
   New Features
 
+    - CMFDefault skins: Added members_delete_form.
+      This adds a confirmation step to avoid accidental deletion of members.
+
     - DirectoryView and derived classes can now have metadata associated with
       them just like regular FSObject-derived objects can.
 

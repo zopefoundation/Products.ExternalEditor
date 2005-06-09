@@ -11,8 +11,8 @@ mtool = getToolByName(script, 'portal_membership')
 form = context.REQUEST.form
 if members_delete and \
         context.validateMemberIds(**form) and \
-        context.members_delete_control(**form) and \
-        context.setRedirect(atool, 'global/manage_members', b_start=b_start):
+        context.setRedirect(atool, 'global/members_delete', b_start=b_start,
+                            ids=ids):
     return
 elif members_new and \
         context.setRedirect(atool, 'user/join', b_start=b_start):
@@ -47,7 +47,7 @@ for name, value in html_marshal(b_start=b_start):
 buttons = []
 buttons.append( {'name': 'members_new', 'value': 'New...'} )
 if items:
-    buttons.append( {'name': 'members_delete', 'value': 'Delete'} )
+    buttons.append( {'name': 'members_delete', 'value': 'Delete...'} )
 options['form'] = { 'action': target,
                     'listHiddenVarInfos': tuple(hidden_vars),
                     'listButtonInfos': tuple(buttons) }

@@ -137,6 +137,16 @@
    <element value="Manage users" /></property>
   <property name="visible">True</property>
  </object>
+ <object name="members_delete" meta_type="CMF Action">
+  <property name="title">Delete members</property>
+  <property name="description">Delete portal members</property>
+  <property name="url_expr">string:${portal_url}/members_delete_form</property>
+  <property name="icon_expr"></property>
+  <property name="available_expr"></property>
+  <property name="permissions">
+   <element value="Manage users" /></property>
+  <property name="visible">False</property>
+ </object>
  <object name="undo" meta_type="CMF Action">
   <property name="title">Undo</property>
   <property name="description"></property>
