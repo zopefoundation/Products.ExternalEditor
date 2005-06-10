@@ -139,7 +139,7 @@ _FIXED_PROPERTY_EXPORT = """\
 <dummy>
 %s
 </dummy>
-""" % _NORMAL_PROPERTY_NODES
+""" % _FIXED_PROPERTY_NODES
 
 _NORMAL_OBJECT_EXPORT = """\
 <?xml version="1.0"?>
