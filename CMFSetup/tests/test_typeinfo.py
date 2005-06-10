@@ -39,393 +39,372 @@ class DummyTypeInfo(SimpleItem):
     pass
 
 
-class DummyTypesTool( Folder ):
+class DummyTypesTool(Folder):
 
-    def __init__( self, type_infos ):
+    def __init__(self, type_infos):
 
         self._type_infos = type_infos
+        for id, obj in [(x['id'], DummyTypeInfo(x))
+                        for x in type_infos]:
+            self._setObject(id, obj)
 
-        for id, obj in [ ( x[ 'id' ], DummyTypeInfo( x ) )
-                            for x in type_infos ]:
-            self._setObject( id, obj )
+    def listContentTypes(self):
 
-    def listContentTypes( self ):
+        return [x['id'] for x in self._type_infos]
 
-        return [ x[ 'id' ] for x in self._type_infos ]
+    def getTypeInfo(self, id):
 
-    def getTypeInfo( self, id ):
-
-        info = [ x for x in self._type_infos if x[ 'id' ] == id ]
-
-        if len( info ) == 0:
+        info = [x for x in self._type_infos if x['id'] == id]
+        if len(info) == 0:
             raise KeyError, id
-
-        info = info[ 0 ]
+        info = info[0]
 
         if 'product' in info.keys():
-            return FactoryTypeInformation( **info )
+            return FactoryTypeInformation(**info)
         else:
-            return ScriptableTypeInformation( **info )
+            return ScriptableTypeInformation(**info)
 
-class _TypeInfoSetup( BaseRegistryTests ):
+class _TypeInfoSetup(BaseRegistryTests):
 
-    def _initSite( self, type_infos=() ):
+    def _initSite(self, type_infos=()):
 
-        self.root.site = Folder( id='site' )
-
-        self.root.site.portal_types = DummyTypesTool( type_infos )
-
+        self.root.site = Folder(id='site')
+        self.root.site.portal_types = DummyTypesTool(type_infos)
         return self.root.site
 
-class TypesToolConfiguratorTests( _TypeInfoSetup ):
+class TypesToolConfiguratorTests(_TypeInfoSetup):
 
-    def _getTargetClass( self ):
+    def _getTargetClass(self):
 
         from Products.CMFSetup.typeinfo import TypesToolConfigurator
         return TypesToolConfigurator
 
-    def test_listTypeInfo_empty( self ):
+    def test_listTypeInfo_empty(self):
 
         site = self._initSite()
-        configurator = self._makeOne( site ).__of__( site )
+        configurator = self._makeOne(site).__of__(site)
 
-        self.assertEqual( len( configurator.listTypeInfo() ), 0 )
+        self.assertEqual(len(configurator.listTypeInfo()), 0)
 
-    def test_listTypeInfo_filled ( self ):
+    def test_listTypeInfo_filled (self):
 
-        site = self._initSite( _TI_LIST )
-        configurator = self._makeOne( site ).__of__( site )
+        site = self._initSite(_TI_LIST)
+        configurator = self._makeOne(site).__of__(site)
 
-        self.assertEqual( len( configurator.listTypeInfo() ), len( _TI_LIST ) )
+        self.assertEqual(len(configurator.listTypeInfo()), len(_TI_LIST))
 
         info_list = configurator.listTypeInfo()
-        self.assertEqual( len( info_list ), len( _TI_LIST ) )
+        self.assertEqual(len(info_list), len(_TI_LIST))
 
         _marker = object()
 
-        for i in range( len( _TI_LIST ) ):
-            found = info_list[ i ]
-            expected = _TI_LIST[ i ]
-            self.assertEqual( found[ 'id' ], expected[ 'id' ] )
-            self.failUnless( found.get( 'filename', _marker ) is _marker )
+        for i in range(len(_TI_LIST)):
+            found = info_list[i]
+            expected = _TI_LIST[i]
+            self.assertEqual(found['id'], expected['id'])
+            self.failUnless(found.get('filename', _marker) is _marker)
 
-    def test_listTypeInfo_with_filename ( self ):
+    def test_listTypeInfo_with_filename (self):
 
-        site = self._initSite( _TI_LIST_WITH_FILENAME )
-        configurator = self._makeOne( site ).__of__( site )
+        site = self._initSite(_TI_LIST_WITH_FILENAME)
+        configurator = self._makeOne(site).__of__(site)
 
         info_list = configurator.listTypeInfo()
-        self.assertEqual( len( info_list ), len( _TI_LIST_WITH_FILENAME ) )
+        self.assertEqual(len(info_list), len(_TI_LIST_WITH_FILENAME))
 
-        for i in range( len( _TI_LIST_WITH_FILENAME ) ):
-            found = info_list[ i ]
-            expected = _TI_LIST_WITH_FILENAME[ i ]
-            self.assertEqual( found[ 'id' ], expected[ 'id' ] )
-            self.assertEqual( found[ 'filename' ]
-                            , 'types/%s.xml'
-                                % expected[ 'id' ].replace( ' ', '_' )
-                            )
+        for i in range(len(_TI_LIST_WITH_FILENAME)):
+            found = info_list[i]
+            expected = _TI_LIST_WITH_FILENAME[i]
+            self.assertEqual(found['id'], expected['id'])
+            self.assertEqual(found['filename'],
+                             'types/%s.xml'
+                             % expected['id'].replace(' ', '_')
+                             )
 
-    def test_generateXML_empty( self ):
-
-        site = self._initSite()
-        configurator = self._makeOne( site ).__of__( site )
-        self._compareDOM( configurator.generateXML(), _EMPTY_TOOL_EXPORT )
-
-    def test_generateXML_normal( self ):
-
-        site = self._initSite( _TI_LIST )
-        configurator = self._makeOne( site ).__of__( site )
-        self._compareDOM( configurator.generateXML(), _NORMAL_TOOL_EXPORT )
-
-    def test_generateXML_explicit_filename( self ):
-
-        site = self._initSite( _TI_LIST_WITH_FILENAME )
-        configurator = self._makeOne( site ).__of__( site )
-        self._compareDOM( configurator.generateXML(), _FILENAME_EXPORT )
-
-    def test_parseXML_empty( self ):
+    def test_generateXML_empty(self):
 
         site = self._initSite()
-        configurator = self._makeOne( site ).__of__( site )
+        configurator = self._makeOne(site).__of__(site)
+        self._compareDOM(configurator.generateXML(), _EMPTY_TOOL_EXPORT)
 
-        tool_info = configurator.parseXML( _EMPTY_TOOL_EXPORT )
-        self.assertEqual( len( tool_info[ 'types' ] ), 0 )
+    def test_generateXML_normal(self):
 
-    def test_parseXML_normal( self ):
+        site = self._initSite(_TI_LIST)
+        configurator = self._makeOne(site).__of__(site)
+        self._compareDOM(configurator.generateXML(), _NORMAL_TOOL_EXPORT)
 
-        site = self._initSite()
-        configurator = self._makeOne( site ).__of__( site )
+    def test_generateXML_explicit_filename(self):
 
-        tool_info = configurator.parseXML( _NORMAL_TOOL_EXPORT )
-        self.assertEqual( len( tool_info[ 'types' ] ), 2 )
+        site = self._initSite(_TI_LIST_WITH_FILENAME)
+        configurator = self._makeOne(site).__of__(site)
+        self._compareDOM(configurator.generateXML(), _FILENAME_EXPORT)
 
-        type_info = tool_info[ 'types' ][ 0 ]
-        self.assertEqual( type_info[ 'id' ], 'foo' )
-        self.assertEqual( type_info[ 'filename' ], 'types/foo.xml' )
-        type_info = tool_info[ 'types' ][ 1 ]
-        self.assertEqual( type_info[ 'id' ], 'bar' )
-        self.assertEqual( type_info[ 'filename' ], 'types/bar.xml' )
-
-    def test_parseXML_with_filename( self ):
+    def test_parseXML_empty(self):
 
         site = self._initSite()
-        configurator = self._makeOne( site ).__of__( site )
+        configurator = self._makeOne(site).__of__(site)
 
-        tool_info = configurator.parseXML( _FILENAME_EXPORT )
-        self.assertEqual( len( tool_info[ 'types' ] ), 2 )
+        tool_info = configurator.parseXML(_EMPTY_TOOL_EXPORT)
+        self.assertEqual(len(tool_info['types']), 0)
 
-        type_info = tool_info[ 'types' ][ 0 ]
-        self.assertEqual( type_info[ 'id' ], 'foo object' )
-        self.assertEqual( type_info[ 'filename' ], 'types/foo_object.xml' )
-        type_info = tool_info[ 'types' ][ 1 ]
-        self.assertEqual( type_info[ 'id' ], 'bar object' )
-        self.assertEqual( type_info[ 'filename' ], 'types/bar_object.xml' )
+    def test_parseXML_normal(self):
+
+        site = self._initSite()
+        configurator = self._makeOne(site).__of__(site)
+
+        tool_info = configurator.parseXML(_NORMAL_TOOL_EXPORT)
+        self.assertEqual(len(tool_info['types']), 2)
+
+        type_info = tool_info['types'][0]
+        self.assertEqual(type_info['id'], 'foo')
+        self.assertEqual(type_info['filename'], 'types/foo.xml')
+        type_info = tool_info['types'][1]
+        self.assertEqual(type_info['id'], 'bar')
+        self.assertEqual(type_info['filename'], 'types/bar.xml')
+
+    def test_parseXML_with_filename(self):
+
+        site = self._initSite()
+        configurator = self._makeOne(site).__of__(site)
+
+        tool_info = configurator.parseXML(_FILENAME_EXPORT)
+        self.assertEqual(len(tool_info['types']), 2)
+
+        type_info = tool_info['types'][0]
+        self.assertEqual(type_info['id'], 'foo object')
+        self.assertEqual(type_info['filename'], 'types/foo_object.xml')
+        type_info = tool_info['types'][1]
+        self.assertEqual(type_info['id'], 'bar object')
+        self.assertEqual(type_info['filename'], 'types/bar_object.xml')
 
 
-class TypeInfoConfiguratorTests( _TypeInfoSetup ):
+class TypeInfoConfiguratorTests(_TypeInfoSetup):
 
-    def _getTargetClass( self ):
+    def _getTargetClass(self):
 
         from Products.CMFSetup.typeinfo import TypeInfoConfigurator
         return TypeInfoConfigurator
 
-    def test_getTypeInfo_nonesuch( self ):
+    def test_getTypeInfo_nonesuch(self):
 
-        site = self._initSite( _TI_LIST )
-        configurator = self._makeOne( site ).__of__( site )
+        site = self._initSite(_TI_LIST)
+        configurator = self._makeOne(site).__of__(site)
 
-        self.assertRaises( ValueError, configurator.getTypeInfo, 'qux' )
+        self.assertRaises(ValueError, configurator.getTypeInfo, 'qux')
 
-    def test_getTypeInfo_FTI( self ):
+    def test_getTypeInfo_FTI(self):
 
-        site = self._initSite( _TI_LIST )
-        configurator = self._makeOne( site ).__of__( site )
-        found = configurator.getTypeInfo( 'foo' )
-        expected = _TI_LIST[ 0 ]
+        site = self._initSite(_TI_LIST)
+        configurator = self._makeOne(site).__of__(site)
+        found = configurator.getTypeInfo('foo')
+        expected = _TI_LIST[0]
 
-        for key in ( 'id'
-                   , 'title'
-                   , 'description'
-                   , 'factory'
-                   , 'product'
-                   , 'factory'
-                   , 'immediate_view'
-                   , 'filter_content_types'
-                   , 'allowed_content_types'
-                   , 'allow_discussion'
-                   , 'global_allow'
-                   , 'aliases'
-                   ):
-            self.assertEqual( found[ key ], expected[ key ] )
+        for key in ('id',
+                    'title',
+                    'description',
+                    'factory',
+                    'product',
+                    'factory',
+                    'immediate_view',
+                    'filter_content_types',
+                    'allowed_content_types',
+                    'allow_discussion',
+                    'global_allow',
+                    'aliases',
+                    ):
+            self.assertEqual(found[key], expected[key])
 
-        for lkey, rkey in ( ( 'meta_type', 'content_meta_type' )
-                          , ( 'icon', 'content_icon' )
-                          ):
-            self.assertEqual( found[ lkey ], expected[ rkey ] )
+        for lkey, rkey in (('meta_type', 'content_meta_type'),
+                           ('icon', 'content_icon'),
+                           ):
+            self.assertEqual(found[lkey], expected[rkey])
 
-        self.assertEqual( len( found[ 'actions' ] )
-                        , len( expected[ 'actions' ] )
-                        )
+        self.assertEqual(len(found['actions']), len(expected['actions']))
 
-        for i in range( len( expected[ 'actions' ] ) ):
+        for i in range(len(expected['actions'])):
 
-            a_expected = expected[ 'actions' ][ i ]
-            a_found = found[ 'actions' ][ i ]
+            a_expected = expected['actions'][i]
+            a_found = found['actions'][i]
 
-            for k in ( 'id'
-                     , 'action'
-                     , 'permissions'
-                     ):
-                self.assertEqual( a_expected[ k ], a_found[ k ] )
+            for k in ('id', 'action', 'permissions'):
+                self.assertEqual(a_expected[k], a_found[k])
 
-            for lk, rk in ( ( 'name', 'title' )
-                          ,
-                          ):
-                self.assertEqual( a_expected[ lk ], a_found[ rk ] )
+            for lk, rk in (('name', 'title'),):
+                self.assertEqual(a_expected[lk], a_found[rk])
 
-    def test_getTypeInfo_STI( self ):
+    def test_getTypeInfo_STI(self):
 
-        site = self._initSite( _TI_LIST )
-        configurator = self._makeOne( site ).__of__( site )
-        found = configurator.getTypeInfo( 'bar' )
-        expected = _TI_LIST[ 1 ]
+        site = self._initSite(_TI_LIST)
+        configurator = self._makeOne(site).__of__(site)
+        found = configurator.getTypeInfo('bar')
+        expected = _TI_LIST[1]
 
-        for key in ( 'id'
-                   , 'title'
-                   , 'description'
-                   , 'constructor_path'
-                   , 'permission'
-                   , 'immediate_view'
-                   , 'filter_content_types'
-                   , 'allowed_content_types'
-                   , 'allow_discussion'
-                   , 'global_allow'
-                   , 'aliases'
-                   ):
-            self.assertEqual( found[ key ], expected[ key ] )
+        for key in ('id',
+                    'title',
+                    'description',
+                    'constructor_path',
+                    'permission',
+                    'immediate_view',
+                    'filter_content_types',
+                    'allowed_content_types',
+                    'allow_discussion',
+                    'global_allow',
+                    'aliases',
+                    ):
+            self.assertEqual(found[key], expected[key])
 
-        for lkey, rkey in ( ( 'meta_type', 'content_meta_type' )
-                          , ( 'icon', 'content_icon' )
-                          ):
-            self.assertEqual( found[ lkey ], expected[ rkey ] )
+        for lkey, rkey in (('meta_type', 'content_meta_type'),
+                           ('icon', 'content_icon'),
+                           ):
+            self.assertEqual(found[lkey], expected[rkey])
 
-        self.assertEqual( len( found[ 'actions' ] )
-                        , len( expected[ 'actions' ] )
-                        )
+        self.assertEqual(len(found['actions']), len(expected['actions']))
 
-        for i in range( len( expected[ 'actions' ] ) ):
+        for i in range(len(expected['actions'])):
 
-            a_expected = expected[ 'actions' ][ i ]
-            a_found = found[ 'actions' ][ i ]
+            a_expected = expected['actions'][i]
+            a_found = found['actions'][i]
 
-            for k in ( 'id'
-                     , 'action'
-                     , 'permissions'
-                     ):
-                self.assertEqual( a_expected[ k ], a_found[ k ] )
+            for k in ('id', 'action', 'permissions'):
+                self.assertEqual(a_expected[k], a_found[k])
 
-            for lk, rk in ( ( 'name', 'title' )
-                          ,
-                          ):
-                self.assertEqual( a_expected[ lk ], a_found[ rk ] )
+            for lk, rk in (('name', 'title'),):
+                self.assertEqual(a_expected[lk], a_found[rk])
 
-    def test_generateXML_FTI( self ):
+    def test_generateXML_FTI(self):
 
-        site = self._initSite( _TI_LIST )
-        configurator = self._makeOne( site ).__of__( site )
-        self._compareDOM( configurator.generateXML( type_id='foo' )
-                        , _FOO_EXPORT % 'foo' )
+        site = self._initSite(_TI_LIST)
+        configurator = self._makeOne(site).__of__(site)
+        self._compareDOM(configurator.generateXML(type_id='foo'),
+                         _FOO_EXPORT % 'foo')
 
-    def test_generateXML_STI( self ):
+    def test_generateXML_STI(self):
 
-        site = self._initSite( _TI_LIST )
-        configurator = self._makeOne( site ).__of__( site )
-        self._compareDOM( configurator.generateXML( type_id='bar' )
-                        , _BAR_EXPORT % 'bar' )
+        site = self._initSite(_TI_LIST)
+        configurator = self._makeOne(site).__of__(site)
+        self._compareDOM(configurator.generateXML(type_id='bar'),
+                         _BAR_EXPORT % 'bar')
 
-    def test_parseXML_FTI( self ):
+    def test_parseXML_FTI(self):
 
         site = self._initSite()
         tool = site.portal_types
-        configurator = self._makeOne( site ).__of__( site )
-        self.assertEqual( len( tool.objectIds() ), 0 )
+        configurator = self._makeOne(site).__of__(site)
+        self.assertEqual(len(tool.objectIds()), 0)
 
-        info = configurator.parseXML( _FOO_EXPORT % 'foo' )
+        info = configurator.parseXML(_FOO_EXPORT % 'foo')
 
-        self.assertEqual( info[ 'id' ], 'foo' )
-        self.assertEqual( info[ 'title' ], 'Foo' )
-        self.assertEqual( len( info[ 'aliases' ] ), 2 )
+        self.assertEqual(info['id'], 'foo')
+        self.assertEqual(info['title'], 'Foo')
+        self.assertEqual(len(info['aliases']), 2)
 
-    def test_parseXML_STI( self ):
-
-        site = self._initSite()
-        tool = site.portal_types
-        configurator = self._makeOne( site ).__of__( site )
-        self.assertEqual( len( tool.objectIds() ), 0 )
-
-        info = configurator.parseXML( _BAR_EXPORT % 'bar' )
-
-        self.assertEqual( info[ 'id' ], 'bar' )
-        self.assertEqual( info[ 'title' ], 'Bar' )
-        self.assertEqual( len( info[ 'aliases' ] ), 2 )
-
-    def test_parseXML_actions( self ):
+    def test_parseXML_STI(self):
 
         site = self._initSite()
         tool = site.portal_types
-        configurator = self._makeOne( site ).__of__( site )
+        configurator = self._makeOne(site).__of__(site)
+        self.assertEqual(len(tool.objectIds()), 0)
 
-        info = configurator.parseXML( _FOO_EXPORT % 'foo' )
+        info = configurator.parseXML(_BAR_EXPORT % 'bar')
 
-        action_info_list = info[ 'actions' ]
-        self.assertEqual( len( action_info_list ), 3 )
+        self.assertEqual(info['id'], 'bar')
+        self.assertEqual(info['title'], 'Bar')
+        self.assertEqual(len(info['aliases']), 2)
 
-        action_info = action_info_list[ 0 ]
-        self.assertEqual( action_info[ 'id' ], 'view' )
-        self.assertEqual( action_info[ 'title' ], 'View' )
-        self.assertEqual( action_info[ 'permissions' ], ( 'View', ) )
+    def test_parseXML_actions(self):
+
+        site = self._initSite()
+        tool = site.portal_types
+        configurator = self._makeOne(site).__of__(site)
+
+        info = configurator.parseXML(_FOO_EXPORT % 'foo')
+
+        action_info_list = info['actions']
+        self.assertEqual(len(action_info_list), 3)
+
+        action_info = action_info_list[0]
+        self.assertEqual(action_info['id'], 'view')
+        self.assertEqual(action_info['title'], 'View')
+        self.assertEqual(action_info['permissions'], ('View',))
 
 
-_TI_LIST = ( { 'id'                     : 'foo'
-             , 'title'                  : 'Foo'
-             , 'description'            : 'Foo things'
-             , 'content_meta_type'      : 'Foo Thing'
-             , 'content_icon'           : 'foo.png'
-             , 'product'                : 'CMFSetup'
-             , 'factory'                : 'addFoo'
-             , 'immediate_view'         : 'foo_view'
-             , 'filter_content_types'   : False
-             , 'allowed_content_types'  : ()
-             , 'allow_discussion'       : False
-             , 'global_allow'           : False
-             , 'aliases'                : { '(Default)' : 'foo_view'
-                                          , 'view'      : 'foo_view'
-                                          }
-             , 'actions'        :
-                ( { 'id'            : 'view'
-                  , 'name'          : 'View'
-                  , 'action': 'string:${object_url}/foo_view'
-                  , 'permissions'   : (View,)
-                  }
-                , { 'id'            : 'edit'
-                  , 'name'          : 'Edit'
-                  , 'action': 'string:${object_url}/foo_edit_form'
-                  , 'permissions'   : (ModifyPortalContent,)
-                  }
-                , { 'id'            : 'metadata'
-                  , 'name'          : 'Metadata'
-                  , 'action': 'string:${object_url}/metadata_edit_form'
-                  , 'permissions'   : (ModifyPortalContent,)
-                  }
-                )
-             }
-           , { 'id'                     : 'bar'
-             , 'title'                  : 'Bar'
-             , 'description'            : 'Bar things'
-             , 'content_meta_type'      : 'Bar Thing'
-             , 'content_icon'           : 'bar.png'
-             , 'constructor_path'       : 'make_bar'
-             , 'permission'             : 'Add portal content'
-             , 'immediate_view'         : 'bar_view'
-             , 'filter_content_types'   : True
-             , 'allowed_content_types'  : ( 'foo', )
-             , 'allow_discussion'       : True
-             , 'global_allow'           : True
-             , 'aliases'                : { '(Default)' : 'bar_view'
-                                          , 'view'      : 'bar_view'
-                                          }
-             , 'actions'        :
-                ( { 'id'            : 'view'
-                  , 'name'          : 'View'
-                  , 'action': 'string:${object_url}/bar_view'
-                  , 'permissions'   : (View,)
-                  }
-                , { 'id'            : 'edit'
-                  , 'name'          : 'Edit'
-                  , 'action': 'string:${object_url}/bar_edit_form'
-                  , 'permissions'   : (ModifyPortalContent,)
-                  }
-                , { 'id'            : 'contents'
-                  , 'name'          : 'Contents'
-                  , 'action': 'string:${object_url}/folder_contents'
-                  , 'permissions'   : (AccessContentsInformation,)
-                  }
-                , { 'id'            : 'metadata'
-                  , 'name'          : 'Metadata'
-                  , 'action': 'string:${object_url}/metadata_edit_form'
-                  , 'permissions'   : (ModifyPortalContent,)
-                  }
-                )
-             }
-           )
+_TI_LIST = ({
+    'id':                    'foo',
+    'title':                 'Foo',
+    'description':           'Foo things',
+    'content_meta_type':     'Foo Thing',
+    'content_icon':          'foo.png',
+    'product':               'CMFSetup',
+    'factory':               'addFoo',
+    'immediate_view':        'foo_view',
+    'filter_content_types':  False,
+    'allowed_content_types': (),
+    'allow_discussion':      False,
+    'global_allow':          False,
+    'aliases': {'(Default)': 'foo_view',
+                'view':      'foo_view',
+                },
+    'actions': ({'id':     'view',
+                 'name':   'View',
+                 'action': 'string:${object_url}/foo_view',
+                 'permissions': (View,),
+                 },
+                {'id':     'edit',
+                 'name':   'Edit',
+                 'action': 'string:${object_url}/foo_edit_form',
+                 'permissions': (ModifyPortalContent,),
+                 },
+                {'id':     'metadata',
+                 'name':   'Metadata',
+                 'action': 'string:${object_url}/metadata_edit_form',
+                 'permissions': (ModifyPortalContent,),
+                 },
+                ),
+    }, {
+    'id':                    'bar',
+    'title':                 'Bar',
+    'description':           'Bar things',
+    'content_meta_type':     'Bar Thing',
+    'content_icon':          'bar.png',
+    'constructor_path':      'make_bar',
+    'permission':            'Add portal content',
+    'immediate_view':        'bar_view',
+    'filter_content_types':  True,
+    'allowed_content_types': ('foo',),
+    'allow_discussion':      True,
+    'global_allow':          True,
+    'aliases': {'(Default)': 'bar_view',
+                'view':      'bar_view',
+                },
+    'actions': ({'id':     'view',
+                 'name':   'View',
+                 'action': 'string:${object_url}/bar_view',
+                 'permissions': (View,),
+                 },
+                {'id':     'edit',
+                 'name':   'Edit',
+                 'action': 'string:${object_url}/bar_edit_form',
+                 'permissions': (ModifyPortalContent,),
+                 },
+                {'id':     'contents',
+                 'name':   'Contents',
+                 'action': 'string:${object_url}/folder_contents',
+                 'permissions': (AccessContentsInformation,),
+                 },
+                {'id':     'metadata',
+                 'name':   'Metadata',
+                 'action': 'string:${object_url}/metadata_edit_form',
+                 'permissions': (ModifyPortalContent,),
+                 },
+               ),
+    })
 
 _TI_LIST_WITH_FILENAME = []
 
 for original in _TI_LIST:
     duplicate = original.copy()
-    duplicate[ 'id' ] = '%s object' % original[ 'id' ]
-    _TI_LIST_WITH_FILENAME.append( duplicate )
+    duplicate['id'] = '%s object' % original['id']
+    _TI_LIST_WITH_FILENAME.append(duplicate)
 
 _EMPTY_TOOL_EXPORT = """\
 <?xml version="1.0"?>
@@ -571,156 +550,156 @@ _UPDATE_FOO_IMPORT = """\
 """
 
 
-class Test_exportTypesTool( _TypeInfoSetup ):
+class Test_exportTypesTool(_TypeInfoSetup):
 
-    def test_empty( self ):
-
-        site = self._initSite()
-        context = DummyExportContext( site )
-
-        from Products.CMFSetup.typeinfo import exportTypesTool
-        exportTypesTool( context )
-
-        self.assertEqual( len( context._wrote ), 1 )
-        filename, text, content_type = context._wrote[ 0 ]
-        self.assertEqual( filename, 'typestool.xml' )
-        self._compareDOM( text, _EMPTY_TOOL_EXPORT )
-        self.assertEqual( content_type, 'text/xml' )
-
-    def test_normal( self ):
-
-        site = self._initSite( _TI_LIST )
-        context = DummyExportContext( site )
-
-        from Products.CMFSetup.typeinfo import exportTypesTool
-        exportTypesTool( context )
-
-        self.assertEqual( len( context._wrote ), 3 )
-
-        filename, text, content_type = context._wrote[ 0 ]
-        self.assertEqual( filename, 'typestool.xml' )
-        self._compareDOM( text, _NORMAL_TOOL_EXPORT )
-        self.assertEqual( content_type, 'text/xml' )
-
-        filename, text, content_type = context._wrote[ 1 ]
-        self.assertEqual( filename, 'types/foo.xml' )
-        self._compareDOM( text, _FOO_EXPORT % 'foo' )
-        self.assertEqual( content_type, 'text/xml' )
-
-        filename, text, content_type = context._wrote[ 2 ]
-        self.assertEqual( filename, 'types/bar.xml' )
-        self._compareDOM( text, _BAR_EXPORT % 'bar' )
-        self.assertEqual( content_type, 'text/xml' )
-
-    def test_with_filenames( self ):
-
-        site = self._initSite( _TI_LIST_WITH_FILENAME )
-        context = DummyExportContext( site )
-
-        from Products.CMFSetup.typeinfo import exportTypesTool
-        exportTypesTool( context )
-
-        self.assertEqual( len( context._wrote ), 3 )
-
-        filename, text, content_type = context._wrote[ 0 ]
-        self.assertEqual( filename, 'typestool.xml' )
-        self._compareDOM( text, _FILENAME_EXPORT )
-        self.assertEqual( content_type, 'text/xml' )
-
-        filename, text, content_type = context._wrote[ 1 ]
-        self.assertEqual( filename, 'types/foo_object.xml' )
-        self._compareDOM( text, _FOO_EXPORT % 'foo object' )
-        self.assertEqual( content_type, 'text/xml' )
-
-        filename, text, content_type = context._wrote[ 2 ]
-        self.assertEqual( filename, 'types/bar_object.xml' )
-        self._compareDOM( text, _BAR_EXPORT % 'bar object' )
-        self.assertEqual( content_type, 'text/xml' )
-
-class Test_importTypesTool( _TypeInfoSetup ):
-
-    def test_empty_default_purge( self ):
-
-        site = self._initSite( _TI_LIST )
-        tool = site.portal_types
-
-        self.assertEqual( len( tool.objectIds() ), 2 )
-
-        context = DummyImportContext( site )
-        context._files[ 'typestool.xml' ] = _EMPTY_TOOL_EXPORT
-
-        from Products.CMFSetup.typeinfo import importTypesTool
-        importTypesTool( context )
-
-        self.assertEqual( len( tool.objectIds() ), 0 )
-
-    def test_empty_explicit_purge( self ):
-
-        site = self._initSite( _TI_LIST )
-        tool = site.portal_types
-
-        self.assertEqual( len( tool.objectIds() ), 2 )
-
-        context = DummyImportContext( site, True )
-        context._files[ 'typestool.xml' ] = _EMPTY_TOOL_EXPORT
-
-        from Products.CMFSetup.typeinfo import importTypesTool
-        importTypesTool( context )
-
-        self.assertEqual( len( tool.objectIds() ), 0 )
-
-    def test_empty_skip_purge( self ):
-
-        site = self._initSite( _TI_LIST )
-        tool = site.portal_types
-
-        self.assertEqual( len( tool.objectIds() ), 2 )
-
-        context = DummyImportContext( site, False )
-        context._files[ 'typestool.xml' ] = _EMPTY_TOOL_EXPORT
-
-        from Products.CMFSetup.typeinfo import importTypesTool
-        importTypesTool( context )
-
-        self.assertEqual( len( tool.objectIds() ), 2 )
-
-    def test_normal( self ):
+    def test_empty(self):
 
         site = self._initSite()
+        context = DummyExportContext(site)
+
+        from Products.CMFSetup.typeinfo import exportTypesTool
+        exportTypesTool(context)
+
+        self.assertEqual(len(context._wrote), 1)
+        filename, text, content_type = context._wrote[0]
+        self.assertEqual(filename, 'typestool.xml')
+        self._compareDOM(text, _EMPTY_TOOL_EXPORT)
+        self.assertEqual(content_type, 'text/xml')
+
+    def test_normal(self):
+
+        site = self._initSite(_TI_LIST)
+        context = DummyExportContext(site)
+
+        from Products.CMFSetup.typeinfo import exportTypesTool
+        exportTypesTool(context)
+
+        self.assertEqual(len(context._wrote), 3)
+
+        filename, text, content_type = context._wrote[0]
+        self.assertEqual(filename, 'typestool.xml')
+        self._compareDOM(text, _NORMAL_TOOL_EXPORT)
+        self.assertEqual(content_type, 'text/xml')
+
+        filename, text, content_type = context._wrote[1]
+        self.assertEqual(filename, 'types/foo.xml')
+        self._compareDOM(text, _FOO_EXPORT % 'foo')
+        self.assertEqual(content_type, 'text/xml')
+
+        filename, text, content_type = context._wrote[2]
+        self.assertEqual(filename, 'types/bar.xml')
+        self._compareDOM(text, _BAR_EXPORT % 'bar')
+        self.assertEqual(content_type, 'text/xml')
+
+    def test_with_filenames(self):
+
+        site = self._initSite(_TI_LIST_WITH_FILENAME)
+        context = DummyExportContext(site)
+
+        from Products.CMFSetup.typeinfo import exportTypesTool
+        exportTypesTool(context)
+
+        self.assertEqual(len(context._wrote), 3)
+
+        filename, text, content_type = context._wrote[0]
+        self.assertEqual(filename, 'typestool.xml')
+        self._compareDOM(text, _FILENAME_EXPORT)
+        self.assertEqual(content_type, 'text/xml')
+
+        filename, text, content_type = context._wrote[1]
+        self.assertEqual(filename, 'types/foo_object.xml')
+        self._compareDOM(text, _FOO_EXPORT % 'foo object')
+        self.assertEqual(content_type, 'text/xml')
+
+        filename, text, content_type = context._wrote[2]
+        self.assertEqual(filename, 'types/bar_object.xml')
+        self._compareDOM(text, _BAR_EXPORT % 'bar object')
+        self.assertEqual(content_type, 'text/xml')
+
+class Test_importTypesTool(_TypeInfoSetup):
+
+    def test_empty_default_purge(self):
+
+        site = self._initSite(_TI_LIST)
         tool = site.portal_types
 
-        self.assertEqual( len( tool.objectIds() ), 0 )
+        self.assertEqual(len(tool.objectIds()), 2)
 
-        context = DummyImportContext( site )
-        context._files[ 'typestool.xml' ] = _NORMAL_TOOL_EXPORT
-        context._files[ 'types/foo.xml' ] = _FOO_EXPORT % 'foo'
-        context._files[ 'types/bar.xml' ] = _BAR_EXPORT % 'bar'
+        context = DummyImportContext(site)
+        context._files['typestool.xml'] = _EMPTY_TOOL_EXPORT
 
         from Products.CMFSetup.typeinfo import importTypesTool
-        importTypesTool( context )
+        importTypesTool(context)
 
-        self.assertEqual( len( tool.objectIds() ), 2 )
-        self.failUnless( 'foo' in tool.objectIds() )
-        self.failUnless( 'bar' in tool.objectIds() )
+        self.assertEqual(len(tool.objectIds()), 0)
 
-    def test_with_filenames_ascii( self ):
+    def test_empty_explicit_purge(self):
+
+        site = self._initSite(_TI_LIST)
+        tool = site.portal_types
+
+        self.assertEqual(len(tool.objectIds()), 2)
+
+        context = DummyImportContext(site, True)
+        context._files['typestool.xml'] = _EMPTY_TOOL_EXPORT
+
+        from Products.CMFSetup.typeinfo import importTypesTool
+        importTypesTool(context)
+
+        self.assertEqual(len(tool.objectIds()), 0)
+
+    def test_empty_skip_purge(self):
+
+        site = self._initSite(_TI_LIST)
+        tool = site.portal_types
+
+        self.assertEqual(len(tool.objectIds()), 2)
+
+        context = DummyImportContext(site, False)
+        context._files['typestool.xml'] = _EMPTY_TOOL_EXPORT
+
+        from Products.CMFSetup.typeinfo import importTypesTool
+        importTypesTool(context)
+
+        self.assertEqual(len(tool.objectIds()), 2)
+
+    def test_normal(self):
 
         site = self._initSite()
         tool = site.portal_types
 
-        self.assertEqual( len( tool.objectIds() ), 0 )
+        self.assertEqual(len(tool.objectIds()), 0)
 
-        context = DummyImportContext( site, encoding='ascii' )
-        context._files[ 'typestool.xml' ] = _FILENAME_EXPORT
-        context._files[ 'types/foo_object.xml' ] = _FOO_EXPORT % 'foo object'
-        context._files[ 'types/bar_object.xml' ] = _BAR_EXPORT % 'bar object'
+        context = DummyImportContext(site)
+        context._files['typestool.xml'] = _NORMAL_TOOL_EXPORT
+        context._files['types/foo.xml'] = _FOO_EXPORT % 'foo'
+        context._files['types/bar.xml'] = _BAR_EXPORT % 'bar'
 
         from Products.CMFSetup.typeinfo import importTypesTool
-        importTypesTool( context )
+        importTypesTool(context)
 
-        self.assertEqual( len( tool.objectIds() ), 2 )
-        self.failUnless( 'foo object' in tool.objectIds() )
-        self.failUnless( 'bar object' in tool.objectIds() )
+        self.assertEqual(len(tool.objectIds()), 2)
+        self.failUnless('foo' in tool.objectIds())
+        self.failUnless('bar' in tool.objectIds())
+
+    def test_with_filenames_ascii(self):
+
+        site = self._initSite()
+        tool = site.portal_types
+
+        self.assertEqual(len(tool.objectIds()), 0)
+
+        context = DummyImportContext(site, encoding='ascii')
+        context._files['typestool.xml'] = _FILENAME_EXPORT
+        context._files['types/foo_object.xml'] = _FOO_EXPORT % 'foo object'
+        context._files['types/bar_object.xml'] = _BAR_EXPORT % 'bar object'
+
+        from Products.CMFSetup.typeinfo import importTypesTool
+        importTypesTool(context)
+
+        self.assertEqual(len(tool.objectIds()), 2)
+        self.failUnless('foo object' in tool.objectIds())
+        self.failUnless('bar object' in tool.objectIds())
 
     def test_fragment_skip_purge_ascii(self):
 
@@ -735,33 +714,33 @@ class Test_importTypesTool( _TypeInfoSetup ):
         context._files['types/bar.xml'] = _BAR_EXPORT % 'bar'
         importTypesTool(context)
 
-        self.assertEqual( tool.foo.title, 'Foo' )
-        self.assertEqual( tool.foo.content_meta_type, 'Foo Thing' )
-        self.assertEqual( tool.foo.content_icon, 'foo.png' )
-        self.assertEqual( tool.foo.immediate_view, 'foo_view' )
-        self.assertEqual( tool.foo._aliases,
-                          {'(Default)': 'foo_view', 'view': 'foo_view'} )
+        self.assertEqual(tool.foo.title, 'Foo')
+        self.assertEqual(tool.foo.content_meta_type, 'Foo Thing')
+        self.assertEqual(tool.foo.content_icon, 'foo.png')
+        self.assertEqual(tool.foo.immediate_view, 'foo_view')
+        self.assertEqual(tool.foo._aliases,
+                         {'(Default)': 'foo_view', 'view': 'foo_view'})
 
         context = DummyImportContext(site, False, encoding='ascii')
         context._files['typestool.xml'] = _UPDATE_TOOL_IMPORT
         context._files['types/foo.xml'] = _UPDATE_FOO_IMPORT
         importTypesTool(context)
 
-        self.assertEqual( tool.foo.title, 'Foo' )
-        self.assertEqual( tool.foo.content_meta_type, 'Foo Thing' )
-        self.assertEqual( tool.foo.content_icon, 'foo.png' )
-        self.assertEqual( tool.foo.immediate_view, 'foo_view' )
-        self.assertEqual( tool.foo._aliases,
-               {'(Default)': 'foo_view', 'view': 'foo_view', 'spam': 'eggs'} )
+        self.assertEqual(tool.foo.title, 'Foo')
+        self.assertEqual(tool.foo.content_meta_type, 'Foo Thing')
+        self.assertEqual(tool.foo.content_icon, 'foo.png')
+        self.assertEqual(tool.foo.immediate_view, 'foo_view')
+        self.assertEqual(tool.foo._aliases,
+               {'(Default)': 'foo_view', 'view': 'foo_view', 'spam': 'eggs'})
 
 
 def test_suite():
     return unittest.TestSuite((
-        unittest.makeSuite( TypesToolConfiguratorTests ),
-        unittest.makeSuite( TypeInfoConfiguratorTests ),
-        unittest.makeSuite( Test_exportTypesTool ),
-        unittest.makeSuite( Test_importTypesTool ),
-        ))
+        unittest.makeSuite(TypesToolConfiguratorTests),
+        unittest.makeSuite(TypeInfoConfiguratorTests),
+        unittest.makeSuite(Test_exportTypesTool),
+        unittest.makeSuite(Test_importTypesTool),
+       ))
 
 if __name__ == '__main__':
     unittest.main(defaultTest='test_suite')
