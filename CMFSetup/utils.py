@@ -134,8 +134,8 @@ class HandlerBase( ContentHandler ):
         return content.encode( self._encoding )
 
 
-class ConfiguratorBase(Implicit):
-    """ Synthesize XML description.
+class ImportConfiguratorBase(Implicit):
+    """ Synthesize data from XML description.
     """
     security = ClassSecurityInfo()
     security.setDefaultAccess('allow')
@@ -144,13 +144,6 @@ class ConfiguratorBase(Implicit):
 
         self._site = site
         self._encoding = encoding
-        self._template = self._getExportTemplate()
-
-    security.declareProtected(ManagePortal, 'generateXML')
-    def generateXML(self, **kw):
-        """ Pseudo API.
-        """
-        return self._template(**kw)
 
     security.declareProtected(ManagePortal, 'parseXML')
     def parseXML(self, xml):
@@ -245,26 +238,6 @@ class ConfiguratorBase(Implicit):
         assert len(val) == 1
         return val[0]
 
-    #
-    #   generic object and property support
-    #
-    _o_nodes = PageTemplateFile('object_nodes.xml', _xmldir)
-    _p_nodes = PageTemplateFile('property_nodes.xml', _xmldir)
-
-    security.declareProtected(ManagePortal, 'generateObjectNodes')
-    def generateObjectNodes(self, obj_infos):
-        """ Pseudo API.
-        """
-        lines = self._o_nodes(objects=obj_infos).splitlines()
-        return '\n'.join(lines)
-
-    security.declareProtected(ManagePortal, 'generatePropertyNodes')
-    def generatePropertyNodes(self, prop_infos):
-        """ Pseudo API.
-        """
-        lines = self._p_nodes(properties=prop_infos).splitlines()
-        return '\n'.join(lines)
-
     security.declareProtected(ManagePortal, 'initObject')
     def initObject(self, parent, o_info):
 
@@ -329,6 +302,47 @@ class ConfiguratorBase(Implicit):
 
         obj._updateProperty(prop_id, prop_value)
 
+InitializeClass(ImportConfiguratorBase)
+
+
+class ExportConfiguratorBase(Implicit):
+    """ Synthesize XML description.
+    """
+    security = ClassSecurityInfo()
+    security.setDefaultAccess('allow')
+
+    def __init__(self, site, encoding=None):
+
+        self._site = site
+        self._encoding = encoding
+        self._template = self._getExportTemplate()
+
+    security.declareProtected(ManagePortal, 'generateXML')
+    def generateXML(self, **kw):
+        """ Pseudo API.
+        """
+        return self._template(**kw)
+
+    #
+    #   generic object and property support
+    #
+    _o_nodes = PageTemplateFile('object_nodes.xml', _xmldir)
+    _p_nodes = PageTemplateFile('property_nodes.xml', _xmldir)
+
+    security.declareProtected(ManagePortal, 'generateObjectNodes')
+    def generateObjectNodes(self, obj_infos):
+        """ Pseudo API.
+        """
+        lines = self._o_nodes(objects=obj_infos).splitlines()
+        return '\n'.join(lines)
+
+    security.declareProtected(ManagePortal, 'generatePropertyNodes')
+    def generatePropertyNodes(self, prop_infos):
+        """ Pseudo API.
+        """
+        lines = self._p_nodes(properties=prop_infos).splitlines()
+        return '\n'.join(lines)
+
     def _extractObject(self, obj):
 
         properties = []
@@ -371,6 +385,20 @@ class ConfiguratorBase(Implicit):
                  'elements': prop_elements,
                  'type': type,
                  'select_variable': select_variable }
+
+InitializeClass(ExportConfiguratorBase)
+
+
+# BBB: old class mixing the two
+class ConfiguratorBase(ImportConfiguratorBase, ExportConfiguratorBase):
+    """ Synthesize XML description.
+    """
+    security = ClassSecurityInfo()
+    security.setDefaultAccess('allow')
+
+    def __init__(self, site, encoding=None):
+        ImportConfiguratorBase.__init__(self, site, encoding)
+        ExportConfiguratorBase.__init__(self, site, encoding)
 
 InitializeClass(ConfiguratorBase)
 

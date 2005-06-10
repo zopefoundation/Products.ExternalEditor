@@ -229,25 +229,7 @@ class DummyObject(Folder):
     _properties = ()
 
 
-class ConfiguratorBaseTests(BaseRegistryTests):
-
-    def _getTargetClass(self):
-
-        from Products.CMFSetup.utils import ConfiguratorBase
-        from Products.CMFSetup.utils import CONVERTER, DEFAULT, KEY
-
-        class Configurator(ConfiguratorBase):
-
-            def _getExportTemplate(self):
-                return None
-
-            def _getImportMapping(self):
-                return {
-                  'dummy':
-                    { 'property':    {KEY: 'properties', DEFAULT: ()},
-                      'description': {CONVERTER: self._convertToUnique} } }
-
-        return Configurator
+class _ConfiguratorBaseTests(BaseRegistryTests):
 
     def _initSite(self, foo=2):
 
@@ -285,6 +267,19 @@ class ConfiguratorBaseTests(BaseRegistryTests):
             site.dummy._updateProperty( 'foo_mselection', ('Foo', 'Baz') )
 
         return site
+
+
+class ExportConfiguratorBaseTests(_ConfiguratorBaseTests):
+
+    def _getTargetClass(self):
+
+        from Products.CMFSetup.utils import ExportConfiguratorBase
+
+        class Configurator(ExportConfiguratorBase):
+            def _getExportTemplate(self):
+                return None
+
+        return Configurator
 
     def test__extractProperty_normal(self):
 
@@ -336,6 +331,24 @@ class ConfiguratorBaseTests(BaseRegistryTests):
         xml = '<?xml version="1.0"?><dummy>%s\n</dummy>' % nodes
 
         self._compareDOM(xml, _NORMAL_OBJECT_EXPORT)
+
+
+class ImportConfiguratorBaseTests(_ConfiguratorBaseTests):
+
+    def _getTargetClass(self):
+
+        from Products.CMFSetup.utils import ImportConfiguratorBase
+        from Products.CMFSetup.utils import CONVERTER, DEFAULT, KEY
+
+        class Configurator(ImportConfiguratorBase):
+            def _getImportMapping(self):
+                return {
+                  'dummy':
+                    { 'property':    {KEY: 'properties', DEFAULT: ()},
+                      'description': {CONVERTER: self._convertToUnique} } }
+
+        return Configurator
+
 
     def test_parseXML_normal(self):
 
@@ -484,7 +497,8 @@ def test_suite():
 
     return unittest.TestSuite((
         unittest.makeSuite( UtilsTests ),
-        unittest.makeSuite( ConfiguratorBaseTests ),
+        unittest.makeSuite( ImportConfiguratorBaseTests ),
+        unittest.makeSuite( ExportConfiguratorBaseTests ),
         ))
 
 if __name__ == '__main__':
