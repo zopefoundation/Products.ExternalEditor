@@ -26,7 +26,7 @@ from Products.CMFCore.utils import getToolByName
 
 from permissions import ManagePortal
 from utils import _xmldir
-from utils import ConfiguratorBase
+from utils import ImportConfiguratorBase, ExportConfiguratorBase
 from utils import CONVERTER, DEFAULT, KEY
 
 
@@ -49,13 +49,13 @@ def importTypesTool( context ):
         for type in types_tool.objectIds():
             types_tool._delObject(type)
 
-    ttc = TypesToolConfigurator( site, encoding )
+    ttc = TypesToolImportConfigurator( site, encoding )
     xml = context.readDataFile( _TOOL_FILENAME )
     if xml is None:
         return 'Types tool: Nothing to import.'
 
     tool_info = ttc.parseXML( xml )
-    tic = TypeInfoConfigurator( site, encoding )
+    tic = TypeInfoImportConfigurator( site, encoding )
 
     for type_info in tool_info[ 'types' ]:
 
@@ -115,8 +115,8 @@ def exportTypesTool( context ):
     site = context.getSite()
     types_tool = getToolByName( site, 'portal_types' )
 
-    ttc = TypesToolConfigurator( site ).__of__( site )
-    tic = TypeInfoConfigurator( site ).__of__( site )
+    ttc = TypesToolExportConfigurator( site ).__of__( site )
+    tic = TypeInfoExportConfigurator( site ).__of__( site )
 
     tool_xml = ttc.generateXML()
     context.writeDataFile( _TOOL_FILENAME, tool_xml, 'text/xml' )
@@ -137,7 +137,30 @@ def exportTypesTool( context ):
     return 'Types tool exported'
 
 
-class TypesToolConfigurator(ConfiguratorBase):
+class TypesToolImportConfigurator(ImportConfiguratorBase):
+
+    def _getImportMapping(self):
+
+        return {
+          'types-tool':
+            { 'type':     {KEY: 'types', DEFAULT: (),
+                           CONVERTER: self._convertTypes} },
+          'type':
+            { 'id':       {},
+              'filename': {DEFAULT: '%(id)s'} } }
+
+    def _convertTypes(self, val):
+
+        for type in val:
+            if type['filename'] == type['id']:
+                type['filename'] = _getTypeFilename( type['filename'] )
+
+        return val
+
+InitializeClass(TypesToolImportConfigurator)
+
+
+class TypesToolExportConfigurator(ExportConfiguratorBase):
 
     security = ClassSecurityInfo()
 
@@ -169,28 +192,74 @@ class TypesToolConfigurator(ConfiguratorBase):
 
         return PageTemplateFile('ticToolExport.xml', _xmldir)
 
-    def _getImportMapping(self):
+InitializeClass(TypesToolExportConfigurator)
 
-        return {
-          'types-tool':
-            { 'type':     {KEY: 'types', DEFAULT: (),
-                           CONVERTER: self._convertTypes} },
-          'type':
-            { 'id':       {},
-              'filename': {DEFAULT: '%(id)s'} } }
 
-    def _convertTypes(self, val):
-
-        for type in val:
-            if type['filename'] == type['id']:
-                type['filename'] = _getTypeFilename( type['filename'] )
-
-        return val
+# BBB:
+class TypesToolConfigurator(TypesToolImportConfigurator,
+                            TypesToolExportConfigurator):
+    def __init__(self, site, encoding=None):
+        TypesToolImportConfigurator.__init__(self, site, encoding)
+        TypesToolExportConfigurator.__init__(self, site, encoding)
 
 InitializeClass(TypesToolConfigurator)
 
 
-class TypeInfoConfigurator(ConfiguratorBase):
+class TypeInfoImportConfigurator(ImportConfiguratorBase):
+
+    def _getImportMapping(self):
+
+        return {
+          'type-info':
+            { 'id':                   {},
+              'kind':                 {},
+              'title':                {},
+              'description':          {CONVERTER: self._convertToUnique},
+              'meta_type':            {KEY: 'content_meta_type'},
+              'icon':                 {KEY: 'content_icon'},
+              'immediate_view':       {},
+              'global_allow':         {CONVERTER: self._convertToBoolean},
+              'filter_content_types': {CONVERTER: self._convertToBoolean},
+              'allowed_content_type': {KEY: 'allowed_content_types'},
+              'allow_discussion':     {CONVERTER: self._convertToBoolean},
+              'aliases':              {CONVERTER: self._convertAliases},
+              'action':               {KEY: 'actions'},
+              'product':              {},
+              'factory':              {},
+              'constructor_path':     {},
+              'permission':           {} },
+          'allowed_content_type':
+            { '#text':                {KEY: None} },
+          'aliases':
+            { 'alias':                {KEY: None} },
+          'alias':
+            { 'from':                 {},
+              'to':                   {} },
+          'action':
+            { 'action_id':            {KEY: 'id'},
+              'title':                {},
+              'description':          {CONVERTER: self._convertToUnique},
+              'category':             {},
+              'condition_expr':       {KEY: 'condition'},
+              'permission':           {KEY: 'permissions', DEFAULT: ()},
+              'visible':              {CONVERTER: self._convertToBoolean},
+              'url_expr':             {KEY: 'action'} },
+          'permission':
+            { '#text':                {KEY: None} } }
+
+    def _convertAliases(self, val):
+
+        result = {}
+
+        for alias in val[0]:
+            result[ alias['from'] ] = alias['to']
+
+        return result
+
+InitializeClass(TypeInfoImportConfigurator)
+
+
+class TypeInfoExportConfigurator(ExportConfiguratorBase):
 
     security = ClassSecurityInfo()
 
@@ -254,54 +323,15 @@ class TypeInfoConfigurator(ConfiguratorBase):
 
         return PageTemplateFile('ticTypeExport.xml', _xmldir)
 
-    def _getImportMapping(self):
+InitializeClass(TypeInfoExportConfigurator)
 
-        return {
-          'type-info':
-            { 'id':                   {},
-              'kind':                 {},
-              'title':                {},
-              'description':          {CONVERTER: self._convertToUnique},
-              'meta_type':            {KEY: 'content_meta_type'},
-              'icon':                 {KEY: 'content_icon'},
-              'immediate_view':       {},
-              'global_allow':         {CONVERTER: self._convertToBoolean},
-              'filter_content_types': {CONVERTER: self._convertToBoolean},
-              'allowed_content_type': {KEY: 'allowed_content_types'},
-              'allow_discussion':     {CONVERTER: self._convertToBoolean},
-              'aliases':              {CONVERTER: self._convertAliases},
-              'action':               {KEY: 'actions'},
-              'product':              {},
-              'factory':              {},
-              'constructor_path':     {},
-              'permission':           {} },
-          'allowed_content_type':
-            { '#text':                {KEY: None} },
-          'aliases':
-            { 'alias':                {KEY: None} },
-          'alias':
-            { 'from':                 {},
-              'to':                   {} },
-          'action':
-            { 'action_id':            {KEY: 'id'},
-              'title':                {},
-              'description':          {CONVERTER: self._convertToUnique},
-              'category':             {},
-              'condition_expr':       {KEY: 'condition'},
-              'permission':           {KEY: 'permissions', DEFAULT: ()},
-              'visible':              {CONVERTER: self._convertToBoolean},
-              'url_expr':             {KEY: 'action'} },
-          'permission':
-            { '#text':                {KEY: None} } }
 
-    def _convertAliases(self, val):
-
-        result = {}
-
-        for alias in val[0]:
-            result[ alias['from'] ] = alias['to']
-
-        return result
+# BBB:
+class TypeInfoConfigurator(TypeInfoImportConfigurator,
+                           TypeInfoExportConfigurator):
+    def __init__(self, site, encoding=None):
+        TypeInfoImportConfigurator.__init__(self, site, encoding)
+        TypeInfoExportConfigurator.__init__(self, site, encoding)
 
 InitializeClass(TypeInfoConfigurator)
 
