@@ -72,12 +72,13 @@ class _TypeInfoSetup(BaseRegistryTests):
         self.root.site.portal_types = DummyTypesTool(type_infos)
         return self.root.site
 
-class TypesToolConfiguratorTests(_TypeInfoSetup):
+
+class TypesToolExportConfiguratorTests(_TypeInfoSetup):
 
     def _getTargetClass(self):
 
-        from Products.CMFSetup.typeinfo import TypesToolConfigurator
-        return TypesToolConfigurator
+        from Products.CMFSetup.typeinfo import TypesToolExportConfigurator
+        return TypesToolExportConfigurator
 
     def test_listTypeInfo_empty(self):
 
@@ -139,6 +140,14 @@ class TypesToolConfiguratorTests(_TypeInfoSetup):
         configurator = self._makeOne(site).__of__(site)
         self._compareDOM(configurator.generateXML(), _FILENAME_EXPORT)
 
+
+class TypesToolImportConfiguratorTests(_TypeInfoSetup):
+
+    def _getTargetClass(self):
+
+        from Products.CMFSetup.typeinfo import TypesToolImportConfigurator
+        return TypesToolImportConfigurator
+
     def test_parseXML_empty(self):
 
         site = self._initSite()
@@ -178,12 +187,12 @@ class TypesToolConfiguratorTests(_TypeInfoSetup):
         self.assertEqual(type_info['filename'], 'types/bar_object.xml')
 
 
-class TypeInfoConfiguratorTests(_TypeInfoSetup):
+class TypeInfoExportConfiguratorTests(_TypeInfoSetup):
 
     def _getTargetClass(self):
 
-        from Products.CMFSetup.typeinfo import TypeInfoConfigurator
-        return TypeInfoConfigurator
+        from Products.CMFSetup.typeinfo import TypeInfoExportConfigurator
+        return TypeInfoExportConfigurator
 
     def test_getTypeInfo_nonesuch(self):
 
@@ -284,6 +293,14 @@ class TypeInfoConfiguratorTests(_TypeInfoSetup):
         configurator = self._makeOne(site).__of__(site)
         self._compareDOM(configurator.generateXML(type_id='bar'),
                          _BAR_EXPORT % 'bar')
+
+
+class TypeInfoImportConfiguratorTests(_TypeInfoSetup):
+
+    def _getTargetClass(self):
+
+        from Products.CMFSetup.typeinfo import TypeInfoImportConfigurator
+        return TypeInfoImportConfigurator
 
     def test_parseXML_FTI(self):
 
@@ -736,8 +753,10 @@ class Test_importTypesTool(_TypeInfoSetup):
 
 def test_suite():
     return unittest.TestSuite((
-        unittest.makeSuite(TypesToolConfiguratorTests),
-        unittest.makeSuite(TypeInfoConfiguratorTests),
+        unittest.makeSuite(TypesToolExportConfiguratorTests),
+        unittest.makeSuite(TypesToolImportConfiguratorTests),
+        unittest.makeSuite(TypeInfoExportConfiguratorTests),
+        unittest.makeSuite(TypeInfoImportConfiguratorTests),
         unittest.makeSuite(Test_exportTypesTool),
         unittest.makeSuite(Test_importTypesTool),
        ))

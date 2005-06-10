@@ -195,7 +195,7 @@ class TypesToolExportConfigurator(ExportConfiguratorBase):
 InitializeClass(TypesToolExportConfigurator)
 
 
-# BBB:
+# BBB: will be removed in CMF 1.6
 class TypesToolConfigurator(TypesToolImportConfigurator,
                             TypesToolExportConfigurator):
     def __init__(self, site, encoding=None):
