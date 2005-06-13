@@ -125,6 +125,15 @@ class SyndicationToolTests(SecurityTest):
         self.assertEqual(info.syUpdateBase, DateTime(NOW.ISO()))
         self.assertEqual(info.max_items, MAX_ITEMS)
 
+    def test_editProperties_isAllowedOnly(self):
+        # Zope 2.8 crashes if we don't edit all properties.
+        # This is because Zope now raises AttributeError
+        # instead of KeyError in editProperties().
+        tool = self._makeOne()
+        tool.editProperties(isAllowed=1)
+
+        self.failUnless(tool.isAllowed)
+
 def test_suite():
     return TestSuite((
         makeSuite(SyndicationToolTests),

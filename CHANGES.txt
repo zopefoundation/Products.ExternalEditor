@@ -28,6 +28,9 @@ HEAD only (unreleased)
 
   Bug Fixes
 
+    - CMFDefault.SyndicationTool: Zope 2.8 raises AttributeError where
+      earlier Zopes used to raise KeyError.
+
     - Set cache headers in 304 responses from FSImage / FSFile
       (http://zope.org/Collectors/355)
 
