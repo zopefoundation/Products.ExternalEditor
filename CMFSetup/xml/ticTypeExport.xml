@@ -1,35 +1,13 @@
 <?xml version="1.0"?>
 <type-info xmlns:tal="http://xml.zope.org/namespaces/tal"
    id="foo"
-   kind="Factory-based Type Information"
-   title="Foo"
-   meta_type="Foo Thing"
-   icon="foo.png"
-   immediate_view="foo_view"
-   filter_content_types="False"
-   allow_discussion="False"
-   global_allow="False"
-   tal:define="info python: here.getTypeInfo( options[ 'type_id' ] )"
+   kind="Some Type Information"
+   tal:define="type_id options/type_id;
+               info python: here.getTypeInfo(type_id);
+               props python: here.generateProperties(type_id)"
    tal:attributes="id info/id;
-                   kind info/kind;
-                   title info/title;
-                   meta_type info/meta_type;
-                   icon info/icon;
-                   product info/product | default;
-                   factory info/factory | default;
-                   permission info/permission | default;
-                   constructor_path info/constructor_path | default;
-                   immediate_view info/immediate_view;
-                   filter_content_types info/filter_content_types;
-                   allow_discussion info/allow_discussion;
-                   global_allow info/global_allow;
-                  "
-   >
-  <description tal:content="info/description">Foo things</description
- ><tal:case tal:condition="info/allowed_content_types">
-  <allowed_content_type
-     tal:repeat="act info/allowed_content_types"
-     tal:content="act">foo</allowed_content_type></tal:case>
+                   kind info/kind"
+ ><properties tal:replace="structure props"/>
   <aliases>
    <alias from="(Default)" to="foo_view"
           tal:repeat="item info/aliases/items"

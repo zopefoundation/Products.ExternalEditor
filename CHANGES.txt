@@ -39,6 +39,10 @@ HEAD only (unreleased)
 
   Others
 
+    - CMFSetup: the import/export of portal types uses a new XML format
+      that can hold arbitrary properties, to facilitate subclassing. The
+      old format is still recognized when importing.
+
     - To document how to create a CMF release from CMF a description is now
       included in RELEASE.txt at the root of the CMF package. This text can
       guide release managers or volunteers with the appropriate release

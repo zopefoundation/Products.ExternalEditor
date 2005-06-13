@@ -208,25 +208,10 @@ class TypeInfoExportConfiguratorTests(_TypeInfoSetup):
         found = configurator.getTypeInfo('foo')
         expected = _TI_LIST[0]
 
-        for key in ('id',
-                    'title',
-                    'description',
-                    'factory',
-                    'product',
-                    'factory',
-                    'immediate_view',
-                    'filter_content_types',
-                    'allowed_content_types',
-                    'allow_discussion',
-                    'global_allow',
-                    'aliases',
-                    ):
-            self.assertEqual(found[key], expected[key])
+        self.assertEqual(found['kind'], 'Factory-based Type Information')
 
-        for lkey, rkey in (('meta_type', 'content_meta_type'),
-                           ('icon', 'content_icon'),
-                           ):
-            self.assertEqual(found[lkey], expected[rkey])
+        for key in ('id', 'aliases'):
+            self.assertEqual(found[key], expected[key])
 
         self.assertEqual(len(found['actions']), len(expected['actions']))
 
@@ -248,24 +233,10 @@ class TypeInfoExportConfiguratorTests(_TypeInfoSetup):
         found = configurator.getTypeInfo('bar')
         expected = _TI_LIST[1]
 
-        for key in ('id',
-                    'title',
-                    'description',
-                    'constructor_path',
-                    'permission',
-                    'immediate_view',
-                    'filter_content_types',
-                    'allowed_content_types',
-                    'allow_discussion',
-                    'global_allow',
-                    'aliases',
-                    ):
-            self.assertEqual(found[key], expected[key])
+        self.assertEqual(found['kind'], 'Scriptable Type Information')
 
-        for lkey, rkey in (('meta_type', 'content_meta_type'),
-                           ('icon', 'content_icon'),
-                           ):
-            self.assertEqual(found[lkey], expected[rkey])
+        for key in ('id', 'aliases'):
+            self.assertEqual(found[key], expected[key])
 
         self.assertEqual(len(found['actions']), len(expected['actions']))
 
@@ -295,6 +266,40 @@ class TypeInfoExportConfiguratorTests(_TypeInfoSetup):
                          _BAR_EXPORT % 'bar')
 
 
+class OldTypeInfoImportConfiguratorTests(_TypeInfoSetup):
+
+    def _getTargetClass(self):
+
+        from Products.CMFSetup.typeinfo import OldTypeInfoImportConfigurator
+        return OldTypeInfoImportConfigurator
+
+    def test_old_parseXML_FTI(self):
+
+        site = self._initSite()
+        tool = site.portal_types
+        configurator = self._makeOne(site).__of__(site)
+        self.assertEqual(len(tool.objectIds()), 0)
+
+        info = configurator.parseXML(_FOO_OLD_EXPORT % 'foo')
+
+        self.assertEqual(info['id'], 'foo')
+        self.assertEqual(info['title'], 'Foo')
+        self.assertEqual(len(info['aliases']), 2)
+
+    def test_old_parseXML_STI(self):
+
+        site = self._initSite()
+        tool = site.portal_types
+        configurator = self._makeOne(site).__of__(site)
+        self.assertEqual(len(tool.objectIds()), 0)
+
+        info = configurator.parseXML(_BAR_OLD_EXPORT % 'bar')
+
+        self.assertEqual(info['id'], 'bar')
+        self.assertEqual(info['title'], 'Bar')
+        self.assertEqual(len(info['aliases']), 2)
+
+
 class TypeInfoImportConfiguratorTests(_TypeInfoSetup):
 
     def _getTargetClass(self):
@@ -310,9 +315,10 @@ class TypeInfoImportConfiguratorTests(_TypeInfoSetup):
         self.assertEqual(len(tool.objectIds()), 0)
 
         info = configurator.parseXML(_FOO_EXPORT % 'foo')
+        props = dict([(e['id'], e) for e in info['properties']])
 
         self.assertEqual(info['id'], 'foo')
-        self.assertEqual(info['title'], 'Foo')
+        self.assertEqual(props['title']['value'], 'Foo')
         self.assertEqual(len(info['aliases']), 2)
 
     def test_parseXML_STI(self):
@@ -323,9 +329,10 @@ class TypeInfoImportConfiguratorTests(_TypeInfoSetup):
         self.assertEqual(len(tool.objectIds()), 0)
 
         info = configurator.parseXML(_BAR_EXPORT % 'bar')
+        props = dict([(e['id'], e) for e in info['properties']])
 
         self.assertEqual(info['id'], 'bar')
-        self.assertEqual(info['title'], 'Bar')
+        self.assertEqual(props['title']['value'], 'Bar')
         self.assertEqual(len(info['aliases']), 2)
 
     def test_parseXML_actions(self):
@@ -452,7 +459,7 @@ _UPDATE_TOOL_IMPORT = """\
 </types-tool>
 """
 
-_FOO_EXPORT = """\
+_FOO_OLD_EXPORT = """\
 <type-info
    id="%s"
    kind="Factory-based Type Information"
@@ -500,7 +507,56 @@ _FOO_EXPORT = """\
 </type-info>
 """
 
-_BAR_EXPORT = """\
+_FOO_EXPORT = """\
+<type-info
+   id="%s"
+   kind="Factory-based Type Information">
+  <property name="title">Foo</property>
+  <property name="description">Foo things</property>
+  <property name="content_icon">foo.png</property>
+  <property name="content_meta_type">Foo Thing</property>
+  <property name="product">CMFSetup</property>
+  <property name="factory">addFoo</property>
+  <property name="immediate_view">foo_view</property>
+  <property name="global_allow">False</property>
+  <property name="filter_content_types">False</property>
+  <property name="allowed_content_types"/>
+  <property name="allow_discussion">False</property>
+  <aliases>
+   <alias from="(Default)" to="foo_view" />
+   <alias from="view" to="foo_view" />
+  </aliases>
+  <action
+     action_id="view"
+     title="View"
+     url_expr="string:${object_url}/foo_view"
+     condition_expr=""
+     category="object"
+     visible="True">
+   <permission>View</permission>
+  </action>
+  <action
+     action_id="edit"
+     title="Edit"
+     url_expr="string:${object_url}/foo_edit_form"
+     condition_expr=""
+     category="object"
+     visible="True">
+   <permission>Modify portal content</permission>
+  </action>
+  <action
+     action_id="metadata"
+     title="Metadata"
+     url_expr="string:${object_url}/metadata_edit_form"
+     condition_expr=""
+     category="object"
+     visible="True">
+   <permission>Modify portal content</permission>
+  </action>
+</type-info>
+"""
+
+_BAR_OLD_EXPORT = """\
 <type-info
    id="%s"
    kind="Scriptable Type Information"
@@ -515,6 +571,65 @@ _BAR_EXPORT = """\
    global_allow="True" >
   <description>Bar things</description>
   <allowed_content_type>foo</allowed_content_type>
+  <aliases>
+   <alias from="(Default)" to="bar_view" />
+   <alias from="view" to="bar_view" />
+  </aliases>
+  <action
+     action_id="view"
+     title="View"
+     url_expr="string:${object_url}/bar_view"
+     condition_expr=""
+     category="object"
+     visible="True">
+   <permission>View</permission>
+  </action>
+  <action
+     action_id="edit"
+     title="Edit"
+     url_expr="string:${object_url}/bar_edit_form"
+     condition_expr=""
+     category="object"
+     visible="True">
+   <permission>Modify portal content</permission>
+  </action>
+  <action
+     action_id="contents"
+     title="Contents"
+     url_expr="string:${object_url}/folder_contents"
+     condition_expr=""
+     category="object"
+     visible="True">
+   <permission>Access contents information</permission>
+  </action>
+  <action
+     action_id="metadata"
+     title="Metadata"
+     url_expr="string:${object_url}/metadata_edit_form"
+     condition_expr=""
+     category="object"
+     visible="True">
+   <permission>Modify portal content</permission>
+  </action>
+</type-info>
+"""
+
+_BAR_EXPORT = """\
+<type-info
+   id="%s"
+   kind="Scriptable Type Information">
+  <property name="title">Bar</property>
+  <property name="description">Bar things</property>
+  <property name="content_icon">bar.png</property>
+  <property name="content_meta_type">Bar Thing</property>
+  <property name="permission">Add portal content</property>
+  <property name="constructor_path">make_bar</property>
+  <property name="immediate_view">bar_view</property>
+  <property name="global_allow">True</property>
+  <property name="filter_content_types">True</property>
+  <property name="allowed_content_types">
+   <element value="foo"/></property>
+  <property name="allow_discussion">True</property>
   <aliases>
    <alias from="(Default)" to="bar_view" />
    <alias from="view" to="bar_view" />
@@ -699,6 +814,25 @@ class Test_importTypesTool(_TypeInfoSetup):
         self.failUnless('foo' in tool.objectIds())
         self.failUnless('bar' in tool.objectIds())
 
+    def test_old_xml(self):
+
+        site = self._initSite()
+        tool = site.portal_types
+
+        self.assertEqual(len(tool.objectIds()), 0)
+
+        context = DummyImportContext(site)
+        context._files['typestool.xml'] = _NORMAL_TOOL_EXPORT
+        context._files['types/foo.xml'] = _FOO_OLD_EXPORT % 'foo'
+        context._files['types/bar.xml'] = _BAR_OLD_EXPORT % 'bar'
+
+        from Products.CMFSetup.typeinfo import importTypesTool
+        importTypesTool(context)
+
+        self.assertEqual(len(tool.objectIds()), 2)
+        self.failUnless('foo' in tool.objectIds())
+        self.failUnless('bar' in tool.objectIds())
+
     def test_with_filenames_ascii(self):
 
         site = self._initSite()
@@ -757,6 +891,7 @@ def test_suite():
         unittest.makeSuite(TypesToolImportConfiguratorTests),
         unittest.makeSuite(TypeInfoExportConfiguratorTests),
         unittest.makeSuite(TypeInfoImportConfiguratorTests),
+        unittest.makeSuite(OldTypeInfoImportConfiguratorTests),
         unittest.makeSuite(Test_exportTypesTool),
         unittest.makeSuite(Test_importTypesTool),
        ))

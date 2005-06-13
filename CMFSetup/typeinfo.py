@@ -20,8 +20,6 @@ from AccessControl import ClassSecurityInfo
 from Globals import InitializeClass
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
-from Products.CMFCore.TypesTool import FactoryTypeInformation
-from Products.CMFCore.TypesTool import ScriptableTypeInformation
 from Products.CMFCore.utils import getToolByName
 
 from permissions import ManagePortal
@@ -56,6 +54,7 @@ def importTypesTool( context ):
 
     tool_info = ttc.parseXML( xml )
     tic = TypeInfoImportConfigurator( site, encoding )
+    old_tic = OldTypeInfoImportConfigurator( site, encoding )
 
     for type_info in tool_info[ 'types' ]:
 
@@ -65,7 +64,12 @@ def importTypesTool( context ):
             text = context.readDataFile( filename )
         else:
             text = context.readDataFile( filename[sep+1:], filename[:sep] )
-        info = tic.parseXML( text )
+
+        is_old = '<description>' in text
+        if is_old:
+            info = old_tic.parseXML( text )
+        else:
+            info = tic.parseXML( text )
 
         type_id = str(info['id'])
         if 'kind' in info:
@@ -89,7 +93,11 @@ def importTypesTool( context ):
         else:
             type_info = types_tool._getOb(type_id)
 
-        type_info.manage_changeProperties(**info)
+        if is_old:
+            type_info.manage_changeProperties(**info)
+        else:
+            for prop_info in info['properties']:
+                tic.initProperty(type_info, prop_info)
 
         if 'actions' in info:
             type_info._actions = info['actions']
@@ -205,7 +213,8 @@ class TypesToolConfigurator(TypesToolImportConfigurator,
 InitializeClass(TypesToolConfigurator)
 
 
-class TypeInfoImportConfigurator(ImportConfiguratorBase):
+# BBB: will be removed in CMF 1.6
+class OldTypeInfoImportConfigurator(ImportConfiguratorBase):
 
     def _getImportMapping(self):
 
@@ -256,6 +265,47 @@ class TypeInfoImportConfigurator(ImportConfiguratorBase):
 
         return result
 
+InitializeClass(OldTypeInfoImportConfigurator)
+
+
+class TypeInfoImportConfigurator(ImportConfiguratorBase):
+
+    def _getImportMapping(self):
+
+        return {
+          'type-info':
+            { 'id':                   {},
+              'kind':                 {},
+              'aliases':              {CONVERTER: self._convertAliases},
+              'action':               {KEY: 'actions'},
+              'property':             {KEY: 'properties', DEFAULT: ()},
+              },
+          'aliases':
+            { 'alias':                {KEY: None} },
+          'alias':
+            { 'from':                 {},
+              'to':                   {} },
+          'action':
+            { 'action_id':            {KEY: 'id'},
+              'title':                {},
+              'description':          {CONVERTER: self._convertToUnique},
+              'category':             {},
+              'condition_expr':       {KEY: 'condition'},
+              'permission':           {KEY: 'permissions', DEFAULT: ()},
+              'visible':              {CONVERTER: self._convertToBoolean},
+              'url_expr':             {KEY: 'action'} },
+          'permission':
+            { '#text':                {KEY: None} } }
+
+    def _convertAliases(self, val):
+
+        result = {}
+
+        for alias in val[0]:
+            result[ alias['from'] ] = alias['to']
+
+        return result
+
 InitializeClass(TypeInfoImportConfigurator)
 
 
@@ -272,52 +322,37 @@ class TypeInfoExportConfigurator(ExportConfiguratorBase):
           'factory_type_information' elements used everywhere in the
           CMF.
         """
-        typestool = getToolByName( self._site, 'portal_types' )
+        ti = self._getTI(type_id)
+        return self._makeTIMapping(ti)
+
+    security.declarePrivate('_getTI' )
+    def _getTI(self, type_id):
+        """Get the TI from its id."""
+        typestool = getToolByName(self._site, 'portal_types')
         try:
-            ti = typestool.getTypeInfo( str( type_id ) ) # gTI expects ASCII?
+            return typestool.getTypeInfo(str(type_id)) # gTI expects ASCII?
         except KeyError:
-            raise ValueError, 'Unknown type: %s' % type_id
-        else:
-            return self._makeTIMapping( ti )
+            raise ValueError("Unknown type: %s" % type_id)
 
     security.declarePrivate( '_makeTIMapping' )
     def _makeTIMapping( self, ti ):
 
         """ Convert a TypeInformation object into the appropriate mapping.
         """
-        result = { 'id'                     : ti.getId()
-                 , 'title'                  : ti.Title()
-                 , 'description'            : ti.Description().strip()
-                 , 'meta_type'              : ti.Metatype()
-                 , 'icon'                   : ti.getIcon()
-                 , 'immediate_view'         : ti.immediate_view
-                 , 'global_allow'           : bool(ti.global_allow)
-                 , 'filter_content_types'   : bool(ti.filter_content_types)
-                 , 'allowed_content_types'  : ti.allowed_content_types
-                 , 'allow_discussion'       : bool(ti.allow_discussion)
-                 , 'aliases'                : ti.getMethodAliases()
-                 }
+        return {
+            'id': ti.getId(),
+            'kind': ti.meta_type,
+            'aliases': ti.getMethodAliases(),
+            'actions': [ai.getMapping() for ai in ti.listActions()],
+            }
 
-        if ' ' in ti.getId():
-
-            result[ 'filename' ]    = _getTypeFilename( ti.getId() )
-
-        if isinstance( ti, FactoryTypeInformation ):
-
-            result[ 'kind' ]        = FactoryTypeInformation.meta_type
-            result[ 'product' ]     = ti.product
-            result[ 'factory' ]     = ti.factory
-
-        elif isinstance( ti, ScriptableTypeInformation ):
-
-            result[ 'kind' ]             = ScriptableTypeInformation.meta_type
-            result[ 'permission' ]       = ti.permission
-            result[ 'constructor_path' ] = ti.constructor_path
-
-        actions = ti.listActions()
-        result['actions'] = [ ai.getMapping() for ai in actions ]
-
-        return result
+    security.declareProtected(ManagePortal, 'generateProperties')
+    def generateProperties(self, type_id):
+        """Get a sequence of mappings for properties."""
+        ti = self._getTI(type_id)
+        prop_infos = [self._extractProperty(ti, prop_map)
+                      for prop_map in ti._propertyMap()]
+        return self.generatePropertyNodes(prop_infos)
 
     def _getExportTemplate(self):
 
