@@ -1,10 +1,25 @@
+##############################################################################
+#
+# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE.
+#
+##############################################################################
+""" Unit tests for Discussions.
+
+$Id$
+"""
+
 from unittest import TestCase, TestSuite, makeSuite, main
 import Testing
 import Zope
 Zope.startup()
-from Interface.Verify import verifyClass
 
-from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.CatalogTool import CatalogTool
 from Products.CMFCore.tests.base.dummy import DummyContent
 from Products.CMFCore.tests.base.dummy import DummySite
@@ -14,41 +29,76 @@ from Products.CMFCore.tests.base.tidata import FTIDATA_DUMMY
 from Products.CMFCore.tests.base.utils import has_path
 from Products.CMFCore.TypesTool import FactoryTypeInformation as FTI
 from Products.CMFCore.TypesTool import TypesTool
-from Products.CMFDefault.DiscussionItem import DiscussionItem
-from Products.CMFDefault.DiscussionItem import DiscussionItemContainer
+from Products.CMFCore.utils import getToolByName
 from Products.CMFDefault.DiscussionTool import DiscussionTool
 from Products.CMFDefault.exceptions import DiscussionNotAllowed
 
 
 class DiscussionItemTests(TestCase):
 
-    def test_interface(self):
-        from Products.CMFCore.interfaces.Dynamic \
-                import DynamicType as IDynamicType
+    def test_z2interfaces(self):
+        from Interface.Verify import verifyClass
         from Products.CMFCore.interfaces.Contentish \
                 import Contentish as IContentish
         from Products.CMFCore.interfaces.Discussions \
                 import DiscussionResponse as IDiscussionResponse
         from Products.CMFCore.interfaces.DublinCore \
-                import DublinCore as IDublinCore
-        from Products.CMFCore.interfaces.DublinCore \
                 import CatalogableDublinCore as ICatalogableDublinCore
         from Products.CMFCore.interfaces.DublinCore \
+                import DublinCore as IDublinCore
+        from Products.CMFCore.interfaces.DublinCore \
                 import MutableDublinCore as IMutableDublinCore
+        from Products.CMFCore.interfaces.Dynamic \
+                import DynamicType as IDynamicType
+        from Products.CMFDefault.DiscussionItem import DiscussionItem
 
-        verifyClass(IDynamicType, DiscussionItem)
-        verifyClass(IContentish, DiscussionItem)
-        verifyClass(IDublinCore, DiscussionItem)
         verifyClass(ICatalogableDublinCore, DiscussionItem)
-        verifyClass(IMutableDublinCore, DiscussionItem)
+        verifyClass(IContentish, DiscussionItem)
         verifyClass(IDiscussionResponse, DiscussionItem)
+        verifyClass(IDublinCore, DiscussionItem)
+        verifyClass(IDynamicType, DiscussionItem)
+        verifyClass(IMutableDublinCore, DiscussionItem)
+
+    def test_z3interfaces(self):
+        try:
+            from zope.interface.verify import verifyClass
+        except ImportError:
+            # BBB: for Zope 2.7
+            return
+        from Products.CMFCore.interfaces import ICatalogableDublinCore
+        from Products.CMFCore.interfaces import IContentish
+        from Products.CMFCore.interfaces import IDiscussionResponse
+        from Products.CMFCore.interfaces import IDublinCore
+        from Products.CMFCore.interfaces import IDynamicType
+        from Products.CMFCore.interfaces import IMutableDublinCore
+        from Products.CMFDefault.DiscussionItem import DiscussionItem
+
+        verifyClass(ICatalogableDublinCore, DiscussionItem)
+        verifyClass(IContentish, DiscussionItem)
+        verifyClass(IDiscussionResponse, DiscussionItem)
+        verifyClass(IDublinCore, DiscussionItem)
+        verifyClass(IDynamicType, DiscussionItem)
+        verifyClass(IMutableDublinCore, DiscussionItem)
 
 
 class DiscussionItemContainerTests(TestCase):
 
-    def test_interface(self):
+    def test_z2interfaces(self):
+        from Interface.Verify import verifyClass
         from Products.CMFCore.interfaces.Discussions \
                 import Discussable as IDiscussable
+        from Products.CMFDefault.DiscussionItem import DiscussionItemContainer
+
+        verifyClass(IDiscussable, DiscussionItemContainer)
+
+    def test_z3interfaces(self):
+        try:
+            from zope.interface.verify import verifyClass
+        except ImportError:
+            # BBB: for Zope 2.7
+            return
+        from Products.CMFCore.interfaces import IDiscussable
+        from Products.CMFDefault.DiscussionItem import DiscussionItemContainer
 
         verifyClass(IDiscussable, DiscussionItemContainer)
 
@@ -183,6 +233,8 @@ class DiscussionTests( SecurityTest ):
                               '/bar/site/test/talkback/%s' % reply.getId() ) )
 
     def test_itemWorkflowNotification(self):
+        from Products.CMFDefault.DiscussionItem import DiscussionItem
+
         dtool = self.site.portal_discussion
         test = self._makeDummyContent('test')
         test.allow_discussion = 1

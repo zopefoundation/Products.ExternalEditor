@@ -65,6 +65,53 @@ class RequestTestBase(RequestTest):
 
 class DocumentTests(RequestTestBase):
 
+    def test_z2interfaces(self):
+        from Interface.Verify import verifyClass
+        from Products.CMFCore.interfaces.Contentish \
+                import Contentish as IContentish
+        from Products.CMFCore.interfaces.DublinCore \
+                import CatalogableDublinCore as ICatalogableDublinCore
+        from Products.CMFCore.interfaces.DublinCore \
+                import DublinCore as IDublinCore
+        from Products.CMFCore.interfaces.DublinCore \
+                import MutableDublinCore as IMutableDublinCore
+        from Products.CMFCore.interfaces.Dynamic \
+                import DynamicType as IDynamicType
+        from Products.CMFDefault.Document import Document
+        from Products.CMFDefault.interfaces.Document import IDocument
+        from Products.CMFDefault.interfaces.Document import IMutableDocument
+
+        verifyClass(ICatalogableDublinCore, Document)
+        verifyClass(IContentish, Document)
+        verifyClass(IDocument, Document)
+        verifyClass(IDublinCore, Document)
+        verifyClass(IDynamicType, Document)
+        verifyClass(IMutableDocument, Document)
+        verifyClass(IMutableDublinCore, Document)
+
+    def test_z3interfaces(self):
+        try:
+            from zope.interface.verify import verifyClass
+        except ImportError:
+            # BBB: for Zope 2.7
+            return
+        from Products.CMFCore.interfaces import ICatalogableDublinCore
+        from Products.CMFCore.interfaces import IContentish
+        from Products.CMFCore.interfaces import IDublinCore
+        from Products.CMFCore.interfaces import IDynamicType
+        from Products.CMFCore.interfaces import IMutableDublinCore
+        from Products.CMFDefault.Document import Document
+        from Products.CMFDefault.interfaces import IDocument
+        from Products.CMFDefault.interfaces import IMutableDocument
+
+        verifyClass(ICatalogableDublinCore, Document)
+        verifyClass(IContentish, Document)
+        verifyClass(IDocument, Document)
+        verifyClass(IDublinCore, Document)
+        verifyClass(IDynamicType, Document)
+        verifyClass(IMutableDocument, Document)
+        verifyClass(IMutableDublinCore, Document)
+
     def test_Empty(self):
         d = self._makeOne('foo', text_format='structured-text')
 
@@ -358,30 +405,6 @@ class DocumentTests(RequestTestBase):
 
         self.assertEqual( d.Format(), 'text/plain' )
         self.assertEqual( d.text_format, 'structured-text' )
-
-    def test_z2interfaces(self):
-        from Interface.Verify import verifyClass
-        from Products.CMFCore.interfaces.Dynamic \
-                import DynamicType as IDynamicType
-        from Products.CMFCore.interfaces.Contentish \
-                import Contentish as IContentish
-        from Products.CMFCore.interfaces.DublinCore \
-                import DublinCore as IDublinCore
-        from Products.CMFCore.interfaces.DublinCore \
-                import CatalogableDublinCore as ICatalogableDublinCore
-        from Products.CMFCore.interfaces.DublinCore \
-                import MutableDublinCore as IMutableDublinCore
-        from Products.CMFDefault.Document import Document
-        from Products.CMFDefault.interfaces.Document import IDocument
-        from Products.CMFDefault.interfaces.Document import IMutableDocument
-
-        verifyClass(IDynamicType, Document)
-        verifyClass(IContentish, Document)
-        verifyClass(IDublinCore, Document)
-        verifyClass(ICatalogableDublinCore, Document)
-        verifyClass(IMutableDublinCore, Document)
-        verifyClass(IDocument, Document)
-        verifyClass(IMutableDocument, Document)
 
 
 class DocumentFTPGetTests(RequestTestBase):

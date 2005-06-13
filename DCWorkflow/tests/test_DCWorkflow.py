@@ -19,28 +19,41 @@ from unittest import TestCase, TestSuite, makeSuite, main
 import Testing
 import Zope
 Zope.startup()
-from Interface.Verify import verifyClass
 
 from Products.CMFCore.tests.base.dummy import DummyContent
 from Products.CMFCore.tests.base.dummy import DummySite
 from Products.CMFCore.tests.base.dummy import DummyTool
 from Products.CMFCore.WorkflowTool import addWorkflowFactory
 from Products.CMFCore.WorkflowTool import WorkflowTool
-from Products.DCWorkflow.DCWorkflow import DCWorkflowDefinition
 
 
 class DCWorkflowDefinitionTests(TestCase):
 
-    def setUp( self ):
+    def setUp(self):
+        from Products.DCWorkflow.DCWorkflow import DCWorkflowDefinition
+
         self.site = DummySite('site')
         self.site._setObject( 'portal_types', DummyTool() )
         self.site._setObject( 'portal_workflow', WorkflowTool() )
         addWorkflowFactory(DCWorkflowDefinition)
         self._constructDummyWorkflow()
 
-    def test_interface(self):
+    def test_z2interfaces(self):
+        from Interface.Verify import verifyClass
         from Products.CMFCore.interfaces.portal_workflow \
              import WorkflowDefinition as IWorkflowDefinition
+        from Products.DCWorkflow.DCWorkflow import DCWorkflowDefinition
+
+        verifyClass(IWorkflowDefinition, DCWorkflowDefinition)
+
+    def test_z3interfaces(self):
+        try:
+            from zope.interface.verify import verifyClass
+        except ImportError:
+            # BBB: for Zope 2.7
+            return
+        from Products.CMFCore.interfaces import IWorkflowDefinition
+        from Products.DCWorkflow.DCWorkflow import DCWorkflowDefinition
 
         verifyClass(IWorkflowDefinition, DCWorkflowDefinition)
 
@@ -116,6 +129,7 @@ class DCWorkflowDefinitionTests(TestCase):
         self.assert_(wf.isActionSupported(dummy, 'publish', arg1=1, arg2=2))
 
     # XXX more tests...
+
 
 def test_suite():
     return TestSuite((

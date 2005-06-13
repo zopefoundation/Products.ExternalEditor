@@ -1,29 +1,88 @@
+##############################################################################
+#
+# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE.
+#
+##############################################################################
+""" Unit tests for CatalogTool module.
+
+$Id$
+"""
+
 from unittest import TestCase, TestSuite, makeSuite, main
 import Testing
 import Zope
 Zope.startup()
-from Interface.Verify import verifyClass
 
-from DateTime import DateTime
-from Products.CMFCore.CatalogTool import CatalogTool
-from Products.CMFCore.CatalogTool import IndexableObjectWrapper
-from Products.CMFCore.tests.base.dummy import DummyContent
-from Products.CMFCore.tests.base.testcase import SecurityTest
-from Products.CMFCore.tests.base.security import UserWithRoles
-from Products.CMFCore.tests.base.security import OmnipotentUser
 from AccessControl.SecurityManagement import newSecurityManager
+from DateTime import DateTime
+
+from Products.CMFCore.tests.base.dummy import DummyContent
+from Products.CMFCore.tests.base.security import OmnipotentUser
+from Products.CMFCore.tests.base.security import UserWithRoles
+from Products.CMFCore.tests.base.testcase import SecurityTest
 
 
 class IndexableObjectWrapperTests(TestCase):
 
-    def test_interface(self):
+    def test_z2interfaces(self):
+        from Interface.Verify import verifyClass
+        from Products.CMFCore.CatalogTool import IndexableObjectWrapper
         from Products.CMFCore.interfaces.portal_catalog \
                 import IndexableObjectWrapper as IIndexableObjectWrapper
 
         verifyClass(IIndexableObjectWrapper, IndexableObjectWrapper)
 
+    def test_z3interfaces(self):
+        try:
+            from zope.interface.verify import verifyClass
+        except ImportError:
+            # BBB: for Zope 2.7
+            return
+        from Products.CMFCore.CatalogTool import IndexableObjectWrapper
+        from Products.CMFCore.interfaces import IIndexableObjectWrapper
+
+        verifyClass(IIndexableObjectWrapper, IndexableObjectWrapper)
+
 
 class CatalogToolTests(SecurityTest):
+
+    def _makeOne(self, *args, **kw):
+        from Products.CMFCore.CatalogTool import CatalogTool
+
+        return CatalogTool(*args, **kw)
+
+    def test_z2interfaces(self):
+        from Interface.Verify import verifyClass
+        from Products.CMFCore.CatalogTool import CatalogTool
+        from Products.CMFCore.interfaces.portal_actions \
+                import ActionProvider as IActionProvider
+        from Products.CMFCore.interfaces.portal_catalog \
+                import portal_catalog as ICatalogTool
+        from Products.ZCatalog.IZCatalog import IZCatalog
+
+        verifyClass(IActionProvider, CatalogTool)
+        verifyClass(ICatalogTool, CatalogTool)
+        verifyClass(IZCatalog, CatalogTool)
+
+    def test_z3interfaces(self):
+        try:
+            from zope.interface.verify import verifyClass
+        except ImportError:
+            # BBB: for Zope 2.7
+            return
+        from Products.CMFCore.CatalogTool import CatalogTool
+        from Products.CMFCore.interfaces import IActionProvider
+        from Products.CMFCore.interfaces import ICatalogTool
+
+        verifyClass(IActionProvider, CatalogTool)
+        verifyClass(ICatalogTool, CatalogTool)
 
     def loginWithRoles(self, *roles):
         user = UserWithRoles(*roles).__of__(self.root)
@@ -38,25 +97,14 @@ class CatalogToolTests(SecurityTest):
             Tracker #405:  CatalogTool doesn't accept optional third
             argument, 'idxs', to 'catalog_object'.
         """
-        tool = CatalogTool()
+        tool = self._makeOne()
         dummy = DummyContent(catalog=1)
 
         tool.catalog_object( dummy, '/dummy' )
         tool.catalog_object( dummy, '/dummy', [ 'SearchableText' ] )
 
-    def test_interface(self):
-        from Products.CMFCore.interfaces.portal_catalog \
-                import portal_catalog as ICatalogTool
-        from Products.CMFCore.interfaces.portal_actions \
-                import ActionProvider as IActionProvider
-        from Products.ZCatalog.IZCatalog import IZCatalog
-
-        verifyClass(ICatalogTool, CatalogTool)
-        verifyClass(IActionProvider, CatalogTool)
-        verifyClass(IZCatalog, CatalogTool)
-
     def test_search_anonymous(self):
-        catalog = CatalogTool()
+        catalog = self._makeOne()
         dummy = DummyContent(catalog=1)
         catalog.catalog_object(dummy, '/dummy')
 
@@ -64,7 +112,7 @@ class CatalogToolTests(SecurityTest):
         self.assertEqual(0, len(catalog.searchResults()))
 
     def test_search_inactive(self):
-        catalog = CatalogTool()
+        catalog = self._makeOne()
         now = DateTime()
         dummy = DummyContent(catalog=1)
         dummy._View_Permission = ('Blob',)
@@ -86,7 +134,7 @@ class CatalogToolTests(SecurityTest):
         self.assertEqual(0, len(catalog.searchResults()))
 
     def test_search_restrict_manager(self):
-        catalog = CatalogTool()
+        catalog = self._makeOne()
         now = DateTime()
         dummy = DummyContent(catalog=1)
 
@@ -117,7 +165,7 @@ class CatalogToolTests(SecurityTest):
             expires={'query': now-2, 'range': None})))
 
     def test_search_restrict_inactive(self):
-        catalog = CatalogTool()
+        catalog = self._makeOne()
         now = DateTime()
         dummy = DummyContent(catalog=1)
         dummy._View_Permission = ('Blob',)
@@ -147,7 +195,7 @@ class CatalogToolTests(SecurityTest):
             expires={'query': now-2, 'range': None})))
 
     def test_search_restrict_visible(self):
-        catalog = CatalogTool()
+        catalog = self._makeOne()
         now = DateTime()
         dummy = DummyContent(catalog=1)
         dummy._View_Permission = ('Blob',)
@@ -224,7 +272,7 @@ class CatalogToolTests(SecurityTest):
             expires={'query': now+3, 'range': 'min'})))
 
     def test_convertQuery(self):
-        convert = CatalogTool()._convertQuery
+        convert = self._makeOne()._convertQuery
 
         kw = {}
         convert(kw)

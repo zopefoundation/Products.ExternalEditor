@@ -15,24 +15,23 @@
 $Id$
 """
 
-from unittest import TestCase, TestSuite, makeSuite, main
+from unittest import TestSuite, makeSuite, main
 import Testing
 import Zope
 Zope.startup()
 
+from common import CriterionTestCase
 
-class ListCriterionTests(TestCase):
 
-    def test_Interface( self ):
-        from Products.CMFTopic.interfaces import Criterion
+class ListCriterionTests(CriterionTestCase):
+
+    def _getTargetClass(self):
         from Products.CMFTopic.ListCriterion import ListCriterion
-        self.failUnless(
-            Criterion.isImplementedByInstancesOf( ListCriterion ) )
+
+        return ListCriterion
 
     def test_Empty( self ):
-
-        from Products.CMFTopic.ListCriterion import ListCriterion
-        listc = ListCriterion('foo', 'foofield')
+        listc = self._makeOne('foo', 'foofield')
 
         self.assertEqual( listc.getId(), 'foo' )
         self.assertEqual( listc.field, 'foofield' )
@@ -40,9 +39,7 @@ class ListCriterionTests(TestCase):
         self.assertEqual( len(listc.getCriteriaItems()), 0 )
 
     def test_Edit_withString( self ):
-
-        from Products.CMFTopic.ListCriterion import ListCriterion
-        listc = ListCriterion( 'foo', 'foofield' )
+        listc = self._makeOne('foo', 'foofield')
 
         listc.edit('bar\nbaz')
         self.assertEqual( listc.getId(), 'foo' )
@@ -56,9 +53,7 @@ class ListCriterionTests(TestCase):
         self.assertEqual( items[0][1], ( 'bar', 'baz' ) )
 
     def test_Edit_withList( self ):
-
-        from Products.CMFTopic.ListCriterion import ListCriterion
-        listc = ListCriterion( 'foo', 'foofield' )
+        listc = self._makeOne('foo', 'foofield')
 
         abc = [ 'a', 'b', 'c' ]
         listc.edit( abc )
@@ -68,9 +63,7 @@ class ListCriterionTests(TestCase):
         self.failUnless( tuple( abc ) in map( lambda x: x[1], items ) )
 
     def test_operator( self ):
-
-        from Products.CMFTopic.ListCriterion import ListCriterion
-        listc = ListCriterion( 'foo', 'foofield' )
+        listc = self._makeOne('foo', 'foofield')
 
         abc = [ 'a', 'b', 'c' ]
 

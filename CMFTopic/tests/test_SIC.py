@@ -15,23 +15,23 @@
 $Id$
 """
 
-from unittest import TestCase, TestSuite, makeSuite, main
+from unittest import TestSuite, makeSuite, main
 import Testing
 import Zope
 Zope.startup()
 
-from Products.CMFTopic.SimpleIntCriterion import SimpleIntCriterion
+from common import CriterionTestCase
 
 
-class SimpleIntCriterionTests(TestCase):
+class SimpleIntCriterionTests(CriterionTestCase):
 
-    def test_Interface( self ):
-        from Products.CMFTopic.interfaces import Criterion
-        self.failUnless(
-            Criterion.isImplementedByInstancesOf( SimpleIntCriterion ) )
+    def _getTargetClass(self):
+        from Products.CMFTopic.SimpleIntCriterion import SimpleIntCriterion
+
+        return SimpleIntCriterion
 
     def test_Empty( self ):
-        sic = SimpleIntCriterion( 'foo', 'foofield' )
+        sic = self._makeOne('foo', 'foofield')
         self.assertEqual( sic.getId(), 'foo' )
         self.assertEqual( sic.field, 'foofield' )
         self.assertEqual( sic.value, None )
@@ -39,7 +39,7 @@ class SimpleIntCriterionTests(TestCase):
         self.assertEqual( len(sic.getCriteriaItems() ), 0 )
 
     def test_EditWithString( self ):
-        sic = SimpleIntCriterion('foo', 'foofield')
+        sic = self._makeOne('foo', 'foofield')
         sic.edit('0')
         self.assertEqual( sic.value, 0 )
         self.assertEqual( sic.getValueString(), '0' )
@@ -51,7 +51,7 @@ class SimpleIntCriterionTests(TestCase):
         self.assertEqual( items[0][1], 0 )
 
     def test_EditWithInt( self ):
-        sic = SimpleIntCriterion( 'foo', 'foofield' )
+        sic = self._makeOne('foo', 'foofield')
         sic.edit( 32 )
         self.assertEqual( sic.value, 32 )
         self.assertEqual( sic.getValueString(), '32' )
@@ -62,8 +62,8 @@ class SimpleIntCriterionTests(TestCase):
         self.assertEqual( items[0][1], 32 )
 
     def test_RangeMin( self ):
-        sic = SimpleIntCriterion( 'foo', 'foofield' )
-        sic.edit( '32', SimpleIntCriterion.MINIMUM )
+        sic = self._makeOne('foo', 'foofield')
+        sic.edit( '32', self._getTargetClass().MINIMUM )
 
         self.assertEqual( sic.value, 32 )
         self.assertEqual( sic.getValueString(), '32' )
@@ -76,8 +76,8 @@ class SimpleIntCriterionTests(TestCase):
         self.assertEqual( items[0][1]['range'], 'min' )
 
     def test_RangeMin_withInt( self ):
-        sic = SimpleIntCriterion( 'foo', 'foofield' )
-        sic.edit( 32, SimpleIntCriterion.MINIMUM )
+        sic = self._makeOne('foo', 'foofield')
+        sic.edit( 32, self._getTargetClass().MINIMUM )
 
         self.assertEqual( sic.value, 32 )
         self.assertEqual( sic.getValueString(), '32' )
@@ -90,8 +90,8 @@ class SimpleIntCriterionTests(TestCase):
         self.assertEqual( items[0][1]['range'], 'min' )
 
     def test_RangeMax( self ):
-        sic = SimpleIntCriterion( 'foo', 'foofield' )
-        sic.edit( '32', SimpleIntCriterion.MAXIMUM )
+        sic = self._makeOne('foo', 'foofield')
+        sic.edit( '32', self._getTargetClass().MAXIMUM )
 
         self.assertEqual( sic.value, 32 )
         self.assertEqual( sic.getValueString(), '32' )
@@ -104,8 +104,8 @@ class SimpleIntCriterionTests(TestCase):
         self.assertEqual( items[0][1]['range'], 'max' )
 
     def test_RangeMax_withInt( self ):
-        sic = SimpleIntCriterion( 'foo', 'foofield' )
-        sic.edit( 32, SimpleIntCriterion.MAXIMUM )
+        sic = self._makeOne('foo', 'foofield')
+        sic.edit( 32, self._getTargetClass().MAXIMUM )
 
         self.assertEqual( sic.value, 32 )
         self.assertEqual( sic.getValueString(), '32' )
@@ -118,8 +118,8 @@ class SimpleIntCriterionTests(TestCase):
         self.assertEqual( items[0][1]['range'], 'max' )
 
     def test_RangeMinMax( self ):
-        sic = SimpleIntCriterion( 'foo', 'foofield' )
-        sic.edit( '32 34', SimpleIntCriterion.MINMAX )
+        sic = self._makeOne('foo', 'foofield')
+        sic.edit( '32 34', self._getTargetClass().MINMAX )
 
         self.assertEqual( sic.value, ( 32, 34 ) )
         self.assertEqual( sic.getValueString(), '32 34' )
@@ -132,8 +132,8 @@ class SimpleIntCriterionTests(TestCase):
         self.assertEqual( items[0][1]['range'], 'min:max' )
 
     def test_RangeMinMax_withTuple( self ):
-        sic = SimpleIntCriterion( 'foo', 'foofield' )
-        sic.edit( ( 32, 34 ), SimpleIntCriterion.MINMAX )
+        sic = self._makeOne('foo', 'foofield')
+        sic.edit( ( 32, 34 ), self._getTargetClass().MINMAX )
 
         self.assertEqual( sic.value, ( 32, 34 ) )
         self.assertEqual( sic.getValueString(), '32 34' )

@@ -15,24 +15,23 @@
 $Id$
 """
 
-from unittest import TestCase, TestSuite, makeSuite, main
+from unittest import TestSuite, makeSuite, main
 import Testing
 import Zope
 Zope.startup()
 
+from common import CriterionTestCase
 
-class SortCriterionTests(TestCase):
 
-    def test_Interface( self ):
-        from Products.CMFTopic.interfaces import Criterion
+class SortCriterionTests(CriterionTestCase):
+
+    def _getTargetClass(self):
         from Products.CMFTopic.SortCriterion import SortCriterion
-        self.failUnless(
-            Criterion.isImplementedByInstancesOf( SortCriterion ) )
+
+        return SortCriterion
 
     def test_Empty( self ):
-
-        from Products.CMFTopic.SortCriterion import SortCriterion
-        ssc = SortCriterion( 'foo', 'foofield' )
+        ssc = self._makeOne('foo', 'foofield')
 
         self.assertEqual( ssc.getId(), 'foo' )
         self.assertEqual( ssc.field, None )
@@ -46,9 +45,7 @@ class SortCriterionTests(TestCase):
         self.assertEqual( items[0][1], 'foofield' )
 
     def test_Nonempty( self ):
-
-        from Products.CMFTopic.SortCriterion import SortCriterion
-        ssc = SortCriterion( 'foo', 'foofield' )
+        ssc = self._makeOne('foo', 'foofield')
 
         ssc.edit( 1 )
 

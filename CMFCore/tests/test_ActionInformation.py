@@ -1,8 +1,24 @@
+##############################################################################
+#
+# Copyright (c) 2002 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE.
+#
+##############################################################################
+""" Unit tests for ActionInformation module.
+
+$Id$
+"""
+
 from unittest import TestCase, TestSuite, makeSuite, main
 import Testing
 import Zope
 Zope.startup()
-from Interface.Verify import verifyClass
 
 from Products.PythonScripts.PythonScript import manage_addPythonScript
 
@@ -22,10 +38,22 @@ class ActionCategoryTests(TestCase):
 
         return ActionCategory(*args, **kw)
 
-    def test_interface(self):
+    def test_z2interfaces(self):
+        from Interface.Verify import verifyClass
+        from Products.CMFCore.ActionInformation import ActionCategory
         from Products.CMFCore.interfaces.portal_actions \
                 import ActionCategory as IActionCategory
+
+        verifyClass(IActionCategory, ActionCategory)
+
+    def test_z3interfaces(self):
+        try:
+            from zope.interface.verify import verifyClass
+        except ImportError:
+            # BBB: for Zope 2.7
+            return
         from Products.CMFCore.ActionInformation import ActionCategory
+        from Products.CMFCore.interfaces import IActionCategory
 
         verifyClass(IActionCategory, ActionCategory)
 
@@ -47,10 +75,22 @@ class ActionTests(TestCase):
 
         return Action(*args, **kw)
 
-    def test_interface(self):
+    def test_z2interfaces(self):
+        from Interface.Verify import verifyClass
+        from Products.CMFCore.ActionInformation import Action
         from Products.CMFCore.interfaces.portal_actions \
                 import Action as IAction
+
+        verifyClass(IAction, Action)
+
+    def test_z3interfaces(self):
+        try:
+            from zope.interface.verify import verifyClass
+        except ImportError:
+            # BBB: for Zope 2.7
+            return
         from Products.CMFCore.ActionInformation import Action
+        from Products.CMFCore.interfaces import IAction
 
         verifyClass(IAction, Action)
 
@@ -86,10 +126,22 @@ class ActionInfoTests(TestCase):
 
         return ActionInfo(*args, **kw)
 
-    def test_interface(self):
+    def test_z2interfaces(self):
+        from Interface.Verify import verifyClass
+        from Products.CMFCore.ActionInformation import ActionInfo
         from Products.CMFCore.interfaces.portal_actions \
                 import ActionInfo as IActionInfo
+
+        verifyClass(IActionInfo, ActionInfo)
+
+    def test_z3interfaces(self):
+        try:
+            from zope.interface.verify import verifyClass
+        except ImportError:
+            # BBB: for Zope 2.7
+            return
         from Products.CMFCore.ActionInformation import ActionInfo
+        from Products.CMFCore.interfaces import IActionInfo
 
         verifyClass(IActionInfo, ActionInfo)
 
@@ -201,10 +253,22 @@ class ActionInformationTests(TransactionalTest):
 
         return ActionInformation(*args, **kw)
 
-    def test_interface(self):
+    def test_z2interfaces(self):
+        from Interface.Verify import verifyClass
+        from Products.CMFCore.ActionInformation import ActionInformation
         from Products.CMFCore.interfaces.portal_actions \
                 import Action as IAction
+
+        verifyClass(IAction, ActionInformation)
+
+    def test_z3interfaces(self):
+        try:
+            from zope.interface.verify import verifyClass
+        except ImportError:
+            # BBB: for Zope 2.7
+            return
         from Products.CMFCore.ActionInformation import ActionInformation
+        from Products.CMFCore.interfaces import IAction
 
         verifyClass(IAction, ActionInformation)
 
@@ -219,7 +283,7 @@ class ActionInformationTests(TransactionalTest):
         self.assertEqual(ai.getVisibility(), 1)
         self.assertEqual(ai.getCategory(), 'object')
         self.assertEqual(ai.getPermissions(), ())
-        
+
     def test_editing(self):
         ai = self._makeOne(id='view', category='folder')
         ai.edit(id='new_id', title='blah')

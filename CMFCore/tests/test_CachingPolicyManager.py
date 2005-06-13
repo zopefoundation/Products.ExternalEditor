@@ -1,15 +1,27 @@
+##############################################################################
+#
+# Copyright (c) 2002 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE.
+#
+##############################################################################
+""" Unit tests for CachingPolicyManager module.
+
+$Id$
+"""
+
 from unittest import TestCase, TestSuite, makeSuite, main
 import Testing
 import Zope
 Zope.startup()
-from Interface.Verify import verifyClass
 
 from App.Common import rfc1123_date
 from DateTime.DateTime import DateTime
-
-from Products.CMFCore.CachingPolicyManager import CachingPolicy
-from Products.CMFCore.CachingPolicyManager import CachingPolicyManager
-from Products.CMFCore.CachingPolicyManager import createCPContext
 
 ACCLARK = DateTime( '2001/01/01' )
 
@@ -34,9 +46,12 @@ class CachingPolicyTests(TestCase):
         self._epoch = DateTime(0)
 
     def _makePolicy( self, policy_id, **kw ):
+        from Products.CMFCore.CachingPolicyManager import CachingPolicy
+
         return CachingPolicy( policy_id, **kw )
 
     def _makeContext( self, **kw ):
+        from Products.CMFCore.CachingPolicyManager import createCPContext
         return createCPContext( DummyContent(self._epoch)
                               , 'foo_view', kw, self._epoch )
 
@@ -241,15 +256,36 @@ class CachingPolicyTests(TestCase):
 
 class CachingPolicyManagerTests(TestCase):
 
+    def _makeOne(self, *args, **kw):
+        from Products.CMFCore.CachingPolicyManager import CachingPolicyManager
+
+        return CachingPolicyManager(*args, **kw)
+
     def setUp(self):
 
         self._epoch = DateTime()
 
-    def _makeOne( self ):
-        return CachingPolicyManager()
-
     def assertEqualDelta( self, lhs, rhs, delta ):
         self.failUnless( abs( lhs - rhs ) <= delta )
+
+    def test_z2interfaces(self):
+        from Interface.Verify import verifyClass
+        from Products.CMFCore.CachingPolicyManager import CachingPolicyManager
+        from Products.CMFCore.interfaces.CachingPolicyManager \
+                import CachingPolicyManager as ICachingPolicyManager
+
+        verifyClass(ICachingPolicyManager, CachingPolicyManager)
+
+    def test_z3interfaces(self):
+        try:
+            from zope.interface.verify import verifyClass
+        except ImportError:
+            # BBB: for Zope 2.7
+            return
+        from Products.CMFCore.CachingPolicyManager import CachingPolicyManager
+        from Products.CMFCore.interfaces import ICachingPolicyManager
+
+        verifyClass(ICachingPolicyManager, CachingPolicyManager)
 
     def test_empty( self ):
 
@@ -405,12 +441,6 @@ class CachingPolicyManagerTests(TestCase):
 
         self.assertEqual( headers[2][0].lower() , 'cache-control' )
         self.assertEqual( headers[2][1] , 'max-age=86400' )
-
-    def test_interface(self):
-        from Products.CMFCore.interfaces.CachingPolicyManager \
-                import CachingPolicyManager as ICachingPolicyManager
-
-        verifyClass(ICachingPolicyManager, CachingPolicyManager)
 
 
 def test_suite():

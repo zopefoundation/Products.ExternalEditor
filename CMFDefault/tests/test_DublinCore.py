@@ -1,12 +1,27 @@
+##############################################################################
+#
+# Copyright (c) 2002 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE.
+#
+##############################################################################
+""" Unit tests for DublinCore module.
+
+$Id$
+"""
+
 from unittest import TestSuite, makeSuite, main
 import Testing
 import Zope
 Zope.startup()
 
-from Acquisition import Implicit
-from Interface.Verify import verifyClass
-
 from AccessControl.SecurityManagement import newSecurityManager
+from Acquisition import Implicit
 from DateTime.DateTime import DateTime
 
 from Products.CMFCore.tests.base.dummy import DummySite
@@ -32,6 +47,7 @@ def _DateIndexConvert(value):
 
     return t_val
 
+
 class DummyMetadataTool(Implicit):
 
     def __init__(self, publisher):
@@ -40,26 +56,10 @@ class DummyMetadataTool(Implicit):
     def getPublisher(self):
         return self._publisher
 
+
 class DublinCoreTests(SecurityTest):
 
-    def xxx_setUp(self):
-        SecurityTest.setUp(self)
-
-    def test_interface(self):
-        from Products.CMFCore.interfaces.DublinCore \
-                import DublinCore as IDublinCore
-        from Products.CMFCore.interfaces.DublinCore \
-                import CatalogableDublinCore as ICatalogableDublinCore
-        from Products.CMFCore.interfaces.DublinCore \
-                import MutableDublinCore as IMutableDublinCore
-        from Products.CMFDefault.DublinCore import DefaultDublinCoreImpl
-
-        verifyClass(IDublinCore, DefaultDublinCoreImpl)
-        verifyClass(ICatalogableDublinCore, DefaultDublinCoreImpl)
-        verifyClass(IMutableDublinCore, DefaultDublinCoreImpl)
-
     def _makeDummyContent(self, id, *args, **kw):
-
         from Products.CMFCore.PortalContent import PortalContent
         from Products.CMFDefault.DublinCore import DefaultDublinCoreImpl
 
@@ -67,6 +67,35 @@ class DublinCoreTests(SecurityTest):
             pass
 
         return DummyContent(id, *args, **kw)
+
+    def test_z2interfaces(self):
+        from Interface.Verify import verifyClass
+        from Products.CMFCore.interfaces.DublinCore \
+                import CatalogableDublinCore as ICatalogableDublinCore
+        from Products.CMFCore.interfaces.DublinCore \
+                import DublinCore as IDublinCore
+        from Products.CMFCore.interfaces.DublinCore \
+                import MutableDublinCore as IMutableDublinCore
+        from Products.CMFDefault.DublinCore import DefaultDublinCoreImpl
+
+        verifyClass(ICatalogableDublinCore, DefaultDublinCoreImpl)
+        verifyClass(IDublinCore, DefaultDublinCoreImpl)
+        verifyClass(IMutableDublinCore, DefaultDublinCoreImpl)
+
+    def test_z3interfaces(self):
+        try:
+            from zope.interface.verify import verifyClass
+        except ImportError:
+            # BBB: for Zope 2.7
+            return
+        from Products.CMFCore.interfaces import ICatalogableDublinCore
+        from Products.CMFCore.interfaces import IDublinCore
+        from Products.CMFCore.interfaces import IMutableDublinCore
+        from Products.CMFDefault.DublinCore import DefaultDublinCoreImpl
+
+        verifyClass(ICatalogableDublinCore, DefaultDublinCoreImpl)
+        verifyClass(IDublinCore, DefaultDublinCoreImpl)
+        verifyClass(IMutableDublinCore, DefaultDublinCoreImpl)
 
     def test_notifyModified(self):
         site = DummySite('site').__of__(self.root)
@@ -174,8 +203,8 @@ class DublinCoreTests(SecurityTest):
             # Finally, verify that display has not changed.
             new_DC = getattr(item, dc_methodname)()
             self.assertEqual(orig_DC, new_DC)
-        
-        
+
+
 def test_suite():
     return TestSuite((
         makeSuite( DublinCoreTests ),

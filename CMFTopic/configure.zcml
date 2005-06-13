@@ -1,0 +1,36 @@
+<configure
+    xmlns:five="http://namespaces.zope.org/five"
+    >
+
+  <five:bridge
+      zope2=".interfaces.Criterion.Criterion"
+      package=".interfaces"
+      name="ICriterion"
+      />
+
+  <five:implements
+      class=".DateCriteria.FriendlyDateCriterion"
+      interface=".interfaces.ICriterion"
+      />
+
+  <five:implements
+      class=".ListCriterion.ListCriterion"
+      interface=".interfaces.ICriterion"
+      />
+
+  <five:implements
+      class=".SimpleIntCriterion.SimpleIntCriterion"
+      interface=".interfaces.ICriterion"
+      />
+
+  <five:implements
+      class=".SimpleStringCriterion.SimpleStringCriterion"
+      interface=".interfaces.ICriterion"
+      />
+
+  <five:implements
+      class=".SortCriterion.SortCriterion"
+      interface=".interfaces.ICriterion"
+      />
+
+</configure>

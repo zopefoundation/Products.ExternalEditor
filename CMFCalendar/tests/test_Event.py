@@ -19,11 +19,9 @@ from unittest import TestCase, TestSuite, makeSuite, main
 import Testing
 import Zope
 Zope.startup()
-from Interface.Verify import verifyClass
 
 from DateTime import DateTime
 
-from Products.CMFCore.tests.base.dummy import DummySite
 from Products.CMFCore.tests.base.dummy import DummyTool
 from Products.CMFCore.tests.base.testcase import RequestTest
 
@@ -34,6 +32,45 @@ class TestEvent(TestCase):
         from Products.CMFCalendar.Event import Event
 
         return Event(id, *args, **kw)
+
+    def test_z2interfaces(self):
+        from Interface.Verify import verifyClass
+        from Products.CMFCore.interfaces.Contentish \
+                import Contentish as IContentish
+        from Products.CMFCore.interfaces.DublinCore \
+                import CatalogableDublinCore as ICatalogableDublinCore
+        from Products.CMFCore.interfaces.DublinCore \
+                import DublinCore as IDublinCore
+        from Products.CMFCore.interfaces.DublinCore \
+                import MutableDublinCore as IMutableDublinCore
+        from Products.CMFCore.interfaces.Dynamic \
+                import DynamicType as IDynamicType
+        from Products.CMFCalendar.Event import Event
+
+        verifyClass(ICatalogableDublinCore, Event)
+        verifyClass(IContentish, Event)
+        verifyClass(IDublinCore, Event)
+        verifyClass(IDynamicType, Event)
+        verifyClass(IMutableDublinCore, Event)
+
+    def test_z3interfaces(self):
+        try:
+            from zope.interface.verify import verifyClass
+        except ImportError:
+            # BBB: for Zope 2.7
+            return
+        from Products.CMFCalendar.Event import Event
+        from Products.CMFCore.interfaces import ICatalogableDublinCore
+        from Products.CMFCore.interfaces import IContentish
+        from Products.CMFCore.interfaces import IDublinCore
+        from Products.CMFCore.interfaces import IDynamicType
+        from Products.CMFCore.interfaces import IMutableDublinCore
+
+        verifyClass(ICatalogableDublinCore, Event)
+        verifyClass(IContentish, Event)
+        verifyClass(IDublinCore, Event)
+        verifyClass(IDynamicType, Event)
+        verifyClass(IMutableDublinCore, Event)
 
     def test_new(self):
         event = self._makeOne('test')
@@ -81,25 +118,6 @@ class TestEvent(TestCase):
                          , startAMPM="AM"
                          )
 
-    def test_interface(self):
-        from Products.CMFCore.interfaces.Dynamic \
-                import DynamicType as IDynamicType
-        from Products.CMFCore.interfaces.Contentish \
-                import Contentish as IContentish
-        from Products.CMFCore.interfaces.DublinCore \
-                import DublinCore as IDublinCore
-        from Products.CMFCore.interfaces.DublinCore \
-                import CatalogableDublinCore as ICatalogableDublinCore
-        from Products.CMFCore.interfaces.DublinCore \
-                import MutableDublinCore as IMutableDublinCore
-        from Products.CMFCalendar.Event import Event
-
-        verifyClass(IDynamicType, Event)
-        verifyClass(IContentish, Event)
-        verifyClass(IDublinCore, Event)
-        verifyClass(ICatalogableDublinCore, Event)
-        verifyClass(IMutableDublinCore, Event)
-
 
 class EventPUTTests(RequestTest):
 
@@ -111,7 +129,7 @@ class EventPUTTests(RequestTest):
 
     def test_PutWithoutMetadata(self):
         self.REQUEST['BODY'] = ''
-        d = self._makeOne('foo') 
+        d = self._makeOne('foo')
         d.PUT(self.REQUEST, self.RESPONSE)
 
         self.assertEqual( d.Title(), '' )

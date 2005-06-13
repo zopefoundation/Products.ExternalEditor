@@ -23,7 +23,6 @@ except ImportError:
     # BBB: for Zope 2.7
     import Zope as Zope2
 Zope2.startup()
-from Interface.Verify import verifyClass
 
 import cStringIO
 
@@ -130,6 +129,34 @@ class PortalFolderTests(SecurityTest):
         from Products.CMFCore.PortalFolder import PortalFolder
 
         return self.site._setObject( id, PortalFolder(id, *args, **kw) )
+
+    def test_z2interfaces(self):
+        from Interface.Verify import verifyClass
+        from OFS.IOrderSupport import IOrderedContainer
+        from webdav.WriteLockInterface import WriteLockInterface
+        from Products.CMFCore.interfaces.Dynamic \
+                import DynamicType as IDynamicType
+        from Products.CMFCore.interfaces.Folderish \
+                import Folderish as IFolderish
+        from Products.CMFCore.PortalFolder import PortalFolder
+
+        verifyClass(IDynamicType, PortalFolder)
+        verifyClass(IFolderish, PortalFolder)
+        verifyClass(IOrderedContainer, PortalFolder)
+        verifyClass(WriteLockInterface, PortalFolder)
+
+    def test_z3interfaces(self):
+        try:
+            from zope.interface.verify import verifyClass
+        except ImportError:
+            # BBB: for Zope 2.7
+            return
+        from Products.CMFCore.interfaces import IDynamicType
+        from Products.CMFCore.interfaces import IFolderish
+        from Products.CMFCore.PortalFolder import PortalFolder
+
+        verifyClass(IDynamicType, PortalFolder)
+        verifyClass(IFolderish, PortalFolder)
 
     def test_contents_methods(self):
         ttool = self.site._setObject( 'portal_types', TypesTool() )
@@ -372,20 +399,6 @@ class PortalFolderTests(SecurityTest):
         test = self._makeOne('test')
         test._setObject('foo', DummyContent('foo'))
         self.failIf(test.checkIdAvailable('foo'))
-
-    def test_interface(self):
-        from Products.CMFCore.interfaces.Folderish \
-                import Folderish as IFolderish
-        from Products.CMFCore.interfaces.Dynamic \
-                import DynamicType as IDynamicType
-        from OFS.IOrderSupport import IOrderedContainer
-        from webdav.WriteLockInterface import WriteLockInterface
-        from Products.CMFCore.PortalFolder import PortalFolder
-
-        verifyClass(IFolderish, PortalFolder)
-        verifyClass(IDynamicType, PortalFolder)
-        verifyClass(IOrderedContainer, PortalFolder)
-        verifyClass(WriteLockInterface, PortalFolder)
 
 
 class PortalFolderMoveTests(SecurityTest):
@@ -1093,7 +1106,7 @@ class PortalFolderCopySupportTests( TestCase ):
                                    )
 
     def test_paste_with_restricted_item_content_type_not_allowed(self):
-        
+
         #   Test from CMF Collector #216 (Plone #2186), for the case
         #   in which the item being pasted does not allow adding such
         #   objects to containers which do not explicitly grant access.
@@ -1138,7 +1151,7 @@ class PortalFolderCopySupportTests( TestCase ):
                          )
 
     def test_paste_with_restricted_item_content_type_allowed(self):
-        
+
         #   Test from CMF Collector #216 (Plone #2186), for the case
         #   in which the item being pasted *does8 allow adding such
         #   objects to containers which *do* explicitly grant access.
@@ -1182,12 +1195,12 @@ class PortalFolderCopySupportTests( TestCase ):
         self.failUnless( 'folder2' in folder1.objectIds() )
 
     def test_paste_with_restricted_container_content_type(self):
-        
+
         #   Test from CMF Collector #216 (Plone #2186), for the case
         #   in which the container does not allow adding items of the
         #   type being pasted.
         from Products.CMFCore.PortalFolder import PortalFolder
-        
+
         RESTRICTED_TYPE = 'Restricted Container'
         UNRESTRICTED_TYPE = 'Unrestricted Item'
 

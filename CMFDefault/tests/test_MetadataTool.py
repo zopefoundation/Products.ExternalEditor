@@ -1,8 +1,24 @@
+##############################################################################
+#
+# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE.
+#
+##############################################################################
+""" Unit tests for MetadataTool module.
+
+$Id$
+"""
+
 from unittest import TestCase, TestSuite, makeSuite, main
 import Testing
 import Zope
 Zope.startup()
-from Interface.Verify import verifyClass
 
 from Acquisition import aq_base
 
@@ -109,6 +125,28 @@ class TestMetadataTool( TestCase ):
 
     def tearDown( self ):
         del self.tool
+
+    def test_z2interfaces(self):
+        from Interface.Verify import verifyClass
+        from Products.CMFCore.interfaces.portal_actions \
+                import ActionProvider as IActionProvider
+        from Products.CMFCore.interfaces.portal_metadata \
+                import portal_metadata as IMetadataTool
+
+        verifyClass(IActionProvider, MetadataTool)
+        verifyClass(IMetadataTool, MetadataTool)
+
+    def test_z3interfaces(self):
+        try:
+            from zope.interface.verify import verifyClass
+        except ImportError:
+            # BBB: for Zope 2.7
+            return
+        from Products.CMFCore.interfaces import IActionProvider
+        from Products.CMFCore.interfaces import IMetadataTool
+
+        verifyClass(IActionProvider, MetadataTool)
+        verifyClass(IMetadataTool, MetadataTool)
 
     def test_empty( self ):
 
@@ -366,15 +404,6 @@ class TestMetadataTool( TestCase ):
 
         foo.setTitle( 'Foo title' )
         self.tool.validateMetadata( foo )
-
-    def test_interface(self):
-        from Products.CMFCore.interfaces.portal_metadata \
-                import portal_metadata as IMetadataTool
-        from Products.CMFCore.interfaces.portal_actions \
-                import ActionProvider as IActionProvider
-
-        verifyClass(IMetadataTool, MetadataTool)
-        verifyClass(IActionProvider, MetadataTool)
 
 
 def test_suite():

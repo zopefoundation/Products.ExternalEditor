@@ -65,16 +65,17 @@ class Criterion(Interface):
         self.edit(**command).
         """
 
-    def edit(**kw):
-        """\
-        The signature of this method should be specific to the
-        criterion.  Using the values in the attribute
-        '_editableAttributes', the Topic can apply the right
-        commands to each criteria object as its being edited without
-        having to know too much about the structure.
-        """
+# XXX: Interfaces have to specify the signature.
+##    def edit(**kw):
+##        """\
+##        The signature of this method should be specific to the
+##        criterion.  Using the values in the attribute
+##        '_editableAttributes', the Topic can apply the right
+##        commands to each criteria object as its being edited without
+##        having to know too much about the structure.
+##        """
 
-    def criteriaItems():
+    def getCriteriaItems():
         """\
         Return a sequence of key-value tuples, each representing
         a value to be injected into the query dictionary (and,

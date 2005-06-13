@@ -2,6 +2,9 @@ HEAD only (unreleased)
 
   New Features
 
+    - Interfaces: Added newstyle (Zope 3) interfaces.
+      This change has no effect on Zope 2.7 without Five.
+
     - CMFDefault skins: Added members_delete_form.
       This adds a confirmation step to avoid accidental deletion of members.
 
@@ -28,17 +31,8 @@ HEAD only (unreleased)
 
   Bug Fixes
 
-    - CMFDefault.SyndicationTool: Zope 2.8 raises AttributeError where
-      earlier Zopes used to raise KeyError.
-
-    - Set cache headers in 304 responses from FSImage / FSFile
-      (http://zope.org/Collectors/355)
-
     - DublinCore and PortalFolder: Changed fallback in 'Type' method.
       The fallback is only necessary if the related type info is missing.
-
-    - CMFDefault.SyndicationTool: Coerce property values into correct
-      types. (http://zope.org/Collectors/CMF/344)
 
     - CMFCore.PortalContent: Wrong variable name in __call__ would blow up
       if no default view could be found for a piece of content.

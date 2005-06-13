@@ -1,12 +1,26 @@
+##############################################################################
+#
+# Copyright (c) 2002 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE.
+#
+##############################################################################
+""" Unit tests for WorkflowTool module.
+
+$Id$
+"""
+
 from unittest import TestCase, TestSuite, makeSuite, main
 import Testing
 import Zope
 Zope.startup()
-from Interface.Verify import verifyClass
 
 from OFS.SimpleItem import SimpleItem
-
-from Products.CMFCore.WorkflowTool import WorkflowTool
 
 
 class Dummy( SimpleItem ):
@@ -128,6 +142,8 @@ class WorkflowToolTests(TestCase):
         _removeWorkflowFactory( DummyWorkflow )
 
     def _makeOne( self, workflow_ids=() ):
+        from Products.CMFCore.WorkflowTool import WorkflowTool
+
         tool = WorkflowTool()
 
         for workflow_id in workflow_ids:
@@ -152,6 +168,30 @@ class WorkflowToolTests(TestCase):
         tool = self._makeWithTypes()
         tool.setChainForPortalTypes( ( 'Dummy Content', ), ( 'a', 'b' ) )
         return tool
+
+    def test_z2interfaces(self):
+        from Interface.Verify import verifyClass
+        from Products.CMFCore.interfaces.portal_actions \
+                import ActionProvider as IActionProvider
+        from Products.CMFCore.interfaces.portal_workflow \
+                import portal_workflow as IWorkflowTool
+        from Products.CMFCore.WorkflowTool import WorkflowTool
+
+        verifyClass(IActionProvider, WorkflowTool)
+        verifyClass(IWorkflowTool, WorkflowTool)
+
+    def test_z3interfaces(self):
+        try:
+            from zope.interface.verify import verifyClass
+        except ImportError:
+            # BBB: for Zope 2.7
+            return
+        from Products.CMFCore.interfaces import IActionProvider
+        from Products.CMFCore.interfaces import IWorkflowTool
+        from Products.CMFCore.WorkflowTool import WorkflowTool
+
+        verifyClass(IActionProvider, WorkflowTool)
+        verifyClass(IWorkflowTool, WorkflowTool)
 
     def test_empty( self ):
 
@@ -329,15 +369,6 @@ class WorkflowToolTests(TestCase):
             and then check to see that the workflows each got called;
             check the resulting count, as well.
         """
-
-    def test_interface(self):
-        from Products.CMFCore.interfaces.portal_workflow \
-                import portal_workflow as IWorkflowTool
-        from Products.CMFCore.interfaces.portal_actions \
-                import ActionProvider as IActionProvider
-
-        verifyClass(IWorkflowTool, WorkflowTool)
-        verifyClass(IActionProvider, WorkflowTool)
 
 
 def test_suite():

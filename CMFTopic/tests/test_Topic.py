@@ -27,7 +27,7 @@ from Products.CMFCore.tests.base.testcase import SecurityTest
 from Products.CMFCore.TypesTool import FactoryTypeInformation as FTI
 from Products.CMFCore.TypesTool import TypesTool
 from Products.CMFTopic.Topic import factory_type_information as FTIDATA_TOPIC
-from Products.CMFTopic.Topic import Topic
+
 
 class FauxBrain( Implicit ):
 
@@ -38,6 +38,7 @@ class FauxBrain( Implicit ):
     def getObject( self ):
 
         return self._object
+
 
 class DummyDocument( Implicit ):
 
@@ -119,8 +120,7 @@ class DummySyndicationTool( Implicit ):
 
 
 class TestTopic(SecurityTest):
-    """
-        Test all the general Topic cases
+    """ Test all the general Topic cases.
     """
 
     def setUp(self):
@@ -128,6 +128,8 @@ class TestTopic(SecurityTest):
         self.site = DummySite('site').__of__(self.root)
 
     def _makeOne(self, id, *args, **kw):
+        from Products.CMFTopic.Topic import Topic
+
         return self.site._setObject( id, Topic(id, *args, **kw) )
 
     def _initSite( self, max_items=15, index_ids=() ):
@@ -144,6 +146,34 @@ class TestTopic(SecurityTest):
 
             self.site._setObject( k, v )
             self.site.portal_catalog._index( document )
+
+    def test_z2interfaces(self):
+        from Interface.Verify import verifyClass
+        from OFS.IOrderSupport import IOrderedContainer
+        from webdav.WriteLockInterface import WriteLockInterface
+        from Products.CMFCore.interfaces.Dynamic \
+                import DynamicType as IDynamicType
+        from Products.CMFCore.interfaces.Folderish \
+                import Folderish as IFolderish
+        from Products.CMFTopic.Topic import Topic
+
+        verifyClass(IDynamicType, Topic)
+        verifyClass(IFolderish, Topic)
+        verifyClass(IOrderedContainer, Topic)
+        verifyClass(WriteLockInterface, Topic)
+
+    def test_z3interfaces(self):
+        try:
+            from zope.interface.verify import verifyClass
+        except ImportError:
+            # BBB: for Zope 2.7
+            return
+        from Products.CMFCore.interfaces import IDynamicType
+        from Products.CMFCore.interfaces import IFolderish
+        from Products.CMFTopic.Topic import Topic
+
+        verifyClass(IDynamicType, Topic)
+        verifyClass(IFolderish, Topic)
 
     def test_Empty( self ):
         topic = self._makeOne('top')
@@ -277,6 +307,7 @@ _DOCUMENTS = \
 , 'six'     : "gonna wash that man right out of my hair"
 , 'seven'   : "I'm so much in love"
 }
+
 
 def test_suite():
     return TestSuite((

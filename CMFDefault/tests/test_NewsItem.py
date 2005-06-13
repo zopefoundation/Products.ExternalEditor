@@ -19,13 +19,11 @@ from unittest import TestCase, TestSuite, makeSuite, main
 import Testing
 import Zope
 Zope.startup()
-from Interface.Verify import verifyClass
 
 from Products.CMFCore.tests.base.content import BASIC_HTML
 from Products.CMFCore.tests.base.content import BASIC_STRUCTUREDTEXT
 from Products.CMFCore.tests.base.content import DOCTYPE
 from Products.CMFCore.tests.base.content import ENTITY_IN_TITLE
-from Products.CMFCore.tests.base.dummy import DummySite
 from Products.CMFCore.tests.base.dummy import DummyTool
 from Products.CMFCore.tests.base.testcase import RequestTest
 
@@ -36,6 +34,45 @@ class NewsItemTests(TestCase):
         from Products.CMFDefault.NewsItem import NewsItem
 
         return NewsItem(id, *args, **kw)
+
+    def test_z2interfaces(self):
+        from Interface.Verify import verifyClass
+        from Products.CMFCore.interfaces.Contentish \
+                import Contentish as IContentish
+        from Products.CMFCore.interfaces.DublinCore \
+                import CatalogableDublinCore as ICatalogableDublinCore
+        from Products.CMFCore.interfaces.DublinCore \
+                import DublinCore as IDublinCore
+        from Products.CMFCore.interfaces.DublinCore \
+                import MutableDublinCore as IMutableDublinCore
+        from Products.CMFCore.interfaces.Dynamic \
+                import DynamicType as IDynamicType
+        from Products.CMFDefault.NewsItem import NewsItem
+
+        verifyClass(ICatalogableDublinCore, NewsItem)
+        verifyClass(IContentish, NewsItem)
+        verifyClass(IDublinCore, NewsItem)
+        verifyClass(IDynamicType, NewsItem)
+        verifyClass(IMutableDublinCore, NewsItem)
+
+    def test_z3interfaces(self):
+        try:
+            from zope.interface.verify import verifyClass
+        except ImportError:
+            # BBB: for Zope 2.7
+            return
+        from Products.CMFCore.interfaces import ICatalogableDublinCore
+        from Products.CMFCore.interfaces import IContentish
+        from Products.CMFCore.interfaces import IDublinCore
+        from Products.CMFCore.interfaces import IDynamicType
+        from Products.CMFCore.interfaces import IMutableDublinCore
+        from Products.CMFDefault.NewsItem import NewsItem
+
+        verifyClass(ICatalogableDublinCore, NewsItem)
+        verifyClass(IContentish, NewsItem)
+        verifyClass(IDublinCore, NewsItem)
+        verifyClass(IDynamicType, NewsItem)
+        verifyClass(IMutableDublinCore, NewsItem)
 
     def test_Empty_html(self):
         d = self._makeOne('empty', text_format='html')
@@ -70,25 +107,6 @@ class NewsItemTests(TestCase):
 
         self.assertEqual( d.Format(), 'text/plain' )
         self.assertEqual( d.text_format, 'structured-text' )
-
-    def test_interface(self):
-        from Products.CMFCore.interfaces.Dynamic \
-                import DynamicType as IDynamicType
-        from Products.CMFCore.interfaces.Contentish \
-                import Contentish as IContentish
-        from Products.CMFCore.interfaces.DublinCore \
-                import DublinCore as IDublinCore
-        from Products.CMFCore.interfaces.DublinCore \
-                import CatalogableDublinCore as ICatalogableDublinCore
-        from Products.CMFCore.interfaces.DublinCore \
-                import MutableDublinCore as IMutableDublinCore
-        from Products.CMFDefault.NewsItem import NewsItem
-
-        verifyClass(IDynamicType, NewsItem)
-        verifyClass(IContentish, NewsItem)
-        verifyClass(IDublinCore, NewsItem)
-        verifyClass(ICatalogableDublinCore, NewsItem)
-        verifyClass(IMutableDublinCore, NewsItem)
 
 
 class NewsItemPUTTests(RequestTest):

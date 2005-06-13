@@ -1,13 +1,28 @@
+##############################################################################
+#
+# Copyright (c) 2002 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE.
+#
+##############################################################################
+""" Unit tests for MembershipTool module.
+
+$Id$
+"""
+
 from unittest import TestCase, TestSuite, makeSuite, main
 import Testing
 import Zope
 Zope.startup()
-from Interface.Verify import verifyClass
 
 from AccessControl.SecurityManagement import newSecurityManager
 
 from Products.CMFCore.MemberDataTool import MemberDataTool
-from Products.CMFCore.MembershipTool import MembershipTool
 from Products.CMFCore.PortalFolder import PortalFolder
 from Products.CMFCore.tests.base.dummy import DummySite
 from Products.CMFCore.tests.base.dummy import DummyTool
@@ -17,22 +32,42 @@ from Products.CMFCore.tests.base.testcase import SecurityTest
 
 class MembershipToolTests(TestCase):
 
-    def test_interface(self):
-        from Products.CMFCore.interfaces.portal_membership \
-                import portal_membership as IMembershipTool
+    def test_z2interfaces(self):
+        from Interface.Verify import verifyClass
         from Products.CMFCore.interfaces.portal_actions \
                 import ActionProvider as IActionProvider
+        from Products.CMFCore.interfaces.portal_membership \
+                import portal_membership as IMembershipTool
+        from Products.CMFCore.MembershipTool import MembershipTool
 
-        verifyClass(IMembershipTool, MembershipTool)
         verifyClass(IActionProvider, MembershipTool)
+        verifyClass(IMembershipTool, MembershipTool)
+
+    def test_z3interfaces(self):
+        try:
+            from zope.interface.verify import verifyClass
+        except ImportError:
+            # BBB: for Zope 2.7
+            return
+        from Products.CMFCore.interfaces import IActionProvider
+        from Products.CMFCore.interfaces import IMembershipTool
+        from Products.CMFCore.MembershipTool import MembershipTool
+
+        verifyClass(IActionProvider, MembershipTool)
+        verifyClass(IMembershipTool, MembershipTool)
 
 
 class MembershipToolSecurityTests(SecurityTest):
 
+    def _makeOne(self, *args, **kw):
+        from Products.CMFCore.MembershipTool import MembershipTool
+
+        return MembershipTool(*args, **kw)
+
     def setUp(self):
         SecurityTest.setUp(self)
         self.site = DummySite('site').__of__(self.root)
-        self.site._setObject( 'portal_membership', MembershipTool() )
+        self.site._setObject( 'portal_membership', self._makeOne() )
 
     def test_getCandidateLocalRoles(self):
         mtool = self.site.portal_membership

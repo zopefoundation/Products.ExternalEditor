@@ -15,27 +15,24 @@
 $Id$
 """
 
-from unittest import TestCase, TestSuite, makeSuite, main
+from unittest import TestSuite, makeSuite, main
 import Testing
 import Zope
 Zope.startup()
 
+from common import CriterionTestCase
 
-class SimpleStringCriterionTests(TestCase):
 
-    def test_Interface( self ):
-        from Products.CMFTopic.interfaces import Criterion
+class SimpleStringCriterionTests(CriterionTestCase):
+
+    def _getTargetClass(self):
         from Products.CMFTopic.SimpleStringCriterion \
-            import SimpleStringCriterion
-        self.failUnless(
-            Criterion.isImplementedByInstancesOf( SimpleStringCriterion ) )
+                import SimpleStringCriterion
+
+        return SimpleStringCriterion
 
     def test_Empty( self ):
-
-        from Products.CMFTopic.SimpleStringCriterion \
-            import SimpleStringCriterion
-
-        ssc = SimpleStringCriterion( 'foo', 'foofield' )
+        ssc = self._makeOne('foo', 'foofield')
 
         self.assertEqual( ssc.getId(), 'foo' )
         self.assertEqual( ssc.field, 'foofield' )
@@ -43,11 +40,7 @@ class SimpleStringCriterionTests(TestCase):
         self.assertEqual( len( ssc.getCriteriaItems() ), 0 )
 
     def test_Nonempty( self ):
-
-        from Products.CMFTopic.SimpleStringCriterion \
-            import SimpleStringCriterion
-
-        ssc = SimpleStringCriterion( 'foo', 'foofield' )
+        ssc = self._makeOne('foo', 'foofield')
         ssc.edit( 'bar' )
 
         self.assertEqual( ssc.getId(), 'foo' )

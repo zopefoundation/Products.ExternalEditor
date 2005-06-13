@@ -1,12 +1,26 @@
+##############################################################################
+#
+# Copyright (c) 2002 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE.
+#
+##############################################################################
+""" Unit tests for MemberDataTool module.
+
+$Id$
+"""
+
 from unittest import TestCase, TestSuite, makeSuite, main
 import Testing
 import Zope
 Zope.startup()
-from Interface.Verify import verifyClass
-import Acquisition
 
-from Products.CMFCore.MemberDataTool import MemberDataTool
-from Products.CMFCore.MemberDataTool import MemberData
+import Acquisition
 
 
 class DummyUserFolder(Acquisition.Implicit):
@@ -50,28 +64,67 @@ class DummyMemberDataTool(Acquisition.Implicit):
 
 class MemberDataToolTests(TestCase):
 
+    def _makeOne(self, *args, **kw):
+        from Products.CMFCore.MemberDataTool import MemberDataTool
+
+        return MemberDataTool(*args, **kw)
+
+    def test_z2interfaces(self):
+        from Interface.Verify import verifyClass
+        from Products.CMFCore.interfaces.portal_actions \
+                import ActionProvider as IActionProvider
+        from Products.CMFCore.interfaces.portal_memberdata \
+                import portal_memberdata as IMemberDataTool
+        from Products.CMFCore.MemberDataTool import MemberDataTool
+
+        verifyClass(IActionProvider, MemberDataTool)
+        verifyClass(IMemberDataTool, MemberDataTool)
+
+    def test_z3interfaces(self):
+        try:
+            from zope.interface.verify import verifyClass
+        except ImportError:
+            # BBB: for Zope 2.7
+            return
+        from Products.CMFCore.interfaces import IActionProvider
+        from Products.CMFCore.interfaces import IMemberDataTool
+        from Products.CMFCore.MemberDataTool import MemberDataTool
+
+        verifyClass(IActionProvider, MemberDataTool)
+        verifyClass(IMemberDataTool, MemberDataTool)
+
     def test_deleteMemberData(self):
-        tool = MemberDataTool()
+        tool = self._makeOne()
         tool.registerMemberData('Dummy', 'user_foo')
         self.failUnless( tool._members.has_key('user_foo') )
         self.failUnless( tool.deleteMemberData('user_foo') )
         self.failIf( tool._members.has_key('user_foo') )
         self.failIf( tool.deleteMemberData('user_foo') )
 
-    def test_interface(self):
-        from Products.CMFCore.interfaces.portal_memberdata \
-                import portal_memberdata as IMemberDataTool
-        from Products.CMFCore.interfaces.portal_actions \
-                import ActionProvider as IActionProvider
-
-        verifyClass(IMemberDataTool, MemberDataTool)
-        verifyClass(IActionProvider, MemberDataTool)
 
 class MemberDataTests(TestCase):
 
-    def test_interface(self):
+    def _makeOne(self, *args, **kw):
+        from Products.CMFCore.MemberDataTool import MemberData
+
+        return MemberData(*args, **kw)
+
+    def test_z2interfaces(self):
+        from Interface.Verify import verifyClass
         from Products.CMFCore.interfaces.portal_memberdata \
                 import MemberData as IMemberData
+        from Products.CMFCore.MemberDataTool import MemberData
+
+        verifyClass(IMemberData, MemberData)
+
+    def test_z3interfaces(self):
+        try:
+            from zope.interface.verify import verifyClass
+        except ImportError:
+            # BBB: for Zope 2.7
+            return
+        from Products.CMFCore.interfaces import IMemberData
+        from Products.CMFCore.MemberDataTool import MemberData
 
         verifyClass(IMemberData, MemberData)
 
@@ -81,7 +134,7 @@ class MemberDataTests(TestCase):
         user = DummyUser('bob', 'pw', ['Role'], ['domain'])
         aclu._addUser(user)
         user = user.__of__(aclu)
-        member = MemberData(None, 'bob').__of__(mdtool).__of__(user)
+        member = self._makeOne(None, 'bob').__of__(mdtool).__of__(user)
         member.setSecurityProfile(password='newpw')
         self.assertEqual(user.__, 'newpw')
         self.assertEqual(list(user.roles), ['Role'])
@@ -94,6 +147,7 @@ class MemberDataTests(TestCase):
         self.assertEqual(user.__, 'newpw')
         self.assertEqual(list(user.roles), ['NewRole'])
         self.assertEqual(list(user.domains), ['newdomain'])
+
 
 def test_suite():
     return TestSuite((

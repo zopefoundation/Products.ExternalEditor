@@ -1,8 +1,24 @@
+##############################################################################
+#
+# Copyright (c) 2001 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE.
+#
+##############################################################################
+""" Unit tests for TypesTool module.
+
+$Id$
+"""
+
 from unittest import TestCase, TestSuite, makeSuite, main
 import Testing
 import Zope
 Zope.startup()
-from Interface.Verify import verifyClass
 
 from AccessControl import Unauthorized
 from AccessControl.SecurityManagement import newSecurityManager
@@ -33,21 +49,49 @@ from Products.CMFCore.tests.base.tidata import FTIDATA_CMF14_SPECIAL2
 from Products.CMFCore.tests.base.tidata import FTIDATA_CMF15
 from Products.CMFCore.tests.base.tidata import FTIDATA_DUMMY
 from Products.CMFCore.tests.base.tidata import STI_SCRIPT
-from Products.CMFCore.TypesTool import FactoryTypeInformation as FTI
-from Products.CMFCore.TypesTool import ScriptableTypeInformation as STI
-from Products.CMFCore.TypesTool import TypesTool
 
 
 class TypesToolTests(SecurityTest):
 
+    def _makeOne(self):
+        from Products.CMFCore.TypesTool import TypesTool
+
+        return TypesTool()
+
     def setUp( self ):
+        from Products.CMFCore.TypesTool import FactoryTypeInformation as FTI
+
         SecurityTest.setUp(self)
 
         self.site = DummySite('site').__of__(self.root)
         self.acl_users = self.site._setObject( 'acl_users', DummyUserFolder() )
-        self.ttool = self.site._setObject( 'portal_types', TypesTool() )
+        self.ttool = self.site._setObject( 'portal_types', self._makeOne() )
         fti = FTIDATA_DUMMY[0].copy()
         self.ttool._setObject( 'Dummy Content', FTI(**fti) )
+
+    def test_z2interfaces(self):
+        from Interface.Verify import verifyClass
+        from Products.CMFCore.interfaces.portal_actions \
+                import ActionProvider as IActionProvider
+        from Products.CMFCore.interfaces.portal_types \
+                import portal_types as ITypesTool
+        from Products.CMFCore.TypesTool import TypesTool
+
+        verifyClass(IActionProvider, TypesTool)
+        verifyClass(ITypesTool, TypesTool)
+
+    def test_z3interfaces(self):
+        try:
+            from zope.interface.verify import verifyClass
+        except ImportError:
+            # BBB: for Zope 2.7
+            return
+        from Products.CMFCore.interfaces import IActionProvider
+        from Products.CMFCore.interfaces import ITypesTool
+        from Products.CMFCore.TypesTool import TypesTool
+
+        verifyClass(IActionProvider, TypesTool)
+        verifyClass(ITypesTool, TypesTool)
 
     def test_allMetaTypes(self):
         """
@@ -70,6 +114,9 @@ class TypesToolTests(SecurityTest):
         self.failUnless(meta_types.has_key('Factory-based Type Information'))
 
     def test_constructContent(self):
+        from Products.CMFCore.TypesTool \
+                import ScriptableTypeInformation as STI
+
         site = self.site
         acl_users = self.acl_users
         ttool = self.ttool
@@ -100,7 +147,7 @@ class TypesToolTests(SecurityTest):
         #http://www.zope.org/Collectors/CMF/49
 
         #If you have two FTIs on the file system, both with the same meta_type
-        #but with different id values, the way listDefaultTypeInformation 
+        #but with different id values, the way listDefaultTypeInformation
         #listed them in the dropdown list made it impossible to distinguish
         #the two because the identifier string only contained the CMF package
         #name and the meta_type
@@ -143,17 +190,12 @@ class TypesToolTests(SecurityTest):
         self.failUnless('NewType2' in self.ttool.objectIds())
 
 
-def test_interface(self):
-        from Products.CMFCore.interfaces.portal_types \
-                import portal_types as ITypesTool
-        from Products.CMFCore.interfaces.portal_actions \
-                import ActionProvider as IActionProvider
-
-        verifyClass(ITypesTool, TypesTool)
-        verifyClass(IActionProvider, TypesTool)
-
-
 class TypeInfoTests(TestCase):
+
+    def _makeTypesTool(self):
+        from Products.CMFCore.TypesTool import TypesTool
+
+        return TypesTool()
 
     def test_construction( self ):
         ti = self._makeInstance( 'Foo'
@@ -180,7 +222,7 @@ class TypeInfoTests(TestCase):
         return tool[id]
 
     def test_allowType( self ):
-        self.tool = TypesTool()
+        self.tool = self._makeTypesTool()
         ti = self._makeAndSetInstance( 'Foo' )
         self.failIf( ti.allowType( 'Foo' ) )
         self.failIf( ti.allowType( 'Bar' ) )
@@ -192,7 +234,7 @@ class TypeInfoTests(TestCase):
         self.failUnless( ti.allowType( 'Foo3' ) )
 
     def test_GlobalHide( self ):
-        self.tool = TypesTool()
+        self.tool = self._makeTypesTool()
         tnf = self._makeAndSetInstance( 'Folder', filter_content_types=0)
         taf = self._makeAndSetInstance( 'Allowing Folder'
                                       , allowed_content_types=( 'Hidden'
@@ -402,7 +444,28 @@ class TypeInfoTests(TestCase):
 class FTIDataTests( TypeInfoTests ):
 
     def _makeInstance(self, id, **kw):
-        return FTI(id, **kw)
+        from Products.CMFCore.TypesTool import FactoryTypeInformation
+
+        return FactoryTypeInformation(id, **kw)
+
+    def test_z2interfaces(self):
+        from Interface.Verify import verifyClass
+        from Products.CMFCore.interfaces.portal_types \
+                import ContentTypeInformation as ITypeInformation
+        from Products.CMFCore.TypesTool import FactoryTypeInformation
+
+        verifyClass(ITypeInformation, FactoryTypeInformation)
+
+    def test_z3interfaces(self):
+        try:
+            from zope.interface.verify import verifyClass
+        except ImportError:
+            # BBB: for Zope 2.7
+            return
+        from Products.CMFCore.interfaces import ITypeInformation
+        from Products.CMFCore.TypesTool import FactoryTypeInformation
+
+        verifyClass(ITypeInformation, FactoryTypeInformation)
 
     def test_properties( self ):
         ti = self._makeInstance( 'Foo' )
@@ -416,17 +479,32 @@ class FTIDataTests( TypeInfoTests ):
         self.assertEqual( ti.product, 'FooProduct' )
         self.assertEqual( ti.factory, 'addFoo' )
 
-    def test_interface(self):
-        from Products.CMFCore.interfaces.portal_types \
-                import ContentTypeInformation as ITypeInformation
-
-        verifyClass(ITypeInformation, FTI)
-
 
 class STIDataTests( TypeInfoTests ):
 
     def _makeInstance(self, id, **kw):
-        return STI(id, **kw)
+        from Products.CMFCore.TypesTool import ScriptableTypeInformation
+
+        return ScriptableTypeInformation(id, **kw)
+
+    def test_z2interfaces(self):
+        from Interface.Verify import verifyClass
+        from Products.CMFCore.interfaces.portal_types \
+                import ContentTypeInformation as ITypeInformation
+        from Products.CMFCore.TypesTool import ScriptableTypeInformation
+
+        verifyClass(ITypeInformation, ScriptableTypeInformation)
+
+    def test_z3interfaces(self):
+        try:
+            from zope.interface.verify import verifyClass
+        except ImportError:
+            # BBB: for Zope 2.7
+            return
+        from Products.CMFCore.interfaces import ITypeInformation
+        from Products.CMFCore.TypesTool import ScriptableTypeInformation
+
+        verifyClass(ITypeInformation, ScriptableTypeInformation)
 
     def test_properties( self ):
         ti = self._makeInstance( 'Foo' )
@@ -440,12 +518,6 @@ class STIDataTests( TypeInfoTests ):
         self.assertEqual( ti.permission, 'Add Foos' )
         self.assertEqual( ti.constructor_path, 'foo_add' )
 
-    def test_interface(self):
-        from Products.CMFCore.interfaces.portal_types \
-                import ContentTypeInformation as ITypeInformation
-
-        verifyClass(ITypeInformation, STI)
-
 
 class FTIConstructionTests(TestCase):
 
@@ -453,7 +525,9 @@ class FTIConstructionTests(TestCase):
         noSecurityManager()
 
     def _makeInstance(self, id, **kw):
-        return FTI(id, **kw)
+        from Products.CMFCore.TypesTool import FactoryTypeInformation
+
+        return FactoryTypeInformation(id, **kw)
 
     def _makeFolder( self, fake_product=0 ):
         return DummyFolder( fake_product )
@@ -491,12 +565,14 @@ class FTIConstructionTests(TestCase):
 
         self.failIf( ti.isConstructionAllowed( folder ) )
 
+
 class FTIConstructionTests_w_Roles(TestCase):
 
     def tearDown( self ):
         noSecurityManager()
 
     def _makeStuff( self, prefix='' ):
+        from Products.CMFCore.TypesTool import FactoryTypeInformation as FTI
 
         ti = FTI( 'Foo'
                   , product='FooProduct'

@@ -23,7 +23,6 @@ except ImportError:
     # BBB: for Zope 2.7
     import Zope as Zope2
 Zope2.startup()
-from Interface.Verify import verifyClass
 
 from AccessControl.SecurityManagement import newSecurityManager
 from AccessControl.SecurityManagement import noSecurityManager
@@ -35,21 +34,36 @@ except ImportError:
     # BBB: for Zope 2.7
     from Products.CMFCore.utils import transaction
 
-from Products.CMFCore.PortalContent import PortalContent
 from Products.CMFCore.tests.base.testcase import RequestTest
 from Products.CMFDefault.Portal import PortalGenerator
 
 
 class PortalContentTests(TestCase):
 
-    def test_interface(self):
-        from Products.CMFCore.interfaces.Dynamic \
-                import DynamicType as IDynamicType
+    def test_z2interfaces(self):
+        from Interface.Verify import verifyClass
         from Products.CMFCore.interfaces.Contentish \
                 import Contentish as IContentish
+        from Products.CMFCore.interfaces.Dynamic \
+                import DynamicType as IDynamicType
+        from Products.CMFCore.PortalContent import PortalContent
 
-        verifyClass(IDynamicType, PortalContent)
         verifyClass(IContentish, PortalContent)
+        verifyClass(IDynamicType, PortalContent)
+
+    def test_z3interfaces(self):
+        try:
+            from zope.interface.verify import verifyClass
+        except ImportError:
+            # BBB: for Zope 2.7
+            return
+        from Products.CMFCore.interfaces import IContentish
+        from Products.CMFCore.interfaces import IDynamicType
+        from Products.CMFCore.PortalContent import PortalContent
+
+        verifyClass(IContentish, PortalContent)
+        verifyClass(IDynamicType, PortalContent)
+
 
 class TestContentCopyPaste(RequestTest):
 
@@ -85,14 +99,13 @@ class TestContentCopyPaste(RequestTest):
         self.site.portal_membership.createMemberArea('member')
         member_area = self.site.Members.member
 
-
-        # Switch to the manager user context and plant a content item into 
+        # Switch to the manager user context and plant a content item into
         # the member user's member area
         newSecurityManager(None, manager1)
         member_area.invokeFactory('File', id='test_file')
         self.site.portal_workflow.doActionFor(member_area.test_file, 'publish')
 
-        # Switch to "member" context now and try to copy and paste the 
+        # Switch to "member" context now and try to copy and paste the
         # content item created by "manager1"
         newSecurityManager(None, member)
         cb = member_area.manage_copyObjects(['test_file'])

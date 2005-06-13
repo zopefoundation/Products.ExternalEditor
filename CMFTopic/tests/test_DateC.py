@@ -10,22 +10,22 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-""" Unit tests for DateCriterion module.
+""" Unit tests for DateCriteria module.
 
 $Id$
 """
 
-from unittest import TestCase, TestSuite, makeSuite, main
+from unittest import TestSuite, makeSuite, main
 import Testing
 import Zope
 Zope.startup()
 
 from DateTime.DateTime import DateTime
 
-from Products.CMFTopic.DateCriteria import FriendlyDateCriterion
+from common import CriterionTestCase
 
 
-class FriendlyDateCriterionTests(TestCase):
+class FriendlyDateCriterionTests(CriterionTestCase):
 
     lessThanFiveDaysOld = { 'value': 4
                           , 'operation': 'min'
@@ -41,13 +41,13 @@ class FriendlyDateCriterionTests(TestCase):
             , 'daterange': 'ahead'
             }
 
-    def test_Interface( self ):
-        from Products.CMFTopic.interfaces import Criterion
-        self.failUnless(
-            Criterion.isImplementedByInstancesOf( FriendlyDateCriterion ) )
+    def _getTargetClass(self):
+        from Products.CMFTopic.DateCriteria import FriendlyDateCriterion
+
+        return FriendlyDateCriterion
 
     def test_Empty( self ):
-        friendly = FriendlyDateCriterion( 'foo', 'foofield' )
+        friendly = self._makeOne('foo', 'foofield')
 
         self.assertEqual( friendly.getId(), 'foo' )
         self.assertEqual( friendly.field, 'foofield' )
@@ -57,7 +57,7 @@ class FriendlyDateCriterionTests(TestCase):
         self.assertEqual( len( friendly.getCriteriaItems() ), 0 )
 
     def test_ListOfDefaultDates( self ):
-        friendly = FriendlyDateCriterion( 'foo', 'foofield' )
+        friendly = self._makeOne('foo', 'foofield')
 
         d = friendly.defaultDateOptions()
         self.assertEqual( d[0][0], 0 )
@@ -65,7 +65,7 @@ class FriendlyDateCriterionTests(TestCase):
         self.assertEqual( d[2][0], 2 )
 
     def test_Clear( self ):
-        friendly = FriendlyDateCriterion( 'foo', 'foofield' )
+        friendly = self._makeOne('foo', 'foofield')
 
         friendly.edit( value=None )
         self.assertEqual( friendly.value, None )
@@ -73,7 +73,7 @@ class FriendlyDateCriterionTests(TestCase):
         self.assertEqual( friendly.daterange, 'old' )
 
     def test_Basic( self ):
-        friendly = FriendlyDateCriterion( 'foo', 'foofield' )
+        friendly = self._makeOne('foo', 'foofield')
 
         friendly.apply( self.lessThanFiveDaysOld )
         self.assertEqual( friendly.value, 4 )
@@ -81,7 +81,7 @@ class FriendlyDateCriterionTests(TestCase):
         self.assertEqual( friendly.daterange, 'old' )
 
     def test_BadInput( self ):
-        friendly = FriendlyDateCriterion( 'foo', 'foofield' )
+        friendly = self._makeOne('foo', 'foofield')
 
         # Bogus value
         self.assertRaises( ValueError, friendly.edit, 'blah' )
@@ -93,7 +93,7 @@ class FriendlyDateCriterionTests(TestCase):
         self.assertRaises( ValueError, friendly.edit, 4, 'max', 'new' )
 
     def test_StringAsValue( self ):
-        friendly = FriendlyDateCriterion( 'foo', 'foofield' )
+        friendly = self._makeOne('foo', 'foofield')
 
         friendly.edit( '4' )
         self.assertEqual( friendly.value, 4 )
@@ -105,7 +105,7 @@ class FriendlyDateCriterionTests(TestCase):
         self.assertEqual( friendly.value, None )
 
     def test_Today( self ):
-        friendly = FriendlyDateCriterion( 'foo', 'foofield' )
+        friendly = self._makeOne('foo', 'foofield')
 
         friendly.apply( self.today )
         self.assertEqual( friendly.daterange, 'ahead' )
@@ -120,7 +120,7 @@ class FriendlyDateCriterionTests(TestCase):
         self.assertEqual( result[0][1]['range'], 'min:max' )
 
     def test_FiveDaysOld( self ):
-        friendly = FriendlyDateCriterion( 'foo', 'foofield' )
+        friendly = self._makeOne('foo', 'foofield')
 
         friendly.apply( self.lessThanFiveDaysOld )
         self.assertEqual( friendly.daterange, 'old' )
@@ -133,7 +133,7 @@ class FriendlyDateCriterionTests(TestCase):
         self.assertEqual( result[0][1]['range'], 'min' )
 
     def test_OneMonthAhead( self ):
-        friendly = FriendlyDateCriterion( 'foo', 'foofield' )
+        friendly = self._makeOne('foo', 'foofield')
 
         friendly.apply( self.lessThanOneMonthAhead )
         self.assertEqual( friendly.daterange, 'ahead' )

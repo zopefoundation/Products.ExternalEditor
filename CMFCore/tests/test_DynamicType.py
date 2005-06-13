@@ -1,8 +1,24 @@
+##############################################################################
+#
+# Copyright (c) 2002 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE.
+#
+##############################################################################
+""" Unit tests for DynamicType module.
+
+$Id$
+"""
+
 from unittest import TestCase, TestSuite, makeSuite, main
 import Testing
 import Zope
 Zope.startup()
-from Interface.Verify import verifyClass
 
 from Acquisition import Implicit
 from ZPublisher.BaseRequest import BaseRequest
@@ -34,6 +50,23 @@ class DynamicTypeTests(TestCase):
         self.site.portal_types._setObject( 'Dummy Content 15', FTI(**fti) )
         self.site._setObject( 'foo', DummyContent() )
 
+    def test_z2interfaces(self):
+        from Interface.Verify import verifyClass
+        from Products.CMFCore.interfaces.Dynamic \
+                import DynamicType as IDynamicType
+
+        verifyClass(IDynamicType, DynamicType)
+
+    def test_z3interfaces(self):
+        try:
+            from zope.interface.verify import verifyClass
+        except ImportError:
+            # BBB: for Zope 2.7
+            return
+        from Products.CMFCore.interfaces import IDynamicType
+
+        verifyClass(IDynamicType, DynamicType)
+
     def test___before_publishing_traverse__(self):
         dummy_view = self.site._setObject( 'dummy_view', DummyObject() )
         response = HTTPResponse()
@@ -50,12 +83,6 @@ class DynamicTypeTests(TestCase):
         self.assertEqual( r.response.base, '/foo/',
                           'CMF Collector issue #192 (wrong base): %s'
                           % (r.response.base or 'empty',) )
-
-    def test_interface(self):
-        from Products.CMFCore.interfaces.Dynamic \
-                import DynamicType as IDynamicType
-
-        verifyClass(IDynamicType, DynamicType)
 
 
 class DynamicTypeSecurityTests(SecurityRequestTest):

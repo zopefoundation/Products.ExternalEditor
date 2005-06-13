@@ -1,8 +1,24 @@
+##############################################################################
+#
+# Copyright (c) 2002 Zope Corporation and Contributors. All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE.
+#
+##############################################################################
+""" Unit tests for ActionProviderBase module.
+
+$Id$
+"""
+
 from unittest import TestSuite, makeSuite, main
 import Testing
 import Zope
 Zope.startup()
-from Interface.Verify import verifyClass
 
 from Products.CMFCore.tests.base.dummy import DummySite
 from Products.CMFCore.tests.base.dummy import DummyTool
@@ -55,6 +71,23 @@ class ActionProviderBaseTests(SecurityRequestTest):
 
         klass = dummy and DummyProvider or ActionProviderBase
         return klass()
+
+    def test_z2interfaces(self):
+        from Interface.Verify import verifyClass
+        from Products.CMFCore.interfaces.portal_actions \
+                import ActionProvider as IActionProvider
+
+        verifyClass(IActionProvider, ActionProviderBase)
+
+    def test_z3interfaces(self):
+        try:
+            from zope.interface.verify import verifyClass
+        except ImportError:
+            # BBB: for Zope 2.7
+            return
+        from Products.CMFCore.interfaces import IActionProvider
+
+        verifyClass(IActionProvider, ActionProviderBase)
 
     def test_addAction( self ):
 
@@ -244,12 +277,6 @@ class ActionProviderBaseTests(SecurityRequestTest):
         self.assertRaises( ValueError,
                            apb.getActionInfo,
                            'object/an_id', check_visibility=1 )
-
-    def test_interface(self):
-        from Products.CMFCore.interfaces.portal_actions \
-                import ActionProvider as IActionProvider
-
-        verifyClass(IActionProvider, ActionProviderBase)
 
 
 def test_suite():
