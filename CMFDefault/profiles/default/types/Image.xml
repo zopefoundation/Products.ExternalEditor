@@ -1,12 +1,16 @@
 <?xml version="1.0"?>
-<type-info id="Image" kind="Factory-based Type Information"
-           title="Image" meta_type="Portal Image"
-           icon="image_icon.gif"
-           immediate_view="metadata_edit_form"
-           filter_content_types="True"
-           allow_discussion="False" global_allow="True"
-           product="CMFDefault" factory="addImage">
-  <description>Image objects can be embedded in Portal documents.</description>
+<type-info id="Image" kind="Factory-based Type Information">
+  <property name="title">Image</property>
+  <property name="description">Image objects can be embedded in Portal documents.</property>
+  <property name="content_icon">image_icon.gif</property>
+  <property name="content_meta_type">Portal Image</property>
+  <property name="product">CMFDefault</property>
+  <property name="factory">addImage</property>
+  <property name="immediate_view">metadata_edit_form</property>
+  <property name="global_allow">True</property>
+  <property name="filter_content_types">True</property>
+  <property name="allowed_content_types"></property>
+  <property name="allow_discussion">False</property>
   <aliases>
    <alias from="(Default)" to="index_html"/>
    <alias from="view" to="image_view"/>

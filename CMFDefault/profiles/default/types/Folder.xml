@@ -1,13 +1,16 @@
 <?xml version="1.0"?>
-<type-info id="Folder" kind="Factory-based Type Information"
-           title="Folder" meta_type="Portal Folder"
-           icon="folder_icon.gif"
-           immediate_view="folder_edit_form"
-           filter_content_types="False"
-           allow_discussion="False" global_allow="True"
-           product="CMFCore"
-           factory="manage_addPortalFolder">
-  <description>Use folders to put content in categories.</description>
+<type-info id="Folder" kind="Factory-based Type Information">
+  <property name="title">Folder</property>
+  <property name="description">Use folders to put content in categories.</property>
+  <property name="content_icon">folder_icon.gif</property>
+  <property name="content_meta_type">Portal Folder</property>
+  <property name="product">CMFCore</property>
+  <property name="factory">manage_addPortalFolder</property>
+  <property name="immediate_view">folder_edit_form</property>
+  <property name="global_allow">True</property>
+  <property name="filter_content_types">False</property>
+  <property name="allowed_content_types"></property>
+  <property name="allow_discussion">False</property>
   <aliases>
    <alias from="index.html" to="index_html"/>
    <alias from="(Default)" to="index_html"/>

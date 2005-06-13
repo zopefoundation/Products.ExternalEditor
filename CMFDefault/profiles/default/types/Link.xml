@@ -1,12 +1,16 @@
 <?xml version="1.0"?>
-<type-info id="Link" kind="Factory-based Type Information"
-           title="Link" meta_type="Link"
-           icon="link_icon.gif"
-           immediate_view="metadata_edit_form"
-           filter_content_types="True"
-           allow_discussion="False" global_allow="True"
-           product="CMFDefault" factory="addLink">
-  <description>Link items are annotated URLs.</description>
+<type-info id="Link" kind="Factory-based Type Information">
+  <property name="title">Link</property>
+  <property name="description">Link items are annotated URLs.</property>
+  <property name="content_icon">link_icon.gif</property>
+  <property name="content_meta_type">Link</property>
+  <property name="product">CMFDefault</property>
+  <property name="factory">addLink</property>
+  <property name="immediate_view">metadata_edit_form</property>
+  <property name="global_allow">True</property>
+  <property name="filter_content_types">True</property>
+  <property name="allowed_content_types"></property>
+  <property name="allow_discussion">False</property>
   <aliases>
    <alias from="(Default)" to="link_view"/>
    <alias from="view" to="link_view"/>

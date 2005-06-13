@@ -1,13 +1,17 @@
 <?xml version="1.0"?>
-<type-info id="Topic" kind="Factory-based Type Information"
-           title="Topic" meta_type="Portal Topic"
-           icon="topic_icon.gif"
-           immediate_view="topic_edit_form"
-           filter_content_types="True"
-           allow_discussion="False" global_allow="True"
-           product="CMFTopic" factory="addTopic">
-  <description>Topics are canned queries for organizing content with up to date queries into the catalog.</description>
-  <allowed_content_type>Topic</allowed_content_type>
+<type-info id="Topic" kind="Factory-based Type Information">
+  <property name="title">Topic</property>
+  <property name="description">Topics are canned queries for organizing content with up to date queries into the catalog.</property>
+  <property name="content_icon">topic_icon.gif</property>
+  <property name="content_meta_type">Portal Topic</property>
+  <property name="product">CMFTopic</property>
+  <property name="factory">addTopic</property>
+  <property name="immediate_view">topic_edit_form</property>
+  <property name="global_allow">True</property>
+  <property name="filter_content_types">True</property>
+  <property name="allowed_content_types">
+   <element value="Topic" /></property>
+  <property name="allow_discussion">False</property>
   <aliases>
    <alias from="(Default)" to="topic_view"/>
    <alias from="view" to="topic_view"/>
