@@ -35,6 +35,7 @@ class Scripts (ContainerTab):
         '''
         '''
         kw['management_view'] = 'Scripts'
-        return Folder.manage_main(self, client, REQUEST, **kw)
+        m = Folder.manage_main.__of__(self)
+        return m(self, client, REQUEST, **kw)
 
 InitializeClass(Scripts)
