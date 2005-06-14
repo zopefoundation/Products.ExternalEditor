@@ -1,5 +1,11 @@
 CMFStaging Changelog
 
+ CMFStaging 0.10 (2005/03/22)
+
+   - CVS-only, tag CMFStaging-0_10
+
+   - LockTool.py:  Added housekeeping to deal with timed-out lock info.
+
  CMFStaging 0.9.1 (2005/10/19)
 
   - Release management file updates only
