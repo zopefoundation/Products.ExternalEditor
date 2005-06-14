@@ -1,4 +1,7 @@
-CMFTracker Readme
+CMFTracker has moved!
 
-  This product is intended to replace the current CMFCollector, using
-  knowledge gained over several years of use.
+  Please check it out (for versions after CMFTracker-0_1) as:
+  
+    $ cvs -d :ext:cvs.zope.org:/cvs-repository \
+       co -d CMFTracker-head CMF_Extras/CMFTracker
+
