@@ -1,0 +1,70 @@
+"Supporter Redirects Issue" Use Case
+
+  Actors
+
+    - Supporter
+
+  Goal
+
+    - Assign issues submitted to the wrong tracker to a more
+      appropriate one.
+
+  Preconditions
+
+    - Supporter is authenticated WRT the CMFSite, and is
+      authorized to accept issues into a tracker.
+
+    - One or more issues has already been
+      "created":../SubmitterDescribesIssue.stx and
+      "submitted":../SubmitterRequestsResolution.stx to that
+      tracker.
+
+  Main Flow
+
+    1. Supporter receives notification that one or more issues
+       are pending against a tracker for which she is
+       responsible (e.g., by email, or by a topic-like slashbox).
+       Supporter browses to that tracker and selects the "Review
+       pending issues" action.
+
+       System displays a summary listing of all issues which are
+       in "pending acceptance" state.
+
+    2. Supporter clicks through to an issue, reviewing it;
+       determining that it would be more appropriately submitted
+       to another tracker, Supporter selects its "Redirect" action.
+
+       System prompts for a log message and for the new target
+       tracker.
+
+    3. Supporter selects the new target, supplies the log message
+       and confirms the redirect.
+
+       System "logs a workflow
+       transition":../WorkflowTransitionLogging.stx to the
+       "Pending Review" state, and catalogs it such that the
+       owners of the new target Tracker are
+       "notified":../NotificationStrategy.stx of its submission.
+       (Submitter and "old" target tracker owners should be
+       notified, as well).
+       
+  See Also
+
+    - "Overview":../Overview.stx
+
+    - "Submitter Describes Issue":../SubmitterDescribesIssue.stx
+
+    - "Submitter Requests Issue
+      Resolution":../SubmitterRequestsResolution.stx
+
+    - "Supporter Accepts Issue":../SupporterAcceptsIssue.stx
+
+    - "Supporter Rejects Issue":../SupporterRejectsIssue.stx
+
+    - "Correspondent Adds Note to Issue":../CorrespondentAddsNote.stx
+
+    - "Supporter Closes Issue":../SupporterClosesIssue.stx
+
+    - "Tracker Issue Lifecycle":../Lifecycle.stx
+
+    - "Notification Strategy":../NotificationStrategy.stx

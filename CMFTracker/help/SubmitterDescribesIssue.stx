@@ -1,0 +1,60 @@
+"Submitter Describes Issue" Use Case
+
+  Actors
+
+    - Submitter
+
+  Goal
+
+    - Describe an issue to be discussed / resolved by the team
+      assigned to its category.
+
+  Preconditions
+
+    - Submitter is authenticated WRT the CMFSite in which she
+      wishes to create an issue.
+      
+    - Submitter is authorized to create IssueDescriptions in the
+      location where she is browsing the site.
+
+  Main Flow
+
+    1. Submitter initiates content creation (e.g., by selecting
+       the "New" button from a 'folder_contents' view) and
+       supplies the required constructor parameters
+       (typically, ID and type, as prompted for in the
+       'folder_factories' form).
+
+       The site creates a new IssueDescription object in that
+       location and redirects to its initial view, which may be
+       customized on a site-by-site basis.
+
+    2. Submitter edits the IssueDescription, potentially linking
+       it to other content via standard HTML/STX mechanisms.
+       Submitter may make multiple edits to the IssueDescription.
+       and need not "submit it for
+       resolution":../SubmitterRequestsResolution.stx immediately.
+
+       The IssueDescription would not normally be "discussable"
+       (nor even "public") while in this "larval" phase.
+
+  See Also
+
+    - "Overview":../Overview.stx
+
+    - "Submitter Requests Issue
+      Resolution":../SubmitterRequestsResolution.stx
+
+    - "Supporter Accepts Issue":../SupporterAcceptsIssue.stx
+
+    - "Supporter Redirects Issue":../SupporterRedirectsIssue.stx
+
+    - "Supporter Rejects Issue":../SupporterRejectsIssue.stx
+
+    - "Correspondent Adds Note to Issue":../CorrespondentAddsNote.stx
+
+    - "Supporter Closes Issue":../SupporterClosesIssue.stx
+
+    - "Tracker Issue Lifecycle":../Lifecycle.stx
+
+    - "Notification Strategy":../NotificationStrategy.stx

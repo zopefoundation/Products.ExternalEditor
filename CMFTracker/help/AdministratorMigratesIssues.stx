@@ -1,0 +1,25 @@
+"Administrator Migrates Issues" Use Case
+
+  Actors
+
+    - Administrator
+
+  Goal
+
+    - Provide a migration target for existing "Collector",
+        http://classic.zope.org:8080/Collector
+      and "Tracker",
+        http://www.zope.org/Members/klm/Tracker
+      issues.
+
+  Preconditions
+
+    - One or more issues has already been
+      created in either the Collector or in a pre-CMF Tracker.
+
+  Main Flow
+
+    1. Administrator invokes the conversion script appropriate
+       to the issue source;  the system queries the source for
+       issues, and loads them one by one as CMFTracker issues,
+       mapping the appropriate metadata for the source issues.

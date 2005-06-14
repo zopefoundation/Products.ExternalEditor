@@ -1,0 +1,81 @@
+CMFTracker Overview
+
+  Goals
+
+    Submitter
+
+      - Build descriptions of issues such that the teams
+        responsible for them can understand, evaluate, and resolve
+        them expeditiously.
+
+      - Get a quick resolution for such issues.
+
+    Supporter
+
+      - Minimize the time any issue remains "on the supporter's
+        plate."
+
+      - Capture all data relevant to the resolution of an issue
+        in a form which eases future handling of similar issues.
+
+    Administrator
+
+      - Provide a migration target for existing "Collector",
+           http://classic.zope.org:8080/Collector
+        and "Tracker",
+           http://www.zope.org/Members/klm/Tracker
+        issues.
+
+      - Ensure that issues receive appropriate and timely resolution.
+
+
+  Use Cases
+
+    - "Submitter Describes Issue":../SubmitterDescribesIssue.stx
+
+    - "Submitter Requests Issue
+      Resolution":../SubmitterRequestsResolution.stx
+
+    - "Supporter Accepts Issue":../SupporterAcceptsIssue.stx
+
+    - "Supporter Redirects Issue":../SupporterRedirectsIssue.stx
+
+    - "Supporter Rejects Issue":../SupporterRejectsIssue.stx
+
+    - "Correspondent Adds Note to Issue":../CorrespondentAddsNote.stx
+
+    - "Supporter Closes Issue":../SupporterClosesIssue.stx
+
+    - "Administrator Migrates Issues":../AdministratorMigratesIssues.stx
+
+    - "Administrator Reviews Issue
+      History":../AdministratorReviewsHistory.stx
+
+
+  Design Notes
+
+    - "Tracker Issue Lifecycle":../Lifecycle.stx
+
+    - "Notification Strategy":../NotificationStrategy.stx
+
+    - "Workflow Transition
+      Logging":../WorkflowTransitionLogging.stx
+
+
+  Administrator Guide
+
+    - "Installing CMFTracker":../Installation.stx
+
+    - "Configuring CMFTracker":../Configuration.stx
+
+
+  User Guide
+
+    - "Submitter's Guide":../SubmitterGuide.stx
+
+    - "Supporter's Guide":../SupporterGuide.stx
+
+
+  Developer's Reference
+
+    - "Skinning CMFTracker":../SkinningCMFTracker.stx 

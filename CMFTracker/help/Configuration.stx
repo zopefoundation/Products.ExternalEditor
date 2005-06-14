@@ -1,0 +1,10 @@
+Configuring CMFTracker Instances
+
+  Properties
+
+    Title --
+        Descriptive name for the tracker, used in dropdowns, etc.
+    
+    Description --
+        Longer textual description of the kinds of issues managed
+        by this tracker.

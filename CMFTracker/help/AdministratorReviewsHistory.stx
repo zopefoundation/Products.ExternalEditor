@@ -1,0 +1,14 @@
+"Administrator Reviews History" Use Case
+
+  Actors
+
+    - Administrator
+
+  Goal
+
+    - Ensure that issues receive appropriate and timely resolution.
+
+  Main Flow
+
+    1. Administrator selects from a set of reports which summarize
+       the status and history of issues submitted to the tracker.

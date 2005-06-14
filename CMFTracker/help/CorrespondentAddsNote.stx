@@ -1,0 +1,72 @@
+"Correspondent Adds Note to an Issue" Use Case
+
+  Actors
+
+    - Correspondent (may be a Submitter or on of the tracker
+      owners)
+
+  Goal
+
+    - Add a comment which illustrates or helps in the resolution
+      of an "in-work" issue.
+
+  Preconditions
+
+    - Correspondent is authenticated WRT the CMFSite.
+
+    - or more issues has already been
+      "accepted":../SupporterAcceptsIssue.stx by one or more
+      Supporters into a tracker.
+    
+    - Correspondent is authorized to add content to an issue
+      within a given tracker (has either "Submitter" or "Owner"
+      role WRT the issue).
+
+  Main Flow
+
+    1. Correspondent either receives notification of (e.g., via a
+       nightly email) or browses to (e.g., via a slashbox) the
+       list of issues in which she is involved, either as the
+       Submitter or as a Supporter.
+
+       System displays a summary listing of all issues which are
+       in a "non-closed" state (e.g., "pending acceptance", "in
+       work", "pending verification", etc.);  these issues are
+       filtered such that those requiring action by Correspondent
+       (based on their state, and Correspondent's roles), are
+       grouped at the top of the list;  others group to the
+       bottom.
+
+    2. Correspondent clicks through to an issue, and selects its
+       "Reply" action.
+
+       System prompts for the reply, which may reference other
+       content objects via standard HTML/STX linking.
+
+    3. Correspondent fills out the reply and submits it.
+       System creates a DiscussionItem within the issue, using the
+       data supplied by Correspondent.
+       
+       System "notifies":../NotificationStrategy.stx all of the
+       issue's Correspondents of the new reply.
+
+  See Also
+
+    - "Overview":../Overview.stx
+
+    - "Submitter Describes Issue":../SubmitterDescribesIssue.stx
+
+    - "Submitter Requests Issue
+      Resolution":../SubmitterRequestsResolution.stx
+
+    - "Supporter Accepts Issue":../SupporterAcceptsIssue.stx
+
+    - "Supporter Redirects Issue":../SupporterRedirectsIssue.stx
+
+    - "Supporter Rejects Issue":../SupporterRejectsIssue.stx
+
+    - "Supporter Closes Issue":../SupporterClosesIssue.stx
+
+    - "Tracker Issue Lifecycle":../Lifecycle.stx
+
+    - "Notification Strategy":../NotificationStrategy.stx

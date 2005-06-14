@@ -1,0 +1,65 @@
+"Supporter Closes Issue" Use Case
+
+  Actors
+
+    - Supporter
+
+  Goal
+
+    - Mark an issue submitted to a given group as "closed".
+
+  Preconditions
+
+    - Supporter is authenticated WRT the CMFSite, and is
+      assigned to a tracker.
+
+    - One or more issues has already been
+      "accepted":../SupporterAcceptsIssue.stx by a supporter.
+
+  Main Flow
+
+    1. Supporter either receives notification of (e.g., via a
+       nightly email) or browses to (e.g., via a slashbox) the
+       list of issues for which she is responsible.
+
+       System displays a summary listing of all issues which are
+       in a "non-closed" state (e.g., "pending acceptance", "in
+       work", "pending verification", etc.);  these issues are
+       filtered such that those requiring action by Correspondent
+       (based on their state, and Correspondent's roles), are
+       grouped at the top of the list;  others group to the
+       bottom.
+
+    2. Supporter clicks through to an issue, reviewing it, and
+       selects one of the "terminal" actions ("Resolve", "Defer",
+       "Divert", "Reject").
+
+       System prompts for a log message.
+
+    3. Supporter supplies the log message an confirms the action.
+
+       System updates the issue, notifying all involved
+       correspondents that it has been closed.  At this point,
+       no further "discussion":../CorrespondentAddsNote.stx of
+       the item is possible.
+
+  See Also
+
+    - "Overview":../Overview.stx
+
+    - "Submitter Describes Issue":../SubmitterDescribesIssue.stx
+
+    - "Submitter Requests Issue
+      Resolution":../SubmitterRequestsResolution.stx
+
+    - "Supporter Accepts Issue":../SupporterAcceptsIssue.stx
+
+    - "Supporter Redirects Issue":../SupporterRedirectsIssue.stx
+
+    - "Supporter Rejects Issue":../SupporterRejectsIssue.stx
+
+    - "Correspondent Adds Note to Issue":../CorrespondentAddsNote.stx
+
+    - "Tracker Issue Lifecycle":../Lifecycle.stx
+
+    - "Notification Strategy":../NotificationStrategy.stx
