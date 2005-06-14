@@ -1,0 +1,52 @@
+<html metal:use-macro="here/main_template/macros/master">
+<head>
+ <title tal:content="template/title">The title</title>
+</head>
+<body>
+
+<div metal:fill-slot="main">
+
+<form action="." method="POST" tal:attributes="action here/absolute_url"
+      tal:define="lt here/portal_lock|nothing;
+                  isLockedOut python: lt and lt.isLockedOut(here)">
+
+<table>
+<tr>
+ <th align="left">Revision</th>
+ <th align="left">Date</th>
+ <th align="left">User</th>
+ <th align="left">Message</th>
+</tr>
+
+<tr tal:define="cur_id python: here.portal_versions.getVersionId(here)"
+    tal:repeat="entry python: here.portal_versions.getLogEntries(here, 1)">
+
+<td>
+ <input type="radio" name="version_id"
+        tal:attributes="value entry/version_id;
+                        checked python: entry['version_id'] == cur_id;
+                        disabled isLockedOut" />
+ <span tal:content="entry/version_id">8</span>
+</td>
+
+<td tal:content="python: DateTime(entry['timestamp']).ISO()">
+ 2002-01-01 18:10:15
+</td>
+
+<td tal:content="entry/user_id">joe</td>
+<td tal:content="entry/message"></td>
+
+</tr>
+
+</table>
+
+<input type="submit" name="object_revert_version:action"
+       value="Revert to selected revision"
+       tal:attributes="disabled isLockedOut" />
+
+</form>
+
+</div>
+
+</body>
+</html>

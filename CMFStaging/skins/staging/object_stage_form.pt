@@ -1,0 +1,60 @@
+<html metal:use-macro="here/main_template/macros/master">
+<head>
+ <title tal:content="template/title">The title</title>
+</head>
+<body>
+
+<div metal:fill-slot="main">
+
+<form action="object_stage" method="POST"
+  tal:attributes="action string:${here/absolute_url}/object_stage">
+
+<h3 class="TitleSection">Stage</h3>
+
+<p>Select stages to update:</p>
+
+<table>
+
+<tr>
+ <th></th>
+ <th align="left">Stage</th>
+ <th align="left">Current revision</th>
+</tr>
+
+<tr tal:repeat="stats python: here.portal_staging.getObjectStats(here)">
+<td>
+ <div tal:condition="not:stats/is_source">
+ <input type="checkbox" name="stage_names:list"
+   tal:attributes="value stats/name; disabled not:stats/stageable" />
+ </div>
+</td>
+<td>
+ <span tal:replace="stats/title">Development</span>
+</td>
+<td>
+ <div tal:condition="stats/exists">
+ Revision <span tal:content="stats/revision">1+</span>
+ (<a href="#"
+   tal:attributes="href string:object_preview_stage?stage_name=${stats/name}"
+   >preview</a>)
+ </div>
+</td>
+</tr>
+
+</table>
+
+<p>
+Comments: <br />
+<textarea name="comments" rows="3" cols="60" style="width: 100%;"></textarea>
+</p>
+
+<p>
+<input type="submit" name="submit" value="Stage" />
+</p>
+
+</form>
+
+</div>
+
+</body>
+</html>

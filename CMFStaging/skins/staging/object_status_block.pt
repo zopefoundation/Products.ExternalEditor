@@ -1,0 +1,94 @@
+<form action="." method="POST"
+      tal:define="uid python: user.getId();
+                  versions python: here.portal_staging.getVersionIds(here, 1);
+                  stage python: here.portal_staging.getStageOf(here);
+                  dev_object python:
+                      here.portal_staging.getObjectInStage(here, 'dev');
+                  lt here/portal_lock|nothing;
+                  locker python: lt and lt.locker(dev_object);"
+      tal:attributes="action here/absolute_url">
+<!--
+  allow_submit python: (locker == uid) or (
+      not locker and versions['dev'] != versions['prod']);
+  allow_publish allow_submit
+-->
+<table>
+<tr>
+  <td>
+   <img src="status_synced.gif"
+        tal:replace="structure python: here.get_status_image('dev')" />
+  </td>
+  <td>
+    <a href="#" tal:omit-tag="python: stage == 'dev'" tal:attributes="href
+       python:here.portal_staging.getURLForStage(here, 'dev')"
+       >Development</a>
+  </td>
+
+  <td width="90%"> &nbsp;
+    <span tal:content="python: versions['dev'] and (
+    'rev %s' % versions['dev']) or '--'">rev 1</span>
+    <span tal:condition="locker">
+      (<span tal:replace="locker">someone</span>)
+    </span>
+  </td>
+</tr>
+
+<tr>
+  <td></td>
+  <td colspan="2" tal:condition="python: stage == 'dev'">
+    <input type="submit" name="object_lock:method"
+      value="Lock" tal:condition="python: lt and lt.canLock(dev_object)" />
+    <input type="submit" name="object_unlock:method"
+      value="Unlock" tal:condition="python: lt and lt.canUnlock(dev_object)" />
+<!--
+    <input type="submit" name="content_submit_form:method"
+           value="Submit for review..." tal:condition="allow_submit" />
+-->
+  </td>
+</tr>
+
+<tr>
+  <td>
+   <img src="status_synced.gif"
+        tal:replace="structure python: here.get_status_image('review')" />
+  </td>
+  <td>
+    <a href="#" tal:omit-tag="python: stage == 'review'" tal:attributes="href
+       python: here.portal_staging.getURLForStage(here, 'review')"
+       >Review</a>
+  </td>
+  <td> &nbsp;
+    <span tal:content="python: versions['review'] and (
+                       'rev %s' % versions['review']) or '--'">rev 1</span>
+  </td>
+</tr>
+
+<!--
+<tr>
+  <td></td>
+  <td colspan="2">
+    <input type="submit" name="content_publish_form:method"
+           value="Publish..." tal:condition="allow_publish" />
+  </td>
+</tr>
+-->
+
+<tr>
+  <td>
+   <img src="status_synced.gif"
+        tal:replace="structure python: here.get_status_image('prod')" />
+  </td>
+  <td>
+    <a href="#" tal:omit-tag="python: stage == 'prod'" tal:attributes="href
+       python: here.portal_staging.getURLForStage(here, 'prod')"
+       >Production</a>
+  </td>
+  <td> &nbsp;
+    <span tal:content="python: versions['prod'] and (
+                       'rev %s' % versions['prod']) or '--'">rev 1</span>
+  </td>
+</tr>
+
+
+</table>
+</form>
