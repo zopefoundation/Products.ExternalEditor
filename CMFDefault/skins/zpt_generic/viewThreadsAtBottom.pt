@@ -1,6 +1,0 @@
-<div tal:condition="here/talkback|nothing" i18n:domain="cmf_default">
-    <div tal:condition="python: here.talkback.hasReplies(here)">
-      <h4 i18n:translate="">Comments:</h4>
-      <span metal:use-macro="here/talkback_tree/macros/tree"></span>
-    </div>
-</div>

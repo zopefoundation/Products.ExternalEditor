@@ -1,8 +1,0 @@
-<?xml version="1.0"?>
-<skins-tool>
- <skin-directory id="zpt_calendar"
-                 directory="CMFCalendar/skins/zpt_calendar"/>
- <skin-path id="*">
-  <layer name="zpt_calendar" insert-before="zpt_content"/>
- </skin-path>
-</skins-tool>

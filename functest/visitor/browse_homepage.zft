@@ -1,9 +1,0 @@
-[Scenario]
-Title : Browse Site Homepage
-Use_case: Browse Site Homepage
-
-[Homepage]
-HTTP_Verb: GET
-HTTP_Version: HTTP/1.0
-URL: %(site_host)s/%(site_path)s
-Expected_Result: 200
