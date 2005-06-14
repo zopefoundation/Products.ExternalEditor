@@ -1,0 +1,27 @@
+<html metal:use-macro="here/main_template/macros/master">
+<head>
+  <title tal:content="template/title">The title</title>
+</head>
+<body>
+
+<div metal:fill-slot="main"
+     tal:define="batch_info python: here.search_box_results_batch(request)">
+
+<form action="." method="POST" tal:attributes="action here/absolute_url">
+
+<div metal:use-macro="here/search_box_results/macros/block">
+Search results
+</div>
+
+<input type="submit" name="workspace_add_references:action"
+       value="Add to workspace"
+       tal:condition="batch_info/total" />
+&nbsp;
+<input type="submit" name="workspace_view:action" value="Search again" />
+
+</form>
+
+</div>
+
+</body>
+</html>

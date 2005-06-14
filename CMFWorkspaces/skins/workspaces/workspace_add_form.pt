@@ -1,0 +1,48 @@
+<html metal:use-macro="here/main_template/macros/master">
+  <head>
+    <title tal:content="template/title">The title</title>
+  </head>
+  <body>
+   <div metal:fill-slot="header">
+   </div>
+
+<div metal:fill-slot="main">
+
+<form action="content_add" method="POST" enctype="multipart/form-data">
+
+<table class="FormLayout">
+ <tr>
+  <th>
+    Workspace Id:
+  </th>
+  <td>
+   <input type="text" name="id" size="30" value="" />
+  </td>
+ </tr>
+
+ <tr>
+   <th>
+     Title:
+   </th>
+   <td>
+     <input type="text" name="title" size="80" />
+   </td>
+ </tr>
+
+ <tr>
+  <td> <br /> </td>
+  <td>
+    <input type="hidden" name="type" value="Workspace" />
+    <!-- Pass the source workspace -->
+    <input type="hidden" name="workspace"
+     tal:attributes="value request/workspace|nothing" />
+    <input type="submit" name="submit" value="Create Workspace" />
+  </td>
+ </tr>
+</table>
+</form>
+</div>
+
+  </body>
+</html>
+
