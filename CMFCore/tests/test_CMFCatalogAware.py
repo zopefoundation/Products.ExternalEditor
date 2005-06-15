@@ -151,27 +151,6 @@ class CMFCatalogAwareTests(unittest.TestCase):
         self.failIf(bar.notified)
         self.failIf(hop.notified)
 
-    def BBB_test_reindexObjectSecurity_oldbrain(self):
-        self.site.portal_catalog.brain_class = DummyOldBrain
-        foo = self.site.foo
-        self.site.foo.bar = TheClass('bar')
-        bar = self.site.foo.bar
-        self.site.foo.hop = TheClass('hop')
-        hop = self.site.foo.hop
-        cat = self.site.portal_catalog
-        cat.setObs([foo, bar, hop])
-        foo.reindexObjectSecurity()
-        l = list(cat.log)
-        l.sort()
-        self.assertEquals(l, [
-            "reindex /site/foo ('allowedRolesAndUsers',)",
-            "reindex /site/foo/bar ('allowedRolesAndUsers',)",
-            "reindex /site/foo/hop ('allowedRolesAndUsers',)",
-            ])
-        self.failIf(foo.notified)
-        self.failIf(bar.notified)
-        self.failIf(hop.notified)
-
     def test_reindexObjectSecurity_missing_raise(self):
         # Exception raised for missing object (Zope 2.8 brains)
         foo = self.site.foo
@@ -186,20 +165,6 @@ class CMFCatalogAwareTests(unittest.TestCase):
         foo = self.site.foo
         missing = TheClass('missing').__of__(foo)
         missing.GETOBJECT_RAISES = False
-        cat = self.site.portal_catalog
-        cat.setObs([foo, missing])
-        foo.reindexObjectSecurity()
-        self.assertEquals(cat.log,
-                          ["reindex /site/foo ('allowedRolesAndUsers',)"])
-        self.failIf(foo.notified)
-        self.failIf(missing.notified)
-
-    def BBB_test_reindexObjectSecurity_missing_oldbrain(self):
-        # Missing object is swallowed by old Zope brains
-        self.site.portal_catalog.brain_class = DummyOldBrain
-        foo = self.site.foo
-        missing = TheClass('missing').__of__(foo)
-        missing.GETOBJECT_RAISES = True
         cat = self.site.portal_catalog
         cat.setObs([foo, missing])
         foo.reindexObjectSecurity()
