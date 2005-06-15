@@ -2,9 +2,6 @@ HEAD only (unreleased)
 
   New Features
 
-    - Interfaces: Added newstyle (Zope 3) interfaces.
-      This change has no effect on Zope 2.7 without Five.
-
     - CMFDefault skins: Added members_delete_form.
       This adds a confirmation step to avoid accidental deletion of members.
 
