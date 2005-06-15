@@ -17,8 +17,8 @@ $Id$
 
 from unittest import TestSuite, makeSuite, main
 import Testing
-import Zope
-Zope.startup()
+import Zope2
+Zope2.startup()
 
 from Products.CMFCore.tests.base.dummy import DummySite
 from Products.CMFCore.tests.base.dummy import DummyTool
@@ -80,11 +80,7 @@ class ActionProviderBaseTests(SecurityRequestTest):
         verifyClass(IActionProvider, ActionProviderBase)
 
     def test_z3interfaces(self):
-        try:
-            from zope.interface.verify import verifyClass
-        except ImportError:
-            # BBB: for Zope 2.7
-            return
+        from zope.interface.verify import verifyClass
         from Products.CMFCore.interfaces import IActionProvider
 
         verifyClass(IActionProvider, ActionProviderBase)

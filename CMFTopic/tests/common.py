@@ -30,11 +30,7 @@ class CriterionTestCase(TestCase):
         verifyClass( ICriterion, self._getTargetClass() )
 
     def test_z3interfaces(self):
-        try:
-            from zope.interface.verify import verifyClass
-        except ImportError:
-            # BBB: for Zope 2.7
-            return
+        from zope.interface.verify import verifyClass
         from Products.CMFTopic.interfaces import ICriterion
 
         verifyClass( ICriterion, self._getTargetClass() )

@@ -17,8 +17,8 @@ $Id$
 
 from unittest import TestSuite, makeSuite, main
 import Testing
-import Zope
-Zope.startup()
+import Zope2
+Zope2.startup()
 
 from os.path import abspath
 from os.path import dirname
@@ -90,11 +90,7 @@ class DocumentTests(RequestTestBase):
         verifyClass(IMutableDublinCore, Document)
 
     def test_z3interfaces(self):
-        try:
-            from zope.interface.verify import verifyClass
-        except ImportError:
-            # BBB: for Zope 2.7
-            return
+        from zope.interface.verify import verifyClass
         from Products.CMFCore.interfaces import ICatalogableDublinCore
         from Products.CMFCore.interfaces import IContentish
         from Products.CMFCore.interfaces import IDublinCore

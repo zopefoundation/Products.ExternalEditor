@@ -17,8 +17,8 @@ $Id$
 
 from unittest import TestSuite, makeSuite, main
 import Testing
-import Zope
-Zope.startup()
+import Zope2
+Zope2.startup()
 
 from AccessControl.SecurityManagement import newSecurityManager
 from Acquisition import Implicit
@@ -83,11 +83,7 @@ class DublinCoreTests(SecurityTest):
         verifyClass(IMutableDublinCore, DefaultDublinCoreImpl)
 
     def test_z3interfaces(self):
-        try:
-            from zope.interface.verify import verifyClass
-        except ImportError:
-            # BBB: for Zope 2.7
-            return
+        from zope.interface.verify import verifyClass
         from Products.CMFCore.interfaces import ICatalogableDublinCore
         from Products.CMFCore.interfaces import IDublinCore
         from Products.CMFCore.interfaces import IMutableDublinCore

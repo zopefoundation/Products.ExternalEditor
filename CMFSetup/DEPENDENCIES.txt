@@ -1,4 +1,4 @@
-Zope >= 2.7.0
+Zope >= 2.8.0
 CMFCore
 CMFDefault
 DCWorkflow

@@ -1,9 +1,5 @@
 from unittest import TestCase
-try:
-    import Zope2
-except ImportError:
-    # BBB: for Zope 2.7
-    import Zope as Zope2
+import Zope2
 Zope2.startup()
 
 from os import curdir, mkdir, stat, remove
@@ -17,11 +13,7 @@ from AccessControl.SecurityManagement import newSecurityManager
 from AccessControl.SecurityManagement import noSecurityManager
 from AccessControl.SecurityManager import setSecurityPolicy
 from Testing.makerequest import makerequest
-try:
-    import transaction
-except ImportError:
-    # BBB: for Zope 2.7
-    from Products.CMFCore.utils import transaction
+import transaction
 
 from dummy import DummyFolder
 from security import AnonymousUser

@@ -17,8 +17,8 @@ $Id$
 
 import unittest
 import Testing
-import Zope
-Zope.startup()
+import Zope2
+Zope2.startup()
 
 from OFS.Folder import Folder
 from Products.CMFSetup.tests.common import BaseRegistryTests

@@ -17,8 +17,8 @@ $Id$
 
 from unittest import main
 import Testing
-import Zope
-Zope.startup()
+import Zope2
+Zope2.startup()
 
 from Products.CMFCore.tests.base.utils import build_test_suite
 

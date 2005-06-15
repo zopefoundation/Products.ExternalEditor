@@ -17,8 +17,8 @@ $Id$
 
 from unittest import TestCase, TestSuite, makeSuite, main
 import Testing
-import Zope
-Zope.startup()
+import Zope2
+Zope2.startup()
 
 from Products.PythonScripts.PythonScript import manage_addPythonScript
 
@@ -47,11 +47,7 @@ class ActionCategoryTests(TestCase):
         verifyClass(IActionCategory, ActionCategory)
 
     def test_z3interfaces(self):
-        try:
-            from zope.interface.verify import verifyClass
-        except ImportError:
-            # BBB: for Zope 2.7
-            return
+        from zope.interface.verify import verifyClass
         from Products.CMFCore.ActionInformation import ActionCategory
         from Products.CMFCore.interfaces import IActionCategory
 
@@ -84,11 +80,7 @@ class ActionTests(TestCase):
         verifyClass(IAction, Action)
 
     def test_z3interfaces(self):
-        try:
-            from zope.interface.verify import verifyClass
-        except ImportError:
-            # BBB: for Zope 2.7
-            return
+        from zope.interface.verify import verifyClass
         from Products.CMFCore.ActionInformation import Action
         from Products.CMFCore.interfaces import IAction
 
@@ -135,11 +127,7 @@ class ActionInfoTests(TestCase):
         verifyClass(IActionInfo, ActionInfo)
 
     def test_z3interfaces(self):
-        try:
-            from zope.interface.verify import verifyClass
-        except ImportError:
-            # BBB: for Zope 2.7
-            return
+        from zope.interface.verify import verifyClass
         from Products.CMFCore.ActionInformation import ActionInfo
         from Products.CMFCore.interfaces import IActionInfo
 
@@ -262,11 +250,7 @@ class ActionInformationTests(TransactionalTest):
         verifyClass(IAction, ActionInformation)
 
     def test_z3interfaces(self):
-        try:
-            from zope.interface.verify import verifyClass
-        except ImportError:
-            # BBB: for Zope 2.7
-            return
+        from zope.interface.verify import verifyClass
         from Products.CMFCore.ActionInformation import ActionInformation
         from Products.CMFCore.interfaces import IAction
 

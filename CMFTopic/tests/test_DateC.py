@@ -17,8 +17,8 @@ $Id$
 
 from unittest import TestSuite, makeSuite, main
 import Testing
-import Zope
-Zope.startup()
+import Zope2
+Zope2.startup()
 
 from DateTime.DateTime import DateTime
 

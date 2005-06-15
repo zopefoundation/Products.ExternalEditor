@@ -17,8 +17,8 @@ $Id$
 
 from unittest import TestCase, TestSuite, makeSuite, main
 import Testing
-import Zope
-Zope.startup()
+import Zope2
+Zope2.startup()
 
 from Products.CMFCore.tests.base.dummy import DummyContent
 from Products.CMFCore.tests.base.dummy import DummyFolder
@@ -48,11 +48,7 @@ class URLToolTests(TestCase):
         verifyClass(IURLTool, URLTool)
 
     def test_z3interfaces(self):
-        try:
-            from zope.interface.verify import verifyClass
-        except ImportError:
-            # BBB: for Zope 2.7
-            return
+        from zope.interface.verify import verifyClass
         from Products.CMFCore.interfaces import IActionProvider
         from Products.CMFCore.interfaces import IURLTool
         from Products.CMFCore.URLTool import URLTool

@@ -17,11 +17,7 @@ $Id$
 
 from unittest import TestCase, TestSuite, makeSuite, main
 import Testing
-try:
-    import Zope2
-except ImportError:
-    # BBB: for Zope 2.7
-    import Zope as Zope2
+import Zope2
 Zope2.startup()
 
 from os.path import join as path_join
@@ -30,11 +26,7 @@ from cStringIO import StringIO
 from AccessControl.SecurityManagement import newSecurityManager
 from AccessControl.SecurityManagement import noSecurityManager
 from AccessControl.User import UnrestrictedUser
-try:
-    import transaction
-except ImportError:
-    # BBB: for Zope 2.7
-    from Products.CMFCore.utils import transaction
+import transaction
 
 from Products.CMFCore.tests.base.dummy import DummySite
 from Products.CMFCore.tests.base.dummy import DummyTool

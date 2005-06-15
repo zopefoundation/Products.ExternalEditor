@@ -17,8 +17,8 @@ $Id$
 
 from unittest import TestCase, TestSuite, makeSuite, main
 import Testing
-import Zope
-Zope.startup()
+import Zope2
+Zope2.startup()
 
 
 class DiscussionToolTests(TestCase):
@@ -35,11 +35,7 @@ class DiscussionToolTests(TestCase):
         verifyClass(IOldstyleDiscussionTool, DiscussionTool)
 
     def test_z3interfaces(self):
-        try:
-            from zope.interface.verify import verifyClass
-        except ImportError:
-            # BBB: for Zope 2.7
-            return
+        from zope.interface.verify import verifyClass
         from Products.CMFCore.DiscussionTool import DiscussionTool
         from Products.CMFCore.interfaces import IActionProvider
         from Products.CMFCore.interfaces import IOldstyleDiscussionTool
@@ -59,11 +55,7 @@ class OldDiscussableTests(TestCase):
         verifyClass(IOldDiscussable, OldDiscussable)
 
     def test_z3interfaces(self):
-        try:
-            from zope.interface.verify import verifyClass
-        except ImportError:
-            # BBB: for Zope 2.7
-            return
+        from zope.interface.verify import verifyClass
         from Products.CMFCore.DiscussionTool import OldDiscussable
         from Products.CMFCore.interfaces import IOldstyleDiscussable
 

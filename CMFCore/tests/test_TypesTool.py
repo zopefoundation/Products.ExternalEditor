@@ -17,8 +17,8 @@ $Id$
 
 from unittest import TestCase, TestSuite, makeSuite, main
 import Testing
-import Zope
-Zope.startup()
+import Zope2
+Zope2.startup()
 
 from AccessControl import Unauthorized
 from AccessControl.SecurityManagement import newSecurityManager
@@ -81,11 +81,7 @@ class TypesToolTests(SecurityTest):
         verifyClass(ITypesTool, TypesTool)
 
     def test_z3interfaces(self):
-        try:
-            from zope.interface.verify import verifyClass
-        except ImportError:
-            # BBB: for Zope 2.7
-            return
+        from zope.interface.verify import verifyClass
         from Products.CMFCore.interfaces import IActionProvider
         from Products.CMFCore.interfaces import ITypesTool
         from Products.CMFCore.TypesTool import TypesTool
@@ -457,11 +453,7 @@ class FTIDataTests( TypeInfoTests ):
         verifyClass(ITypeInformation, FactoryTypeInformation)
 
     def test_z3interfaces(self):
-        try:
-            from zope.interface.verify import verifyClass
-        except ImportError:
-            # BBB: for Zope 2.7
-            return
+        from zope.interface.verify import verifyClass
         from Products.CMFCore.interfaces import ITypeInformation
         from Products.CMFCore.TypesTool import FactoryTypeInformation
 
@@ -496,11 +488,7 @@ class STIDataTests( TypeInfoTests ):
         verifyClass(ITypeInformation, ScriptableTypeInformation)
 
     def test_z3interfaces(self):
-        try:
-            from zope.interface.verify import verifyClass
-        except ImportError:
-            # BBB: for Zope 2.7
-            return
+        from zope.interface.verify import verifyClass
         from Products.CMFCore.interfaces import ITypeInformation
         from Products.CMFCore.TypesTool import ScriptableTypeInformation
 

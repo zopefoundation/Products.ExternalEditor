@@ -36,6 +36,15 @@ HEAD only (unreleased)
 
   Others
 
+    - The CMF now depends on Zope 2.8 / Five.
+
+    - Non-release packages moved out of the /CMF/ repository package:
+    
+      o hotfixes moved to /CMF_Hotfixes
+      
+      o others (CMFStaging, CMFTracker, CMFWorkspaces) moved to
+        /CMF_Extras/
+
     - CMFSetup: the import/export of portal types uses a new XML format
       that can hold arbitrary properties, to facilitate subclassing. The
       old format is still recognized when importing.

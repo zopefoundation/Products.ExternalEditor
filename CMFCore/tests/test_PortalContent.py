@@ -17,22 +17,14 @@ $Id$
 
 from unittest import TestCase, TestSuite, makeSuite, main
 import Testing
-try:
-    import Zope2
-except ImportError:
-    # BBB: for Zope 2.7
-    import Zope as Zope2
+import Zope2
 Zope2.startup()
 
 from AccessControl.SecurityManagement import newSecurityManager
 from AccessControl.SecurityManagement import noSecurityManager
 from AccessControl.User import UnrestrictedUser
 from Acquisition import aq_base
-try:
-    import transaction
-except ImportError:
-    # BBB: for Zope 2.7
-    from Products.CMFCore.utils import transaction
+import transaction
 
 from Products.CMFCore.tests.base.testcase import RequestTest
 from Products.CMFDefault.Portal import PortalGenerator
@@ -52,11 +44,7 @@ class PortalContentTests(TestCase):
         verifyClass(IDynamicType, PortalContent)
 
     def test_z3interfaces(self):
-        try:
-            from zope.interface.verify import verifyClass
-        except ImportError:
-            # BBB: for Zope 2.7
-            return
+        from zope.interface.verify import verifyClass
         from Products.CMFCore.interfaces import IContentish
         from Products.CMFCore.interfaces import IDynamicType
         from Products.CMFCore.PortalContent import PortalContent

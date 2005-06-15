@@ -17,11 +17,7 @@ $Id$
 
 import unittest
 import Testing
-try:
-    import Zope2
-except ImportError:
-    # BBB: for Zope 2.7
-    import Zope as Zope2
+import Zope2
 Zope2.startup()
 
 import locale
@@ -33,11 +29,7 @@ from DateTime import DateTime
 from Products.TemporaryFolder.TemporaryFolder import MountedTemporaryFolder
 from Products.Transience.Transience import TransientObjectContainer
 from Testing.makerequest import makerequest
-try:
-    import transaction
-except ImportError:
-    # BBB: for Zope 2.7
-    from Products.CMFCore.utils import transaction
+import transaction
 
 
 class CalendarTests(unittest.TestCase):

@@ -94,11 +94,7 @@ class CMFCatalogAware(Base):
                 if brain_path == path:
                     continue
                 # Get the object
-                if hasattr(aq_base(brain), '_unrestrictedGetObject'):
-                    ob = brain._unrestrictedGetObject()
-                else:
-                    # BBB older Zope
-                    ob = self.unrestrictedTraverse(brain_path, None)
+                ob = brain._unrestrictedGetObject()
                 if ob is None:
                     # Ignore old references to deleted objects.
                     LOG('reindexObjectSecurity', PROBLEM,

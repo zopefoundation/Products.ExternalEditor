@@ -20,8 +20,8 @@ from warnings import warn
 
 import unittest
 import Testing
-import Zope
-Zope.startup()
+import Zope2
+Zope2.startup()
 
 import getopt
 import sys

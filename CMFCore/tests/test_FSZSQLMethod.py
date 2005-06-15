@@ -2,8 +2,8 @@ from unittest import TestSuite, makeSuite, main
 from os.path import join
 
 import Testing
-import Zope
-Zope.startup()
+import Zope2
+Zope2.startup()
 
 from OFS.Folder import Folder
 

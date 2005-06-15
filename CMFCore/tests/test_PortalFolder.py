@@ -17,11 +17,7 @@ $Id$
 
 from unittest import TestCase, TestSuite, makeSuite, main
 import Testing
-try:
-    import Zope2
-except ImportError:
-    # BBB: for Zope 2.7
-    import Zope as Zope2
+import Zope2
 Zope2.startup()
 
 import cStringIO
@@ -35,11 +31,7 @@ from OFS.Application import Application
 from OFS.Image import manage_addFile
 from OFS.tests.testCopySupport import makeConnection
 from Testing.makerequest import makerequest
-try:
-    import transaction
-except ImportError:
-    # BBB: for Zope 2.7
-    from Products.CMFCore.utils import transaction
+import transaction
 
 from Products.CMFCore.CatalogTool import CatalogTool
 from Products.CMFCore.exceptions import BadRequest
@@ -146,11 +138,7 @@ class PortalFolderTests(SecurityTest):
         verifyClass(WriteLockInterface, PortalFolder)
 
     def test_z3interfaces(self):
-        try:
-            from zope.interface.verify import verifyClass
-        except ImportError:
-            # BBB: for Zope 2.7
-            return
+        from zope.interface.verify import verifyClass
         from Products.CMFCore.interfaces import IDynamicType
         from Products.CMFCore.interfaces import IFolderish
         from Products.CMFCore.PortalFolder import PortalFolder
