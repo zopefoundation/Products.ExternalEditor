@@ -6,4 +6,6 @@
 
   <include file="implements.zcml"/>
 
+  <include package=".browser"/>
+
 </configure>

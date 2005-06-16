@@ -1,0 +1,12 @@
+<configure
+    xmlns="http://namespaces.zope.org/browser"
+    >
+
+  <page
+      name="five_template"
+      for="Products.CMFCore.interfaces.IDynamicType"
+      template="five_template.pt"
+      permission="zope2.View"
+      />
+
+</configure>

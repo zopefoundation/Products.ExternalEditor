@@ -24,13 +24,14 @@
 <head>
  <title tal:content="here/expanded_title"> Title goes here </title>
 
- <metal:block define-slot="base" />
+ <metal:slot define-slot="base" />
 
  <link rel="stylesheet" type="text/css" href="zpt_stylesheet.css"
        tal:attributes="href here/zpt_stylesheet.css/absolute_url" />
  <link rel="stylesheet" type="text/css" href="CalendarStyle.css"
        tal:condition="here/CalendarStyle.css|nothing"
        tal:attributes="href here/CalendarStyle.css/absolute_url" />
+ <metal:slot define-slot="style_slot" />
 </head>
 
 <body>
