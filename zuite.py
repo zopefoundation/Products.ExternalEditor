@@ -14,6 +14,7 @@ import StringIO
 from AccessControl.SecurityInfo import ClassSecurityInfo
 from App.special_dtml import DTMLFile
 from App.ImageFile import ImageFile
+from App.config import getConfiguration
 from DateTime.DateTime import DateTime
 from Globals import package_home
 from Globals import InitializeClass
@@ -388,7 +389,8 @@ class Zuite( OrderedFolder ):
     def _listFilesystemObjects( self ):
         """ Return a mapping of any filesystem objects we "hold".
         """
-        if self._v_filesystem_objects is not None:
+        if ( self._v_filesystem_objects is not None and
+             not getConfiguration().debug_mode ):
             return self._v_filesystem_objects
 
         if not self.filesystem_path:

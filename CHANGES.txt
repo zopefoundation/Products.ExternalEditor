@@ -1,5 +1,13 @@
 Zelenium Product Changelog
 
+  After Zelenium-0.7
+
+    - If debug-mode is set to "on" in zope.conf, filesystem-based testcases
+      files are reloaded every time they are used, to ease development of
+      filesystem-based test suites. This behavior emulates what the CMF
+      Filesystem Directory Views do with debug-mode on.
+
+
   Zelenium-0.7 (2005/06/07)
 
     - CVS tag:  'Zelenium-0_7'
