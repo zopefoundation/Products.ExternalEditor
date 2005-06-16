@@ -2,11 +2,7 @@
 ##
 subset_ids = [ obj.getId() for obj in context.listFolderContents() ]
 try:
-    try:
-        attempt = context.moveObjectsDown(ids, delta, subset_ids=subset_ids)
-    except TypeError:
-        # Zope 2.7.0
-        attempt = context.moveObjectsDown(ids, delta)
+    attempt = context.moveObjectsDown(ids, delta, subset_ids=subset_ids)
     if attempt:
         return context.setStatus( True, '%d item%s moved down.' %
                                     ( attempt, (attempt != 1 and 's' or '') ) )

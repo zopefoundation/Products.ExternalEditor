@@ -389,7 +389,7 @@ class ExportConfiguratorBase(Implicit):
 InitializeClass(ExportConfiguratorBase)
 
 
-# BBB: old class mixing the two
+# BBB: old class mixing the two, will be removed in CMF 1.7
 class ConfiguratorBase(ImportConfiguratorBase, ExportConfiguratorBase):
     """ Synthesize XML description.
     """

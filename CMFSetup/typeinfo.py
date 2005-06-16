@@ -361,7 +361,7 @@ class TypeInfoExportConfigurator(ExportConfiguratorBase):
 InitializeClass(TypeInfoExportConfigurator)
 
 
-# BBB:
+# BBB: will be removed in CMF 1.7
 class TypeInfoConfigurator(TypeInfoImportConfigurator,
                            TypeInfoExportConfigurator):
     def __init__(self, site, encoding=None):
