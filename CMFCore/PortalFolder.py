@@ -517,7 +517,7 @@ class PortalFolder(DynamicType, CMFCatalogAware, OrderedFolder):
         a PortalFolder.
         """
         ti = self.getTypeInfo()
-        method_id = ti and ti.queryMethodID('mkdir')
+        method_id = ti and ti.queryMethodID('mkdir', context=self)
         if method_id:
             # call it
             getattr(self, method_id)(id=id)

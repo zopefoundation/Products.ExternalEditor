@@ -116,7 +116,7 @@ class DynamicType:
         stack = REQUEST['TraversalRequestNameStack']
         key = stack and stack[-1] or '(Default)'
         ti = self.getTypeInfo()
-        method_id = ti and ti.queryMethodID(key)
+        method_id = ti and ti.queryMethodID(key, context=self)
         if method_id:
             if key != '(Default)':
                 stack.pop()

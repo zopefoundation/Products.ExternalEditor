@@ -94,7 +94,7 @@ class PortalContent(DynamicType, CMFCatalogAware, SimpleItem):
         """ Invokes the default view.
         """
         ti = self.getTypeInfo()
-        method_id = ti and ti.queryMethodID('(Default)')
+        method_id = ti and ti.queryMethodID('(Default)', context=self)
         if method_id:
             method = getattr(self, method_id)
             if getattr(aq_base(method), 'isDocTemp', 0):

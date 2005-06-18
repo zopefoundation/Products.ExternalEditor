@@ -90,8 +90,11 @@ class ContentTypeInformation(Interface):
         Returns -- Boolean value
         """
 
-    def queryMethodID(alias, default=None):
+    def queryMethodID(alias, default=None, context=None):
         """ Query method ID by alias.
+        
+        context points to the object that calls queryMethodID. It may be used to
+        return dynamic values based on the caller.
 
         Permission -- Always available
 

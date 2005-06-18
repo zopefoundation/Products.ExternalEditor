@@ -25,7 +25,7 @@ if str(subpath).strip() == 'isAvailable':
 obj = uid_handler.getObject(subpath)
 
 ti = obj.getTypeInfo()
-method_id = ti and ti.queryMethodID('view')
+method_id = ti and ti.queryMethodID('view', context=self)
 if method_id:
     return getattr(obj, method_id)()
 return obj()
