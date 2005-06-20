@@ -1,18 +1,6 @@
-CMF Collector Update Notes
+CMF Collector Changelog
 
-  This file is for notes about crucial considerations for updating
-  preexisting collectors to the current release.  You should always
-  check here when doing updates for instructions about accommodating
-  changes, when necessary.
-
-  The file is ordered most recent items first, and the items refer to
-  the collector version as indicated by the version.txt file in the
-  same directory.
-
-  See KNOWN_PROBLEMS.txt for pending bugs and problems to beware.
-
-
-  Changes after release 0.9b
+  CMFCollector 0.10
 
     Bug fixes
 
@@ -35,42 +23,46 @@ CMF Collector Update Notes
         of Plone-specific collectors it is doubtful collector_plone
         would ever see maintenance.
 
+  CMFCollector 0.9 (2003/11/27)
 
-  Version 0.9b,  Nov 7, 2002
+    - Repaired wrapping of name in quotes, separate from bracked email,
+      for mail delivery.
 
-    Fixed bug where non-manager (supporters and non-staff) could not
-    upload files ("attachments") to issues unless they owned the
-    issues.  You can get the new, proper permission settings on
-    existing collectors by changing your collector's "participation
-    mode" on the configuration page.  Toggle it away and then back to
-    the current setting to preserve the current setting...
+    - Improved compatibility with CMF 1.5's action expression strings.
 
-    The collector now works with CMF 1.3 and prior versions (tested to
-    my knowledge on CMF 1.3 and 1.2, at least).
+    - Improved compatibility with CMF 1.5's permissions.
 
-    Tres implemented CollectorSubset, which encapsulates persistent
-    queries you can add to a collector and refer to by URL traversal.
+    - Fixed bug where non-manager (supporters and non-staff) could not
+      upload files ("attachments") to issues unless they owned the
+      issues.  You can get the new, proper permission settings on
+      existing collectors by changing your collector's "participation
+      mode" on the configuration page.  Toggle it away and then back to
+      the current setting to preserve the current setting...
 
-    There's now a batch_size parameter, and other handy niggles.
+  CMFCollector 0.9b (2002/11/07
 
-  Version 0.9b, Feb 21, 2002
+    - The collector now works with CMF 1.3 and prior versions (tested to
+      my knowledge on CMF 1.3 and 1.2, at least).
 
-    Enabled alternate collector policies about who can followup with
-    comments on existing issues.  Now the collector configurer can
-    enable comments by only staff and issue participants (the prior
-    and default situation), by any authenticated user, or by anyone
-    including authenticated users.
+    - Tres implemented CollectorSubset, which encapsulates persistent
+      queries you can add to a collector and refer to by URL traversal.
 
-    To get this new functionality, you'll have to do two things
+    - There's now a batch_size parameter, and other handy niggles.
 
-    - Remove the old collector_issue_workflow from the site's workflow
-      contents and import the new collector_issue_workflow.zexp
+    - Enabled alternate collector policies about who can followup with
+      comments on existing issues.  Now the collector configurer can
+      enable comments by only staff and issue participants (the prior
+      and default situation), by any authenticated user, or by anyone
+      including authenticated users.
 
-    - Run the configuration "Reinstate catalog" action - the
-      "Internal only" option will be sufficient - so preexisting
-      issues will be properly adjusted.
+    - To get this new functionality, you'll have to do two things
 
-  Version 0.9b, Nov 7, 2001
+      o Remove the old collector_issue_workflow from the site's workflow
+        contents and import the new collector_issue_workflow.zexp
+
+      o Run the configuration "Reinstate catalog" action - the
+        "Internal only" option will be sufficient - so preexisting
+        issues will be properly adjusted.
 
     - Packaged transcript webtext in a Document derivative
       ("WebTextDocument"), to take advantage of the CookedBody
@@ -81,24 +73,21 @@ CMF Collector Update Notes
       type using an external method, Extensions/webtext_migration.py.
       See the notes at the top of that file for migration instructions.
 
-  Version 0.9b, Nov 1, 2001
-
     - Accommodation for recent (two days ago) DCWorkflow changes -
       backwards compatable with prior DCWorkflow version, but
       necessary for operation with new (DCWorkflow.py 1.12 and later).
 
       See the checkin notice for details:
-     http://cvs.zope.org/CMF/CMFCollector/collector_issue_workflow.zexp#rev1.10
+       http://cvs.zope.org/CMF/CMFCollector/collector_issue_workflow.zexp#rev1.10
 
-  Version 0.9b, Oct 28, 2001
-
-    I believe we're now feature-complete for v 0.9, hence the beta
-    designation and only bug fixes 'til 0.9 full release.
+    - I believe we're now feature-complete for v 0.9, hence the beta
+      designation and only bug fixes 'til 0.9 full release.
 
     - Minor changes to the workflow - may help with issues preexisting
       0.9a, if you encounter problems.
 
-  Version 0.9a, Oct 25, 2001
+
+  CMFCollector 0.9a (2001/20/25)
 
     - This version requires two installation changes.
 
