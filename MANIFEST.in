@@ -1,0 +1,6 @@
+include *.txt
+include zopeedit.py
+include setup.py
+recursive-include man *
+recursive-include Plugins *.py
+
