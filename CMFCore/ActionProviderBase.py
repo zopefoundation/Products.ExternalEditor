@@ -21,6 +21,7 @@ from Globals import InitializeClass
 
 from ActionInformation import ActionInfo
 from ActionInformation import ActionInformation
+from ActionInformation import getOAI
 from exceptions import AccessControl_Unauthorized
 from Expression import getExprContext
 from interfaces.portal_actions import ActionProvider as IActionProvider
@@ -81,7 +82,7 @@ class ActionProviderBase:
         # List ActionInfo objects.
         # (method is without docstring to disable publishing)
         #
-        ec = getExprContext(self, object)
+        ec = self._getExprContext(self, object)
         actions = self.listActions(object=object)
         actions = [ ActionInfo(action, ec) for action in actions ]
 
@@ -322,5 +323,11 @@ class ActionProviderBase:
                                 , category=category
                                 , visible=visible
                                 )
+
+    def _getOAI(self, context, object):
+        return getOAI(context, object)
+        
+    def _getExprContext(self, context, object):
+        return getExprContext(context, object)
 
 InitializeClass(ActionProviderBase)

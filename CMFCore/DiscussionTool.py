@@ -160,7 +160,7 @@ class DiscussionTool (UniqueObject, SimpleItem, ActionProviderBase):
     def listActions(self, info=None, object=None):
         # Return actions for reply and show replies
         if object is not None or info is None:
-            info = getOAI(self, object)
+            info = self._getOAI(self, object)
         content = info.object
         if content is None or not self.isDiscussionAllowedFor(content):
             return ()
