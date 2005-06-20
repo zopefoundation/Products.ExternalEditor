@@ -140,7 +140,7 @@ class TypeInformation(SimpleItemWithProperties, ActionProviderBase):
         # _actions and convert them.
         self._actions = actions
         self._convertActions()
-        
+
         aliases = kw.get( 'aliases', _marker )
         if aliases is _marker:
             self._guessMethodAliases()

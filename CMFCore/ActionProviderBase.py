@@ -82,7 +82,7 @@ class ActionProviderBase:
         # List ActionInfo objects.
         # (method is without docstring to disable publishing)
         #
-        ec = self._getExprContext(self, object)
+        ec = self._getExprContext(object)
         actions = self.listActions(object=object)
         actions = [ ActionInfo(action, ec) for action in actions ]
 
@@ -324,10 +324,10 @@ class ActionProviderBase:
                                 , visible=visible
                                 )
 
-    def _getOAI(self, context, object):
-        return getOAI(context, object)
-        
-    def _getExprContext(self, context, object):
-        return getExprContext(context, object)
+    def _getOAI(self, object):
+        return getOAI(self, object)
+
+    def _getExprContext(self, object):
+        return getExprContext(self, object)
 
 InitializeClass(ActionProviderBase)

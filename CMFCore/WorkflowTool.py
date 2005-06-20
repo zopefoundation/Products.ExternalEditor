@@ -24,7 +24,6 @@ from Globals import InitializeClass
 from Globals import PersistentMapping
 from OFS.Folder import Folder
 
-from ActionInformation import getOAI
 from ActionProviderBase import ActionProviderBase
 from interfaces.portal_workflow import portal_workflow as IWorkflowTool
 from permissions import ManagePortal
@@ -228,7 +227,7 @@ class WorkflowTool(UniqueObject, Folder, ActionProviderBase):
         o Global actions are supplied by all workflows.
         """
         if object is not None or info is None:
-            info = self._getOAI(self, object)
+            info = self._getOAI(object)
         chain = self.getChainFor(info.object)
         did = {}
         actions = []

@@ -21,7 +21,6 @@ from Acquisition import Implicit
 from AccessControl import ClassSecurityInfo
 
 from ActionProviderBase import ActionProviderBase
-from ActionInformation import getOAI
 from permissions import AccessContentsInformation
 from permissions import ManagePortal
 from permissions import ReplyToItem
@@ -160,7 +159,7 @@ class DiscussionTool (UniqueObject, SimpleItem, ActionProviderBase):
     def listActions(self, info=None, object=None):
         # Return actions for reply and show replies
         if object is not None or info is None:
-            info = self._getOAI(self, object)
+            info = self._getOAI(object)
         content = info.object
         if content is None or not self.isDiscussionAllowedFor(content):
             return ()
