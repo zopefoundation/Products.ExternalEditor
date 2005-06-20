@@ -1,8 +1,6 @@
-CMFCollector README
+CMFCollector has moved!
 
-  The CMFCollector is starting out as a rudimentary issue tracker, to
-  replace the equally rudimentary, ancient collector we've been using
-  on zope.org for a long time.  It is being implemented as CMF content
-  to enable evolution to a more comprehensive solution with time.
-
-  See INSTALL.txt for instructions about installing in your CMF site.
+  Please check it out (for versions after CMFCollector-0_10) as:
+  
+    $ cvs -d :ext:cvs.zope.org:/cvs-repository \
+       co -d CMFCollector-head CMF_Extras/CMFCollector
