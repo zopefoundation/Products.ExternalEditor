@@ -25,6 +25,7 @@ from Acquisition import aq_parent, aq_inner, aq_base
 from Globals import DTMLFile
 from Globals import InitializeClass
 from OFS.OrderedFolder import OrderedFolder
+from OFS.Folder import Folder
 
 from CMFCatalogAware import CMFCatalogAware
 from DynamicType import DynamicType
@@ -95,22 +96,19 @@ factory_type_information = (
 )
 
 
-class PortalFolder(DynamicType, CMFCatalogAware, OrderedFolder):
+class PortalFolderBase(DynamicType, CMFCatalogAware, Folder):
+    """Base class for portal folder
     """
-        Implements portal content management, but not UI details.
-    """
-    meta_type = 'Portal Folder'
-    portal_type = 'Folder'
+    meta_type = 'Portal Folder Base'
 
-    __implements__ = (IFolderish, DynamicType.__implements__,
-                      OrderedFolder.__implements__)
+    __implements__ = (IFolderish, DynamicType.__implements__, Folder.__implements__)
 
     security = ClassSecurityInfo()
 
     description = ''
-
-    manage_options = ( OrderedFolder.manage_options +
-                       CMFCatalogAware.manage_options )
+    
+    manage_options = ( Folder.manage_options +
+                       CMFCatalogAware.manage_options )  
 
     def __init__( self, id, title='' ):
         self.id = id
@@ -164,15 +162,6 @@ class PortalFolder(DynamicType, CMFCatalogAware, OrderedFolder):
                           typ.isConstructionAllowed( container )
                      , result )
 
-    security.declareProtected(AddPortalFolders, 'manage_addPortalFolder')
-    def manage_addPortalFolder(self, id, title='', REQUEST=None):
-        """Add a new PortalFolder object with id *id*.
-        """
-        ob = PortalFolder(id, title)
-        self._setObject(id, ob)
-        if REQUEST is not None:
-            return self.folder_contents( # XXX: ick!
-                self, REQUEST, portal_status_message="Folder added")
 
     def _filteredItems( self, ids, filt ):
         """
@@ -385,7 +374,7 @@ class PortalFolder(DynamicType, CMFCatalogAware, OrderedFolder):
         self.manage_addFolder( id=id, title='' )
 
     def _checkId(self, id, allow_dup=0):
-        PortalFolder.inheritedAttribute('_checkId')(self, id, allow_dup)
+        PortalFolderBase.inheritedAttribute('_checkId')(self, id, allow_dup)
 
         if allow_dup:
             return
@@ -485,7 +474,7 @@ class PortalFolder(DynamicType, CMFCatalogAware, OrderedFolder):
 
         # Call OFS' _verifyObjectPaste if necessary
         if not securityChecksDone:
-            PortalFolder.inheritedAttribute(
+            PortalFolderBase.inheritedAttribute(
                 '_verifyObjectPaste')(self, object, validate_src)
 
         # Finally, check allowed content types
@@ -503,7 +492,6 @@ class PortalFolder(DynamicType, CMFCatalogAware, OrderedFolder):
                                         % type_name)
 
     security.setPermissionDefault(AddPortalContent, ('Owner','Manager'))
-    security.setPermissionDefault(AddPortalFolders, ('Owner','Manager'))
 
     security.declareProtected(AddPortalFolders, 'manage_addFolder')
     def manage_addFolder( self
@@ -533,6 +521,37 @@ class PortalFolder(DynamicType, CMFCatalogAware, OrderedFolder):
 
         if REQUEST is not None:
             return self.manage_main(self, REQUEST, update_menu=1)
+
+InitializeClass(PortalFolderBase)
+
+
+class PortalFolder(PortalFolderBase, OrderedFolder):
+    """
+        Implements portal content management, but not UI details.
+    """
+    meta_type = 'Portal Folder'
+    portal_type = 'Folder'
+
+    __implements__ = (PortalFolderBase.__implements__,
+                      OrderedFolder.__implements__)
+
+    security = ClassSecurityInfo()
+
+    manage_options = ( OrderedFolder.manage_options +
+                       CMFCatalogAware.manage_options )
+
+    security.declareProtected(AddPortalFolders, 'manage_addPortalFolder')
+    def manage_addPortalFolder(self, id, title='', REQUEST=None):
+        """Add a new PortalFolder object with id *id*.
+        """
+        ob = PortalFolder(id, title)
+        self._setObject(id, ob)
+        if REQUEST is not None:
+            return self.folder_contents( # XXX: ick!
+                self, REQUEST, portal_status_message="Folder added")
+                
+    manage_renameObject = OrderedFolder.manage_renameObject.im_func
+    tpValues = OrderedFolder.tpValues.im_func
 
 InitializeClass(PortalFolder)
 
