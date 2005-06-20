@@ -47,8 +47,8 @@ HEAD only (unreleased)
     
       o hotfixes moved to /CMF_Hotfixes
       
-      o others (CMFStaging, CMFTracker, CMFWorkspaces) moved to
-        /CMF_Extras/
+      o others (CMFCollector, CMFStaging, CMFTracker, CMFWorkspaces)
+        moved to /CMF_Extras/
 
     - CMFSetup: the import/export of portal types uses a new XML format
       that can hold arbitrary properties, to facilitate subclassing. The
