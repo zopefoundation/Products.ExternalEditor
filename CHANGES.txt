@@ -1,6 +1,10 @@
 External Editor Change Log
 
-  Next Release
+  6/20/2005 - 0.9 Release
+
+    - When using the Excel plugin, errors were seen by users like
+      "TypeError: This object does not support enumeration".  We no
+      make the user deal with these.
 
     - When using the Excel plugin, errors were intermittently raised to the
       user in the form "Fatal error: <unknown>.Path" and the user could

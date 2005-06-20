@@ -82,7 +82,20 @@ class EditorProcess:
                 if why.endswith('Path') or why.endswith('Name'):
                     return 1
             raise
-
+        except TypeError, why:
+            # Again, who knows why this happens but the enumeration of
+            # workbooks can occasionally lead to a type error, e.g.:
+            # Traceback (most recent call last):
+            # File "zopeedit.py", line 764, in ?
+            # File "zopeedit.py", line 372, in launch
+            # File "Plugins\excel.pyc", line 57, in isAlive
+            # File "win32com\client\dynamic.pyc", line 210, in __getitem__
+            # TypeError: This object does not support enumeration
+            # We ignore this and return true.
+            why = str(why)
+            if why.endswith('enumeration'):
+                return 1
+            raise
 
 def test():
     import os
