@@ -24,7 +24,7 @@ from AccessControl import getSecurityManager
 from Acquisition import aq_parent, aq_inner, aq_base
 from Globals import DTMLFile
 from Globals import InitializeClass
-from OFS.OrderedFolder import OrderedFolder
+from OFS.OrderSupport import OrderSupport
 from OFS.Folder import Folder
 
 from CMFCatalogAware import CMFCatalogAware
@@ -525,7 +525,7 @@ class PortalFolderBase(DynamicType, CMFCatalogAware, Folder):
 InitializeClass(PortalFolderBase)
 
 
-class PortalFolder(PortalFolderBase, OrderedFolder):
+class PortalFolder(OrderSupport, PortalFolderBase):
     """
         Implements portal content management, but not UI details.
     """
@@ -533,12 +533,9 @@ class PortalFolder(PortalFolderBase, OrderedFolder):
     portal_type = 'Folder'
 
     __implements__ = (PortalFolderBase.__implements__,
-                      OrderedFolder.__implements__)
+                      OrderSupport.__implements__)
 
     security = ClassSecurityInfo()
-
-    manage_options = ( OrderedFolder.manage_options +
-                       CMFCatalogAware.manage_options )
 
     security.declareProtected(AddPortalFolders, 'manage_addPortalFolder')
     def manage_addPortalFolder(self, id, title='', REQUEST=None):
@@ -549,9 +546,6 @@ class PortalFolder(PortalFolderBase, OrderedFolder):
         if REQUEST is not None:
             return self.folder_contents( # XXX: ick!
                 self, REQUEST, portal_status_message="Folder added")
-                
-    manage_renameObject = OrderedFolder.manage_renameObject.im_func
-    tpValues = OrderedFolder.tpValues.im_func
 
 InitializeClass(PortalFolder)
 
