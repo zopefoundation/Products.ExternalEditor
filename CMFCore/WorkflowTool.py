@@ -16,6 +16,7 @@ $Id$
 """
 
 import sys
+from warnings import warn
 
 from AccessControl import ClassSecurityInfo
 from Acquisition import aq_base, aq_inner, aq_parent
@@ -43,6 +44,9 @@ class WorkflowInformation:
         querying actions without mediation of the 'portal_actions' tool.
     """
     def __init__(self, object):
+        warn('WorkflowInformation() is deprecated and will be removed in '
+             'CMF 1.7.',
+             DeprecationWarning)
         self.content = object
         self.content_url = object.absolute_url()
         self.portal_url = self.folder_url = ''
@@ -259,6 +263,9 @@ class WorkflowTool(UniqueObject, Folder, ActionProviderBase):
         """ Return a list of action dictionaries for 'ob', just as though
             queried via 'ActionsTool.listFilteredActionsFor'.
         """
+        warn('getActionsFor() is deprecated and will be removed in CMF 1.7. '
+             'Please use listActionInfos() instead.',
+             DeprecationWarning)
         return self.listActions( WorkflowInformation( ob ) )
 
     security.declarePublic('doActionFor')

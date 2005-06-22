@@ -39,6 +39,8 @@ class portal_workflow(Interface):
     # security.declarePublic('getActionsFor')
     def getActionsFor(ob):
         '''
+        This method is deprecated and will be removed in CMF 1.7. 
+
         Return a list of action dictionaries for 'ob', just as though
         queried via 'ActionsTool.listFilteredActionsFor'.
         '''
