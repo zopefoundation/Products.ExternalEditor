@@ -1,5 +1,10 @@
 External Editor Change Log
 
+  6/23/2005 - 0.9.1 Release
+
+    - Older pyc files for plugins were included in the 0.9 release.
+      This version has the most up to date plugins.
+
   6/20/2005 - 0.9 Release
 
     - When using the Excel plugin, errors were seen by users like
