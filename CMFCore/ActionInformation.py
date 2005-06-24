@@ -221,6 +221,11 @@ class ActionInfo(UserDict):
         else:
             return self.data == other
 
+    def copy(self):
+        c = UserDict.copy(self)
+        c._lazy_keys = self._lazy_keys[:]
+        return c
+
     def _checkPermissions(self, ec):
         """ Check permissions in the current context.
         """

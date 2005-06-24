@@ -222,6 +222,18 @@ class ActionInfoSecurityTests(SecurityTest):
         self.assertEqual( ai['allowed'], WANTED['allowed'] )
         self.assertEqual( ai, WANTED )
 
+    def test_copy(self):
+        action = {'name': 'foo', 'url': '', 'permissions': ('View',)}
+        ec = createExprContext(self.site, self.site, None)
+        ai = self._makeOne(action, ec)
+        ai2 = ai.copy()
+
+        self.assertEqual( ai._lazy_keys, ['allowed'] )
+        self.assertEqual( ai2._lazy_keys, ['allowed'] )
+        self.failIf( ai2._lazy_keys is ai._lazy_keys )
+        self.assertEqual( ai['allowed'], True )
+        self.assertEqual( ai2['allowed'], True )
+
 
 class ActionInformationTests(TransactionalTest):
 
