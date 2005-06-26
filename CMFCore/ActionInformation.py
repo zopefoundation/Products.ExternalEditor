@@ -381,7 +381,8 @@ class ActionInformation( SimpleItem ):
         action = self._getActionObject()
         expr = action and action.text or ''
         if expr and isinstance(expr, basestring):
-            if not expr.startswith('string:') and not expr.startswith('python:'):
+            if ( not expr.startswith('string:')
+                 and not expr.startswith('python:') ):
                 expr = 'string:${object_url}/%s' % expr
                 self.action = Expression( expr )
         return expr
@@ -389,9 +390,10 @@ class ActionInformation( SimpleItem ):
     security.declarePrivate( 'setActionExpression' )
     def setActionExpression(self, action):
         if action and isinstance(action, basestring):
-            if not action.startswith('string:') and not action.startswith('python:'):
+            if ( not action.startswith('string:')
+                 and not action.startswith('python:') ):
                 action = 'string:${object_url}/%s' % action
-                action = Expression( action )
+            action = Expression( action )
         self.action = action
 
     security.declarePublic( 'getCondition' )

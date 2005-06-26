@@ -293,6 +293,13 @@ class ActionInformationTests(TransactionalTest):
         self.assertEqual(ai.getCategory(), 'folder')
         self.assertEqual(ai.getPermissions(), ())
 
+    def test_setActionExpression_with_string_prefix(self):
+        from Products.CMFCore.Expression import Expression
+        ai = self._makeOne(id='view', category='folder')
+        ai.setActionExpression('string:blah')
+        self.failUnless(isinstance(ai.action,Expression))
+        self.assertEqual(ai.getActionExpression(), 'string:blah')
+
     def test_construction_with_Expressions(self):
         ai = self._makeOne( id='view',
                             title='View',
