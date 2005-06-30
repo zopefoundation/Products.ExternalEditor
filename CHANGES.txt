@@ -2,6 +2,9 @@ Zelenium Product Changelog
 
   After Zelenium-0.7
 
+    - Define zelenium_globals in __init__.py to be able to
+      registerDirectoryView the 'selenium' directory.
+
     - If debug-mode is set to "on" in zope.conf, filesystem-based testcases
       files are reloaded every time they are used, to ease development of
       filesystem-based test suites. This behavior emulates what the CMF

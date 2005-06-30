@@ -7,6 +7,8 @@ $Id$
 import zuite
 import permissions
 
+zelenium_globals = globals()
+
 def initialize(context):
 
     context.registerClass( zuite.Zuite
