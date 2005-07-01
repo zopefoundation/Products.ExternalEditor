@@ -1,12 +1,16 @@
 <?xml version="1.0"?>
-<type-info id="Event" kind="Factory-based Type Information"
-           title="Event" meta_type="CMF Event"
-           icon="event_icon.gif"
-           immediate_view="event_edit_form"
-           filter_content_types="True"
-           allow_discussion="False" global_allow="True"
-           product="CMFCalendar" factory="addEvent">
-  <description>Events are objects for use in Calendar topical queries on the catalog.</description>
+<type-info id="Event" kind="Factory-based Type Information">
+  <property name="title">Event</property>
+  <property name="description">Events are objects for use in Calendar topical queries on the catalog.</property>
+  <property name="content_icon">event_icon.gif</property>
+  <property name="content_meta_type">CMF Event</property>
+  <property name="product">CMFCalendar</property>
+  <property name="factory">addEvent</property>
+  <property name="immediate_view">event_edit_form</property>
+  <property name="global_allow">True</property>
+  <property name="filter_content_types">True</property>
+  <property name="allowed_content_types"></property>
+  <property name="allow_discussion">False</property>
   <aliases>
    <alias from="(Default)" to="event_view"/>
    <alias from="view" to="event_view"/>
