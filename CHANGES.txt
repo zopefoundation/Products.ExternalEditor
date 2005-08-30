@@ -2,6 +2,11 @@ Zelenium Product Changelog
 
   After Zelenium-0.7
 
+    - Suites now recurse through all "folderish" subobjects, looking
+      for tests (allows, for instance, tests to be loaded from disk via
+      CMF's FileSystemDirectoryView).  Thanks to Malcom Cleaton for the
+      patch!
+
     - Define zelenium_globals in __init__.py to be able to
       registerDirectoryView the 'selenium' directory.
 

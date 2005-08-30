@@ -187,14 +187,17 @@ class Zuite( OrderedFolder ):
         """ Return a list of our contents which qualify as test cases.
         """
         result = []
-        types = [ self.meta_type ]
-        types.extend( self.test_case_metatypes )
-
-        for tcid, test_case in self.objectItems( types ):
+        self._recurseListTestCases(result, prefix, self)
+        return result
+    
+    def _recurseListTestCases( self, result, prefix, ob ):
+        for tcid, test_case in ob.objectItems():
             if isinstance( test_case, self.__class__ ):
                 result.extend( test_case.listTestCases(
                                         prefix=prefix + ( tcid, ) ) )
-            else:
+            elif test_case.isPrincipiaFolderish:
+                self._recurseListTestCases(result, prefix+(tcid,), test_case)
+            elif test_case.meta_type in self.test_case_metatypes:
                 path = '/'.join( prefix + ( tcid, ) )
                 result.append( { 'id' : tcid
                                , 'title' : test_case.title_or_id()
@@ -206,9 +209,6 @@ class Zuite( OrderedFolder ):
         fsobjs = self._listFilesystemObjects()
 
         _recurseFSTestCases( result, prefix, fsobjs )
-
-        return result
-
 
 
     security.declareProtected(ManageSeleniumTestCases, 'getZipFileName')
