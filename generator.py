@@ -173,7 +173,7 @@ class ScenarioGenerator:
                                            , 'logfile-prefix='
                                            , 'logfile-extension='
                                            , 'logfile-extension-response='
-                                           , 'output-file'
+                                           , 'output-file='
                                            , 'exclude-pattern'
                                            , 'exclude-file'
                                            , 'site-host='
