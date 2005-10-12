@@ -23,8 +23,6 @@ TEST_CONTINUE = false;
 function TestLoop(commandFactory) {
     this.commandFactory = commandFactory;
 
-    var self = this;
-
     this.start = function() {
         selenium.reset();
         this.continueCurrentTest();
@@ -50,10 +48,9 @@ function TestLoop(commandFactory) {
 
         if (!command) return TEST_FINISHED;
 
-        // Make the current row blue
         this.commandStarted(command);
 
-        LOG.debug("Executing: |" + command.command + " | " + command.target + " | " + command.value + " |");
+        LOG.info("Executing: |" + command.command + " | " + command.target + " | " + command.value + " |");
 
         var result;
         try {
@@ -67,27 +64,21 @@ function TestLoop(commandFactory) {
 
             result = handler.execute(selenium, command);
         } catch (e) {
-            LOG.error(e);
-            // TODO: only throw typed errors from commands so that we can perform better error handling
-            // to differentiate between expected command errors and unexpected javascript errors.
-            if (e instanceof TypeError) {
-                // Not a command error.
-                throw e;
-            }
-            this.commandError(e.message);
+            this.handleCommandError(e);
             return TEST_FINISHED;
         }
 
-        // Record the result so that we can continue the execution using window.setTimeout()
+        // Record the result so that we can continue the execution using
+        // window.setTimeout()
         this.lastCommandResult = result;
         if (result.processState == SELENIUM_PROCESS_WAIT) {
-            // Since we're waiting for page to reload, we can't continue command execution
-            // directly, we need use a page load listener.
+            this.waitForCondition = function() {
+                return selenium.browserbot.isNewPageLoaded();
+            };
+        }
 
-            // TODO there is a potential race condition by attaching a load listener after
-            // the command has completed execution.
-            selenium.callOnNextPageLoad(function() {eval("testLoop.continueCommandExecutionWithDelay()");});
-
+        if (this.waitForCondition) {
+            this.pollUntilConditionIsTrue();
         } else {
             // Continue processing
             this.continueCommandExecutionWithDelay();
@@ -97,9 +88,38 @@ function TestLoop(commandFactory) {
         return TEST_CONTINUE;
     };
 
+    this.handleCommandError = function(e) {
+       if (!e.isSeleniumError) {
+            LOG.exception(e);
+            var msg = "Selenium failure. Please report to selenium-devel@lists.public.thoughtworks.org, with details from the logs at the base of the page.";
+            if (e.message) {
+               msg += "  The error message is: " + e.message;
+            }
+            this.commandError(msg);
+        } else {
+            LOG.error(e.message);
+            this.commandError(e.message);
+        }
+    };
+
     /**
-    * Continues the command execution, after waiting for the specified delay.
-    */
+     * Busy wait for waitForCondition() to become true, and then continue
+     * command execution.
+     */
+    this.pollUntilConditionIsTrue = function () {
+        if (this.waitForCondition()) {
+            this.waitForCondition = null;
+            this.continueCommandExecutionWithDelay();
+        } else {
+            window.setTimeout("testLoop.pollUntilConditionIsTrue()", 10);
+        }
+    };
+
+
+    /**
+     * Continue the command execution, after waiting for the specified
+     * delay.
+     */
     this.continueCommandExecutionWithDelay = function() {
         // Get the interval to use for this command execution, using the pauseInterval as
         // specified. Reset the pause interval, since it's a one-off thing.
@@ -108,7 +128,7 @@ function TestLoop(commandFactory) {
 
         if (interval < 0) {
             // Enable the "next/continue" button
-            this.waitingForNext();
+            this.pause();
         }
         else {
             // Continue processing
@@ -117,8 +137,8 @@ function TestLoop(commandFactory) {
     };
 
     /**
-    * Finishes the execution of the previous command, and continues the test
-    */
+     * Finish the execution of the previous command, and continue the test.
+     */
     this.finishCommandExecution = function() {
         this.commandComplete(this.lastCommandResult);
         this.continueCurrentTest();
@@ -142,15 +162,15 @@ TestLoop.prototype.commandComplete = noop;
 
 TestLoop.prototype.testComplete = noop;
 
-TestLoop.prototype.waitingForNext = noop;
+TestLoop.prototype.pause = noop;
 
 function noop() {
 
 };
 
 /**
- * A selenium command that tells selenium to expect a failure on the next command
- * execution. This command temporarily installs a new CommandFactory, that generates
+ * Tell Selenium to expect a failure on the next command execution. This
+ * command temporarily installs a CommandFactory that generates
  * CommandHandlers that expect a failure.
  */
 Selenium.prototype.assertFailureOnNext = function(message) {
@@ -165,8 +185,8 @@ Selenium.prototype.assertFailureOnNext = function(message) {
 };
 
 /**
- * A selenium command that tells selenium to expect a failure on the next command
- * execution. This command temporarily installs a new CommandFactory, that generates
+ * Tell Selenium to expect an error on the next command execution. This
+ * command temporarily installs a CommandFactory that generates
  * CommandHandlers that expect a failure.
  */
 Selenium.prototype.assertErrorOnNext = function(message) {
@@ -193,7 +213,7 @@ function ExpectFailureCommandFactory(originalCommandFactory, expectedErrorMessag
                 result.failureMessage = "Command should have failed.";
             }
             else {
-                if (baseFailureMessage != expectedErrorMessage) {
+                if (! PatternMatcher.matches(expectedErrorMessage, baseFailureMessage)) {
                     result.failed = true;
                     result.failureMessage = "Expected failure message '" + expectedErrorMessage
                                             + "' but was '" + baseFailureMessage + "'";
@@ -216,7 +236,7 @@ function executeCommandAndReturnFailureMessage(baseHandler, originalArguments) {
         return null;
     }
     return baseResult.failureMessage;
- };
+};
 
 function executeCommandAndReturnErrorMessage(baseHandler, originalArguments) {
     try {
@@ -226,5 +246,5 @@ function executeCommandAndReturnErrorMessage(baseHandler, originalArguments) {
     catch (expected) {
         return expected.message;
     }
- };
+};
 

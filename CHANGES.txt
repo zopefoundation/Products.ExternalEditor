@@ -2,6 +2,8 @@ Zelenium Product Changelog
 
   After Zelenium-0.7
 
+    - Upgrade to selenium version 0.6
+
     - Suites now recurse through all "folderish" subobjects, looking
       for tests (allows, for instance, tests to be loaded from disk via
       CMF's FileSystemDirectoryView).  Thanks to Malcom Cleaton for the

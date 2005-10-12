@@ -60,6 +60,7 @@ _SUPPORT_FILE_NAMES = [ 'html-xpath-patched.js'
                       , 'selenium.css'
                       , 'domviewer.html'
                       , 'selenium-logo.png'
+                      , 'SeleniumLog.html'
                       ]
 
 def _makeFile(filename, prefix=None, id=None):
