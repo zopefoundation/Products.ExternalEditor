@@ -45,23 +45,7 @@ _WWW_DIR = os.path.join( package_home( globals() ), 'www' )
 #   Selenium support files.
 #
 _SUPPORT_DIR = os.path.join( package_home( globals() ), 'selenium' )
-
-# TODO:  generate this list dynamically from the selenium sources!
-_SUPPORT_FILE_NAMES = [ 'html-xpath-patched.js'
-                      , 'selenium-browserbot.js'
-                      , 'selenium-api.js'
-                      , 'selenium-commandhandlers.js'
-                      , 'selenium-executionloop.js'
-                      , 'selenium-executioncontext.js'
-                      , 'selenium-fitrunner.js'
-                      , 'selenium-logging.js'
-                      , 'htmlutils.js'
-                      , 'selenium-domviewer.js'
-                      , 'selenium.css'
-                      , 'domviewer.html'
-                      , 'selenium-logo.png'
-                      , 'SeleniumLog.html'
-                      ]
+_SUPPORT_FILES = {}
 
 def _makeFile(filename, prefix=None, id=None):
 
@@ -75,8 +59,12 @@ def _makeFile(filename, prefix=None, id=None):
 
     return File( id=id, title='', file=open(path).read() )
 
-_SUPPORT_FILES = dict( [ ( x, _makeFile( x, prefix=_SUPPORT_DIR ) )
-                            for x in _SUPPORT_FILE_NAMES ] )
+for filename in os.listdir(_SUPPORT_DIR):
+    ignored, extension = os.path.splitext(filename)
+
+    if extension.lower() in ('.js', '.html', '.css', '.png'):
+        _SUPPORT_FILES[filename] = _makeFile( filename, prefix=_SUPPORT_DIR )
+
 
 _MARKER = object()
 
@@ -168,7 +156,7 @@ class Zuite( OrderedFolder ):
         if key in self.objectIds():
             return self._getOb( key )
 
-        if key in _SUPPORT_FILE_NAMES:
+        if key in _SUPPORT_FILES.keys():
             return _SUPPORT_FILES[ key ].__of__( self )
 
         proxy = _FilesystemProxy( key
@@ -658,7 +646,7 @@ class _FilesystemProxy( Folder ):
             return self.__class__( key, self._fsobjs[ 'subdirs' ][ key ]
                                  ).__of__( self.aq_parent )
 
-        if key in _SUPPORT_FILE_NAMES:
+        if key in _SUPPORT_FILES.keys():
             return _SUPPORT_FILES[ key ].__of__( self )
 
         if default is not _MARKER:

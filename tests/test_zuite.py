@@ -172,11 +172,11 @@ class ZuiteTests( unittest.TestCase ):
 
     def test___getitem___support_files( self ):
 
-        from Products.Zelenium.zuite import _SUPPORT_FILE_NAMES
+        from Products.Zelenium.zuite import _SUPPORT_FILES
 
         zuite = self._makeOne()
 
-        for name in _SUPPORT_FILE_NAMES:
+        for name in _SUPPORT_FILES.keys():
             object = zuite[ name ]
             self.assertEqual( object.meta_type, 'File' )
 
