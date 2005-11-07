@@ -5,6 +5,7 @@ import copy
 import pkg_resources
 import Products
 from Products.Basket.utils import EggProductContext
+from Products.Basket import get_containing_package
 from OFS.ObjectManager import ObjectManager
 from OFS.SimpleItem import SimpleItem
 
@@ -214,6 +215,15 @@ class TestBasket(unittest.TestCase):
         self.failUnless(sys.modules.has_key('Products.product1'))
         self.failUnless(sys.modules.has_key('Products.product2'))
         self.failUnless(sys.modules.has_key('Products.diskproduct1'))
+
+    def test_get_containing_package(self):
+        self.assertEqual(
+            get_containing_package('Products.PageTemplates.PageTemplate'
+                                   ).__name__,
+            'Products.PageTemplates')
+        self.assertEqual(
+            get_containing_package('Shared.DC.ZRDB').__name__,
+            'Shared.DC.ZRDB')
 
     def _importProduct(self, name):
         __import__(name)

@@ -152,7 +152,8 @@ class EggProduct(Product):
 InitializeClass(EggProduct)
 
 class EggProductContext(object):
-    def __init__(self, app, package):
+    def __init__(self, productname, app, package):
+        self.productname = productname
         self.app = app
         self.package = package
         self.createProductObject()
@@ -164,7 +165,7 @@ class EggProductContext(object):
         fver = ''
 
         packagename = self.package.__name__
-        productname = packagename.split('.')[-1]
+        productname = self.productname
 
         if hasattr(self.package, '__import_error__'):
             ie = self.package.__import_error__

@@ -38,9 +38,12 @@ class Basket(object):
         app = context._ProductContext__app
         meta_types = []
         for point in points:
+            # XXX deal with duplicate product names by raising an exception
+            # somewhere in here.
             package = get_containing_package(point.module_name)
+            productname = package.__name__.split('.')[-1]
+            context = EggProductContext(productname, app, package)
             initialize = point.load()
-            context = EggProductContext(app, package)
             data.append(initialize(context))
         return data
 
