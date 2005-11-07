@@ -155,27 +155,26 @@ class EggProductContext(object):
     def __init__(self, app, package):
         self.app = app
         self.package = package
-        self.product = None
+        self.createProductObject()
 
     def createProductObject(self):
-        # Create a persisten object in the ControlPanel.Products area
-        # represeing a product packaged as an egg and set it as self.product
+        # Create a persistent object in the ControlPanel.Products area
+        # representing a product packaged as an egg and set it as self.product
         products = self.app.Control_Panel.Products
         fver = ''
 
-        
+        packagename = self.package.__name___
+        productname = packagename.split('.')[-1]
 
         if hasattr(self.package, '__import_error__'):
             ie = self.package.__import_error__
         else:
             ie = None
 
-        productname = self.product.__name__
-
         # Retrieve version number from any suitable version.txt
         for fname in ('version.txt', 'VERSION.txt', 'VERSION.TXT'):
-            if pkg_resources.resource_exists(productname, fname):
-                fver = pkg_resources.resource_string(productname, fname)
+            if pkg_resources.resource_exists(packagename, fname):
+                fver = pkg_resources.resource_string(packagename, fname)
                 break
 
         old=None

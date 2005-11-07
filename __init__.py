@@ -40,6 +40,8 @@ class Basket(object):
         return data
 
     def product_distributions_by_dwim(self):
+        """ Find all product distributions which have an appropriate
+        entry point group on sys.path """
         environment = pkg_resources.Environment()
         ns_meta = 'entry_points.txt'
         product_distros = []
