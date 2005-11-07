@@ -507,6 +507,7 @@ class EggProductContext(object):
         return data
 
     def initialize_egg_product(self, productp, name, app):
+		pass
 
     def registerHelp(self, *arg, **kw):
         return # this is so not worth it

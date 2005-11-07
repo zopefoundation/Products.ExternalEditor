@@ -2,7 +2,6 @@ import sys
 import os
 import pkg_resources
 import inspect
-from utils import install_egg_product
 
 class Basket(object):
     def __init__(self):
