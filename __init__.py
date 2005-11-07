@@ -3,6 +3,8 @@ import os
 import pkg_resources
 import inspect
 
+entrypoint_group = 'zope2.initialize'
+
 class Basket(object):
     def __init__(self):
         self.pre_initialized = False
@@ -29,7 +31,7 @@ class Basket(object):
             pdist_fname = os.path.join(etc, 'PRODUCT_DISTRIBUTIONS.txt')
             self.preinitialize(pdist_fname)
         data = []
-        points = pkg_resources.iter_entry_points('zope2.initialize')
+        points = pkg_resources.iter_entry_points(entrypoint_group)
         meta_types = []
         for point in points:
             initialize = point.load()
@@ -39,16 +41,18 @@ class Basket(object):
 
     def product_distributions_by_dwim(self):
         environment = pkg_resources.Environment()
-        ns_meta = 'namespace_packages.txt'
+        ns_meta = 'entry_points.txt'
         product_distros = []
         for project_name in environment:
             distributions = environment[project_name]
             for distribution in distributions:
                 if distribution.has_metadata(ns_meta):
-                    packages = distribution.get_metadata(ns_meta)
-                    lines = packages.splitlines()
-                    if 'Products' in lines:
-                        product_distros.append(distribution)
+                    inifile = distribution.get_metadata(ns_meta)
+                    sections = pkg_resources.split_sections(inifile)
+                    for section, content in sections:
+                        if section == entrypoint_group:
+                            product_distros.append(distribution)
+                            break
         return product_distros
 
     def preinitialize(self, pdist_fname=None):
