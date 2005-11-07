@@ -1,0 +1,3 @@
+[zope2.initialize]
+initialize = Products.diskproduct1:initialize
+

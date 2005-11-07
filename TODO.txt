@@ -1,0 +1,17 @@
+- Allow ImageResource, PageTemplateResource, and DTMLResource to
+  monkeypatch their counterparts in Zope.
+
+- Do "jackboot" import prevention by putting a wrapper around Basket
+  in sys.modules (Basket is immediately deprecated; it is a stopgap
+  until we get support for egg distributions in the Zope core).
+
+- Cause egg-distribution-packaged Products to show up in the Control
+  Panel -> Products area.
+
+- Cause module-scope resources like "misc_", "methods", "__roles__",
+  and so on to be registered (see OFS.Application.install_product).
+
+- Passing Basket's "context" in to each subproducts' initialize
+  function is wrong; instead we need to create a ProductContext object
+  specially for the product (see OFS.Application.install_product).
+
