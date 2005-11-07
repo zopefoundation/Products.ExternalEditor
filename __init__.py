@@ -41,7 +41,7 @@ class Basket(object):
             package = get_containing_package(point.module_name)
             initialize = point.load()
             context = EggProductContext(app, package)
-            initialize(context)
+            data.append(initialize(context))
         return data
 
     def product_distributions_by_dwim(self):
