@@ -130,7 +130,7 @@ class TestBasket(unittest.TestCase):
         self.working_set.add_entry(self.fixtures)
 
         basket.require(distro_str='diskproduct1')
-        result = basket.initialize(None)
+        result = basket.initialize(DummyProductContext('Basket'))
         self.assertEqual(result, ['diskproduct1 initialized'])
 
     def test_product_distributions_by_dwim(self):
