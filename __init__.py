@@ -34,8 +34,9 @@ class Basket(object):
         points = pkg_resources.iter_entry_points(entrypoint_group)
         meta_types = []
         for point in points:
+            package = get_containing_package(point.module_name)
             initialize = point.load()
-            context = EggProductContext(product, app, package)
+            context = EggProductContext(app, package)
             initialize(context)
         return data
 
@@ -70,6 +71,16 @@ class Basket(object):
             for distribution in distributions:
                 pkg_resources.working_set.add(distribution)
         self.pre_initialized = True
+
+def get_containing_package(module_name):
+    __import__(module_name)
+    thing = sys.modules[module_name]
+    if hasattr(thing, '__path__'):
+        return thing
+    new = '.'.join(module_name.split('.')[:-1])
+    if new == module_name:
+        return None
+    return get_containing_package(new)
 
 basket = Basket()
 initialize = basket.initialize
