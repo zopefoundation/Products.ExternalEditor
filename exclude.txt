@@ -1,5 +1,0 @@
-.css
-.gif
-.ico
-/misc_
-/p_
