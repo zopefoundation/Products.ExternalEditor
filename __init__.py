@@ -1,6 +1,8 @@
 import sys
 import os
 import pkg_resources
+import inspect
+from utils import install_egg_product
 
 class Basket(object):
     def __init__(self):
@@ -29,10 +31,11 @@ class Basket(object):
             self.preinitialize(pdist_fname)
         data = []
         points = pkg_resources.iter_entry_points('zope2.initialize')
+        meta_types = []
         for point in points:
             initialize = point.load()
-            data.append(initialize(context))
-        # we return data here for unit testing purposes
+            context = EggProductContext(product, app, package)
+            initialize(context)
         return data
 
     def product_distributions_by_dwim(self):
@@ -65,4 +68,20 @@ class Basket(object):
 
 basket = Basket()
 initialize = basket.initialize
+
+class Jackboot(object):
+    """
+    Nazi-like proxy for an object to replace this package in
+    sys.modules... Basket is born deprecated, and nothing but the
+    Zope core should try to use it... if you can get around this,
+    you DESERVE TO LOSE! ;-)
+    """
+    def __setattr__(self, k, v):
+        raise DeprecationWarning('This package is deprecated, '
+                                 'do not monkey-patch it!')
+    def __getattribute__(self, k):
+        raise DeprecationWarning('This package is deprecated, do not import '
+                                 'it directly!')
+
+
 

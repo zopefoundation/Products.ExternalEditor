@@ -4,6 +4,7 @@ import sys
 import copy
 import pkg_resources
 import Products
+from Products.Basket.utils import EggProductContext
 
 here = os.path.dirname(__file__)
 
