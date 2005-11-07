@@ -1,3 +1,0 @@
-ZWiki is a ZoPe-based WikiWikiClone which allows you to build wikiwebs out of zope objects. 
-
-For more information, visit ZWikiWeb:ZWiki or http://joyful.com/zwiki

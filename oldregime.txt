@@ -1,0 +1,203 @@
+Old product initialization routine in prose:
+
+- get an ordered list with product data in it (apparently plugin
+  indexes must come first, otherwise the list contains (priority,
+  product name, counter in loop, name of place this product is
+  found on Products.__path__)
+
+- import each product in the order it's defined in the ordered list
+  (from within Zope2.startup.startup)
+
+  create a seen dict
+
+  using the seen dict, warn if a product has duplicate installations
+
+  respect __module_aliases__ at import time...
+
+     for k, v in aliases:
+
+        if we don't have the target module already...
+
+             set the source module into the target module's name in sys.modules
+
+  if the product can't be imported, set package.__import_error__
+  to the traceback value
+
+- get "folder_permissions":
+
+     folder_permissions={}
+     for p in Folder.Folder.__ac_permissions__:
+         permission, names = p[:2]
+         folder_permissions[permission]=names
+     return folder_permissions
+
+- create emtpy meta_types list
+
+- create seen dict for products
+
+- figure out if we're in debug mode or not
+
+- commit a transaction (with a note: 'Prior to product installs')
+
+- for each set of product data in the ordered product list:
+
+  if it's seen, continue
+
+  make it seen
+
+  install_product (mutating meta_types list as we go, we also pass in
+  folder permissions and whether we raise on error)
+
+    set __traceback_info__ to the product's name (not its dotted path)
+
+    import the product package
+
+    look for misc_ on the package (uses "pgetattr"; if it exists and
+    it's a dictionary, create a Misc_ object entry in
+    Application.misc_.__dict__[product_name].
+
+    find or create the "product object" (a persistent object in the
+    control panel).
+
+       look for '__import_error__' on the product package (set during
+       the import phase)
+
+       read the contents of version.txt in the package as fver
+
+       look for the product_name as an attr of the C_P.Products
+       object (using 'ihasattr')
+
+       if we find one, and its version is the same as fver and it is
+       the victim of a pior import error that's the same as the
+       current import error for the product, return the old product.
+
+       otherwise, create a Product object using the product_name and
+       version)
+
+       if we're dealing with a case where we have an existing product
+       in the control panel, but it's the victim of a different import
+       error than the 'old' product, do
+       app._manage_remove_product_meta_type(productObject), delete the
+       object from C_P.Products, and reset all of the objectitems from
+       the old productobject into the new productobject.  Don't fail.
+
+       set the productobject into C_P.Products using _setObject (its
+       name is just the product name)
+
+       set productObject.icon = 'p_/InstalledProduct_icon'
+
+       set productobject.version = fver
+
+       set product.home to the product's full directory name
+       (e.g. "<instancehome>/Products/Productname"
+
+       set product.manage_options = (Folder.manage_options[0],) +
+                                     tuple(Folder.manage_options[2:])
+
+       set product._distribution = None
+
+       set product.manage_distribution = None
+
+       set product.thisIsAnInstalledProduct = 1
+
+       if there was an import error:
+
+           set product.import_error_ to the error traceback text
+
+           set product.title = 'Broken product <productname>'
+
+           set product.icon = 'p_/BrokenProduct_icon'
+
+           set product.manage_options = ( {'label':'Traceback', 
+                                           'action':'manage_traceback'}, )
+
+        if there's a readme.txt in the product, add ({label:'README',
+          'action':'manage_readme'},) to the manage_options of the product
+
+        set up a refresh tab on the product if one doesn't already exist...
+
+          product.manage_options = product.manage_options + (
+            {'label':'Refresh', 'action':'manage_refresh',
+             'help': ('OFSP','Product_Refresh.stx')},)
+
+        if we're not really doing an install, abort the transaction
+
+        otherwise, set Globals.__disk_product_installed__ = 1
+
+        return the product
+
+    manufacture a product context using the product object.
+
+    call the product package's 'initialize' method
+
+    set new_permissions = {}
+
+    support old-style product metadata...
+
+      if the package has an __ac_permissions__... (using pgetattr)...
+
+          for p in pgetattr(product, '__ac_permissions__', ()):
+                permission, names, default = (
+                    tuple(p)+('Manager',))[:3]
+                if names:
+                    for name in names:
+                        permissions[name]=permission
+                elif not folder_permissions.has_key(permission):
+                    new_permissions[permission]=()
+
+      if the package has a meta_types attr (using pgetattr):
+
+            for meta_type in pgetattr(product, 'meta_types', ()):
+                # Modern product initialization via a ProductContext
+                # adds 'product' and 'permission' keys to the meta_type
+                # mapping. We have to add these here for old products.
+                pname=permissions.get(meta_type['action'], None)
+                if pname is not None:
+                    meta_type['permission']=pname
+                meta_type['product']=productObject.id
+                meta_type['visibility'] = 'Global'
+                meta_types.append(meta_type)
+
+     if the package has a "methods" attribute (using pgetattr):
+
+            for name,method in pgetattr(
+                product, 'methods', {}).items():
+                if not hasattr(Folder.Folder, name):
+                    setattr(Folder.Folder, name, method)
+                    if name[-9:]!='__roles__': # not Just setting roles
+                        if (permissions.has_key(name) and
+                            not folder_permissions.has_key(
+                                permissions[name])):
+                            permission=permissions[name]
+                            if new_permissions.has_key(permission):
+                                new_permissions[permission].append(name)
+                            else:
+                                new_permissions[permission]=[name]
+
+     if new permissions were added...
+
+            if new_permissions:
+                new_permissions=new_permissions.items()
+                for permission, names in new_permissions:
+                    folder_permissions[permission]=names
+                new_permissions.sort()
+                Folder.Folder.__ac_permissions__=tuple(
+                    list(Folder.Folder.__ac_permissions__)+new_permissions)
+
+    if we're not really installing, do transaction.abort()
+
+    otherwise, transaction.note('Installed product <productname>') and commit
+
+    if any of the above fails, abort the transaction.  if we're in debug
+    mode, raise the exception
+
+- Set Products.meta_types = Products.meta_types + tuple(meta_types)
+
+- Globals.default__class_init__(Folder.Folder) # why?
+
+
+
+  
+
+
+
