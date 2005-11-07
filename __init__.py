@@ -2,6 +2,7 @@ import sys
 import os
 import pkg_resources
 import inspect
+from utils import EggProductContext
 
 entrypoint_group = 'zope2.initialize'
 
@@ -32,6 +33,9 @@ class Basket(object):
             self.preinitialize(pdist_fname)
         data = []
         points = pkg_resources.iter_entry_points(entrypoint_group)
+        # Grab app from Zope product context
+        # It's a "protected" attributes, hence the name mangling
+        app = context._ProductContext__app
         meta_types = []
         for point in points:
             package = get_containing_package(point.module_name)

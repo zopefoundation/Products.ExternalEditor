@@ -5,8 +5,33 @@ import copy
 import pkg_resources
 import Products
 from Products.Basket.utils import EggProductContext
+from OFS.ObjectManager import ObjectManager
+from OFS.SimpleItem import SimpleItem
 
 here = os.path.dirname(__file__)
+
+class DummyProduct:
+
+	def __init__(self, id):
+		self.id = id
+
+class DummyPackage:
+	pass
+
+class DummyApp(ObjectManager):
+
+	def __init__(self):
+		self.Control_Panel = SimpleItem()
+		self.Control_Panel.id = 'Control_Panel'
+		self.Control_Panel.Products = ObjectManager()
+		self.Control_Panel.Products.id = 'Products'
+	
+class DummyProductContext:
+
+	def __init__(self, product_name):
+		self._ProductContext__app = DummyApp()
+		self._ProductContext__prod = DummyProduct(product_name)
+		self._ProductContext__pack = DummyPackage()
 
 class TestBasket(unittest.TestCase):
 
@@ -81,8 +106,8 @@ class TestBasket(unittest.TestCase):
 
         basket.require(distro_str='product1>=0.1')
         basket.require(distro_str='product2>=0.1')
-
-        result = basket.initialize(None)
+		
+        result = basket.initialize(DummyProductContext('Basket'))
         self.assertEqual(result, ['product1 initialized',
                                   'product2 initialized'])
         self.failUnless(sys.modules.has_key('Products.product1'))

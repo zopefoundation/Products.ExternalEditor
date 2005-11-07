@@ -163,7 +163,7 @@ class EggProductContext(object):
         products = self.app.Control_Panel.Products
         fver = ''
 
-        packagename = self.package.__name___
+        packagename = self.package.__name__
         productname = packagename.split('.')[-1]
 
         if hasattr(self.package, '__import_error__'):
@@ -180,8 +180,8 @@ class EggProductContext(object):
         old=None
 
         try:
-            if ihasattr(products, name):
-                old = getattr(products, name)
+            if ihasattr(products, productname):
+                old = getattr(products, productname)
                 if ( ihasattr(old, 'version') and old.version == fver ):
                     if hasattr(old, 'import_error_') and \
                        old.import_error_==ie:
@@ -193,19 +193,19 @@ class EggProductContext(object):
             pass
 
         f=fver and (" (%s)" % fver)
-        product = EggProduct(name, 'Installed product %s%s' % (name,f))
+        product = EggProduct(productname, 'Installed product %s%s' % (productname,f))
 
         if old is not None:
             app._manage_remove_product_meta_type(product)
-            products._delObject(name)
+            products._delObject(productname)
             for id, v in old.objectItems():
                 try: product._setObject(id, v)
                 except: pass
 
-        products._setObject(name, product)
+        products._setObject(productname, product)
         product.icon='p_/InstalledProduct_icon'
         product.version=fver
-        product.home=home
+        product.home=str(self.package.__path__)
 
         product.manage_options=(Folder.manage_options[0],) + \
                                 tuple(Folder.manage_options[2:])
@@ -215,14 +215,14 @@ class EggProductContext(object):
 
         if ie:
             product.import_error_=ie
-            product.title='Broken product %s' % name
+            product.title='Broken product %s' % productname
             product.icon='p_/BrokenProduct_icon'
             product.manage_options=(
                 {'label':'Traceback', 'action':'manage_traceback'},
                 )
 
         for fname in ('README.txt', 'README.TXT', 'readme.txt'):
-            if pkg_resources.resource_exists(productname, fname):
+            if pkg_resources.resource_exists(packagename, fname):
                 product.manage_options=product.manage_options+(
                     {'label':'README', 'action':'manage_readme'},
                     )
@@ -234,7 +234,7 @@ class EggProductContext(object):
 
         # Give the ZClass fixup code in Application
         Globals.__disk_product_installed__=1
-        product.productname = productname
+        product.name = productname
         return product
     
     def registerClass(self, instance_class=None, meta_type='',
