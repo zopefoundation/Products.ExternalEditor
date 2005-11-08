@@ -160,6 +160,9 @@ class EggProductContext(object):
         self.app = app
         self.package = package
         self.product = self.createProductObject()
+        self.permissions = {}
+        self.new_permissions = {}
+        self.meta_types = {}
         
     def createProductObject(self):
         # Create a persistent object in the ControlPanel.Products area
@@ -427,77 +430,75 @@ class EggProductContext(object):
                         v = sys.modules[v]
                     sys.modules[k] = v
 
-    def install(self, raise_exc=0, log_exc=1):
+    def set_misc_attrs(self):
+        # Install items into the misc_ namespace, used by products
+        # and the framework itself to store common static resources
+        # like icon images.
+        misc_=pgetattr(self.package, 'misc_', {})
+        if misc_:
+            if isinstance(misc_, dict):
+                misc_ = Misc_(self.productname, misc_)
+            Application.misc_.__dict__[self.productname]=misc_
 
+    def set_ac_permissions(self):
+        # Support old-old-style product metadata. Older products may
+        # define attributes to name their permissions, meta_types,
+        # constructors, etc.
         folder_permissions = get_folder_permissions()
+        for p in pgetattr(self.package, '__ac_permissions__', ()):
+            permission, names, default = tuple(p) + ('Manager',)[:3]
+            if names:
+                for name in names:
+                    self.permissions[name] = permission
+            elif not folder_permissions.has_key(permission):
+                self.new_permissions[permission]=()
 
-        global_dict = globals()
+    def set_meta_types(self):
+        for meta_type in pgetattr(self.package, 'meta_types', ()):
+            # Modern product initialization via a ProductContext
+            # adds 'product' and 'permission' keys to the meta_type
+            # mapping. We have to add these here for old products.
+            pname = self.permissions.get(meta_type['action'], None)
+            if pname is not None:
+                meta_type['permission']=pname
+            meta_type['product']=productObject.id
+            meta_type['visibility'] = 'Global'
 
+    def set_methods(self):
+        for name, method in pgetattr(self.package, 'methods', {}).items():
+            if not hasattr(Folder, name):
+                setattr(Folder, name, method)
+                if name[-9:]!='__roles__': # not just setting roles
+                    if (self.permissions.has_key(name) and
+                        not self.folder_permissions.has_key(
+                            self.permissions[name])):
+                        permission = self.permissions[name]
+                        if self.new_permissions.has_key(permission):
+                            self.new_permissions[permission].append(name)
+                        else:
+                            self.new_permissions[permission]=[name]
+
+    def install(self, raise_exc=1, log_exc=1):
         __traceback_info__ = self.productname
-
-        self.set_module_aliases()
 
         package = self.package
         product = self.product
         productname = self.productname
         initializer = self.initializer
+        permissions = self.permissions
+        folder_permissions = get_folder_permissions()
+        init_data = None
 
         try:
-            # Install items into the misc_ namespace, used by products
-            # and the framework itself to store common static resources
-            # like icon images.
-            misc_=pgetattr(package, 'misc_', {})
-            if misc_:
-                if isinstance(misc_, dict):
-                    misc_ = Misc_(productname, misc_)
-                Application.misc_.__dict__[self.productname]=misc_
+            self.set_module_aliases()
+            self.set_misc_attrs()
+            init_data = initializer(self)
+            self.set_ac_permissions()
+            self.set_meta_types()
+            self.set_methods()
 
-            # Look for an 'initialize' method in the product. If it does
-            # not exist, then this is an old product that has never been
-            # updated. In that case, we will analyze the product and
-            # build up enough information to do initialization manually.
-            returned = initializer(self)
-
-            # Support old-style product metadata. Older products may
-            # define attributes to name their permissions, meta_types,
-            # constructors, etc.
-            permissions={}
-            new_permissions={}
-            for p in pgetattr(package, '__ac_permissions__', ()):
-                permission, names, default = (
-                    tuple(p)+('Manager',))[:3]
-                if names:
-                    for name in names:
-                        permissions[name]=permission
-                elif not folder_permissions.has_key(permission):
-                    new_permissions[permission]=()
-
-            for meta_type in pgetattr(package, 'meta_types', ()):
-                # Modern product initialization via a ProductContext
-                # adds 'product' and 'permission' keys to the meta_type
-                # mapping. We have to add these here for old products.
-                pname=permissions.get(meta_type['action'], None)
-                if pname is not None:
-                    meta_type['permission']=pname
-                meta_type['product']=productObject.id
-                meta_type['visibility'] = 'Global'
-
-            for name,method in pgetattr(
-                product, 'methods', {}).items():
-                if not hasattr(Folder, name):
-                    setattr(Folder, name, method)
-                    if name[-9:]!='__roles__': # not Just setting roles
-                        if (permissions.has_key(name) and
-                            not folder_permissions.has_key(
-                                permissions[name])):
-                            permission=permissions[name]
-                            if new_permissions.has_key(permission):
-                                new_permissions[permission].append(name)
-                            else:
-                                new_permissions[permission]=[name]
-
-            if new_permissions:
-                new_permissions=new_permissions.items()
+            if self.new_permissions:
+                new_permissions = self.new_permissions.items()
                 for permission, names in new_permissions:
                     folder_permissions[permission]=names
                 new_permissions.sort()
@@ -518,7 +519,7 @@ class EggProductContext(object):
             if raise_exc:
                 raise
 
-        return returned
+        return init_data
 
     def registerHelp(self, *arg, **kw):
         return # this is so not worth it

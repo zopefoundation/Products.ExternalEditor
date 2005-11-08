@@ -35,6 +35,9 @@ class DummyProductContext:
 		self._ProductContext__prod = DummyProduct(product_name)
 		self._ProductContext__pack = DummyPackage()
 
+def dummy_initializer(context):
+    return 'initializer called'
+
 class TestBasket(unittest.TestCase):
 
     def setUp(self):
@@ -249,28 +252,24 @@ class TestEggProductContext(unittest.TestCase):
         return klass(*arg, **kw)
 
     def test_constructor(self):
-        def initializer(context):
-            return 'initializer called'
         app = DummyApp()
         package = DummyPackage()
-        context = self._makeOne('DummyProduct', initializer, app, package)
+        context = self._makeOne('DummyProduct', dummy_initializer, app, package)
         data = context.install()
         self.assertEqual(data, 'initializer called')
         self.assertEqual(context.productname, 'DummyProduct')
-        self.assertEqual(context.initializer, initializer)
+        self.assertEqual(context.initializer, dummy_initializer)
         self.assertEqual(context.package, package)
         self.assertEqual(context.product.__class__.__name__, 'EggProduct')
 
-    def test_module_aliases(self):
-        def initializer(context):
-            return 'initializer called'
+    def test_module_aliases_set(self):
         app = DummyApp()
         package = DummyPackage()
         package.__module_aliases__ = (
             ('Dummy.Foo', 'Products.Basket'),
             ('Dummy.Bar', 'Products.Basket')
             )
-        context = self._makeOne('DummyProduct', initializer, app, package)
+        context = self._makeOne('DummyProduct', dummy_initializer, app, package)
         data = context.install()
         self.assertEqual(data, 'initializer called')
         self.assertEqual(sys.modules['Dummy.Foo'].__name__,
@@ -279,20 +278,47 @@ class TestEggProductContext(unittest.TestCase):
                          'Products.Basket')
 
     def test_misc_under_set(self):
-        def initializer(context):
-            return 'initializer called'
         app = DummyApp()
         package = DummyPackage()
         def afunction():
             pass
         package.misc_ = {'afunction':afunction}
-        context = self._makeOne('DummyProduct', initializer, app, package)
+        context = self._makeOne('DummyProduct', dummy_initializer, app, package)
         data = context.install()
         from OFS import Application
         self.assertEqual(
             Application.misc_.__dict__['DummyProduct']['afunction'],
             afunction)
 
+    def test__ac_permissions__set(self):
+        app = DummyApp()
+        package = DummyPackage()
+        package.__ac_permissions__ = ( ('aPermission', (), () ), )
+        context = self._makeOne('DummyProduct', dummy_initializer, app, package)
+        data = context.install()
+        from OFS.Folder import Folder
+        self.assert_( ('aPermission', (),)  in Folder.__ac_permissions__)
+
+    def test_meta_types_set(self):
+        app = DummyApp()
+        package = DummyPackage()
+        package.meta_types = ( {'name':'grabass', 'action':'amethod'}, )
+        context = self._makeOne('DummyProduct', dummy_initializer, app, package)
+        meta_types = []
+        data = context.install()
+        from OFS.Folder import Folder
+        self.assert_({'action': 'amethod', 'product': 'abaz',
+                       'name': 'grabass', 'visibility': 'Global'}
+                      in meta_types)
+
+    def test_methods_set(self):
+        app = DummyApp()
+        package = DummyPackage()
+        package.methods = {'amethod':dummy_initializer}
+        context = self._makeOne('DummyProduct', dummy_initializer, app, package)
+        data = context.install()
+        from OFS.Folder import Folder
+        self.assertEqual(Folder.amethod.im_func, dummy_initializer)
 
 def test_suite():
     from unittest import TestSuite, makeSuite
