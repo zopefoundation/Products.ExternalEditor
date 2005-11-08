@@ -12,9 +12,11 @@ from Globals import InitializeClass
 from OFS.content_types import guess_content_type
 from App.Common import rfc1123_date
 from App.special_dtml import defaultBindings
+from OFS.misc_ import Misc_
 
 from OFS.Application import pgetattr
 from OFS.Application import get_folder_permissions
+from OFS import Application
 from App.ProductContext import ProductContext
 from App.Product import Product
 from App.Product import ihasattr
@@ -152,8 +154,9 @@ class EggProduct(Product):
 InitializeClass(EggProduct)
 
 class EggProductContext(object):
-    def __init__(self, productname, app, package):
+    def __init__(self, productname, initializer, app, package):
         self.productname = productname
+        self.initializer = initializer
         self.app = app
         self.package = package
         self.product = self.createProductObject()
@@ -178,7 +181,7 @@ class EggProductContext(object):
                 fver = pkg_resources.resource_string(packagename, fname)
                 break
 
-        old=None
+        old = None
 
         try:
             if ihasattr(products, productname):
@@ -193,8 +196,9 @@ class EggProductContext(object):
         except:
             pass
 
-        f=fver and (" (%s)" % fver)
-        product = EggProduct(productname, 'Installed product %s%s' % (productname,f))
+        f = fver and (" (%s)" % fver)
+        product = EggProduct(productname, 'Installed product %s%s' %
+                             (productname, f))
 
         if old is not None:
             app._manage_remove_product_meta_type(product)
@@ -423,7 +427,7 @@ class EggProductContext(object):
                         v = sys.modules[v]
                     sys.modules[k] = v
 
-    def install(self, initializer, raise_exc=0, log_exc=1):
+    def install(self, raise_exc=0, log_exc=1):
 
         folder_permissions = get_folder_permissions()
 
@@ -436,6 +440,7 @@ class EggProductContext(object):
         package = self.package
         product = self.product
         productname = self.productname
+        initializer = self.initializer
 
         try:
             # Install items into the misc_ namespace, used by products
@@ -514,9 +519,6 @@ class EggProductContext(object):
                 raise
 
         return returned
-
-    def initialize_egg_product(self, productp, name, app):
-        pass
 
     def registerHelp(self, *arg, **kw):
         return # this is so not worth it

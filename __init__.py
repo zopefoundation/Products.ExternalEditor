@@ -42,23 +42,14 @@ class Basket(object):
             # somewhere in here.
             # XXX test by creating a broken product and see what happens
             product_pkg = get_containing_package(point.module_name)
-            self.set_module_aliases(product_pkg)
             productname = product_pkg.__name__.split('.')[-1]
-            context = EggProductContext(productname, app, product_pkg)
             initializer = point.load()
+            context = EggProductContext(productname, initializer, app,
+                                        product_pkg)
             # XXX debug mode conditions raise_exc, log_exc
-            returned = context.install(initializer, raise_exc=True,
-                                       log_exc=True)
+            returned = context.install()
             data.append(returned)
         return data
-
-    def set_module_aliases(self, product):
-        if hasattr(product, '__module_aliases__'):
-            for k, v in product.__module_aliases__:
-                if not sys.modules.has_key(k):
-                    if isinstance(v, basestring) and sys.modules.has_key(v):
-                        v = sys.modules[v]
-                    sys.modules[k] = v
 
     def product_distributions_by_dwim(self):
         """ Find all product distributions which have an appropriate

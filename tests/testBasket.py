@@ -17,7 +17,8 @@ class DummyProduct:
 		self.id = id
 
 class DummyPackage:
-	pass
+	__name__ = 'Products.Basket'
+        __path__ = os.path.split(here)[:-2]
 
 class DummyApp(ObjectManager):
 
@@ -143,7 +144,10 @@ class TestBasket(unittest.TestCase):
 
         distributions = basket.product_distributions_by_dwim()
         expected = [ 'diskproduct1', 'product1', 'product2' ]
-        self.assertEqual(expected, [ dist.key for dist in distributions ])
+        # don't consider other eggs that happen to be on the path, only
+        # test that we find the things that are in our fixture dir
+        actual = [ dist.key for dist in distributions if dist.key in expected ]
+        self.assertEqual(expected, actual)
 
     def test_preinitalize_pdist_file_success(self):
         basket = self._makeOne()
@@ -228,9 +232,71 @@ class TestBasket(unittest.TestCase):
     def _importProduct(self, name):
         __import__(name)
 
+class TestEggProductContext(unittest.TestCase):
+
+    def tearDown(self):
+        if sys.modules.has_key('Dummy.Foo'):
+            del sys.modules['Dummy.Foo']
+        if sys.modules.has_key('Dummy.Bar'):
+            del sys.modules['Dummy.Bar']
+
+    def _getTargetClass(self):
+        from Products.Basket.utils import EggProductContext
+        return EggProductContext
+
+    def _makeOne(self, *arg, **kw):
+        klass = self._getTargetClass()
+        return klass(*arg, **kw)
+
+    def test_constructor(self):
+        def initializer(context):
+            return 'initializer called'
+        app = DummyApp()
+        package = DummyPackage()
+        context = self._makeOne('DummyProduct', initializer, app, package)
+        data = context.install()
+        self.assertEqual(data, 'initializer called')
+        self.assertEqual(context.productname, 'DummyProduct')
+        self.assertEqual(context.initializer, initializer)
+        self.assertEqual(context.package, package)
+        self.assertEqual(context.product.__class__.__name__, 'EggProduct')
+
+    def test_module_aliases(self):
+        def initializer(context):
+            return 'initializer called'
+        app = DummyApp()
+        package = DummyPackage()
+        package.__module_aliases__ = (
+            ('Dummy.Foo', 'Products.Basket'),
+            ('Dummy.Bar', 'Products.Basket')
+            )
+        context = self._makeOne('DummyProduct', initializer, app, package)
+        data = context.install()
+        self.assertEqual(data, 'initializer called')
+        self.assertEqual(sys.modules['Dummy.Foo'].__name__,
+                         'Products.Basket')
+        self.assertEqual(sys.modules['Dummy.Bar'].__name__,
+                         'Products.Basket')
+
+    def test_misc_under_set(self):
+        def initializer(context):
+            return 'initializer called'
+        app = DummyApp()
+        package = DummyPackage()
+        def afunction():
+            pass
+        package.misc_ = {'afunction':afunction}
+        context = self._makeOne('DummyProduct', initializer, app, package)
+        data = context.install()
+        from OFS import Application
+        self.assertEqual(
+            Application.misc_.__dict__['DummyProduct']['afunction'],
+            afunction)
+
 
 def test_suite():
     from unittest import TestSuite, makeSuite
     suite = TestSuite()
     suite.addTest(makeSuite(TestBasket))
+    suite.addTest(makeSuite(TestEggProductContext))
     return suite
