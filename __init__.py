@@ -40,6 +40,7 @@ class Basket(object):
         for point in points:
             # XXX deal with duplicate product names by raising an exception
             # somewhere in here.
+            # XXX test by creating a broken product and see what happens
             package = get_containing_package(point.module_name)
             productname = package.__name__.split('.')[-1]
             context = EggProductContext(productname, app, package)
