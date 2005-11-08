@@ -156,8 +156,8 @@ class EggProductContext(object):
         self.productname = productname
         self.app = app
         self.package = package
-        self.createProductObject()
-
+        self.product = self.createProductObject()
+        
     def createProductObject(self):
         # Create a persistent object in the ControlPanel.Products area
         # representing a product packaged as an egg and set it as self.product
@@ -414,42 +414,51 @@ class EggProductContext(object):
         return Z
 
 
-    def install(self, app, product, initializer, raise_exc=0, log_exc=1):
+    def set_module_aliases(self):
+        product_pkg = self.package
+        if hasattr(product_pkg, '__module_aliases__'):
+            for k, v in product_pkg.__module_aliases__:
+                if not sys.modules.has_key(k):
+                    if isinstance(v, basestring) and sys.modules.has_key(v):
+                        v = sys.modules[v]
+                    sys.modules[k] = v
+
+    def install(self, initializer, raise_exc=0, log_exc=1):
 
         folder_permissions = get_folder_permissions()
 
         global_dict = globals()
 
-        __traceback_info__ = product_name = product.__name__
+        __traceback_info__ = self.productname
+
+        self.set_module_aliases()
+
+        package = self.package
+        product = self.product
+        productname = self.productname
 
         try:
             # Install items into the misc_ namespace, used by products
             # and the framework itself to store common static resources
             # like icon images.
-            misc_=pgetattr(product, 'misc_', {})
+            misc_=pgetattr(package, 'misc_', {})
             if misc_:
                 if isinstance(misc_, dict):
-                    misc_=Misc_(product_name, misc_)
-                Application.misc_.__dict__[product_name]=misc_
+                    misc_ = Misc_(productname, misc_)
+                Application.misc_.__dict__[self.productname]=misc_
 
-            # Here we create a ProductContext object which contains
-            # information about the product and provides an interface
-            # for registering things like classes and help topics that
-            # should be associated with that product. Products are
-            # expected to implement a method named 'initialize' in
-            # their __init__.py that takes the ProductContext as an
-            # argument.
-            productObject = initialize_egg_product(product, product_name, app)
-            context = EggProductContext(productObject, app, product)
-
-            data = initializer(context)
+            # Look for an 'initialize' method in the product. If it does
+            # not exist, then this is an old product that has never been
+            # updated. In that case, we will analyze the product and
+            # build up enough information to do initialization manually.
+            returned = initializer(self)
 
             # Support old-style product metadata. Older products may
             # define attributes to name their permissions, meta_types,
             # constructors, etc.
             permissions={}
             new_permissions={}
-            for p in pgetattr(product, '__ac_permissions__', ()):
+            for p in pgetattr(package, '__ac_permissions__', ()):
                 permission, names, default = (
                     tuple(p)+('Manager',))[:3]
                 if names:
@@ -458,7 +467,7 @@ class EggProductContext(object):
                 elif not folder_permissions.has_key(permission):
                     new_permissions[permission]=()
 
-            for meta_type in pgetattr(product, 'meta_types', ()):
+            for meta_type in pgetattr(package, 'meta_types', ()):
                 # Modern product initialization via a ProductContext
                 # adds 'product' and 'permission' keys to the meta_type
                 # mapping. We have to add these here for old products.
@@ -493,18 +502,18 @@ class EggProductContext(object):
             if not doInstall():
                 transaction().abort()
             else:
-                transaction.get().note('Installed product '+product_name)
+                transaction.get().note('Installed product '+productname)
                 transaction.commit()
 
         except:
             if log_exc:
-                LOG('Zope',ERROR,'Couldn\'t install %s' % product_name,
+                LOG('Zope',ERROR,'Couldn\'t install %s' % productname,
                     error=sys.exc_info())
             transaction.abort()
             if raise_exc:
                 raise
 
-        return data
+        return returned
 
     def initialize_egg_product(self, productp, name, app):
         pass
@@ -531,7 +540,7 @@ class EggProductContext(object):
         pass
 
 
-def import_product(product_dir, product_name, raise_exc=0, log_exc=1):
+def import_product(product_dir, productname, raise_exc=0, log_exc=1):
     path_join=os.path.join
     isdir=os.path.isdir
     exists=os.path.exists
@@ -542,14 +551,14 @@ def import_product(product_dir, product_name, raise_exc=0, log_exc=1):
     have_module=modules.has_key
 
     try:
-        package_dir=path_join(product_dir, product_name)
+        package_dir=path_join(product_dir, productname)
         if not isdir(package_dir): return
         if not exists(path_join(package_dir, '__init__.py')):
             if not exists(path_join(package_dir, '__init__.pyc')):
                 if not exists(path_join(package_dir, '__init__.pyo')):
                     return
 
-        pname="Products.%s" % product_name
+        pname="Products.%s" % productname
         try:
             product=__import__(pname, global_dict, global_dict, silly)
             if hasattr(product, '__module_aliases__'):
