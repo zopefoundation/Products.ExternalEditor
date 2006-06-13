@@ -1,5 +1,9 @@
 External Editor Change Log
 
+  mm/dd/yyyy
+
+    - Don't emit a warning about deprecated 'methods' in Zope >= 2.10.
+
   6/23/2005 - 0.9.1 Release
 
     - Older pyc files for plugins were included in the 0.9 release.
