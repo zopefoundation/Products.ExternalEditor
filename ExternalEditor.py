@@ -40,6 +40,26 @@ except ImportError:
     
 ExternalEditorPermission = 'Use external editor'
 
+_callbacks = []
+
+def registerCallback(cb):
+    """Register a callback to be called by the External Editor when
+    it's about to be finished with collecting metadata for the
+    to-be-edited file to allow actions to be taken, like for example
+    inserting more metadata headers or enabling response compression
+    or anything.
+    """
+    _callbacks.append(cb)
+
+def applyCallbacks(ob, metadata, request, response):
+    """Apply the registered callbacks in the order they were
+    registered. The callbacks are free to perform any operation,
+    including appending new metadata attributes and setting response
+    headers.
+    """
+    for cb in _callbacks:
+        cb(ob, metadata, request, response)
+
 class ExternalEditor(Acquisition.Implicit):
     """Create a response that encapsulates the data needed by the
        ZopeEdit helper application
@@ -120,6 +140,9 @@ class ExternalEditor(Acquisition.Implicit):
                         r.append('borrow_lock:1')
                     break       
               
+        # Apply any extra callbacks that might have been registered.
+        applyCallbacks(ob, r, REQUEST, RESPONSE)
+
         r.append('')
         streamiterator = None
         

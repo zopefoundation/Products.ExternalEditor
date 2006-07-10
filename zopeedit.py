@@ -28,6 +28,7 @@ if win32:
     warnings.filterwarnings('ignore')
 
 import os, re
+import rfc822
 import traceback
 from tempfile import mktemp
 from ConfigParser import ConfigParser
@@ -109,17 +110,10 @@ class ExternalEditor:
             self.config = Configuration(config_path)
 
             # Open the input file and read the metadata headers
-            in_f = open(input_file, 'rb')
-            metadata = {}
+            in_f = open(input_file, 'rU')
+            m = rfc822.Message(in_f)
 
-            while 1:
-                line = in_f.readline()[:-1]
-                if not line: break
-                sep = line.find(':')
-                key = line[:sep]
-                val = line[sep+1:]
-                metadata[key] = val
-            self.metadata = metadata
+            self.metadata = metadata = m.dict.copy()
                                
             # parse the incoming url
             scheme, self.host, self.path = urlparse(metadata['url'])[:3]

@@ -2,6 +2,13 @@ External Editor Change Log
 
   mm/dd/yyyy
 
+    - Add a simple callback registry that can be used to add extra
+      metadata headers or set special response headers when a file is
+      edited through External Editor.
+
+    - Use rfc822.Message for parsing the metadata of the file being
+      edited.
+
     - Don't emit a warning about deprecated 'methods' in Zope >= 2.10.
 
   6/23/2005 - 0.9.1 Release
@@ -12,7 +19,7 @@ External Editor Change Log
   6/20/2005 - 0.9 Release
 
     - When using the Excel plugin, errors were seen by users like
-      "TypeError: This object does not support enumeration".  We no
+      "TypeError: This object does not support enumeration".  We now
       make the user deal with these.
 
     - When using the Excel plugin, errors were intermittently raised to the
