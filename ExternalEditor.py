@@ -2,14 +2,14 @@
 #
 # Copyright (c) 2001, 2002 Zope Corporation and Contributors.
 # All Rights Reserved.
-# 
+#
 # This software is subject to the provisions of the Zope Public License,
 # Version 2.0 (ZPL).  A copy of the ZPL should accompany this distribution.
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
 # WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE.
-# 
+#
 ##############################################################################
 """$Id$
 """
@@ -37,10 +37,27 @@ try:
 except ImportError:
     # pre-2.7.1 Zope without stream iterators
     IStreamIterator = None
-    
+
 ExternalEditorPermission = 'Use external editor'
 
 _callbacks = []
+
+class PDataStreamIterator:
+
+    __implements__ = (IStreamIterator,)
+
+    def __init__(self, data):
+        self.data = data
+
+    def __iter__(self):
+        return iter(self)
+
+    def next(self):
+        if self.data is None:
+            raise StopIteration
+        data = self.data.data
+        self.data = self.data.next
+        return data
 
 def registerCallback(cb):
     """Register a callback to be called by the External Editor when
@@ -64,10 +81,10 @@ class ExternalEditor(Acquisition.Implicit):
     """Create a response that encapsulates the data needed by the
        ZopeEdit helper application
     """
-    
+
     security = ClassSecurityInfo()
     security.declareObjectProtected(ExternalEditorPermission)
-    
+
     def __before_publishing_traverse__(self, self2, request):
         path = request['TraversalRequestNameStack']
         if path:
@@ -80,10 +97,10 @@ class ExternalEditor(Acquisition.Implicit):
             path[:] = []
         else:
             request.set('target', None)
-    
+
     def index_html(self, REQUEST, RESPONSE, path=None):
         """Publish the object to the external editor helper app"""
-        
+
         security = getSecurityManager()
         if path is None:
             parent = self.aq_parent
@@ -96,11 +113,11 @@ class ExternalEditor(Acquisition.Implicit):
                 ob = parent.propertysheets.methods[REQUEST['target']]
         else:
             ob = self.restrictedTraverse( path )
-        
+
         r = []
         r.append('url:%s' % ob.absolute_url())
         r.append('meta_type:%s' % ob.meta_type)
-        
+
         title = getattr(Acquisition.aq_base(ob), 'title', None)
         if title is not None:
             if callable(title):
@@ -108,7 +125,7 @@ class ExternalEditor(Acquisition.Implicit):
             if isinstance(title, types.UnicodeType):
                 title = unicode.encode(title, 'utf-8')
             r.append('title:%s' % title)
-                
+
         if hasattr(Acquisition.aq_base(ob), 'content_type'):
             if callable(ob.content_type):
                 r.append('content_type:%s' % ob.content_type())
@@ -120,13 +137,13 @@ class ExternalEditor(Acquisition.Implicit):
                 auth = REQUEST._auth[:-1]
             else:
                 auth = REQUEST._auth
-                
+
             r.append('auth:%s' % auth)
-            
+
         r.append('cookie:%s' % REQUEST.environ.get('HTTP_COOKIE',''))
-        
+
         if wl_isLocked(ob):
-            # Object is locked, send down the lock token 
+            # Object is locked, send down the lock token
             # owned by this user (if any)
             user_id = security.getUser().getId()
             for lock in ob.wl_lockValues():
@@ -138,35 +155,35 @@ class ExternalEditor(Acquisition.Implicit):
                     r.append('lock-token:%s' % lock.getLockToken())
                     if REQUEST.get('borrow_lock'):
                         r.append('borrow_lock:1')
-                    break       
-              
+                    break
+
         # Apply any extra callbacks that might have been registered.
         applyCallbacks(ob, r, REQUEST, RESPONSE)
 
+        # Finish metadata with an empty line.
         r.append('')
-        streamiterator = None
-        
+        metadata = join(r, '\n')
+        metadata_len = len(metadata)
+
         # Using RESPONSE.setHeader('Pragma', 'no-cache') would be better, but
         # this chokes crappy most MSIE versions when downloads happen on SSL.
         # cf. http://support.microsoft.com/support/kb/articles/q316/4/31.asp
         RESPONSE.setHeader('Last-Modified', rfc1123_date())
-        
-        if hasattr(Acquisition.aq_base(ob), 'data') \
-           and hasattr(ob.data, '__class__') \
-           and ob.data.__class__ is Image.Pdata:
-            # We have a File instance with chunked data, lets stream it
-            metadata = join(r, '\n')
-            RESPONSE.setHeader('Content-Type', 'application/x-zope-edit')
-            RESPONSE.setHeader('Content-Length', 
-                               len(metadata) + ob.get_size() + 1)
-            RESPONSE.write(metadata)
-            RESPONSE.write('\n')
-            data = ob.data
-            while data is not None:
-                RESPONSE.write(data.data)
-                data = data.next         
+        RESPONSE.setHeader('Content-Type', 'application/x-zope-edit')
+
+        # Check if we should send the file's data down the response.
+        if REQUEST.get('skip_data'):
+            # We've been requested to send only the metadata. The
+            # client will presumably fetch the data itself.
+            self._write_metadata(RESPONSE, metadata, metadata_len)
             return ''
-        if hasattr(ob, 'manage_FTPget'):
+
+        ob_data = getattr(Acquisition.aq_base(ob), 'data', None)
+        if (ob_data is not None and isinstance(ob_data, Image.Pdata)):
+            # We have a File instance with chunked data, lets stream it
+            RESPONSE.setHeader('Content-Length', ob.get_size())
+            body = PDataStreamIterator(ob.data)
+        elif hasattr(ob, 'manage_FTPget'):
             try:
                 body = ob.manage_FTPget()
             except TypeError: # some need the R/R pair!
@@ -180,8 +197,6 @@ class ExternalEditor(Acquisition.Implicit):
         else:
             # can't read it!
             raise 'BadRequest', 'Object does not support external editing'
-        
-        RESPONSE.setHeader('Content-Type', 'application/x-zope-edit')
 
         if (IStreamIterator is not None and
             IStreamIterator.isImplementedBy(body)):
@@ -191,21 +206,24 @@ class ExternalEditor(Acquisition.Implicit):
             # here because we insert metadata before the body.
             clen = RESPONSE.headers.get('content-length', None)
             assert clen is not None
-            metadata = join(r, '\n')
-            RESPONSE.setHeader('Content-Length', len(metadata) + int(clen) + 1)
-            RESPONSE.write(metadata)
-            RESPONSE.write('\n')
+            self._write_metadata(RESPONSE, metadata, metadata_len + int(clen))
             for data in body:
                 RESPONSE.write(data)
-        else:
-            r.append(body)
-            return join(r, '\n')
+            return ''
+
+        # If we reached this point, body *must* be a string.
+        return join((metadata, body), '\n')
+
+    def _write_metadata(self, RESPONSE, metadata, length):
+        RESPONSE.setHeader('Content-Length', length + 1)
+        RESPONSE.write(metadata)
+        RESPONSE.write('\n')
 
 InitializeClass(ExternalEditor)
 
 is_mac_user_agent = re.compile('.*Mac OS X.*|.*Mac_PowerPC.*').match
 
-def EditLink(self, object, borrow_lock=0):
+def EditLink(self, object, borrow_lock=0, skip_data=0):
     """Insert the external editor link to an object if appropriate"""
     base = Acquisition.aq_base(object)
     user = getSecurityManager().getUser()
@@ -226,8 +244,10 @@ def EditLink(self, object, borrow_lock=0):
             ext = ''
         if borrow_lock:
             query['borrow_lock'] = 1
-        url = "%s/externalEdit_/%s%s%s" % (object.aq_parent.absolute_url(), 
-                                           urllib.quote(object.getId()), 
+        if skip_data:
+            query['skip_data'] = 1
+        url = "%s/externalEdit_/%s%s%s" % (object.aq_parent.absolute_url(),
+                                           urllib.quote(object.getId()),
                                            ext, querystr(query))
         return ('<a href="%s" '
                 'title="Edit using external editor">'

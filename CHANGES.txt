@@ -2,6 +2,9 @@ External Editor Change Log
 
   mm/dd/yyyy
 
+    - Added 'skip_data' option to make External Editor send out only
+      the metadata part and skip appending data to the 'body'.
+
     - Add a simple callback registry that can be used to add extra
       metadata headers or set special response headers when a file is
       edited through External Editor.
