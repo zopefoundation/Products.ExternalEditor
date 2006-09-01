@@ -14,6 +14,9 @@ External Editor Change Log
 
     - Don't emit a warning about deprecated 'methods' in Zope >= 2.10.
 
+    - Fixed acquisition issue in manage_main.dtml to sync up with the
+      same fix applied to Zope.
+
   6/23/2005 - 0.9.1 Release
 
     - Older pyc files for plugins were included in the 0.9 release.
