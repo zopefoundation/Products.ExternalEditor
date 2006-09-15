@@ -1,6 +1,6 @@
 External Editor Change Log
 
-  mm/dd/yyyy
+  9/14/2006 - 0.9.2 Release
 
     - Added 'skip_data' option to make External Editor send out only
       the metadata part and skip appending data to the 'body'.

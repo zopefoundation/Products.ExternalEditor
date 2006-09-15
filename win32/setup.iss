@@ -3,10 +3,10 @@
 [Setup]
 DisableStartupPrompt=yes
 AppName=Zope External Editor Helper Application
-AppVerName=Zope External Editor 0.9.1
+AppVerName=Zope External Editor 0.9.2
 AppPublisher=Casey Duncan, Zope Corporation (maintained by Chris McDonough)
 AppPublisherURL=http://plope.com/software/ExternalEditor
-AppVersion=0.9.1
+AppVersion=0.9.2
 AppSupportURL=http://plope.com/software/ExternalEditor
 AppUpdatesURL=http://plope.com/software/ExternalEditor
 DefaultDirName={pf}\ZopeExternalEditor
@@ -14,7 +14,7 @@ DefaultGroupName=Zope External Editor
 AllowNoIcons=yes
 LicenseFile=..\LICENSE.txt
 ChangesAssociations=yes
-OutputBaseFilename=zopeedit-win32-0.9.1
+OutputBaseFilename=zopeedit-win32-0.9.2
 
 [Registry]
 ; Register file type for use by helper app
