@@ -46,7 +46,7 @@ function toggleSelect() {
     <input class="form-element" type="submit" name="submit" value=" Add " />
   <dtml-else>
     <dtml-in filtered_meta_types mapping sort=name>
-    <input type="hidden" name=":method" value="&dtml.url_quote-action;" />
+    <input type="hidden" name=":method" value="&dtml.html_quote-action;" />
     <input class="form-element" type="submit" name="submit" value="Add &dtml-name;" />
     </dtml-in>
   </dtml-if>
@@ -99,7 +99,7 @@ function toggleSelect() {
   <td width="19%" align="left"><div class="list-item"><a 
    href="./manage_main?skey=bobobase_modification_time<dtml-if 
    "skey == 'bobobase_modification_time' and not rkey"
-   >&amprkey=bobobase_modification_time</dtml-if>"
+   >&amp;rkey=bobobase_modification_time</dtml-if>"
    onMouseOver="window.status='Sort objects by modification time'; return true"
    onMouseOut="window.status=''; return true"><dtml-if 
    "skey == 'bobobase_modification_time' or rkey == 'bobobase_modification_time'"
