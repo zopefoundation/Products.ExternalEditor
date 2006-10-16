@@ -20,6 +20,16 @@ from Testing import ZopeTestCase
 # Install our product
 ZopeTestCase.installProduct('ExternalEditor')
 
+from OFS.SimpleItem import SimpleItem
+class SideEffects(SimpleItem):
+    meta_type = 'Side Effects'
+    def __init__(self, id, content):
+        self.id = id
+        self.content = content
+    def manage_FTPget(self, REQUEST, RESPONSE):
+        RESPONSE.setHeader('Content-Type', 'text/plain')
+        return self.content
+
 def test_suite():
     import unittest
     suite = unittest.TestSuite()

@@ -145,6 +145,32 @@ Clear the locks:
 
   >>> self.folder['some-file'].wl_clearLocks()
 
+
+Create a class that has a 'manage_FTPget' method with
+side-effects. Make sure that the content-type header is properly set
+to 'application/x-zope-edit':
+
+  >>> from Products.ExternalEditor.tests.test_functional import SideEffects
+  >>> _ = self.folder._setObject('another-file', SideEffects('another-file', 'some content'))
+
+  >>> print http(r"""
+  ... GET /test_folder_1_/externalEdit_/another-file HTTP/1.1
+  ... Authorization: Basic %s:%s
+  ... """ % (user_name, user_password))
+  HTTP/1.1 200 OK
+  Content-Length: 140
+  Content-Type: application/x-zope-edit; charset=iso-8859-15
+  Last-Modified:...
+  <BLANKLINE>
+  url:http://localhost/test_folder_1_/another-file
+  meta_type:Side Effects
+  title:
+  auth:...
+  cookie:
+  <BLANKLINE>
+  some content
+
+
 Callback Registry
 =================
 

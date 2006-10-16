@@ -1,5 +1,10 @@
 External Editor Change Log
 
+  XX/XX/XXXX - 0.9.3 Release
+
+    - Fixed issue with 'manage_FTPget' overriding the 'Content-Type'
+      header.
+
   9/14/2006 - 0.9.2 Release
 
     - Added 'skip_data' option to make External Editor send out only

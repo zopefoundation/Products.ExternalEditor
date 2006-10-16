@@ -165,12 +165,6 @@ class ExternalEditor(Acquisition.Implicit):
         metadata = join(r, '\n')
         metadata_len = len(metadata)
 
-        # Using RESPONSE.setHeader('Pragma', 'no-cache') would be better, but
-        # this chokes crappy most MSIE versions when downloads happen on SSL.
-        # cf. http://support.microsoft.com/support/kb/articles/q316/4/31.asp
-        RESPONSE.setHeader('Last-Modified', rfc1123_date())
-        RESPONSE.setHeader('Content-Type', 'application/x-zope-edit')
-
         # Check if we should send the file's data down the response.
         if REQUEST.get('skip_data'):
             # We've been requested to send only the metadata. The
@@ -180,10 +174,31 @@ class ExternalEditor(Acquisition.Implicit):
 
         ob_data = getattr(Acquisition.aq_base(ob), 'data', None)
         if (ob_data is not None and isinstance(ob_data, Image.Pdata)):
-            # We have a File instance with chunked data, lets stream it
+            # We have a File instance with chunked data, lets stream it.
+            #
+            # Note we are setting the content-length header here. This
+            # is a simplification. Read comment below.
+            #
+            # We assume that ob.get_size() will return the exact size
+            # of the PData chain. If that assumption is broken we
+            # might have problems. This is mainly an optimization. If
+            # we read the whole PData chain just to compute the
+            # correct size that could cause the whole file to be read
+            # into memory.
             RESPONSE.setHeader('Content-Length', ob.get_size())
+            # It is safe to use this PDataStreamIterator here because
+            # it is consumed right below. This is only used to
+            # simplify the code below so it only has to deal with
+            # stream iterators or plain strings.
             body = PDataStreamIterator(ob.data)
         elif hasattr(ob, 'manage_FTPget'):
+            # Calling manage_FTPget *might* have side-effects. For
+            # example, in Archetypes it does set the 'content-type'
+            # response header, which would end up overriding our own
+            # content-type header because we've set it 'too
+            # early'. We've moved setting the content-type header to
+            # the '_write_metadata' method since, and any manipulation
+            # of response headers should happen there, if possible.
             try:
                 body = ob.manage_FTPget()
             except TypeError: # some need the R/R pair!
@@ -211,10 +226,26 @@ class ExternalEditor(Acquisition.Implicit):
                 RESPONSE.write(data)
             return ''
 
-        # If we reached this point, body *must* be a string.
+        # If we reached this point, body *must* be a string. We *must*
+        # set the headers ourselves since _write_metadata won't get
+        # called.
+        self._set_headers(RESPONSE)
         return join((metadata, body), '\n')
 
+    def _set_headers(self, RESPONSE):
+        # Using RESPONSE.setHeader('Pragma', 'no-cache') would be better, but
+        # this chokes crappy most MSIE versions when downloads happen on SSL.
+        # cf. http://support.microsoft.com/support/kb/articles/q316/4/31.asp
+        RESPONSE.setHeader('Last-Modified', rfc1123_date())
+        RESPONSE.setHeader('Content-Type', 'application/x-zope-edit')
+
     def _write_metadata(self, RESPONSE, metadata, length):
+        # Set response content-type so that the browser gets hinted
+        # about what application should handle this.
+        self._set_headers(RESPONSE)
+
+        # Set response length and write our metadata. The '+1' on the
+        # content-length is the '\n' after the metadata.
         RESPONSE.setHeader('Content-Length', length + 1)
         RESPONSE.write(metadata)
         RESPONSE.write('\n')
