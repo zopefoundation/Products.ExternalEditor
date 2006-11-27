@@ -23,6 +23,9 @@ import sys
 win32 = sys.platform == 'win32'
 
 if win32:
+    # import pywin32 stuff first so it never looks into system32
+    import pythoncom, pywintypes
+    
     # prevent warnings from being turned into errors by py2exe
     import warnings
     warnings.filterwarnings('ignore')
@@ -30,11 +33,17 @@ if win32:
 import os, re
 import rfc822
 import traceback
-from tempfile import mktemp
+import logging
+import urllib
+import shutil
+
+from tempfile import mktemp, NamedTemporaryFile
 from ConfigParser import ConfigParser
 from httplib import HTTPConnection, HTTPSConnection
 from urlparse import urlparse
-import urllib
+
+logger = logging.getLogger('zopeedit')
+log_file = None
 
 class Configuration:
     
@@ -95,22 +104,47 @@ class ExternalEditor:
     did_lock = 0
     
     def __init__(self, input_file):
+        global log_file
+        log_file = NamedTemporaryFile(suffix='-zopeedit-log.txt')
+
+        self.input_file = input_file
+
+        # Setup logging.
+        logging.basicConfig(stream=log_file,
+                            level=logging.DEBUG)
+        logger.info('Opening %r.', input_file)
+    
         try:
             # Read the configuration file
             if win32:
                 # Check the home dir first and then the program dir
                 config_path = os.path.expanduser('~\\ZopeEdit.ini')
-                global_config = os.path.join(sys.path[0] or '', 'ZopeEdit.ini')
-                if not os.path.exists(config_path) \
-                   and os.path.exists(global_config):
+
+                # sys.path[0] might be library.zip!!!!
+                app_dir = sys.path[0]
+                if app_dir.lower().endswith('library.zip'):
+                    app_dir = os.path.dirname(app_dir)
+                global_config = os.path.join(app_dir or '', 'ZopeEdit.ini')
+
+                if not os.path.exists(config_path):
+                    logger.debug('Config file %r does not exist. '
+                                 'Using global configuration file: %r.',
+                                 config_path, global_config)
+
+                    # Don't check for the existence of the global
+                    # config file. It will be created anyway.
                     config_path = global_config
+                else:
+                    logger.debug('Using user configuration file: %r.',
+                                 config_path)
+                    
             else:
                 config_path = os.path.expanduser('~/.zope-external-edit')
                 
             self.config = Configuration(config_path)
 
             # Open the input file and read the metadata headers
-            in_f = open(input_file, 'rU')
+            in_f = open(input_file, 'rb')
             m = rfc822.Message(in_f)
 
             self.metadata = metadata = m.dict.copy()
@@ -124,6 +158,9 @@ class ExternalEditor:
                                             metadata['meta_type'],
                                             metadata.get('content_type',''),
                                             self.host)
+
+            # Should we keep the log file?
+            self.keep_log = int(self.options.get('keep_log', 0))
 
             # Write the body of the input file to a separate file
             if int(self.options.get('long_file_name', 1)):
@@ -148,8 +185,10 @@ class ExternalEditor:
             else:
                 content_file = mktemp(content_file)
                 
+            logger.debug('Destination filename will be: %r.', content_file)
+            
             body_f = open(content_file, 'wb')
-            body_f.write(in_f.read())
+            shutil.copyfileobj(in_f, body_f)
             self.content_file = content_file
             self.saved = 1
             in_f.close()
@@ -157,8 +196,10 @@ class ExternalEditor:
             self.clean_up = int(self.options.get('cleanup_files', 1))
             if self.clean_up: 
                 try:
+                    logger.debug('Cleaning up %r.', input_file)
                     os.remove(input_file)
                 except OSError:
+                    logger.exception('Failed to clean up %r.', input_file)
                     pass # Sometimes we aren't allowed to delete it
             
             if self.ssl:
@@ -190,11 +231,29 @@ class ExternalEditor:
             try:
                 os.remove(self.content_file)
             except OSError:
+                logger.exception('Failed to clean up %r', self.content_file)
                 pass     
 
         if self.did_lock:
             # Try not to leave dangling locks on the server
-            self.unlock(interactive=0)
+            try:
+                self.unlock(interactive=0)
+            except:
+                logger.exception('Failure during unlock.')
+
+        if getattr(self, 'keep_log', 0):
+            if log_file is not None:
+                base = getattr(self, 'content_file', '')
+                if not base:
+                    base = getattr(self, 'input_file', 'noname')
+                base = os.path.basename(base)
+                fname = mktemp(suffix='-zopeedit-log.txt',
+                               prefix='%s-' % base)
+                bkp_f = open(fname, 'wb')
+
+                # Copy the log file to a backup file.
+                log_file.seek(0)
+                shutil.copyfileobj(log_file, bkp_f)
             
     def getEditorCommand(self):
         """Return the editor command"""
@@ -203,11 +262,14 @@ class ExternalEditor:
         if win32 and editor is None:
             from _winreg import HKEY_CLASSES_ROOT, OpenKeyEx, \
                                 QueryValueEx, EnumKey
-            from win32api import FindExecutable
-            import pywintypes
+            from win32api import FindExecutable, ExpandEnvironmentStrings
+
             # Find editor application based on mime type and extension
             content_type = self.metadata.get('content_type')
             extension = self.options.get('extension')
+
+            logger.debug('Have content type: %r, extension: %r',
+                         content_type, extension)
             
             if content_type:
                 # Search registry for the extension by MIME type
@@ -215,6 +277,9 @@ class ExternalEditor:
                     key = 'MIME\\Database\\Content Type\\%s' % content_type
                     key = OpenKeyEx(HKEY_CLASSES_ROOT, key)
                     extension, nil = QueryValueEx(key, 'Extension')
+                    logger.debug('Registry has extension %r for '
+                                 'content type %r',
+                                 extension, content_type)
                 except EnvironmentError:
                     pass
             
@@ -225,67 +290,83 @@ class ExternalEditor:
                 if dot != -1 and dot > url.rfind('/'):
                     extension = url[dot:]
 
+                    logger.debug('Extracted extension from url: %r',
+                                 extension)
+
+            classname = editor = None
             if extension is not None:
                 try:
                     key = OpenKeyEx(HKEY_CLASSES_ROOT, extension)
                     classname, nil = QueryValueEx(key, None)
+                    logger.debug('ClassName for extension %r is: %r',
+                                 extension, classname)
                 except EnvironmentError:
                     classname = None
 
-                if classname is not None:
-                    try:
-                        # Look for Edit action in registry
-                        key = OpenKeyEx(HKEY_CLASSES_ROOT, 
-                                        classname+'\\Shell\\Edit\\Command')
-                        editor, nil = QueryValueEx(key, None)
-                    except EnvironmentError:
-                        pass
+            if classname is not None:
+                try:
+                    # Look for Edit action in registry
+                    key = OpenKeyEx(HKEY_CLASSES_ROOT, 
+                                    classname+'\\Shell\\Edit\\Command')
+                    editor, nil = QueryValueEx(key, None)
+                    logger.debug('Edit action for %r is: %r',
+                                 classname, editor)
+                except EnvironmentError:
+                    pass
 
-                    if editor is None:
-                        # Enumerate the actions looking for one
-                        # starting with 'Edit'
+            if classname is not None and editor is None:
+                logger.debug('Could not find Edit action for %r. '
+                             'Brute-force enumeration.', classname)
+                # Enumerate the actions looking for one
+                # starting with 'Edit'
+                try:
+                    key = OpenKeyEx(HKEY_CLASSES_ROOT, 
+                                    classname+'\\Shell')
+                    index = 0
+                    while 1:
                         try:
-                            key = OpenKeyEx(HKEY_CLASSES_ROOT, 
-                                            classname+'\\Shell')
-                            index = 0
-                            while 1:
-                                try:
-                                    subkey = EnumKey(key, index)
-                                    index += 1
-                                    if str(subkey).lower().startswith('edit'):
-                                        subkey = OpenKeyEx(key, 
-                                                           subkey + 
-                                                           '\\Command')
-                                        editor, nil = QueryValueEx(subkey, 
-                                                                   None)
-                                    else:
-                                        continue
-                                except EnvironmentError:
-                                    break
+                            subkey = EnumKey(key, index)
+                            index += 1
+                            if str(subkey).lower().startswith('edit'):
+                                subkey = OpenKeyEx(key, subkey + '\\Command')
+                                editor, nil = QueryValueEx(subkey, 
+                                                           None)
+                            if editor is None:
+                                continue
+                            logger.debug('Found action %r for %r. '
+                                         'Command will be: %r',
+                                         subkey, classname, editor)
                         except EnvironmentError:
-                            pass
+                            break
+                except EnvironmentError:
+                    pass
 
-                    if editor is None:
-                        try:
-                            # Look for Open action in registry
-                            key = OpenKeyEx(HKEY_CLASSES_ROOT, 
-                                            classname+'\\Shell\\Open\\Command')
-                            editor, nil = QueryValueEx(key, None)
-                        except EnvironmentError:
-                            pass
+            if classname is not None and editor is None:
+                try:
+                    # Look for Open action in registry
+                    key = OpenKeyEx(HKEY_CLASSES_ROOT, 
+                                    classname+'\\Shell\\Open\\Command')
+                    editor, nil = QueryValueEx(key, None)
+                    logger.debug('Open action for %r has command: %r. ',
+                                 classname, editor)
+                except EnvironmentError:
+                    pass
 
-                if editor is None:
-                    try:
-                        nil, editor = FindExecutable(self.content_file, '')
-                    except pywintypes.error:
-                        pass
+            if editor is None:
+                try:
+                    nil, editor = FindExecutable(self.content_file, '')
+                    logger.debug('Executable for %r is: %r. ',
+                                 self.content_file, editor)
+                except pywintypes.error:
+                    pass
             
             # Don't use IE as an "editor"
             if editor is not None and editor.find('\\iexplore.exe') != -1:
+                logger.debug('Found iexplore.exe. Skipping.')
                 editor = None
 
         if editor is not None:            
-            return editor
+            return ExpandEnvironmentStrings(editor)
         else:
             fatalError('No editor was found for that object.\n'
                        'Specify an editor in the configuration file:\n'
@@ -322,6 +403,8 @@ class ExternalEditor:
         else:
             bin = command
 
+        logger.debug('Command %r, will use %r', command, bin)
+
         if bin is not None:
             # Try to load the plugin for this editor
             try:
@@ -329,6 +412,8 @@ class ExternalEditor:
                 Plugin = __import__(module, globals(), locals(), 
                                     ('EditorProcess',))
                 editor = Plugin.EditorProcess(self.content_file)
+                logger.debug('Launching Plugin %r with: %r',
+                             Plugin, self.content_file)
             except (ImportError, AttributeError):
                 bin = None
 
@@ -344,6 +429,7 @@ class ExternalEditor:
             else:
                 command = '%s %s' % (command, self.content_file)
 
+            logger.debug('Launching EditorProcess with: %r', command)
             editor = EditorProcess(command)
             
         launch_success = editor.isAlive()
@@ -558,7 +644,6 @@ if win32:
     from win32con import MB_OK, MB_OKCANCEL, MB_YESNO, MB_RETRYCANCEL, \
                          MB_SYSTEMMODAL, MB_ICONERROR, MB_ICONQUESTION, \
                          MB_ICONEXCLAMATION
-    import pywintypes
 
     def errorDialog(message):
         MessageBox(message, title, MB_OK + MB_ICONERROR + MB_SYSTEMMODAL)
@@ -577,6 +662,7 @@ if win32:
         def __init__(self, command):
             """Launch editor process"""
             try:
+                logger.debug('CreateProcess: %r', command)
                 self.handle, nil, nil, nil = CreateProcess(None, command, None, 
                                                            None, 1, 0, None, 
                                                            None, STARTUPINFO())
@@ -660,10 +746,16 @@ else: # Posix platform
 
 def fatalError(message, exit=1):
     """Show error message and exit"""
+    global log_file
     errorDialog('FATAL ERROR: %s' % message)
     # Write out debug info to a temp file
     debug_f = open(mktemp('-zopeedit-traceback.txt'), 'w')
     try:
+        # Copy the log_file before it goes away on a fatalError.
+        if log_file is not None:
+            log_file.seek(0)
+            shutil.copyfileobj(log_file, debug_f)
+            print >> debug_f, '-' * 80
         traceback.print_exc(file=debug_f)
     finally:
         debug_f.close()
