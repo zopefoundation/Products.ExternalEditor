@@ -5,6 +5,8 @@ External Editor Change Log
     - Fixed issue with 'manage_FTPget' overriding the 'Content-Type'
       header.
 
+    - Only run ExpandEnvironmentStrings on win32 systems.
+
   9/14/2006 - 0.9.2 Release
 
     - Added 'skip_data' option to make External Editor send out only

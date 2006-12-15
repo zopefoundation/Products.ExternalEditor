@@ -365,12 +365,15 @@ class ExternalEditor:
                 logger.debug('Found iexplore.exe. Skipping.')
                 editor = None
 
-        if editor is not None:            
-            return ExpandEnvironmentStrings(editor)
-        else:
+            if editor is not None:            
+                return ExpandEnvironmentStrings(editor)
+
+        if editor is None:
             fatalError('No editor was found for that object.\n'
                        'Specify an editor in the configuration file:\n'
                        '(%s)' % self.config.path)
+
+        return editor
         
     def launch(self):
         """Launch external editor"""
