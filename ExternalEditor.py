@@ -50,7 +50,7 @@ class PDataStreamIterator:
         self.data = data
 
     def __iter__(self):
-        return iter(self)
+        return self
 
     def next(self):
         if self.data is None:
