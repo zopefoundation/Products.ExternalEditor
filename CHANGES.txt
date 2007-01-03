@@ -1,6 +1,6 @@
 External Editor Change Log
 
-  XX/XX/XXXX - 0.9.3 Release
+  01/03/2007 - 0.9.3 Release
 
     - Fixed issue with 'manage_FTPget' overriding the 'Content-Type'
       header.
