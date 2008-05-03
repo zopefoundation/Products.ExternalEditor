@@ -1,9 +1,8 @@
 from setuptools import setup, find_packages
-from zopeedit import __version__
 
 
 setup(name='Products.ExternalEditor',
-      version=__version__,
+      version='0.9.4',
       description="Zope External Editor",
       classifiers=[
         'Framework :: Zope2',

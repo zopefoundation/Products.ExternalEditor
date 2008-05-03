@@ -1,6 +1,6 @@
 External Editor Change Log
 
-  unreleased - 1.0 Release
+  unreleased - 0.9.4
 
     - Updated package metadata to be usable as a package.
 
