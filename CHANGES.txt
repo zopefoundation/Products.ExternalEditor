@@ -1,5 +1,9 @@
 External Editor Change Log
 
+  unreleased - 1.0 Release
+
+    - Updated package metadata to be usable as a package.
+
   01/03/2007 - 0.9.3 Release
 
     - Fixed issue with 'manage_FTPget' overriding the 'Content-Type'

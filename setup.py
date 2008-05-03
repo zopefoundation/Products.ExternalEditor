@@ -1,25 +1,25 @@
-import sys
-from distutils.core import setup
+from setuptools import setup, find_packages
 from zopeedit import __version__
 
-try:
-    import py2exe
-except ImportError:
-    if sys.platform == 'win32':
-        raise
-    packages = None
-else:
-    packages = ['Plugins']
 
-setup(name='zopeedit',
+setup(name='Products.ExternalEditor',
       version=__version__,
       description="Zope External Editor",
+      classifiers=[
+        'Framework :: Zope2',
+      ],
       author="Casey Duncan and Contributors, maintained by Chris McDonough",
       author_email="chrism@plope.com",
       url="http://www.plope.com/software/ExternalEditor",
-      scripts=['zopeedit.py'],
-      windows=['zopeedit.py'],
-      options={"py2exe": {"packages": ["encodings", "Plugins", "win32com"]}},
-      
-      packages=packages
+      packages=find_packages(),
+      namespace_packages=['Products'],
+      include_package_data=True,
+      zip_safe=False,
+      install_requires=[
+        'setuptools',
+      ],
+      entry_points="""
+      [console_scripts]
+          zopeedit=Products.ExternalEditor.zopeedit:main
+      """,
       )
