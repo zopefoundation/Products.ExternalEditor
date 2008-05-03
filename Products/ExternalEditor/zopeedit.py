@@ -841,7 +841,7 @@ extension=.jpg
 [content-type:image/png]
 extension=.png"""
 
-if __name__ == '__main__':
+def main():
     try:
         args = sys.argv
         
@@ -867,3 +867,6 @@ if __name__ == '__main__':
         pass
     except:
         fatalError(sys.exc_info()[1])
+
+if __name__ == '__main__':
+    main()
