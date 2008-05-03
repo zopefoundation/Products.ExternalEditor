@@ -4,6 +4,8 @@ from setuptools import setup, find_packages
 setup(name='Products.ExternalEditor',
       version='0.9.4',
       description="Zope External Editor",
+      long_description=open("README.txt").read() + "\n" + \
+                       open("CHANGES.txt").read(),
       classifiers=[
         'Framework :: Zope2',
       ],
