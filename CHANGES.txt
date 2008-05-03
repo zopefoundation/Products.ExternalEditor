@@ -97,7 +97,7 @@ unreleased - 0.9.4
   - Compiled windows helper app binary using Python 2.3.4, Pythonwin build
     163 and py2exe 0.5.
 
-  - Add Dreamweaver plugin contributed by Manuel Aristaránn. Thanks also
+  - Add Dreamweaver plugin contributed by Manuel Aristarann. Thanks also
     to Anton Stonor.
 
   - Add ZMI support for Zope 2.7's ordered folder objects.      
@@ -106,7 +106,7 @@ unreleased - 0.9.4
     Thanks to David D. Smith and Federico Sevilla III.
   
   - Workaround IE browser error when running over SSL. Thanks to 
-    Marc-Aurèle Darche.
+    Marc-Aurele Darche.
 
   - Add ".zem" file extension support for MacOS X (especially Mac IE),
     to ease helper app integration where MIME support is lacking. Thanks
@@ -284,7 +284,7 @@ unreleased - 0.9.4
   - Rewrote "Editor did not launch" error message so it makes more sense.
 
   - Fixed https detection bug. External editor is now tested and working with
-    https. Many thanks to Hans-Dieter Stich and Martin Grönemeyer for their 
+    https. Many thanks to Hans-Dieter Stich and Martin Groenemeyer for their 
     assistance and ideas.
 
   - Made it possible to edit objects that are methods of ZClasses. Thanks to
