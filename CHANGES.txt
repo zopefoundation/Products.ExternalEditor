@@ -1,7 +1,7 @@
 Change Log
 ==========
 
-unreleased - 0.9.4
+unreleased - 1.0a1
 ------------------
 
   - Updated package metadata to be usable as a package.
