@@ -214,7 +214,7 @@ class ExternalEditor(Acquisition.Implicit):
             raise 'BadRequest', 'Object does not support external editing'
 
         if (IStreamIterator is not None and
-            IStreamIterator.isImplementedBy(body)):
+            IStreamIterator.implementedBy(body)):
             # We need to manage our content-length because we're streaming.
             # The content-length should have been set in the response by
             # the method that returns the iterator, but we need to fix it up
