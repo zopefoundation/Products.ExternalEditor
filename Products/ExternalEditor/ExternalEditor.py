@@ -32,19 +32,20 @@ except ImportError:
     # webdav module not available
     def wl_isLocked(ob):
         return 0
-try:
-    from ZPublisher.Iterators import IStreamIterator
-except ImportError:
-    # pre-2.7.1 Zope without stream iterators
-    IStreamIterator = None
+
+from ZPublisher.Iterators import IStreamIterator
+from zope.interface import implements, Interface
+HAVE_Z3_IFACE = issubclass(IStreamIterator, Interface)
 
 ExternalEditorPermission = 'Use external editor'
 
 _callbacks = []
 
 class PDataStreamIterator:
-
-    __implements__ = (IStreamIterator,)
+    if HAVE_Z3_IFACE:
+        implements(IStreamIterator)
+    else:
+        __implements__ = IStreamIterator
 
     def __init__(self, data):
         self.data = data
@@ -213,8 +214,8 @@ class ExternalEditor(Acquisition.Implicit):
             # can't read it!
             raise 'BadRequest', 'Object does not support external editing'
 
-        if (IStreamIterator is not None and
-            IStreamIterator.implementedBy(body)):
+        if (HAVE_Z3_IFACE and IStreamIterator.providedBy(body) or
+            not HAVE_Z3_IFACE and IStreamIterator.isImplementedBy(body)):
             # We need to manage our content-length because we're streaming.
             # The content-length should have been set in the response by
             # the method that returns the iterator, but we need to fix it up
