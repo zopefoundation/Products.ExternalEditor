@@ -21,7 +21,10 @@ import types
 import re
 import urllib
 import Acquisition
-from Globals import InitializeClass
+try:
+    from App.class_init import InitializeClass
+except ImportError:
+    from App.class_init import default__class_init__ as InitializeClass
 from App.Common import rfc1123_date
 from AccessControl.SecurityManagement import getSecurityManager
 from AccessControl.SecurityInfo import ClassSecurityInfo

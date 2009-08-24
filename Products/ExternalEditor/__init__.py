@@ -14,7 +14,8 @@
 
 # Zope External Editor Product by Casey Duncan
 
-from Globals import ImageFile, DTMLFile
+from App.ImageFile import ImageFile
+from App.special_dtml import DTMLFile
 from OFS.ObjectManager import ObjectManager
 from OFS.FindSupport import FindSupport
 from OFS.Folder import Folder
