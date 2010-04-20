@@ -22,6 +22,7 @@ __version__ = '0.7'
 import sys, os, re
 import traceback
 from tempfile import mktemp
+from string import split, replace
 from ConfigParser import ConfigParser
 from httplib import HTTPConnection, HTTPSConnection
 from urlparse import urlparse
@@ -114,8 +115,8 @@ class ExternalEditor:
             self.metadata = metadata
                                
             # parse the incoming url
-            scheme, self.host, self.path = urlparse(metadata['url'])[:3]
-            self.ssl = scheme == 'https'
+            self.scheme, self.host, self.path = urlparse(metadata['url'])[:3]
+            self.ssl = self.scheme == 'https'
             
             # Get all configuration options
             self.options = self.config.getAllOptions(
@@ -321,14 +322,34 @@ class ExternalEditor:
                 bin = command.lower().strip()
         else:
             bin = command
-
+        ## enno: does the plugin want a webdav url rather than filename?
+        webdav = int(self.options.get('webdav'))
+        ## enno: does the plugin want a webdav url rather than filename?
+        localfile = int(self.options.get('local'))
+        localpath = self.options.get('local_path', 1)
         if bin is not None:
             # Try to load the plugin for this editor
             try:
                 module = 'Plugins.%s' % bin
                 Plugin = __import__(module, globals(), locals(), 
                                     ('EditorProcess',))
-                editor = Plugin.EditorProcess(self.content_file)
+                
+                ## enno: hand the plugin either an url or a filename
+                if webdav:
+                    host = self.host
+                    if self.options.get('webdav_port', 1)!=None:
+                        host, port = split(self.host, ':')
+                        port = int(self.options.get('webdav_port', 1))
+                        host = '%s:%d' % (host, port)
+                    webdav_url="%s://%s%s" % (self.scheme, host, self.path)
+                    editor = Plugin.EditorProcess(webdav_url)
+                elif localfile:
+                    localpart, urlpart = split(localpath, '|')
+                    localpath = replace(urllib.unquote(self.path), urlpart, localpart, 1)
+                    localpath = replace(localpath, '/', '\\')
+                    editor = Plugin.EditorProcess(localpath)
+                else:
+                    editor = Plugin.EditorProcess(self.content_file)
             except (ImportError, AttributeError):
                 bin = None
 
@@ -346,26 +367,29 @@ class ExternalEditor:
 
             editor = EditorProcess(command)
         
-        if use_locks:
-            self.lock()
-            
-        while 1:
-            editor.wait(save_interval or 2)
-            mtime = os.path.getmtime(self.content_file)
-            
-            if (save_interval or not editor.isAlive()) and mtime != last_mtime:
-                # File was modified
-                launch_success = 1 # handle very short editing sessions
-                self.saved = self.putChanges()
-                last_mtime = mtime
+        ## enno: if we're not using webdav or local path, watch the application while it runs:
+        if webdav!=0 or localpath==0:
+	    return
+	if use_locks:
+	    self.lock()
 
-            if editor.isAlive():
-                launch_success = 1
-            else:
-                break
-                
-        if not launch_success:
-            fatalError('Editor did not launch properly.\n'
+	while 1:
+	    editor.wait(save_interval or 2)
+	    mtime = os.path.getmtime(self.content_file)
+
+	    if (save_interval or not editor.isAlive()) and mtime != last_mtime:
+		# File was modified
+		launch_success = 1 # handle very short editing sessions
+		self.saved = self.putChanges()
+		last_mtime = mtime
+
+	    if editor.isAlive():
+		launch_success = 1
+	    else:
+		break
+
+	if not launch_success:
+	    fatalError('Editor did not launch properly.\n'
                        'External editor lost connection '
                        'to editor process.\n'
                        '(%s)' % command)
