@@ -4,6 +4,9 @@ Changelog
 1.0b1 - Unreleased
 ------------------
 
+- Update manage_main, manage_tabs, and findResult monkey patches to include
+  fixes from Zope 2.12.
+
 
 1.0a2 - 2009-11-13
 ------------------

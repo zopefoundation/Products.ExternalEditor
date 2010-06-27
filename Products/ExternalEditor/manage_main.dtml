@@ -34,10 +34,10 @@ function toggleSelect() {
   <td align="left" valign="top">&nbsp;</td>
   <td align="right" valign="top">
   <div class="form-element">
-  <form action="&dtml-URL1;/" method="get">
+  <form action="<dtml-var "REQUEST.URL1" html_quote>/" method="get">
   <dtml-if "_.len(filtered_meta_types) > 1">
     <select class="form-element" name=":action" 
-     onChange="location.href='&dtml-URL1;/'+this.options[this.selectedIndex].value">
+     onChange="location.href='<dtml-var "REQUEST.URL1" html_quote>/'+this.options[this.selectedIndex].value">
     <option value="manage_workspace" disabled>Select type to add...</option>
     <dtml-in filtered_meta_types mapping sort=name>
     <dtml-if action>
@@ -59,7 +59,7 @@ function toggleSelect() {
   </table>
 </dtml-if>
 
-<form action="&dtml-URL1;/" name="objectItems" method="post">
+<form action="<dtml-var "REQUEST.URL1" html_quote>/" name="objectItems" method="post">
 <dtml-if objectItems>
   <dtml-let hasOrderSupport="_.getattr(this().aq_explicit, 'has_order_support', 0)">
   <dtml-unless skey>
@@ -133,7 +133,7 @@ function toggleSelect() {
   <a href="&dtml.url_quote-sequence-key;/manage_workspace">
   <dtml-in om_icons mapping>
   <img src="&dtml-BASEPATH1;/&dtml.url_quote-path;" alt="&dtml.missing-alt;" 
-   title="&dtml.missing-title;" border="0" /></dtml-in></a>
+   title="&dtml.missing-title;" border="0" width="16" height="16"/></dtml-in></a>
   <dtml-else>
 
   <dtml-if icon>
@@ -154,16 +154,6 @@ function toggleSelect() {
   <a href="&dtml.url_quote-sequence-key;/manage_workspace">
   &dtml-sequence-key; <dtml-if title>(&dtml-title;)</dtml-if>
   </a>
-  <dtml-if locked_in_version>
-    <dtml-if modified_in_version>
-      <img src="&dtml-BASEPATH1;/p_/locked"
-       alt="This item has been modified in this version" />
-    <dtml-else>
-      <img src="&dtml-BASEPATH1;/p_/lockedo"
-       alt="This item has been modified in another version" />
-       (<em>&dtml-locked_in_version;</em>)
-    </dtml-if>
-  </dtml-if>
   <dtml-try>
     <dtml-if "wl_isLocked()==1">
       <img src="/p_/davlocked">
