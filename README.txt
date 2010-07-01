@@ -373,5 +373,3 @@ I hope you enjoy using this software. If you have any comments, suggestions
 or would like to report a bug, send an email to the author:
 
 Casey Duncan
-
-`(c) 2003, Casey Duncan and Zope Corporation. All rights reserved.`
