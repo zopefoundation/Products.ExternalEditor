@@ -19,7 +19,7 @@
 from string import join # For Zope 2.3 compatibility
 import types
 import urllib
-import Acquisition
+from Acquisition import aq_inner, aq_base, aq_parent, Implicit
 try:
     from App.class_init import InitializeClass
 except ImportError:
@@ -80,7 +80,7 @@ def applyCallbacks(ob, metadata, request, response):
     for cb in _callbacks:
         cb(ob, metadata, request, response)
 
-class ExternalEditor(Acquisition.Implicit):
+class ExternalEditor(Implicit):
     """Create a response that encapsulates the data needed by the
        ZopeEdit helper application
     """
@@ -121,7 +121,7 @@ class ExternalEditor(Acquisition.Implicit):
         r.append('url:%s' % ob.absolute_url())
         r.append('meta_type:%s' % ob.meta_type)
 
-        title = getattr(Acquisition.aq_base(ob), 'title', None)
+        title = getattr(aq_base(ob), 'title', None)
         if title is not None:
             if callable(title):
                 title = title()
@@ -129,7 +129,7 @@ class ExternalEditor(Acquisition.Implicit):
                 title = unicode.encode(title, 'utf-8')
             r.append('title:%s' % title)
 
-        if hasattr(Acquisition.aq_base(ob), 'content_type'):
+        if hasattr(aq_base(ob), 'content_type'):
             if callable(ob.content_type):
                 r.append('content_type:%s' % ob.content_type())
             else:
@@ -175,7 +175,7 @@ class ExternalEditor(Acquisition.Implicit):
             self._write_metadata(RESPONSE, metadata, metadata_len)
             return ''
 
-        ob_data = getattr(Acquisition.aq_base(ob), 'data', None)
+        ob_data = getattr(aq_base(ob), 'data', None)
         if (ob_data is not None and isinstance(ob_data, Image.Pdata)):
             # We have a File instance with chunked data, lets stream it.
             #
@@ -270,7 +270,7 @@ InitializeClass(ExternalEditor)
 
 def EditLink(self, object, borrow_lock=0, skip_data=0):
     """Insert the external editor link to an object if appropriate"""
-    base = Acquisition.aq_base(object)
+    base = aq_base(object)
     user = getSecurityManager().getUser()
     editable = (hasattr(base, 'manage_FTPget')
                 or hasattr(base, 'EditableBody')
@@ -286,7 +286,7 @@ def EditLink(self, object, borrow_lock=0, skip_data=0):
             query['borrow_lock'] = 1
         if skip_data:
             query['skip_data'] = 1
-        url = "%s/externalEdit_/%s%s%s" % (object.aq_parent.absolute_url(),
+        url = "%s/externalEdit_/%s%s%s" % (aq_parent(aq_inner(object)).absolute_url(),
                                            urllib.quote(object.getId()),
                                            ext, querystr(query))
         return ('<a href="%s" '
