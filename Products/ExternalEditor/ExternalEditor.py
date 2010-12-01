@@ -18,7 +18,6 @@
 
 from string import join # For Zope 2.3 compatibility
 import types
-import re
 import urllib
 import Acquisition
 try:
@@ -94,7 +93,7 @@ class ExternalEditor(Acquisition.Implicit):
         if path:
             target = path[-1]
             if target.endswith('.zem'):
-                # Remove extension added by EditLink() for Mac finder
+                # Remove extension added by EditLink()
                 # so we can traverse to the target in Zope
                 target = target[:-4]
             request.set('target', target)
@@ -268,7 +267,6 @@ class ExternalEditor(Acquisition.Implicit):
 
 InitializeClass(ExternalEditor)
 
-#is_mac_user_agent = re.compile('.*Mac OS X.*|.*Mac_PowerPC.*').match
 
 def EditLink(self, object, borrow_lock=0, skip_data=0):
     """Insert the external editor link to an object if appropriate"""
