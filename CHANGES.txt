@@ -1,8 +1,15 @@
 Changelog
 =========
 
-1.0.1 - unreleased
+1.1.0 - 2010-12-01
 ------------------
+
+- Added support for unaware mimetype browser - we now add the .zem extension no 
+  matter what the user-agent
+  
+- Modified the cache's parameters - special case for MSIE
+
+- Corrected and added tests
 
 
 1.0 - 2010-07-01

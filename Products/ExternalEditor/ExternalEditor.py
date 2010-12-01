@@ -93,7 +93,7 @@ class ExternalEditor(Acquisition.Implicit):
         path = request['TraversalRequestNameStack']
         if path:
             target = path[-1]
-            if request.get('macosx') and target.endswith('.zem'):
+            if target.endswith('.zem'):
                 # Remove extension added by EditLink() for Mac finder
                 # so we can traverse to the target in Zope
                 target = target[:-4]
@@ -240,8 +240,20 @@ class ExternalEditor(Acquisition.Implicit):
         # Using RESPONSE.setHeader('Pragma', 'no-cache') would be better, but
         # this chokes crappy most MSIE versions when downloads happen on SSL.
         # cf. http://support.microsoft.com/support/kb/articles/q316/4/31.asp
-        RESPONSE.setHeader('Last-Modified', rfc1123_date())
+        #RESPONSE.setHeader('Last-Modified', rfc1123_date())
         RESPONSE.setHeader('Content-Type', 'application/x-zope-edit')
+        
+        # We have to test the msie behaviour
+        user_agent = self.REQUEST.get_header('User-Agent')
+        if user_agent and (("msie" in user_agent.lower())
+            or ("microsoft internet explorer" in user_agent.lower())):
+            RESPONSE.setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0')
+            RESPONSE.setHeader('Pragma', 'public')
+        else:
+            RESPONSE.setHeader('Pragma', 'no-cache')
+        now = rfc1123_date()
+        RESPONSE.setHeader('Last-Modified', now)
+        RESPONSE.setHeader('Expires', now)
 
     def _write_metadata(self, RESPONSE, metadata, length):
         # Set response content-type so that the browser gets hinted
@@ -256,7 +268,7 @@ class ExternalEditor(Acquisition.Implicit):
 
 InitializeClass(ExternalEditor)
 
-is_mac_user_agent = re.compile('.*Mac OS X.*|.*Mac_PowerPC.*').match
+#is_mac_user_agent = re.compile('.*Mac OS X.*|.*Mac_PowerPC.*').match
 
 def EditLink(self, object, borrow_lock=0, skip_data=0):
     """Insert the external editor link to an object if appropriate"""
@@ -268,15 +280,10 @@ def EditLink(self, object, borrow_lock=0, skip_data=0):
                 or hasattr(base, 'read'))
     if editable and user.has_permission(ExternalEditorPermission, object):
         query = {}
-        if is_mac_user_agent(object.REQUEST['HTTP_USER_AGENT']):
-            # Add extension to URL so that the Mac finder can
-            # launch the ZopeEditManager helper app
-            # this is a workaround for limited MIME type
-            # support on MacOS X browsers
-            ext = '.zem'
-            query['macosx'] = 1
-        else:
-            ext = ''
+        # Add extension to URL so that the Client
+        # launch the ZopeEditManager helper app
+        # this is a workaround for limited MIME type
+        ext = '.zem'
         if borrow_lock:
             query['borrow_lock'] = 1
         if skip_data:

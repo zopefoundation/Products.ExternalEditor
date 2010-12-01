@@ -16,13 +16,15 @@ External Editor:
   >>> self.folder.manage_addFile('some-file', file='some content')
 
   >>> print http(r"""
-  ... GET /test_folder_1_/externalEdit_/some-file HTTP/1.1
+  ... GET /test_folder_1_/externalEdit_/some-file.zem HTTP/1.1
   ... Authorization: Basic %s:%s
   ... """ % (user_name, user_password))
   HTTP/1.1 200 OK
   Content-Length: 167
-  Content-Type: application/x-zope-edit; charset=iso-8859-15
+  Content-Type: application/x-zope-edit
+  Expires:...
   Last-Modified:...
+  Pragma: no-cache
   <BLANKLINE>
   url:http://localhost/test_folder_1_/some-file
   meta_type:File
@@ -57,8 +59,10 @@ Lock the file, should now send out the lock-token in the metadata:
   ... """ % (user_name, user_password))
   HTTP/1.1 200 OK
   Content-Length: ...
-  Content-Type: application/x-zope-edit; charset=iso-8859-15
+  Content-Type: application/x-zope-edit
+  Expires:...
   Last-Modified:...
+  Pragma: no-cache
   <BLANKLINE>
   url:http://localhost/test_folder_1_/some-file
   meta_type:File
@@ -79,8 +83,10 @@ appended to the metadata along with the lock-token:
   ... """ % (user_name, user_password))
   HTTP/1.1 200 OK
   Content-Length: ...
-  Content-Type: application/x-zope-edit; charset=iso-8859-15
+  Content-Type: application/x-zope-edit
+  Expires:...
   Last-Modified:...
+  Pragma: no-cache  
   <BLANKLINE>
   url:http://localhost/test_folder_1_/some-file
   meta_type:File
@@ -103,7 +109,9 @@ appended after the metadata:
   HTTP/1.1 200 OK
   Content-Length: ...
   Content-Type: application/x-zope-edit
+  Expires:...
   Last-Modified:...
+  Pragma: no-cache  
   <BLANKLINE>
   url:http://localhost/test_folder_1_/some-file
   meta_type:File
@@ -129,8 +137,10 @@ A user that is not the lock owner will not get the 'lock-token' or
   ... """ % (user_name_2, user_password_2))
   HTTP/1.1 200 OK
   Content-Length: 163
-  Content-Type: application/x-zope-edit; charset=iso-8859-15
+  Content-Type: application/x-zope-edit
+  Expires:...
   Last-Modified:...
+  Pragma: no-cache  
   <BLANKLINE>
   url:http://localhost/test_folder_1_/some-file
   meta_type:File
@@ -159,8 +169,10 @@ to 'application/x-zope-edit':
   ... """ % (user_name, user_password))
   HTTP/1.1 200 OK
   Content-Length: 140
-  Content-Type: application/x-zope-edit; charset=iso-8859-15
+  Content-Type: application/x-zope-edit
+  Expires:...
   Last-Modified:...
+  Pragma: no-cache  
   <BLANKLINE>
   url:http://localhost/test_folder_1_/another-file
   meta_type:Side Effects
@@ -189,8 +201,10 @@ that is sent out:
   ... """ % (user_name, user_password))
   HTTP/1.1 200 OK
   Content-Length: 191
-  Content-Type: application/x-zope-edit; charset=iso-8859-15
+  Content-Type: application/x-zope-edit
+  Expires:...
   Last-Modified:...
+  Pragma: no-cache  
   <BLANKLINE>
   url:http://localhost/test_folder_1_/some-file
   meta_type:File
@@ -220,7 +234,9 @@ REQUEST, for example the 'skip_data' parameter:
   HTTP/1.1 200 OK
   Content-Length: 155
   Content-Type: application/x-zope-edit
+  Expires:...
   Last-Modified:...
+  Pragma: no-cache  
   <BLANKLINE>
   url:http://localhost/test_folder_1_/some-file
   meta_type:File
@@ -248,7 +264,62 @@ the RESPONSE:
   HTTP/1.1 200 OK
   Content-Encoding: gzip
   Content-Length: 159
-  Content-Type: application/x-zope-edit; charset=iso-8859-15
+  Content-Type: application/x-zope-edit
+  Expires:...
   Last-Modified:...
+  Pragma:...
 
   >>> _callbacks[:] = old_cb
+  
+  
+MSIE cache behaviour
+====================
+
+We set the user agent at `MSIE` and look at the cache headers.
+
+  >>> print http(r"""
+  ... GET /test_folder_1_/externalEdit_/some-file.zem HTTP/1.1
+  ... User-Agent: MSIE
+  ... Authorization: Basic %s:%s
+  ... """ % (user_name, user_password))
+  HTTP/1.1 200 OK
+  Cache-Control: must-revalidate, post-check=0, pre-check=0
+  Content-Length: 167
+  Content-Type: application/x-zope-edit
+  Expires:...
+  Last-Modified:...
+  Pragma: public
+  <BLANKLINE>
+  url:http://localhost/test_folder_1_/some-file
+  meta_type:File
+  title:
+  content_type:application/octet-stream
+  auth:...
+  cookie:
+  <BLANKLINE>
+  some content
+
+Because we also are IE 1.0 compliant, we try with `Microsoft Internet Explorer'
+Cheers JNUT !! ;)
+
+  >>> print http(r"""
+  ... GET /test_folder_1_/externalEdit_/some-file.zem HTTP/1.1
+  ... User-Agent: Microsoft Internet Explorer
+  ... Authorization: Basic %s:%s
+  ... """ % (user_name, user_password))
+  HTTP/1.1 200 OK
+  Cache-Control: must-revalidate, post-check=0, pre-check=0
+  Content-Length: 167
+  Content-Type: application/x-zope-edit
+  Expires:...
+  Last-Modified:...
+  Pragma: public
+  <BLANKLINE>
+  url:http://localhost/test_folder_1_/some-file
+  meta_type:File
+  title:
+  content_type:application/octet-stream
+  auth:...
+  cookie:
+  <BLANKLINE>
+  some content
