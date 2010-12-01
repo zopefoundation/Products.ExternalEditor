@@ -1,0 +1,18 @@
+Zope External Editor Installation
+
+  Installation is two-fold: 
+
+  - Install the ExternalEditor product in Zope.
+
+  - Install the helper application on the client(s) and configure the browser(s)
+
+  Product Installation
+
+    Download the archive and extract it into your Zope products directory. Then
+    restart Zope. If you succeeded, you'll notice pencil icons next to the
+    external editable objects in the Zope management screens.
+
+  Helper Application Installation
+  
+    See http://plone.org/products/zope-externaleditor-client or get directly the
+    egg from http://pypi.python.org/pypi/collective.zopeedit

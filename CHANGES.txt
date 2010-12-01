@@ -11,6 +11,8 @@ Changelog
 
 - Corrected and added tests
 
+- Moved the sources of the client to another package : collective.zopeedit
+
 
 1.0 - 2010-07-01
 ----------------
