@@ -1,6 +1,11 @@
 Changelog
 =========
 
+2.0.0 - unreleased
+------------------
+
+- Update dtml to Zope trunk.
+
 1.1.0 - 2010-12-01
 ------------------
 
