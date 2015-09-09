@@ -1,12 +1,14 @@
 Changelog
 =========
 
-2.0.0 - unreleased
+
+2.0.0 (unreleased)
 ------------------
 
 - Update dtml to Zope trunk.
 
-1.1.0 - 2010-12-01
+
+1.1.0 (2010-12-01)
 ------------------
 
 - Added support for unaware mimetype browser - we now add the .zem extension no
@@ -19,14 +21,14 @@ Changelog
 - Moved the sources of the client to another package : collective.zopeedit
 
 
-1.0 - 2010-07-01
+1.0 (2010-07-01)
 ----------------
 
 - Update manage_main, manage_tabs, and findResult monkey patches to include
   fixes from Zope 2.12.
 
 
-1.0a2 - 2009-11-13
+1.0a2 (2009-11-13)
 ------------------
 
 - Removed imports from Globals.
@@ -34,7 +36,7 @@ Changelog
 - Purged old Zope 2 Interface interfaces for Zope 2.12 compatibility.
 
 
-1.0a1 - 2008-03-05
+1.0a1 (2008-03-05)
 ------------------
 
 - Updated package metadata to be usable as a package.
