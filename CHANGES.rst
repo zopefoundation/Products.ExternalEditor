@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-2.0.0 (unreleased)
+2.0.0 (2015-09-09)
 ------------------
 
 - Moved code to https://github.com/zopefoundation/Products.ExternalEditor
