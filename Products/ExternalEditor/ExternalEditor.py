@@ -243,13 +243,13 @@ class ExternalEditor(Implicit):
         # Using RESPONSE.setHeader('Pragma', 'no-cache') would be better, but
         # this chokes crappy most MSIE versions when downloads happen on SSL.
         # cf. http://support.microsoft.com/support/kb/articles/q316/4/31.asp
-        #RESPONSE.setHeader('Last-Modified', rfc1123_date())
+        # RESPONSE.setHeader('Last-Modified', rfc1123_date())
         RESPONSE.setHeader('Content-Type', 'application/x-zope-edit')
 
         # We have to test the msie behaviour
         user_agent = self.REQUEST.get_header('User-Agent')
-        if user_agent and (("msie" in user_agent.lower())
-                           or ("microsoft internet explorer" in user_agent.lower())):
+        if user_agent and (("msie" in user_agent.lower()) or
+                           ("microsoft internet explorer" in user_agent.lower())):
             RESPONSE.setHeader('Cache-Control',
                                'must-revalidate, post-check=0, pre-check=0')
             RESPONSE.setHeader('Pragma', 'public')
@@ -277,10 +277,10 @@ def EditLink(self, object, borrow_lock=0, skip_data=0):
     """Insert the external editor link to an object if appropriate"""
     base = aq_base(object)
     user = getSecurityManager().getUser()
-    editable = (hasattr(base, 'manage_FTPget')
-                or hasattr(base, 'EditableBody')
-                or hasattr(base, 'document_src')
-                or hasattr(base, 'read'))
+    editable = (hasattr(base, 'manage_FTPget') or
+                hasattr(base, 'EditableBody') or
+                hasattr(base, 'document_src') or
+                hasattr(base, 'read'))
     if editable and user.has_permission(ExternalEditorPermission, object):
         query = {}
         # Add extension to URL so that the Client
