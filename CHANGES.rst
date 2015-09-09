@@ -5,6 +5,8 @@ Changelog
 2.0.0 (unreleased)
 ------------------
 
+- Moved code to https://github.com/zopefoundation/Products.ExternalEditor
+
 - Update dtml to Zope trunk.
 
 
