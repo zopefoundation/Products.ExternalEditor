@@ -12,15 +12,14 @@
 #
 ##############################################################################
 
-import os, sys
-
 # Load fixture
 from Testing import ZopeTestCase
+from OFS.SimpleItem import SimpleItem
 
 # Install our product
 ZopeTestCase.installProduct('ExternalEditor')
 
-from OFS.SimpleItem import SimpleItem
+
 class SideEffects(SimpleItem):
     meta_type = 'Side Effects'
     def __init__(self, id, content):
@@ -29,6 +28,7 @@ class SideEffects(SimpleItem):
     def manage_FTPget(self, REQUEST, RESPONSE):
         RESPONSE.setHeader('Content-Type', 'text/plain')
         return self.content
+
 
 def test_suite():
     import unittest
