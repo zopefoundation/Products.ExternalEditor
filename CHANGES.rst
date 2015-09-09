@@ -9,9 +9,9 @@ Changelog
 1.1.0 - 2010-12-01
 ------------------
 
-- Added support for unaware mimetype browser - we now add the .zem extension no 
+- Added support for unaware mimetype browser - we now add the .zem extension no
   matter what the user-agent
-  
+
 - Modified the cache's parameters - special case for MSIE
 
 - Corrected and added tests
@@ -113,7 +113,7 @@ Changelog
 - Properly escape hyphens in man page. Thanks to Federico Sevilla III.
 
 - Check if the editor was launched before locking the file in Zope. This
-  prevents errors if the editor is closed before the lock request 
+  prevents errors if the editor is closed before the lock request
   completes.
 
 - Do not ask the user what editor to use on Posix platforms. Instead just
@@ -133,12 +133,12 @@ Changelog
 - Add Dreamweaver plugin contributed by Manuel Aristarann. Thanks also
   to Anton Stonor.
 
-- Add ZMI support for Zope 2.7's ordered folder objects.      
+- Add ZMI support for Zope 2.7's ordered folder objects.
 
 - Fix bug detecting basic auth info from older versions of CookieCrumber.
   Thanks to David D. Smith and Federico Sevilla III.
 
-- Workaround IE browser error when running over SSL. Thanks to 
+- Workaround IE browser error when running over SSL. Thanks to
   Marc-Aurele Darche.
 
 - Add ".zem" file extension support for MacOS X (especially Mac IE),
@@ -155,7 +155,7 @@ Changelog
 4/23/04 - 0.7.2
 ---------------
 
-- Change default configuration to use .txt extension for text/plain only. 
+- Change default configuration to use .txt extension for text/plain only.
   Add extensions for css and javascript files.
 
 - Fixed packaging bug in Windows binary which disabled several plugins.
@@ -184,7 +184,7 @@ Changelog
   suppressing the dialog box which appears by default. Thanks
   to Shane Hathaway.
 
-- Improved open file check in Word and Powerpoint plugins 
+- Improved open file check in Word and Powerpoint plugins
   thanks to Yura Petrov.
 
 - Added plugins for Microsoft Word, Excel and Powerpoint.
@@ -258,7 +258,7 @@ Changelog
 6/30/02 - 0.4.2
 ---------------
 
-- Added SSL support to Windows binary package. Thanks to Federico 
+- Added SSL support to Windows binary package. Thanks to Federico
   Sevilla III
 
 
@@ -267,7 +267,7 @@ Changelog
 
 - Fixed dangling dav lock bug on fatal errors. Thanks to Marc St-Jean.
 
-- Fixed content_type bug, now checks if it is callable. Thanks to Arnaud 
+- Fixed content_type bug, now checks if it is callable. Thanks to Arnaud
   Bienvenu.
 
 - Fixed bug with editing binary data on Windows. Thanks to Eric Kamm.
@@ -303,7 +303,7 @@ Changelog
   Gabriel Genellina and Arno Gross for testing, patches and suggestions.
 
 - Added "temp_dir" configuration option for specifying a different
-  temp file directory then the OS default. Also further improved 
+  temp file directory then the OS default. Also further improved
   temp file name generation.
 
 - Added support for domain specific configuration options.
@@ -313,11 +313,11 @@ Changelog
 
 - You can now pass command line arguments to the editor in the config file,
   or wrap the editor in an xterm without using a shell script.
-  
+
 - Rewrote "Editor did not launch" error message so it makes more sense.
 
 - Fixed https detection bug. External editor is now tested and working with
-  https. Many thanks to Hans-Dieter Stich and Martin Groenemeyer for their 
+  https. Many thanks to Hans-Dieter Stich and Martin Groenemeyer for their
   assistance and ideas.
 
 - Made it possible to edit objects that are methods of ZClasses. Thanks to

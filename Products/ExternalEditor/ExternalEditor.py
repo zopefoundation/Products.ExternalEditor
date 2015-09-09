@@ -241,7 +241,7 @@ class ExternalEditor(Implicit):
         # cf. http://support.microsoft.com/support/kb/articles/q316/4/31.asp
         #RESPONSE.setHeader('Last-Modified', rfc1123_date())
         RESPONSE.setHeader('Content-Type', 'application/x-zope-edit')
-        
+
         # We have to test the msie behaviour
         user_agent = self.REQUEST.get_header('User-Agent')
         if user_agent and (("msie" in user_agent.lower())
