@@ -1,25 +1,29 @@
 from setuptools import setup, find_packages
 
-
 setup(name='Products.ExternalEditor',
-      version='2.0.0dev',
+      version='2.0.0.dev0',
       description="Zope External Editor",
       long_description=(open("README.rst").read() + "\n" +
                         open("CHANGES.rst").read()),
       classifiers=[
-        'Framework :: Zope2',
+          'Framework :: Zope2',
+          'Programming Language :: Python',
+          'Programming Language :: Python :: 2.6',
+          'Programming Language :: Python :: 2.7',
       ],
       author="Zope Foundation and Contributors",
+      author_email="zope-dev@zope.org",
       maintainer="Chris McDonough",
       maintainer_email="chrism@plope.com",
       license="ZPL 2.1",
+      keywords="zope external editor",
       url="http://pypi.python.org/pypi/Products.ExternalEditor",
       packages=find_packages(),
       namespace_packages=['Products'],
       include_package_data=True,
       zip_safe=False,
       install_requires=[
-        'setuptools',
+          'setuptools',
       ],
       entry_points="""
       [console_scripts]
