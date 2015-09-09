@@ -319,12 +319,10 @@ own content management applications.
 
 Say you have an FTP editable object, "document", in a Zope folder named
 "my_stuff". The URL to view the object would be:
-
-    http://zopeserver/my_stuff/document
+http://zopeserver/my_stuff/document
 
 The URL to kick off the external editor on this document would be:
-
-    http://zopeserver/my_stuff/externalEdit_/document
+http://zopeserver/my_stuff/externalEdit_/document
 
 Now, this may look a bit odd to you if you are used to tacking views on to
 the end of the URL. Because `externalEdit_` is required to work on Python
@@ -345,9 +343,10 @@ As an alternative, you can also pass the path the object you want to edit
 directly to the `externalEdit_` object when you call its index_html method.
 It can be called either directly by URL or from a python script.
 `externalEdit_` will return the proper response data for the object to edit.
-Here are some examples:
+You can invoke it via a URL:
+http://zopeserver/externalEdit_?path=/my_stuff/document
 
-    http://zopeserver/externalEdit_?path=/my_stuff/document
+or via Python:
 
 .. code-block:: python
 
@@ -360,9 +359,8 @@ after displaying a confirmation dialog box. Although you can make this
 automatic by specifying 'always_borrow_locks = 1' in the External Editor
 config file, it may be desireable to make this the default behavior when
 using that server. To facilitate this, you can specify that locks
-should be automatically borrowed in the URL (New in 0.7):
-
-    http://zopeserver/my_stuff/externalEdit_/document?borrow_lock=1
+should be automatically borrowed in the URL (New in 0.7), i.e:
+http://zopeserver/my_stuff/externalEdit_/document?borrow_lock=1
 
 External Editor also defines a global method that you can call to insert
 pencil icon links for appropriate objects. The method automatically checks
