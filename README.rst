@@ -144,7 +144,6 @@ Options
 The available options for all sections of the config file are:
 
 ``editor``
-
     Command line or plugin name used to invoke the editor application. On
     Windows, if no editor setting is found for an object you edit, the
     helper app will search the file type registry for an appropriate editor
@@ -155,17 +154,14 @@ The available options for all sections of the config file are:
     and "%1" for Windows respectively.
 
 ``save_interval``
-
     (float) The interval in seconds that the helper application checks the
     edited file for changes.
 
 ``use_locks``
-
     (1 or 0) Whether to use WebDAV locking. The user editing must have the
     proper WebDAV related permissions for this to work.
 
 ``always_borrow_locks``
-
     (1 or 0) When use_locks is enabled this features suppresses warnings
     when trying to edit an object you have already locked.  When enabled,
     external editor will always "borrow" the existing lock token instead of
@@ -173,7 +169,6 @@ The available options for all sections of the config file are:
     instance. If omitted, this option defaults to 0.
 
 ``cleanup_files``
-
     (1 or 0) Whether to delete the temp files created.  WARNING the temp
     file coming from the browser contains authentication information and
     therefore setting this to 0 is a security risk, especially on shared
@@ -182,25 +177,21 @@ The available options for all sections of the config file are:
     only.
 
 ``extension``
-
     (text) The file extension to add to the content file. Allows better
     handling of images and can improve syntax highlighting.
 
 ``temp_dir``
-
     (path) Path to store local copies of object data being edited. Defaults
     to operating system temp directory. *Note: this setting has no apparent
     effect on Windows* 8^(
 
 ``long_file_name``
-
     (1 or 0) Whether to include the whole path to the object including the
     hostname in the file name (the default) or just the id of the object
     being edited. Turn this option off for shorter file names in your
     editors, and for editors that don't like long names.
 
 ``file_name_separator``
-
     (string) Character or characters used to separate path elements in long
     files names used by external editor. Defaults to a comma (,). This must
     be a legal character for use in file names on your platorm (i.e., don't
@@ -283,14 +274,12 @@ Plugin Notes
 ------------
 
 Photoshop
-
     Photoshop's COM API is quite limited, and external editor cannot detect
     that you have closed a file until you exit the entire application (it
     can still detect saves). Therefore you may want to turn off DAV locking
     (use_locks=0) or borrow locks (always_borrow_locks=1) when using it.
 
 Dreamweaver
-
     External editor cannot detect when you have finished editing a single
     file. Objects edited with Dreamweaver will remain locked on the server
     until you exit the application. As with Photoshop above, you may want
