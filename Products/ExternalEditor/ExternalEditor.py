@@ -16,7 +16,7 @@
 
 # Zope External Editor Product by Casey Duncan
 
-from string import join # For Zope 2.3 compatibility
+from string import join  # For Zope 2.3 compatibility
 import types
 import urllib
 from Acquisition import aq_inner, aq_base, aq_parent, Implicit
@@ -43,6 +43,7 @@ ExternalEditorPermission = 'Use external editor'
 
 _callbacks = []
 
+
 class PDataStreamIterator:
     if HAVE_Z3_IFACE:
         implements(IStreamIterator)
@@ -62,6 +63,7 @@ class PDataStreamIterator:
         self.data = self.data.next
         return data
 
+
 def registerCallback(cb):
     """Register a callback to be called by the External Editor when
     it's about to be finished with collecting metadata for the
@@ -71,6 +73,7 @@ def registerCallback(cb):
     """
     _callbacks.append(cb)
 
+
 def applyCallbacks(ob, metadata, request, response):
     """Apply the registered callbacks in the order they were
     registered. The callbacks are free to perform any operation,
@@ -79,6 +82,7 @@ def applyCallbacks(ob, metadata, request, response):
     """
     for cb in _callbacks:
         cb(ob, metadata, request, response)
+
 
 class ExternalEditor(Implicit):
     """Create a response that encapsulates the data needed by the
@@ -108,14 +112,14 @@ class ExternalEditor(Implicit):
         if path is None:
             parent = self.aq_parent
             try:
-                ob = parent[REQUEST['target']] # Try getitem
+                ob = parent[REQUEST['target']]  # Try getitem
             except KeyError:
-                ob = getattr(parent, REQUEST['target']) # Try getattr
+                ob = getattr(parent, REQUEST['target'])  # Try getattr
             except AttributeError:
                 # Handle objects that are methods in ZClasses
                 ob = parent.propertysheets.methods[REQUEST['target']]
         else:
-            ob = self.restrictedTraverse( path )
+            ob = self.restrictedTraverse(path)
 
         r = []
         r.append('url:%s' % ob.absolute_url())
@@ -143,7 +147,7 @@ class ExternalEditor(Implicit):
 
             r.append('auth:%s' % auth)
 
-        r.append('cookie:%s' % REQUEST.environ.get('HTTP_COOKIE',''))
+        r.append('cookie:%s' % REQUEST.environ.get('HTTP_COOKIE', ''))
 
         if wl_isLocked(ob):
             # Object is locked, send down the lock token
@@ -151,7 +155,7 @@ class ExternalEditor(Implicit):
             user_id = security.getUser().getId()
             for lock in ob.wl_lockValues():
                 if not lock.isValid():
-                    continue # Skip invalid/expired locks
+                    continue  # Skip invalid/expired locks
                 creator = lock.getCreator()
                 if creator and creator[1] == user_id:
                     # Found a lock for this user, so send it
@@ -204,7 +208,7 @@ class ExternalEditor(Implicit):
             # of response headers should happen there, if possible.
             try:
                 body = ob.manage_FTPget()
-            except TypeError: # some need the R/R pair!
+            except TypeError:  # some need the R/R pair!
                 body = ob.manage_FTPget(REQUEST, RESPONSE)
         elif hasattr(ob, 'EditableBody'):
             body = ob.EditableBody()
@@ -217,7 +221,7 @@ class ExternalEditor(Implicit):
             raise 'BadRequest', 'Object does not support external editing'
 
         if (HAVE_Z3_IFACE and IStreamIterator.providedBy(body) or
-            (not HAVE_Z3_IFACE) and IStreamIterator.isImplementedBy(body)):
+                (not HAVE_Z3_IFACE) and IStreamIterator.isImplementedBy(body)):
             # We need to manage our content-length because we're streaming.
             # The content-length should have been set in the response by
             # the method that returns the iterator, but we need to fix it up
@@ -245,8 +249,9 @@ class ExternalEditor(Implicit):
         # We have to test the msie behaviour
         user_agent = self.REQUEST.get_header('User-Agent')
         if user_agent and (("msie" in user_agent.lower())
-            or ("microsoft internet explorer" in user_agent.lower())):
-            RESPONSE.setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0')
+                           or ("microsoft internet explorer" in user_agent.lower())):
+            RESPONSE.setHeader('Cache-Control',
+                               'must-revalidate, post-check=0, pre-check=0')
             RESPONSE.setHeader('Pragma', 'public')
         else:
             RESPONSE.setHeader('Pragma', 'no-cache')
@@ -294,9 +299,10 @@ def EditLink(self, object, borrow_lock=0, skip_data=0):
                 '<img src="%s/misc_/ExternalEditor/edit_icon" '
                 'align="middle" hspace="2" border="0" alt="External Editor" />'
                 '</a>' % (url, object.REQUEST.BASEPATH1)
-               )
+                )
     else:
         return ''
+
 
 def querystr(d):
     """Create a query string from a dict"""
@@ -305,4 +311,3 @@ def querystr(d):
             ['%s=%s' % (name, val) for name, val in d.items()])
     else:
         return ''
-

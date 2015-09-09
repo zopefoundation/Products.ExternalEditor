@@ -22,9 +22,11 @@ ZopeTestCase.installProduct('ExternalEditor')
 
 class SideEffects(SimpleItem):
     meta_type = 'Side Effects'
+
     def __init__(self, id, content):
         self.id = id
         self.content = content
+
     def manage_FTPget(self, REQUEST, RESPONSE):
         RESPONSE.setHeader('Content-Type', 'text/plain')
         return self.content
@@ -38,7 +40,7 @@ def test_suite():
     files = [
         'link.txt',
         'edit.txt',
-        ]
+    ]
     for f in files:
         suite.addTest(
             FileSuite(f, package='Products.ExternalEditor.tests'))
