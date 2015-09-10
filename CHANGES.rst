@@ -1,7 +1,7 @@
 Changelog
 =========
 
-1.1.1 (unreleased)
+1.1.1 (2015-09-10)
 ------------------
 
 - Reverted dtml to older Zope 2.12/2.13.  Version 2.0.0 had changes
