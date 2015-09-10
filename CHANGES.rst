@@ -1,19 +1,18 @@
 Changelog
 =========
 
-
-2.0.1 (unreleased)
+1.1.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
-
-2.0.0 (2015-09-09)
-------------------
+- Reverted dtml to older Zope 2.12/2.13.  Version 2.0.0 had changes
+  for Zope trunk that were making the management interface ugly
+  (missing icons) in older Zopes.  So there now is a branch 1.1.x to
+  support those versions.  Note that our code patches
+  `OFS.ObjectManager.manage_main` and
+  `App.Management.Tabs.manage_tabs`, adding external edit icons to
+  those files.
 
 - Moved code to https://github.com/zopefoundation/Products.ExternalEditor
-
-- Update dtml to Zope trunk.
 
 
 1.1.0 (2010-12-01)
