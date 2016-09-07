@@ -5,7 +5,8 @@ Changelog
 2.0.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Quote variable in manage_tabs to avoid XSS.
+  From Products.PloneHotfix20160830.  [maurits]
 
 
 2.0.0 (2015-09-09)
