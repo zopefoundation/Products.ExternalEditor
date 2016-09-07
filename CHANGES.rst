@@ -1,7 +1,7 @@
 Changelog
 =========
 
-1.1.2 (unreleased)
+1.1.2 (2016-09-08)
 ------------------
 
 - Quote variable in manage_tabs to avoid XSS.
