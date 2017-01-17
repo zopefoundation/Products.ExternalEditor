@@ -5,7 +5,8 @@ Changelog
 2.0.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fixed reflective XSS in findResult.
+  This applies PloneHotfix20170117.  [maurits]
 
 
 2.0.1 (2016-09-08)
