@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='Products.ExternalEditor',
-      version='2.0.2.dev0',
+      version='2.0.2',
       description="Zope External Editor",
       long_description=(open("README.rst").read() + "\n" +
                         open("CHANGES.rst").read()),

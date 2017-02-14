@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-2.0.2 (unreleased)
+2.0.2 (2017-02-14)
 ------------------
 
 - Fixed reflective XSS in findResult.
