@@ -5,7 +5,8 @@ Changelog
 2.0.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Update manage_main.dtml to Zope 2.13 version to restore 
+  ZMI icons [dataflake]
 
 
 2.0.2 (2017-02-14)
