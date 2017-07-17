@@ -28,6 +28,12 @@ client-side tools. It has the following features:
 
 - https support (Openssl required)
 
+Zope version compatibility
+--------------------------
+
+For Zope 4, please use release 2.0 and upwards. For Zope releases prior to
+4.0, please use ExternalEditor releases from the 1.1 branch.
+
 Using It
 --------
 

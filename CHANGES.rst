@@ -5,7 +5,7 @@ Changelog
 2.0.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Document Zope version compatibility [dataflake]
 
 
 2.0.2 (2017-02-14)
