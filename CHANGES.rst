@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-2.0.3 (unreleased)
+2.0.3 (2017-07-17)
 ------------------
 
 - Document Zope version compatibility [dataflake]
