@@ -11,11 +11,13 @@ Changelog
 
 - Add needed dependencies in `setup.py`.
 
+- Prepare for Python 2 / 3 compatibility  [davilima6]
+
 
 2.0.3 (2017-07-17)
 ------------------
 
-- Document Zope version compatibility [dataflake]
+- Document Zope version compatibility  [dataflake]
 
 
 2.0.2 (2017-02-14)
