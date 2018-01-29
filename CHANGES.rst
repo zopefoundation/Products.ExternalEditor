@@ -4,7 +4,7 @@ Changelog
 1.1.4 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Prepare for Python 2 / 3 compatibility  [davilima6]
 
 
 1.1.3 (2017-02-14)
