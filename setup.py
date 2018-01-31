@@ -24,6 +24,7 @@ setup(name='Products.ExternalEditor',
       zip_safe=False,
       install_requires=[
           'setuptools',
+          'six',
       ],
       entry_points="""
       [console_scripts]
