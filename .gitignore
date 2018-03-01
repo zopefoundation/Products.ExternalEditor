@@ -1,4 +1,9 @@
-build
-dist
 *.egg-info
 *.pyc
+.coverage
+.coverage.*
+.tox/
+build
+coverage.xml
+dist
+htmlcov/

@@ -1,0 +1,6 @@
+[run]
+branch = True
+source = Products.ExternalEditor
+
+[report]
+precision = 2
