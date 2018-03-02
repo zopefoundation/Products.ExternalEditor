@@ -23,9 +23,8 @@ setup(name='Products.ExternalEditor',
       zip_safe=False,
       install_requires=[
           'setuptools',
-          'Products.ZCatalog < 4',
-          'Products.ZCTextIndex < 4',
-          'Zope2 < 4',
+          'Zope >= 4.0b3',
+          'ZServer >= 4.0b1',
       ],
       entry_points="""
       [console_scripts]

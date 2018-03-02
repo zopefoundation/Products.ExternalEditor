@@ -1,6 +1,6 @@
 [run]
 branch = True
-source = Products.ExternalEditor
+source = Products
 
 [report]
 precision = 2

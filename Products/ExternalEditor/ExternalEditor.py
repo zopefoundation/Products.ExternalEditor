@@ -177,7 +177,7 @@ class ExternalEditor(Implicit):
             # We've been requested to send only the metadata. The
             # client will presumably fetch the data itself.
             self._write_metadata(RESPONSE, metadata, metadata_len)
-            return ''
+            return metadata + '\n'
 
         ob_data = getattr(aq_base(ob), 'data', None)
         if (ob_data is not None and isinstance(ob_data, Image.Pdata)):

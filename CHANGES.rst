@@ -7,6 +7,10 @@ Changelog
 
 - Drop support for Python 2.6.
 
+- Adapt tests to Zope 4.
+
+- Add needed dependencies in `setup.py`.
+
 
 2.0.3 (2017-07-17)
 ------------------

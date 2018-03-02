@@ -12,9 +12,14 @@
 #
 ##############################################################################
 
+from __future__ import print_function
+from rfc822 import Message
+from StringIO import StringIO
+
 # Load fixture
 from Testing import ZopeTestCase
 from OFS.SimpleItem import SimpleItem
+from Testing.ZopeTestCase.zopedoctest.functional import http
 
 # Install our product
 ZopeTestCase.installProduct('ExternalEditor')
@@ -32,6 +37,17 @@ class SideEffects(SimpleItem):
         return self.content
 
 
+def print_http(request):
+    response = http(request)
+    status, _, msg = str(response).partition("\r\n")
+    print(status)
+    message = Message(StringIO(msg))
+    for key, value in sorted(message.items()):
+        print('{}: {}'.format(key, value))
+    print()
+    print(message.fp.read())
+
+
 def test_suite():
     import unittest
     suite = unittest.TestSuite()
@@ -43,5 +59,6 @@ def test_suite():
     ]
     for f in files:
         suite.addTest(
-            FileSuite(f, package='Products.ExternalEditor.tests'))
+            FileSuite(f, package='Products.ExternalEditor.tests',
+                      globs={'print_http': print_http}))
     return suite
