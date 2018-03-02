@@ -5,7 +5,7 @@ Changelog
 2.0.4 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Drop support for Python 2.6.
 
 
 2.0.3 (2017-07-17)
