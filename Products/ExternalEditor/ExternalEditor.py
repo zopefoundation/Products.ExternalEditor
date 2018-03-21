@@ -16,8 +16,11 @@
 
 # Zope External Editor Product by Casey Duncan
 
-from string import join  # For Zope 2.3 compatibility
-import types
+try:
+    from string import join  # For Zope 2.3 compatibility
+except ImportError:
+    # Python 3
+    join = str.join
 from Acquisition import aq_inner, aq_base, aq_parent, Implicit
 try:
     from App.class_init import InitializeClass
@@ -36,20 +39,17 @@ except ImportError:
     def wl_isLocked(ob):
         return 0
 
+from zExceptions import BadRequest
 from ZPublisher.Iterators import IStreamIterator
-from zope.interface import implements, Interface
-HAVE_Z3_IFACE = issubclass(IStreamIterator, Interface)
+from zope.interface import implementer, Interface
 
 ExternalEditorPermission = 'Use external editor'
 
 _callbacks = []
 
 
+@implementer(IStreamIterator)
 class PDataStreamIterator:
-    if HAVE_Z3_IFACE:
-        implements(IStreamIterator)
-    else:
-        __implements__ = IStreamIterator
 
     def __init__(self, data):
         self.data = data
@@ -222,10 +222,9 @@ class ExternalEditor(Implicit):
             body = ob.read()
         else:
             # can't read it!
-            raise 'BadRequest', 'Object does not support external editing'
+            raise BadRequest('Object does not support external editing')
 
-        if (HAVE_Z3_IFACE and IStreamIterator.providedBy(body) or
-                (not HAVE_Z3_IFACE) and IStreamIterator.isImplementedBy(body)):
+        if IStreamIterator.providedBy(body):
             # We need to manage our content-length because we're streaming.
             # The content-length should have been set in the response by
             # the method that returns the iterator, but we need to fix it up
