@@ -16,11 +16,6 @@
 
 # Zope External Editor Product by Casey Duncan
 
-try:
-    from string import join  # For Zope 2.3 compatibility
-except ImportError:
-    # Python 3
-    join = str.join
 from Acquisition import aq_inner, aq_base, aq_parent, Implicit
 try:
     from App.class_init import InitializeClass
@@ -173,7 +168,7 @@ class ExternalEditor(Implicit):
 
         # Finish metadata with an empty line.
         r.append('')
-        metadata = join(r, '\n')
+        metadata = '\n'.join(r)
         metadata_len = len(metadata)
 
         # Check if we should send the file's data down the response.
@@ -240,7 +235,7 @@ class ExternalEditor(Implicit):
         # set the headers ourselves since _write_metadata won't get
         # called.
         self._set_headers(RESPONSE)
-        return join((metadata, body), '\n')
+        return '\n'.join((metadata, body))
 
     def _set_headers(self, RESPONSE):
         # Using RESPONSE.setHeader('Pragma', 'no-cache') would be better, but
