@@ -5,6 +5,7 @@ python:
 install:
     - pip install zope.testrunner
     - pip install coveralls coverage
+    - pip install git+https://github.com/zopefoundation/Zope.git@fix-doctest#egg=Zope
     - pip install -U --pre -e .
 script:
     - coverage run -m zope.testrunner --path=Products --all -v
