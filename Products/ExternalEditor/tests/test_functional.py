@@ -12,8 +12,6 @@
 #
 ##############################################################################
 
-from __future__ import print_function
-
 # Load fixture
 from Testing import ZopeTestCase
 from OFS.SimpleItem import SimpleItem
