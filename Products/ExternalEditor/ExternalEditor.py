@@ -16,27 +16,19 @@
 
 # Zope External Editor Product by Casey Duncan
 
-from Acquisition import aq_inner, aq_base, aq_parent, Implicit
-try:
-    from App.class_init import InitializeClass
-except ImportError:
-    from App.class_init import default__class_init__ as InitializeClass
-from App.Common import rfc1123_date
-from AccessControl.SecurityManagement import getSecurityManager
 from AccessControl.SecurityInfo import ClassSecurityInfo
+from AccessControl.SecurityManagement import getSecurityManager
+from AccessControl.class_init import InitializeClass
+from Acquisition import aq_inner, aq_base, aq_parent, Implicit
+from App.Common import rfc1123_date
 from OFS import Image
-import six
+from OFS.Lockable import wl_isLocked
 from six.moves import urllib
-try:
-    from webdav.Lockable import wl_isLocked
-except ImportError:
-    # webdav module not available
-    def wl_isLocked(ob):
-        return 0
+import six
 
 from zExceptions import BadRequest
 from ZPublisher.Iterators import IStreamIterator
-from zope.interface import implementer, Interface
+from zope.interface import implementer
 
 ExternalEditorPermission = 'Use external editor'
 
