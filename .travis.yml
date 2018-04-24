@@ -1,0 +1,18 @@
+language: python
+sudo: false
+python:
+    - 2.7
+install:
+    - pip install zope.testrunner
+    - pip install coveralls coverage
+    - pip install -U --pre -e .
+script:
+    - coverage run -m zope.testrunner --path=Products --all -v
+after_success:
+    - coveralls
+notifications:
+    email: false
+cache:
+  pip: true
+  directories:
+    - eggs/

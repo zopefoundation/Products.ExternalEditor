@@ -86,7 +86,7 @@ appended to the metadata along with the lock-token:
   Content-Type: application/x-zope-edit
   Expires:...
   Last-Modified:...
-  Pragma: no-cache  
+  Pragma: no-cache
   <BLANKLINE>
   url:http://localhost/test_folder_1_/some-file
   meta_type:File
@@ -111,7 +111,7 @@ appended after the metadata:
   Content-Type: application/x-zope-edit
   Expires:...
   Last-Modified:...
-  Pragma: no-cache  
+  Pragma: no-cache
   <BLANKLINE>
   url:http://localhost/test_folder_1_/some-file
   meta_type:File
@@ -129,7 +129,7 @@ A user that is not the lock owner will not get the 'lock-token' or
   >>> user_password_2 = 'frob'
 
   >>> uf = self.folder.acl_users
-  >>> uf.userFolderAddUser(user_name_2, user_password_2, ['Manager'], [])
+  >>> _ = uf.userFolderAddUser(user_name_2, user_password_2, ['Manager'], [])
 
   >>> print http(r"""
   ... GET /test_folder_1_/externalEdit_/some-file?borrow_lock=1 HTTP/1.1
@@ -140,7 +140,7 @@ A user that is not the lock owner will not get the 'lock-token' or
   Content-Type: application/x-zope-edit
   Expires:...
   Last-Modified:...
-  Pragma: no-cache  
+  Pragma: no-cache
   <BLANKLINE>
   url:http://localhost/test_folder_1_/some-file
   meta_type:File
@@ -172,7 +172,7 @@ to 'application/x-zope-edit':
   Content-Type: application/x-zope-edit
   Expires:...
   Last-Modified:...
-  Pragma: no-cache  
+  Pragma: no-cache
   <BLANKLINE>
   url:http://localhost/test_folder_1_/another-file
   meta_type:Side Effects
@@ -204,7 +204,7 @@ that is sent out:
   Content-Type: application/x-zope-edit
   Expires:...
   Last-Modified:...
-  Pragma: no-cache  
+  Pragma: no-cache
   <BLANKLINE>
   url:http://localhost/test_folder_1_/some-file
   meta_type:File
@@ -236,7 +236,7 @@ REQUEST, for example the 'skip_data' parameter:
   Content-Type: application/x-zope-edit
   Expires:...
   Last-Modified:...
-  Pragma: no-cache  
+  Pragma: no-cache
   <BLANKLINE>
   url:http://localhost/test_folder_1_/some-file
   meta_type:File
@@ -270,8 +270,8 @@ the RESPONSE:
   Pragma:...
 
   >>> _callbacks[:] = old_cb
-  
-  
+
+
 MSIE cache behaviour
 ====================
 
