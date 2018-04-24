@@ -34,6 +34,7 @@ setup(name='Products.ExternalEditor',
           'setuptools',
           'Zope >= 4.0b4',
           'ZServer >= 4.0b1',
+          'six',
       ],
       entry_points="""
       [console_scripts]

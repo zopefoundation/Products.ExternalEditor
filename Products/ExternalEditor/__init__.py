@@ -20,7 +20,7 @@ from OFS.ObjectManager import ObjectManager
 from OFS.FindSupport import FindSupport
 from OFS.Folder import Folder
 from App.Management import Tabs
-from ExternalEditor import ExternalEditor, EditLink
+from Products.ExternalEditor.ExternalEditor import ExternalEditor, EditLink
 
 # Add the icon and the edit method to the misc_ namespace
 

@@ -16,39 +16,27 @@
 
 # Zope External Editor Product by Casey Duncan
 
-from string import join  # For Zope 2.3 compatibility
-import types
-import urllib
-from Acquisition import aq_inner, aq_base, aq_parent, Implicit
-try:
-    from App.class_init import InitializeClass
-except ImportError:
-    from App.class_init import default__class_init__ as InitializeClass
-from App.Common import rfc1123_date
-from AccessControl.SecurityManagement import getSecurityManager
 from AccessControl.SecurityInfo import ClassSecurityInfo
+from AccessControl.SecurityManagement import getSecurityManager
+from AccessControl.class_init import InitializeClass
+from Acquisition import aq_inner, aq_base, aq_parent, Implicit
+from App.Common import rfc1123_date
 from OFS import Image
-try:
-    from webdav.Lockable import wl_isLocked
-except ImportError:
-    # webdav module not available
-    def wl_isLocked(ob):
-        return 0
+from OFS.Lockable import wl_isLocked
+from six.moves import urllib
+import six
 
+from zExceptions import BadRequest
 from ZPublisher.Iterators import IStreamIterator
-from zope.interface import implements, Interface
-HAVE_Z3_IFACE = issubclass(IStreamIterator, Interface)
+from zope.interface import implementer
 
 ExternalEditorPermission = 'Use external editor'
 
 _callbacks = []
 
 
+@implementer(IStreamIterator)
 class PDataStreamIterator:
-    if HAVE_Z3_IFACE:
-        implements(IStreamIterator)
-    else:
-        __implements__ = IStreamIterator
 
     def __init__(self, data):
         self.data = data
@@ -56,12 +44,15 @@ class PDataStreamIterator:
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
+        # Python 3
         if self.data is None:
             raise StopIteration
         data = self.data.data
-        self.data = self.data.next
+        self.data = next(self.data)
         return data
+
+    next = __next__  # Python 2
 
 
 def registerCallback(cb):
@@ -129,8 +120,8 @@ class ExternalEditor(Implicit):
         if title is not None:
             if callable(title):
                 title = title()
-            if isinstance(title, types.UnicodeType):
-                title = unicode.encode(title, 'utf-8')
+            if isinstance(title, six.text_type):
+                title = title.encode('utf-8')
             r.append('title:%s' % title)
 
         if hasattr(aq_base(ob), 'content_type'):
@@ -169,7 +160,7 @@ class ExternalEditor(Implicit):
 
         # Finish metadata with an empty line.
         r.append('')
-        metadata = join(r, '\n')
+        metadata = '\n'.join(r)
         metadata_len = len(metadata)
 
         # Check if we should send the file's data down the response.
@@ -218,10 +209,9 @@ class ExternalEditor(Implicit):
             body = ob.read()
         else:
             # can't read it!
-            raise 'BadRequest', 'Object does not support external editing'
+            raise BadRequest('Object does not support external editing')
 
-        if (HAVE_Z3_IFACE and IStreamIterator.providedBy(body) or
-                (not HAVE_Z3_IFACE) and IStreamIterator.isImplementedBy(body)):
+        if IStreamIterator.providedBy(body):
             # We need to manage our content-length because we're streaming.
             # The content-length should have been set in the response by
             # the method that returns the iterator, but we need to fix it up
@@ -233,11 +223,11 @@ class ExternalEditor(Implicit):
                 RESPONSE.write(data)
             return ''
 
-        # If we reached this point, body *must* be a string. We *must*
+        # If we reached this point, body must be a string. We *must*
         # set the headers ourselves since _write_metadata won't get
         # called.
         self._set_headers(RESPONSE)
-        return join((metadata, body), '\n')
+        return '\n'.join((metadata, body))
 
     def _set_headers(self, RESPONSE):
         # Using RESPONSE.setHeader('Pragma', 'no-cache') would be better, but
@@ -292,7 +282,7 @@ def EditLink(self, object, borrow_lock=0, skip_data=0):
         if skip_data:
             query['skip_data'] = 1
         url = "%s/externalEdit_/%s%s%s" % (aq_parent(aq_inner(object)).absolute_url(),
-                                           urllib.quote(object.getId()),
+                                           urllib.parse.quote(object.getId()),
                                            ext, querystr(query))
         return ('<a href="%s" '
                 'title="Edit using external editor">'
