@@ -16,11 +16,11 @@
 
 from App.ImageFile import ImageFile
 from App.special_dtml import DTMLFile
-from OFS.ObjectManager import ObjectManager
+from ExternalEditor import ExternalEditor, EditLink
 from OFS.FindSupport import FindSupport
 from OFS.Folder import Folder
-from App.Management import Tabs
-from Products.ExternalEditor.ExternalEditor import ExternalEditor, EditLink
+from OFS.ObjectManager import ObjectManager
+from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
 # Add the icon and the edit method to the misc_ namespace
 
@@ -31,11 +31,8 @@ Folder.externalEdit_ = ExternalEditor()
 Folder.externalEditLink_ = EditLink
 
 # Monkey patch in our manage_main for Object Manager
-ObjectManager.manage_main = DTMLFile('manage_main', globals())
+ObjectManager.manage_main = PageTemplateFile('zpt/main', globals())
 
 # Add our patch for the find results template
-FindSupport.manage_findResult = DTMLFile('findResult', globals(),
-                                         management_view='Find')
-
-# Add external editor icon in breadcrumbs under tabs
-Tabs.manage_tabs = DTMLFile('manage_tabs', globals())
+FindSupport.manage_findForm = DTMLFile('dtml/findForm', globals(),
+                                       management_view='Find')
