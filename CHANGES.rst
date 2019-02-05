@@ -5,6 +5,9 @@ Changelog
 3.0 (unreleased)
 ----------------
 
+- Fix zmi-patches for Zope 4.
+  [pbauer]
+
 - Drop support for Python 2.6.
 
 - Adapt tests to Zope 4.
