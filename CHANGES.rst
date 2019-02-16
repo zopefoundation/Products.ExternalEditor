@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-3.0 (unreleased)
+3.0 (2019-02-16)
 ----------------
 
 - Fix zmi-patches for Zope 4.
