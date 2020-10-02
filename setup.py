@@ -37,7 +37,7 @@ setup(name='Products.ExternalEditor',
       zip_safe=False,
       install_requires=[
           'setuptools',
-          'Zope >= 4.0b4',
+          'Zope >= 4.3',
           'six',
       ],
       entry_points="""
