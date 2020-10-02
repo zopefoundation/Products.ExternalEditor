@@ -7,7 +7,7 @@ Changelog
 
 Bug fixes:
 
-- Add support to recent Python 3 versions [ale-rt]
+- Add support for recent Python 3 versions [ale-rt]
 
 
 3.0 (2019-02-16)
