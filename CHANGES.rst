@@ -5,17 +5,9 @@ Changelog
 3.0.1 (unreleased)
 ------------------
 
-Breaking changes:
-
-- *add item here*
-
-New features:
-
-- *add item here*
-
 Bug fixes:
 
-- *add item here*
+- Add support to recent Python 3 versions [ale-rt]
 
 
 3.0 (2019-02-16)
