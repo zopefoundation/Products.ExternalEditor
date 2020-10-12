@@ -13,7 +13,7 @@ Tests for the External Editor
 Create a OFS.File instance, see if it gets properly sent out by
 External Editor:
 
-  >>> self.folder.manage_addFile('some-file', file='some content')
+  >>> self.folder.manage_addFile('some-file', file=b'some content')
 
   >>> print(http(r"""
   ... GET /test_folder_1_/externalEdit_/some-file.zem HTTP/1.1
@@ -161,7 +161,7 @@ side-effects. Make sure that the content-type header is properly set
 to 'application/x-zope-edit':
 
   >>> from Products.ExternalEditor.tests.test_functional import SideEffects
-  >>> _ = self.folder._setObject('another-file', SideEffects('another-file', 'some content'))
+  >>> _ = self.folder._setObject('another-file', SideEffects('another-file', b'some content'))
 
   >>> print(http(r"""
   ... GET /test_folder_1_/externalEdit_/another-file HTTP/1.1

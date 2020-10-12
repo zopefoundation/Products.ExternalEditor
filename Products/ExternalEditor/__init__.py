@@ -16,7 +16,7 @@
 
 from App.ImageFile import ImageFile
 from App.special_dtml import DTMLFile
-from ExternalEditor import ExternalEditor, EditLink
+from Products.ExternalEditor.ExternalEditor import ExternalEditor, EditLink
 from OFS.FindSupport import FindSupport
 from OFS.Folder import Folder
 from OFS.ObjectManager import ObjectManager

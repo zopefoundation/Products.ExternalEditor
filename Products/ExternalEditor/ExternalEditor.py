@@ -120,7 +120,7 @@ class ExternalEditor(Implicit):
         if title is not None:
             if callable(title):
                 title = title()
-            if isinstance(title, six.text_type):
+            if six.PY2 and isinstance(title, six.text_type):
                 title = title.encode('utf-8')
             r.append('title:%s' % title)
 
@@ -161,6 +161,8 @@ class ExternalEditor(Implicit):
         # Finish metadata with an empty line.
         r.append('')
         metadata = '\n'.join(r)
+        if not six.PY2:
+            metadata = metadata.encode()
         metadata_len = len(metadata)
 
         # Check if we should send the file's data down the response.
@@ -207,6 +209,8 @@ class ExternalEditor(Implicit):
             body = ob.document_src(REQUEST, RESPONSE)
         elif hasattr(ob, 'read'):
             body = ob.read()
+        elif ob_data is not None:
+            body = ob_data
         else:
             # can't read it!
             raise BadRequest('Object does not support external editing')
@@ -227,7 +231,7 @@ class ExternalEditor(Implicit):
         # set the headers ourselves since _write_metadata won't get
         # called.
         self._set_headers(RESPONSE)
-        return '\n'.join((metadata, body))
+        return b'\n'.join((metadata, body))
 
     def _set_headers(self, RESPONSE):
         # Using RESPONSE.setHeader('Pragma', 'no-cache') would be better, but
@@ -258,7 +262,7 @@ class ExternalEditor(Implicit):
         # content-length is the '\n' after the metadata.
         RESPONSE.setHeader('Content-Length', length + 1)
         RESPONSE.write(metadata)
-        RESPONSE.write('\n')
+        RESPONSE.write(b'\n')
 
 InitializeClass(ExternalEditor)
 
