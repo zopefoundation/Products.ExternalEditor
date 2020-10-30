@@ -1,4 +1,6 @@
 graft Products
 graft docs
 include *rst *txt
+include .coveragerc
+include tox.ini
 global-exclude *.pyc
