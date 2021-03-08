@@ -3,7 +3,12 @@
 .coverage
 .coverage.*
 .tox/
+bin/
 build
 coverage.xml
+default.profraw
 dist
 htmlcov/
+lib/
+lib64
+pyvenv.cfg
