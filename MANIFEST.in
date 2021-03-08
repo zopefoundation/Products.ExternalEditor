@@ -1,6 +1,11 @@
-graft Products
-graft docs
-include *rst *txt
-include .coveragerc
+include *.rst
+include *.txt
 include tox.ini
-global-exclude *.pyc
+
+recursive-include docs *.txt
+
+recursive-include src *.py
+recursive-include src *.txt
+recursive-include src *.dtml
+recursive-include src *.gif
+recursive-include src *.zpt

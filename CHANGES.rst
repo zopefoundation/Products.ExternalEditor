@@ -5,17 +5,7 @@ Changelog
 3.0.2 (unreleased)
 ------------------
 
-Breaking changes:
-
-- *add item here*
-
-New features:
-
-- *add item here*
-
-Bug fixes:
-
-- *add item here*
+- change package structure to move package code into a ``src`` subfolder
 
 
 3.0.1 (2020-10-30)

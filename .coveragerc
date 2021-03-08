@@ -1,6 +1,0 @@
-[run]
-branch = True
-source = Products
-
-[report]
-precision = 2
