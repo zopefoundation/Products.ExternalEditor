@@ -241,9 +241,9 @@ class ExternalEditor(Implicit):
         RESPONSE.setHeader('Content-Type', 'application/x-zope-edit')
 
         # We have to test the msie behaviour
-        user_agent = self.REQUEST.get_header('User-Agent')
-        if user_agent and (("msie" in user_agent.lower()) or
-                           ("microsoft internet explorer" in user_agent.lower())):
+        agent = self.REQUEST.get_header('User-Agent', '').lower()
+        if agent and \
+           ("msie" in agent or "microsoft internet explorer" in agent):
             RESPONSE.setHeader('Cache-Control',
                                'must-revalidate, post-check=0, pre-check=0')
             RESPONSE.setHeader('Pragma', 'public')
@@ -263,6 +263,7 @@ class ExternalEditor(Implicit):
         RESPONSE.setHeader('Content-Length', length + 1)
         RESPONSE.write(metadata)
         RESPONSE.write(b'\n')
+
 
 InitializeClass(ExternalEditor)
 
@@ -285,9 +286,10 @@ def EditLink(self, object, borrow_lock=0, skip_data=0):
             query['borrow_lock'] = 1
         if skip_data:
             query['skip_data'] = 1
-        url = "%s/externalEdit_/%s%s%s" % (aq_parent(aq_inner(object)).absolute_url(),
-                                           urllib.parse.quote(object.getId()),
-                                           ext, querystr(query))
+        url = "%s/externalEdit_/%s%s%s" % (
+            aq_parent(aq_inner(object)).absolute_url(),
+            urllib.parse.quote(object.getId()),
+            ext, querystr(query))
         return ('<a href="%s" '
                 'title="Edit using external editor">'
                 '<img src="%s/misc_/ExternalEditor/edit_icon" '
