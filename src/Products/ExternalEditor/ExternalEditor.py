@@ -20,7 +20,7 @@ from AccessControl.SecurityInfo import ClassSecurityInfo
 from AccessControl.SecurityManagement import getSecurityManager
 from AccessControl.class_init import InitializeClass
 from Acquisition import aq_inner, aq_base, aq_parent, Implicit
-from App.Common import rfc1123_date
+from zope.datetime import rfc1123_date
 from OFS import Image
 from OFS.Lockable import wl_isLocked
 from six.moves import urllib
