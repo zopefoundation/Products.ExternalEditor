@@ -11,7 +11,7 @@ Changelog
 
 - Fix bug which prevented ZMI from rendering, when Products.ExternalEdit was
   installed.
-
+  (`#18 <https://github.com/zopefoundation/Products.ExternalEditor/pull/18>`_)
 
 3.0.1 (2020-10-30)
 ------------------
