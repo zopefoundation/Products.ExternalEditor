@@ -16,19 +16,23 @@
 
 # Zope External Editor Product by Casey Duncan
 
+import six
+from six.moves import urllib
+
+from AccessControl.class_init import InitializeClass
 from AccessControl.SecurityInfo import ClassSecurityInfo
 from AccessControl.SecurityManagement import getSecurityManager
-from AccessControl.class_init import InitializeClass
-from Acquisition import aq_inner, aq_base, aq_parent, Implicit
-from zope.datetime import rfc1123_date
+from Acquisition import Implicit
+from Acquisition import aq_base
+from Acquisition import aq_inner
+from Acquisition import aq_parent
 from OFS import Image
 from OFS.Lockable import wl_isLocked
-from six.moves import urllib
-import six
-
 from zExceptions import BadRequest
-from ZPublisher.Iterators import IStreamIterator
+from zope.datetime import rfc1123_date
 from zope.interface import implementer
+from ZPublisher.Iterators import IStreamIterator
+
 
 ExternalEditorPermission = 'Use external editor'
 
