@@ -3,7 +3,7 @@ from setuptools import setup
 
 
 setup(name='Products.ExternalEditor',
-      version='3.1.0.dev0',
+      version='3.1.0',
       description="Zope External Editor",
       long_description=(open("README.rst").read() + "\n" +
                         open("CHANGES.rst").read()),
