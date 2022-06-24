@@ -7,8 +7,11 @@ Changelog
 
 - Add support for Python 3.9
 
-- change package structure to move package code into a ``src`` subfolder
+- Change package structure to move package code into a ``src`` subfolder.
 
+- Fix bug which prevented ZMI from rendering, when Products.ExternalEdit was
+  installed.
+  (`#18 <https://github.com/zopefoundation/Products.ExternalEditor/pull/18>`_)
 
 3.0.1 (2020-10-30)
 ------------------

@@ -50,8 +50,4 @@ setup(name='Products.ExternalEditor',
           'Zope >= 4.3',
           'six',
       ],
-      entry_points="""
-      [console_scripts]
-          zopeedit=Products.ExternalEditor.zopeedit:main
-      """,
       )
