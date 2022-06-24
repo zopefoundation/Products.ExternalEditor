@@ -5,7 +5,7 @@ Changelog
 3.1.0 (unreleased)
 ------------------
 
-- Add support for Python 3.9
+- Add support for Python 3.9, 3.10.
 
 - Change package structure to move package code into a ``src`` subfolder.
 

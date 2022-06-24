@@ -16,11 +16,14 @@
 
 from App.ImageFile import ImageFile
 from App.special_dtml import DTMLFile
-from Products.ExternalEditor.ExternalEditor import ExternalEditor, EditLink
 from OFS.FindSupport import FindSupport
 from OFS.Folder import Folder
 from OFS.ObjectManager import ObjectManager
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
+
+from Products.ExternalEditor.ExternalEditor import EditLink
+from Products.ExternalEditor.ExternalEditor import ExternalEditor
+
 
 # Add the icon and the edit method to the misc_ namespace
 

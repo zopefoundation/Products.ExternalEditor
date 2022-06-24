@@ -12,9 +12,10 @@
 #
 ##############################################################################
 
+from OFS.SimpleItem import SimpleItem
 # Load fixture
 from Testing import ZopeTestCase
-from OFS.SimpleItem import SimpleItem
+
 
 # Install our product
 ZopeTestCase.installProduct('ExternalEditor')
