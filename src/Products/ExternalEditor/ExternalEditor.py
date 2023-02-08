@@ -11,13 +11,9 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-"""$Id$
-"""
+"""Zope External Editor Product by Casey Duncan."""
 
-# Zope External Editor Product by Casey Duncan
-
-import six
-from six.moves import urllib
+import urllib
 
 from AccessControl.class_init import InitializeClass
 from AccessControl.SecurityInfo import ClassSecurityInfo
@@ -49,14 +45,11 @@ class PDataStreamIterator:
         return self
 
     def __next__(self):
-        # Python 3
         if self.data is None:
             raise StopIteration
         data = self.data.data
         self.data = next(self.data)
         return data
-
-    next = __next__  # Python 2
 
 
 def registerCallback(cb):
@@ -124,8 +117,6 @@ class ExternalEditor(Implicit):
         if title is not None:
             if callable(title):
                 title = title()
-            if six.PY2 and isinstance(title, six.text_type):
-                title = title.encode('utf-8')
             r.append('title:%s' % title)
 
         if hasattr(aq_base(ob), 'content_type'):
@@ -165,8 +156,7 @@ class ExternalEditor(Implicit):
         # Finish metadata with an empty line.
         r.append('')
         metadata = '\n'.join(r)
-        if not six.PY2:
-            metadata = metadata.encode()
+        metadata = metadata.encode()
         metadata_len = len(metadata)
 
         # Check if we should send the file's data down the response.
@@ -290,7 +280,7 @@ def EditLink(self, object, borrow_lock=0, skip_data=0):
             query['borrow_lock'] = 1
         if skip_data:
             query['skip_data'] = 1
-        url = "%s/externalEdit_/%s%s%s" % (
+        url = "{}/externalEdit_/{}{}{}".format(
             aq_parent(aq_inner(object)).absolute_url(),
             urllib.parse.quote(object.getId()),
             ext, querystr(query))
@@ -308,6 +298,6 @@ def querystr(d):
     """Create a query string from a dict"""
     if d:
         return '?' + '&'.join(
-            ['%s=%s' % (name, val) for name, val in d.items()])
+            ['{}={}'.format(name, val) for name, val in d.items()])
     else:
         return ''
