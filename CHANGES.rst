@@ -5,7 +5,7 @@ Changelog
 4.0 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Drop support for Python 2.7, 3.5, 3.6.
 
 
 3.1.0 (2022-06-24)
