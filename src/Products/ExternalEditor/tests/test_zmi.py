@@ -7,7 +7,7 @@ class ZMITests(Testing.ZopeTestCase.FunctionalTestCase):
     """Testing the ZMI rendering."""
 
     def setUp(self):
-        super(ZMITests, self).setUp()
+        super().setUp()
 
         Zope2.App.zcml.load_site(force=True)
 
