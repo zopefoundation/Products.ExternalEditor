@@ -5,7 +5,7 @@ Changelog
 4.0 (unreleased)
 ----------------
 
-- Ensure an objects' editable body is cast to bytes
+- Ensure an object's editable body is cast to bytes
   (`#20 <https://github.com/zopefoundation/Products.ExternalEditor/issues/20>`_)
 
 - Add support for Python 3.11.
