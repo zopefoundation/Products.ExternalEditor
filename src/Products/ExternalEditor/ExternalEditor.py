@@ -27,6 +27,7 @@ from OFS.Lockable import wl_isLocked
 from zExceptions import BadRequest
 from zope.datetime import rfc1123_date
 from zope.interface import implementer
+from ZPublisher.HTTPRequest import default_encoding
 from ZPublisher.Iterators import IStreamIterator
 
 
@@ -208,6 +209,9 @@ class ExternalEditor(Implicit):
         else:
             # can't read it!
             raise BadRequest('Object does not support external editing')
+
+        if isinstance(body, str):
+            body = body.encode(default_encoding)
 
         if IStreamIterator.providedBy(body):
             # We need to manage our content-length because we're streaming.

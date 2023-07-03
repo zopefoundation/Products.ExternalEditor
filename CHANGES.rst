@@ -5,6 +5,9 @@ Changelog
 4.0 (unreleased)
 ----------------
 
+- Ensure an objects' editable body is cast to bytes
+  (`#20 <https://github.com/zopefoundation/Products.ExternalEditor/issues/20>`_)
+
 - Add support for Python 3.11.
 
 - Drop support for Python 2.7, 3.5, 3.6.
@@ -20,6 +23,7 @@ Changelog
 - Fix bug which prevented ZMI from rendering, when Products.ExternalEdit was
   installed.
   (`#18 <https://github.com/zopefoundation/Products.ExternalEditor/pull/18>`_)
+
 
 3.0.1 (2020-10-30)
 ------------------
