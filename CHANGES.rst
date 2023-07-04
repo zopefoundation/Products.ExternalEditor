@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-4.0 (unreleased)
+4.0 (2023-07-04)
 ----------------
 
 - Ensure an object's editable body is cast to bytes
