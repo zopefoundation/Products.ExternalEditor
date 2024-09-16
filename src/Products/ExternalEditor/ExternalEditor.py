@@ -49,7 +49,7 @@ class PDataStreamIterator:
         if self.data is None:
             raise StopIteration
         data = self.data.data
-        self.data = next(self.data)
+        self.data = self.data.next
         return data
 
 
