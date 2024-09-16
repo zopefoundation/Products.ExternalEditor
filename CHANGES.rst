@@ -1,10 +1,16 @@
 Changelog
 =========
 
+4.0.2 (unreleased)
+------------------
+
+
 4.0.1 (2024-09-16)
 ------------------
+
 - Correction of the use of Pdata when editing content
   (`#23 <https://github.com/zopefoundation/Products.ExternalEditor/issues/23>`_)
+
 
 4.0 (2023-07-04)
 ----------------
