@@ -302,6 +302,6 @@ def querystr(d):
     """Create a query string from a dict"""
     if d:
         return '?' + '&'.join(
-            ['{}={}'.format(name, val) for name, val in d.items()])
+            [f'{name}={val}' for name, val in d.items()])
     else:
         return ''
