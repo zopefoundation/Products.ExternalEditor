@@ -1,4 +1,3 @@
-from setuptools import find_packages
 from setuptools import setup
 
 
@@ -16,11 +15,11 @@ setup(name='Products.ExternalEditor',
           'License :: OSI Approved :: Zope Public License',
           'Operating System :: OS Independent',
           'Programming Language :: Python :: 3',
-          'Programming Language :: Python :: 3.9',
           'Programming Language :: Python :: 3.10',
           'Programming Language :: Python :: 3.11',
           'Programming Language :: Python :: 3.12',
           'Programming Language :: Python :: 3.13',
+          'Programming Language :: Python :: 3.14',
           'Programming Language :: Python :: Implementation :: CPython',
           'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
           'Topic :: Software Development',
@@ -37,14 +36,9 @@ setup(name='Products.ExternalEditor',
           'Sources': (
               'https://github.com/zopefoundation/Products.ExternalEditor'),
       },
-      packages=find_packages('src'),
-      package_dir={'': 'src'},
-      namespace_packages=['Products'],
       include_package_data=True,
-      zip_safe=False,
-      python_requires='>=3.9',
+      python_requires='>=3.10',
       install_requires=[
-          'setuptools',
           'Zope >= 5',
       ],
       )
