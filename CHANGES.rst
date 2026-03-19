@@ -1,7 +1,7 @@
 Changelog
 =========
 
-4.1 (unreleased)
+4.1 (2026-03-19)
 ----------------
 
 - Move all package metadata to ``pyproject.toml``.
