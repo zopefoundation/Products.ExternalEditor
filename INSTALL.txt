@@ -1,6 +1,6 @@
 Zope External Editor Installation
 
-  Installation is two-fold: 
+  Installation is two-fold:
 
   - Install the ExternalEditor product in Zope.
 
@@ -13,6 +13,6 @@ Zope External Editor Installation
     external editable objects in the Zope management screens.
 
   Helper Application Installation
-  
+
     See http://plone.org/products/zope-externaleditor-client or get directly the
     egg from http://pypi.python.org/pypi/collective.zopeedit
