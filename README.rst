@@ -268,7 +268,7 @@ environments. The following applications currently have plugin support::
     Application       Platform    Plugin Module Name(s)
     ===================================================
     HomeSite          Windows     homesite5, homesite
-    Dreamweaver       Windows     dreamweaver	
+    Dreamweaver       Windows     dreamweaver
     Photoshop         Windows     photoshp, photoshop
     MS Word           Windows     winword, word
     MS Excel          Windows     excel
